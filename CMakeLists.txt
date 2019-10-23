@@ -140,16 +140,6 @@ include_directories("sky/lib/imgui")
 add_library(imgui STATIC ${IMGUI_SRC})
 target_link_libraries(${PROJECT_NAME} imgui)
 
-# xgfx
-
-file(GLOB XGFX_SRC 
-	sky/lib/xgfx/*.cpp 
-	sky/lib/xgfx/*.h
-)	
-include_directories("sky/lib/xgfx")
-add_library(xgfx STATIC ${XGFX_SRC})
-target_link_libraries(${PROJECT_NAME} xgfx)
-
 # tinygltf
 
 include_directories("sky/lib/tinygltf")

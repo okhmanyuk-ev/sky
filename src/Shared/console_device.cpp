@@ -112,7 +112,7 @@ void ConsoleDevice::frame()
 	auto height = ImGui::GetWindowHeight();
 	auto top = ImGui::GetWindowPos().y;
 
-	auto engineName = std::string("Ion Engine");
+	auto engineName = std::string("Sky Engine");
 	auto apiName = std::string(RENDERER_NAME_LONG);
 	auto buildName = std::string(__DATE__) + " " + std::string(__TIME__);
 	
