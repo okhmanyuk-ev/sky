@@ -5,67 +5,67 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif()
 
 file(GLOB CORE_SRC
-    "ion/src/Core/*.cpp"
-    "ion/src/Core/*.h"
+    "sky/src/Core/*.cpp"
+    "sky/src/Core/*.h"
 )
 
 file(GLOB CONSOLE_SRC
-    "ion/src/Console/*.cpp"
-    "ion/src/Console/*.h"
+    "sky/src/Console/*.cpp"
+    "sky/src/Console/*.h"
 )
 
 file(GLOB COMMON_SRC
-    "ion/src/Common/*.cpp"
-    "ion/src/Common/*.h"
+    "sky/src/Common/*.cpp"
+    "sky/src/Common/*.h"
 )
 
 file(GLOB PLATFORM_SRC
-	ion/src/Platform/*.cpp
-	ion/src/Platform/*.mm
-    ion/src/Platform/*.h
+	sky/src/Platform/*.cpp
+	sky/src/Platform/*.mm
+    sky/src/Platform/*.h
 )
 
 file(GLOB GRAPHICS_SRC
-    "ion/src/Graphics/*.cpp"
-    "ion/src/Graphics/*.h"
+    "sky/src/Graphics/*.cpp"
+    "sky/src/Graphics/*.h"
 )
 
 file(GLOB RENDERER_SRC
-	ion/src/Renderer/*.cpp
-	ion/src/Renderer/*.mm
-    ion/src/Renderer/*.h
+	sky/src/Renderer/*.cpp
+	sky/src/Renderer/*.mm
+    sky/src/Renderer/*.h
 )
 
 file(GLOB RENDERER_D3D11_SRC
-	ion/src/Renderer/D3D11/*.cpp
-	ion/src/Renderer/D3D11/*.mm
-    ion/src/Renderer/D3D11/*.h
+	sky/src/Renderer/D3D11/*.cpp
+	sky/src/Renderer/D3D11/*.mm
+    sky/src/Renderer/D3D11/*.h
 )
 
 file(GLOB RENDERER_OPENGL_SRC
-	ion/src/Renderer/OpenGL/*.cpp
-	ion/src/Renderer/OpenGL/*.mm
-    ion/src/Renderer/OpenGL/*.h
+	sky/src/Renderer/OpenGL/*.cpp
+	sky/src/Renderer/OpenGL/*.mm
+    sky/src/Renderer/OpenGL/*.h
 )
 
 file(GLOB AUDIO_SRC
-	"ion/src/Audio/*.cpp"
-	"ion/src/Audio/*.h"
+	"sky/src/Audio/*.cpp"
+	"sky/src/Audio/*.h"
 )
 
 file(GLOB SCENE_SRC
-    "ion/src/Scene/*.cpp"
-    "ion/src/Scene/*.h"
+    "sky/src/Scene/*.cpp"
+    "sky/src/Scene/*.h"
 )
 
 file(GLOB SHARED_SRC
-    "ion/src/Shared/*.cpp"
-    "ion/src/Shared/*.h"
+    "sky/src/Shared/*.cpp"
+    "sky/src/Shared/*.h"
 )
 
 file(GLOB NETWORK_SRC
-    "ion/src/Network/*.cpp"
-    "ion/src/Network/*.h"
+    "sky/src/Network/*.cpp"
+    "sky/src/Network/*.h"
 )
 
 source_group("Core" FILES ${CORE_SRC})
@@ -81,8 +81,8 @@ source_group("Scene" FILES ${SCENE_SRC})
 source_group("Shared" FILES ${SHARED_SRC})
 source_group("Network" FILES ${NETWORK_SRC})
 
-include_directories("ion/src")
-add_library(ion STATIC 
+include_directories("sky/src")
+add_library(sky STATIC 
 	${CORE_SRC}
 	${CONSOLE_SRC}
 	${COMMON_SRC}
@@ -96,12 +96,12 @@ add_library(ion STATIC
 	${SHARED_SRC}
 	${NETWORK_SRC}
 )
-target_link_libraries(${PROJECT_NAME} ion)
+target_link_libraries(${PROJECT_NAME} sky)
 
 if(APPLE)
 	set(OBJC_SOURCES
-		ion/src/Renderer/system_gl.cpp
-		ion/src/Platform/asset.cpp
+		sky/src/Renderer/system_gl.cpp
+		sky/src/Platform/asset.cpp
 	)
 	set_source_files_properties(${OBJC_SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++ -fembed-bitcode")
 endif()
@@ -112,20 +112,20 @@ endif()
 
 # glm
 
-target_compile_definitions(ion PRIVATE -DGLM_ENABLE_EXPERIMENTAL)
-include_directories("ion/lib/glm")
+target_compile_definitions(sky PRIVATE -DGLM_ENABLE_EXPERIMENTAL)
+include_directories("sky/lib/glm")
 
 # stb
 
-include_directories("ion/lib/stb")
+include_directories("sky/lib/stb")
 
 # glew
 
 file(GLOB GLEW_SRC 
-	"ion/lib/glew/src/glew.c"
-    "ion/lib/glew/include/GL/glew.h"
+	"sky/lib/glew/src/glew.c"
+    "sky/lib/glew/include/GL/glew.h"
 )
-include_directories("ion/lib/glew/include")
+include_directories("sky/lib/glew/include")
 add_library(glew STATIC ${GLEW_SRC})
 target_link_libraries(${PROJECT_NAME} glew)
 target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
@@ -133,63 +133,63 @@ target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
 # imgui
 
 file(GLOB IMGUI_SRC 
-	ion/lib/imgui/*.cpp 
-	ion/lib/imgui/*.h
+	sky/lib/imgui/*.cpp 
+	sky/lib/imgui/*.h
 )	
-include_directories("ion/lib/imgui")
+include_directories("sky/lib/imgui")
 add_library(imgui STATIC ${IMGUI_SRC})
 target_link_libraries(${PROJECT_NAME} imgui)
 
 # xgfx
 
 file(GLOB XGFX_SRC 
-	ion/lib/xgfx/*.cpp 
-	ion/lib/xgfx/*.h
+	sky/lib/xgfx/*.cpp 
+	sky/lib/xgfx/*.h
 )	
-include_directories("ion/lib/xgfx")
+include_directories("sky/lib/xgfx")
 add_library(xgfx STATIC ${XGFX_SRC})
 target_link_libraries(${PROJECT_NAME} xgfx)
 
 # tinygltf
 
-include_directories("ion/lib/tinygltf")
+include_directories("sky/lib/tinygltf")
 
 #tinyobjloader
 
-include_directories("ion/lib/tinyobjloader")
+include_directories("sky/lib/tinyobjloader")
 
 # fmod
 
-include_directories("ion/lib/fmod/include")
+include_directories("sky/lib/fmod/include")
 if(WIN32)
 	if(X64)
-		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/ion/lib/fmod/x64/fmodL_vc.lib)
-		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/ion/lib/fmod/x64/fmod_vc.lib)
+		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodL_vc.lib)
+		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmod_vc.lib)
 		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/ion/lib/fmod/x64/fmodL.dll">
-			$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/ion/lib/fmod/x64/fmod.dll">
+			$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodL.dll">
+			$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmod.dll">
 			$<TARGET_FILE_DIR:${PROJECT_NAME}>)
 	else()
-		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/ion/lib/fmod/x86/fmodL_vc.lib)
-		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/ion/lib/fmod/x86/fmod_vc.lib)
+		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodL_vc.lib)
+		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmod_vc.lib)
 		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/ion/lib/fmod/x86/fmodL.dll">
-			$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/ion/lib/fmod/x86/fmod.dll">
+			$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodL.dll">
+			$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmod.dll">
 			$<TARGET_FILE_DIR:${PROJECT_NAME}>)
 	endif()
 endif()
 
 if(APPLE)
-	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/ion/lib/fmod/ios/libfmodL_iphonesimulator.a)
-	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/ion/lib/fmod/ios/libfmodL_iphoneos.a)
-#	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/ion/lib/fmod/ios/libfmod_iphonesimulator.a)
-#	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/ion/lib/fmod/ios/libfmod_iphoneos.a)
+	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmodL_iphonesimulator.a)
+	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmodL_iphoneos.a)
+#	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmod_iphonesimulator.a)
+#	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmod_iphoneos.a)
 endif()
 
 # rectpack2D
 
-include_directories("ion/lib/rectpack2D/include")
+include_directories("sky/lib/rectpack2D/include")
 
 # nlohmann_json
 
-include_directories("ion/lib/nlohmann_json/include")
+include_directories("sky/lib/nlohmann_json/include")
