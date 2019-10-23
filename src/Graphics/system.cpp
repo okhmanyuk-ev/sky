@@ -288,25 +288,24 @@ void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 
 void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& color)
 {
-	const float radius = 0.5f;
-	const float increment = 2.0f * glm::pi<float>() / segments;
+	const float Radius = 0.5f;
+	const float Increment = 2.0f * glm::pi<float>() / segments;
 
-	float sinInc = glm::sin(increment);
-	float cosInc = glm::cos(increment);
+	float sinInc = glm::sin(Increment);
+	float cosInc = glm::cos(Increment);
 
-	auto v0 = glm::vec2({ 0.0f, 0.0f });
 	auto r1 = glm::vec2({ cosInc, sinInc });
-	auto v1 = v0 + radius * r1;
+	auto v1 = Radius * r1;
 
 	std::vector<Renderer::Vertex::PositionColor> vertices;
 
 	for (int i = 0; i < segments; i++)
 	{
 		auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
-		auto v2 = v0 + radius * r2;
-		vertices.push_back({ { v0 + radius, 0.0f }, color });
-		vertices.push_back({ { v1 + radius, 0.0f }, color });
-		vertices.push_back({ { v2 + radius, 0.0f }, color });
+		auto v2 = Radius * r2;
+		vertices.push_back({ { Radius, Radius, 0.0f }, color });
+		vertices.push_back({ { v1 + Radius, 0.0f }, color });
+		vertices.push_back({ { v2 + Radius, 0.0f }, color });
 		r1 = r2;
 		v1 = v2;
 	}
@@ -316,25 +315,23 @@ void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& c
 
 void System::drawLineCircle(const glm::mat4& model, int segments, const glm::vec4& color)
 {
-	const float radius = 0.5f;
-	const float increment = 2.0f * glm::pi<float>() / segments;
+	const float Radius = 0.5f;
+	const float Increment = 2.0f * glm::pi<float>() / segments;
 
-	float sinInc = glm::sin(increment);
-	float cosInc = glm::cos(increment);
+	float sinInc = glm::sin(Increment);
+	float cosInc = glm::cos(Increment);
 
-	auto v0 = glm::vec2({ 0.0f, 0.0f });
 	auto r1 = glm::vec2({ cosInc, sinInc });
-	auto v1 = v0 + radius * r1;
+	auto v1 = Radius * r1;
 
 	std::vector<Renderer::Vertex::PositionColor> vertices;
 
 	for (int i = 0; i < segments; i++)
 	{
 		auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
-		auto v2 = v0 + radius * r2;
-		//vertices.push_back({ { v0 + radius, 0.0f }, color });
-		vertices.push_back({ { v1 + radius, 0.0f }, color });
-		vertices.push_back({ { v2 + radius, 0.0f }, color });
+		auto v2 = Radius * r2;
+		vertices.push_back({ { v1 + Radius, 0.0f }, color });
+		vertices.push_back({ { v2 + Radius, 0.0f }, color });
 		r1 = r2;
 		v1 = v2;
 	}
