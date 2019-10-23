@@ -1,0 +1,96 @@
+#pragma once
+
+#include <Shared/all.h>
+#include "scene_manager.h"
+
+namespace Shared
+{
+	class SceneManager : public Scene::Actionable<Scene::Node>, public std::enable_shared_from_this<SceneManager>
+	{
+	public:
+		class Screen;
+		class Window;
+
+	public:
+		SceneManager();
+
+	public:
+		void switchScreen(std::shared_ptr<Screen> screen, std::function<void()> finishCallback = nullptr);
+		
+		void pushWindow(std::shared_ptr<Window> window);
+		void popWindow(std::function<void()> finishCallback = nullptr);
+
+		int getOpenedWindowsCount() const { return mCurrentWindow ? 1 : 0; }
+		bool hasOpenedWindows() const { return getOpenedWindowsCount() > 0; }
+
+	private:
+		std::shared_ptr<Screen> mCurrentScreen = nullptr;
+		std::shared_ptr<Window> mCurrentWindow = nullptr; // TODO: make stack
+		bool mInTransition = false;
+	};
+
+	class SceneManager::Screen : public Scene::Node
+	{
+		friend SceneManager;
+	public:
+		enum class State
+		{
+			Leaving,
+			Leaved,
+			Entering,
+			Entered,
+		};
+
+	public:
+		auto getState() const { return mState; }
+
+	private:
+		State mState = State::Leaved;
+
+	protected:
+		virtual void onEnterBegin() { }
+		virtual void onEnterEnd() { }
+		virtual void onLeaveBegin() { }
+		virtual void onLeaveEnd() { }
+
+		virtual void onWindowAppearing() { }
+		virtual void onWindowDisappearing() { }
+
+	public:
+		virtual std::unique_ptr<Common::Actions::Action> createEnterAction() = 0;
+		virtual std::unique_ptr<Common::Actions::Action> createLeaveAction() = 0;
+
+	public:
+		auto getSceneManager() const { return mSceneManager.lock(); }
+
+	private:
+		void setSceneManager(std::weak_ptr<SceneManager> value) { mSceneManager = value; }
+
+	private:
+		std::weak_ptr<SceneManager> mSceneManager;
+	};
+
+	class SceneManager::Window : public Scene::Node
+	{
+		friend SceneManager;
+
+	protected:
+		virtual void onOpenBegin() { }
+		virtual void onOpenEnd() { }
+		virtual void onCloseBegin() { }
+		virtual void onCloseEnd() { }
+
+	public:
+		virtual std::unique_ptr<Common::Actions::Action> createOpenAction() = 0;
+		virtual std::unique_ptr<Common::Actions::Action> createCloseAction() = 0;
+
+	public:
+		auto getSceneManager() const { return mSceneManager.lock(); }
+
+	private:
+		void setSceneManager(std::weak_ptr<SceneManager> value) { mSceneManager = value; }
+
+	private:
+		std::weak_ptr<SceneManager> mSceneManager;
+	};
+}
