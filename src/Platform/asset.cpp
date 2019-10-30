@@ -6,7 +6,6 @@
 #include <cassert>
 #if !defined(PLATFORM_IOS)
 #include <filesystem>
-#include <experimental/filesystem>
 #endif
 #include <sys/stat.h>
 
