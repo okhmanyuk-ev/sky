@@ -58,6 +58,8 @@ namespace Scene
 		auto getVerticalSize() const { return mSize.y; }
 		void setVerticalSize(float value) { mSize.y = value; }
 
+		void setSize(float value) { mSize = { value, value }; }
+
 		auto getHorizontalStretch() const { return mStretch.x; }
 		void setHorizontalStretch(float value) { mStretch.x = value; }
 
