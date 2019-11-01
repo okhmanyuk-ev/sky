@@ -70,7 +70,7 @@ namespace Shared
 		void close();
 		void open();
 
-		bool isOpened() const override { return mState != State::Closed && mState != State::Closing; }
+		bool isOpened() const override { return mState != State::Closed; }
 		void setEnabled(bool value) override { mEnabled = value; }
 
 	private:
