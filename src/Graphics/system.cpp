@@ -190,6 +190,15 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	}
 }
 
+void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+	const glm::mat4& model)
+{
+	auto indices = std::vector<uint32_t>(vertices.size());
+	std::iota(indices.begin(), indices.end(), 0);
+	draw(topology, texture, vertices, indices, model);
+}
+
 void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, const glm::mat4& model)
 {

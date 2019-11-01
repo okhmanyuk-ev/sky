@@ -47,6 +47,11 @@ namespace Graphics
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 			const std::vector<uint32_t>& indices, const glm::mat4& model = glm::mat4(1.0f));
 
+		// draw colored and textured vertices
+		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+			const glm::mat4& model = glm::mat4(1.0f));
+
 		// draw indexed colored and textured vertices
 		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, 
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
