@@ -133,7 +133,8 @@ CommonActions::Action CommonActions::Kill(std::shared_ptr<Scene::Node> node)
 {
 	return Execute([node] {
 		FRAME->addOne([node] {
-			node->getParent()->detach(node);
+			if (auto parent = node->getParent(); parent != nullptr)
+				parent->detach(node);
 		});
 	});
 }
