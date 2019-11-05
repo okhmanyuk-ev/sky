@@ -6,6 +6,7 @@
 #include <functional>
 
 #define LOG(S) CONSOLE_DEVICE->writeLine(S)
+#define LOGC(S, C) CONSOLE_DEVICE->writeLine(S, C)
 
 namespace Console
 {
