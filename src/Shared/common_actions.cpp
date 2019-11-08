@@ -16,9 +16,26 @@ CommonActions::Action CommonActions::ChangePositionByDirection(SceneTransform no
 CommonActions::Action CommonActions::ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed, float duration)
 {
 	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
-		std::make_unique<Common::Actions::Wait>(duration),
+		Wait(duration),
 		ChangePositionByDirection(node, direction, speed)
 	);
+}
+
+// wait
+
+CommonActions::Action CommonActions::Wait(float duration)
+{
+	return std::make_unique<Common::Actions::Wait>(Clock::FromSeconds(duration));
+}
+
+CommonActions::Action CommonActions::Wait(std::function<bool()> while_callback)
+{
+	return std::make_unique<Common::Actions::Generic>([while_callback] {
+		if (while_callback())
+			return Common::Actions::Action::Status::Continue;
+
+		return Common::Actions::Action::Status::Finished;
+	});
 }
 
 // delayed
@@ -26,9 +43,17 @@ CommonActions::Action CommonActions::ChangePositionByDirection(SceneTransform no
 CommonActions::Action CommonActions::Delayed(float duration, Action action)
 {
     return MakeSequence(
-        std::make_unique<Common::Actions::Wait>(duration),
+        Wait(duration),
         std::move(action)
     );
+}
+
+CommonActions::Action CommonActions::Delayed(std::function<bool()> while_callback, Action action)
+{
+	return MakeSequence(
+		Wait(while_callback),
+		std::move(action)
+	);
 }
 
 // generic execute
@@ -56,7 +81,7 @@ CommonActions::Action CommonActions::Log(const std::string& text)
 
 CommonActions::Action CommonActions::InterpolateValue(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(startValue, destValue, duration, easingFunction, [&value](float _value) {
+	return std::make_unique<Common::Actions::Interpolate>(startValue, destValue, Clock::FromSeconds(duration), easingFunction, [&value](float _value) {
 		value = _value;
 	});
 }
@@ -72,7 +97,7 @@ CommonActions::Action CommonActions::InterpolateValue(float destValue, float dur
 
 CommonActions::Action CommonActions::ChangeColor(SceneColor node, const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setColor(glm::lerp(start, dest, value));
 	});
 }
@@ -88,7 +113,7 @@ CommonActions::Action CommonActions::ChangeColor(SceneColor node, const glm::vec
 
 CommonActions::Action CommonActions::ChangeAlpha(SceneColor node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(start, dest, duration, easingFunction, [node](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(start, dest, Clock::FromSeconds(duration), easingFunction, [node](float value) {
 		node->setAlpha(value);
 	});
 }
@@ -116,7 +141,7 @@ CommonActions::Action CommonActions::Shake(SceneTransform node, float radius, fl
 {
 	return MakeSequence(
 		MakeParallel(Common::Actions::Parallel::Awaiting::Any,
-			std::make_unique<Common::Actions::Wait>(duration),
+			Wait(duration),
 			std::make_unique<Common::Actions::Repeat>([node, radius] {
 				return Execute([node, radius] {
 					node->setOrigin(glm::circularRand(radius));
@@ -141,7 +166,7 @@ CommonActions::Action CommonActions::Kill(std::shared_ptr<Scene::Node> node)
 
 CommonActions::Action CommonActions::ChangeHorizontalAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setHorizontalAnchor(glm::lerp(start, dest, value));
 	});
 }
@@ -155,7 +180,7 @@ CommonActions::Action CommonActions::ChangeHorizontalAnchor(SceneTransform node,
 
 CommonActions::Action CommonActions::ChangeVerticalAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setVerticalAnchor(glm::lerp(start, dest, value));
 	});
 }
@@ -184,7 +209,7 @@ CommonActions::Action CommonActions::ChangeAnchor(SceneTransform node, const glm
 
 CommonActions::Action CommonActions::ChangeHorizontalPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setHorizontalPivot(glm::lerp(start, dest, value));
 	});
 }
@@ -198,7 +223,7 @@ CommonActions::Action CommonActions::ChangeHorizontalPivot(SceneTransform node, 
 
 CommonActions::Action CommonActions::ChangeVerticalPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setVerticalPivot(glm::lerp(start, dest, value));
 	});
 }
@@ -227,7 +252,7 @@ CommonActions::Action CommonActions::ChangePivot(SceneTransform node, const glm:
 
 CommonActions::Action CommonActions::ChangeHorizontalPosition(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setHorizontalPosition(glm::lerp(start, dest, value));
 	});
 }
@@ -241,7 +266,7 @@ CommonActions::Action CommonActions::ChangeHorizontalPosition(SceneTransform nod
 
 CommonActions::Action CommonActions::ChangeVerticalPosition(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setVerticalPosition(glm::lerp(start, dest, value));
 	});
 }
@@ -270,7 +295,7 @@ CommonActions::Action CommonActions::ChangePosition(SceneTransform node, const g
 
 CommonActions::Action CommonActions::ChangeHorizontalSize(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setHorizontalSize(glm::lerp(start, dest, value));
 	});
 }
@@ -284,7 +309,7 @@ CommonActions::Action CommonActions::ChangeHorizontalSize(SceneTransform node, f
 
 CommonActions::Action CommonActions::ChangeVerticalSize(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setVerticalSize(glm::lerp(start, dest, value));
 	});
 }
@@ -313,7 +338,7 @@ CommonActions::Action CommonActions::ChangeSize(SceneTransform node, const glm::
 
 CommonActions::Action CommonActions::ChangeHorizontalStretch(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setHorizontalStretch(glm::lerp(start, dest, value));
 	});
 }
@@ -327,7 +352,7 @@ CommonActions::Action CommonActions::ChangeHorizontalStretch(SceneTransform node
 
 CommonActions::Action CommonActions::ChangeVerticalStretch(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setVerticalStretch(glm::lerp(start, dest, value));
 	});
 }
@@ -356,7 +381,7 @@ CommonActions::Action CommonActions::ChangeStretch(SceneTransform node, const gl
 
 CommonActions::Action CommonActions::ChangeHorizontalScale(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setHorizontalScale(glm::lerp(start, dest, value));
 	});
 }
@@ -370,7 +395,7 @@ CommonActions::Action CommonActions::ChangeHorizontalScale(SceneTransform node, 
 
 CommonActions::Action CommonActions::ChangeVerticalScale(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
 		node->setVerticalScale(glm::lerp(start, dest, value));
 	});
 }

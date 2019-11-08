@@ -117,7 +117,6 @@ namespace Common::Actions
 	{
 	public:
 		Wait(Clock::Duration duration);
-		Wait(float duration_sec);
 
 	private:
 		Status frame() override;
@@ -160,9 +159,6 @@ namespace Common::Actions
 	public:
 		Interpolate(float startValue, float destValue, Clock::Duration duration,
 			EasingFunction easingFunction, ProcessCallback processCallback);
-
-		Interpolate(float startValue, float destValue,
-			float duration, EasingFunction easingFunction, ProcessCallback processCallback);
 
 	private:
 		Status frame() override;

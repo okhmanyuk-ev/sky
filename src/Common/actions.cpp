@@ -101,11 +101,6 @@ Wait::Wait(Clock::Duration duration) : mDuration(duration)
 	//
 }
 
-Wait::Wait(float duration_sec) : Wait(Clock::FromSeconds(duration_sec))
-{
-	//
-}
-
 Action::Status Wait::frame()
 {
 	mPassed += FRAME->getTimeDelta();
@@ -155,13 +150,6 @@ Interpolate::Interpolate(float startValue, float destValue, Clock::Duration dura
 	mDuration(duration),
 	mEasingFunction(easingFunction),
 	mProcessCallback(processCallback)
-{
-	//
-}
-
-Interpolate::Interpolate(float startValue, float destValue,
-	float duration, EasingFunction easingFunction, ProcessCallback processCallback) : Interpolate(startValue,
-		destValue, Clock::FromSeconds(duration), easingFunction, processCallback)
 {
 	//
 }

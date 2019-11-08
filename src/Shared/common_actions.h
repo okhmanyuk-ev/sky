@@ -15,8 +15,12 @@ namespace Shared::CommonActions
 	Action ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed);
 	Action ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed, float duration);
 
-    Action Delayed(float duration, Action action);
+	Action Wait(float duration);
+	Action Wait(std::function<bool()> while_callback);
     
+	Action Delayed(float duration, Action action);
+	Action Delayed(std::function<bool()> while_callback, Action action);
+
 	Action Execute(std::function<void()> callback);
 	Action ExecuteInfinite(std::function<void()> callback);
 
