@@ -104,10 +104,10 @@ void Node::updateTransform()
 	if (hasParent())
 	{
 		if (verticalStretch >= 0.0f)
-			setHeight((getParent()->getHeight() * verticalStretch) - (verticalMargin * 2.0f));
+			setHeight((getParent()->getHeight() * verticalStretch) - verticalMargin);
 
 		if (horizontalStretch >= 0.0f)
-			setWidth((getParent()->getWidth() * horizontalStretch) - (horizontalMargin * 2.0f));
+			setWidth((getParent()->getWidth() * horizontalStretch) - horizontalMargin);
 
 		mTransform = getParent()->getTransform();
 		mTransform = glm::translate(mTransform, { getAnchor() * getParent()->getSize(), 0.0f });
@@ -115,10 +115,10 @@ void Node::updateTransform()
 	else
 	{
 		if (verticalStretch >= 0.0f)
-			setHeight(PLATFORM->getLogicalHeight() * verticalStretch);
+			setHeight((PLATFORM->getLogicalHeight() * verticalStretch) - verticalMargin);
 
 		if (horizontalStretch >= 0.0f)
-			setWidth(PLATFORM->getLogicalWidth() * horizontalStretch);
+			setWidth((PLATFORM->getLogicalWidth() * horizontalStretch) - horizontalMargin);
 
 		mTransform = glm::mat4(1.0f);
 	}
