@@ -13,6 +13,10 @@ namespace Scene
 		void update() override
 		{
 			T::update();
+
+			if (!mActionsEnabled)
+				return;
+
 			mActions.update();
 		}
 
@@ -20,7 +24,12 @@ namespace Scene
 		void runAction(std::unique_ptr<Common::Actions::Action> action) { mActions.add(std::move(action)); }
 		void clearActions() { mActions.clear(); }
 
+	public:
+		bool isActionsEnabled() const { return mActionsEnabled; }
+		void setActionsEnabled(bool value) { mActionsEnabled = value; }
+
 	private:
 		Common::Actions::GenericActionsPlayer<Common::Actions::Parallel> mActions;
+		bool mActionsEnabled = true;
 	};
 }
