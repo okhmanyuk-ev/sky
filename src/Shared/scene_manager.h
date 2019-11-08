@@ -74,6 +74,21 @@ namespace Shared
 	{
 		friend SceneManager;
 
+	public:
+		enum class State
+		{
+			Opening,
+			Opened,
+			Closing,
+			Closed,
+		};
+
+	public:
+		auto getState() const { return mState; }
+
+	private:
+		State mState = State::Closed;
+
 	protected:
 		virtual void onOpenBegin() { }
 		virtual void onOpenEnd() { }

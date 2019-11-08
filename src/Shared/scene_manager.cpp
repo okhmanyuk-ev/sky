@@ -98,11 +98,13 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window)
 	attach(mCurrentWindow);
 
 	mCurrentWindow->onOpenBegin();
+	mCurrentWindow->mState = Window::State::Opening;
 
 	runAction(Shared::CommonActions::MakeSequence(
 		mCurrentWindow->createOpenAction(),
 		Shared::CommonActions::Execute([this] {
 			mCurrentWindow->onOpenEnd();
+			mCurrentWindow->mState = Window::State::Opened;
 		})
 	));
 }
@@ -112,11 +114,13 @@ void SceneManager::popWindow(std::function<void()> finishCallback)
 	assert(mCurrentWindow);
 
 	mCurrentWindow->onCloseBegin();
+	mCurrentWindow->mState = Window::State::Closing;
 
 	runAction(Shared::CommonActions::MakeSequence(
 		mCurrentWindow->createCloseAction(),
 		Shared::CommonActions::Execute([this, finishCallback] {
 			mCurrentWindow->onCloseEnd();
+			mCurrentWindow->mState = Window::State::Closed;
 			detach(mCurrentWindow);
 			mCurrentWindow = nullptr; 
 			mCurrentScreen->onWindowDisappearing(); // TODO: only on last window close (when stack will be included)
