@@ -24,7 +24,7 @@
 #include <Scene/node.h>
 #include <Scene/label.h>
 #include <Scene/render_layer.h>
-#include <Scene/blur_layer.h>
+#include <Scene/bloom_layer.h>
 #include <Scene/sprite.h>
 #include <Scene/rectangle.h>
 #include <Scene/circle.h>

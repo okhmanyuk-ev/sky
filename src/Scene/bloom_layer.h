@@ -8,7 +8,7 @@
 
 namespace Scene
 {
-	class BlurLayer : public RenderLayer<Node>
+	class BloomLayer : public RenderLayer<Node>
 	{
 	protected:
 		void event(const Platform::System::ResizeEvent& e) override;

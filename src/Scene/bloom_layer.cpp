@@ -1,14 +1,14 @@
-#include "blur_layer.h"
+#include "bloom_layer.h"
 
 using namespace Scene;
 
-void BlurLayer::event(const Platform::System::ResizeEvent& e)
+void BloomLayer::event(const Platform::System::ResizeEvent& e)
 {
 	RenderLayer<Node>::event(e);
 	mTargetsDirty = true;
 }
 
-void BlurLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture)
+void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture)
 {
 	auto scale = PLATFORM->getScale();
 
