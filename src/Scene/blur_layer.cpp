@@ -34,14 +34,17 @@ void BlurLayer::beginRender()
 
 	Node::beginRender();
 
-	GRAPHICS->push(mSourceTarget);
-	GRAPHICS->push({ Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, Renderer::Blend::One, Renderer::Blend::InvSrcAlpha });
+	auto state = GRAPHICS->getCurrentState();
+	state.renderTarget = mSourceTarget;
+	state.blendMode = { Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, Renderer::Blend::One, Renderer::Blend::InvSrcAlpha };
+
+	GRAPHICS->push(state);
 	GRAPHICS->clear();
 }
 
 void BlurLayer::endRender()
 {
-	GRAPHICS->pop(2);
+	GRAPHICS->pop();
 
 	if (!mPosteffectEnabled)
 	{
@@ -60,14 +63,17 @@ void BlurLayer::endRender()
 	{
 		auto model = glm::scale(glm::mat4(1.0f), { mBlurTarget->getWidth(), mBlurTarget->getHeight(), 1.0f });
 
-		GRAPHICS->push(Renderer::BlendStates::AlphaBlend);
-		GRAPHICS->push(Renderer::Viewport::FullRenderTarget(*mBlurTarget));
-		GRAPHICS->push(mBlurTarget);
-		GRAPHICS->pushProjectionMatrix(glm::orthoLH(0.0f, (float)mBlurTarget->getWidth(), (float)mBlurTarget->getHeight(), 0.0f, -1.0f, 1.0f));
-		GRAPHICS->push(Renderer::Sampler::Linear);
+		auto state = GRAPHICS->getCurrentState();
+		state.blendMode = Renderer::BlendStates::AlphaBlend;
+		state.viewport = Renderer::Viewport::FullRenderTarget(*mBlurTarget);
+		state.renderTarget = mBlurTarget;
+		state.projectionMatrix = glm::orthoLH(0.0f, (float)mBlurTarget->getWidth(), (float)mBlurTarget->getHeight(), 0.0f, -1.0f, 1.0f);
+		state.sampler = Renderer::Sampler::Linear;
+		
+		GRAPHICS->push(state);
 		GRAPHICS->clear();
 		GRAPHICS->draw(mSourceTarget, model);
-		GRAPHICS->pop(5);
+		GRAPHICS->pop();
 	}
 
 	GRAPHICS->push(Graphics::System::State());
@@ -117,8 +123,11 @@ void BlurLayer::endRender()
 	{
 		auto model = glm::scale(glm::mat4(1.0f), { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 1.0f });
 
-		GRAPHICS->push(Renderer::Sampler::Linear);
-		GRAPHICS->push(Renderer::BlendStates::AlphaBlend);
+		auto state = GRAPHICS->getCurrentState();
+		state.sampler = Renderer::Sampler::Linear;
+		state.blendMode = Renderer::BlendStates::AlphaBlend;
+		
+		GRAPHICS->push(state);
 
 		if (mBloom)
 			GRAPHICS->draw(mSourceTarget, model);
@@ -128,7 +137,7 @@ void BlurLayer::endRender()
 		for (int i = 0; i < mGlowSamples; i++)
 			GRAPHICS->draw(mBlurTarget, model);
 
-		GRAPHICS->pop(2);
+		GRAPHICS->pop();
 	}
 
 	GRAPHICS->setBatching(prev_batching);

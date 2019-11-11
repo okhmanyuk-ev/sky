@@ -32,7 +32,7 @@ void Sprite::update()
 		if (mTexRegion.size.x > 0.0f)
 			setWidth(mTexRegion.size.x);
 		else
-			setWidth(mTexture->getWidth());
+			setWidth(static_cast<float>(mTexture->getWidth()));
 	}
 
 	if (getHeight() <= 0.0f)
@@ -40,7 +40,7 @@ void Sprite::update()
 		if (mTexRegion.size.y > 0.0f)
 			setHeight(mTexRegion.size.y);
 		else
-			setHeight(mTexture->getHeight());
+			setHeight(static_cast<float>(mTexture->getHeight()));
 	}
 
 	Node::update();

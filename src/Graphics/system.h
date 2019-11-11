@@ -95,6 +95,8 @@ namespace Graphics
 		void pushViewMatrix(const glm::mat4& value);
 		void pushProjectionMatrix(const glm::mat4& value);
 
+		auto getCurrentState() const { return mStates.top(); }
+
 	public:
 		void setSdfEnabled(bool value) { mSdfEnabled = value; }
 		bool isSdfEnabled() const { return mSdfEnabled; }	
