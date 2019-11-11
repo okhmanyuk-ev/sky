@@ -14,28 +14,31 @@ namespace Scene
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 		static_assert(!std::is_base_of<Color, T>::value, "T must NOT be derived from Color");
 
-	private:
+	protected:
 		void event(const Platform::System::ResizeEvent& e) override
 		{
 			mTarget.reset();
 			mTarget = std::make_shared<Renderer::RenderTarget>(e.width, e.height);
 		}
 
-	protected:
 		void beginRender() override
 		{
 			T::beginRender();
 
-			GRAPHICS->push(mTarget);
-			GRAPHICS->push({ Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, Renderer::Blend::One, Renderer::Blend::InvSrcAlpha });
+			auto state = GRAPHICS->getCurrentState();
+			state.renderTarget = mTarget;
+			state.blendMode = { Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, Renderer::Blend::One, Renderer::Blend::InvSrcAlpha };
+
+			GRAPHICS->push(state);
 			GRAPHICS->clear();
 		}
 
 		void endRender() override
 		{
-			GRAPHICS->pop(2);
+			GRAPHICS->pop();
 
-			T::endRender();
+			if (mPostprocessEnabled)
+				postprocess(mTarget);
 
 			auto model = glm::scale(glm::mat4(1.0f), { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 1.0f });
 			auto color = getColor() * glm::vec4({ glm::vec3(getAlpha()), 1.0f });
@@ -43,9 +46,23 @@ namespace Scene
 			GRAPHICS->push(Renderer::BlendStates::AlphaBlend);
 			GRAPHICS->draw(mTarget, model, { }, color);
 			GRAPHICS->pop();
+			
+			T::endRender();
+		}
+
+		virtual void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) 
+		{
+			//
 		}
 
 	private:
 		std::shared_ptr<Renderer::RenderTarget> mTarget = std::make_shared<Renderer::RenderTarget>(PLATFORM->getWidth(), PLATFORM->getHeight());
+
+	public:
+		void isPostprocessEnabled() const { return mPostprocessEnabled; }
+		void setPostprocessEnabled(bool value) { mPostprocessEnabled = value; }
+
+	private:
+		bool mPostprocessEnabled = true;
 	};
 }

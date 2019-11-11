@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Scene/node.h>
-#include <Scene/color.h>
+#include <Scene/render_layer.h>
 #include <Renderer/render_target.h>
 #include <Common/event_system.h>
 #include <stack>
@@ -9,45 +8,32 @@
 
 namespace Scene
 {
-	class BlurLayer : public Node, public Color,
-		public Common::EventSystem::Listenable<Platform::System::ResizeEvent>
+	class BlurLayer : public RenderLayer<Node>
 	{
-	private:
-		void event(const Platform::System::ResizeEvent& e) override;
-	
 	protected:
-		void beginRender() override;
-		void endRender() override;
-
-	private:
-		std::shared_ptr<Renderer::RenderTarget> mSourceTarget;
-		std::shared_ptr<Renderer::RenderTarget> mBlurTarget;
-		std::shared_ptr<Renderer::RenderTarget> mBlurTarget2;
-		Renderer::ShaderBlur mBlurShader = Renderer::ShaderBlur(Renderer::Vertex::PositionTexture::Layout);
+		void event(const Platform::System::ResizeEvent& e) override;
+		void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) override;
 
 	public:
-		auto isPosteffectEnabled() const { return mPosteffectEnabled; }
-		void setPosteffectEnabled(bool value) { mPosteffectEnabled = value; }
-
-		auto getGlowSamples() const { return mGlowSamples; }
-		void setGlowSamples(int value) { mGlowSamples = value; }
-
 		auto getBlurPasses() const { return mBlurPasses; }
 		void setBlurPasses(int value) { mBlurPasses = value; }
+
+		auto getGlowPasses() const { return mGlowPasses; }
+		void setGlowPasses(int value) { mGlowPasses = value; }
 
 		auto getDownscaleFactor() const { return mDownscaleFactor; }
 		void setDownscaleFactor(float value) { mDownscaleFactor = value; mTargetsDirty = true; }
 
-		auto isBloom() const { return mBloom; }
-		void setBloom(bool value) { mBloom = value; }
-
 	private:
-		bool  mPosteffectEnabled = true;
+		std::shared_ptr<Renderer::RenderTarget> mBlurTarget1;
+		std::shared_ptr<Renderer::RenderTarget> mBlurTarget2;
 		bool mTargetsDirty = true;
+		Renderer::ShaderBlur mBlurShader = Renderer::ShaderBlur(Renderer::Vertex::PositionTexture::Layout);
+		float mTargetWidth = 0.0f;
+		float mTargetHeight = 0.0f;
 		int mBlurPasses = 1;
-		int mGlowSamples = 0;
-		float mDownscaleFactor = 1.0f;
-		float mPrevScale = PLATFORM->getScale();
-		bool mBloom = false;
+		int mGlowPasses = 1;
+		float mDownscaleFactor = 4.0f;
+		float mPrevScale = 0.0f;
 	};
 }
