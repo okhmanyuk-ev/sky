@@ -113,9 +113,14 @@ Font::Font(void* data, size_t size)
 
 	// codepoints
 
-	for (int i = 0; i < 512; i++)
+	for (int i = 0; i < 65535; i++)
 	{
-		mCodepoints[i] = stbtt_FindGlyphIndex(&info, i);
+		auto index = stbtt_FindGlyphIndex(&info, i);
+		
+		if (index == 0)
+			continue;
+
+		mGlyphIndices[i] = index;
 	}
 }
 
@@ -134,9 +139,9 @@ float Font::getScaleFactorForSize(float size)
 	return size / GlyphSize;
 }
 
-const Font::Glyph& Font::getGlyph(int c) const
+const Font::Glyph& Font::getGlyph(uint16_t symbol) const
 {
-	return mGlyphs.at(getGlyphIndex(c));
+	return mGlyphs.at(getGlyphIndex(symbol));
 }
 
 float Font::getStringWidth(const std::string& text, float size) const
@@ -144,11 +149,11 @@ float Font::getStringWidth(const std::string& text, float size) const
 	float result = 0.0f;
 	for (int i = 0; i < static_cast<int>(text.size()); i++)
 	{
-		result += getGlyph((uint8_t)text.at(i)).xadvance;
+		result += getGlyph(text.at(i)).xadvance;
 	
 		if (i < static_cast<int>(text.size()) - 1)
 		{
-			result += getKerning((uint8_t)text.at(i), (uint8_t)text.at(i + 1));
+			result += getKerning(text.at(i), text.at(i + 1));
 		}
 	}
 	return result * Font::getScaleFactorForSize(size);
@@ -159,7 +164,7 @@ float Font::getStringHeight(const std::string& text, float size) const
 	float result = 0.0f;
 	for (const auto& symbol : text)
 	{
-		float h = static_cast<float>(getGlyph((uint8_t)symbol).h);
+		float h = static_cast<float>(getGlyph(symbol).h);
 
 		if (result >= h)
 			continue;
@@ -169,7 +174,7 @@ float Font::getStringHeight(const std::string& text, float size) const
 	return (result - (SdfPadding * 2.0f)) * Font::getScaleFactorForSize(size);
 }
 
-float Font::getKerning(int left, int right) const
+float Font::getKerning(uint16_t left, uint16_t right) const
 {
 	auto left_glyph = getGlyphIndex(left);
 	auto right_glyph = getGlyphIndex(right);
@@ -183,7 +188,10 @@ float Font::getKerning(int left, int right) const
 	return mKernings.at(left_glyph).at(right_glyph);
 }
 
-int Font::getGlyphIndex(int codepoint) const
+int Font::getGlyphIndex(uint16_t symbol) const
 {
-	return mCodepoints.at(codepoint);
+	if (mGlyphIndices.count(symbol) == 0)
+		return 0;
+
+	return mGlyphIndices.at(symbol); // 433 == 'ÿ' (1103)
 }

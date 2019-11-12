@@ -32,22 +32,22 @@ namespace Graphics
 		~Font();
 
 		const auto getTexture() const { return mTexture; }
-		const Glyph& getGlyph(int c) const;
+		const Glyph& getGlyph(uint16_t symbol) const;
 
 		static float getScaleFactorForSize(float size);
 
 		float getStringWidth(const std::string& text, float size = GlyphSize) const;
 		float getStringHeight(const std::string& text, float size = GlyphSize) const;
 
-		float getKerning(int left, int right) const;
+		float getKerning(uint16_t left, uint16_t right) const;
 
 	private:
-		int getGlyphIndex(int codepoint) const;
+		int getGlyphIndex(uint16_t symbol) const;
 
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
-		std::map<int, Glyph> mGlyphs;
-		std::map<int, std::map<int, float>> mKernings;
-		std::map<int, int> mCodepoints;
+		std::map<uint16_t, Glyph> mGlyphs;
+		std::map<uint16_t, std::map<int, float>> mKernings;
+		std::map<uint16_t, int> mGlyphIndices;
 	};
 }
