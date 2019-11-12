@@ -3,6 +3,7 @@
 #include <Scene/node.h>
 #include <Scene/color.h>
 #include <Graphics/font.h>
+#include <Common/convert.h>
 
 namespace Scene
 {
@@ -20,7 +21,8 @@ namespace Scene
 		void setFontSize(float value) { mFontSize = value; }
 
 		auto& getText() const { return mText; }
-		void setText(const std::string& value) { mText = value; }
+		void setText(const std::wstring& value) { mText = value; }
+		void setText(const std::string& value) { setText(Common::ToWideString(value)); }
 
 		auto getOutlineThickness() const { return mOutlineThickness; }
 		void setOutlineThickness(float value) { mOutlineThickness = value; }
@@ -35,7 +37,7 @@ namespace Scene
 	private:
 		std::shared_ptr<Graphics::Font> mFont;
 		float mFontSize = 24.0f;
-		std::string mText = "";
+		std::wstring mText = L"";
 		float mOutlineThickness = 0.0f;
 		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
 	};

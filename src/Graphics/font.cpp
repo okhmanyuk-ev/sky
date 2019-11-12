@@ -31,7 +31,7 @@ Font::Font(void* data, size_t size)
 		const float PixelDistScale = Onedge / SdfPadding;
 
 		auto& g = glyphs[i];
-		g.pixels = stbtt_GetGlyphSDF(&info, scale, i, SdfPadding, Onedge, PixelDistScale, &g.w, &g.h, &g.xoff, &g.yoff);
+		g.pixels = stbtt_GetGlyphSDF(&info, scale, i, (int)SdfPadding, Onedge, PixelDistScale, &g.w, &g.h, &g.xoff, &g.yoff);
 	}
 
 	using namespace rectpack2D;
@@ -144,7 +144,7 @@ const Font::Glyph& Font::getGlyph(uint16_t symbol) const
 	return mGlyphs.at(getGlyphIndex(symbol));
 }
 
-float Font::getStringWidth(const std::string& text, float size) const
+float Font::getStringWidth(const std::wstring& text, float size) const
 {
 	float result = 0.0f;
 	for (int i = 0; i < static_cast<int>(text.size()); i++)
@@ -159,7 +159,7 @@ float Font::getStringWidth(const std::string& text, float size) const
 	return result * Font::getScaleFactorForSize(size);
 }
 
-float Font::getStringHeight(const std::string& text, float size) const
+float Font::getStringHeight(const std::wstring& text, float size) const
 {
 	float result = 0.0f;
 	for (const auto& symbol : text)

@@ -10,6 +10,7 @@
 #include <Common/hash.h>
 #include <Common/actions.h>
 #include <Common/frame_system.h>
+#include <Common/convert.h>
 
 #include <Audio/sound.h>
 

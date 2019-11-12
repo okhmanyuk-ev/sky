@@ -6,12 +6,12 @@
 namespace Shared::SceneHelpers
 {
 	std::shared_ptr<Scene::Label> MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder, 
-		std::shared_ptr<Scene::Node> target, const std::string& text, float text_size, float move_duration = 0.5f);
+		std::shared_ptr<Scene::Node> target, const std::wstring& text, float text_size, float move_duration = 0.5f);
 
-	std::shared_ptr<Scene::Node> MakeFastButton(const std::string& title, float title_size, 
+	std::shared_ptr<Scene::Node> MakeFastButton(const std::wstring& title, float title_size, 
 		std::function<void(std::shared_ptr<Scene::Node>)> callback = nullptr);
 	
-	std::shared_ptr<Scene::Node> MakeFastButton(const std::string& title, float title_size, 
+	std::shared_ptr<Scene::Node> MakeFastButton(const std::wstring& title, float title_size,
 		std::function<void()> callback = nullptr);
 
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(float height, const std::vector<std::pair<float/*width*/, 

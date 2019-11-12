@@ -371,7 +371,7 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model);
 }
 
-void System::draw(const Font& font, const std::string& text, const glm::mat4& model,
+void System::draw(const Font& font, const std::wstring& text, const glm::mat4& model,
 	const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
 {
 	assert(mWorking);
@@ -396,7 +396,7 @@ void System::draw(const Font& font, const std::string& text, const glm::mat4& mo
 	
 	for (int i = 0; i < static_cast<int>(text.size()); i++)
 	{
-		const auto& glyph = font.getGlyph((uint8_t)text.at(i));
+		const auto& glyph = font.getGlyph(text.at(i));
 
 		float glyph_w = static_cast<float>(glyph.w);
 		float glyph_h = static_cast<float>(glyph.h);
@@ -419,7 +419,7 @@ void System::draw(const Font& font, const std::string& text, const glm::mat4& mo
 		
 		if (i < static_cast<int>(text.size()) - 1)
 		{
-			pos.x += font.getKerning((uint8_t)text.at(i), (uint8_t)text.at(i + 1));
+			pos.x += font.getKerning(text.at(i), text.at(i + 1));
 		}
 
 		float u1 = glyph_x / tex_w;
@@ -469,7 +469,7 @@ void System::draw(const Font& font, const std::string& text, const glm::mat4& mo
 	RENDERER->drawIndexed(indices.size());
 }
 
-void System::draw(const Font& font, const std::string& text, const glm::mat4& model,
+void System::draw(const Font& font, const std::wstring& text, const glm::mat4& model,
 	float size, const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
 	if (size <= 0.0f)

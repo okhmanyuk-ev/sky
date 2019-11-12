@@ -4,11 +4,12 @@
 #include <imgui.h>
 #include <Scene/clickable.h>
 #include <Scene/rectangle.h>
+#include <Common/convert.h>
 
 using namespace Shared;
 
 std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder,
-	std::shared_ptr<Scene::Node> target, const std::string& text, float text_size, float move_duration)
+	std::shared_ptr<Scene::Node> target, const std::wstring& text, float text_size, float move_duration)
 {
 	auto label = std::make_shared<Scene::Actionable<Scene::Label>>();
 	label->setFont(GET_CACHED_FONT("default"));
@@ -27,7 +28,7 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	return label;
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const std::string& title, float title_size, std::function<void(std::shared_ptr<Scene::Node>)> callback)
+std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const std::wstring& title, float title_size, std::function<void(std::shared_ptr<Scene::Node>)> callback)
 {
 	auto node = std::make_shared<Scene::Clickable<Scene::Rectangle>>();
 	node->setAlpha(0.33f);
@@ -46,7 +47,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const std::string& tit
 	return node;
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const std::string& title, float title_size, std::function<void()> callback)
+std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const std::wstring& title, float title_size, std::function<void()> callback)
 {
 	return MakeFastButton(title, title_size, [callback](auto node) { callback(); });
 }

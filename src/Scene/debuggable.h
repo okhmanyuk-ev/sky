@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Scene/node.h>
+#include <Common/convert.h>
 
 namespace Scene
 {
@@ -32,8 +33,10 @@ namespace Scene
 				auto model = glm::mat4(1.0f);
                 model = glm::translate(model, { T::project(T::getSize() / 2.0f) / PLATFORM->getScale(), 0.0f });
 		
-				auto text_width = Debug::Font.value()->getStringWidth(mName, Debug::FontSize);
-				auto text_height = Debug::Font.value()->getStringHeight(mName, Debug::FontSize);
+				auto wname = Common::ToWideString(mName);
+
+				auto text_width = Debug::Font.value()->getStringWidth(wname, Debug::FontSize);
+				auto text_height = Debug::Font.value()->getStringHeight(wname, Debug::FontSize);
 
 				auto bg_width = text_width + 4.0f;
 				auto bg_height = text_height + 4.0f;
@@ -50,7 +53,7 @@ namespace Scene
 				const glm::vec4 BackgroundColor = { 0.0f, 0.0f, 0.0f, 0.5f };
 
 				GRAPHICS->drawRectangle(bg_model, BackgroundColor);
-				GRAPHICS->draw(*Debug::Font.value(), mName, label_model, Debug::FontSize, NameColor);
+				GRAPHICS->draw(*Debug::Font.value(), wname, label_model, Debug::FontSize, NameColor);
 			}
 		}
 
