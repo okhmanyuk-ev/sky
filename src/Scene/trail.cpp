@@ -37,13 +37,10 @@ void Trail::draw()
 
 	for (int i = 0; i < mSegments.size(); i++)
 	{
-		auto p1 = glm::vec2();
-		auto p2 = glm::vec2();
-
 		bool last = i == mSegments.size() - 1;
 
-		p1 = mSegments[i].pos;
-		p2 = mSegments[last ? i - 1 : i + 1].pos;
+		auto p1 = mSegments[i].pos;
+		auto p2 = mSegments[last ? i - 1 : i + 1].pos;
 
 		auto perp = glm::normalize(p1 - p2);
 		perp = { -perp.y, perp.x };
@@ -52,7 +49,7 @@ void Trail::draw()
 
 		perp *= thickness;
 		
-		auto interp = Common::Easing::Linear(((float)i / (float)mSegments.size()));
+		auto interp = Common::Easing::Linear((float)i / (float)mSegments.size());
 
 		if (mNarrowing)
 			perp *= interp;
@@ -60,11 +57,11 @@ void Trail::draw()
 		auto v1 = glm::vec2(p1.x + perp.x, p1.y + perp.y);
 		auto v2 = glm::vec2(p1.x - perp.x, p1.y - perp.y);
 
-		auto alpha = 1.0f * interp * getAlpha();
 		auto color = getColor();
+		color.a = 1.0f * interp * getAlpha();
 
-		vertices.push_back({ { last ? v2 : v1, 0.0f }, { color.r, color.g, color.b, alpha } });
-		vertices.push_back({ { last ? v1 : v2, 0.0f }, { color.r, color.g, color.b, alpha } });
+		vertices.push_back({ { last ? v2 : v1, 0.0f }, color });
+		vertices.push_back({ { last ? v1 : v2, 0.0f }, color });
 	}
 
 	GRAPHICS->draw(Renderer::Topology::TriangleStrip, vertices, holder->getTransform());

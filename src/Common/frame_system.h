@@ -47,6 +47,8 @@ namespace Common
 		auto getFramerate() const { return 1.0 / Clock::ToSeconds<double>(mTimeDelta) * mTimeScale; } // frame count per second
 		auto getFramerCount() const { return mFramers.size(); }
 
+		auto getUptime() const { return mUptime; }
+
 	private:
 		std::list<StatusCallback> mFramers;
 		int mFramerateLimit = 0;
@@ -54,6 +56,7 @@ namespace Common
 		double mTimeScale = 1.0;
 		Clock::TimePoint mLastTime = Clock::Now();
 		Clock::Duration mTimeDelta = Clock::Duration::zero();
+		Clock::Duration mUptime = Clock::Duration::zero();
 	};
 
 	class FrameSystem::Frameable

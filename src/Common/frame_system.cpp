@@ -45,6 +45,8 @@ void FrameSystem::frame()
 	mTimeDelta = Clock::FromSeconds(Clock::ToSeconds<double>(now - mLastTime) * mTimeScale);
 	mLastTime = now;
 
+	mUptime += mTimeDelta;
+
 	auto it = mFramers.begin();
 	while (it != mFramers.end())
 	{

@@ -25,6 +25,8 @@ namespace Scene
 		auto getNarrowing() const { return mNarrowing; }
 		void setNarrowing(bool value) { mNarrowing = value; }
 
+		auto getSegmentsCount() const { return mSegments.size(); }
+
 	private:
 		float mLifetime = 1.0f;
 		bool mNarrowing = false;
