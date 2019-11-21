@@ -12,10 +12,14 @@ void Trail::update()
 	Node::update();
 
 	auto holder = mHolder.lock();
+	auto pos = holder->unproject(project(getSize() * 0.5f));
+
+	if (!mSegments.empty() && glm::distance(mSegments.rbegin()->pos, pos) < 0.5f)
+		return;
 
 	auto segment = Segment();
-	segment.pos = holder->unproject(project(getSize() * 0.5f));
-	segment.time = Clock::Now();
+	segment.pos = pos;
+	segment.time = FRAME->getUptime();
 	mSegments.push_back(segment);
 }
 
@@ -25,9 +29,9 @@ void Trail::draw()
 
 	auto holder = mHolder.lock();
 
-	auto now = Clock::Now();
+	auto now = FRAME->getUptime();
 
-	while (!mSegments.empty() && now - mSegments.front().time > Clock::FromSeconds(mLifetime) / FRAME->getTimeScale())
+	while (!mSegments.empty() && now - mSegments.front().time > Clock::FromSeconds(mLifetime))
 		mSegments.pop_front();
 
 	if (mSegments.size() < 2)

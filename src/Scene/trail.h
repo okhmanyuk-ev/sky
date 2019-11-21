@@ -35,7 +35,7 @@ namespace Scene
 		struct Segment
 		{
 			glm::vec2 pos = { 0.0f, 0.0f };
-			Clock::TimePoint time;
+			Clock::Duration time;
 		};
 
 		std::deque<Segment> mSegments;

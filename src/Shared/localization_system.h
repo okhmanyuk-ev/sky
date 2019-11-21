@@ -28,13 +28,13 @@ namespace Shared
 		static std::string getLanguageName(Language language);
 
 	public:
-		const std::string& getString(const std::string& key) const;
+		const std::wstring& getString(const std::string& key) const;
 		
 		auto getLanguage() const { return mLanguage; }
 		void setLanguage(Language value) { mLanguage = value; }
 
 	private:
-		std::map<Language, std::map<std::string, std::string>> mDictionaries;
+		std::map<Language, std::map<std::string, std::wstring>> mDictionaries;
 		Language mLanguage = Language::English;
 	};
 }

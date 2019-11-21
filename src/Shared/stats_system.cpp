@@ -40,7 +40,7 @@ void StatsSystem::frame()
 	auto& style = ImGui::GetStyle();
 	ImVec4 col = style.Colors[ImGuiCol_Text];
 
-	auto now = Clock::Now();
+	auto now = FRAME->getUptime();
 
 	const float MaxLifetime = 5.0f;
 
@@ -116,7 +116,7 @@ void StatsSystem::frame()
 
 void StatsSystem::indicate(const std::string& key, const std::string& value, const std::string& group)
 {
-	mGroups[group][key] = { value, Clock::Now() };
+	mGroups[group][key] = { value, FRAME->getUptime() };
 }
 
 void StatsSystem::indicate(const std::string& key, int value, const std::string& group)

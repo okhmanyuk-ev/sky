@@ -93,6 +93,21 @@ void Scene::Scene::updateTransformations()
 	recursiveNodeUpdate(mRoot);
 }
 
+size_t Scene::Scene::getNodesCount(const std::shared_ptr<Node>& node) const
+{
+	if (node == nullptr)
+		return getNodesCount(mRoot);
+	
+	auto result = 1;
+
+	for (const auto& _node : node->getNodes())
+	{
+		result += getNodesCount(_node);
+	}
+
+	return result;
+}
+
 void Scene::Scene::event(const Platform::Mouse::Event& e)
 {
 	if (e.type == Platform::Mouse::Event::Type::ButtonDown)

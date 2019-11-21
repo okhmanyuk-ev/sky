@@ -42,17 +42,17 @@ PerformanceConsoleCommands::~PerformanceConsoleCommands()
 void PerformanceConsoleCommands::frame()
 {
 	if (mWantShowFps > 1)
-		ENGINE_STATS("FPS", std::to_string(mFramerateCounter.getFramerate()) + " (" + std::to_string(mFramerateCounter.getAverageFramerate()) + " avg)");
+		ENGINE_STATS("fps", std::to_string(mFramerateCounter.getFramerate()) + " (" + std::to_string(mFramerateCounter.getAverageFramerate()) + " avg)");
 	else if (mWantShowFps > 0)
-		ENGINE_STATS("FPS", mFramerateCounter.getFramerate());
+		ENGINE_STATS("fps", mFramerateCounter.getFramerate());
 
 	if (mWantShowDrawcalls > 0)
-		ENGINE_STATS("DRAW", mDrawCallCounter.getDrawCalls());
+		ENGINE_STATS("draw", mDrawCallCounter.getDrawCalls());
 
 	if (mWantShowTasks > 1)
-		ENGINE_STATS("TASKS", std::to_string(TASK->getTasksCount()) + " at " + std::to_string(TASK->getThreadsCount()) + " threads");
+		ENGINE_STATS("tasks", std::to_string(TASK->getTasksCount()) + " at " + std::to_string(TASK->getThreadsCount()) + " threads");
 	else if (mWantShowTasks > 0)
-		ENGINE_STATS("TASKS", TASK->getTasksCount());
+		ENGINE_STATS("tasks", TASK->getTasksCount());
 
 	return;
 

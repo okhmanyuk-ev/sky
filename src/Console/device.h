@@ -45,6 +45,8 @@ namespace Console
 		virtual void clear() = 0;
 
 		virtual bool isOpened() const = 0;
+
+		virtual bool isEnabled() const = 0;
 		virtual void setEnabled(bool value) = 0;
 	};
 }

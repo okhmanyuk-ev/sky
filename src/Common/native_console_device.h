@@ -21,6 +21,8 @@ namespace Common
 		void writeLine(const std::string& s, Console::Color color = Console::Color::Default) override;
 		void clear() override;
 		bool isOpened() const override { return true; }
+
+		bool isEnabled() const override { return true; }
 		void setEnabled(bool value) override {};
 
 	public:

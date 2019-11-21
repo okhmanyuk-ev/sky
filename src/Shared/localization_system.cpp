@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <cassert>
+#include <Common/convert.h>
 
 using namespace Shared;
 
@@ -39,7 +40,7 @@ LocalizationSystem::LocalizationSystem(const std::string& path)
 			if (key.empty() || value.empty())
 				continue;
 
-			dictionary[key] = value;
+			dictionary[key] = Common::ToWideString(value);
 		}
 	};
 
@@ -63,12 +64,12 @@ std::string LocalizationSystem::getLanguageName(Language language)
 	return "";
 }
 
-const std::string& LocalizationSystem::getString(const std::string& key) const
+const std::wstring& LocalizationSystem::getString(const std::string& key) const
 {
 	auto& dictionary = mDictionaries.at(mLanguage);
 
 	if (dictionary.count(key) == 0)
-		return key;
+		return Common::ToWideString(key);
 
 	return dictionary.at(key);
 }
