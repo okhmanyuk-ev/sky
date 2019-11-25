@@ -32,11 +32,15 @@ namespace Scene
 		auto getOutlineAlpha() const { return mOutlineColor.a; }
 		void setOutlineAlpha(float value) { mOutlineColor.a = value; }
 
+		auto isMultiline() const { return mMultiline; }
+		void setMultiline(bool value) { mMultiline = value; }
+
 	private:
 		std::shared_ptr<Graphics::Font> mFont;
 		float mFontSize = 24.0f;
 		utf8_string mText = "";
 		float mOutlineThickness = 0.0f;
 		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
+		bool mMultiline = false;
 	};
 }
