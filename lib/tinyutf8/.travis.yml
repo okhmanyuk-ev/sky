@@ -1,0 +1,12 @@
+language: cpp
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+
+script:
+  - $CXX -std=c++11 -Wall -Wextra -pedantic -Wno-attributes -I. test/test.cpp

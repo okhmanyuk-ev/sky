@@ -4,13 +4,14 @@
 #include <Renderer/texture.h>
 #include <map>
 #include <memory>
+#include <tinyutf8.hpp>
 
 namespace Graphics
 {
 	class Font
 	{
 	public:
-		static inline const float GlyphSize = 64.0f;
+		static inline const float GlyphSize = 32.0f;
 		static inline const float SdfPadding = GlyphSize / 8.0f;
 		static inline const float SdfOnedge = 0.5f;
 
@@ -36,8 +37,8 @@ namespace Graphics
 
 		static float getScaleFactorForSize(float size);
 
-		float getStringWidth(const std::wstring& text, float size = GlyphSize) const;
-		float getStringHeight(const std::wstring& text, float size = GlyphSize) const;
+		float getStringWidth(const utf8_string& text, float size = GlyphSize) const;
+		float getStringHeight(const utf8_string& text, float size = GlyphSize) const;
 
 		float getKerning(uint16_t left, uint16_t right) const;
 

@@ -144,9 +144,20 @@ target_link_libraries(${PROJECT_NAME} imgui)
 
 include_directories("sky/lib/tinygltf")
 
-#tinyobjloader
+# tinyobjloader
 
 include_directories("sky/lib/tinyobjloader")
+
+# tinyutf8
+
+file(GLOB TINYUTF8_SRC
+	sky/lib/tinyutf8/*.cpp
+	sky/lib/tinyutf8/*.h
+	sky/lib/tinyutf8/*.hpp
+)
+include_directories("sky/lib/tinyutf8")
+add_library(tinyutf8 STATIC ${TINYUTF8_SRC})
+target_link_libraries(${PROJECT_NAME} tinyutf8)
 
 # fmod
 

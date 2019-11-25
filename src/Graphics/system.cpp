@@ -371,7 +371,7 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model);
 }
 
-void System::draw(const Font& font, const std::wstring& text, const glm::mat4& model,
+void System::draw(const Font& font, const utf8_string& text, const glm::mat4& model,
 	const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
 {
 	assert(mWorking);
@@ -392,9 +392,9 @@ void System::draw(const Font& font, const std::wstring& text, const glm::mat4& m
 	std::vector<Renderer::Vertex::PositionColorTexture> vertices(4 * text.size());
 	std::vector<uint16_t> indices(6 * text.size());
 
-	auto pos = glm::vec2(0.0f);
+	glm::vec2 pos = { 0.0f, 0.0f };
 	
-	for (int i = 0; i < static_cast<int>(text.size()); i++)
+	for (size_t i = 0; i < text.length(); i++)
 	{
 		const auto& glyph = font.getGlyph(text.at(i));
 
@@ -417,7 +417,7 @@ void System::draw(const Font& font, const std::wstring& text, const glm::mat4& m
 		pos.x -= glyph.xoff;
 		pos.x += glyph.xadvance;
 		
-		if (i < static_cast<int>(text.size()) - 1)
+		if (i < text.length() - 1)
 		{
 			pos.x += font.getKerning(text.at(i), text.at(i + 1));
 		}
@@ -469,7 +469,7 @@ void System::draw(const Font& font, const std::wstring& text, const glm::mat4& m
 	RENDERER->drawIndexed(indices.size());
 }
 
-void System::draw(const Font& font, const std::wstring& text, const glm::mat4& model,
+void System::draw(const Font& font, const utf8_string& text, const glm::mat4& model,
 	float size, const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
 	if (size <= 0.0f)

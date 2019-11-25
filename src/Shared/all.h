@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tinyutf8.hpp>
+
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
@@ -10,7 +12,6 @@
 #include <Common/hash.h>
 #include <Common/actions.h>
 #include <Common/frame_system.h>
-#include <Common/convert.h>
 
 #include <Audio/sound.h>
 

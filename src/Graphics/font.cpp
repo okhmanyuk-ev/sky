@@ -144,14 +144,15 @@ const Font::Glyph& Font::getGlyph(uint16_t symbol) const
 	return mGlyphs.at(getGlyphIndex(symbol));
 }
 
-float Font::getStringWidth(const std::wstring& text, float size) const
+float Font::getStringWidth(const utf8_string& text, float size) const
 {
 	float result = 0.0f;
-	for (int i = 0; i < static_cast<int>(text.size()); i++)
+
+	for (size_t i = 0; i < text.length(); i++)
 	{
 		result += getGlyph(text.at(i)).xadvance;
 	
-		if (i < static_cast<int>(text.size()) - 1)
+		if (i < text.length() - 1)
 		{
 			result += getKerning(text.at(i), text.at(i + 1));
 		}
@@ -159,7 +160,7 @@ float Font::getStringWidth(const std::wstring& text, float size) const
 	return result * Font::getScaleFactorForSize(size);
 }
 
-float Font::getStringHeight(const std::wstring& text, float size) const
+float Font::getStringHeight(const utf8_string& text, float size) const
 {
 	float result = 0.0f;
 	for (const auto& symbol : text)
@@ -193,5 +194,5 @@ int Font::getGlyphIndex(uint16_t symbol) const
 	if (mGlyphIndices.count(symbol) == 0)
 		return 0;
 
-	return mGlyphIndices.at(symbol); // 433 == 'ÿ' (1103)
+	return mGlyphIndices.at(symbol);
 }
