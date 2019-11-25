@@ -29,11 +29,11 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const utf8_string& title, float title_size, std::function<void(std::shared_ptr<Scene::Node>)> callback)
 {
-	auto node = std::make_shared<Scene::Clickable<Scene::Rectangle>>();
-	node->setAlpha(0.33f);
-	node->setClickCallback([node, callback] { callback(node); });
-	node->setChooseCallback([node] { node->setAlpha(0.66f); });
-	node->setCancelChooseCallback([node] { node->setAlpha(0.33f); });
+	auto rect = std::make_shared<Scene::Clickable<Scene::Rectangle>>();
+	rect->setAlpha(0.33f);
+	rect->setClickCallback([rect, callback] { callback(rect); });
+	rect->setChooseCallback([rect] { rect->setAlpha(0.66f); });
+	rect->setCancelChooseCallback([rect] { rect->setAlpha(0.33f); });
 
 	auto label = std::make_shared<Scene::Label>();
 	label->setFont(GET_CACHED_FONT("default"));
@@ -41,14 +41,89 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const utf8_string& tit
 	label->setText(title);
 	label->setAnchor({ 0.5f, 0.5f });
 	label->setPivot({ 0.5f, 0.5f });
-	node->attach(label);
+	rect->attach(label);
 
-	return node;
+	return rect;
 }
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const utf8_string& title, float title_size, std::function<void()> callback)
 {
 	return MakeFastButton(title, title_size, [callback](auto node) { callback(); });
+}
+
+std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers::MakeFastCheckbox(
+	const utf8_string& title, float title_size, bool checked, std::function<void(bool)> changeCallback)
+{
+	auto holder = std::make_shared<Scene::Clickable<Scene::Node>>();
+
+	auto outer_rect = std::make_shared<Scene::Actionable<Scene::Rectangle>>();
+	outer_rect->setAlpha(0.33f);
+	outer_rect->setVerticalStretch(1.0f);
+	outer_rect->setMargin({ 8.0f, 8.0f });
+	outer_rect->setAnchor({ 0.0f, 0.5f });
+	outer_rect->setPivot({ 0.0f, 0.5f });
+	holder->attach(outer_rect);
+
+	outer_rect->runAction(Shared::CommonActions::ExecuteInfinite([outer_rect] {
+		outer_rect->setWidth(outer_rect->getHeight());
+	}));
+
+	auto inner_rect = std::make_shared<Scene::Rectangle>();
+	inner_rect->setAnchor({ 0.5f, 0.5f });
+	inner_rect->setPivot({ 0.5f, 0.5f });
+	inner_rect->setStretch({ 0.66f, 0.66f });
+	inner_rect->setAlpha(0.66);
+	inner_rect->setEnabled(checked);
+	outer_rect->attach(inner_rect);
+
+	auto label = std::make_shared<Scene::Label>();
+	label->setFont(GET_CACHED_FONT("default"));
+	label->setFontSize(title_size);
+	label->setText(title);
+	label->setAnchor({ 1.0f, 0.5f });
+	label->setPivot({ 0.0f, 0.5f });
+	label->setX(8.0f);
+	outer_rect->attach(label);
+
+	holder->setClickCallback([inner_rect, changeCallback] { 
+		inner_rect->setEnabled(!inner_rect->isEnabled());
+		changeCallback(inner_rect->isEnabled());
+	});
+	holder->setChooseCallback([outer_rect] { outer_rect->setAlpha(0.66f); });
+	holder->setCancelChooseCallback([outer_rect] { outer_rect->setAlpha(0.33f); });
+
+	auto setter = [inner_rect](bool value) {
+		inner_rect->setEnabled(value);
+	};
+
+	return { holder, setter };
+}
+
+std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std::vector<utf8_string> titles,
+	float title_size, int choosed, std::function<void(int)> changeCallback)
+{
+	std::vector<std::shared_ptr<Scene::Node>> result;
+	auto setters = std::make_shared<std::vector<std::function<void(bool)>>>();
+
+	int index = 0;
+
+	for (const auto& title : titles)
+	{
+		auto [checkbox, setter] = MakeFastCheckbox(title, title_size, choosed == index, [index, setters, changeCallback](bool value) {
+			for (auto setter : *setters)
+				setter(false);
+			
+			setters->at(index)(true);
+			changeCallback(index);
+		});
+
+		setters->push_back(setter);
+		result.push_back(checkbox);
+
+		index += 1;
+	}
+
+	return result;
 }
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(float height, 

@@ -28,7 +28,7 @@ namespace Shared
 		static std::string getLanguageName(Language language);
 
 	public:
-		const utf8_string& getString(const std::string& key) const;
+		utf8_string getString(const std::string& key) const;
 		
 		auto getLanguage() const { return mLanguage; }
 		void setLanguage(Language value) { mLanguage = value; }

@@ -5,7 +5,7 @@
 #include <Common/actions.h>
 #include <Common/easing.h>
 
-namespace Shared::CommonActions
+namespace Shared::CommonActions // TODO: rename to ActionsHelpers
 {
 	using EasingFunction = Common::Actions::Interpolate::EasingFunction;
     using Action = std::unique_ptr<Common::Actions::Action>;

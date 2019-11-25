@@ -63,7 +63,7 @@ std::string LocalizationSystem::getLanguageName(Language language)
 	return "";
 }
 
-const utf8_string& LocalizationSystem::getString(const std::string& key) const
+utf8_string LocalizationSystem::getString(const std::string& key) const
 {
 	auto& dictionary = mDictionaries.at(mLanguage);
 
