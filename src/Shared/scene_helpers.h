@@ -1,19 +1,15 @@
 #pragma once
 
-#include <Scene/label.h>
 #include <Shared/cache_system.h>
 #include <tinyutf8.hpp>
+#include <Scene/label.h>
+#include <Scene/clickable.h>
+#include <Scene/rectangle.h>
 
 namespace Shared::SceneHelpers
 {
 	std::shared_ptr<Scene::Label> MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder, 
 		std::shared_ptr<Scene::Node> target, const utf8_string& text, float text_size, float move_duration = 0.5f);
-
-	std::shared_ptr<Scene::Node> MakeFastButton(const utf8_string& title, float title_size,
-		std::function<void(std::shared_ptr<Scene::Node>)> callback = nullptr);
-	
-	std::shared_ptr<Scene::Node> MakeFastButton(const utf8_string& title, float title_size,
-		std::function<void()> callback = nullptr);
 
 	std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> MakeFastCheckbox(
 		const utf8_string& title, float title_size, bool checked, std::function<void(bool)> changeCallback = nullptr);
@@ -34,4 +30,16 @@ namespace Shared::SceneHelpers
 		const std::vector<std::shared_ptr<Scene::Node>> items); // TODO: std::span<..>
 
 	void ShowGraphEditor(Scene::Node& root);
+
+	class FastButton : public Scene::Clickable<Scene::Rectangle>
+	{
+	public:
+		FastButton(const utf8_string& title, float fontSize);
+
+	public:
+		void setButtonActive(bool value);
+
+	private:
+		bool mButtonActive = true;
+	};
 }

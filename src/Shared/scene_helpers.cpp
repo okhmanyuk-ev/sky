@@ -2,8 +2,6 @@
 #include <Scene/actionable.h>
 #include <Shared/common_actions.h>
 #include <imgui.h>
-#include <Scene/clickable.h>
-#include <Scene/rectangle.h>
 
 using namespace Shared;
 
@@ -25,30 +23,6 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	));
 	holder->attach(label);
 	return label;
-}
-
-std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const utf8_string& title, float title_size, std::function<void(std::shared_ptr<Scene::Node>)> callback)
-{
-	auto rect = std::make_shared<Scene::Clickable<Scene::Rectangle>>();
-	rect->setAlpha(0.33f);
-	rect->setClickCallback([rect, callback] { callback(rect); });
-	rect->setChooseCallback([rect] { rect->setAlpha(0.66f); });
-	rect->setCancelChooseCallback([rect] { rect->setAlpha(0.33f); });
-
-	auto label = std::make_shared<Scene::Label>();
-	label->setFont(GET_CACHED_FONT("default"));
-	label->setFontSize(title_size);
-	label->setText(title);
-	label->setAnchor({ 0.5f, 0.5f });
-	label->setPivot({ 0.5f, 0.5f });
-	rect->attach(label);
-
-	return rect;
-}
-
-std::shared_ptr<Scene::Node> SceneHelpers::MakeFastButton(const utf8_string& title, float title_size, std::function<void()> callback)
-{
-	return MakeFastButton(title, title_size, [callback](auto node) { callback(); });
 }
 
 std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers::MakeFastCheckbox(
@@ -298,4 +272,27 @@ void SceneHelpers::ShowGraphEditor(Scene::Node& root)
 		show(*node);
 
 	ImGui::End();
+}
+
+SceneHelpers::FastButton::FastButton(const utf8_string& title, float fontSize)
+{
+	setChooseCallback([this] { setAlpha(0.66f); });
+	setCancelChooseCallback([this] { setAlpha(0.33f); });
+
+	auto label = std::make_shared<Scene::Label>();
+	label->setFont(GET_CACHED_FONT("default"));
+	label->setFontSize(fontSize);
+	label->setText(title);
+	label->setAnchor({ 0.5f, 0.5f });
+	label->setPivot({ 0.5f, 0.5f });
+	attach(label);
+
+	setButtonActive(true);
+}
+
+void SceneHelpers::FastButton::setButtonActive(bool value)
+{
+	setAlpha(value ? 0.33f : 0.125f);
+	setClickEnabled(value);
+	mButtonActive = value;
 }

@@ -194,3 +194,12 @@ include_directories("sky/lib/rectpack2D/include")
 # nlohmann_json
 
 include_directories("sky/lib/nlohmann_json/include")
+
+# fmt
+
+file(GLOB FMT_SRC
+	sky/lib/fmt/src/*.cc
+)
+include_directories("sky/lib/fmt/include")
+add_library(fmt STATIC ${FMT_SRC})
+target_link_libraries(${PROJECT_NAME} fmt)
