@@ -1,7 +1,9 @@
 #pragma once
 
 #include <tinyutf8.hpp>
+
 #include <fmt/format.h>
+#include <fmt/chrono.h>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>

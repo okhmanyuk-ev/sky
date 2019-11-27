@@ -279,13 +279,13 @@ SceneHelpers::FastButton::FastButton(const utf8_string& title, float fontSize)
 	setChooseCallback([this] { setAlpha(0.66f); });
 	setCancelChooseCallback([this] { setAlpha(0.33f); });
 
-	auto label = std::make_shared<Scene::Label>();
-	label->setFont(GET_CACHED_FONT("default"));
-	label->setFontSize(fontSize);
-	label->setText(title);
-	label->setAnchor({ 0.5f, 0.5f });
-	label->setPivot({ 0.5f, 0.5f });
-	attach(label);
+	mLabel = std::make_shared<Scene::Label>();
+	mLabel->setFont(GET_CACHED_FONT("default"));
+	mLabel->setFontSize(fontSize);
+	mLabel->setText(title);
+	mLabel->setAnchor({ 0.5f, 0.5f });
+	mLabel->setPivot({ 0.5f, 0.5f });
+	attach(mLabel);
 
 	setButtonActive(true);
 }
