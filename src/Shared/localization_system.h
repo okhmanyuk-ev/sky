@@ -8,7 +8,8 @@
 #define LOCALIZATION_SYSTEM_KEY "localization_system"
 #define LOCALIZATION static_cast<Shared::LocalizationSystem*>(ENGINE->getCustomSystem(LOCALIZATION_SYSTEM_KEY))
 
-#define LOCALIZE(KEY, ...) LOCALIZATION->getStringFmt(KEY, __VA_ARGS__)
+#define LOCALIZE(KEY) LOCALIZATION->getString(KEY)
+#define LOCALIZE_FMT(KEY, ...) LOCALIZATION->getStringFmt(KEY, __VA_ARGS__)
 
 namespace Shared
 {
