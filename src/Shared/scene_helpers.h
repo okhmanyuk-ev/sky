@@ -5,6 +5,7 @@
 #include <Scene/label.h>
 #include <Scene/clickable.h>
 #include <Scene/rectangle.h>
+#include <Scene/actionable.h>
 
 namespace Shared::SceneHelpers
 {
@@ -45,5 +46,20 @@ namespace Shared::SceneHelpers
 	private:
 		bool mButtonActive = true;
 		std::shared_ptr<Scene::Label> mLabel;
+	};
+
+	class Progressbar : public Scene::Actionable<Scene::Rectangle>
+	{
+	public:
+		Progressbar();
+
+	public:
+		void setProgress(float value);
+		float getProgress() const;
+		
+		void addProgressWithIndicator(float value);
+
+	private:
+		std::shared_ptr<Scene::Rectangle> mProgress;
 	};
 }

@@ -296,3 +296,46 @@ void SceneHelpers::FastButton::setButtonActive(bool value)
 	setClickEnabled(value);
 	mButtonActive = value;
 }
+
+SceneHelpers::Progressbar::Progressbar()
+{
+	setAlpha(0.33f);
+	
+	mProgress = std::make_shared<Scene::Rectangle>();
+	mProgress->setAnchor({ 0.0f, 0.5f });
+	mProgress->setPivot({ 0.0f, 0.5f });
+	mProgress->setVerticalStretch(1.0f);
+	mProgress->setAlpha(0.66f);
+	attach(mProgress);
+}
+
+void SceneHelpers::Progressbar::setProgress(float value)
+{
+	mProgress->setHorizontalStretch(value);
+}
+
+float SceneHelpers::Progressbar::getProgress() const
+{
+	return mProgress->getHorizontalStretch();
+}
+
+void SceneHelpers::Progressbar::addProgressWithIndicator(float value)
+{
+	auto indicator = std::make_shared<Scene::Rectangle>();
+	indicator->setAnchor({ getProgress(), 0.5f });
+	indicator->setPivot({ 0.0f, 0.5f });
+	indicator->setStretch({ 0.0f, 1.0f });
+	indicator->setAlpha(mProgress->getAlpha());
+	indicator->setColor(Graphics::Color::Yellow);
+	attach(indicator);
+
+	runAction(Shared::CommonActions::MakeSequence(
+		Shared::CommonActions::ChangeHorizontalStretch(indicator, value, 0.5f),
+		Shared::CommonActions::ChangeColor(indicator, Graphics::Color::White, 0.5f),
+		Shared::CommonActions::Execute([this, value, indicator] {
+			setProgress(getProgress() + value);
+			indicator->setEnabled(false);
+		}),
+		Shared::CommonActions::Kill(indicator)
+	));
+}
