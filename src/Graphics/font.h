@@ -2,7 +2,7 @@
 
 #include <Platform/asset.h>
 #include <Renderer/texture.h>
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <tinyutf8.hpp>
 
@@ -47,8 +47,8 @@ namespace Graphics
 
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
-		std::map<uint16_t, Glyph> mGlyphs;
-		std::map<uint16_t, std::map<int, float>> mKernings;
-		std::map<uint16_t, int> mGlyphIndices;
+		std::unordered_map<uint16_t, Glyph> mGlyphs;
+		std::unordered_map<uint16_t, std::unordered_map<uint16_t, float>> mKernings;
+		std::unordered_map<uint16_t, uint16_t> mGlyphIndices;
 	};
 }
