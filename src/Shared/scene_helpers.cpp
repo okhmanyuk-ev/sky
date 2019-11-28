@@ -1,6 +1,6 @@
 #include "scene_helpers.h"
 #include <Scene/actionable.h>
-#include <Shared/common_actions.h>
+#include <Shared/action_helpers.h>
 #include <imgui.h>
 
 using namespace Shared;
@@ -15,11 +15,11 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	label->setPosition(holder->unproject(target->project({ target->getSize() / 2.0f })));
 	label->setPivot({ 0.5f, 0.5f });
 	label->setAlpha(0.0f);
-	label->runAction(CommonActions::MakeSequence(
-		CommonActions::Show(label, 0.5f),
-		CommonActions::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
-		CommonActions::Hide(label, 0.5f),
-		CommonActions::Kill(label)
+	label->runAction(ActionHelpers::MakeSequence(
+		ActionHelpers::Show(label, 0.5f),
+		ActionHelpers::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
+		ActionHelpers::Hide(label, 0.5f),
+		ActionHelpers::Kill(label)
 	));
 	holder->attach(label);
 	return label;
@@ -38,7 +38,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	outer_rect->setPivot({ 0.0f, 0.5f });
 	holder->attach(outer_rect);
 
-	outer_rect->runAction(Shared::CommonActions::ExecuteInfinite([outer_rect] {
+	outer_rect->runAction(ActionHelpers::ExecuteInfinite([outer_rect] {
 		outer_rect->setWidth(outer_rect->getHeight());
 	}));
 
@@ -329,13 +329,13 @@ void SceneHelpers::Progressbar::addProgressWithIndicator(float value)
 	indicator->setColor(Graphics::Color::Yellow);
 	attach(indicator);
 
-	runAction(Shared::CommonActions::MakeSequence(
-		Shared::CommonActions::ChangeHorizontalStretch(indicator, value, 0.5f),
-		Shared::CommonActions::ChangeColor(indicator, Graphics::Color::White, 0.5f),
-		Shared::CommonActions::Execute([this, value, indicator] {
+	runAction(Shared::ActionHelpers::MakeSequence(
+		Shared::ActionHelpers::ChangeHorizontalStretch(indicator, value, 0.5f),
+		Shared::ActionHelpers::ChangeColor(indicator, Graphics::Color::White, 0.5f),
+		Shared::ActionHelpers::Execute([this, value, indicator] {
 			setProgress(getProgress() + value);
 			indicator->setEnabled(false);
 		}),
-		Shared::CommonActions::Kill(indicator)
+		Shared::ActionHelpers::Kill(indicator)
 	));
 }

@@ -51,7 +51,7 @@
 #include <Shared/graphical_application.h>
 #include <Shared/localization_system.h>
 #include <Shared/graphics_helpers.h>
-#include <Shared/common_actions.h>
+#include <Shared/action_helpers.h>
 #include <Shared/first_person_camera_controller.h>
 #include <Shared/imgui_user.h>
 #include <Shared/renderer_debug.h>

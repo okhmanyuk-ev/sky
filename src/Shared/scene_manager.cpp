@@ -17,13 +17,13 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 	mInTransition = true;
 
 	auto createLeaveAction = [this] {
-		return Shared::CommonActions::MakeSequence(
-			Shared::CommonActions::Execute([this] {
+		return ActionHelpers::MakeSequence(
+			ActionHelpers::Execute([this] {
 				mCurrentScreen->mState = Screen::State::Leaving;
 				mCurrentScreen->onLeaveBegin();
 			}),
 			mCurrentScreen->createLeaveAction(),
-			Shared::CommonActions::Execute([this] {
+			ActionHelpers::Execute([this] {
 				mCurrentScreen->mState = Screen::State::Leaved;
 				mCurrentScreen->onLeaveEnd();
 				detach(mCurrentScreen);
@@ -33,8 +33,8 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 	};
 
 	auto createEnterAction = [this, screen] {
-		return Shared::CommonActions::MakeSequence(
-			Shared::CommonActions::Execute([this, screen] {
+		return ActionHelpers::MakeSequence(
+			ActionHelpers::Execute([this, screen] {
 				attach(screen);
 				mCurrentScreen = screen;
 				mCurrentScreen->mState = Screen::State::Entering;
@@ -42,7 +42,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 				mCurrentScreen->setSceneManager(weak_from_this());
 			}),
 			screen->createEnterAction(),
-			Shared::CommonActions::Execute([this] {
+			ActionHelpers::Execute([this] {
 				mInTransition = false;
 				mCurrentScreen->mState = Screen::State::Entered;
 				mCurrentScreen->onEnterEnd();
@@ -51,7 +51,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 	};
 
 	auto createFinalAction = [this, finishCallback] {
-		return Shared::CommonActions::Execute([this, finishCallback] {
+		return ActionHelpers::Execute([this, finishCallback] {
 			mInTransition = false;
 			if (finishCallback)
 				finishCallback();
@@ -62,7 +62,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 	{
 		if (mCurrentScreen)
 		{
-			runAction(Shared::CommonActions::MakeSequence(
+			runAction(ActionHelpers::MakeSequence(
 				createLeaveAction(),
 				createFinalAction()
 			));
@@ -72,14 +72,14 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 	{
 		if (!mCurrentScreen)
 		{
-			runAction(Shared::CommonActions::MakeSequence(
+			runAction(ActionHelpers::MakeSequence(
 				createEnterAction(),
 				createFinalAction()
 			));
 		}
 		else if (screen != mCurrentScreen)
 		{
-			runAction(Shared::CommonActions::MakeSequence(
+			runAction(ActionHelpers::MakeSequence(
 				createLeaveAction(),
 				createEnterAction(),
 				createFinalAction()
@@ -100,9 +100,9 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window)
 	mCurrentWindow->onOpenBegin();
 	mCurrentWindow->mState = Window::State::Opening;
 
-	runAction(Shared::CommonActions::MakeSequence(
+	runAction(ActionHelpers::MakeSequence(
 		mCurrentWindow->createOpenAction(),
-		Shared::CommonActions::Execute([this] {
+		ActionHelpers::Execute([this] {
 			mCurrentWindow->onOpenEnd();
 			mCurrentWindow->mState = Window::State::Opened;
 		})
@@ -116,9 +116,9 @@ void SceneManager::popWindow(std::function<void()> finishCallback)
 	mCurrentWindow->onCloseBegin();
 	mCurrentWindow->mState = Window::State::Closing;
 
-	runAction(Shared::CommonActions::MakeSequence(
+	runAction(ActionHelpers::MakeSequence(
 		mCurrentWindow->createCloseAction(),
-		Shared::CommonActions::Execute([this, finishCallback] {
+		ActionHelpers::Execute([this, finishCallback] {
 			mCurrentWindow->onCloseEnd();
 			mCurrentWindow->mState = Window::State::Closed;
 			detach(mCurrentWindow);

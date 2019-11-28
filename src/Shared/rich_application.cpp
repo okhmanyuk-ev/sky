@@ -3,7 +3,7 @@
 #include <imgui.h>
 #include <Shared/imgui_user.h>
 #include <Common/easing.h>
-#include <Shared/common_actions.h>
+#include <Shared/action_helpers.h>
 
 using namespace Shared;
 
@@ -18,10 +18,10 @@ RichApplication::RichApplication(const std::string& appname) : GraphicalApplicat
 	CONSOLE_DEVICE->setEnabled(false);
 	
 	FRAME->addOne([this] {
-		Common::Actions::Run(Shared::CommonActions::Delayed(1.0f,
-			Shared::CommonActions::MakeSequence(
-				Shared::CommonActions::InterpolateValue(1.0f, 0.0f, 0.5f, mLoadingFade),
-				Shared::CommonActions::Execute([this] {
+		Common::Actions::Run(ActionHelpers::Delayed(1.0f,
+			ActionHelpers::MakeSequence(
+				ActionHelpers::InterpolateValue(1.0f, 0.0f, 0.5f, mLoadingFade),
+				ActionHelpers::Execute([this] {
 					mLoading = true;
 					mStartLoadingTime = Clock::Now();
 				})
@@ -56,15 +56,15 @@ RichApplication::RichApplication(const std::string& appname) : GraphicalApplicat
 		mLoading = false;
 
 		FRAME->addOne([this] {
-			Common::Actions::Run(Shared::CommonActions::Delayed(0.25f,
-				Shared::CommonActions::MakeSequence(
-					Shared::CommonActions::InterpolateValue(0.0f, 1.0f, 0.5f, mLoadingFade),
-					Shared::CommonActions::Execute([this] {
+			Common::Actions::Run(ActionHelpers::Delayed(0.25f,
+				ActionHelpers::MakeSequence(
+					ActionHelpers::InterpolateValue(0.0f, 1.0f, 0.5f, mLoadingFade),
+					ActionHelpers::Execute([this] {
 						initInternal();
 						initialize();
 						mInitialized = true;
 					}),
-					Shared::CommonActions::InterpolateValue(1.0f, 0.0f, 0.5f, mGameFade)
+					ActionHelpers::InterpolateValue(1.0f, 0.0f, 0.5f, mGameFade)
 				)
 			));
 		});

@@ -5,7 +5,7 @@
 #include <Common/actions.h>
 #include <Common/easing.h>
 
-namespace Shared::CommonActions // TODO: rename to ActionsHelpers
+namespace Shared::ActionHelpers
 {
 	using EasingFunction = Common::Actions::Interpolate::EasingFunction;
     using Action = std::unique_ptr<Common::Actions::Action>;
@@ -96,7 +96,7 @@ namespace Shared::CommonActions // TODO: rename to ActionsHelpers
 	Action ChangeScale(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 }
 
-namespace Shared::CommonActions
+namespace Shared::ActionHelpers
 {
 	template<class...Args> std::unique_ptr<Common::Actions::Sequence> MakeSequence(Args&&...args)
 	{
