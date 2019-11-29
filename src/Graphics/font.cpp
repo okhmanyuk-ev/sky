@@ -86,7 +86,12 @@ Font::Font(void* data, size_t size)
 	{
 		for (int j = 0; j < info.numGlyphs; j++)
 		{
-			mKernings[i][j] = stbtt_GetGlyphKernAdvance(&info, i, j) * scale;
+			auto kern = stbtt_GetGlyphKernAdvance(&info, i, j);
+			
+			if (kern == 0.0f)
+				continue;
+
+			mKernings[i][j] = kern * scale;
 		}
 	}
 
@@ -193,13 +198,15 @@ float Font::getKerning(uint16_t left, uint16_t right) const
 	if (mKernings.count(left_glyph) == 0)
 		return 0.0f;
 
-	if (mKernings.at(left_glyph).count(right_glyph) == 0)
+	const auto& left_kern = mKernings.at(left_glyph);
+
+	if (left_kern.count(right_glyph) == 0)
 		return 0.0f;
 
-	return mKernings.at(left_glyph).at(right_glyph);
+	return left_kern.at(right_glyph);
 }
 
-int Font::getGlyphIndex(uint16_t symbol) const
+uint16_t Font::getGlyphIndex(uint16_t symbol) const
 {
 	if (mGlyphIndices.count(symbol) == 0)
 		return 0;

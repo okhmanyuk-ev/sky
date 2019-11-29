@@ -48,7 +48,7 @@ namespace Graphics
 		float getKerning(uint16_t left, uint16_t right) const;
 
 	private:
-		int getGlyphIndex(uint16_t symbol) const;
+		uint16_t getGlyphIndex(uint16_t symbol) const;
 
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
