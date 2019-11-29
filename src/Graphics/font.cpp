@@ -90,16 +90,16 @@ Font::Font(void* data, size_t size)
 		_glyph.xadvance = static_cast<float>(xadvance) * scale;
 	}
 
-	for (int i = 0; i < info.numGlyphs; i++)
+	for (const auto& [left_index, left_glyph] : mGlyphs)
 	{
-		for (int j = 0; j < info.numGlyphs; j++)
+		for (const auto& [right_index, right_glyph] : mGlyphs)
 		{
-			auto kern = stbtt_GetCodepointKernAdvance(&info, i, j);
-			
+			auto kern = stbtt_GetCodepointKernAdvance(&info, left_index, right_index);
+
 			if (kern == 0.0f)
 				continue;
 
-			mKernings[i][j] = kern * scale;
+			mKernings[left_index][right_index] = kern * scale;
 		}
 	}
 
