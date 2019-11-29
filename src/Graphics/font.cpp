@@ -69,24 +69,32 @@ Font::Font(void* data, size_t size)
 	const auto result_size = find_best_packing<spaces_type>(rectangles,
 		make_finder_input(max_side, discard_step, report_successful, report_unsuccessful, runtime_flipping_mode), my_custom_order_1, my_custom_order_2);
 
-	for (int i = 0; i < info.numGlyphs; i++)
+	for (int i = 0; i < 65535; i++)
 	{
+		auto g_index = stbtt_FindGlyphIndex(&info, i);
+
+		if (g_index == 0 && i != 0)
+			continue;
+
 		int xadvance;
-		stbtt_GetGlyphHMetrics(&info, i, &xadvance, nullptr);
-		mGlyphs[i].x = rectangles[i].x;
-		mGlyphs[i].y = rectangles[i].y;
-		mGlyphs[i].w = rectangles[i].w;
-		mGlyphs[i].h = rectangles[i].h;
-		mGlyphs[i].xoff = static_cast<float>(glyphs[i].xoff);
-		mGlyphs[i].yoff = static_cast<float>(glyphs[i].yoff);
-		mGlyphs[i].xadvance = static_cast<float>(xadvance) * scale;
+		stbtt_GetCodepointHMetrics(&info, i, &xadvance, nullptr);
+		auto& _glyph = mGlyphs[i];
+		const auto& rect = rectangles.at(g_index);
+		const auto& g = glyphs.at(g_index);
+		_glyph.x = rect.x;
+		_glyph.y = rect.y;
+		_glyph.w = rect.w;
+		_glyph.h = rect.h;
+		_glyph.xoff = static_cast<float>(g.xoff);
+		_glyph.yoff = static_cast<float>(g.yoff);
+		_glyph.xadvance = static_cast<float>(xadvance) * scale;
 	}
 
 	for (int i = 0; i < info.numGlyphs; i++)
 	{
 		for (int j = 0; j < info.numGlyphs; j++)
 		{
-			auto kern = stbtt_GetGlyphKernAdvance(&info, i, j);
+			auto kern = stbtt_GetCodepointKernAdvance(&info, i, j);
 			
 			if (kern == 0.0f)
 				continue;
@@ -115,18 +123,6 @@ Font::Font(void* data, size_t size)
 	}
 
 	mTexture = std::make_shared<Renderer::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory());
-
-	// codepoints
-
-	for (int i = 0; i < 65535; i++)
-	{
-		auto index = stbtt_FindGlyphIndex(&info, i);
-		
-		if (index == 0)
-			continue;
-
-		mGlyphIndices[i] = index;
-	}
 }
 
 Font::Font(const Platform::Asset& asset) : Font(asset.getMemory(), asset.getSize())
@@ -146,7 +142,10 @@ float Font::getScaleFactorForSize(float size)
 
 const Font::Glyph& Font::getGlyph(uint16_t symbol) const
 {
-	return mGlyphs.at(getGlyphIndex(symbol));
+	if (mGlyphs.count(symbol) == 0)
+		return mGlyphs.at(0);
+
+	return mGlyphs.at(symbol);
 }
 
 float Font::getStringWidth(utf8_string::const_iterator begin, utf8_string::const_iterator end, float size) const
@@ -192,24 +191,13 @@ float Font::getStringHeight(const utf8_string& text, float size) const
 
 float Font::getKerning(uint16_t left, uint16_t right) const
 {
-	auto left_glyph = getGlyphIndex(left);
-	auto right_glyph = getGlyphIndex(right);
-
-	if (mKernings.count(left_glyph) == 0)
+	if (mKernings.count(left) == 0)
 		return 0.0f;
 
-	const auto& left_kern = mKernings.at(left_glyph);
+	const auto& left_kern = mKernings.at(left);
 
-	if (left_kern.count(right_glyph) == 0)
+	if (left_kern.count(right) == 0)
 		return 0.0f;
 
-	return left_kern.at(right_glyph);
-}
-
-uint16_t Font::getGlyphIndex(uint16_t symbol) const
-{
-	if (mGlyphIndices.count(symbol) == 0)
-		return 0;
-
-	return mGlyphIndices.at(symbol);
+	return left_kern.at(right);
 }

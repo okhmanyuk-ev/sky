@@ -48,12 +48,8 @@ namespace Graphics
 		float getKerning(uint16_t left, uint16_t right) const;
 
 	private:
-		uint16_t getGlyphIndex(uint16_t symbol) const;
-
-	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
 		std::unordered_map<uint16_t, Glyph> mGlyphs;
 		std::unordered_map<uint16_t, std::unordered_map<uint16_t, float>> mKernings;
-		std::unordered_map<uint16_t, uint16_t> mGlyphIndices;
 	};
 }

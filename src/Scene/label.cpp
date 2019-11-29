@@ -41,8 +41,7 @@ void Label::draw()
 		auto drawLine = [this, fontSize, draw](utf8_string::const_iterator begin, utf8_string::const_iterator end, float y) -> utf8_string::iterator {
 			for (auto it = begin; it != end; ++it)
 			{
-				auto s = utf8_string(begin, it);
-				auto s_width = mFont->getStringWidth(s, fontSize);
+				auto s_width = mFont->getStringWidth(begin, it, fontSize);
 				
 				if (s_width <= getWidth())
 					continue;
