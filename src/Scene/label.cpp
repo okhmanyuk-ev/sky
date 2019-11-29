@@ -21,50 +21,68 @@ void Label::update()
 
 void Label::draw()
 {
-	if (mFont == nullptr || mFontSize <= 0.0f /*|| (mMultiline && getWidth() <= 0.0f)*/)
+	if (mFont == nullptr || mFontSize <= 0.0f || (mMultiline && getWidth() <= 0.0f))
 	{
 		Node::draw();
 		return;
 	}
 
+	auto scale = mFont->getScaleFactorForSize(mFontSize);
+	auto fontSize = mFontSize * glm::max(getHorizontalScale(), getVerticalScale());
+
 	if (mMultiline)
 	{
-		auto scale = mFont->getScaleFactorForSize(mFontSize);
-		auto fontSize = mFontSize * glm::max(getHorizontalScale(), getVerticalScale());
-		auto base_transform = getTransform();
-
-		auto draw = [this, base_transform, scale, fontSize](const utf8_string& s, float y) {
-			auto model = glm::translate(base_transform, { 0.0f, y, 0.0f });
+		auto draw = [this, scale, fontSize](const utf8_string& s, float y) {
+			auto model = glm::translate(getTransform(), { 0.0f, y, 0.0f });
 			model = glm::scale(model, { scale, scale, 1.0f });
 			GRAPHICS->draw(*mFont, s, model, fontSize, getColor(), mOutlineThickness, mOutlineColor);
 		};
 
-		utf8_string s = "";
-		float y = 0.0f;
-		for (int i = 0; i < mText.length(); i++)
-		{
-			auto width = mFont->getStringWidth(s + mText.at(i), mFontSize);
-
-			if (width >= getWidth())
+		auto drawLine = [this, fontSize, draw](utf8_string::iterator begin, utf8_string::iterator end, float y) -> utf8_string::iterator {
+			for (auto it = begin; it != end; ++it)
 			{
-				draw(s, y);				
-				y += mFont->getStringHeight(s, mFontSize);
-				s.clear();
+				auto s = utf8_string(begin, it);
+				auto s_width = mFont->getStringWidth(s, fontSize);
+				
+				if (s_width <= getWidth())
+					continue;
+
+				auto local_end = it - 1;
+
+				auto rit_begin = utf8_string::reverse_iterator(local_end);
+				auto rit_end = utf8_string::reverse_iterator(begin);
+				
+				for (auto rit = rit_begin; rit != rit_end; ++rit)
+				{
+					if (*rit != ' ')
+						continue;
+
+					rit--;
+					draw({ begin, rit.base() }, y);
+					return rit.base();
+				}
+
+				draw({ begin, local_end }, y);
+				return local_end;
 			}
+			draw({ begin, end }, y);
+			return end;
+		};
 
-			s += mText.at(i);
+		auto it = mText.begin();
+		float y = 0.0f;
+
+		while (it != mText.end())
+		{
+			it = drawLine(it, mText.end(), y);
+			y += mFontSize;
 		}
-		draw(s, y);
 
-		setHeight(y + mFont->getStringHeight(s));
+		setHeight(y);
 	}
 	else
 	{
-		auto scale = mFont->getScaleFactorForSize(mFontSize);
-
 		auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
-		auto fontSize = mFontSize * glm::max(getHorizontalScale(), getVerticalScale());
-
 		GRAPHICS->draw(*mFont, mText, model, fontSize, getColor(), mOutlineThickness, mOutlineColor);
 	}
 
