@@ -371,32 +371,34 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model);
 }
 
-void System::draw(const Font& font, const utf8_string& text, const glm::mat4& model,
-	const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
+void System::draw(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
+	const glm::mat4& model, const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
 {
 	assert(mWorking);
 
-	if (text.empty())
+	if (begin == end)
 		return;
 
 	flush();
 
 	const auto texture = font.getTexture();
 	
-	float str_w = font.getStringWidth(text);
-	float str_h = font.getStringHeight(text);
+	float str_w = font.getStringWidth(begin, end);
+	float str_h = font.getStringHeight(begin, end);
 
 	float tex_w = static_cast<float>(texture->getWidth());
 	float tex_h = static_cast<float>(texture->getHeight());
 
-	std::vector<Renderer::Vertex::PositionColorTexture> vertices(4 * text.size());
-	std::vector<uint16_t> indices(6 * text.size());
+	auto length = std::distance(begin, end);
+	std::vector<Renderer::Vertex::PositionColorTexture> vertices(4 * length);
+	std::vector<uint16_t> indices(6 * length);
 
 	glm::vec2 pos = { 0.0f, 0.0f };
-	
-	for (size_t i = 0; i < text.length(); i++)
+	int i = 0;
+
+	for (auto it = begin; it != end; ++it, i++)
 	{
-		const auto& glyph = font.getGlyph(text.at(i));
+		const auto& glyph = font.getGlyph(*it);
 
 		float glyph_w = static_cast<float>(glyph.w);
 		float glyph_h = static_cast<float>(glyph.h);
@@ -417,9 +419,9 @@ void System::draw(const Font& font, const utf8_string& text, const glm::mat4& mo
 		pos.x -= glyph.xoff;
 		pos.x += glyph.xadvance;
 		
-		if (i < text.length() - 1)
+		if (it < end - 1)
 		{
-			pos.x += font.getKerning(text.at(i), text.at(i + 1));
+			pos.x += font.getKerning(*it, *(it + 1));
 		}
 
 		float u1 = glyph_x / tex_w;
@@ -470,7 +472,14 @@ void System::draw(const Font& font, const utf8_string& text, const glm::mat4& mo
 }
 
 void System::draw(const Font& font, const utf8_string& text, const glm::mat4& model,
-	float size, const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
+	const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
+{
+	draw(font, text.begin(), text.end(), model, color, minValue, maxValue, smoothFactor);
+}
+
+void System::draw(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
+	const glm::mat4& model, float size, const glm::vec4& color, float outlineThickness, 
+	const glm::vec4& outlineColor)
 {
 	if (size <= 0.0f)
 		return;
@@ -485,10 +494,16 @@ void System::draw(const Font& font, const utf8_string& text, const glm::mat4& mo
 	
 	if (fixedOutlineThickness > 0.0f && mSdfEnabled)
 	{
-		draw(font, text, model, outlineColor, outline,
+		draw(font, begin, end, model, outlineColor, outline,
 			mid + (smoothFactor / 2.0f), smoothFactor);
 	}
-	draw(font, text, model, color, mid, max, smoothFactor);
+	draw(font, begin, end, model, color, mid, max, smoothFactor);
+}
+
+void System::draw(const Font& font, const utf8_string& text, const glm::mat4& model, float size, 
+	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
+{
+	draw(font, text.begin(), text.end(), model, size, color, outlineThickness, outlineColor);
 }
 
 void System::push(const State& value)

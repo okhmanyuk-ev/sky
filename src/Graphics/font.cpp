@@ -144,28 +144,33 @@ const Font::Glyph& Font::getGlyph(uint16_t symbol) const
 	return mGlyphs.at(getGlyphIndex(symbol));
 }
 
-float Font::getStringWidth(const utf8_string& text, float size) const
+float Font::getStringWidth(utf8_string::const_iterator begin, utf8_string::const_iterator end, float size) const
 {
 	float result = 0.0f;
 
-	for (size_t i = 0; i < text.length(); i++)
+	for (auto it = begin; it != end; ++it)
 	{
-		result += getGlyph(text.at(i)).xadvance;
+		result += getGlyph(*it).xadvance;
 	
-		if (i < text.length() - 1)
+		if (it < end - 1)
 		{
-			result += getKerning(text.at(i), text.at(i + 1));
+			result += getKerning(*it, *(it + 1));
 		}
 	}
 	return result * Font::getScaleFactorForSize(size);
 }
 
-float Font::getStringHeight(const utf8_string& text, float size) const
+float Font::getStringWidth(const utf8_string& text, float size) const
+{
+	return getStringWidth(text.begin(), text.end(), size);
+}
+
+float Font::getStringHeight(utf8_string::const_iterator begin, utf8_string::const_iterator end, float size) const
 {
 	float result = 0.0f;
-	for (const auto& symbol : text)
+	for (auto it = begin; it != end; ++it)
 	{
-		float h = static_cast<float>(getGlyph(symbol).h);
+		float h = static_cast<float>(getGlyph(*it).h);
 
 		if (result >= h)
 			continue;
@@ -173,6 +178,11 @@ float Font::getStringHeight(const utf8_string& text, float size) const
 		result = h;
 	}
 	return (result - (SdfPadding * 2.0f)) * Font::getScaleFactorForSize(size);
+}
+
+float Font::getStringHeight(const utf8_string& text, float size) const
+{
+	return getStringHeight(text.begin(), text.end(), size);
 }
 
 float Font::getKerning(uint16_t left, uint16_t right) const
