@@ -31,6 +31,8 @@ void Label::draw()
 	auto scale = mFont->getScaleFactorForSize(fontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
+	GRAPHICS->push(Renderer::Sampler::Linear);
+
 	if (mMultiline)
 	{
 		auto height = GRAPHICS->drawMultilineString(*mFont, mText, model, fontSize, getWidth(),
@@ -41,6 +43,8 @@ void Label::draw()
 	{
 		GRAPHICS->drawString(*mFont, mText, model, fontSize, getColor(), mOutlineThickness, mOutlineColor);
 	}
+
+	GRAPHICS->pop();
 
 	Node::draw();
 }

@@ -371,6 +371,30 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model);
 }
 
+void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+	const std::vector<uint32_t>& indices, float minValue, float maxValue,
+	float smoothFactor, const glm::mat4 model)
+{
+	flush();
+
+	mSdfShader.setProjectionMatrix(mStates.top().projectionMatrix);
+	mSdfShader.setViewMatrix(mStates.top().viewMatrix);
+	mSdfShader.setModelMatrix(model);
+	mSdfShader.setMinValue(minValue);
+	mSdfShader.setMaxValue(maxValue);
+	mSdfShader.setSmoothFactor(smoothFactor);
+
+	RENDERER->setTexture(*texture);
+	RENDERER->setTopology(topology);
+	RENDERER->setIndexBuffer(indices);
+	RENDERER->setVertexBuffer(vertices);
+	RENDERER->setSampler(mStates.top().sampler); // linear
+	RENDERER->setShader(mSdfShader);
+
+	RENDERER->drawIndexed(indices.size());
+}
+
 void System::drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end,
 	const glm::mat4& model, const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
 {
@@ -378,8 +402,6 @@ void System::drawString(const Font& font, utf8_string::const_iterator begin, utf
 
 	if (begin == end)
 		return;
-
-	flush();
 
 	const auto texture = font.getTexture();
 	
@@ -391,7 +413,7 @@ void System::drawString(const Font& font, utf8_string::const_iterator begin, utf
 
 	auto length = std::distance(begin, end);
 	std::vector<Renderer::Vertex::PositionColorTexture> vertices(4 * length);
-	std::vector<uint16_t> indices(6 * length);
+	std::vector<uint32_t> indices(6 * length);
 
 	glm::vec2 pos = { 0.0f, 0.0f };
 	int i = 0;
@@ -444,31 +466,8 @@ void System::drawString(const Font& font, utf8_string::const_iterator begin, utf
 		idx[5] = start_vtx + 3;
 	}
 	
-	if (mSdfEnabled)
-	{
-		mSdfShader.setProjectionMatrix(mStates.top().projectionMatrix);
-		mSdfShader.setViewMatrix(mStates.top().viewMatrix);
-		mSdfShader.setModelMatrix(model);
-		mSdfShader.setMinValue(minValue);
-		mSdfShader.setMaxValue(maxValue);
-		mSdfShader.setSmoothFactor(smoothFactor);
-		RENDERER->setShader(mSdfShader);
-	}
-	else
-	{
-		mTexturedShader.setProjectionMatrix(mStates.top().projectionMatrix);
-		mTexturedShader.setViewMatrix(mStates.top().viewMatrix);
-		mTexturedShader.setModelMatrix(model);
-		RENDERER->setShader(mTexturedShader);
-	}
-
-	RENDERER->setTexture(*texture);
-	RENDERER->setTopology(Renderer::Topology::TriangleList);
-	RENDERER->setIndexBuffer(indices);
-	RENDERER->setVertexBuffer(vertices);
-	RENDERER->setSampler(Renderer::Sampler::Linear);
-
-	RENDERER->drawIndexed(indices.size());
+	drawSdf(Renderer::Topology::TriangleList, font.getTexture(), vertices, indices,
+		minValue, maxValue, smoothFactor, model);
 }
 
 void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model,
@@ -492,7 +491,7 @@ void System::drawString(const Font& font, utf8_string::const_iterator begin, utf
 	const float outline = glm::lerp(mid, min, fixedOutlineThickness);
 	float smoothFactor = 2.0f / size / PLATFORM->getScale();
 	
-	if (fixedOutlineThickness > 0.0f && mSdfEnabled)
+	if (fixedOutlineThickness > 0.0f)
 	{
 		drawString(font, begin, end, model, outlineColor, outline,
 			mid + (smoothFactor / 2.0f), smoothFactor);

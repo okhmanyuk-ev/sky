@@ -75,6 +75,12 @@ namespace Graphics
 		void draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model, 
 			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f });
 
+		// sdf mesh
+		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
+			float smoothFactor, const glm::mat4 model = glm::mat4(1.0f));
+
 		// low-level text
 		void drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
 			const glm::mat4& model, const glm::vec4& color, float minValue, float maxValue, 
@@ -111,13 +117,8 @@ namespace Graphics
 		void pushProjectionMatrix(const glm::mat4& value);
 
 		auto getCurrentState() const { return mStates.top(); }
-
-	public:
-		void setSdfEnabled(bool value) { mSdfEnabled = value; }
-		bool isSdfEnabled() const { return mSdfEnabled; }	
 		
 	private:
-		bool mSdfEnabled = true;
 		bool mWorking = false;
 
 	public:
