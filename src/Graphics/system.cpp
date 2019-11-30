@@ -371,7 +371,7 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model);
 }
 
-void System::draw(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
+void System::drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end,
 	const glm::mat4& model, const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
 {
 	assert(mWorking);
@@ -471,13 +471,13 @@ void System::draw(const Font& font, utf8_string::const_iterator begin, utf8_stri
 	RENDERER->drawIndexed(indices.size());
 }
 
-void System::draw(const Font& font, const utf8_string& text, const glm::mat4& model,
+void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model,
 	const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
 {
-	draw(font, text.begin(), text.end(), model, color, minValue, maxValue, smoothFactor);
+	drawString(font, text.begin(), text.end(), model, color, minValue, maxValue, smoothFactor);
 }
 
-void System::draw(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
+void System::drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end,
 	const glm::mat4& model, float size, const glm::vec4& color, float outlineThickness, 
 	const glm::vec4& outlineColor)
 {
@@ -494,16 +494,68 @@ void System::draw(const Font& font, utf8_string::const_iterator begin, utf8_stri
 	
 	if (fixedOutlineThickness > 0.0f && mSdfEnabled)
 	{
-		draw(font, begin, end, model, outlineColor, outline,
+		drawString(font, begin, end, model, outlineColor, outline,
 			mid + (smoothFactor / 2.0f), smoothFactor);
 	}
-	draw(font, begin, end, model, color, mid, max, smoothFactor);
+	drawString(font, begin, end, model, color, mid, max, smoothFactor);
 }
 
-void System::draw(const Font& font, const utf8_string& text, const glm::mat4& model, float size, 
+void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
-	draw(font, text.begin(), text.end(), model, size, color, outlineThickness, outlineColor);
+	drawString(font, text.begin(), text.end(), model, size, color, outlineThickness, outlineColor);
+}
+
+float System::drawMultilineString(const Font& font, const utf8_string& text, const glm::mat4& model,
+	float size, float maxWidth, const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
+{
+	auto draw = [this, &font, model, size, color, outlineThickness, outlineColor](utf8_string::const_iterator begin, utf8_string::const_iterator end, float y) {
+		auto m = glm::translate(model, { 0.0f, y, 0.0f });
+		drawString(font, begin, end, m, size, color, outlineThickness, outlineColor);
+	};
+
+	auto drawLine = [this, &font, maxWidth, size, draw](utf8_string::const_iterator begin, utf8_string::const_iterator end, float y) -> utf8_string::iterator {
+		for (auto it = begin; it != end; ++it)
+		{
+			auto s_width = font.getStringWidth(begin, it, size);
+
+			if (s_width <= maxWidth)
+				continue;
+
+			auto local_end = utf8_string::const_iterator(it - 1);
+
+			auto rit_begin = utf8_string::const_reverse_iterator(local_end);
+			auto rit_end = utf8_string::const_reverse_iterator(begin);
+
+			for (auto rit = rit_begin; rit != rit_end; ++rit)
+			{
+				if (*rit != ' ')
+					continue;
+
+				rit--;
+
+				draw(begin, rit.base(), y);
+				return rit.base();
+			}
+
+			draw(begin, local_end, y);
+			return local_end;
+		}
+		draw(begin, end, y);
+		return end;
+	};
+	
+	auto it = text.begin();
+	float y = 0.0f;
+	auto scale = font.getScaleFactorForSize(size);
+
+	while (it != text.end())
+	{
+		it = drawLine(it, text.end(), y);
+		y += size / scale;
+	}
+
+	return y * scale;
 }
 
 void System::push(const State& value)

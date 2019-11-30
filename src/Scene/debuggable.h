@@ -50,7 +50,7 @@ namespace Scene
 				const glm::vec4 BackgroundColor = { 0.0f, 0.0f, 0.0f, 0.5f };
 
 				GRAPHICS->drawRectangle(bg_model, BackgroundColor);
-				GRAPHICS->draw(*Debug::Font.value(), mName, label_model, Debug::FontSize, NameColor);
+				GRAPHICS->drawString(*Debug::Font.value(), mName, label_model, Debug::FontSize, NameColor);
 			}
 		}
 

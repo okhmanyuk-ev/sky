@@ -76,20 +76,25 @@ namespace Graphics
 			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f });
 
 		// low-level text
-		void draw(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
+		void drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
 			const glm::mat4& model, const glm::vec4& color, float minValue, float maxValue, 
 			float smoothFactor);
 		
-		void draw(const Font& font, const utf8_string& text, const glm::mat4& model,
+		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model,
 			const glm::vec4& color, float minValue, float maxValue, float smoothFactor);
 
 		// text
-		void draw(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
+		void drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end,
 			const glm::mat4& model, float size, const glm::vec4& color = { Color::White, 1.0f }, 
 			float outlineThickness = 0.0f, const glm::vec4& outlineColor = { Color::Black, 1.0f });
 
-		void draw(const Font& font, const utf8_string& text, const glm::mat4& model,
+		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model,
 			float size, const glm::vec4& color = { Color::White, 1.0f }, float outlineThickness = 0.0f,
+			const glm::vec4& outlineColor = { Color::Black, 1.0f });
+
+		// multiline string, returning height of text
+		float drawMultilineString(const Font& font, const utf8_string& text, const glm::mat4& model,
+			float size, float maxWidth, const glm::vec4& color = { Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Color::Black, 1.0f });
 
 	public:
