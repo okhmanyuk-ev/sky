@@ -26,7 +26,7 @@ namespace Graphics
 	{
 	public:
 		struct State;
-		using TextMesh = Mesh<Renderer::Vertex::PositionColorTexture>;
+		using TextMesh = Mesh<Renderer::Vertex::PositionTexture>;
 
 	public:
 		void begin(const glm::mat4& viewMatrix = glm::mat4(1.0f), const glm::mat4& projectionMatrix = glm::mat4(1.0f));
@@ -78,27 +78,30 @@ namespace Graphics
 
 		// sdf mesh
 		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+			const std::vector<Renderer::Vertex::PositionTexture>& vertices,
 			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
-			float smoothFactor, const glm::mat4 model = glm::mat4(1.0f));
-
-		// low-level text
-		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, 
-			float minValue, float maxValue, float smoothFactor);
-
-		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size);
-		
-		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
+			float smoothFactor, const glm::mat4 model,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
+		// text
+		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, 
+			float minValue, float maxValue, float smoothFactor, 
+			const glm::vec4& color = { Graphics::Color::White, 1.0f });
+
+		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size, 
+			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
+			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
+		
+		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
+			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
+			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
+
 	public:
-		TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end, 
-			const glm::vec4& color);
-		
-		TextMesh createTextMesh(const Font& font, const utf8_string& text, const glm::vec4& color);
-		
+		TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end);
+		TextMesh createTextMesh(const Font& font, const utf8_string& text);
+
 		std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const utf8_string& text, 
-			const glm::vec4& color, float maxWidth, float size);
+			float maxWidth, float size);
 
 	public:
 		void push(const State& value);
@@ -158,7 +161,7 @@ namespace Graphics
 		bool mBatching = true;
 		
 	private:
-		Renderer::ShaderSDF mSdfShader = Renderer::ShaderSDF(Renderer::Vertex::PositionColorTexture::Layout);
+		Renderer::ShaderSDF mSdfShader = Renderer::ShaderSDF(Renderer::Vertex::PositionTexture::Layout);
 		Renderer::ShaderDefault mTexturedShader = Renderer::ShaderDefault(Renderer::Vertex::PositionColorTexture::Layout);
 		Renderer::ShaderDefault mColoredShader = Renderer::ShaderDefault(Renderer::Vertex::PositionColor::Layout);
 

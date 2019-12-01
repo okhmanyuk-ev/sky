@@ -21,6 +21,7 @@ namespace
 			float4x4 viewMatrix;
 			float4x4 projectionMatrix;
 			float4x4 modelMatrix;
+			float4 color;
 			float minValue;
 			float maxValue;
 			float smoothFactor;
@@ -29,13 +30,11 @@ namespace
 		struct VertexInput
 		{
 			float3 pos : POSITION0;
-			float4 col : COLOR0;
 			float2 uv : TEXCOORD0;
 		};
 
 		struct PixelInput
 		{
-			float4 col : COLOR0;
 			float2 uv : TEXCOORD0;
 			float4 pixelPosition : SV_POSITION;
 		};
@@ -46,7 +45,6 @@ namespace
 		PixelInput vs_main(VertexInput input)
 		{
 			PixelInput result;
-			result.col = input.col;
 			result.uv = input.uv;
 			result.pixelPosition = mul(projectionMatrix, mul(viewMatrix, mul(modelMatrix, float4(input.pos, 1.0))));
 			return result;
@@ -62,11 +60,11 @@ namespace
 			{
 				if (maxAlpha > 0.0)
 				{
-					result = float4(input.col.rgb, input.col.a * maxAlpha);
+					result = float4(color.rgb, color.a * maxAlpha);
 				}
 				if (minAlpha > 0.0 && minAlpha < maxAlpha)
 				{
-					result = float4(input.col.rgb, input.col.a * minAlpha);
+					result = float4(color.rgb, color.a * minAlpha);
 				}
 			}
 			return result;

@@ -13,7 +13,6 @@ namespace Renderer
 	private:
 		const std::set<Vertex::Attribute::Type> requiredAttribs = {
 			Vertex::Attribute::Type::Position,
-			Vertex::Attribute::Type::Color,
 			Vertex::Attribute::Type::TexCoord,
 		};
 
@@ -23,6 +22,7 @@ namespace Renderer
 			glm::mat4 view = glm::mat4(1.0f);
 			glm::mat4 projection = glm::mat4(1.0f);
 			glm::mat4 model = glm::mat4(1.0f);
+			glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 			float minValue = 0.0f;
 			float maxValue = 0.0f;
 			float smoothFactor = 0.0f;
@@ -43,6 +43,7 @@ namespace Renderer
 		void setMinValue(float value) { mConstantBufferData.minValue = value; mNeedUpdate = true; }
 		void setMaxValue(float value) { mConstantBufferData.maxValue = value; mNeedUpdate = true; }
 		void setSmoothFactor(float value) { mConstantBufferData.smoothFactor = value; mNeedUpdate = true; }
+		void setColor(const glm::vec4& value) { mConstantBufferData.color = value; mNeedUpdate = true; }
 
 	private:
 		ConstantBuffer mConstantBufferData;

@@ -26,6 +26,7 @@ namespace
 			mat4 uViewMatrix;
 			mat4 uProjectionMatrix;
 			mat4 uModelMatrix;
+			vec4 uColor;
 			float uMinValue;
 			float uMaxValue;
 			float uSmoothFactor;
@@ -36,15 +37,12 @@ namespace
 		
 		#ifdef VERTEX_SHADER
 		in vec3 aPosition;
-		in vec4 aColor;
 		in vec2 aTexCoord;
 
-		out vec4 vColor;
 		out vec2 vTexCoord;
 
 		void main()
 		{
-			vColor = aColor;
 			vTexCoord = aTexCoord;
 			gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
 			
@@ -54,7 +52,6 @@ namespace
 		#endif
 
 		#ifdef FRAGMENT_SHADER
-		in vec4 vColor;
 		in vec2 vTexCoord;
 
 		out vec4 fragColor;
@@ -69,11 +66,11 @@ namespace
 			{
 				if (maxAlpha > 0.0)
 				{
-					result = vec4(vColor.rgb, vColor.a * maxAlpha);
+					result = vec4(uColor.rgb, uColor.a * maxAlpha);
 				}
 				if (minAlpha > 0.0 && minAlpha < maxAlpha)
 				{
-					result = vec4(vColor.rgb, vColor.a * minAlpha);
+					result = vec4(uColor.rgb, uColor.a * minAlpha);
 				}
 			}
 			fragColor = result;
@@ -155,7 +152,6 @@ ShaderSDF::ShaderSDF(const Vertex::Layout& layout)
 	
 	static const std::map<Vertex::Attribute::Type, std::string> attribName = {
 		{ Vertex::Attribute::Type::Position, "aPosition" },
-		{ Vertex::Attribute::Type::Color, "aColor" },
 		{ Vertex::Attribute::Type::TexCoord, "aTexCoord" }
 	};
 

@@ -372,9 +372,9 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 }
 
 void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+	const std::vector<Renderer::Vertex::PositionTexture>& vertices,
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
-	float smoothFactor, const glm::mat4 model)
+	float smoothFactor, const glm::mat4 model, const glm::vec4& color)
 {
 	flush();
 
@@ -384,6 +384,7 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 	mSdfShader.setMinValue(minValue);
 	mSdfShader.setMaxValue(maxValue);
 	mSdfShader.setSmoothFactor(smoothFactor);
+	mSdfShader.setColor(color);
 
 	RENDERER->setTexture(*texture);
 	RENDERER->setTopology(topology);
@@ -396,29 +397,37 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model,
-	float minValue, float maxValue, float smoothFactor)
+	float minValue, float maxValue, float smoothFactor, const glm::vec4& color)
 {
 	assert(mWorking);
 	drawSdf(mesh.topology, font.getTexture(), mesh.vertices, mesh.indices, minValue, 
-		maxValue, smoothFactor, model);
+		maxValue, smoothFactor, model, color);
 }
 
-void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size)
+void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size,
+	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
+	float fixedOutlineThickness = glm::lerp(0.0f, 0.75f, outlineThickness);
+
+	const float min = 0.0f;
 	const float mid = Font::SdfOnedge;
 	const float max = 1.0f;
+	const float outline = glm::lerp(mid, min, fixedOutlineThickness);
 	float smoothFactor = 2.0f / size / PLATFORM->getScale();
-	drawString(font, mesh, model, mid, max, smoothFactor);
+
+	if (fixedOutlineThickness > 0.0f)
+		drawString(font, mesh, model, outline, mid + (smoothFactor / 2.0f), smoothFactor, outlineColor);
+
+	drawString(font, mesh, model, mid, max, smoothFactor, color);
 }
 
 void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
-	const glm::vec4& color)
+	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(font, createTextMesh(font, text, color), model, size);
+	drawString(font, createTextMesh(font, text), model, size, color, outlineThickness, outlineColor);
 }
 
-System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end,
-	const glm::vec4& color)
+System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end)
 {
 	TextMesh mesh;
 
@@ -471,10 +480,10 @@ System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator 
 		float u2 = (glyph_x + glyph_w) / tex_w;
 		float v2 = (glyph_y + glyph_h) / tex_h;
 
-		vtx[0] = { { x1, y1, 0.0f }, color, { u1, v1 } };
-		vtx[1] = { { x1, y2, 0.0f }, color, { u1, v2 } };
-		vtx[2] = { { x2, y2, 0.0f }, color, { u2, v2 } };
-		vtx[3] = { { x2, y1, 0.0f }, color, { u2, v1 } };
+		vtx[0] = { { x1, y1, 0.0f }, { u1, v1 } };
+		vtx[1] = { { x1, y2, 0.0f }, { u1, v2 } };
+		vtx[2] = { { x2, y2, 0.0f }, { u2, v2 } };
+		vtx[3] = { { x2, y1, 0.0f }, { u2, v1 } };
 
 		auto base_vtx = i * 4;
 
@@ -489,12 +498,12 @@ System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator 
 	return mesh;
 }
 
-System::TextMesh System::createTextMesh(const Font& font, const utf8_string& text, const glm::vec4& color)
+System::TextMesh System::createTextMesh(const Font& font, const utf8_string& text)
 {
-	return createTextMesh(font, text.begin(), text.end(), color);
+	return createTextMesh(font, text.begin(), text.end());
 }
 
-std::tuple<float, System::TextMesh> System::createMultilineTextMesh(const Font& font, const utf8_string& text, const glm::vec4& color,
+std::tuple<float, System::TextMesh> System::createMultilineTextMesh(const Font& font, const utf8_string& text,
 	float maxWidth, float size)
 {
 	auto scale = font.getScaleFactorForSize(size);
@@ -546,7 +555,7 @@ std::tuple<float, System::TextMesh> System::createMultilineTextMesh(const Font& 
 			if (best_it != begin)
 				it = best_it;
 
-			appendTextMesh(result, createTextMesh(font, begin, it, color), height);
+			appendTextMesh(result, createTextMesh(font, begin, it), height);
 			begin = it;
 		}
 
@@ -554,7 +563,7 @@ std::tuple<float, System::TextMesh> System::createMultilineTextMesh(const Font& 
 	}
 
 	if (begin != text.end()) 
-		appendTextMesh(result, createTextMesh(font, begin, text.end(), color), height);
+		appendTextMesh(result, createTextMesh(font, begin, text.end()), height);
 
 	return { height * scale, result };
 }

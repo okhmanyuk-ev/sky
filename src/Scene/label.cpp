@@ -42,26 +42,18 @@ void Label::update()
 		mMeshDirty = true;
 	}
 
-	auto color = getColor();
-
-	if (mPrevColor != color)
-	{
-		mPrevColor = color;
-		mMeshDirty = true;
-	}
-
 	if (mMeshDirty)
 	{
 		if (!mMultiline)
 		{
 			setWidth(mFont->getStringWidth(mText, mFontSize));
 			setHeight(mFont->getStringHeight(mText, mFontSize));
-			mMesh = GRAPHICS->createTextMesh(*mFont, mText, color);
+			mMesh = GRAPHICS->createTextMesh(*mFont, mText);
 		}
 		else if (width > 0.0f)
 		{
 			float height = 0.0f;
-			std::tie(height, mMesh) = GRAPHICS->createMultilineTextMesh(*mFont, mText, color, width, mFontSize);
+			std::tie(height, mMesh) = GRAPHICS->createMultilineTextMesh(*mFont, mText, width, mFontSize);
 			setHeight(height);
 		}
 		mMeshDirty = false;
@@ -82,7 +74,7 @@ void Label::draw()
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
 	GRAPHICS->push(Renderer::Sampler::Linear);
-	GRAPHICS->drawString(*mFont, mMesh, model, mFontSize);
+	GRAPHICS->drawString(*mFont, mMesh, model, mFontSize, getColor(), mOutlineThickness, mOutlineColor);
 	GRAPHICS->pop();
 
 	Node::draw();
