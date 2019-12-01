@@ -47,7 +47,6 @@ namespace Scene
 		float mPrevFontSize = 0.0f;
 		std::shared_ptr<Graphics::Font> mPrevFont;
 		bool mPrevMultiline = false;
-		glm::vec4 mPrevColor;
 		float mOutlineThickness = 0.0f;
 		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
 	};
