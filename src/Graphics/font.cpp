@@ -148,15 +148,15 @@ const Font::Glyph& Font::getGlyph(uint16_t symbol) const
 	return mGlyphs.at(symbol);
 }
 
-float Font::getStringWidth(utf8_string::const_iterator begin, utf8_string::const_iterator end, float size) const
+float Font::getStringWidth(utf8_string::iterator begin, utf8_string::iterator end, float size) const
 {
 	float result = 0.0f;
 
 	for (auto it = begin; it != end; ++it)
 	{
 		result += getGlyph(*it).xadvance;
-	
-		if (it < end - 1)
+
+		if (it != end - 1)
 		{
 			result += getKerning(*it, *(it + 1));
 		}
@@ -169,7 +169,7 @@ float Font::getStringWidth(const utf8_string& text, float size) const
 	return getStringWidth(text.begin(), text.end(), size);
 }
 
-float Font::getStringHeight(utf8_string::const_iterator begin, utf8_string::const_iterator end, float size) const
+float Font::getStringHeight(utf8_string::iterator begin, utf8_string::iterator end, float size) const
 {
 	float result = 0.0f;
 	for (auto it = begin; it != end; ++it)

@@ -21,16 +21,6 @@ namespace Scene
 
 		const auto& getText() const { return mText; }
 		void setText(const utf8_string& value) { mText = value; }
-		
-		auto getOutlineThickness() const { return mOutlineThickness; }
-		void setOutlineThickness(float value) { mOutlineThickness = value; }
-
-		auto getOutlineColor() const { return mOutlineColor; }
-		void setOutlineColor(const glm::vec4& value) { mOutlineColor = value; }
-		void setOutlineColor(const glm::vec3& value) { mOutlineColor = { value, mOutlineColor.a }; }
-
-		auto getOutlineAlpha() const { return mOutlineColor.a; }
-		void setOutlineAlpha(float value) { mOutlineColor.a = value; }
 
 		auto isMultiline() const { return mMultiline; }
 		void setMultiline(bool value) { mMultiline = value; }
@@ -39,8 +29,14 @@ namespace Scene
 		std::shared_ptr<Graphics::Font> mFont;
 		float mFontSize = 24.0f;
 		utf8_string mText = "";
-		float mOutlineThickness = 0.0f;
-		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
 		bool mMultiline = false;
+		Graphics::System::TextMesh mMesh;
+		bool mMeshDirty = true;
+		utf8_string mPrevText;
+		float mPrevWidth = 0.0f;
+		float mPrevFontSize = 0.0f;
+		std::shared_ptr<Graphics::Font> mPrevFont;
+		bool mPrevMultiline = false;
+		glm::vec4 mPrevColor;
 	};
 }

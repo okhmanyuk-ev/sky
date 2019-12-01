@@ -229,7 +229,7 @@ void SceneHelpers::ShowGraphEditor(Scene::Node& root)
 			ImGui::DragFloat2("Margin", (float*)&margin);
 			ImGui::DragFloat2("Anchor", (float*)&anchor, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat2("Pivot", (float*)&pivot, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat2("Scale", (float*)&scale);
+			ImGui::DragFloat2("Scale", (float*)&scale, 0.01f, 0.0f, 2.0f);
 			ImGui::DragFloat("Pivot", &rotation);
 
 			node.setPosition(position);

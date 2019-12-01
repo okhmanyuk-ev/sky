@@ -17,8 +17,8 @@
 #include <glm/ext.hpp>
 #include <optional>
 #include <stack>
-
 #include <tinyutf8.hpp>
+#include "mesh.h"
 
 namespace Graphics
 {
@@ -26,6 +26,7 @@ namespace Graphics
 	{
 	public:
 		struct State;
+		using TextMesh = Mesh<Renderer::Vertex::PositionColorTexture>;
 
 	public:
 		void begin(const glm::mat4& viewMatrix = glm::mat4(1.0f), const glm::mat4& projectionMatrix = glm::mat4(1.0f));
@@ -82,26 +83,22 @@ namespace Graphics
 			float smoothFactor, const glm::mat4 model = glm::mat4(1.0f));
 
 		// low-level text
-		void drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end, 
-			const glm::mat4& model, const glm::vec4& color, float minValue, float maxValue, 
-			float smoothFactor);
+		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, 
+			float minValue, float maxValue, float smoothFactor);
+
+		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size);
 		
-		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model,
-			const glm::vec4& color, float minValue, float maxValue, float smoothFactor);
+		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
+			const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
-		// text
-		void drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end,
-			const glm::mat4& model, float size, const glm::vec4& color = { Color::White, 1.0f }, 
-			float outlineThickness = 0.0f, const glm::vec4& outlineColor = { Color::Black, 1.0f });
-
-		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model,
-			float size, const glm::vec4& color = { Color::White, 1.0f }, float outlineThickness = 0.0f,
-			const glm::vec4& outlineColor = { Color::Black, 1.0f });
-
-		// multiline string, returning height of text
-		float drawMultilineString(const Font& font, const utf8_string& text, const glm::mat4& model,
-			float size, float maxWidth, const glm::vec4& color = { Color::White, 1.0f }, float outlineThickness = 0.0f,
-			const glm::vec4& outlineColor = { Color::Black, 1.0f });
+	public:
+		TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end, 
+			const glm::vec4& color);
+		
+		TextMesh createTextMesh(const Font& font, const utf8_string& text, const glm::vec4& color);
+		
+		std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const utf8_string& text, 
+			const glm::vec4& color, float maxWidth, float size);
 
 	public:
 		void push(const State& value);

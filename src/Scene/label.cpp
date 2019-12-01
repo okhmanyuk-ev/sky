@@ -10,10 +10,61 @@ void Label::update()
 		return;
 	}
 
-	if (!mMultiline)
+	if (mPrevText != mText)
 	{
-		setWidth(mFont->getStringWidth(mText, mFontSize));
-		setHeight(mFont->getStringHeight(mText, mFontSize));
+		mPrevText = mText;
+		mMeshDirty = true;
+	}
+
+	auto width = getWidth();
+
+	if (mMultiline && mPrevWidth != width)
+	{
+		mPrevWidth = width;
+		mMeshDirty = true;
+	}
+
+	if (mPrevFontSize != mFontSize)
+	{
+		mPrevFontSize = mFontSize;
+		mMeshDirty = true;
+	}
+
+	if (mPrevFont != mFont)
+	{
+		mPrevFont = mFont;
+		mMeshDirty = true;
+	}
+
+	if (mPrevMultiline != mMultiline)
+	{
+		mPrevMultiline = mMultiline;
+		mMeshDirty = true;
+	}
+
+	auto color = getColor();
+
+	if (mPrevColor != color)
+	{
+		mPrevColor = color;
+		mMeshDirty = true;
+	}
+
+	if (mMeshDirty)
+	{
+		if (!mMultiline)
+		{
+			setWidth(mFont->getStringWidth(mText, mFontSize));
+			setHeight(mFont->getStringHeight(mText, mFontSize));
+			mMesh = GRAPHICS->createTextMesh(*mFont, mText, color);
+		}
+		else if (width > 0.0f)
+		{
+			float height = 0.0f;
+			std::tie(height, mMesh) = GRAPHICS->createMultilineTextMesh(*mFont, mText, color, width, mFontSize);
+			setHeight(height);
+		}
+		mMeshDirty = false;
 	}
 
 	Node::update();
@@ -27,23 +78,11 @@ void Label::draw()
 		return;
 	}
 
-	auto fontSize = mFontSize * glm::max(getHorizontalScale(), getVerticalScale());
-	auto scale = mFont->getScaleFactorForSize(fontSize);
+	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
 	GRAPHICS->push(Renderer::Sampler::Linear);
-
-	if (mMultiline)
-	{
-		auto height = GRAPHICS->drawMultilineString(*mFont, mText, model, fontSize, getWidth(),
-			getColor(), mOutlineThickness, mOutlineColor);
-		setHeight(height);
-	}
-	else
-	{
-		GRAPHICS->drawString(*mFont, mText, model, fontSize, getColor(), mOutlineThickness, mOutlineColor);
-	}
-
+	GRAPHICS->drawString(*mFont, mMesh, model, mFontSize);
 	GRAPHICS->pop();
 
 	Node::draw();

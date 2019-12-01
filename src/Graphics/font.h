@@ -37,12 +37,10 @@ namespace Graphics
 
 		static float getScaleFactorForSize(float size);
 
-		float getStringWidth(utf8_string::const_iterator begin, utf8_string::const_iterator end, 
-			float size = GlyphSize) const;
+		float getStringWidth(utf8_string::iterator begin, utf8_string::iterator end, float size = GlyphSize) const;
 		float getStringWidth(const utf8_string& text, float size = GlyphSize) const;
-		
-		float getStringHeight(utf8_string::const_iterator begin, utf8_string::const_iterator end, 
-			float size = GlyphSize) const;
+
+		float getStringHeight(utf8_string::iterator begin, utf8_string::iterator end, float size = GlyphSize) const;
 		float getStringHeight(const utf8_string& text, float size = GlyphSize) const;
 
 		float getKerning(uint16_t left, uint16_t right) const;

@@ -389,31 +389,51 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 	RENDERER->setTopology(topology);
 	RENDERER->setIndexBuffer(indices);
 	RENDERER->setVertexBuffer(vertices);
-	RENDERER->setSampler(mStates.top().sampler); // linear
+	RENDERER->setSampler(mStates.top().sampler);
 	RENDERER->setShader(mSdfShader);
 
 	RENDERER->drawIndexed(indices.size());
 }
 
-void System::drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end,
-	const glm::mat4& model, const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
+void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model,
+	float minValue, float maxValue, float smoothFactor)
 {
 	assert(mWorking);
+	drawSdf(mesh.topology, font.getTexture(), mesh.vertices, mesh.indices, minValue, 
+		maxValue, smoothFactor, model);
+}
 
-	if (begin == end)
-		return;
+void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size)
+{
+	const float mid = Font::SdfOnedge;
+	const float max = 1.0f;
+	float smoothFactor = 2.0f / size / PLATFORM->getScale();
+	drawString(font, mesh, model, mid, max, smoothFactor);
+}
+
+void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
+	const glm::vec4& color)
+{
+	drawString(font, createTextMesh(font, text, color), model, size);
+}
+
+System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end,
+	const glm::vec4& color)
+{
+	TextMesh mesh;
+
+	mesh.topology = Renderer::Topology::TriangleList;
 
 	const auto texture = font.getTexture();
-	
-	float str_w = font.getStringWidth(begin, end);
+
 	float str_h = font.getStringHeight(begin, end);
 
 	float tex_w = static_cast<float>(texture->getWidth());
 	float tex_h = static_cast<float>(texture->getHeight());
 
 	auto length = std::distance(begin, end);
-	std::vector<Renderer::Vertex::PositionColorTexture> vertices(4 * length);
-	std::vector<uint32_t> indices(6 * length);
+	mesh.vertices.resize(length * 4);
+	mesh.indices.resize(length * 6);
 
 	glm::vec2 pos = { 0.0f, 0.0f };
 	int i = 0;
@@ -426,22 +446,22 @@ void System::drawString(const Font& font, utf8_string::const_iterator begin, utf
 		float glyph_h = static_cast<float>(glyph.h);
 		float glyph_x = static_cast<float>(glyph.x);
 		float glyph_y = static_cast<float>(glyph.y);
-		
-		auto vtx = &vertices[i * 4];
-		auto idx = &indices[i * 6];
+
+		auto vtx = &mesh.vertices[i * 4];
+		auto idx = &mesh.indices[i * 6];
 
 		pos.y = glyph.yoff;
 		pos.x += glyph.xoff;
 
 		float x1 = pos.x;
-		float x2 = pos.x + glyph_w ;
+		float x2 = pos.x + glyph_w;
 		float y1 = pos.y + str_h;
 		float y2 = pos.y + str_h + glyph_h;
 
 		pos.x -= glyph.xoff;
 		pos.x += glyph.xadvance;
-		
-		if (it < end - 1)
+
+		if (it != end - 1)
 		{
 			pos.x += font.getKerning(*it, *(it + 1));
 		}
@@ -456,105 +476,87 @@ void System::drawString(const Font& font, utf8_string::const_iterator begin, utf
 		vtx[2] = { { x2, y2, 0.0f }, color, { u2, v2 } };
 		vtx[3] = { { x2, y1, 0.0f }, color, { u2, v1 } };
 
-		auto start_vtx = i * 4;
+		auto base_vtx = i * 4;
 
-		idx[0] = start_vtx + 0;
-		idx[1] = start_vtx + 1;
-		idx[2] = start_vtx + 2;
-		idx[3] = start_vtx + 0;
-		idx[4] = start_vtx + 2;
-		idx[5] = start_vtx + 3;
+		idx[0] = base_vtx + 0;
+		idx[1] = base_vtx + 1;
+		idx[2] = base_vtx + 2;
+		idx[3] = base_vtx + 0;
+		idx[4] = base_vtx + 2;
+		idx[5] = base_vtx + 3;
 	}
-	
-	drawSdf(Renderer::Topology::TriangleList, font.getTexture(), vertices, indices,
-		minValue, maxValue, smoothFactor, model);
+
+	return mesh;
 }
 
-void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model,
-	const glm::vec4& color, float minValue, float maxValue, float smoothFactor)
+System::TextMesh System::createTextMesh(const Font& font, const utf8_string& text, const glm::vec4& color)
 {
-	drawString(font, text.begin(), text.end(), model, color, minValue, maxValue, smoothFactor);
+	return createTextMesh(font, text.begin(), text.end(), color);
 }
 
-void System::drawString(const Font& font, utf8_string::const_iterator begin, utf8_string::const_iterator end,
-	const glm::mat4& model, float size, const glm::vec4& color, float outlineThickness, 
-	const glm::vec4& outlineColor)
+std::tuple<float, System::TextMesh> System::createMultilineTextMesh(const Font& font, const utf8_string& text, const glm::vec4& color,
+	float maxWidth, float size)
 {
-	if (size <= 0.0f)
-		return;
-	
-	float fixedOutlineThickness = glm::lerp(0.0f, 0.75f, outlineThickness);
-
-	const float min = 0.0f;
-	const float mid = Font::SdfOnedge;
-	const float max = 1.0f;
-	const float outline = glm::lerp(mid, min, fixedOutlineThickness);
-	float smoothFactor = 2.0f / size / PLATFORM->getScale();
-	
-	if (fixedOutlineThickness > 0.0f)
-	{
-		drawString(font, begin, end, model, outlineColor, outline,
-			mid + (smoothFactor / 2.0f), smoothFactor);
-	}
-	drawString(font, begin, end, model, color, mid, max, smoothFactor);
-}
-
-void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
-	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
-{
-	drawString(font, text.begin(), text.end(), model, size, color, outlineThickness, outlineColor);
-}
-
-float System::drawMultilineString(const Font& font, const utf8_string& text, const glm::mat4& model,
-	float size, float maxWidth, const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
-{
-	auto draw = [this, &font, model, size, color, outlineThickness, outlineColor](utf8_string::const_iterator begin, utf8_string::const_iterator end, float y) {
-		auto m = glm::translate(model, { 0.0f, y, 0.0f });
-		drawString(font, begin, end, m, size, color, outlineThickness, outlineColor);
-	};
-
-	auto drawLine = [this, &font, maxWidth, size, draw](utf8_string::const_iterator begin, utf8_string::const_iterator end, float y) -> utf8_string::iterator {
-		for (auto it = begin; it != end; ++it)
-		{
-			auto s_width = font.getStringWidth(begin, it, size);
-
-			if (s_width <= maxWidth)
-				continue;
-
-			auto local_end = utf8_string::const_iterator(it - 1);
-
-			auto rit_begin = utf8_string::const_reverse_iterator(local_end);
-			auto rit_end = utf8_string::const_reverse_iterator(begin);
-
-			for (auto rit = rit_begin; rit != rit_end; ++rit)
-			{
-				if (*rit != ' ')
-					continue;
-
-				rit--;
-
-				draw(begin, rit.base(), y);
-				return rit.base();
-			}
-
-			draw(begin, local_end, y);
-			return local_end;
-		}
-		draw(begin, end, y);
-		return end;
-	};
-	
-	auto it = text.begin();
-	float y = 0.0f;
 	auto scale = font.getScaleFactorForSize(size);
+
+	auto appendTextMesh = [scale, size](TextMesh& source, const TextMesh& append, float& height) {
+		for (auto index : append.indices)
+		{
+			index += source.vertices.size();
+			source.indices.push_back(index);
+		}
+		for (auto vertex : append.vertices)
+		{
+			vertex.pos.y += height;
+			source.vertices.push_back(vertex);
+		}
+		height += size / scale;
+	};
+
+	TextMesh result;
+	
+	result.topology = Renderer::Topology::TriangleList;
+
+	float height = 0.0f;
+
+	auto begin = text.begin();
+	auto it = begin;
 
 	while (it != text.end())
 	{
-		it = drawLine(it, text.end(), y);
-		y += size / scale;
+		auto str_w = font.getStringWidth(begin, it, size);
+
+		if (str_w >= maxWidth)
+		{
+			--it;
+			
+			auto best_it = it;
+			
+			while (best_it != begin)
+			{
+				if (*best_it == ' ')
+				{
+					++best_it;
+					break;
+				}
+
+				--best_it;
+			}
+
+			if (best_it != begin)
+				it = best_it;
+
+			appendTextMesh(result, createTextMesh(font, begin, it, color), height);
+			begin = it;
+		}
+
+		++it;
 	}
 
-	return y * scale;
+	if (begin != text.end()) 
+		appendTextMesh(result, createTextMesh(font, begin, text.end(), color), height);
+
+	return { height * scale, result };
 }
 
 void System::push(const State& value)
