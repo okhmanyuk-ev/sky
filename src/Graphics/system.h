@@ -97,8 +97,9 @@ namespace Graphics
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
 
 	public:
-		TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end);
-		TextMesh createTextMesh(const Font& font, const utf8_string& text);
+		TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end, float height);
+		
+		TextMesh createSinglelineTextMesh(const Font& font, const utf8_string& text);
 
 		std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const utf8_string& text, 
 			float maxWidth, float size);

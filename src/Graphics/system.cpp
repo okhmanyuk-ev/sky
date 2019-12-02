@@ -424,18 +424,16 @@ void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4&
 void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(font, createTextMesh(font, text), model, size, color, outlineThickness, outlineColor);
+	drawString(font, createSinglelineTextMesh(font, text), model, size, color, outlineThickness, outlineColor);
 }
 
-System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end)
+System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end, float height)
 {
 	TextMesh mesh;
 
 	mesh.topology = Renderer::Topology::TriangleList;
 
 	const auto texture = font.getTexture();
-
-	float str_h = font.getStringHeight(begin, end);
 
 	float tex_w = static_cast<float>(texture->getWidth());
 	float tex_h = static_cast<float>(texture->getHeight());
@@ -464,8 +462,8 @@ System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator 
 
 		float x1 = pos.x;
 		float x2 = pos.x + glyph_w;
-		float y1 = pos.y + str_h;
-		float y2 = pos.y + str_h + glyph_h;
+		float y1 = pos.y + height;
+		float y2 = pos.y + height + glyph_h;
 
 		pos.x -= glyph.xoff;
 		pos.x += glyph.xadvance;
@@ -498,35 +496,49 @@ System::TextMesh System::createTextMesh(const Font& font, utf8_string::iterator 
 	return mesh;
 }
 
-System::TextMesh System::createTextMesh(const Font& font, const utf8_string& text)
+System::TextMesh System::createSinglelineTextMesh(const Font& font, const utf8_string& text)
 {
-	return createTextMesh(font, text.begin(), text.end());
+	return createTextMesh(font, text.begin(), text.end(), font.getStringHeight(text));
 }
 
 std::tuple<float, System::TextMesh> System::createMultilineTextMesh(const Font& font, const utf8_string& text,
 	float maxWidth, float size)
 {
 	auto scale = font.getScaleFactorForSize(size);
-
-	auto appendTextMesh = [scale, size](TextMesh& source, const TextMesh& append, float& height) {
-		for (auto index : append.indices)
-		{
-			index += source.vertices.size();
-			source.indices.push_back(index);
-		}
-		for (auto vertex : append.vertices)
-		{
-			vertex.pos.y += height;
-			source.vertices.push_back(vertex);
-		}
-		height += size / scale;
-	};
+	float height = 0.0f;
 
 	TextMesh result;
+
+	bool firstLine = true;
+	auto getStringHeight = [&firstLine, scale, size, &font](utf8_string::iterator begin, utf8_string::iterator end) {
+		if (firstLine)
+		{
+			firstLine = false;
+			return font.getStringHeight(begin, end);
+		}
+		return size / scale;
+	};
+
+	auto appendTextMesh = [this, &font, scale, &height, getStringHeight, &result](utf8_string::iterator begin, utf8_string::iterator end, bool lastLine = false) {
+		auto str_h = getStringHeight(begin, end);
+		auto mesh = createTextMesh(font, begin, end, str_h);
+		for (auto index : mesh.indices)
+		{
+			index += result.vertices.size();
+			result.indices.push_back(index);
+		}
+		for (auto vertex : mesh.vertices)
+		{
+			vertex.pos.y += height;
+			result.vertices.push_back(vertex);
+		}
+		if (lastLine)
+			height += font.getStringHeight(begin, end) / scale;
+		else
+			height += str_h;
+	};
 	
 	result.topology = Renderer::Topology::TriangleList;
-
-	float height = 0.0f;
 
 	auto begin = text.begin();
 	auto it = begin;
@@ -555,15 +567,15 @@ std::tuple<float, System::TextMesh> System::createMultilineTextMesh(const Font& 
 			if (best_it != begin)
 				it = best_it;
 
-			appendTextMesh(result, createTextMesh(font, begin, it), height);
+			appendTextMesh(begin, it);
 			begin = it;
 		}
 
 		++it;
 	}
 
-	if (begin != text.end()) 
-		appendTextMesh(result, createTextMesh(font, begin, text.end()), height);
+	if (begin != text.end())
+		appendTextMesh(begin, text.end(), true);
 
 	return { height * scale, result };
 }

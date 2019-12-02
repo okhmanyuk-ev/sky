@@ -4,11 +4,10 @@ using namespace Scene;
 
 void Label::update()
 {
+	Node::update();
+
 	if (mFont == nullptr || mFontSize <= 0.0f)
-	{
-		Node::update();
 		return;
-	}
 
 	if (mPrevText != mText)
 	{
@@ -46,29 +45,28 @@ void Label::update()
 	{
 		if (!mMultiline)
 		{
-			setWidth(mFont->getStringWidth(mText, mFontSize));
-			setHeight(mFont->getStringHeight(mText, mFontSize));
-			mMesh = GRAPHICS->createTextMesh(*mFont, mText);
+			mMeshWidth = mFont->getStringWidth(mText, mFontSize);
+			mMeshHeight = mFont->getStringHeight(mText, mFontSize);
+			mMesh = GRAPHICS->createSinglelineTextMesh(*mFont, mText);
 		}
 		else if (width > 0.0f)
 		{
-			float height = 0.0f;
-			std::tie(height, mMesh) = GRAPHICS->createMultilineTextMesh(*mFont, mText, width, mFontSize);
-			setHeight(height);
+			mMeshWidth = width;
+			std::tie(mMeshHeight, mMesh) = GRAPHICS->createMultilineTextMesh(*mFont, mText, width, mFontSize);
 		}
 		mMeshDirty = false;
 	}
 
-	Node::update();
+	setWidth(mMeshWidth);
+	setHeight(mMeshHeight);
 }
 
 void Label::draw()
 {
+	Node::draw();
+
 	if (mFont == nullptr || mFontSize <= 0.0f || (mMultiline && getWidth() <= 0.0f))
-	{
-		Node::draw();
 		return;
-	}
 
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
@@ -76,6 +74,4 @@ void Label::draw()
 	GRAPHICS->push(Renderer::Sampler::Linear);
 	GRAPHICS->drawString(*mFont, mMesh, model, mFontSize, getColor(), mOutlineThickness, mOutlineColor);
 	GRAPHICS->pop();
-
-	Node::draw();
 }

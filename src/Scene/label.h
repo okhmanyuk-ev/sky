@@ -41,6 +41,8 @@ namespace Scene
 		utf8_string mText = "";
 		bool mMultiline = false;
 		Graphics::System::TextMesh mMesh;
+		float mMeshWidth = 0.0f;
+		float mMeshHeight = 0.0f;
 		bool mMeshDirty = true;
 		utf8_string mPrevText;
 		float mPrevWidth = 0.0f;
