@@ -9,7 +9,7 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	std::shared_ptr<Scene::Node> target, const utf8_string& text, float text_size, float move_duration)
 {
 	auto label = std::make_shared<Scene::Actionable<Scene::Label>>();
-	label->setFont(GET_CACHED_FONT("default"));
+	label->setFont(FONT("default"));
 	label->setFontSize(text_size);
 	label->setText(text);
 	label->setPosition(holder->unproject(target->project({ target->getSize() / 2.0f })));
@@ -51,7 +51,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	outer_rect->attach(inner_rect);
 
 	auto label = std::make_shared<Scene::Label>();
-	label->setFont(GET_CACHED_FONT("default"));
+	label->setFont(FONT("default"));
 	label->setFontSize(title_size);
 	label->setText(title);
 	label->setAnchor({ 1.0f, 0.5f });
@@ -184,7 +184,7 @@ SceneHelpers::FastButton::FastButton(const utf8_string& title, float fontSize)
 	setCancelChooseCallback([this] { setAlpha(0.33f); });
 
 	mLabel = std::make_shared<Scene::Label>();
-	mLabel->setFont(GET_CACHED_FONT("default"));
+	mLabel->setFont(FONT("default"));
 	mLabel->setFontSize(fontSize);
 	mLabel->setText(title);
 	mLabel->setAnchor({ 0.5f, 0.5f });

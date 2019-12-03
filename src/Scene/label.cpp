@@ -59,6 +59,8 @@ void Label::update()
 
 	setWidth(mMeshWidth);
 	setHeight(mMeshHeight);
+
+	Node::update();
 }
 
 void Label::draw()
