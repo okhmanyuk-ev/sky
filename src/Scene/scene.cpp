@@ -38,7 +38,7 @@ void Scene::Scene::recursiveNodeDraw(const std::shared_ptr<Node>& node)
 	node->endRender();
 }
 
-std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNode(const std::shared_ptr<Node>& node, const glm::vec2& pos)
+std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(const std::shared_ptr<Node>& node, const glm::vec2& pos)
 {
 	if (!node->isEnabled())
 		return { };
@@ -58,7 +58,7 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNode(const std
 
 	for (auto it = nodes.rbegin(); it != nodes.rend(); ++it)
 	{
-		for (auto node : getTouchableNode(*it, pos))
+		for (auto node : getTouchableNodes(*it, pos))
 		{
 			result.push_back(node);
 		}
@@ -75,9 +75,45 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNode(const std
 	return result;
 }
 
-std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNode(const glm::vec2& pos)
+std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(const glm::vec2& pos)
 {
-	return getTouchableNode(mRoot, pos);
+	return getTouchableNodes(mRoot, pos);
+}
+
+std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const std::shared_ptr<Node>& node, const glm::vec2& pos)
+{
+	if (!node->isEnabled())
+		return { };
+
+	if (!node->isVisible())
+		return { };
+
+	if (!node->interactTest(node->unproject(pos)))
+		return { };
+
+	auto& nodes = node->getNodes();
+
+	std::list<std::shared_ptr<Node>> result;
+
+	for (auto it = nodes.rbegin(); it != nodes.rend(); ++it)
+	{
+		for (auto node : getNodes(*it, pos))
+		{
+			result.push_back(node);
+		}
+	}
+
+	if (!node->hitTest(node->unproject(pos)))
+		return result;
+
+	result.push_back(node);
+
+	return result;
+}
+
+std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const glm::vec2& pos)
+{
+	return getNodes(mRoot, pos);
 }
 
 void Scene::Scene::frame()
@@ -142,7 +178,7 @@ void Scene::Scene::event(const Platform::Touch::Event& e)
 	{
 		int mask = 0;
 
-		for (auto node : getTouchableNode(pos))
+		for (auto node : getTouchableNodes(pos))
 		{
 			if ((mask & node->getTouchMask()) > 0)
 				continue;

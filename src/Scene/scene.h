@@ -33,8 +33,13 @@ namespace Scene
 		void recursiveNodeUpdate(const std::shared_ptr<Node>& node);
 		void recursiveNodeDraw(const std::shared_ptr<Node>& node);
 
-		std::list<std::shared_ptr<Node>> getTouchableNode(const std::shared_ptr<Node>& node, const glm::vec2& pos);
-		std::list<std::shared_ptr<Node>> getTouchableNode(const glm::vec2& pos);
+	private:
+		std::list<std::shared_ptr<Node>> getTouchableNodes(const std::shared_ptr<Node>& node, const glm::vec2& pos);
+		std::list<std::shared_ptr<Node>> getTouchableNodes(const glm::vec2& pos);
+
+	public:
+		std::list<std::shared_ptr<Node>> getNodes(const std::shared_ptr<Node>& node, const glm::vec2& pos);
+		std::list<std::shared_ptr<Node>> getNodes(const glm::vec2& pos);
 
 	public:
 		auto& getRoot() { return mRoot; }

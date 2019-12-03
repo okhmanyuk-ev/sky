@@ -30,8 +30,6 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(const glm::vec2& cell_size,
 		const std::vector<std::shared_ptr<Scene::Node>> items); // TODO: std::span<..>
 
-	void ShowGraphEditor(Scene::Node& root);
-
 	class FastButton : public Scene::Clickable<Scene::Rectangle>
 	{
 	public:

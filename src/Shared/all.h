@@ -60,6 +60,7 @@
 #include <Shared/scene_helpers.h>
 #include <Shared/scene_manager.h>
 #include <Shared/format_helpers.h>
+#include <Shared/scene_editor.h>
 
 #include <Graphics/font.h>
 #include <Graphics/legacy_renderer.h>
