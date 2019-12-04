@@ -47,12 +47,12 @@ void Label::update()
 		{
 			mMeshWidth = mFont->getStringWidth(mText, mFontSize);
 			mMeshHeight = mFont->getStringHeight(mText, mFontSize);
-			mMesh = GRAPHICS->createSinglelineTextMesh(*mFont, mText);
+			mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText);
 		}
 		else if (width > 0.0f)
 		{
 			mMeshWidth = width;
-			std::tie(mMeshHeight, mMesh) = GRAPHICS->createMultilineTextMesh(*mFont, mText, width, mFontSize);
+			std::tie(mMeshHeight, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, mText, width, mFontSize, mMultilineAlign);
 		}
 		mMeshDirty = false;
 	}

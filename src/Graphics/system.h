@@ -18,7 +18,7 @@
 #include <optional>
 #include <stack>
 #include <tinyutf8.hpp>
-#include "mesh.h"
+#include "text_mesh.h"
 
 namespace Graphics
 {
@@ -26,7 +26,6 @@ namespace Graphics
 	{
 	public:
 		struct State;
-		using TextMesh = Mesh<Renderer::Vertex::PositionTexture>;
 
 	public:
 		void begin(const glm::mat4& viewMatrix = glm::mat4(1.0f), const glm::mat4& projectionMatrix = glm::mat4(1.0f));
@@ -95,14 +94,6 @@ namespace Graphics
 		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
-
-	public:
-		TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end, float height);
-		
-		TextMesh createSinglelineTextMesh(const Font& font, const utf8_string& text);
-
-		std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const utf8_string& text, 
-			float maxWidth, float size);
 
 	public:
 		void push(const State& value);
