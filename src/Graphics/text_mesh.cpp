@@ -2,7 +2,7 @@
 
 using namespace Graphics;
 
-TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end, float height)
+TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end)
 {
 	TextMesh mesh;
 
@@ -12,12 +12,17 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 
 	float tex_w = static_cast<float>(texture->getWidth());
 	float tex_h = static_cast<float>(texture->getHeight());
-
+	
+	float baseline = font.getAscent() + font.getDescent();
+	
 	auto length = std::distance(begin, end);
+
 	mesh.vertices.resize(length * 4);
 	mesh.indices.resize(length * 6);
 
-	glm::vec2 pos = { 0.0f, 0.0f };
+	float pos_x = 0.0f;
+	float pos_y = 0.0f;
+
 	int i = 0;
 
 	for (auto it = begin; it != end; ++it, i++)
@@ -32,20 +37,20 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 		auto vtx = &mesh.vertices[i * 4];
 		auto idx = &mesh.indices[i * 6];
 
-		pos.y = glyph.yoff;
-		pos.x += glyph.xoff;
+		pos_x += glyph.xoff;
+		pos_y = baseline + glyph.yoff;
 
-		float x1 = pos.x;
-		float x2 = pos.x + glyph_w;
-		float y1 = pos.y + height;
-		float y2 = pos.y + height + glyph_h;
+		float x1 = pos_x;
+		float x2 = pos_x + glyph_w;
+		float y1 = pos_y;
+		float y2 = pos_y + glyph_h;
 
-		pos.x -= glyph.xoff;
-		pos.x += glyph.xadvance;
+		pos_x -= glyph.xoff;
+		pos_x += glyph.xadvance;
 
 		if (it != end - 1)
 		{
-			pos.x += font.getKerning(*it, *(it + 1));
+			pos_x += font.getKerning(*it, *(it + 1));
 		}
 
 		float u1 = glyph_x / tex_w;
@@ -73,7 +78,7 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 
 TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const utf8_string& text)
 {
-	return createTextMesh(font, text.begin(), text.end(), font.getStringHeight(text));
+	return createTextMesh(font, text.begin(), text.end());
 }
 
 std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, const utf8_string& text,
@@ -82,41 +87,29 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 	auto scale = font.getScaleFactorForSize(size);
 	float height = 0.0f;
 
+	float scaledMaxWidth = maxWidth / scale;
+
 	TextMesh result;
 
-	bool firstLine = true;
-	auto getStringHeight = [&firstLine, scale, size, &font](utf8_string::iterator begin, utf8_string::iterator end) {
-		if (firstLine)
-		{
-			firstLine = false;
-			return font.getStringHeight(begin, end);
-		}
-		return size / scale;
-	};
-
-	auto appendTextMesh = [&font, scale, &height, getStringHeight, &result, align, maxWidth](utf8_string::iterator begin, utf8_string::iterator end, bool lastLine = false) {
-		auto str_h = getStringHeight(begin, end);
-		auto str_w = font.getStringWidth(begin, end);
-		auto mesh = createTextMesh(font, begin, end, str_h);
+	auto appendTextMesh = [&font, scaledMaxWidth, &height, &result, align](utf8_string::iterator begin, utf8_string::iterator end) {
+		auto mesh = createTextMesh(font, begin, end);
 		for (auto index : mesh.indices)
 		{
 			index += result.vertices.size();
 			result.indices.push_back(index);
 		}
+		auto str_w = font.getStringWidth(begin, end);
 		for (auto vertex : mesh.vertices)
 		{
 			if (align == Align::Right)
-				vertex.pos.x += (maxWidth / scale) - str_w;
+				vertex.pos.x += scaledMaxWidth - str_w;
 			else if (align == Align::Center)
-				vertex.pos.x += ((maxWidth / scale) - str_w) / 2.0f;
+				vertex.pos.x += (scaledMaxWidth - str_w) / 2.0f;
 
 			vertex.pos.y += height;
 			result.vertices.push_back(vertex);
 		}
-		if (lastLine)
-			height += font.getStringHeight(begin, end) / scale;
-		else
-			height += str_h;
+		height += font.getAscent() - font.getDescent() + font.getLinegap();
 	};
 
 	result.topology = Renderer::Topology::TriangleList;
@@ -126,9 +119,9 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 
 	while (it != text.end())
 	{
-		auto str_w = font.getStringWidth(begin, it, size);
+		auto str_w = font.getStringWidth(begin, it);
 
-		if (str_w >= maxWidth)
+		if (str_w >= scaledMaxWidth)
 		{
 			--it;
 
@@ -156,7 +149,9 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 	}
 
 	if (begin != text.end())
-		appendTextMesh(begin, text.end(), true);
+		appendTextMesh(begin, text.end());
+
+	height += font.getDescent() - font.getLinegap();
 
 	return { height * scale, result };
 }

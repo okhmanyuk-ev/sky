@@ -40,14 +40,20 @@ namespace Graphics
 		float getStringWidth(utf8_string::iterator begin, utf8_string::iterator end, float size = GlyphSize) const;
 		float getStringWidth(const utf8_string& text, float size = GlyphSize) const;
 
-		float getStringHeight(utf8_string::iterator begin, utf8_string::iterator end, float size = GlyphSize) const;
-		float getStringHeight(const utf8_string& text, float size = GlyphSize) const;
-
+		float getStringHeight(float size) const;
+		
 		float getKerning(uint16_t left, uint16_t right) const;
+
+		float getAscent() const { return mAscent; }
+		float getDescent() const { return mDescent; }
+		float getLinegap() const { return mLinegap; }
 
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
 		std::unordered_map<uint16_t, Glyph> mGlyphs;
 		std::unordered_map<uint16_t, std::unordered_map<uint16_t, float>> mKernings;
+		float mAscent = 0.0f;
+		float mDescent = 0.0f;
+		float mLinegap = 0.0f;
 	};
 }

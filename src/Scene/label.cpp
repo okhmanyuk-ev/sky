@@ -52,7 +52,7 @@ void Label::update()
 		if (!mMultiline)
 		{
 			mMeshWidth = mFont->getStringWidth(mText, mFontSize);
-			mMeshHeight = mFont->getStringHeight(mText, mFontSize);
+			mMeshHeight = mFont->getStringHeight(mFontSize);
 			mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText);
 		}
 		else if (width > 0.0f)

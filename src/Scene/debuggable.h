@@ -33,7 +33,7 @@ namespace Scene
                 model = glm::translate(model, { T::project(T::getSize() / 2.0f) / PLATFORM->getScale(), 0.0f });
 		
 				auto text_width = Debug::Font.value()->getStringWidth(mName, Debug::FontSize);
-				auto text_height = Debug::Font.value()->getStringHeight(mName, Debug::FontSize);
+				auto text_height = Debug::Font.value()->getStringHeight(Debug::FontSize);
 
 				auto bg_width = text_width + 4.0f;
 				auto bg_height = text_height + 4.0f;

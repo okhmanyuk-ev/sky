@@ -21,7 +21,7 @@ namespace Graphics
 		std::vector<Renderer::Vertex::PositionTexture> vertices;
 		std::vector<uint32_t> indices;
 	
-		static TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end, float height);
+		static TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end);
 
 		static TextMesh createSinglelineTextMesh(const Font& font, const utf8_string& text);
 

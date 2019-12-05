@@ -123,6 +123,16 @@ Font::Font(void* data, size_t size)
 	}
 
 	mTexture = std::make_shared<Renderer::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory());
+
+	int ascent = 0;
+	int descent = 0;
+	int linegap = 0;
+	
+	stbtt_GetFontVMetrics(&info, &ascent, &descent, &linegap);
+
+	mAscent = ascent * scale;
+	mDescent = descent * scale;
+	mLinegap = linegap * scale;
 }
 
 Font::Font(const Platform::Asset& asset) : Font(asset.getMemory(), asset.getSize())
@@ -169,24 +179,9 @@ float Font::getStringWidth(const utf8_string& text, float size) const
 	return getStringWidth(text.begin(), text.end(), size);
 }
 
-float Font::getStringHeight(utf8_string::iterator begin, utf8_string::iterator end, float size) const
-{
-	float result = 0.0f;
-	for (auto it = begin; it != end; ++it)
-	{
-		float h = static_cast<float>(getGlyph(*it).h);
-
-		if (result >= h)
-			continue;
-
-		result = h;
-	}
-	return (result - (SdfPadding * 2.0f)) * Font::getScaleFactorForSize(size);
-}
-
-float Font::getStringHeight(const utf8_string& text, float size) const
-{
-	return getStringHeight(text.begin(), text.end(), size);
+float Font::getStringHeight(float size) const
+{	
+	return (getAscent() + getDescent()) * Font::getScaleFactorForSize(size);
 }
 
 float Font::getKerning(uint16_t left, uint16_t right) const
