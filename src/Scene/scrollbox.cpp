@@ -47,6 +47,7 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 	else
 	{
 		auto diff = pos - mPrevPosition;
-		LOG("touch end diff x: " + std::to_string(diff.x));
+		//LOG("touch end diff x: " + std::to_string(diff.x));
+		// log always 0.0
 	}
 }

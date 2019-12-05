@@ -17,23 +17,7 @@ namespace Scene
 		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
 		
 	public:
-		void attachContent(std::shared_ptr<Node> value) { mContent->attach(value); }
-		void detachContent(std::shared_ptr<Node> value) { mContent->detach(value); }
-		void clearContent() { mContent->clear(); }
-
-		void setContentSize(const glm::vec2& value) { mContent->setSize(value); }
-		void setContentWidth(float value) { mContent->setWidth(value); }
-		void setContentHeight(float value) { mContent->setHeight(value); }
-
-		auto getContentPosition() const { return mContent->getPosition(); }
-		void setContentPosition(const glm::vec2& value) { mContent->setPosition(value); }
-
-		auto getContentX() const { return mContent->getX(); }
-		void setContentX(float value) { mContent->setX(value); }
-
-		auto getContentY() const { return mContent->getY(); }
-		void setContentY(float value) { mContent->setY(value); }
-
+		auto getContent() { return mContent; }
 		auto getBounding() { return std::static_pointer_cast<Transform>(mBounding); }
 
 		auto getSensitivity() const { return mSensitivity; }

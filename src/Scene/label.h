@@ -55,5 +55,6 @@ namespace Scene
 		bool mPrevMultiline = false;
 		float mOutlineThickness = 0.0f;
 		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
+		Graphics::TextMesh::Align mPrevMultilineAlign = Graphics::TextMesh::Align::Left;
 	};
 }

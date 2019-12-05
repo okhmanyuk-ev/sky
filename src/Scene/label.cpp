@@ -41,6 +41,12 @@ void Label::update()
 		mMeshDirty = true;
 	}
 
+	if (mPrevMultilineAlign != mMultilineAlign)
+	{
+		mPrevMultilineAlign = mMultilineAlign;
+		mMeshDirty = true;
+	}
+
 	if (mMeshDirty)
 	{
 		if (!mMultiline)
@@ -55,12 +61,15 @@ void Label::update()
 			std::tie(mMeshHeight, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, mText, width, mFontSize, mMultilineAlign);
 		}
 		mMeshDirty = false;
+
+		setWidth(mMeshWidth);
+		setHeight(mMeshHeight);
+		
+		Node::update();
 	}
 
 	setWidth(mMeshWidth);
 	setHeight(mMeshHeight);
-
-	Node::update();
 }
 
 void Label::draw()
