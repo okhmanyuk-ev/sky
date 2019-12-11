@@ -83,7 +83,9 @@ Generic::Generic(StatusCallback callback) : mCallback(callback)
 Generic::Generic(Type type, Callback callback)
 {
 	mCallback = [type, callback] {
-		callback();
+		if (callback)
+			callback();
+
 		return type == Type::One ? Status::Finished : Status::Continue;
 	};
 }
