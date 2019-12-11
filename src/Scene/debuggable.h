@@ -33,7 +33,7 @@ namespace Scene
                 model = glm::translate(model, { T::project(T::getSize() / 2.0f) / PLATFORM->getScale(), 0.0f });
 		
 				auto text_width = Debug::Font.value()->getStringWidth(mName, Debug::FontSize);
-				auto text_height = Debug::Font.value()->getStringHeight(Debug::FontSize);
+				auto text_height = Debug::Font.value()->getAscent() * Debug::Font.value()->getScaleFactorForSize(Debug::FontSize);
 
 				auto bg_width = text_width + 4.0f;
 				auto bg_height = text_height + 4.0f;
@@ -82,5 +82,15 @@ namespace Scene
 		bool mOutlineEnabled = true;
 		glm::vec4 mHighlightColor = { 1.0f, 1.0f, 1.0f, 1.0 };
 		glm::vec4 mOutlineColor = { 1.0f, 1.0f, 1.0f, 1.0 };
+	};
+
+	template <typename T> class Outlined : public Debuggable<T>
+	{
+		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
+	public:
+		Outlined()
+		{
+			setNameShowingEnabled(false);
+		}
 	};
 }

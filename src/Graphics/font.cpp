@@ -128,7 +128,9 @@ Font::Font(void* data, size_t size)
 	int descent = 0;
 	int linegap = 0;
 	
-	stbtt_GetFontVMetrics(&info, &ascent, &descent, &linegap);
+	auto res = stbtt_GetFontVMetricsOS2(&info, &ascent, &descent, &linegap);
+
+	assert(res == 1);
 
 	mAscent = ascent * scale;
 	mDescent = descent * scale;
@@ -177,11 +179,6 @@ float Font::getStringWidth(utf8_string::iterator begin, utf8_string::iterator en
 float Font::getStringWidth(const utf8_string& text, float size) const
 {
 	return getStringWidth(text.begin(), text.end(), size);
-}
-
-float Font::getStringHeight(float size) const
-{	
-	return (getAscent() + getDescent()) * Font::getScaleFactorForSize(size);
 }
 
 float Font::getKerning(uint16_t left, uint16_t right) const

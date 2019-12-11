@@ -13,8 +13,6 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 	float tex_w = static_cast<float>(texture->getWidth());
 	float tex_h = static_cast<float>(texture->getHeight());
 	
-	float baseline = font.getAscent() + font.getDescent();
-	
 	auto length = std::distance(begin, end);
 
 	mesh.vertices.resize(length * 4);
@@ -38,7 +36,7 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 		auto idx = &mesh.indices[i * 6];
 
 		pos_x += glyph.xoff;
-		pos_y = baseline + glyph.yoff;
+		pos_y = font.getAscent() + glyph.yoff;
 
 		float x1 = pos_x;
 		float x2 = pos_x + glyph_w;
@@ -76,9 +74,16 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 	return mesh;
 }
 
-TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const utf8_string& text)
+TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const utf8_string& text, float vertical_offset)
 {
-	return createTextMesh(font, text.begin(), text.end());
+	auto mesh = createTextMesh(font, text.begin(), text.end());
+
+	for (auto& vertex : mesh.vertices)
+	{
+		vertex.pos.y += vertical_offset;
+	}
+
+	return mesh;
 }
 
 std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, const utf8_string& text,
@@ -151,7 +156,7 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 	if (begin != text.end())
 		appendTextMesh(begin, text.end());
 
-	height += font.getDescent() - font.getLinegap();
+	height -= font.getLinegap();
 
 	return { height * scale, result };
 }

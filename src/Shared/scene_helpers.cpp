@@ -1,7 +1,6 @@
 #include "scene_helpers.h"
 #include <Scene/actionable.h>
 #include <Shared/action_helpers.h>
-#include <imgui.h>
 
 using namespace Shared;
 

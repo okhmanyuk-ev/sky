@@ -6,6 +6,7 @@
 #include <Scene/clickable.h>
 #include <Scene/rectangle.h>
 #include <Scene/actionable.h>
+#include <Scene/debuggable.h>
 
 namespace Shared::SceneHelpers
 {
