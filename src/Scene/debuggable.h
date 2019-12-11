@@ -90,7 +90,7 @@ namespace Scene
 	public:
 		Outlined()
 		{
-			setNameShowingEnabled(false);
+			Debuggable<T>::setNameShowingEnabled(false);
 		}
 	};
 }
