@@ -295,28 +295,63 @@ void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 	draw(Renderer::Topology::LineList, vertices, indices, model);
 }
 
-void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& color)
+void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& color,
+	float radius, float inner_offset, float outer_offset, float begin, float end)
 {
-	const float Radius = 0.5f;
-	const float Increment = 2.0f * glm::pi<float>() / segments;
+	if (begin >= end)
+		return;
 
-	float sinInc = glm::sin(Increment);
-	float cosInc = glm::cos(Increment);
+	float increment = 2.0f * glm::pi<float>() / segments;
 
-	auto r1 = glm::vec2({ cosInc, sinInc });
-	auto v1 = Radius * r1;
+	float sinInc = glm::sin(increment);
+	float cosInc = glm::cos(increment);
 
-	std::vector<Renderer::Vertex::PositionColor> vertices;
+	auto r1 = glm::vec2({ sinInc, -cosInc });
+	auto vertices = std::vector<Renderer::Vertex::PositionColor>();
+
+	auto radius_inner = inner_offset;
+	auto radius_outer = radius + outer_offset;
+
+	auto delta_inner = radius - radius_inner;
+	auto delta_outer = radius_outer - radius;
+
+	auto v1_outer = radius_outer * r1;
+	auto v1_inner = radius_inner * r1;
 
 	for (int i = 0; i < segments; i++)
 	{
-		auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
-		auto v2 = Radius * r2;
-		vertices.push_back({ { Radius, Radius, 0.0f }, color });
-		vertices.push_back({ { v1 + Radius, 0.0f }, color });
-		vertices.push_back({ { v2 + Radius, 0.0f }, color });
+		float progress = (float)(i + 1) / (float)segments;
+
+		if (progress < begin)
+			continue;
+
+		if (progress > end)
+			continue;
+
+		auto r2 = glm::vec2({
+			(cosInc * r1.x) - (sinInc * r1.y),
+			(sinInc * r1.x) + (cosInc * r1.y)
+		});
+
+		auto v2_outer = radius_outer * r2;
+		auto v2_inner = radius_inner * r2;
+
+		auto p1 = glm::vec3({ v1_outer + radius_outer - delta_outer, 0.0f });
+		auto p2 = glm::vec3({ v2_outer + radius_outer - delta_outer, 0.0f });
+		auto p3 = glm::vec3({ v1_inner + radius_inner + delta_inner, 0.0f });
+		auto p4 = glm::vec3({ v2_inner + radius_inner + delta_inner, 0.0f });
+
+		vertices.push_back({ p1, color });
+		vertices.push_back({ p2, color });
+		vertices.push_back({ p3, color });
+
+		vertices.push_back({ p3, color });
+		vertices.push_back({ p2, color });
+		vertices.push_back({ p4, color });
+
 		r1 = r2;
-		v1 = v2;
+		v1_outer = v2_outer;
+		v1_inner = v2_inner;
 	}
 
 	draw(Renderer::Topology::TriangleList, vertices, model);

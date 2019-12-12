@@ -164,6 +164,20 @@ ActionHelpers::Action ActionHelpers::Kill(std::shared_ptr<Scene::Node> node)
 	});
 }
 
+ActionHelpers::Action ActionHelpers::ChangeRotation(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {
+		node->setRotation(glm::lerp(start, dest, value));
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeRotation(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
+{
+	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+		return ChangeRotation(node, node->getRotation(), dest, duration, easingFunction);
+	});
+}
+
 ActionHelpers::Action ActionHelpers::ChangeHorizontalAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
 	return std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(duration), easingFunction, [node, start, dest](float value) {

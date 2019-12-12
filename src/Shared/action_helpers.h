@@ -41,6 +41,9 @@ namespace Shared::ActionHelpers
 	Action Shake(SceneTransform node, float radius, float duration);
 	Action Kill(std::shared_ptr<Scene::Node> node);
 
+	Action ChangeRotation(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+	Action ChangeRotation(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+
 	Action ChangeHorizontalAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 	Action ChangeHorizontalAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 
