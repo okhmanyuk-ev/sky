@@ -67,10 +67,7 @@ namespace Graphics
 
 		// colored circle
 		void drawCircle(const glm::mat4& model, int segments = 32, const glm::vec4& color = { Color::White, 1.0f },
-			float radius = 0.5f, float inner_offset = 0.0f, float outer_offset = 0.0f, float begin = 0.0f, float end = 1.0f);
-
-		// colored line circle
-		void drawLineCircle(const glm::mat4& model, int segments = 32, const glm::vec4 & color = { Color::White, 1.0f });
+			float fill = 1.0f, float begin = 0.0f, float end = 1.0f);
 
 		// sprite
 		void draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model, 

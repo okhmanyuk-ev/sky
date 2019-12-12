@@ -14,11 +14,19 @@ namespace Scene
 		auto getSegments() const { return mSegments; }
 		void setSegments(int value) { mSegments = value; }
 
-		bool isFilled() const { return mFilled; }
-		void setFilled(bool value) { mFilled = value; }
+		auto getFill() const { return mFill; }
+		void setFill(float value) { mFill = value; }
+
+		auto getBegin() const { return mBegin; }
+		void setBegin(float value) { mBegin = value; }
+
+		auto getEnd() const { return mEnd; }
+		void setEnd(float value) { mEnd = value; }
 
 	private:
 		int mSegments = 32;
-		bool mFilled = true;
+		float mFill = 1.0f;
+		float mBegin = 0.0f;
+		float mEnd = 1.0f;
 	};
 }
