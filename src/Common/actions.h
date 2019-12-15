@@ -97,7 +97,10 @@ namespace Common::Actions
 	public:
 		using StatusCallback = std::function<Status()>;
 		using Callback = std::function<void()>;
-		enum class Type {
+	
+	public:
+		enum class Type 
+		{
 			One,
 			Infinity
 		};
@@ -134,13 +137,9 @@ namespace Common::Actions
 		using Result = std::pair<Action::Status, OptionalAction>;
 		using Callback = std::function<Result()>;
 		
-		using InfiniteResult = OptionalAction;
-		using InifinteCallback = std::function<OptionalAction()>;
-
 	public:
 		Repeat(Callback callback);
-		Repeat(InifinteCallback callback);
-
+		
 	private:
 		Status frame() override;
 
@@ -172,22 +171,6 @@ namespace Common::Actions
 
 		EasingFunction mEasingFunction = nullptr;
 		ProcessCallback mProcessCallback = nullptr;
-	};
-
-	class Insert : public Action
-	{
-	public:
-		using Callback = std::function<std::optional<std::unique_ptr<Action>>()>;
-
-	public:
-		Insert(Callback callback);
-
-	private:
-		Status frame() override;
-
-	private:
-		Callback mCallback = nullptr;
-		std::optional<std::unique_ptr<Action>> mAction;
 	};
 
 	// an instant action player whithout states,

@@ -12,6 +12,9 @@ namespace Shared::ActionHelpers
 	using SceneTransform = std::shared_ptr<Scene::Transform>;
 	using SceneColor = std::shared_ptr<Scene::Color>;
 
+	Action Insert(std::function<Action()> action);
+	Action RepeatInfinite(std::function<Action()> action);
+
 	Action ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed);
 	Action ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed, float duration);
 

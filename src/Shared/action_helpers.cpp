@@ -3,6 +3,22 @@
 
 using namespace Shared;
 
+// insert
+
+ActionHelpers::Action ActionHelpers::Insert(std::function<Action()> action)
+{
+	return std::make_unique<Common::Actions::Repeat>([action]() -> Common::Actions::Repeat::Result {
+		return { Common::Actions::Action::Status::Finished, action() };
+	});
+}
+
+ActionHelpers::Action ActionHelpers::RepeatInfinite(std::function<Action()> action)
+{
+	return std::make_unique<Common::Actions::Repeat>([action]() -> Common::Actions::Repeat::Result {
+		return { Common::Actions::Action::Status::Continue, action() };
+	});
+}
+
 // change position by direction
 
 ActionHelpers::Action ActionHelpers::ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed)
@@ -88,7 +104,7 @@ ActionHelpers::Action ActionHelpers::InterpolateValue(float startValue, float de
 
 ActionHelpers::Action ActionHelpers::InterpolateValue(float destValue, float duration, float& value, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([destValue, duration, &value, easingFunction] {
+	return Insert([destValue, duration, &value, easingFunction] {
 		return InterpolateValue(value, destValue, duration, value, easingFunction);
 	});
 }
@@ -104,7 +120,7 @@ ActionHelpers::Action ActionHelpers::ChangeColor(SceneColor node, const glm::vec
 
 ActionHelpers::Action ActionHelpers::ChangeColor(SceneColor node, const glm::vec3& dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeColor(node, node->getColor(), dest, duration, easingFunction);
 	});
 }
@@ -120,7 +136,7 @@ ActionHelpers::Action ActionHelpers::ChangeAlpha(SceneColor node, float start, f
 
 ActionHelpers::Action ActionHelpers::ChangeAlpha(SceneColor node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeAlpha(node, node->getAlpha(), dest, duration, easingFunction);
 	});
 }
@@ -142,7 +158,7 @@ ActionHelpers::Action ActionHelpers::Shake(SceneTransform node, float radius, fl
 	return MakeSequence(
 		MakeParallel(Common::Actions::Parallel::Awaiting::Any,
 			Wait(duration),
-			std::make_unique<Common::Actions::Repeat>([node, radius] {
+			RepeatInfinite([node, radius] {
 				return Execute([node, radius] {
 					node->setOrigin(glm::circularRand(radius));
 				});
@@ -173,7 +189,7 @@ ActionHelpers::Action ActionHelpers::ChangeRotation(SceneTransform node, float s
 
 ActionHelpers::Action ActionHelpers::ChangeRotation(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeRotation(node, node->getRotation(), dest, duration, easingFunction);
 	});
 }
@@ -187,7 +203,7 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalAnchor(SceneTransform node,
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeHorizontalAnchor(node, node->getHorizontalAnchor(), dest, duration, easingFunction);
 	});
 }
@@ -201,7 +217,7 @@ ActionHelpers::Action ActionHelpers::ChangeVerticalAnchor(SceneTransform node, f
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeVerticalAnchor(node, node->getVerticalAnchor(), dest, duration, easingFunction);
 	});
 }
@@ -216,7 +232,7 @@ ActionHelpers::Action ActionHelpers::ChangeAnchor(SceneTransform node, const glm
 
 ActionHelpers::Action ActionHelpers::ChangeAnchor(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeAnchor(node, node->getAnchor(), dest, duration, easingFunction);
 	});
 }
@@ -230,7 +246,7 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalPivot(SceneTransform node, 
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalPivot(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeHorizontalPivot(node, node->getHorizontalPivot(), dest, duration, easingFunction);
 	});
 }
@@ -244,7 +260,7 @@ ActionHelpers::Action ActionHelpers::ChangeVerticalPivot(SceneTransform node, fl
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalPivot(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeVerticalPivot(node, node->getVerticalPivot(), dest, duration, easingFunction);
 	});
 }
@@ -259,7 +275,7 @@ ActionHelpers::Action ActionHelpers::ChangePivot(SceneTransform node, const glm:
 
 ActionHelpers::Action ActionHelpers::ChangePivot(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangePivot(node, node->getPivot(), dest, duration, easingFunction);
 	});
 }
@@ -273,7 +289,7 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalPosition(SceneTransform nod
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalPosition(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeHorizontalPosition(node, node->getHorizontalPosition(), dest, duration, easingFunction);
 	});
 }
@@ -287,7 +303,7 @@ ActionHelpers::Action ActionHelpers::ChangeVerticalPosition(SceneTransform node,
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalPosition(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeVerticalPosition(node, node->getVerticalPosition(), dest, duration, easingFunction);
 	});
 }
@@ -302,7 +318,7 @@ ActionHelpers::Action ActionHelpers::ChangePosition(SceneTransform node, const g
 
 ActionHelpers::Action ActionHelpers::ChangePosition(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangePosition(node, node->getPosition(), dest, duration, easingFunction);
 	});
 }
@@ -316,7 +332,7 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalSize(SceneTransform node, f
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalSize(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeHorizontalSize(node, node->getHorizontalSize(), dest, duration, easingFunction);
 	});
 }
@@ -330,7 +346,7 @@ ActionHelpers::Action ActionHelpers::ChangeVerticalSize(SceneTransform node, flo
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalSize(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeVerticalSize(node, node->getVerticalSize(), dest, duration, easingFunction);
 	});
 }
@@ -345,7 +361,7 @@ ActionHelpers::Action ActionHelpers::ChangeSize(SceneTransform node, const glm::
 
 ActionHelpers::Action ActionHelpers::ChangeSize(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeSize(node, node->getSize(), dest, duration, easingFunction);
 	});
 }
@@ -359,7 +375,7 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalStretch(SceneTransform node
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalStretch(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeHorizontalStretch(node, node->getHorizontalStretch(), dest, duration, easingFunction);
 	});
 }
@@ -373,7 +389,7 @@ ActionHelpers::Action ActionHelpers::ChangeVerticalStretch(SceneTransform node, 
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalStretch(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeVerticalStretch(node, node->getVerticalStretch(), dest, duration, easingFunction);
 	});
 }
@@ -388,7 +404,7 @@ ActionHelpers::Action ActionHelpers::ChangeStretch(SceneTransform node, const gl
 
 ActionHelpers::Action ActionHelpers::ChangeStretch(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeStretch(node, node->getStretch(), dest, duration, easingFunction);
 	});
 }
@@ -402,7 +418,7 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalScale(SceneTransform node, 
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalScale(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeHorizontalScale(node, node->getHorizontalScale(), dest, duration, easingFunction);
 	});
 }
@@ -416,7 +432,7 @@ ActionHelpers::Action ActionHelpers::ChangeVerticalScale(SceneTransform node, fl
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalScale(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeVerticalScale(node, node->getVerticalScale(), dest, duration, easingFunction);
 	});
 }
@@ -431,7 +447,7 @@ ActionHelpers::Action ActionHelpers::ChangeScale(SceneTransform node, const glm:
 
 ActionHelpers::Action ActionHelpers::ChangeScale(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction)
 {
-	return std::make_unique<Common::Actions::Insert>([node, dest, duration, easingFunction] {
+	return Insert([node, dest, duration, easingFunction] {
 		return ChangeScale(node, node->getScale(), dest, duration, easingFunction);
 	});
 }

@@ -116,12 +116,6 @@ Repeat::Repeat(Callback callback) : mCallback(std::move(callback))
 	//
 }
 
-Repeat::Repeat(InifinteCallback callback) : 
-	Repeat([callback]() -> Result { return { Action::Status::Continue, callback() }; })
-{
-	//
-}
-
 Action::Status Repeat::frame() 
 {
 	if (!mStatus.has_value())
@@ -172,24 +166,6 @@ Action::Status Interpolate::frame()
 	mProcessCallback(glm::lerp(mStartValue, mDestinationValue, mEasingFunction(p / d)));
 	
 	return Status::Continue;
-}
-
-// insert action
-
-Insert::Insert(Callback callback) : mCallback(callback)
-{
-	//
-}
-
-Action::Status Insert::frame()
-{
-	if (!mAction.has_value())
-		mAction = mCallback();
-	
-	if (!mAction.has_value())
-		return Status::Finished;
-
-	return mAction.value()->frame();
 }
 
 // instant player
