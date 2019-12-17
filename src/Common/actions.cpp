@@ -22,15 +22,14 @@ Action::Status Parallel::frame()
 	{
 		auto& action = *it;
 
-		if (!action || action->frame() == Status::Continue)
-			++it;
-		else
-		{
-			if (mAwaitingType == Awaiting::Any)
-				return Status::Finished;
-		
+		if (!action)
 			it = mActions.erase(it);
-		}
+		else if (action->frame() == Status::Continue)
+			++it;
+		else if (mAwaitingType == Awaiting::Any)
+			return Status::Finished;
+		else
+			it = mActions.erase(it);
 	}
 
 	if (mActions.empty())
