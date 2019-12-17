@@ -20,7 +20,9 @@ Action::Status Parallel::frame()
 	auto it = mActions.begin();
 	while (it != mActions.end())
 	{
-		if ((*it)->frame() == Status::Continue)
+		auto& action = *it;
+
+		if (!action || action->frame() == Status::Continue)
 			++it;
 		else
 		{
@@ -54,7 +56,9 @@ Action::Status Sequence::frame()
 	if (mActions.empty())
 		return Status::Finished;
 
-	if (mActions.front()->frame() == Status::Finished)
+	auto& action = mActions.front();
+
+	if (!action || action->frame() == Status::Finished)
 		mActions.pop_front();
 
 	return mActions.empty() ? Status::Finished : Status::Continue;

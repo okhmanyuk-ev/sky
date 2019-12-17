@@ -133,8 +133,7 @@ namespace Common::Actions
 	{
 	public:
 		using OptionalAction = std::optional<std::unique_ptr<Action>>;
-		
-		using Result = std::pair<Action::Status, OptionalAction>;
+		using Result = std::tuple<Action::Status, OptionalAction>;
 		using Callback = std::function<Result()>;
 		
 	public:
