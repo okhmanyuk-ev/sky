@@ -132,8 +132,7 @@ namespace Common::Actions
 	class Repeat : public Action
 	{
 	public:
-		using OptionalAction = std::optional<std::unique_ptr<Action>>;
-		using Result = std::tuple<Action::Status, OptionalAction>;
+		using Result = std::tuple<Action::Status, std::unique_ptr<Action>>;
 		using Callback = std::function<Result()>;
 		
 	public:
@@ -145,7 +144,7 @@ namespace Common::Actions
 	private:
 		Callback mCallback;
 		std::optional<Action::Status> mStatus;
-		std::optional<std::unique_ptr<Action>> mAction;
+		std::unique_ptr<Action> mAction = nullptr;
 	};
 
 	class Interpolate : public Action

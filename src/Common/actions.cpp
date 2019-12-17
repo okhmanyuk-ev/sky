@@ -127,8 +127,8 @@ Action::Status Repeat::frame()
 
 	auto status = Status::Finished;
 
-	if (mAction.has_value())
-		status = mAction.value()->frame();
+	if (mAction)
+		status = mAction->frame();
 
 	if (status == Status::Continue)
 		return Status::Continue;
