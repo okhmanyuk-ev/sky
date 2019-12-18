@@ -599,6 +599,9 @@ SystemAndroid::SystemAndroid(const std::string& appname) :
 {
 	Instance->userData = this;
 	//mScale = scale;
+
+	lastWidth = Width;
+	lastHeight = Height;
 }
 
 SystemAndroid::~SystemAndroid()
