@@ -33,13 +33,9 @@ namespace
 
 		#ifdef VERTEX_SHADER
 		in vec3 aPosition;
-		in vec2 aTexCoord;
-		
-		out vec2 vTexCoord;
 		
 		void main()
 		{
-			vTexCoord = aTexCoord;
 			gl_Position = vec4(aPosition, 1.0);
 			
 			if (uRenderTargetBound)
@@ -48,8 +44,6 @@ namespace
 		#endif
 
 		#ifdef FRAGMENT_SHADER
-		in vec2 vTexCoord;
-		
 		out vec4 fragColor;
 
 		void main()
@@ -59,13 +53,15 @@ namespace
 			vec2 off1 = vec2(1.3846153846) * uDirection / uResolution;
 			vec2 off2 = vec2(3.2307692308) * uDirection / uResolution;
 			
-			result += texture(uTexture, vTexCoord) * 0.2270270270;
-	
-			result += texture(uTexture, vTexCoord + off1) * 0.3162162162;
-			result += texture(uTexture, vTexCoord - off1) * 0.3162162162;
+			vec2 uv = vec2(gl_FragCoord.xy / uResolution.xy);
 
-			result += texture(uTexture, vTexCoord + off2) * 0.0702702703;
-			result += texture(uTexture, vTexCoord - off2) * 0.0702702703;
+			result += texture(uTexture, uv) * 0.2270270270;
+	
+			result += texture(uTexture, uv + off1) * 0.3162162162;
+			result += texture(uTexture, uv - off1) * 0.3162162162;
+
+			result += texture(uTexture, uv + off2) * 0.0702702703;
+			result += texture(uTexture, uv - off2) * 0.0702702703;
 
 			fragColor = result;
 		}
@@ -147,8 +143,6 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 
 	static const std::map<Vertex::Attribute::Type, std::string> attribName = {
 		{ Vertex::Attribute::Type::Position, "aPosition" },
-		{ Vertex::Attribute::Type::Color, "aColor" },
-		{ Vertex::Attribute::Type::TexCoord, "aTexCoord" }
 	};
 
 	glGenVertexArrays(1, &mImpl->vao);

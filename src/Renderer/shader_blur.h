@@ -20,7 +20,6 @@ namespace Renderer
 	private:
 		const std::set<Vertex::Attribute::Type> requiredAttribs = {
 			Vertex::Attribute::Type::Position,
-			Vertex::Attribute::Type::TexCoord,
 		};
 
 	private:

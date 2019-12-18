@@ -25,12 +25,10 @@ namespace
 		struct VertexInput
 		{
 			float3 pos : POSITION0;
-			float2 uv : TEXCOORD0;
 		};
 
 		struct PixelInput
 		{
-			float2 uv : TEXCOORD0;
 			float4 pixelPosition : SV_POSITION;
 		};
 
@@ -40,7 +38,6 @@ namespace
 		PixelInput vs_main(VertexInput input)
 		{
 			PixelInput result;
-			result.uv = input.uv;
 			result.pixelPosition = float4(input.pos, 1.0);
 			return result;
 		};
