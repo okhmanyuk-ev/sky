@@ -54,7 +54,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 		mBlurShader.setResolution({ mTargetWidth, mTargetHeight });
 
-		const std::vector<Renderer::Vertex::PositionTexture> Vertices = {
+		const std::vector<Renderer::Vertex::Position> Vertices = {
 			{ { -1.0f, -1.0f, 0.0f } },
 			{ { -1.0f,  1.0f, 0.0f } },
 			{ {  1.0f,  1.0f, 0.0f } },
