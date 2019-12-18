@@ -59,20 +59,17 @@ namespace
 			vec2 off1 = vec2(1.3846153846) * uDirection / uResolution;
 			vec2 off2 = vec2(3.2307692308) * uDirection / uResolution;
 			
-			vec2 uv = vec2(gl_FragCoord.xy / uResolution.xy);
-
-			result += texture(uTexture, uv) * 0.2270270270;
+			result += texture(uTexture, vTexCoord) * 0.2270270270;
 	
-			result += texture(uTexture, uv + off1) * 0.3162162162;
-			result += texture(uTexture, uv - off1) * 0.3162162162;
+			result += texture(uTexture, vTexCoord + off1) * 0.3162162162;
+			result += texture(uTexture, vTexCoord - off1) * 0.3162162162;
 
-			result += texture(uTexture, uv + off2) * 0.0702702703;
-			result += texture(uTexture, uv - off2) * 0.0702702703;
+			result += texture(uTexture, vTexCoord + off2) * 0.0702702703;
+			result += texture(uTexture, vTexCoord - off2) * 0.0702702703;
 
 			fragColor = result;
 		}
 	#endif
-
 	)";
 }
 
@@ -163,7 +160,7 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 			continue;
 
 		auto location = glGetAttribLocation(mImpl->program, attribName.at(attrib.type).c_str());
-		//assert(location != -1);
+		assert(location != -1);
 		
 		if (location == -1)
 			continue;
@@ -171,6 +168,7 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 		glEnableVertexAttribArray(location);
 		mImpl->attribLocations[attrib.type] = location;
 	}
+	glBindVertexArray(0);
 }
 
 ShaderBlur::~ShaderBlur()

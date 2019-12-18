@@ -79,10 +79,12 @@ void System::flush()
 	if (mBatchFlushed)
 		return;
 
+	auto& state = mStates.top();
+
 	if (mBatchTexture.has_value()) // means we need textured shader
 	{
-		mTexturedShader.setProjectionMatrix(mStates.top().projectionMatrix);
-		mTexturedShader.setViewMatrix(mStates.top().viewMatrix);
+		mTexturedShader.setProjectionMatrix(state.projectionMatrix);
+		mTexturedShader.setViewMatrix(state.viewMatrix);
 		mTexturedShader.setModelMatrix(glm::mat4(1.0f));
 
 		RENDERER->setShader(mTexturedShader);
@@ -91,15 +93,15 @@ void System::flush()
 	}
 	else
 	{
-		mColoredShader.setProjectionMatrix(mStates.top().projectionMatrix);
-		mColoredShader.setViewMatrix(mStates.top().viewMatrix);
+		mColoredShader.setProjectionMatrix(state.projectionMatrix);
+		mColoredShader.setViewMatrix(state.viewMatrix);
 		mColoredShader.setModelMatrix(glm::mat4(1.0f));
 
 		RENDERER->setShader(mColoredShader);
 		RENDERER->setVertexBuffer(mBatchColoredVertices);
 	}
 
-	RENDERER->setSampler(mStates.top().sampler);
+	RENDERER->setSampler(state.sampler);
 
 	RENDERER->setTopology(mBatchTopology.value());
 	RENDERER->setIndexBuffer(mBatchIndices);
