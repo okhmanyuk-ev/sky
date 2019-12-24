@@ -20,7 +20,7 @@ RichApplication::RichApplication(const std::string& appname) : GraphicalApplicat
 	FRAME->addOne([this] {
 		Common::Actions::Run(ActionHelpers::Delayed(1.0f,
 			ActionHelpers::MakeSequence(
-				ActionHelpers::InterpolateValue(1.0f, 0.0f, 0.5f, mLoadingFade),
+				ActionHelpers::Interpolate(1.0f, 0.0f, 0.5f, mLoadingFade),
 				ActionHelpers::Execute([this] {
 					mLoading = true;
 					mStartLoadingTime = Clock::Now();
@@ -58,13 +58,13 @@ RichApplication::RichApplication(const std::string& appname) : GraphicalApplicat
 		FRAME->addOne([this] {
 			Common::Actions::Run(ActionHelpers::Delayed(0.25f,
 				ActionHelpers::MakeSequence(
-					ActionHelpers::InterpolateValue(0.0f, 1.0f, 0.5f, mLoadingFade),
+					ActionHelpers::Interpolate(0.0f, 1.0f, 0.5f, mLoadingFade),
 					ActionHelpers::Execute([this] {
 						initInternal();
 						initialize();
 						mInitialized = true;
 					}),
-					ActionHelpers::InterpolateValue(1.0f, 0.0f, 0.5f, mGameFade)
+					ActionHelpers::Interpolate(1.0f, 0.0f, 0.5f, mGameFade)
 				)
 			));
 		});

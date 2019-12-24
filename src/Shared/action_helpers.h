@@ -29,8 +29,9 @@ namespace Shared::ActionHelpers
 
 	Action Log(const std::string& text);
 
-	Action InterpolateValue(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
-	Action InterpolateValue(float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
+	Action Interpolate(float startValue, float destValue, float duration, EasingFunction easingFunction, std::function<void(float)> callback);
+	Action Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
+	Action Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
 
 	Action ChangeColor(SceneColor node, const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 	Action ChangeColor(SceneColor node, const glm::vec3& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
