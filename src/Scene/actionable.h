@@ -23,6 +23,7 @@ namespace Scene
 	public:
 		void runAction(std::unique_ptr<Common::Actions::Action> action) { mActions.add(std::move(action)); }
 		void clearActions() { mActions.clear(); }
+		bool hasActions() const { return mActions.hasActions(); }
 
 	public:
 		bool isActionsEnabled() const { return mActionsEnabled; }
