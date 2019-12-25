@@ -66,6 +66,8 @@ namespace Scene
 		auto getVerticalStretch() const { return mStretch.y; }
 		void setVerticalStretch(float value) { mStretch.y = value; }
 
+		void setStretch(float value) { mStretch = { value, value }; }
+
 		auto getX() const { return mPosition.x; }
 		void setX(float value) { mPosition.x = value; }
 		
