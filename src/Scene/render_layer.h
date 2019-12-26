@@ -59,7 +59,7 @@ namespace Scene
 		std::shared_ptr<Renderer::RenderTarget> mTarget = std::make_shared<Renderer::RenderTarget>(PLATFORM->getWidth(), PLATFORM->getHeight());
 
 	public:
-		void isPostprocessEnabled() const { return mPostprocessEnabled; }
+		bool isPostprocessEnabled() const { return mPostprocessEnabled; }
 		void setPostprocessEnabled(bool value) { mPostprocessEnabled = value; }
 
 	private:
