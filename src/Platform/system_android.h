@@ -52,11 +52,8 @@ namespace Platform
 		void showVirtualKeyboard() override { setKeyboardVisible(true); };
 		void hideVirtualKeyboard() override { setKeyboardVisible(false); };
 		bool isVirtualKeyboardOpened() const override { return false; }; // TODO
-
-	public:
-		static void run(void* app, std::function<void()> code);
 		
-	private:
+	public:
 		static void handle_cmd(android_app* app, int32_t cmd);
 		static int32_t handle_input(android_app* app, AInputEvent* event);
 		static void handle_content_rect_changed(ANativeActivity* activity, const ARect* rect);
@@ -71,8 +68,6 @@ namespace Platform
 		std::string mAppName;
 		int lastWidth = 0;
 		int lastHeight = 0;
-
-		inline static bool Initialized = false;
 
 		static void calcScale();
 		static int getUnicode(AInputEvent* event);

@@ -3,6 +3,11 @@
 
 using namespace Platform;
 
+namespace
+{
+    bool initialized = false;
+}
+
 std::shared_ptr<System> System::create(const std::string& appname)
 {
 	return std::make_shared<SystemAndroid>(appname);
@@ -12,23 +17,19 @@ extern int main(int argc, char *argv[]);
 
 void android_main(android_app* app)
 {
-	Platform::SystemAndroid::run(app, [] { main(0, nullptr); });
-}
+	SystemAndroid::Instance = app;
 
-void SystemAndroid::run(void* app, std::function<void()> code)
-{
-	Instance = static_cast<android_app*>(app);
-	Instance->userData = nullptr;
-	Instance->onAppCmd = handle_cmd;
-	Instance->onInputEvent = handle_input;
-	Instance->activity->callbacks->onContentRectChanged = handle_content_rect_changed;
+	app->userData = nullptr;
+	app->onAppCmd = SystemAndroid::handle_cmd;
+	app->onInputEvent = SystemAndroid::handle_input;
+	app->activity->callbacks->onContentRectChanged = SystemAndroid::handle_content_rect_changed;
 
-	ANativeActivity_setWindowFlags(Instance->activity, AWINDOW_FLAG_KEEP_SCREEN_ON |
+	ANativeActivity_setWindowFlags(app->activity, AWINDOW_FLAG_KEEP_SCREEN_ON |
 		AWINDOW_FLAG_FULLSCREEN, 0);
 
-	while (!Initialized)
+	while (!initialized)
 	{
-		if (Instance->destroyRequested != 0)
+		if (app->destroyRequested != 0)
 			return;
 
 		int num;
@@ -37,11 +38,10 @@ void SystemAndroid::run(void* app, std::function<void()> code)
 		ALooper_pollAll(0, nullptr, &num, (void**)&source);
 
 		if (source != nullptr)
-			source->process(Instance, source);
+			source->process(app, source);
 	}
 
-	if (code)
-		code();
+	main(0, NULL);
 }
 
 void SystemAndroid::calcScale() // TODO: find better solution
@@ -323,7 +323,7 @@ void SystemAndroid::handle_cmd(android_app* app, int32_t cmd)
 
 			calcScale();
 
-			Initialized = true;
+			initialized = true;
 
 			if (app->userData != nullptr)
 				EVENT->emit(InitWindowEvent());
@@ -633,7 +633,7 @@ void SystemAndroid::process()
 	if (source != nullptr)
 		source->process(Instance, source);
 
-	if (lastWidth != Width || lastHeight != Height) // TODO: wtf
+	if (lastWidth != Width || lastHeight != Height)
 	{
 		lastWidth = Width;
 		lastHeight = Height;
@@ -663,7 +663,7 @@ std::string SystemAndroid::getAppName() const
 
 std::string SystemAndroid::getAppFolder() const
 {
-	return SystemAndroid::Instance->activity->internalDataPath;
+	return Instance->activity->internalDataPath;
 }
 
 #endif
