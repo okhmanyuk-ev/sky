@@ -8,6 +8,13 @@ std::shared_ptr<System> System::create(const std::string& appname)
 	return std::make_shared<SystemAndroid>(appname);
 }
 
+extern int main(int argc, char *argv[]);
+
+void android_main(android_app* app)
+{
+	Platform::SystemAndroid::run(app, [] { main(0, nullptr); });
+}
+
 void SystemAndroid::run(void* app, std::function<void()> code)
 {
 	Instance = static_cast<android_app*>(app);
