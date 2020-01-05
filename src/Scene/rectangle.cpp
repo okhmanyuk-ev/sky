@@ -20,3 +20,29 @@ void Rectangle::draw()
 
 	Node::draw();
 }
+
+void Rectangle::setHorizontalGradient(const glm::vec4& left, const glm::vec4& right)
+{
+	setCornerColor(Corner::TopLeft, left);
+	setCornerColor(Corner::BottomLeft, left);
+	setCornerColor(Corner::TopRight, right);
+	setCornerColor(Corner::BottomRight, right);
+}
+
+void Rectangle::setHorizontalGradient(const glm::vec3& left, const glm::vec3& right)
+{
+	setHorizontalGradient({ left, 1.0f }, { right, 1.0f });
+}
+
+void Rectangle::setVerticalGradient(const glm::vec4& top, const glm::vec4& bottom)
+{
+	setCornerColor(Corner::TopLeft, top);
+	setCornerColor(Corner::TopRight, top);
+	setCornerColor(Corner::BottomLeft, bottom);
+	setCornerColor(Corner::BottomRight, bottom);
+}
+
+void Rectangle::setVerticalGradient(const glm::vec3& top, const glm::vec3& bottom)
+{
+	setVerticalGradient({ top, 1.0f }, { bottom, 1.0f });
+}

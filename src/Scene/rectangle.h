@@ -20,8 +20,16 @@ namespace Scene
 		void draw() override;
 
 	public:
+		void setHorizontalGradient(const glm::vec4& left, const glm::vec4& right);
+		void setHorizontalGradient(const glm::vec3& left, const glm::vec3& right);
+
+		void setVerticalGradient(const glm::vec4& top, const glm::vec4& bottom);
+		void setVerticalGradient(const glm::vec3& top, const glm::vec3& bottom);
+
+	public:
 		auto getCornerColor(Corner corner) const { return mCornerColors.at(corner); }
 		void setCornerColor(Corner corner, const glm::vec4& value) { mCornerColors[corner] = value; }
+		void setCornerColor(Corner corner, const glm::vec3& value) { setCornerColor(corner, { value, 1.0f }); }
 
 	public:
 		std::map<Corner, glm::vec4> mCornerColors = {
