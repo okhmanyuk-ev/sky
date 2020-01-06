@@ -78,11 +78,11 @@ void PerformanceConsoleCommands::frame()
 			}
 
 			auto s = "min: " + std::to_string(min) + ", max: " + std::to_string(max);
-			ImGui::PlotLines("Delta", getter, &mDeltaTimes, mDeltaTimes.size(), 0, s.c_str(), FLT_MAX, FLT_MAX, ImVec2(0, 64));
+			ImGui::PlotLines("Delta", getter, &mDeltaTimes, (int)mDeltaTimes.size(), 0, s.c_str(), FLT_MAX, FLT_MAX, ImVec2(0, 64));
 		}
 		else
 		{
-			ImGui::PlotLines("Delta", getter, &mDeltaTimes, mDeltaTimes.size());
+			ImGui::PlotLines("Delta", getter, &mDeltaTimes, (int)mDeltaTimes.size());
 		}
 	}
 }

@@ -23,7 +23,7 @@ namespace Scene
 		void frame();
 		void updateTransformations();
 		
-		size_t getNodesCount(const std::shared_ptr<Node>& node = nullptr) const;
+		size_t getNodesCount(std::shared_ptr<Node> node = nullptr) const;
 
 	private:
 		void event(const Platform::Mouse::Event& e) override;

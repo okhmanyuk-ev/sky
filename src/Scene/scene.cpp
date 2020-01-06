@@ -129,12 +129,12 @@ void Scene::Scene::updateTransformations()
 	recursiveNodeUpdate(mRoot);
 }
 
-size_t Scene::Scene::getNodesCount(const std::shared_ptr<Node>& node) const
+size_t Scene::Scene::getNodesCount(std::shared_ptr<Node> node) const
 {
 	if (node == nullptr)
 		return getNodesCount(mRoot);
 	
-	auto result = 1;
+	size_t result = 1;
 
 	for (const auto& _node : node->getNodes())
 	{

@@ -25,8 +25,8 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		mTargetWidth = render_texture->getWidth() / factor;
 		mTargetHeight = render_texture->getHeight() / factor;
 
-		mBlurTarget1 = std::make_shared<Renderer::RenderTarget>(mTargetWidth, mTargetHeight);
-		mBlurTarget2 = std::make_shared<Renderer::RenderTarget>(mTargetWidth, mTargetHeight);
+		mBlurTarget1 = std::make_shared<Renderer::RenderTarget>((int)mTargetWidth, (int)mTargetHeight);
+		mBlurTarget2 = std::make_shared<Renderer::RenderTarget>((int)mTargetWidth, (int)mTargetHeight);
 
 		mTargetsDirty = false;
 	}

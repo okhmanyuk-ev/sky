@@ -45,7 +45,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	inner_rect->setAnchor({ 0.5f, 0.5f });
 	inner_rect->setPivot({ 0.5f, 0.5f });
 	inner_rect->setStretch({ 0.66f, 0.66f });
-	inner_rect->setAlpha(0.66);
+	inner_rect->setAlpha(0.66f);
 	inner_rect->setEnabled(checked);
 	outer_rect->attach(inner_rect);
 

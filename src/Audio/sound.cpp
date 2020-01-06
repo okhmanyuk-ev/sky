@@ -9,7 +9,7 @@ Sound::Sound(const Platform::Asset& asset, bool loop)
 	FMOD_CREATESOUNDEXINFO exinfo;
 	memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-	exinfo.length = asset.getSize();
+	exinfo.length = static_cast<unsigned int>(asset.getSize());
 
 	FMOD_MODE mode = FMOD_OPENMEMORY;
 
