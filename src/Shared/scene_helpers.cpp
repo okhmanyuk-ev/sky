@@ -242,3 +242,27 @@ void SceneHelpers::Progressbar::addProgressWithIndicator(float value)
 		Shared::ActionHelpers::Kill(indicator)
 	));
 }
+
+SceneHelpers::SplashScene::SplashScene(std::shared_ptr<Renderer::Texture> logo)
+{
+	auto root = getRoot();
+
+	auto image = std::make_shared<::Scene::Sprite>();
+	image->setTexture(logo);
+	image->setAnchor({ 0.5f, 0.5f });
+	image->setPivot({ 0.5f, 0.5f });
+	image->setSampler(Renderer::Sampler::Linear);
+	image->setSize({ 286.0f, 286.0f });
+	root->attach(image);
+
+	mProgressbar = std::make_shared<Progressbar>();
+	mProgressbar->setSize({ 224.0f, 4.0f });
+	mProgressbar->setPivot({ 0.5f, 0.5f });
+	mProgressbar->setAnchor({ 0.5f, 0.8f });
+	root->attach(mProgressbar);
+}
+
+void SceneHelpers::SplashScene::updateProgress(float value)
+{
+	mProgressbar->setProgress(value);
+}

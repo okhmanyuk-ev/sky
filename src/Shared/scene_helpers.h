@@ -7,10 +7,12 @@
 #include <Scene/rectangle.h>
 #include <Scene/actionable.h>
 #include <Scene/debuggable.h>
+#include <Scene/scene.h>
+#include <Scene/sprite.h>
 
 namespace Shared::SceneHelpers
 {
-	std::shared_ptr<Scene::Label> MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder, 
+	std::shared_ptr<Scene::Label> MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder,
 		std::shared_ptr<Scene::Node> target, const utf8_string& text, float text_size, float move_duration = 0.5f);
 
 	std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> MakeFastCheckbox(
@@ -19,10 +21,10 @@ namespace Shared::SceneHelpers
 	std::vector<std::shared_ptr<Scene::Node>> MakeFastRadioButtons(std::vector<utf8_string> titles,
 		float title_size, int choosed, std::function<void(int)> changeCallback = nullptr);
 
-	std::shared_ptr<Scene::Node> MakeHorizontalGrid(float height, const std::vector<std::pair<float/*width*/, 
+	std::shared_ptr<Scene::Node> MakeHorizontalGrid(float height, const std::vector<std::pair<float/*width*/,
 		std::shared_ptr<Scene::Node>>> items);
-	
-	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const glm::vec2& cell_size, 
+
+	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const glm::vec2& cell_size,
 		const std::vector<std::shared_ptr<Scene::Node>> items); // TODO: std::span<..>
 
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(float width, const std::vector<std::pair<float/*height*/,
@@ -55,10 +57,22 @@ namespace Shared::SceneHelpers
 	public:
 		void setProgress(float value);
 		float getProgress() const;
-		
+
 		void addProgressWithIndicator(float value);
 
 	private:
 		std::shared_ptr<Scene::Rectangle> mProgress;
+	};
+
+	class SplashScene : public Scene::Scene
+	{
+	public:
+		SplashScene(std::shared_ptr<Renderer::Texture> logo);
+
+	public:
+		void updateProgress(float value);
+
+	private:
+		std::shared_ptr<Progressbar> mProgressbar;
 	};
 }
