@@ -6,7 +6,7 @@
 
 namespace Common::BufferHelpers
 {
-	void WriteString(Common::Buffer& msg, std::string_view value)
+	void WriteString(Common::BitBuffer& msg, std::string_view value)
 	{
 		for (auto it = value.begin(); it != value.end(); ++it)
 		{
@@ -16,7 +16,7 @@ namespace Common::BufferHelpers
 		msg.write<uint8_t>(0);
 	}
 
-	std::string ReadString(Common::Buffer& msg)
+	std::string ReadString(Common::BitBuffer& msg)
 	{
 		std::string result;
 

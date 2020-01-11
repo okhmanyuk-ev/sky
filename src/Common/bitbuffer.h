@@ -1,12 +1,30 @@
 #pragma once
 
-#include "buffer.h"
+#include <cstdint>
 
 namespace Common
 {
-	class BitBuffer : public Buffer
+	class BitBuffer
 	{
 	public:
+		enum class Origin
+		{
+			Begin,
+			Current,
+			End
+		};
+
+	public:
+		~BitBuffer();
+
+	public:
+		void clear();
+		void toStart();
+		void toEnd();
+
+		void fill(uint8_t value);
+		void ensureSpace(size_t value);
+
 		uint32_t readBits(int size);
 		void writeBits(uint32_t value, int size);
 
@@ -24,22 +42,43 @@ namespace Common
 		void alignByteBoundary();
 		void normalizeBitPosition();
 
-		void seek(int offset, Buffer::Origin origin = Buffer::Origin::Current) override;
+		void seek(int offset, Origin origin = Origin::Current);
 
-		void read(void* value, size_t size) override;
-		void write(void* value, size_t size) override;
+		void read(void* value, size_t size);
+		void write(void* value, size_t size);
 
 		template <typename T> T read() { T result; read(&result, sizeof(T)); return result; };
 		template <typename T> void write(const T& value) { write((void*)&value, sizeof(T)); };
 
 	public:
+		auto getMemory() const { return mMemory; }
+
+		auto getSize() const { return mSize; }
+		void setSize(size_t value);
+
+		auto getPosition() const { return mPosition; }
+		void setPosition(size_t value) { mPosition = value; };
+
+		auto getRemaining() const { return mSize - mPosition; };
+		bool hasRemaining() { return getRemaining() > 0; }
+
+		auto getCapacity() const { return mCapacity; }
+		void setCapacity(size_t value);
+
+		auto getBlockSize() const { return mBlockSize; }
+		void setBlockSize(size_t value) { mBlockSize = value; }
+
 		int getBitPosition() { return m_BitPosition; }
 		void setBitPosition(int value) { m_BitPosition = value; }
 
 		int getRemainingBits() { if (!hasRemaining()) return 0; return static_cast<int>(getRemaining()) * 8 - getBitPosition(); }
 
 	private:
+		void* mMemory = nullptr;
+		size_t mSize = 0;
+		size_t mPosition = 0;
+		size_t mCapacity = 0;
+		size_t mBlockSize = 1 << 13;
 		int m_BitPosition = 0;
-		// m_BitSize;
 	};
 }

@@ -1,8 +1,80 @@
 #include "bitbuffer.h"
 
 #include <cassert>
+#include <string>
 
 using namespace Common;
+
+namespace
+{
+	uint32_t nextPowerOfTwo(uint32_t n)
+	{
+		--n;
+
+		n |= n >> 1;
+		n |= n >> 2;
+		n |= n >> 4;
+		n |= n >> 8;
+		n |= n >> 16;
+
+		return n + 1;
+	}
+}
+
+using namespace Common;
+
+BitBuffer::~BitBuffer()
+{
+	setCapacity(0);
+}
+
+void BitBuffer::clear()
+{
+	setSize(0);
+	toStart();
+}
+
+void BitBuffer::toStart()
+{
+	seek(0, Origin::Begin);
+}
+
+void BitBuffer::toEnd()
+{
+	seek(0, Origin::End);
+}
+
+void BitBuffer::fill(uint8_t value)
+{
+	memset(mMemory, value, mSize);
+}
+
+void BitBuffer::ensureSpace(size_t value)
+{
+	if (mSize < mPosition + value)
+	{
+		setSize(mPosition + value);
+	}
+}
+
+void BitBuffer::setSize(size_t value)
+{
+	if (value + (mBlockSize / 2) > mCapacity)
+		setCapacity(value + (mBlockSize / 2));
+
+	mSize = value;
+}
+
+void BitBuffer::setCapacity(size_t value)
+{
+	value = (value + (mBlockSize - 1)) & ~(mBlockSize - 1);
+	if (mCapacity == value)
+	{
+		return;
+	}
+	mCapacity = value;
+	mMemory = realloc(mMemory, mCapacity);
+}
 
 uint32_t BitBuffer::readBits(int size)
 {
@@ -139,23 +211,24 @@ void BitBuffer::normalizeBitPosition()
 	}
 }
 
-void BitBuffer::seek(int offset, Buffer::Origin origin)
+void BitBuffer::seek(int offset, Origin origin)
 {
 	switch (origin)
 	{
 	case Origin::Begin:
+		mPosition = offset;
 		m_BitPosition = 0;
+		break;
+
+	case Origin::Current:
+		mPosition += offset;
 		break;
 
 	case Origin::End:
+		mPosition = mSize - offset;
 		m_BitPosition = 0;
 		break;
-
-	default:
-		break;
 	}
-
-	Buffer::seek(offset, origin);
 }
 
 void BitBuffer::read(void* value, size_t size)

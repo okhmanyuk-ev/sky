@@ -1,6 +1,5 @@
 #pragma once
 
-#include "buffer.h"
 #include "bitbuffer.h"
 
 #include <string>
@@ -8,8 +7,8 @@
 
 namespace Common::BufferHelpers
 {
-	void WriteString(Common::Buffer& msg, std::string_view value);
-	std::string ReadString(Common::Buffer& msg);
+	void WriteString(Common::BitBuffer& msg, std::string_view value);
+	std::string ReadString(Common::BitBuffer& msg);
 
 	void WriteToBuffer(BitBuffer& from, BitBuffer& to);
 
