@@ -33,6 +33,9 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 
 	mImguiSystem = std::make_shared<Shared::ImguiSystem>();
 	
+	mNetwork = std::make_shared<Network::System>();
+	ENGINE->setNetwork(&(*mNetwork));
+
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
 

@@ -5,14 +5,11 @@
 #include <Common/task_system.h>
 #include <Common/frame_system.h>
 #include <Common/event_system.h>
-
 #include <Shared/imgui_system.h>
-
 #include <Platform/system.h>
 #include <Renderer/system.h>
-
 #include <Graphics/system.h>
-
+#include <Network/system.h>
 #include <Common/console_commands.h>
 #include <Shared/graphical_console_commands.h>
 #include <Shared/performance_console_commands.h>
@@ -56,6 +53,8 @@ namespace Shared
 
 		std::shared_ptr<Graphics::System> mGraphics;
 		std::shared_ptr<Shared::ImguiSystem> mImguiSystem;
+
+		std::shared_ptr<Network::System> mNetwork;
 
 	private:
 		std::shared_ptr<Common::ConsoleCommands> mConsoleCommands;
