@@ -22,7 +22,7 @@ namespace Scene
 		void setGlowPasses(int value) { mGlowPasses = value; }
 
 		auto getDownscaleFactor() const { return mDownscaleFactor; }
-		void setDownscaleFactor(float value) { mDownscaleFactor = value; mTargetsDirty = true; }
+		void setDownscaleFactor(float value) { mDownscaleFactor = value; }
 
 	private:
 		std::shared_ptr<Renderer::RenderTarget> mBlurTarget1;
@@ -35,5 +35,6 @@ namespace Scene
 		int mGlowPasses = 1;
 		float mDownscaleFactor = 4.0f;
 		float mPrevScale = 0.0f;
+		float mPrevDownscaleFactor = mDownscaleFactor;
 	};
 }

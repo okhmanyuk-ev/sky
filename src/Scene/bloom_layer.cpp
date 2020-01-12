@@ -18,12 +18,18 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		mPrevScale = scale;
 	}
 
+	if (mPrevDownscaleFactor != mDownscaleFactor)
+	{
+		mTargetsDirty = true;
+		mPrevDownscaleFactor = mDownscaleFactor;
+	}
+
 	if (mTargetsDirty)
 	{
 		float factor = mDownscaleFactor * scale;
 
-		mTargetWidth = render_texture->getWidth() / factor;
-		mTargetHeight = render_texture->getHeight() / factor;
+		mTargetWidth = glm::floor(render_texture->getWidth() / factor);
+		mTargetHeight = glm::floor(render_texture->getHeight() / factor);
 
 		mBlurTarget1 = std::make_shared<Renderer::RenderTarget>((int)mTargetWidth, (int)mTargetHeight);
 		mBlurTarget2 = std::make_shared<Renderer::RenderTarget>((int)mTargetWidth, (int)mTargetHeight);
