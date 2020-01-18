@@ -60,6 +60,10 @@ namespace Shared::SceneHelpers
 
 		void addProgressWithIndicator(float value);
 
+		auto getProgressColor() const { return mProgress->getColor(); }
+		void setProgressColor(const glm::vec4& value) { mProgress->setColor(value); }
+		void setProgressColor(const glm::vec3& value) { mProgress->setColor(value); }
+
 	private:
 		std::shared_ptr<Scene::Rectangle> mProgress;
 	};

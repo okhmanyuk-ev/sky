@@ -144,7 +144,7 @@ namespace Graphics::Color
 	const glm::vec3 Yellow = { 1.000000f, 1.000000f, 0.000000f };
 	const glm::vec3 YellowGreen = { 0.603922f, 0.803922f, 0.196078f };
 
-	glm::vec4 toNormalized(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
-	glm::vec4 toNormalized(uint32_t value);
-	uint32_t toUInt32(glm::vec4 color);
+	glm::vec4 ToNormalized(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
+	glm::vec4 ToNormalized(uint32_t value);
+	uint32_t ToUInt32(glm::vec4 color);
 }

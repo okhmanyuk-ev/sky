@@ -67,8 +67,6 @@ void ConsoleDevice::frame()
 
 	if (mState == State::Closed)
 	{
-		// TODO: show help for user, how he can close this shit
-#if defined(PLATFORM_MOBILE)
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0001f);
 		ImGui::Begin("ConsoleButton", nullptr, ImGui::User::ImGuiWindowFlags_Overlay & ~ImGuiWindowFlags_NoInputs);
 		ImGui::SetWindowPos(ImVec2((PLATFORM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10, 10));
@@ -85,7 +83,7 @@ void ConsoleDevice::frame()
 		}
 		ImGui::End();
 		ImGui::PopStyleVar(1);
-#endif
+
 		showFastLogs();
 		return;
 	}
