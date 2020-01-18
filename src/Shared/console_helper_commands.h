@@ -6,6 +6,8 @@
 #include <Console/system.h>
 #include <Platform/system.h>
 
+#include <glm/glm.hpp>
+
 namespace Shared
 {
 	class ConsoleHelperCommands : public Common::FrameSystem::Frameable
@@ -20,5 +22,6 @@ namespace Shared
 	private:
 		bool mWantShowCVars = false;
 		bool mWantImguiDemo = false;
+		
 	};
 }

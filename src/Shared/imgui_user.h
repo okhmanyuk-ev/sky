@@ -25,6 +25,7 @@ namespace ImGui::User
 		ImGuiWindowFlags_NoBringToFrontOnFocus |
 		ImGuiWindowFlags_AlwaysAutoResize;
 
+	ImVec4 GetColorFromStyle();
 	void SetupStyleFromColor(float r, float g, float b);
 
 	ImVec2 TopLeftCorner(float margin = 10.0f);

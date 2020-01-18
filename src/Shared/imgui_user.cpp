@@ -4,6 +4,11 @@
 
 namespace ImGui::User
 {
+	ImVec4 GetColorFromStyle()
+	{
+		return ImGui::GetStyle().Colors[ImGuiCol_Text];
+	}
+
 	void SetupStyleFromColor(float r, float g, float b)
 	{
 		auto color = [r, g ,b](float a) {

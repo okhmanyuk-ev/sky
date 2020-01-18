@@ -12,9 +12,16 @@ ConsoleHelperCommands::ConsoleHelperCommands()
 		CVAR_GETTER_BOOL(mWantShowCVars),
 		CVAR_SETTER_BOOL(mWantShowCVars));
 
-	CONSOLE->registerCommand("con_color", { "r", "g", "b" },  [](CON_ARGS) {
-		ImGui::User::SetupStyleFromColor(CON_ARG_FLOAT(0), CON_ARG_FLOAT(1), CON_ARG_FLOAT(2));
-	});
+
+	CONSOLE->registerCVar("con_color", { "r", "g", "b" },
+		[this] {
+			auto col = ImGui::User::GetColorFromStyle();
+			return std::vector<std::string>({ std::to_string(col.x), std::to_string(col.y), std::to_string(col.z) });
+		},
+		CVAR_SETTER(
+			ImGui::User::SetupStyleFromColor(CON_ARG_FLOAT(0), CON_ARG_FLOAT(1), CON_ARG_FLOAT(2))
+		)
+	);
 
 	CONSOLE->registerCVar("imgui_show_demo", { "bool" },
 		CVAR_GETTER_BOOL(mWantImguiDemo),
