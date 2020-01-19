@@ -7,16 +7,16 @@
 
 using namespace Shared;
 
-LocalizationSystem::LocalizationSystem(const std::string& path)
+void LocalizationSystem::loadDicrionaries(const std::string& path)
 {
 	auto loadDictionary = [this, path](Language language) {
 		auto& dictionary = mDictionaries[language];
-		
+
 		auto asset = Platform::Asset(path + "/" + getLanguageName(language) + ".txt");
 
 		auto s = std::string((char*)asset.getMemory(), asset.getSize());
 		auto ss = std::stringstream(s);
-		
+
 		auto trim = [](std::string& s) {
 			const char* ws = " \t\n\r\f\v";
 			s.erase(s.find_last_not_of(ws) + 1);
@@ -45,11 +45,6 @@ LocalizationSystem::LocalizationSystem(const std::string& path)
 
 	loadDictionary(Language::English);
 	loadDictionary(Language::Russian);
-}
-
-LocalizationSystem::~LocalizationSystem()
-{
-	//
 }
 
 std::string LocalizationSystem::getLanguageName(Language language)

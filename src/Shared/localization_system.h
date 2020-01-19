@@ -5,9 +5,6 @@
 #include <tinyutf8.hpp>
 #include <fmt/format.h>
 
-#define LOCALIZATION_SYSTEM_KEY "localization_system"
-#define LOCALIZATION static_cast<Shared::LocalizationSystem*>(ENGINE->getCustomSystem(LOCALIZATION_SYSTEM_KEY))
-
 #define LOCALIZE(KEY) LOCALIZATION->getString(KEY)
 #define LOCALIZE_FMT(KEY, ...) LOCALIZATION->getStringFmt(KEY, __VA_ARGS__)
 
@@ -23,13 +20,11 @@ namespace Shared
 		};
 
 	public:
-		LocalizationSystem(const std::string& path);
-		~LocalizationSystem();
-
-	public:
 		static std::string getLanguageName(Language language);
 
 	public:
+		void loadDicrionaries(const std::string& path);
+
 		utf8_string getString(const std::string& key) const;
 		
 		auto getLanguage() const { return mLanguage; }

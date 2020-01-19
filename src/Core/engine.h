@@ -14,6 +14,9 @@
 #define TASK ENGINE->getTask()
 #define AUDIO ENGINE->getAudio()
 #define NETWORK ENGINE->getNetwork()
+#define LOCALIZATION ENGINE->getLocalization()
+#define CACHE ENGINE->getCache()
+#define STATS ENGINE->getStats()
 
 namespace Common
 {
@@ -51,6 +54,13 @@ namespace Audio
 namespace Network
 {
 	class System;
+}
+
+namespace Shared
+{
+	class LocalizationSystem;
+	class CacheSystem;
+	class StatsSystem;
 }
 
 namespace Core
@@ -99,8 +109,17 @@ namespace Core
 		auto getNetwork() { return mNetwork; }
 		void setNetwork(Network::System* value) { mNetwork = value; }
 
-		auto getCustomSystem(const std::string& key) const { return mCustomSystems.at(key); }
-		void setCustomSystem(const std::string& key, void* value) { mCustomSystems[key] = value; }
+		auto getLocalization() const { return mLocalization; }
+		void setLocalization(Shared::LocalizationSystem* value) { mLocalization = value; }
+
+		auto getCache() const { return mCache; }
+		void setCache(Shared::CacheSystem* value) { mCache = value; }
+
+		auto getStats() const { return mStats; }
+		void setStats(Shared::StatsSystem* value) { mStats = value; }
+
+		auto getCustomSystem() const { return mCustomSystem; }
+		void setCustomSystem(void* value) { mCustomSystem = value; }
 
 	private:
 		Platform::System* mPlatform = nullptr;
@@ -113,6 +132,9 @@ namespace Core
 		Common::TaskSystem* mTask = nullptr;
 		Audio::System* mAudio = nullptr;
 		Network::System* mNetwork = nullptr;
-		std::map<std::string, void*> mCustomSystems;
+		Shared::LocalizationSystem* mLocalization = nullptr;
+		Shared::CacheSystem* mCache = nullptr;
+		Shared::StatsSystem* mStats = nullptr;
+		void* mCustomSystem = nullptr;
 	};
 }

@@ -8,9 +8,6 @@
 #include <map>
 #include <memory>
 
-#define CACHE_SYSTEM_KEY "cache_system"
-#define CACHE static_cast<Shared::CacheSystem*>(ENGINE->getCustomSystem(CACHE_SYSTEM_KEY))
-
 #define PRECACHE_TEXTURE_ALIAS(NAME, ALIAS) CACHE->loadTexture(NAME, ALIAS)
 #define PRECACHE_FONT_ALIAS(NAME, ALIAS) CACHE->loadFont(NAME, ALIAS)
 

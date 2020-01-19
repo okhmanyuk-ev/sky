@@ -15,6 +15,7 @@
 #include <Shared/performance_console_commands.h>
 #include <Shared/console_helper_commands.h>
 #include <Shared/console_device.h>
+#include <Shared/localization_system.h>
 #include <Shared/stats_system.h>
 #include <Shared/cache_system.h>
 #include <Renderer/system_d3d11.h>
@@ -63,6 +64,7 @@ namespace Shared
 		std::shared_ptr<Shared::PerformanceConsoleCommands> mPerformanceConsoleCommands;
 		std::shared_ptr<Shared::ConsoleHelperCommands> mConsoleHelperCommands;
 
+		std::shared_ptr<Shared::LocalizationSystem> mLocalization;
 		std::shared_ptr<Shared::StatsSystem> mStats;
 		std::shared_ptr<Shared::CacheSystem> mCache;
 		std::shared_ptr<Shared::TouchEmulator> mTouchEmulator;

@@ -42,11 +42,14 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	mPerformanceConsoleCommands = std::make_shared<Shared::PerformanceConsoleCommands>();
 	mConsoleHelperCommands = std::make_shared<Shared::ConsoleHelperCommands>();
 
+	mLocalization = std::make_shared<Shared::LocalizationSystem>();
+	ENGINE->setLocalization(&(*mLocalization));
+
 	mStats = std::make_shared<Shared::StatsSystem>();
-	ENGINE->setCustomSystem(STATS_SYSTEM_KEY, &(*mStats));
+	ENGINE->setStats(&(*mStats));
 
 	mCache = std::make_shared<Shared::CacheSystem>();
-	ENGINE->setCustomSystem(CACHE_SYSTEM_KEY, &(*mCache));
+	ENGINE->setCache(&(*mCache));
 
 	mTouchEmulator = std::make_shared<Shared::TouchEmulator>();
 	mGestureDetector = std::make_shared<Shared::GestureDetector>();

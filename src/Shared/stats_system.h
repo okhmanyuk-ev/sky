@@ -6,10 +6,6 @@
 #include <unordered_map>
 #include <Common/frame_system.h>
 
-
-#define STATS_SYSTEM_KEY "stats_system"
-#define STATS static_cast<Shared::StatsSystem*>(ENGINE->getCustomSystem(STATS_SYSTEM_KEY))
-
 #define STATS_INDICATE(KEY, VALUE) STATS->indicate(KEY, VALUE)
 #define STATS_INDICATE_GROUP(GROUP, KEY, VALUE) STATS->indicate(KEY, VALUE, GROUP)
 
