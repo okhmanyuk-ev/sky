@@ -49,7 +49,7 @@ namespace Shared::SceneHelpers
 		std::shared_ptr<Scene::Label> mLabel;
 	};
 
-	class Progressbar : public Scene::Actionable<Scene::Rectangle>
+	class Progressbar : public Scene::Rectangle
 	{
 	public:
 		Progressbar();
@@ -57,8 +57,6 @@ namespace Shared::SceneHelpers
 	public:
 		void setProgress(float value);
 		float getProgress() const;
-
-		void addProgressWithIndicator(float value);
 
 		auto getProgressColor() const { return mProgress->getColor(); }
 		void setProgressColor(const glm::vec4& value) { mProgress->setColor(value); }

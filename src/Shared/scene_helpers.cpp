@@ -222,27 +222,6 @@ float SceneHelpers::Progressbar::getProgress() const
 	return mProgress->getHorizontalStretch();
 }
 
-void SceneHelpers::Progressbar::addProgressWithIndicator(float value)
-{
-	auto indicator = std::make_shared<Scene::Rectangle>();
-	indicator->setAnchor({ getProgress(), 0.5f });
-	indicator->setPivot({ 0.0f, 0.5f });
-	indicator->setStretch({ 0.0f, 1.0f });
-	indicator->setAlpha(mProgress->getAlpha());
-	indicator->setColor(Graphics::Color::Yellow);
-	attach(indicator);
-
-	runAction(Shared::ActionHelpers::MakeSequence(
-		Shared::ActionHelpers::ChangeHorizontalStretch(indicator, value, 0.5f),
-		Shared::ActionHelpers::ChangeColor(indicator, Graphics::Color::White, 0.5f),
-		Shared::ActionHelpers::Execute([this, value, indicator] {
-			setProgress(getProgress() + value);
-			indicator->setEnabled(false);
-		}),
-		Shared::ActionHelpers::Kill(indicator)
-	));
-}
-
 SceneHelpers::SplashScene::SplashScene(std::shared_ptr<Renderer::Texture> logo)
 {
 	auto root = getRoot();
