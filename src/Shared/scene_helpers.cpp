@@ -177,7 +177,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const glm::vec2& cel
 	return MakeVerticalGrid(cell_size.x, items_height);
 }
 
-SceneHelpers::FastButton::FastButton(const utf8_string& title, float fontSize)
+SceneHelpers::FastButton::FastButton(float fontSize)
 {
 	setChooseCallback([this] { setAlpha(0.66f); });
 	setCancelChooseCallback([this] { setAlpha(0.33f); });
@@ -185,7 +185,6 @@ SceneHelpers::FastButton::FastButton(const utf8_string& title, float fontSize)
 	mLabel = std::make_shared<Scene::Label>();
 	mLabel->setFont(FONT("default"));
 	mLabel->setFontSize(fontSize);
-	mLabel->setText(title);
 	mLabel->setAnchor({ 0.5f, 0.5f });
 	mLabel->setPivot({ 0.5f, 0.5f });
 	attach(mLabel);
