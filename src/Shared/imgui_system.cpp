@@ -115,6 +115,7 @@ void ImguiSystem::end()
 	RENDERER->setSampler(Renderer::Sampler::Nearest);
 	RENDERER->setDepthMode(Renderer::DepthMode::None);
 	RENDERER->setCullMode(Renderer::CullMode::None);
+	RENDERER->setBlendMode(Renderer::BlendStates::NonPremultiplied);
 	RENDERER->setShader(mShader);
 
 	for (int i = 0; i < drawData->CmdListsCount; i++)

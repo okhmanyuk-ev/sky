@@ -49,10 +49,6 @@ void System::end()
 	assert(mWorking);
 	assert(mStates.size() == 1);
 	mWorking = false;
-	if (stateWouldApplied())
-	{
-		applyState();
-	}
 	flush();
 	mStates.pop();
 }
