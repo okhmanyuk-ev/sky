@@ -35,6 +35,7 @@ namespace Graphics
 		void end();
 
 	private:
+		bool stateWouldApplied();
 		void applyState();
 		void flush();
 
@@ -147,6 +148,7 @@ namespace Graphics
 		};
 
 		std::stack<State> mStates;
+		std::optional<State> mAppliedState;
 
 	public:
 		bool isBatching() const { return mBatching; }
@@ -175,7 +177,6 @@ namespace Graphics
 
 			std::optional<std::shared_ptr<Renderer::Texture>> texture;
 			std::optional<Renderer::Topology> topology;
-
 			
 			size_t verticesCount = 0;
 			size_t indicesCount = 0;

@@ -15,6 +15,7 @@ void System::begin(const glm::mat4& viewMatrix, const glm::mat4& projectionMatri
 	state.viewMatrix = viewMatrix;
 	state.projectionMatrix = projectionMatrix;
 	mStates.push(state);
+	mAppliedState = std::nullopt;
 	applyState();
 }
 
@@ -52,12 +53,22 @@ void System::end()
 	mStates.pop();
 }
 
-void System::applyState()
+bool System::stateWouldApplied()
 {
 	assert(!mStates.empty());
-
-	const auto& state = mStates.top();
 	
+	if (!mAppliedState.has_value())
+		return true;
+
+	return mStates.top() != mAppliedState.value();
+}
+
+void System::applyState()
+{
+	assert(stateWouldApplied());
+	
+	const auto& state = mStates.top();
+
 	if (state.scissor.has_value())
 		RENDERER->setScissor(state.scissor.value());
 	else
@@ -72,6 +83,9 @@ void System::applyState()
 	RENDERER->setCullMode(Renderer::CullMode::None);
 	RENDERER->setViewport(state.viewport);
 	RENDERER->setBlendMode(state.blendMode);
+	RENDERER->setSampler(state.sampler);
+
+	mAppliedState = state;
 }
 
 void System::flush()
@@ -112,10 +126,9 @@ void System::flush()
 	if (mBatch.texture.has_value())
 		RENDERER->setTexture(*mBatch.texture.value());
 
-	RENDERER->setSampler(state.sampler);
-
 	RENDERER->setTopology(mBatch.topology.value());
 	RENDERER->setIndexBuffer(mBatch.indices);
+
 	RENDERER->drawIndexed(mBatch.indicesCount);
 
 	mBatch.mode = BatchMode::None;
@@ -140,6 +153,12 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	const std::vector<uint32_t>& indices, const glm::mat4& model)
 {
 	assert(mWorking);
+
+	if (stateWouldApplied())
+	{
+		flush();
+		applyState();
+	}
 
 	if (topology == Renderer::Topology::TriangleStrip)
 	{
@@ -204,6 +223,12 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	const std::vector<uint32_t>& indices, const glm::mat4& model)
 {
 	assert(mWorking);
+
+	if (stateWouldApplied())
+	{
+		flush();
+		applyState();
+	}
 
 	if (topology == Renderer::Topology::TriangleStrip)
 	{
@@ -378,6 +403,12 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 {
 	assert(mWorking);
 
+	if (stateWouldApplied())
+	{
+		flush();
+		applyState();
+	}
+
 	if (topology == Renderer::Topology::TriangleStrip)
 	{
 		auto new_indices = triangulate(topology, indices);
@@ -528,35 +559,18 @@ std::vector<uint32_t> System::triangulate(Renderer::Topology topology, const std
 
 void System::push(const State& value)
 {
-	assert(mWorking);
-
-	if (mStates.top() != value)
-		flush();
-	
+	assert(mWorking);	
 	mStates.push(value);
-	applyState();
 }
 
 void System::pop(int count)
 {
 	assert(mWorking);
-	
+	assert(mStates.size() >= count);
+
 	for (int i = 0; i < count; i++)
 	{
-		assert(!mStates.empty());
-		auto state = mStates.top();
-
 		mStates.pop();
-
-		if (state != mStates.top())
-		{
-			mStates.push(state);
-			flush();
-			mStates.pop();
-		}
-
-		if (!mStates.empty())
-			applyState();
 	}
 }
 
