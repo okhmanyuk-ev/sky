@@ -53,21 +53,16 @@ void System::end()
 	mStates.pop();
 }
 
-bool System::stateWouldApplied()
-{
-	assert(!mStates.empty());
-	
-	if (!mAppliedState.has_value())
-		return true;
-
-	return mStates.top() != mAppliedState.value();
-}
-
 void System::applyState()
 {
-	assert(stateWouldApplied());
-	
+	assert(!mStates.empty());
+
 	const auto& state = mStates.top();
+
+	if (mAppliedState.has_value() && state == mAppliedState.value())
+		return;
+
+	flush();
 
 	if (state.scissor.has_value())
 		RENDERER->setScissor(state.scissor.value());
@@ -138,11 +133,7 @@ void System::flush()
 
 void System::clear(const glm::vec4& color)
 {
-	if (stateWouldApplied())
-	{
-		flush();
-		applyState();
-	}
+	applyState();
 	RENDERER->clear(color);
 }
 
@@ -166,11 +157,7 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 		return;
 	}
 
-	if (stateWouldApplied())
-	{
-		flush();
-		applyState();
-	}
+	applyState();
 
 	if (mBatching)
 	{
@@ -236,12 +223,8 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 		return;
 	}
 
-	if (stateWouldApplied())
-	{
-		flush();
-		applyState();
-	}
-
+	applyState();
+	
 	if (mBatching)
 	{
 		if (mBatch.topology != topology || mBatch.texture != texture || mBatch.mode != BatchMode::Textured)
@@ -404,7 +387,7 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 	const std::vector<Renderer::Vertex::PositionTexture>& vertices,
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
-	float smoothFactor, const glm::mat4 model, const glm::vec4& color)
+	float smoothFactor, const glm::mat4& model, const glm::vec4& color)
 {
 	assert(mWorking);
 
@@ -415,12 +398,8 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 		return;
 	}
 
-	if (stateWouldApplied())
-	{
-		flush();
-		applyState();
-	}
-
+	applyState();
+	
 	if (mBatching)
 	{
 		if (mBatch.topology != topology ||
@@ -516,10 +495,13 @@ void System::drawString(const Font& font, const utf8_string& text, const glm::ma
 
 glm::vec3 System::project(const glm::vec3& pos, const glm::mat4& model)
 {
-	auto width = PLATFORM->getLogicalWidth();
-	auto height = PLATFORM->getLogicalHeight();
+	const auto& state = mStates.top();
+
+	auto width = state.viewport.size.x;
+	auto height = state.viewport.size.y;
+
 	glm::vec4 viewport = { 0.0f, height, width, -height };
-	return glm::project(pos, model, mStates.top().projectionMatrix, viewport);
+	return glm::project(pos, model, state.projectionMatrix, viewport);
 }
 
 void System::pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size)
@@ -633,4 +615,12 @@ void System::pushProjectionMatrix(const glm::mat4& value)
 	auto state = mStates.top();
 	state.projectionMatrix = value;
 	push(state);
+}
+
+void System::setBatching(bool value) 
+{ 
+	if (!value && mBatching) 
+		flush(); 
+	
+	mBatching = value; 
 }

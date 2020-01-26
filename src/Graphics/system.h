@@ -35,8 +35,6 @@ namespace Graphics
 		void end();
 
 	private:
-		bool stateWouldApplied();
-		void applyState();
 		void flush();
 
 	public:
@@ -78,7 +76,7 @@ namespace Graphics
 		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 			const std::vector<Renderer::Vertex::PositionTexture>& vertices,
 			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
-			float smoothFactor, const glm::mat4 model,
+			float smoothFactor, const glm::mat4& model,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
 		// text
@@ -100,6 +98,7 @@ namespace Graphics
 		std::vector<uint32_t> triangulate(Renderer::Topology topology, const std::vector<uint32_t>& indices);
 
 	public:
+		void applyState();
 		void push(const State& value);
 		void pop(int count = 1);
 
@@ -147,12 +146,13 @@ namespace Graphics
 			}
 		};
 
+	private:
 		std::stack<State> mStates;
 		std::optional<State> mAppliedState;
 
 	public:
 		bool isBatching() const { return mBatching; }
-		void setBatching(bool value) { mBatching = value; }
+		void setBatching(bool value);
 
 	private:
 		bool mBatching = true;

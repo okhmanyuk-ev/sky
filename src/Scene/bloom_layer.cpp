@@ -57,6 +57,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 	}
 	{
 		GRAPHICS->push(Graphics::System::State());
+		GRAPHICS->applyState();
 
 		mBlurShader.setResolution({ mTargetWidth, mTargetHeight });
 
@@ -99,6 +100,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		}
 
 		GRAPHICS->pop();
+		GRAPHICS->applyState();
 	}
 	{
 		auto state = GRAPHICS->getCurrentState();
