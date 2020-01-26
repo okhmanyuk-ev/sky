@@ -93,6 +93,11 @@ namespace Graphics
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
 
+	private:
+		glm::vec3 project(const glm::vec3& pos, const glm::mat4& model);
+		void pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size);
+		std::vector<uint32_t> triangulate(Renderer::Topology topology, const std::vector<uint32_t>& indices);
+
 	public:
 		void push(const State& value);
 		void pop(int count = 1);

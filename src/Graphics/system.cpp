@@ -130,21 +130,21 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 {
 	assert(mWorking);
 
+	if (topology == Renderer::Topology::TriangleStrip)
+	{
+		auto new_indices = triangulate(topology, indices);
+		draw(Renderer::Topology::TriangleList, vertices, new_indices, model);
+		return;
+	}
+
 	if (mBatching)
 	{
 		if (mBatchTexture != std::nullopt || mBatchTopology != topology)
 			flush();
 
+		mBatchFlushed = false;
 		mBatchTexture = std::nullopt;
 		mBatchTopology = topology;
-
-		auto project = [&model, this](const glm::vec3& pos) {
-			auto width = PLATFORM->getLogicalWidth();
-			auto height = PLATFORM->getLogicalHeight();
-			glm::vec4 viewport = { 0.0f, height, width, -height };
-			return glm::project(pos, model, mStates.top().projectionMatrix, viewport);
-		};
-
 		mBatchVerticesCount += vertices.size();
 
 		if (mBatchVerticesCount > mBatchColoredVertices.size())
@@ -152,27 +152,15 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 
 		auto start_vertex = mBatchVerticesCount - vertices.size();
 
-		for (const auto& vertex : vertices)
+		for (const auto& src_vertex : vertices)
 		{
-			mBatchColoredVertices[start_vertex] = vertex;
-			mBatchColoredVertices[start_vertex].pos = project(mBatchColoredVertices.at(start_vertex).pos);
+			auto& dst_vertex = mBatchColoredVertices.at(start_vertex);
+			dst_vertex.pos = project(src_vertex.pos, model);
+			dst_vertex.col = src_vertex.col;
 			start_vertex += 1;
 		}
 
-		mBatchIndicesCount += indices.size();
-
-		if (mBatchIndicesCount > mBatchIndices.size())
-			mBatchIndices.resize(mBatchIndicesCount);
-
-		auto start_index = mBatchIndicesCount - indices.size();
-
-		for (auto index : indices)
-		{
-			mBatchIndices[start_index] = static_cast<uint32_t>(mBatchVerticesCount - vertices.size() + static_cast<size_t>(index));
-			start_index += 1;
-		}
-
-		mBatchFlushed = false;
+		pushBatchIndices(indices, vertices.size());
 	}
 	else
 	{
@@ -206,21 +194,21 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 {
 	assert(mWorking);
 
+	if (topology == Renderer::Topology::TriangleStrip)
+	{
+		auto new_indices = triangulate(topology, indices);
+		draw(Renderer::Topology::TriangleList, texture, vertices, new_indices, model);
+		return;
+	}
+
 	if (mBatching)
 	{
 		if (mBatchTexture != texture || mBatchTopology != topology)
 			flush();
 
+		mBatchFlushed = false;
 		mBatchTexture = texture;
 		mBatchTopology = topology;
-
-		auto project = [&model, this](const glm::vec3& pos) {
-			auto width = PLATFORM->getLogicalWidth();
-			auto height = PLATFORM->getLogicalHeight();
-			glm::vec4 viewport = { 0.0f, height, width, -height };
-			return glm::project(pos, model, mStates.top().projectionMatrix, viewport);
-		};
-
 		mBatchVerticesCount += vertices.size();
 
 		if (mBatchVerticesCount > mBatchTexturedVertices.size())
@@ -228,27 +216,16 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 
 		auto start_vertex = mBatchVerticesCount - vertices.size();
 
-		for (const auto& vertex : vertices)
+		for (const auto& src_vertex : vertices)
 		{
-			mBatchTexturedVertices[start_vertex] = vertex;
-			mBatchTexturedVertices[start_vertex].pos = project(mBatchTexturedVertices.at(start_vertex).pos);
+			auto& dst_vertex = mBatchTexturedVertices.at(start_vertex);
+			dst_vertex.pos = project(src_vertex.pos, model);
+			dst_vertex.col = src_vertex.col;
+			dst_vertex.tex = src_vertex.tex;
 			start_vertex += 1;
 		}
 
-		mBatchIndicesCount += indices.size();
-
-		if (mBatchIndicesCount > mBatchIndices.size())
-			mBatchIndices.resize(mBatchIndicesCount);
-
-		auto start_index = mBatchIndicesCount - indices.size();
-
-		for (auto index : indices)
-		{
-			mBatchIndices[start_index] = static_cast<uint32_t>(mBatchVerticesCount - vertices.size() + static_cast<size_t>(index));
-			start_index += 1;
-		}
-
-		mBatchFlushed = false;
+		pushBatchIndices(indices, vertices.size());
 	}
 	else
 	{
@@ -437,6 +414,54 @@ void System::drawString(const Font& font, const utf8_string& text, const glm::ma
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
 	drawString(font, TextMesh::createSinglelineTextMesh(font, text), model, size, color, outlineThickness, outlineColor);
+}
+
+glm::vec3 System::project(const glm::vec3& pos, const glm::mat4& model)
+{
+	auto width = PLATFORM->getLogicalWidth();
+	auto height = PLATFORM->getLogicalHeight();
+	glm::vec4 viewport = { 0.0f, height, width, -height };
+	return glm::project(pos, model, mStates.top().projectionMatrix, viewport);
+}
+
+void System::pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size)
+{
+	mBatchIndicesCount += indices.size();
+
+	if (mBatchIndicesCount > mBatchIndices.size())
+		mBatchIndices.resize(mBatchIndicesCount);
+
+	auto start_index = mBatchIndicesCount - indices.size();
+
+	for (auto src_index : indices)
+	{
+		auto& dst_index = mBatchIndices.at(start_index);
+		dst_index = static_cast<uint32_t>(mBatchVerticesCount - vertices_size) + src_index;
+		start_index += 1;
+	}
+}
+
+std::vector<uint32_t> System::triangulate(Renderer::Topology topology, const std::vector<uint32_t>& indices)
+{
+	assert(topology == Renderer::Topology::TriangleStrip);
+
+	std::vector<uint32_t> result;
+
+	for (int i = 0; i < indices.size() - 2; i++)
+	{
+		if (i % 2) {
+			result.push_back(indices.at(i + 1));
+			result.push_back(indices.at(i));
+			result.push_back(indices.at(i + 2));
+		}
+		else {
+			result.push_back(indices.at(i));
+			result.push_back(indices.at(i + 1));
+			result.push_back(indices.at(i + 2));
+		}
+	}
+
+	return result;
 }
 
 void System::push(const State& value)
