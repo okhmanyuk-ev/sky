@@ -40,9 +40,17 @@ namespace Renderer
 		void setProjectionMatrix(const glm::mat4& value) { mConstantBufferData.projection = value; mNeedUpdate = true; }
 		void setViewMatrix(const glm::mat4& value) { mConstantBufferData.view = value; mNeedUpdate = true; }
 		void setModelMatrix(const glm::mat4& value) { mConstantBufferData.model = value; mNeedUpdate = true; }
+		
+		auto getMinValue() const { return mConstantBufferData.minValue; }
 		void setMinValue(float value) { mConstantBufferData.minValue = value; mNeedUpdate = true; }
+
+		auto getMaxValue() const { return mConstantBufferData.maxValue; }
 		void setMaxValue(float value) { mConstantBufferData.maxValue = value; mNeedUpdate = true; }
+
+		auto getSmoothFactor() const { return mConstantBufferData.smoothFactor; }
 		void setSmoothFactor(float value) { mConstantBufferData.smoothFactor = value; mNeedUpdate = true; }
+
+		auto getColor() const { return mConstantBufferData.color;  }
 		void setColor(const glm::vec4& value) { mConstantBufferData.color = value; mNeedUpdate = true; }
 
 	private:

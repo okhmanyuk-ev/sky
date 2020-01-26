@@ -76,40 +76,51 @@ void System::applyState()
 
 void System::flush()
 {
-	if (mBatchFlushed)
+	if (mBatch.mode == BatchMode::None)
 		return;
 
-	auto& state = mStates.top();
+	const auto& state = mStates.top();
+	
+	if (mBatch.mode == BatchMode::Sdf)
+	{
+		mSdfShader.setProjectionMatrix(state.projectionMatrix);
+		mSdfShader.setViewMatrix(state.viewMatrix);
+		mSdfShader.setModelMatrix(glm::mat4(1.0f));
 
-	if (mBatchTexture.has_value()) // means we need textured shader
+		RENDERER->setShader(mSdfShader);
+		RENDERER->setVertexBuffer(mBatch.positionTextureVertices);
+	}
+	else if (mBatch.mode == BatchMode::Textured)
 	{
 		mTexturedShader.setProjectionMatrix(state.projectionMatrix);
 		mTexturedShader.setViewMatrix(state.viewMatrix);
 		mTexturedShader.setModelMatrix(glm::mat4(1.0f));
 
 		RENDERER->setShader(mTexturedShader);
-		RENDERER->setVertexBuffer(mBatchTexturedVertices);
-		RENDERER->setTexture(*mBatchTexture.value());
+		RENDERER->setVertexBuffer(mBatch.positionColorTextureVertices);
 	}
-	else
+	else if (mBatch.mode == BatchMode::Colored)
 	{
 		mColoredShader.setProjectionMatrix(state.projectionMatrix);
 		mColoredShader.setViewMatrix(state.viewMatrix);
 		mColoredShader.setModelMatrix(glm::mat4(1.0f));
 
 		RENDERER->setShader(mColoredShader);
-		RENDERER->setVertexBuffer(mBatchColoredVertices);
+		RENDERER->setVertexBuffer(mBatch.positionColorVertices);
 	}
+
+	if (mBatch.texture.has_value())
+		RENDERER->setTexture(*mBatch.texture.value());
 
 	RENDERER->setSampler(state.sampler);
 
-	RENDERER->setTopology(mBatchTopology.value());
-	RENDERER->setIndexBuffer(mBatchIndices);
-	RENDERER->drawIndexed(mBatchIndicesCount);
+	RENDERER->setTopology(mBatch.topology.value());
+	RENDERER->setIndexBuffer(mBatch.indices);
+	RENDERER->drawIndexed(mBatch.indicesCount);
 
-	mBatchFlushed = true;
-	mBatchVerticesCount = 0;
-	mBatchIndicesCount = 0;
+	mBatch.mode = BatchMode::None;
+	mBatch.verticesCount = 0;
+	mBatch.indicesCount = 0;
 }
 
 void System::clear(const glm::vec4& color)
@@ -139,22 +150,22 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 
 	if (mBatching)
 	{
-		if (mBatchTexture != std::nullopt || mBatchTopology != topology)
+		if (mBatch.topology != topology || mBatch.texture != std::nullopt || mBatch.mode != BatchMode::Colored)
 			flush();
 
-		mBatchFlushed = false;
-		mBatchTexture = std::nullopt;
-		mBatchTopology = topology;
-		mBatchVerticesCount += vertices.size();
+		mBatch.mode = BatchMode::Colored;
+		mBatch.texture = std::nullopt;
+		mBatch.topology = topology;
+		mBatch.verticesCount += vertices.size();
 
-		if (mBatchVerticesCount > mBatchColoredVertices.size())
-			mBatchColoredVertices.resize(mBatchVerticesCount);
+		if (mBatch.verticesCount > mBatch.positionColorVertices.size())
+			mBatch.positionColorVertices.resize(mBatch.verticesCount);
 
-		auto start_vertex = mBatchVerticesCount - vertices.size();
+		auto start_vertex = mBatch.verticesCount - vertices.size();
 
 		for (const auto& src_vertex : vertices)
 		{
-			auto& dst_vertex = mBatchColoredVertices.at(start_vertex);
+			auto& dst_vertex = mBatch.positionColorVertices.at(start_vertex);
 			dst_vertex.pos = project(src_vertex.pos, model);
 			dst_vertex.col = src_vertex.col;
 			start_vertex += 1;
@@ -203,22 +214,22 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 
 	if (mBatching)
 	{
-		if (mBatchTexture != texture || mBatchTopology != topology)
+		if (mBatch.topology != topology || mBatch.texture != texture || mBatch.mode != BatchMode::Textured)
 			flush();
 
-		mBatchFlushed = false;
-		mBatchTexture = texture;
-		mBatchTopology = topology;
-		mBatchVerticesCount += vertices.size();
+		mBatch.mode = BatchMode::Textured;
+		mBatch.texture = texture;
+		mBatch.topology = topology;
+		mBatch.verticesCount += vertices.size();
 
-		if (mBatchVerticesCount > mBatchTexturedVertices.size())
-			mBatchTexturedVertices.resize(mBatchVerticesCount);
+		if (mBatch.verticesCount > mBatch.positionColorTextureVertices.size())
+			mBatch.positionColorTextureVertices.resize(mBatch.verticesCount);
 
-		auto start_vertex = mBatchVerticesCount - vertices.size();
+		auto start_vertex = mBatch.verticesCount - vertices.size();
 
 		for (const auto& src_vertex : vertices)
 		{
-			auto& dst_vertex = mBatchTexturedVertices.at(start_vertex);
+			auto& dst_vertex = mBatch.positionColorTextureVertices.at(start_vertex);
 			dst_vertex.pos = project(src_vertex.pos, model);
 			dst_vertex.col = src_vertex.col;
 			dst_vertex.tex = src_vertex.tex;
@@ -365,24 +376,75 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
 	float smoothFactor, const glm::mat4 model, const glm::vec4& color)
 {
-	flush();
+	assert(mWorking);
 
-	mSdfShader.setProjectionMatrix(mStates.top().projectionMatrix);
-	mSdfShader.setViewMatrix(mStates.top().viewMatrix);
-	mSdfShader.setModelMatrix(model);
-	mSdfShader.setMinValue(minValue);
-	mSdfShader.setMaxValue(maxValue);
-	mSdfShader.setSmoothFactor(smoothFactor);
-	mSdfShader.setColor(color);
+	if (topology == Renderer::Topology::TriangleStrip)
+	{
+		auto new_indices = triangulate(topology, indices);
+		drawSdf(Renderer::Topology::TriangleList, texture, vertices, new_indices, minValue, maxValue, smoothFactor, model, color);
+		return;
+	}
 
-	RENDERER->setTexture(*texture);
-	RENDERER->setTopology(topology);
-	RENDERER->setIndexBuffer(indices);
-	RENDERER->setVertexBuffer(vertices);
-	RENDERER->setSampler(mStates.top().sampler);
-	RENDERER->setShader(mSdfShader);
+	if (mBatching)
+	{
+		if (mBatch.topology != topology ||
+			mBatch.texture != texture ||
+			mBatch.mode != BatchMode::Sdf ||
+			mSdfShader.getMaxValue() != maxValue ||
+			mSdfShader.getMinValue() != minValue ||
+			mSdfShader.getSmoothFactor() != smoothFactor ||
+			mSdfShader.getColor() != color)
+		{
+			flush();
+		}
 
-	RENDERER->drawIndexed(indices.size());
+		mBatch.mode = BatchMode::Sdf;
+		mBatch.texture = texture;
+		mBatch.topology = topology;
+
+		mSdfShader.setMaxValue(maxValue);
+		mSdfShader.setMinValue(minValue);
+		mSdfShader.setSmoothFactor(smoothFactor);
+		mSdfShader.setColor(color);
+
+		mBatch.verticesCount += vertices.size();
+
+		if (mBatch.verticesCount > mBatch.positionTextureVertices.size())
+			mBatch.positionTextureVertices.resize(mBatch.verticesCount);
+
+		auto start_vertex = mBatch.verticesCount - vertices.size();
+
+		for (const auto& src_vertex : vertices)
+		{
+			auto& dst_vertex = mBatch.positionTextureVertices.at(start_vertex);
+			dst_vertex.pos = project(src_vertex.pos, model);
+			dst_vertex.tex = src_vertex.tex;
+			start_vertex += 1;
+		}
+
+		pushBatchIndices(indices, vertices.size());
+	}
+	else
+	{
+		flush();
+
+		mSdfShader.setProjectionMatrix(mStates.top().projectionMatrix);
+		mSdfShader.setViewMatrix(mStates.top().viewMatrix);
+		mSdfShader.setModelMatrix(model);
+		mSdfShader.setMinValue(minValue);
+		mSdfShader.setMaxValue(maxValue);
+		mSdfShader.setSmoothFactor(smoothFactor);
+		mSdfShader.setColor(color);
+
+		RENDERER->setTexture(*texture);
+		RENDERER->setTopology(topology);
+		RENDERER->setIndexBuffer(indices);
+		RENDERER->setVertexBuffer(vertices);
+		RENDERER->setSampler(mStates.top().sampler);
+		RENDERER->setShader(mSdfShader);
+
+		RENDERER->drawIndexed(indices.size());
+	}
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model,
@@ -426,17 +488,17 @@ glm::vec3 System::project(const glm::vec3& pos, const glm::mat4& model)
 
 void System::pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size)
 {
-	mBatchIndicesCount += indices.size();
+	mBatch.indicesCount += indices.size();
 
-	if (mBatchIndicesCount > mBatchIndices.size())
-		mBatchIndices.resize(mBatchIndicesCount);
+	if (mBatch.indicesCount > mBatch.indices.size())
+		mBatch.indices.resize(mBatch.indicesCount);
 
-	auto start_index = mBatchIndicesCount - indices.size();
+	auto start_index = mBatch.indicesCount - indices.size();
 
 	for (auto src_index : indices)
 	{
-		auto& dst_index = mBatchIndices.at(start_index);
-		dst_index = static_cast<uint32_t>(mBatchVerticesCount - vertices_size) + src_index;
+		auto& dst_index = mBatch.indices.at(start_index);
+		dst_index = static_cast<uint32_t>(mBatch.verticesCount - vertices_size) + src_index;
 		start_index += 1;
 	}
 }

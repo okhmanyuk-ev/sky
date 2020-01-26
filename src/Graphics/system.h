@@ -161,15 +161,30 @@ namespace Graphics
 		Renderer::ShaderDefault mColoredShader = Renderer::ShaderDefault(Renderer::Vertex::PositionColor::Layout);
 
 	private:
-		std::vector<Renderer::Vertex::PositionColorTexture> mBatchTexturedVertices;
-		std::vector<Renderer::Vertex::PositionColor> mBatchColoredVertices;
-		std::vector<uint32_t> mBatchIndices;
-		std::optional<std::shared_ptr<Renderer::Texture>> mBatchTexture;
-		std::optional<Renderer::Topology> mBatchTopology;
-		
-		size_t mBatchVerticesCount = 0;
-		size_t mBatchIndicesCount = 0;
+		enum class BatchMode
+		{
+			None,
+			Colored,
+			Textured,
+			Sdf
+		};
 
-		bool mBatchFlushed = true;
+		struct
+		{
+			BatchMode mode = BatchMode::None;
+
+			std::optional<std::shared_ptr<Renderer::Texture>> texture;
+			std::optional<Renderer::Topology> topology;
+
+			
+			size_t verticesCount = 0;
+			size_t indicesCount = 0;
+
+			std::vector<uint32_t> indices;
+
+			std::vector<Renderer::Vertex::PositionTexture> positionTextureVertices;
+			std::vector<Renderer::Vertex::PositionColorTexture> positionColorTextureVertices;
+			std::vector<Renderer::Vertex::PositionColor> positionColorVertices;
+		} mBatch;
 	};
 }
