@@ -153,18 +153,18 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	const std::vector<uint32_t>& indices, const glm::mat4& model)
 {
 	assert(mWorking);
-
-	if (stateWouldApplied())
-	{
-		flush();
-		applyState();
-	}
-
+	
 	if (topology == Renderer::Topology::TriangleStrip)
 	{
 		auto new_indices = triangulate(topology, indices);
 		draw(Renderer::Topology::TriangleList, vertices, new_indices, model);
 		return;
+	}
+
+	if (stateWouldApplied())
+	{
+		flush();
+		applyState();
 	}
 
 	if (mBatching)
@@ -224,17 +224,17 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 {
 	assert(mWorking);
 
-	if (stateWouldApplied())
-	{
-		flush();
-		applyState();
-	}
-
 	if (topology == Renderer::Topology::TriangleStrip)
 	{
 		auto new_indices = triangulate(topology, indices);
 		draw(Renderer::Topology::TriangleList, texture, vertices, new_indices, model);
 		return;
+	}
+
+	if (stateWouldApplied())
+	{
+		flush();
+		applyState();
 	}
 
 	if (mBatching)
@@ -403,17 +403,17 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 {
 	assert(mWorking);
 
-	if (stateWouldApplied())
-	{
-		flush();
-		applyState();
-	}
-
 	if (topology == Renderer::Topology::TriangleStrip)
 	{
 		auto new_indices = triangulate(topology, indices);
 		drawSdf(Renderer::Topology::TriangleList, texture, vertices, new_indices, minValue, maxValue, smoothFactor, model, color);
 		return;
+	}
+
+	if (stateWouldApplied())
+	{
+		flush();
+		applyState();
 	}
 
 	if (mBatching)
