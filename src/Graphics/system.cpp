@@ -88,7 +88,9 @@ void System::flush()
 	if (mBatch.mode == BatchMode::None)
 		return;
 
-	const auto& state = mStates.top();
+	assert(mAppliedState.has_value());
+
+	const auto& state = mAppliedState.value();
 	
 	if (mBatch.mode == BatchMode::Sdf)
 	{

@@ -36,10 +36,6 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 		mTargetsDirty = false;
 	}
-
-	auto was_batching = GRAPHICS->isBatching();
-	GRAPHICS->setBatching(false);
-
 	{
 		auto state = GRAPHICS->getCurrentState();
 		state.renderTarget = mBlurTarget1;
@@ -120,6 +116,4 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 		GRAPHICS->pop();
 	}
-
-	GRAPHICS->setBatching(was_batching);
 }
