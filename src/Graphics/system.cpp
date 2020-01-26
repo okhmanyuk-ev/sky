@@ -49,6 +49,10 @@ void System::end()
 	assert(mWorking);
 	assert(mStates.size() == 1);
 	mWorking = false;
+	if (stateWouldApplied())
+	{
+		applyState();
+	}
 	flush();
 	mStates.pop();
 }
@@ -138,6 +142,11 @@ void System::flush()
 
 void System::clear(const glm::vec4& color)
 {
+	if (stateWouldApplied())
+	{
+		flush();
+		applyState();
+	}
 	RENDERER->clear(color);
 }
 
