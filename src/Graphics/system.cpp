@@ -498,9 +498,10 @@ void System::drawString(const Font& font, const utf8_string& text, const glm::ma
 glm::vec3 System::project(const glm::vec3& pos, const glm::mat4& model)
 {
 	const auto& state = mStates.top();
+	auto scale = PLATFORM->getScale();
 
-	auto width = state.viewport.size.x;
-	auto height = state.viewport.size.y;
+	auto width = state.viewport.size.x / scale;
+	auto height = state.viewport.size.y / scale;
 
 	glm::vec4 viewport = { 0.0f, height, width, -height };
 	return glm::project(pos, model, state.projectionMatrix, viewport);
