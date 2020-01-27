@@ -8,7 +8,7 @@
 
 namespace Renderer
 {
-	class ShaderLight : public Shader
+	class ShaderLight : public Shader, public ShaderMatrices
 	{
 	private:
 		const std::set< Vertex::Attribute::Type> requiredAttribs = {
@@ -70,9 +70,14 @@ namespace Renderer
 		void update() override;
 
 	public:
-		void setProjectionMatrix(const glm::mat4& value) { mConstantBuffer.projection = value; mDirty = true; }
-		void setViewMatrix(const glm::mat4& value) { mConstantBuffer.view = value; mDirty = true; }
-		void setModelMatrix(const glm::mat4& value) { mConstantBuffer.model = value; mDirty = true; }
+		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
+		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; mDirty = true; }
+
+		glm::mat4 getViewMatrix() const override { return mConstantBuffer.view; }
+		void setViewMatrix(const glm::mat4& value) override { mConstantBuffer.view = value; mDirty = true; }
+
+		glm::mat4 getModelMatrix() const override { return mConstantBuffer.model; }
+		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; mDirty = true; }
 		
 		void setEyePosition(const glm::vec3& value) { mConstantBuffer.eyePosition = value; mDirty = true; }
 

@@ -8,7 +8,7 @@
 
 namespace Renderer
 {
-	class ShaderDefault : public Shader
+	class ShaderDefault : public Shader, public ShaderMatrices
 	{
 	private:
 		const std::set< Vertex::Attribute::Type> requiredAttribs = {
@@ -32,9 +32,14 @@ namespace Renderer
 		void update() override;
 
 	public:
-		void setProjectionMatrix(const glm::mat4& value) { mConstantBufferData.projection = value; mNeedUpdate = true; }
-		void setViewMatrix(const glm::mat4& value) { mConstantBufferData.view = value; mNeedUpdate = true; }
-		void setModelMatrix(const glm::mat4& value) { mConstantBufferData.model = value; mNeedUpdate = true; }
+		glm::mat4 getProjectionMatrix() const override { return mConstantBufferData.projection; }
+		void setProjectionMatrix(const glm::mat4& value) override { mConstantBufferData.projection = value; mNeedUpdate = true; }
+
+		glm::mat4 getViewMatrix() const override { return mConstantBufferData.view; }
+		void setViewMatrix(const glm::mat4& value) override { mConstantBufferData.view = value; mNeedUpdate = true; }
+
+		glm::mat4 getModelMatrix() const override { return mConstantBufferData.model; }
+		void setModelMatrix(const glm::mat4& value) override { mConstantBufferData.model = value; mNeedUpdate = true; }
 
 	private:
 		ConstantBuffer mConstantBufferData;

@@ -78,40 +78,34 @@ void System::flush()
 		return;
 
 	assert(mAppliedState.has_value());
-	const auto& state = mAppliedState.value();
-	auto scale = PLATFORM->getScale();
 	
-	auto view = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	auto proj = glm::orthoLH(0.0f, state.viewport.size.x / scale, state.viewport.size.y / scale, 0.0f, -1.0f, 1.0f);
-	auto model = glm::mat4(1.0f);
+	Renderer::ShaderMatrices* shader = nullptr;
 
 	if (mBatch.mode == BatchMode::Sdf)
 	{
-		mSdfShader.setProjectionMatrix(proj);
-		mSdfShader.setViewMatrix(view);
-		mSdfShader.setModelMatrix(model);
-
+		shader = &mSdfShader;
 		RENDERER->setShader(mSdfShader);
 		RENDERER->setVertexBuffer(mBatch.positionTextureVertices);
 	}
 	else if (mBatch.mode == BatchMode::Textured)
 	{
-		mTexturedShader.setProjectionMatrix(proj);
-		mTexturedShader.setViewMatrix(view);
-		mTexturedShader.setModelMatrix(model);
-
+		shader = &mTexturedShader;
 		RENDERER->setShader(mTexturedShader);
 		RENDERER->setVertexBuffer(mBatch.positionColorTextureVertices);
 	}
 	else if (mBatch.mode == BatchMode::Colored)
 	{
-		mColoredShader.setProjectionMatrix(proj);
-		mColoredShader.setViewMatrix(view);
-		mColoredShader.setModelMatrix(model);
-
+		shader = &mColoredShader;
 		RENDERER->setShader(mColoredShader);
 		RENDERER->setVertexBuffer(mBatch.positionColorVertices);
 	}
+
+	const auto& state = mAppliedState.value();
+	auto scale = PLATFORM->getScale();
+	
+	shader->setProjectionMatrix(glm::orthoLH(0.0f, state.viewport.size.x / scale, state.viewport.size.y / scale, 0.0f, -1.0f, 1.0f));
+	shader->setViewMatrix(glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+	shader->setModelMatrix(glm::mat4(1.0f));
 
 	if (mBatch.texture.has_value())
 		RENDERER->setTexture(*mBatch.texture.value());
