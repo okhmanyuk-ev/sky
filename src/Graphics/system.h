@@ -30,7 +30,6 @@ namespace Graphics
 	public:
 		void begin(const glm::mat4& viewMatrix = glm::mat4(1.0f), const glm::mat4& projectionMatrix = glm::mat4(1.0f));
 		void beginOrtho();
-		void beginOrtho(const Renderer::RenderTarget& target);
 		void begin(const Camera& camera);
 		void end();
 

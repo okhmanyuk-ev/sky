@@ -16,7 +16,6 @@ void System::begin(const glm::mat4& viewMatrix, const glm::mat4& projectionMatri
 	state.projectionMatrix = projectionMatrix;
 	mStates.push(state);
 	mAppliedState = std::nullopt;
-	applyState();
 }
 
 void System::beginOrtho()
@@ -26,16 +25,6 @@ void System::beginOrtho()
 
 	auto projectionMatrix = glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
 	
-	begin(viewMatrix, projectionMatrix);
-}
-
-void System::beginOrtho(const Renderer::RenderTarget& target)
-{
-	auto viewMatrix = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f));
-
-	auto projectionMatrix = glm::orthoLH(0.0f, (float)target.getWidth(), (float)target.getHeight(), 0.0f, -1.0f, 1.0f);
-
 	begin(viewMatrix, projectionMatrix);
 }
 
@@ -89,32 +78,36 @@ void System::flush()
 		return;
 
 	assert(mAppliedState.has_value());
-
 	const auto& state = mAppliedState.value();
+	auto scale = PLATFORM->getScale();
 	
+	auto view = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	auto proj = glm::orthoLH(0.0f, state.viewport.size.x / scale, state.viewport.size.y / scale, 0.0f, -1.0f, 1.0f);
+	auto model = glm::mat4(1.0f);
+
 	if (mBatch.mode == BatchMode::Sdf)
 	{
-		mSdfShader.setProjectionMatrix(state.projectionMatrix);
-		mSdfShader.setViewMatrix(state.viewMatrix);
-		mSdfShader.setModelMatrix(glm::mat4(1.0f));
+		mSdfShader.setProjectionMatrix(proj);
+		mSdfShader.setViewMatrix(view);
+		mSdfShader.setModelMatrix(model);
 
 		RENDERER->setShader(mSdfShader);
 		RENDERER->setVertexBuffer(mBatch.positionTextureVertices);
 	}
 	else if (mBatch.mode == BatchMode::Textured)
 	{
-		mTexturedShader.setProjectionMatrix(state.projectionMatrix);
-		mTexturedShader.setViewMatrix(state.viewMatrix);
-		mTexturedShader.setModelMatrix(glm::mat4(1.0f));
+		mTexturedShader.setProjectionMatrix(proj);
+		mTexturedShader.setViewMatrix(view);
+		mTexturedShader.setModelMatrix(model);
 
 		RENDERER->setShader(mTexturedShader);
 		RENDERER->setVertexBuffer(mBatch.positionColorTextureVertices);
 	}
 	else if (mBatch.mode == BatchMode::Colored)
 	{
-		mColoredShader.setProjectionMatrix(state.projectionMatrix);
-		mColoredShader.setViewMatrix(state.viewMatrix);
-		mColoredShader.setModelMatrix(glm::mat4(1.0f));
+		mColoredShader.setProjectionMatrix(proj);
+		mColoredShader.setViewMatrix(view);
+		mColoredShader.setModelMatrix(model);
 
 		RENDERER->setShader(mColoredShader);
 		RENDERER->setVertexBuffer(mBatch.positionColorVertices);
@@ -498,13 +491,20 @@ void System::drawString(const Font& font, const utf8_string& text, const glm::ma
 glm::vec3 System::project(const glm::vec3& pos, const glm::mat4& model)
 {
 	const auto& state = mStates.top();
+	
+	assert(state == mAppliedState);
+	
 	auto scale = PLATFORM->getScale();
 
 	auto width = state.viewport.size.x / scale;
 	auto height = state.viewport.size.y / scale;
 
-	glm::vec4 viewport = { 0.0f, height, width, -height };
-	return glm::project(pos, model, state.projectionMatrix, viewport);
+	glm::vec4 viewport = { 0.0f, height, width, -height }; // TODO: { 0.0f, 0.0f, width, height }
+		
+	auto view = state.viewMatrix;
+	auto proj = state.projectionMatrix;
+
+	return glm::project(pos, view * model, proj, viewport);
 }
 
 void System::pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size)
