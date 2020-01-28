@@ -79,23 +79,23 @@ void System::flush()
 
 	assert(mAppliedState.has_value());
 	
-	Renderer::ShaderMatrices* shader = nullptr;
+	std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr;
 
 	if (mBatch.mode == BatchMode::Sdf)
 	{
-		shader = &mSdfShader;
+		shader = mSdfShader;
 		RENDERER->setShader(mSdfShader);
 		RENDERER->setVertexBuffer(mBatch.positionTextureVertices);
 	}
 	else if (mBatch.mode == BatchMode::Textured)
 	{
-		shader = &mTexturedShader;
+		shader = mTexturedShader;
 		RENDERER->setShader(mTexturedShader);
 		RENDERER->setVertexBuffer(mBatch.positionColorTextureVertices);
 	}
 	else if (mBatch.mode == BatchMode::Colored)
 	{
-		shader = &mColoredShader;
+		shader = mColoredShader;
 		RENDERER->setShader(mColoredShader);
 		RENDERER->setVertexBuffer(mBatch.positionColorVertices);
 	}
@@ -177,9 +177,9 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	{
 		flush();
 
-		mColoredShader.setProjectionMatrix(mStates.top().projectionMatrix);
-		mColoredShader.setViewMatrix(mStates.top().viewMatrix);
-		mColoredShader.setModelMatrix(model);
+		mColoredShader->setProjectionMatrix(mStates.top().projectionMatrix);
+		mColoredShader->setViewMatrix(mStates.top().viewMatrix);
+		mColoredShader->setModelMatrix(model);
 
 		RENDERER->setTopology(topology);
 		RENDERER->setIndexBuffer(indices);
@@ -244,9 +244,9 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	{
 		flush();
 
-		mTexturedShader.setProjectionMatrix(mStates.top().projectionMatrix);
-		mTexturedShader.setViewMatrix(mStates.top().viewMatrix);
-		mTexturedShader.setModelMatrix(model);
+		mTexturedShader->setProjectionMatrix(mStates.top().projectionMatrix);
+		mTexturedShader->setViewMatrix(mStates.top().viewMatrix);
+		mTexturedShader->setModelMatrix(model);
 
 		RENDERER->setTexture(*texture);
 		RENDERER->setTopology(topology);
@@ -394,10 +394,10 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 		if (mBatch.topology != topology ||
 			mBatch.texture != texture ||
 			mBatch.mode != BatchMode::Sdf ||
-			mSdfShader.getMaxValue() != maxValue ||
-			mSdfShader.getMinValue() != minValue ||
-			mSdfShader.getSmoothFactor() != smoothFactor ||
-			mSdfShader.getColor() != color)
+			mSdfShader->getMaxValue() != maxValue ||
+			mSdfShader->getMinValue() != minValue ||
+			mSdfShader->getSmoothFactor() != smoothFactor ||
+			mSdfShader->getColor() != color)
 		{
 			flush();
 		}
@@ -406,10 +406,10 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 		mBatch.texture = texture;
 		mBatch.topology = topology;
 
-		mSdfShader.setMaxValue(maxValue);
-		mSdfShader.setMinValue(minValue);
-		mSdfShader.setSmoothFactor(smoothFactor);
-		mSdfShader.setColor(color);
+		mSdfShader->setMaxValue(maxValue);
+		mSdfShader->setMinValue(minValue);
+		mSdfShader->setSmoothFactor(smoothFactor);
+		mSdfShader->setColor(color);
 
 		mBatch.verticesCount += vertices.size();
 
@@ -432,13 +432,13 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 	{
 		flush();
 
-		mSdfShader.setProjectionMatrix(mStates.top().projectionMatrix);
-		mSdfShader.setViewMatrix(mStates.top().viewMatrix);
-		mSdfShader.setModelMatrix(model);
-		mSdfShader.setMinValue(minValue);
-		mSdfShader.setMaxValue(maxValue);
-		mSdfShader.setSmoothFactor(smoothFactor);
-		mSdfShader.setColor(color);
+		mSdfShader->setProjectionMatrix(mStates.top().projectionMatrix);
+		mSdfShader->setViewMatrix(mStates.top().viewMatrix);
+		mSdfShader->setModelMatrix(model);
+		mSdfShader->setMinValue(minValue);
+		mSdfShader->setMaxValue(maxValue);
+		mSdfShader->setSmoothFactor(smoothFactor);
+		mSdfShader->setColor(color);
 
 		RENDERER->setTexture(*texture);
 		RENDERER->setTopology(topology);

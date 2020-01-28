@@ -375,9 +375,9 @@ void SystemGL::setRenderTarget(std::nullptr_t value)
 #endif
 }
 
-void SystemGL::setShader(const Shader& value) 
+void SystemGL::setShader(std::shared_ptr<Shader> value)
 {
-	mStateShader = const_cast<Shader*>(&value);
+	mStateShader = value;
 }
 
 void SystemGL::setSampler(const Sampler& value) 
@@ -528,10 +528,10 @@ void SystemGL::prepareForDrawing()
 	auto shader = mStateShader;
 	assert(shader != nullptr);
 
-	if (mShader != shader)
+	if (mAppliedShader != shader)
 	{
 		shader->apply();
-		mShader = shader;
+		mAppliedShader = shader;
 	}
 
 	shader->update();

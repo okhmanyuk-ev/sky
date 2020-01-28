@@ -28,7 +28,7 @@ namespace Scene
 		std::shared_ptr<Renderer::RenderTarget> mBlurTarget1;
 		std::shared_ptr<Renderer::RenderTarget> mBlurTarget2;
 		bool mTargetsDirty = true;
-		Renderer::ShaderBlur mBlurShader = Renderer::ShaderBlur(Renderer::Vertex::Position::Layout);
+		std::shared_ptr<Renderer::ShaderBlur> mBlurShader = std::make_shared<Renderer::ShaderBlur>(Renderer::Vertex::Position::Layout);
 		float mTargetWidth = 0.0f;
 		float mTargetHeight = 0.0f;
 		int mBlurPasses = 1;

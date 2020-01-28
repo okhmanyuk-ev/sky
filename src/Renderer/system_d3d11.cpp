@@ -231,9 +231,9 @@ void SystemD3D11::setRenderTarget(std::nullptr_t value)
 	currentRenderTarget = nullptr;
 }
 
-void SystemD3D11::setShader(const Shader& value)
+void SystemD3D11::setShader(std::shared_ptr<Shader> value)
 {
-	mShader = const_cast<Shader*>(&value);
+	mShader = value;
 }
 
 void SystemD3D11::setSampler(const Sampler& value) 

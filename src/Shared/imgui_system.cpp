@@ -106,9 +106,9 @@ void ImguiSystem::end()
 	auto projection = glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
 	auto model = glm::mat4(1.0f);
 	
-	mShader.setProjectionMatrix(projection);
-	mShader.setViewMatrix(view);
-	mShader.setModelMatrix(model);
+	mShader->setProjectionMatrix(projection);
+	mShader->setViewMatrix(view);
+	mShader->setModelMatrix(model);
 
 	RENDERER->setViewport(Renderer::Viewport::FullScreen());
 	RENDERER->setTopology(Renderer::Topology::TriangleList);

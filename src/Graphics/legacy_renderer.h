@@ -28,7 +28,7 @@ namespace Graphics
 		void setModelMatrix(const glm::mat4& value) { mModelMatrix = value; }
 
 	private:		
-		Renderer::ShaderDefault mShader = Renderer::ShaderDefault(Renderer::Vertex::PositionColor::Layout);
+		std::shared_ptr<Renderer::ShaderDefault> mShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColor::Layout);
 		
 	private:
 		bool mWorking = false;

@@ -28,7 +28,7 @@ namespace Renderer
 		void setTexture(const Texture& value) override;
 		void setRenderTarget(const RenderTarget& value) override;
 		void setRenderTarget(std::nullptr_t value) override;
-		void setShader(const Shader& value) override;
+		void setShader(std::shared_ptr<Shader> value) override;
 		void setSampler(const Sampler& value) override;
 		void setDepthMode(const DepthMode& value) override;
 		void setCullMode(const CullMode& value) override;
@@ -136,8 +136,8 @@ namespace Renderer
 		Viewport mViewport;
 		Scissor mScissor;
 
-		Shader* mAppliedShader = nullptr;
-		Shader* mShader = nullptr;
+		std::shared_ptr<Shader> mAppliedShader = nullptr;
+		std::shared_ptr<Shader> mShader = nullptr;
 
 		RasterizerState mRasterizerState;
 		bool mStateScissorEnabled = false;

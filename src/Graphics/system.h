@@ -157,9 +157,9 @@ namespace Graphics
 		bool mBatching = true;
 		
 	private:
-		Renderer::ShaderSDF mSdfShader = Renderer::ShaderSDF(Renderer::Vertex::PositionTexture::Layout);
-		Renderer::ShaderDefault mTexturedShader = Renderer::ShaderDefault(Renderer::Vertex::PositionColorTexture::Layout);
-		Renderer::ShaderDefault mColoredShader = Renderer::ShaderDefault(Renderer::Vertex::PositionColor::Layout);
+		std::shared_ptr<Renderer::ShaderSDF> mSdfShader = std::make_shared<Renderer::ShaderSDF>(Renderer::Vertex::PositionTexture::Layout);
+		std::shared_ptr<Renderer::ShaderDefault> mTexturedShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::ShaderDefault> mColoredShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColor::Layout);
 
 	private:
 		enum class BatchMode

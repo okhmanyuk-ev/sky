@@ -55,9 +55,9 @@ void LegacyRenderer::end()
 	assert(mWorking);
 	mWorking = false;
 
-	mShader.setProjectionMatrix(mProjectionMatrix);
-	mShader.setViewMatrix(mViewMatrix);
-	mShader.setModelMatrix(mModelMatrix);
+	mShader->setProjectionMatrix(mProjectionMatrix);
+	mShader->setViewMatrix(mViewMatrix);
+	mShader->setModelMatrix(mModelMatrix);
  
 	RENDERER->setViewport(Renderer::Viewport::FullScreen());
 	RENDERER->setScissor(nullptr);
