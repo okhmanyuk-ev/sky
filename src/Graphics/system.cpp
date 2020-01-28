@@ -58,11 +58,7 @@ void System::applyState()
 	else
 		RENDERER->setScissor(nullptr);
 
-	if (state.renderTarget)
-		RENDERER->setRenderTarget(*state.renderTarget);
-	else
-		RENDERER->setRenderTarget(nullptr);
-
+	RENDERER->setRenderTarget(state.renderTarget);
 	RENDERER->setDepthMode(state.depthMode);
 	RENDERER->setCullMode(Renderer::CullMode::None);
 	RENDERER->setViewport(state.viewport);

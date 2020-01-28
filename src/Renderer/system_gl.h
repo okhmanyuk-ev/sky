@@ -29,8 +29,7 @@ namespace Renderer
 		void setVertexBuffer(const Buffer& value) override;
 		void setIndexBuffer(const Buffer& value) override;
 		void setTexture(const Texture& value) override;
-		void setRenderTarget(const RenderTarget& value) override;
-		void setRenderTarget(std::nullptr_t value) override;
+		void setRenderTarget(std::shared_ptr<RenderTarget> value) override;
 		void setShader(std::shared_ptr<Shader> value) override;
 		void setSampler(const Sampler& value) override;
 		void setDepthMode(const DepthMode& value) override;

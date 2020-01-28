@@ -358,21 +358,23 @@ void SystemGL::setTexture(const Texture& value)
 	updateGLSampler();
 }
 
-void SystemGL::setRenderTarget(const RenderTarget& value) 
+void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value) 
 {
-	mRenderTargetBound = true;
-	value.bindRenderTarget();
-}
-
-void SystemGL::setRenderTarget(std::nullptr_t value) 
-{
-	mRenderTargetBound = false;
+	if (value == nullptr)
+	{
+		mRenderTargetBound = false;
 #if defined(PLATFORM_IOS)
-    auto view = (GLKView*)Platform::SystemIos::Window.rootViewController.view;
-    [view bindDrawable];
+		auto view = (GLKView*)Platform::SystemIos::Window.rootViewController.view;
+		[view bindDrawable] ;
 #else
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
+	}
+	else
+	{
+		mRenderTargetBound = true;
+		value->bindRenderTarget();
+	}
 }
 
 void SystemGL::setShader(std::shared_ptr<Shader> value)

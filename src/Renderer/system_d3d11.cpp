@@ -219,16 +219,18 @@ void SystemD3D11::setTexture(const Texture& value)
 	value.bindTexture();
 }
 
-void SystemD3D11::setRenderTarget(const RenderTarget& value)
+void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)
 {
-	value.bindRenderTarget();
-	currentRenderTarget = &const_cast<RenderTarget&>(value);
-}
-
-void SystemD3D11::setRenderTarget(std::nullptr_t value) 
-{
-	Context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-	currentRenderTarget = nullptr;
+	if (value == nullptr) 
+	{
+		Context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+		currentRenderTarget = nullptr;
+	}
+	else
+	{
+		value->bindRenderTarget();
+		currentRenderTarget = value;
+	}
 }
 
 void SystemD3D11::setShader(std::shared_ptr<Shader> value)

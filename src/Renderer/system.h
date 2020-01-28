@@ -26,8 +26,7 @@ namespace Renderer
 		virtual void setVertexBuffer(const Buffer& value) = 0;
 		virtual void setIndexBuffer(const Buffer& value) = 0;
 		virtual void setTexture(const Texture& value) = 0;
-		virtual void setRenderTarget(const RenderTarget& value) = 0;
-		virtual void setRenderTarget(std::nullptr_t value) = 0;
+		virtual void setRenderTarget(std::shared_ptr<RenderTarget> value) = 0;
 		virtual void setShader(std::shared_ptr<Shader> value) = 0;
 		virtual void setSampler(const Sampler& value) = 0;
 		virtual void setDepthMode(const DepthMode& value) = 0;
