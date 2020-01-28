@@ -65,11 +65,8 @@ namespace Common
 		auto getCapacity() const { return mCapacity; }
 		void setCapacity(size_t value);
 
-		auto getBlockSize() const { return mBlockSize; }
-		void setBlockSize(size_t value) { mBlockSize = value; }
-
-		int getBitPosition() { return m_BitPosition; }
-		void setBitPosition(int value) { m_BitPosition = value; }
+		int getBitPosition() { return mBitPosition; }
+		void setBitPosition(int value) { mBitPosition = value; }
 
 		int getRemainingBits() { if (!hasRemaining()) return 0; return static_cast<int>(getRemaining()) * 8 - getBitPosition(); }
 
@@ -78,7 +75,6 @@ namespace Common
 		size_t mSize = 0;
 		size_t mPosition = 0;
 		size_t mCapacity = 0;
-		size_t mBlockSize = 1 << 13;
-		int m_BitPosition = 0;
+		int mBitPosition = 0;
 	};
 }

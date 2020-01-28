@@ -59,19 +59,19 @@ void BitBuffer::ensureSpace(size_t value)
 
 void BitBuffer::setSize(size_t value)
 {
-	if (value + (mBlockSize / 2) > mCapacity)
-		setCapacity(value + (mBlockSize / 2));
+	if (value > getCapacity())
+		setCapacity(value);
 
 	mSize = value;
 }
 
 void BitBuffer::setCapacity(size_t value)
 {
-	value = (value + (mBlockSize - 1)) & ~(mBlockSize - 1);
-	if (mCapacity == value)
-	{
+	value *= 2;
+
+	if (mCapacity >= value)
 		return;
-	}
+	
 	mCapacity = value;
 	mMemory = realloc(mMemory, mCapacity);
 }
@@ -88,12 +88,12 @@ uint32_t BitBuffer::readBits(int size)
 		return read<uint32_t>();
 
 	uint32_t result = ((1UL << size) - 1) &
-		(*(uint32_t*)((size_t)(getMemory()) + getPosition()) >> m_BitPosition);
+		(*(uint32_t*)((size_t)(getMemory()) + getPosition()) >> mBitPosition);
 
-	int bitCount = m_BitPosition + size;
+	int bitCount = mBitPosition + size;
 	int byteCount = bitCount >> 3;
 
-	m_BitPosition = bitCount & 7;
+	mBitPosition = bitCount & 7;
 	seek(byteCount);
 
 	return result;
@@ -118,7 +118,7 @@ void BitBuffer::writeBits(uint32_t value, int size)
 	if (value > maxValue)
 		value = maxValue;
 
-	int bitCount = m_BitPosition + size;
+	int bitCount = mBitPosition + size;
 	int byteCount = bitCount >> 3;
 
 	bitCount = bitCount & 7;
@@ -129,12 +129,12 @@ void BitBuffer::writeBits(uint32_t value, int size)
 	ensureSpace(byteCount + 1);
 
 	*(uint32_t*)((size_t)getMemory() + getPosition()) = (*(uint32_t*)((size_t)getMemory() +
-		getPosition()) & ((1UL << m_BitPosition) - 1)) | (value << m_BitPosition);
+		getPosition()) & ((1UL << mBitPosition) - 1)) | (value << mBitPosition);
 
 	if (bitCount > 0)
-		m_BitPosition = bitCount;
+		mBitPosition = bitCount;
 	else
-		m_BitPosition = 8;
+		mBitPosition = 8;
 
 	seek(byteCount);
 
@@ -189,25 +189,25 @@ void BitBuffer::alignByteBoundary()
 {
 	normalizeBitPosition();
 
-	if (m_BitPosition == 0)
+	if (mBitPosition == 0)
 		return;
 
 	seek(1);
-	m_BitPosition = 0;
+	mBitPosition = 0;
 }
 
 void BitBuffer::normalizeBitPosition()
 {
-	while (m_BitPosition >= 8)
+	while (mBitPosition >= 8)
 	{
 		seek(1);
-		m_BitPosition -= 8;
+		mBitPosition -= 8;
 	}
 
-	while (m_BitPosition < 0)
+	while (mBitPosition < 0)
 	{
 		seek(-1);
-		m_BitPosition += 8;
+		mBitPosition += 8;
 	}
 }
 
@@ -217,7 +217,7 @@ void BitBuffer::seek(int offset, Origin origin)
 	{
 	case Origin::Begin:
 		mPosition = offset;
-		m_BitPosition = 0;
+		mBitPosition = 0;
 		break;
 
 	case Origin::Current:
@@ -226,7 +226,7 @@ void BitBuffer::seek(int offset, Origin origin)
 
 	case Origin::End:
 		mPosition = mSize - offset;
-		m_BitPosition = 0;
+		mBitPosition = 0;
 		break;
 	}
 }
