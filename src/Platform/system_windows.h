@@ -13,6 +13,7 @@
 
 #include <Common/frame_system.h>
 #include <Common/event_system.h>
+#include <Common/actions.h>
 
 namespace Platform
 {
@@ -51,7 +52,7 @@ namespace Platform
 		bool isVirtualKeyboardOpened() const override { return false; };
 
 		void initializeBilling(const std::vector<std::string>& products) { /*nothing*/ };
-		void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail) { if (onSuccess) onSuccess(); };
+		void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail);
 
 	private:
 		bool mCursorHidden = false;

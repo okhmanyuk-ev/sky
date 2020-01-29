@@ -272,4 +272,15 @@ void SystemWindows::dispatchKeyboardEvent(WPARAM keyCode, bool isKeyDown)
 
 	EVENT->emit(evt);
 }
+
+void SystemWindows::purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail)
+{
+	auto seq = std::make_unique<Common::Actions::Sequence>();
+	seq->add(std::make_unique<Common::Actions::Wait>(Clock::FromSeconds(3.0f)));
+	seq->add(std::make_unique<Common::Actions::Generic>(Common::Actions::Generic::Type::One, [onSuccess, onFail] {
+		if (onSuccess)
+			onSuccess();
+	}));
+	Common::Actions::Run(std::move(seq));
+}
 #endif
