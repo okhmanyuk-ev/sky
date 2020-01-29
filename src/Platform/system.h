@@ -8,6 +8,8 @@
 
 #include <string>
 #include <memory>
+#include <vector>
+#include <functional>
 
 namespace Platform
 {
@@ -50,6 +52,9 @@ namespace Platform
 		virtual void showVirtualKeyboard() = 0;
 		virtual void hideVirtualKeyboard() = 0;
 		virtual bool isVirtualKeyboardOpened() const = 0;
+
+		virtual void initializeBilling(const std::vector<std::string>& products) = 0;
+		virtual void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail) = 0;
 
 	public:
 		static std::shared_ptr<System> create(const std::string& appname);

@@ -50,6 +50,9 @@ namespace Platform
 		void hideVirtualKeyboard() override { /*nothing*/ };
 		bool isVirtualKeyboardOpened() const override { return false; };
 
+		void initializeBilling(const std::vector<std::string>& products) { /*nothing*/ };
+		void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail) { if (onSuccess) onSuccess(); };
+
 	private:
 		bool mCursorHidden = false;
 		std::string mAppName;
