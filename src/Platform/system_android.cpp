@@ -666,4 +666,26 @@ std::string SystemAndroid::getAppFolder() const
 	return Instance->activity->internalDataPath;
 }
 
+void SystemAndroid::initializeBilling(const std::vector<std::string>& products)
+{
+	//
+}
+
+void SystemAndroid::purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail)
+{
+	//
+}
+
+
+extern "C"
+{
+	void Java_com_skymunge_sky_SkyActivity_initSkyActivity(JNIEnv *env, jclass thiz)
+	{
+		if (env)
+		{
+		//	gMainActivityObject = env->NewGlobalRef(mainActivity);
+		}
+	}
+}
+
 #endif

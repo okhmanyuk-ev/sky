@@ -52,7 +52,9 @@ namespace Platform
 		void showVirtualKeyboard() override { setKeyboardVisible(true); };
 		void hideVirtualKeyboard() override { setKeyboardVisible(false); };
 		bool isVirtualKeyboardOpened() const override { return false; }; // TODO
-		
+
+		void initializeBilling(const std::vector<std::string>& products) override;
+		void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail) override;
 	public:
 		static void handle_cmd(android_app* app, int32_t cmd);
 		static int32_t handle_input(android_app* app, AInputEvent* event);
