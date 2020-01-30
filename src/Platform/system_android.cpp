@@ -3,6 +3,21 @@
 
 using namespace Platform;
 
+static jobject gSkyActivity = nullptr;
+
+extern "C"
+{
+    void Java_com_skymunge_sky_SkyActivity_createSkyActivity(JNIEnv *env, jobject thiz)
+    {
+        gSkyActivity = env->NewGlobalRef(thiz);
+    }
+
+    void Java_com_skymunge_sky_SkyActivity_destroySkyActivity(JNIEnv *env, jobject thiz)
+    {
+        env->DeleteGlobalRef(gSkyActivity);
+    }
+}
+
 namespace
 {
     bool initialized = false;
@@ -666,26 +681,60 @@ std::string SystemAndroid::getAppFolder() const
 	return Instance->activity->internalDataPath;
 }
 
+JNIEnv* GetJNIEnv(){
+    auto jvm = SystemAndroid::Instance->activity->vm;
+    JNIEnv* env;
+    int getEnvStat = jvm->GetEnv((void **)&env, JNI_VERSION_1_6);
+    switch(getEnvStat){
+        case JNI_OK:
+            return env;
+        case JNI_EDETACHED:
+            return env;
+    }
+}
+
 void SystemAndroid::initializeBilling(const std::vector<std::string>& products)
 {
-	//
+    auto env = getEnv();
+
+    auto list = env->FindClass("java/util/ArrayList");
+    auto init = env->GetMethodID(list, "<init>", "()V");
+    auto add = env->GetMethodID(list, "add", "(Ljava/lang/Object;)Z");
+    auto list_obj = env->NewObject(list, init);
+
+    for (const auto& product : products)
+    {
+        auto element = env->NewStringUTF(product.c_str());
+        env->CallBooleanMethod(list_obj, add, element);
+        env->DeleteLocalRef(element);
+    }
+
+    auto clazz = env->GetObjectClass(gSkyActivity);
+    auto method = env->GetMethodID(clazz, "initializeBilling", "(Ljava/util/List;)V");
+	env->CallVoidMethod(gSkyActivity, method, list_obj);
+	env->DeleteLocalRef(clazz);
+	env->DeleteLocalRef(list_obj);
 }
 
 void SystemAndroid::purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail)
 {
-	//
+    auto env = getEnv();
+    auto clazz = env->GetObjectClass(gSkyActivity);
+    auto method = env->GetMethodID(clazz, "purchase", "(Ljava/lang/String;)V");
+    auto str_arg = env->NewStringUTF(product.c_str());
+    env->CallVoidMethod(gSkyActivity, method, str_arg);
+    env->DeleteLocalRef(str_arg);
+    env->DeleteLocalRef(clazz);
 }
 
-
-extern "C"
+JNIEnv* SystemAndroid::getEnv() const
 {
-	void Java_com_skymunge_sky_SkyActivity_initSkyActivity(JNIEnv *env, jclass thiz)
-	{
-		if (env)
-		{
-		//	gMainActivityObject = env->NewGlobalRef(mainActivity);
-		}
-	}
+    auto jvm = Instance->activity->vm;
+    auto env = Instance->activity->env;
+
+    jvm->AttachCurrentThread(&env, NULL);
+
+    return env;
 }
 
 #endif

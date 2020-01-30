@@ -20,7 +20,9 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SkyActivity extends NativeActivity {
     static {
@@ -28,18 +30,28 @@ public class SkyActivity extends NativeActivity {
         System.loadLibrary("fmod");
     }
 
-   // private BillingClient billingClient;
-
     @Override
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
-        initSkyActivity();
+        createSkyActivity();
     }
 
-    private static native void initSkyActivity();
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        destroySkyActivity();
+    }
 
-    /*private void setupBillingClient() {
-        billingClient = BillingClient.newBuilder(this)
+    private native void createSkyActivity();
+    private native void destroySkyActivity();
+
+    // ------------------
+
+    private BillingClient mBillingClient;
+    private Map<String, SkuDetails> mSkuDetails = new HashMap<>();
+
+    public void initializeBilling(final List products) {
+        mBillingClient = BillingClient.newBuilder(this)
                 .enablePendingPurchases()
                 .setListener(new PurchasesUpdatedListener() {
                     @Override
@@ -49,13 +61,13 @@ public class SkyActivity extends NativeActivity {
                 })
                 .build();
 
-        billingClient.startConnection(new BillingClientStateListener() {
+        mBillingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingSetupFinished(BillingResult billingResult) {
-                int response = billingResult.getResponseCode();
-                if (response == BillingClient.BillingResponseCode.OK) {
-                    setupSkuList();
-                }
+                if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                    return;
+
+                querySkuDetails(products);
             }
             @Override
             public void onBillingServiceDisconnected() {
@@ -65,46 +77,32 @@ public class SkyActivity extends NativeActivity {
         });
     }
 
-    private void setupSkuList() {
-        List<String> skuList = new ArrayList<>();
-        skuList.add("rubies.001");
-
+    private void querySkuDetails(List products) {
         SkuDetailsParams params = SkuDetailsParams.newBuilder()
-                .setSkusList(skuList)
+                .setSkusList(products)
                 .setType(BillingClient.SkuType.INAPP)
                 .build();
 
-        billingClient.querySkuDetailsAsync(params,
+        mBillingClient.querySkuDetailsAsync(params,
                 new SkuDetailsResponseListener() {
                     @Override
                     public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-                        int response = billingResult.getResponseCode();
-                        if (response == BillingClient.BillingResponseCode.OK) {
+                        if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                            return;
 
-
-                            for (SkuDetails skuDetails : skuDetailsList) {
-                                String sku = skuDetails.getSku();
-                                String price = skuDetails.getPrice();
-
-                                launchBilling(skuDetails);
-
-                                break;
-                            }
-
-
-
-
+                        for (SkuDetails skuDetails : skuDetailsList) {
+                            mSkuDetails.put(skuDetails.getSku(), skuDetails);
                         }
                     }
                 });
     }
 
-    private void launchBilling(SkuDetails skuDetails) {
+    public void purchase(String product) {
         BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                .setSkuDetails(skuDetails)
+                .setSkuDetails(mSkuDetails.get(product))
                 .build();
 
-        billingClient.launchBillingFlow(this, billingFlowParams);
-    }*/
+        mBillingClient.launchBillingFlow(this, billingFlowParams);
+    }
 
 }

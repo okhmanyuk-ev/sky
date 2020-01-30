@@ -55,6 +55,10 @@ namespace Platform
 
 		void initializeBilling(const std::vector<std::string>& products) override;
 		void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail) override;
+
+	private:
+		JNIEnv* getEnv() const;
+
 	public:
 		static void handle_cmd(android_app* app, int32_t cmd);
 		static int32_t handle_input(android_app* app, AInputEvent* event);
