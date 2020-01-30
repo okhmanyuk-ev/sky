@@ -24,6 +24,7 @@ import java.util.List;
 
 public class SkyActivity extends NativeActivity {
     static {
+        System.loadLibrary("main");
         System.loadLibrary("fmod");
     }
 
@@ -32,7 +33,7 @@ public class SkyActivity extends NativeActivity {
     @Override
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
-      //  initSkyActivity();
+        initSkyActivity();
     }
 
     private static native void initSkyActivity();
