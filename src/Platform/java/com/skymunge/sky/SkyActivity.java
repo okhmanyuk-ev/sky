@@ -11,6 +11,8 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
+import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
@@ -51,30 +53,34 @@ public class SkyActivity extends NativeActivity {
     private Map<String, SkuDetails> mSkuDetails = new HashMap<>();
 
     public void initializeBilling(final List products) {
+        PurchasesUpdatedListener purchasesUpdatedListener = new PurchasesUpdatedListener() {
+                @Override
+                public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> list) {
+                    //
+                }
+            };
+
         mBillingClient = BillingClient.newBuilder(this)
                 .enablePendingPurchases()
-                .setListener(new PurchasesUpdatedListener() {
-                    @Override
-                    public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> list) {
-                        //
-                    }
-                })
+                .setListener(purchasesUpdatedListener)
                 .build();
 
-        mBillingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
-                if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
-                    return;
+        BillingClientStateListener billingClientStateListener = new BillingClientStateListener() {
+                @Override
+                public void onBillingSetupFinished(BillingResult billingResult) {
+                    if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                        return;
 
-                querySkuDetails(products);
-            }
-            @Override
-            public void onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to
-                // Google Play by calling the startConnection() method.
-            }
-        });
+                    querySkuDetails(products);
+                }
+                @Override
+                public void onBillingServiceDisconnected() {
+                    // Try to restart the connection on the next request to
+                    // Google Play by calling the startConnection() method.
+                }
+            };
+
+        mBillingClient.startConnection(billingClientStateListener);
     }
 
     private void querySkuDetails(List products) {
@@ -83,18 +89,19 @@ public class SkyActivity extends NativeActivity {
                 .setType(BillingClient.SkuType.INAPP)
                 .build();
 
-        mBillingClient.querySkuDetailsAsync(params,
-                new SkuDetailsResponseListener() {
-                    @Override
-                    public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-                        if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
-                            return;
+        SkuDetailsResponseListener skuDetailsResponseListener = new SkuDetailsResponseListener() {
+                @Override
+                public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
+                    if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                        return;
 
-                        for (SkuDetails skuDetails : skuDetailsList) {
-                            mSkuDetails.put(skuDetails.getSku(), skuDetails);
-                        }
+                    for (SkuDetails skuDetails : skuDetailsList) {
+                        mSkuDetails.put(skuDetails.getSku(), skuDetails);
                     }
-                });
+                }
+            };
+
+        mBillingClient.querySkuDetailsAsync(params, skuDetailsResponseListener);
     }
 
     public void purchase(String product) {
@@ -103,6 +110,21 @@ public class SkyActivity extends NativeActivity {
                 .build();
 
         mBillingClient.launchBillingFlow(this, billingFlowParams);
-    }
 
+        /*ConsumeParams consumeParams = ConsumeParams.newBuilder()
+                .setPurchaseToken(product)
+                .build();
+
+        ConsumeResponseListener consumeResponseListener = new ConsumeResponseListener() {
+                @Override
+                public void onConsumeResponse(BillingResult billingResult, String outToken) {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        // Handle the success of the consume operation.
+                        // For example, increase the number of coins inside the user's basket.
+                    }
+                }
+            };
+
+        mBillingClient.consumeAsync(consumeParams,consumeResponseListener);*/
+    }
 }
