@@ -55,8 +55,14 @@ public class SkyActivity extends NativeActivity {
     public void initializeBilling(final List products) {
         PurchasesUpdatedListener purchasesUpdatedListener = new PurchasesUpdatedListener() {
                 @Override
-                public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> list) {
-                    //
+                public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
+                    if (purchases == null)
+                        return;
+
+                    if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                        return;
+
+                    consume(purchases);
                 }
             };
 
@@ -72,6 +78,7 @@ public class SkyActivity extends NativeActivity {
                         return;
 
                     querySkuDetails(products);
+                    consumeEstimatedPurchases();
                 }
                 @Override
                 public void onBillingServiceDisconnected() {
@@ -104,15 +111,28 @@ public class SkyActivity extends NativeActivity {
         mBillingClient.querySkuDetailsAsync(params, skuDetailsResponseListener);
     }
 
+    private void consumeEstimatedPurchases() {
+        Purchase.PurchasesResult purchasesResult = mBillingClient.queryPurchases(BillingClient.SkuType.INAPP);
+        consume(purchasesResult.getPurchasesList());
+    }
+
     public void purchase(String product) {
         BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
                 .setSkuDetails(mSkuDetails.get(product))
                 .build();
 
         mBillingClient.launchBillingFlow(this, billingFlowParams);
+    }
 
-        /*ConsumeParams consumeParams = ConsumeParams.newBuilder()
-                .setPurchaseToken(product)
+    public void consume(List<Purchase> purchases) {
+        for (Purchase purchase : purchases) {
+            consume(purchase.getPurchaseToken());
+        }
+    }
+
+    public void consume(String purchaseToken) {
+        ConsumeParams consumeParams = ConsumeParams.newBuilder()
+                .setPurchaseToken(purchaseToken)
                 .build();
 
         ConsumeResponseListener consumeResponseListener = new ConsumeResponseListener() {
@@ -125,6 +145,6 @@ public class SkyActivity extends NativeActivity {
                 }
             };
 
-        mBillingClient.consumeAsync(consumeParams,consumeResponseListener);*/
+        mBillingClient.consumeAsync(consumeParams,consumeResponseListener);
     }
 }
