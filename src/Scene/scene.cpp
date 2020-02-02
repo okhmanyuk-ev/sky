@@ -26,9 +26,6 @@ void Scene::Scene::recursiveNodeDraw(const std::shared_ptr<Node>& node)
 	if (!node->isEnabled())
 		return;
 
-	if (!node->isVisible())
-		return;
-
 	node->beginRender();
 	node->draw();
 
@@ -43,16 +40,13 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(const st
 	if (!node->isEnabled())
 		return { };
 
-	if (!node->isVisible())
-		return { };
-
 	if (!node->isInteractions())
 		return { };
 
 	if (!node->interactTest(node->unproject(pos)))
 		return { };
 
-	auto& nodes = node->getNodes();
+	const auto& nodes = node->getNodes();
 
 	std::list<std::shared_ptr<Node>> result;
 
@@ -83,9 +77,6 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(const gl
 std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const std::shared_ptr<Node>& node, const glm::vec2& pos)
 {
 	if (!node->isEnabled())
-		return { };
-
-	if (!node->isVisible())
 		return { };
 
 	if (!node->interactTest(node->unproject(pos)))
