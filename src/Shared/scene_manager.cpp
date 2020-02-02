@@ -90,40 +90,45 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 
 void SceneManager::pushWindow(std::shared_ptr<Window> window)
 {
-	assert(!mCurrentWindow);
+	if (mWindows.empty())
+		mCurrentScreen->onWindowAppearing(); // only on first window in stack
+	
+	mWindows.push(window);
+	
+	window->setSceneManager(weak_from_this());
+	attach(window);
 
-	mCurrentScreen->onWindowAppearing(); // TODO: call this on first window open (stack must be included)
-	mCurrentWindow = window;
-	mCurrentWindow->setSceneManager(weak_from_this());
-	attach(mCurrentWindow);
-
-	mCurrentWindow->onOpenBegin();
-	mCurrentWindow->mState = Window::State::Opening;
+	window->onOpenBegin();
+	window->mState = Window::State::Opening;
 
 	runAction(ActionHelpers::MakeSequence(
-		mCurrentWindow->createOpenAction(),
-		ActionHelpers::Execute([this] {
-			mCurrentWindow->onOpenEnd();
-			mCurrentWindow->mState = Window::State::Opened;
+		window->createOpenAction(),
+		ActionHelpers::Execute([window] {
+			window->onOpenEnd();
+			window->mState = Window::State::Opened;
 		})
 	));
 }
 
 void SceneManager::popWindow(std::function<void()> finishCallback)
 {
-	assert(mCurrentWindow);
+	auto window = mWindows.top();
 
-	mCurrentWindow->onCloseBegin();
-	mCurrentWindow->mState = Window::State::Closing;
+	window->onCloseBegin();
+	window->mState = Window::State::Closing;
 
 	runAction(ActionHelpers::MakeSequence(
-		mCurrentWindow->createCloseAction(),
-		ActionHelpers::Execute([this, finishCallback] {
-			mCurrentWindow->onCloseEnd();
-			mCurrentWindow->mState = Window::State::Closed;
-			detach(mCurrentWindow);
-			mCurrentWindow = nullptr; 
-			mCurrentScreen->onWindowDisappearing(); // TODO: only on last window close (when stack will be included)
+		window->createCloseAction(),
+		ActionHelpers::Execute([this, window, finishCallback] {
+			window->onCloseEnd();
+			window->mState = Window::State::Closed;
+			detach(window);
+
+			mWindows.pop(); 
+			
+			if (mWindows.empty())
+				mCurrentScreen->onWindowDisappearing(); // only on last window in stack
+			
 			if (finishCallback)
 				finishCallback();
 		})

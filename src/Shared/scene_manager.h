@@ -20,12 +20,12 @@ namespace Shared
 		void pushWindow(std::shared_ptr<Window> window);
 		void popWindow(std::function<void()> finishCallback = nullptr);
 
-		int getOpenedWindowsCount() const { return mCurrentWindow ? 1 : 0; }
+		int getOpenedWindowsCount() const { return mWindows.size(); }
 		bool hasOpenedWindows() const { return getOpenedWindowsCount() > 0; }
 
 	private:
 		std::shared_ptr<Screen> mCurrentScreen = nullptr;
-		std::shared_ptr<Window> mCurrentWindow = nullptr; // TODO: make stack
+		std::stack<std::shared_ptr<Window>> mWindows;
 		bool mInTransition = false;
 	};
 
