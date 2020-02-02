@@ -90,9 +90,12 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 
 void SceneManager::pushWindow(std::shared_ptr<Window> window)
 {
+	assert(window->getState() == Window::State::Closed);
+	assert(!isWindowsBusy());
+
 	if (mWindows.empty())
 		mCurrentScreen->onWindowAppearing(); // only on first window in stack
-	
+
 	mWindows.push(window);
 	
 	window->setSceneManager(weak_from_this());
@@ -112,6 +115,9 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window)
 
 void SceneManager::popWindow(std::function<void()> finishCallback)
 {
+	assert(!mWindows.empty());
+	assert(!isWindowsBusy());
+
 	auto window = mWindows.top();
 
 	window->onCloseBegin();
@@ -133,4 +139,12 @@ void SceneManager::popWindow(std::function<void()> finishCallback)
 				finishCallback();
 		})
 	));
+}
+
+bool SceneManager::isWindowsBusy() const
+{
+	if (mWindows.empty())
+		return false;
+
+	return mWindows.top()->getState() != Window::State::Opened;
 }
