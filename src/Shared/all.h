@@ -64,8 +64,6 @@
 
 #include <Graphics/font.h>
 #include <Graphics/legacy_renderer.h>
-#include <Graphics/embedded_font.h>
-#include <Graphics/embedded_texture.h>
 
 #include <Renderer/shader_default.h>
 #include <Renderer/shader_light.h>

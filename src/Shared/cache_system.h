@@ -29,7 +29,6 @@ namespace Shared
 		void loadTexture(const std::string& path, const std::string& name);
 		void loadTexture(const std::string& path);
 
-		void loadFont(void* data, size_t size, const std::string& name);
 		void loadFont(const std::string& path, const std::string& name);
 		void loadFont(const std::string& path);
 

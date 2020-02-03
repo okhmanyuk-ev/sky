@@ -35,14 +35,6 @@ void CacheSystem::loadTexture(const std::string& path)
 	loadTexture(path, path);
 }
 
-void CacheSystem::loadFont(void* data, size_t size, const std::string& name)
-{
-	if (mFonts.count(name) > 0)
-		return;
-
-	mFonts[name] = std::make_shared<Graphics::Font>(data, size);
-}
-
 void CacheSystem::loadFont(const std::string& path, const std::string& name)
 {
 	if (mFonts.count(name) > 0)
