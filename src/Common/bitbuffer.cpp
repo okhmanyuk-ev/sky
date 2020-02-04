@@ -59,7 +59,7 @@ void BitBuffer::ensureSpace(size_t value)
 
 void BitBuffer::setSize(size_t value)
 {
-	if (value > getCapacity())
+	if (value > mCapacity)
 		setCapacity(value);
 
 	mSize = value;
@@ -87,14 +87,16 @@ uint32_t BitBuffer::readBits(int size)
 	if (size == 32)
 		return read<uint32_t>();
 
-	uint32_t result = ((1UL << size) - 1) &
-		(*(uint32_t*)((size_t)(getMemory()) + getPosition()) >> mBitPosition);
+	auto& src_value = *(uint32_t*)((size_t)mMemory + mPosition);
+	auto max_value = (1UL << size) - 1;
 
-	int bitCount = mBitPosition + size;
-	int byteCount = bitCount >> 3;
+	auto result = max_value & (src_value >> mBitPosition);
 
-	mBitPosition = bitCount & 7;
-	seek(byteCount);
+	int bit_count = mBitPosition + size;
+	int byte_count = bit_count >> 3;
+
+	mBitPosition = bit_count & 7;
+	seek(byte_count);
 
 	return result;
 }
@@ -113,30 +115,32 @@ void BitBuffer::writeBits(uint32_t value, int size)
 		return;
 	}
 
-	uint32_t maxValue = (1UL << size) - 1;
+	auto max_value = (1UL << size) - 1;
 
-	if (value > maxValue)
-		value = maxValue;
+	if (value > max_value)
+		value = max_value;
 
-	int bitCount = mBitPosition + size;
-	int byteCount = bitCount >> 3;
+	int bit_count = mBitPosition + size;
+	int byte_count = bit_count >> 3;
 
-	bitCount = bitCount & 7;
+	bit_count = bit_count & 7;
 
-	if (bitCount == 0)
-		byteCount--;
+	if (bit_count == 0)
+		byte_count--;
 
-	ensureSpace(byteCount + 1);
+	ensureSpace(byte_count + 1);
 
-	*(uint32_t*)((size_t)getMemory() + getPosition()) = (*(uint32_t*)((size_t)getMemory() +
-		getPosition()) & ((1UL << mBitPosition) - 1)) | (value << mBitPosition);
+	auto& src_value = *(uint32_t*)((size_t)mMemory + mPosition);
+	auto row = (1UL << mBitPosition) - 1;
 
-	if (bitCount > 0)
-		mBitPosition = bitCount;
+	src_value = (src_value & row) | (value << mBitPosition);
+
+	if (bit_count > 0)
+		mBitPosition = bit_count;
 	else
 		mBitPosition = 8;
 
-	seek(byteCount);
+	seek(byte_count);
 
 	normalizeBitPosition();
 }
@@ -176,12 +180,12 @@ void BitBuffer::writeBitsFor(uint32_t value, uint32_t max)
 
 uint32_t BitBuffer::readBitsVar()
 {
-	return readBits(readBitsFor(31)); // TODO: maybe we should write "32" in second argument ?
+	return readBits(readBitsFor(31)); // TODO: 31 -> 32 ?
 }
 
 void BitBuffer::writeBitsVar(uint32_t value)
 {
-	writeBitsFor(bitsFor(value), 31); // TODO: maybe we should write "32" in second argument ?
+	writeBitsFor(bitsFor(value), 31); // TODO: 31 -> 32 ?
 	writeBitsFor(value, value);
 }
 
