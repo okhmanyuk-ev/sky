@@ -173,6 +173,7 @@ namespace Graphics
 		struct
 		{
 			BatchMode mode = BatchMode::None;
+			std::shared_ptr<Renderer::Shader> shader = nullptr;
 
 			std::optional<std::shared_ptr<Renderer::Texture>> texture;
 			std::optional<Renderer::Topology> topology;

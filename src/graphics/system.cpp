@@ -74,34 +74,31 @@ void System::flush()
 		return;
 
 	assert(mAppliedState.has_value());
-	
-	std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr;
 
 	if (mBatch.mode == BatchMode::Sdf)
 	{
-		shader = mSdfShader;
-		RENDERER->setShader(mSdfShader);
 		RENDERER->setVertexBuffer(mBatch.positionTextureVertices);
 	}
 	else if (mBatch.mode == BatchMode::Textured)
 	{
-		shader = mTexturedShader;
-		RENDERER->setShader(mTexturedShader);
 		RENDERER->setVertexBuffer(mBatch.positionColorTextureVertices);
 	}
 	else if (mBatch.mode == BatchMode::Colored)
 	{
-		shader = mColoredShader;
-		RENDERER->setShader(mColoredShader);
 		RENDERER->setVertexBuffer(mBatch.positionColorVertices);
 	}
 
 	const auto& state = mAppliedState.value();
 	auto scale = PLATFORM->getScale();
 	
-	shader->setProjectionMatrix(glm::orthoLH(0.0f, state.viewport.size.x / scale, state.viewport.size.y / scale, 0.0f, -1.0f, 1.0f));
-	shader->setViewMatrix(glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
-	shader->setModelMatrix(glm::mat4(1.0f));
+	auto shader_matrices = std::dynamic_pointer_cast<Renderer::ShaderMatrices>(mBatch.shader);
+	assert(shader_matrices);
+
+	shader_matrices->setProjectionMatrix(glm::orthoLH(0.0f, state.viewport.size.x / scale, state.viewport.size.y / scale, 0.0f, -1.0f, 1.0f));
+	shader_matrices->setViewMatrix(glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+	shader_matrices->setModelMatrix(glm::mat4(1.0f));
+
+	RENDERER->setShader(mBatch.shader);
 
 	if (mBatch.texture.has_value())
 		RENDERER->setTexture(*mBatch.texture.value());
@@ -112,6 +109,7 @@ void System::flush()
 	RENDERER->drawIndexed(mBatch.indicesCount);
 
 	mBatch.mode = BatchMode::None;
+	mBatch.shader = nullptr;
 	mBatch.verticesCount = 0;
 	mBatch.indicesCount = 0;
 }
@@ -150,6 +148,7 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 			flush();
 
 		mBatch.mode = BatchMode::Colored;
+		mBatch.shader = mColoredShader;
 		mBatch.texture = std::nullopt;
 		mBatch.topology = topology;
 		mBatch.verticesCount += vertices.size();
@@ -180,7 +179,6 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 		RENDERER->setTopology(topology);
 		RENDERER->setIndexBuffer(indices);
 		RENDERER->setVertexBuffer(vertices);
-		RENDERER->setSampler(mStates.top().sampler);
 		RENDERER->setShader(mColoredShader);
 
 		RENDERER->drawIndexed(indices.size());
@@ -216,6 +214,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 			flush();
 
 		mBatch.mode = BatchMode::Textured;
+		mBatch.shader = mTexturedShader;
 		mBatch.texture = texture;
 		mBatch.topology = topology;
 		mBatch.verticesCount += vertices.size();
@@ -248,7 +247,6 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 		RENDERER->setTopology(topology);
 		RENDERER->setIndexBuffer(indices);
 		RENDERER->setVertexBuffer(vertices);
-		RENDERER->setSampler(mStates.top().sampler);
 		RENDERER->setShader(mTexturedShader);
 
 		RENDERER->drawIndexed(indices.size());
@@ -399,6 +397,7 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 		}
 
 		mBatch.mode = BatchMode::Sdf;
+		mBatch.shader = mSdfShader;
 		mBatch.texture = texture;
 		mBatch.topology = topology;
 
@@ -440,7 +439,6 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 		RENDERER->setTopology(topology);
 		RENDERER->setIndexBuffer(indices);
 		RENDERER->setVertexBuffer(vertices);
-		RENDERER->setSampler(mStates.top().sampler);
 		RENDERER->setShader(mSdfShader);
 
 		RENDERER->drawIndexed(indices.size());
