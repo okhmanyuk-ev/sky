@@ -165,7 +165,7 @@ namespace Graphics
 			std::set<Renderer::ShaderDefault::Flag>({ Renderer::ShaderDefault::Flag::Colored }));
 
 		std::shared_ptr<Renderer::ShaderDefault> mBatchTextureShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout,
-			std::set<Renderer::ShaderDefault::Flag>({ Renderer::ShaderDefault::Flag::Textured }));
+			std::set<Renderer::ShaderDefault::Flag>({ Renderer::ShaderDefault::Flag::Colored, Renderer::ShaderDefault::Flag::Textured }));
 
 		std::shared_ptr<Renderer::ShaderSDF> mBatchSdfShader = std::make_shared<Renderer::ShaderSDF>(Renderer::Vertex::PositionColorTexture::Layout);
 
