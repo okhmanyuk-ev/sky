@@ -5,83 +5,83 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif()
 
 file(GLOB CORE_SRC
-    "sky/src/Core/*.cpp"
-    "sky/src/Core/*.h"
+    sky/src/core/*.cpp
+    sky/src/core/*.h
 )
 
 file(GLOB CONSOLE_SRC
-    "sky/src/Console/*.cpp"
-    "sky/src/Console/*.h"
+    sky/src/console/*.cpp
+    sky/src/console/*.h
 )
 
 file(GLOB COMMON_SRC
-    "sky/src/Common/*.cpp"
-    "sky/src/Common/*.h"
+    sky/src/common/*.cpp
+    sky/src/common/*.h
 )
 
 file(GLOB PLATFORM_SRC
-	sky/src/Platform/*.cpp
-	sky/src/Platform/*.mm
-    sky/src/Platform/*.h
+	sky/src/platform/*.cpp
+	sky/src/platform/*.mm
+    sky/src/platform/*.h
 )
 
 file(GLOB GRAPHICS_SRC
-    "sky/src/Graphics/*.cpp"
-    "sky/src/Graphics/*.h"
+    sky/src/graphics/*.cpp
+    sky/src/graphics/*.h
 )
 
 file(GLOB RENDERER_SRC
-	sky/src/Renderer/*.cpp
-	sky/src/Renderer/*.mm
-    sky/src/Renderer/*.h
+	sky/src/renderer/*.cpp
+	sky/src/renderer/*.mm
+    sky/src/renderer/*.h
 )
 
 file(GLOB RENDERER_D3D11_SRC
-	sky/src/Renderer/D3D11/*.cpp
-	sky/src/Renderer/D3D11/*.mm
-    sky/src/Renderer/D3D11/*.h
+	sky/src/renderer/d3d11/*.cpp
+	sky/src/renderer/d3d11/*.mm
+    sky/src/renderer/d3d11/*.h
 )
 
 file(GLOB RENDERER_OPENGL_SRC
-	sky/src/Renderer/OpenGL/*.cpp
-	sky/src/Renderer/OpenGL/*.mm
-    sky/src/Renderer/OpenGL/*.h
+	sky/src/renderer/opengl/*.cpp
+	sky/src/renderer/opengl/*.mm
+    sky/src/renderer/opengl/*.h
 )
 
 file(GLOB AUDIO_SRC
-	"sky/src/Audio/*.cpp"
-	"sky/src/Audio/*.h"
+	sky/src/audio/*.cpp
+	sky/src/audio/*.h
 )
 
 file(GLOB SCENE_SRC
-    "sky/src/Scene/*.cpp"
-    "sky/src/Scene/*.h"
+    sky/src/scene/*.cpp
+    sky/src/scene/*.h
 )
 
 file(GLOB SHARED_SRC
-    "sky/src/Shared/*.cpp"
-    "sky/src/Shared/*.h"
+    sky/src/shared/*.cpp
+    sky/src/shared/*.h
 )
 
 file(GLOB NETWORK_SRC
-    "sky/src/Network/*.cpp"
-    "sky/src/Network/*.h"
+    sky/src/network/*.cpp
+    sky/src/network/*.h
 )
 
-source_group("Core" FILES ${CORE_SRC})
-source_group("Console" FILES ${CONSOLE_SRC})
-source_group("Common" FILES ${COMMON_SRC})
-source_group("Platform" FILES ${PLATFORM_SRC})
-source_group("Graphics" FILES ${GRAPHICS_SRC})
-source_group("Renderer" FILES ${RENDERER_SRC})
-source_group("Renderer\\D3D11" FILES ${RENDERER_D3D11_SRC})
-source_group("Renderer\\OpenGL" FILES ${RENDERER_OPENGL_SRC})
-source_group("Audio" FILES ${AUDIO_SRC})
-source_group("Scene" FILES ${SCENE_SRC})
-source_group("Shared" FILES ${SHARED_SRC})
-source_group("Network" FILES ${NETWORK_SRC})
+source_group("core" FILES ${CORE_SRC})
+source_group("console" FILES ${CONSOLE_SRC})
+source_group("common" FILES ${COMMON_SRC})
+source_group("platform" FILES ${PLATFORM_SRC})
+source_group("graphics" FILES ${GRAPHICS_SRC})
+source_group("renderer" FILES ${RENDERER_SRC})
+source_group("renderer\\d3d11" FILES ${RENDERER_D3D11_SRC})
+source_group("renderer\\opengl" FILES ${RENDERER_OPENGL_SRC})
+source_group("audio" FILES ${AUDIO_SRC})
+source_group("scene" FILES ${SCENE_SRC})
+source_group("shared" FILES ${SHARED_SRC})
+source_group("network" FILES ${NETWORK_SRC})
 
-include_directories("sky/src")
+include_directories(sky/src)
 add_library(sky STATIC 
 	${CORE_SRC}
 	${CONSOLE_SRC}
@@ -100,8 +100,8 @@ target_link_libraries(${PROJECT_NAME} sky)
 
 if(APPLE)
 	set(OBJC_SOURCES
-		sky/src/Renderer/system_gl.cpp
-		sky/src/Platform/asset.cpp
+		sky/src/renderer/system_gl.cpp
+		sky/src/platform/asset.cpp
 	)
 	set_source_files_properties(${OBJC_SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++ -fembed-bitcode")
 endif()
@@ -113,19 +113,19 @@ endif()
 # glm
 
 target_compile_definitions(sky PRIVATE -DGLM_ENABLE_EXPERIMENTAL)
-include_directories("sky/lib/glm")
+include_directories(sky/lib/glm)
 
 # stb
 
-include_directories("sky/lib/stb")
+include_directories(sky/lib/stb)
 
 # glew
 
 file(GLOB GLEW_SRC 
-	"sky/lib/glew/src/glew.c"
-    "sky/lib/glew/include/GL/glew.h"
+	sky/lib/glew/src/glew.c
+    sky/lib/glew/include/GL/glew.h
 )
-include_directories("sky/lib/glew/include")
+include_directories(sky/lib/glew/include)
 add_library(glew STATIC ${GLEW_SRC})
 target_link_libraries(${PROJECT_NAME} glew)
 target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
@@ -136,17 +136,17 @@ file(GLOB IMGUI_SRC
 	sky/lib/imgui/*.cpp 
 	sky/lib/imgui/*.h
 )	
-include_directories("sky/lib/imgui")
+include_directories(sky/lib/imgui)
 add_library(imgui STATIC ${IMGUI_SRC})
 target_link_libraries(${PROJECT_NAME} imgui)
 
 # tinygltf
 
-include_directories("sky/lib/tinygltf")
+include_directories(sky/lib/tinygltf)
 
 # tinyobjloader
 
-include_directories("sky/lib/tinyobjloader")
+include_directories(sky/lib/tinyobjloader)
 
 # tinyutf8
 
@@ -155,13 +155,13 @@ file(GLOB TINYUTF8_SRC
 	sky/lib/tinyutf8/*.h
 	sky/lib/tinyutf8/*.hpp
 )
-include_directories("sky/lib/tinyutf8")
+include_directories(sky/lib/tinyutf8)
 add_library(tinyutf8 STATIC ${TINYUTF8_SRC})
 target_link_libraries(${PROJECT_NAME} tinyutf8)
 
 # fmod
 
-include_directories("sky/lib/fmod/include")
+include_directories(sky/lib/fmod/include)
 if(WIN32)
 	if(X64)
 		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodL_vc.lib)
@@ -189,17 +189,17 @@ endif()
 
 # rectpack2D
 
-include_directories("sky/lib/rectpack2D/include")
+include_directories(sky/lib/rectpack2D/include)
 
 # nlohmann_json
 
-include_directories("sky/lib/nlohmann_json/include")
+include_directories(sky/lib/nlohmann_json/include)
 
 # fmt
 
 file(GLOB FMT_SRC
 	sky/lib/fmt/src/*.cc
 )
-include_directories("sky/lib/fmt/include")
+include_directories(sky/lib/fmt/include)
 add_library(fmt STATIC ${FMT_SRC})
 target_link_libraries(${PROJECT_NAME} fmt)
