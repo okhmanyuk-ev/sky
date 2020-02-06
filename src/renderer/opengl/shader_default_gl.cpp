@@ -85,19 +85,25 @@ namespace
 		#endif)";
 }
 
-ShaderDefault::ShaderDefault(const Vertex::Layout& layout)
+ShaderDefault::ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>& flags)
 {
     mImpl = std::make_unique<Impl>();
 	mImpl->layout = layout;
-	checkRequiredAttribs(requiredAttribs, layout);
+	checkRequiredAttribs(RequiredAttribs, layout);
 
 	auto source = std::string(shaderSource);
 
-	if (layout.hasAttribute(Vertex::Attribute::Type::Color))
+	if (flags.count(Flag::Colored) > 0)
+	{
+		assert(layout.hasAttribute(Renderer::Vertex::Attribute::Type::Color));
 		source = "#define HAS_COLOR_ATTRIB\n" + source;
+	}
 
-	if (layout.hasAttribute(Vertex::Attribute::Type::TexCoord))
+	if (flags.count(Flag::Textured) > 0)
+	{
+		assert(layout.hasAttribute(Renderer::Vertex::Attribute::Type::TexCoord));
 		source = "#define HAS_TEXCOORD_ATTRIB\n" + source;
+	}
 
 	auto vertexSource = "#define VERTEX_SHADER\n" + source;
 	auto fragmentSource = "#define FRAGMENT_SHADER\n" + source;

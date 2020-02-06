@@ -161,6 +161,14 @@ namespace Graphics
 		std::shared_ptr<Renderer::ShaderDefault> mTexturedShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::ShaderDefault> mColoredShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColor::Layout);
 
+		std::shared_ptr<Renderer::ShaderDefault> mBatchColorShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout, 
+			std::set<Renderer::ShaderDefault::Flag>({ Renderer::ShaderDefault::Flag::Colored }));
+
+		std::shared_ptr<Renderer::ShaderDefault> mBatchTextureShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout,
+			std::set<Renderer::ShaderDefault::Flag>({ Renderer::ShaderDefault::Flag::Textured }));
+
+		std::shared_ptr<Renderer::ShaderSDF> mBatchSdfShader = std::make_shared<Renderer::ShaderSDF>(Renderer::Vertex::PositionColorTexture::Layout);
+
 	private:
 		enum class BatchMode
 		{
@@ -182,10 +190,7 @@ namespace Graphics
 			size_t indicesCount = 0;
 
 			std::vector<uint32_t> indices;
-
-			std::vector<Renderer::Vertex::PositionTexture> positionTextureVertices;
-			std::vector<Renderer::Vertex::PositionColorTexture> positionColorTextureVertices;
-			std::vector<Renderer::Vertex::PositionColor> positionColorVertices;
+			std::vector<Renderer::Vertex::PositionColorTexture> vertices;
 		} mBatch;
 	};
 }

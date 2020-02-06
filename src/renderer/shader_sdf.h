@@ -11,7 +11,7 @@ namespace Renderer
 	class ShaderSDF : public Shader, public ShaderMatrices
 	{
 	private:
-		const std::set<Vertex::Attribute::Type> requiredAttribs = {
+		const std::set<Vertex::Attribute::Type> RequiredAttribs = {
 			Vertex::Attribute::Type::Position,
 			Vertex::Attribute::Type::TexCoord,
 		};

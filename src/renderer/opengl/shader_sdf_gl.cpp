@@ -82,7 +82,7 @@ ShaderSDF::ShaderSDF(const Vertex::Layout& layout)
 {
     mImpl = std::make_unique<Impl>();
 	mImpl->layout = layout;
-	checkRequiredAttribs(requiredAttribs, layout);
+	checkRequiredAttribs(RequiredAttribs, layout);
 
 	auto source = std::string(shaderSource);
 

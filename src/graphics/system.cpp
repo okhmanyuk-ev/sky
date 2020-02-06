@@ -75,19 +75,6 @@ void System::flush()
 
 	assert(mAppliedState.has_value());
 
-	if (mBatch.mode == BatchMode::Sdf)
-	{
-		RENDERER->setVertexBuffer(mBatch.positionTextureVertices);
-	}
-	else if (mBatch.mode == BatchMode::Textured)
-	{
-		RENDERER->setVertexBuffer(mBatch.positionColorTextureVertices);
-	}
-	else if (mBatch.mode == BatchMode::Colored)
-	{
-		RENDERER->setVertexBuffer(mBatch.positionColorVertices);
-	}
-
 	const auto& state = mAppliedState.value();
 	auto scale = PLATFORM->getScale();
 	
@@ -105,6 +92,7 @@ void System::flush()
 
 	RENDERER->setTopology(mBatch.topology.value());
 	RENDERER->setIndexBuffer(mBatch.indices);
+	RENDERER->setVertexBuffer(mBatch.vertices);
 
 	RENDERER->drawIndexed(mBatch.indicesCount);
 
@@ -148,19 +136,19 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 			flush();
 
 		mBatch.mode = BatchMode::Colored;
-		mBatch.shader = mColoredShader;
+		mBatch.shader = mBatchColorShader;
 		mBatch.texture = std::nullopt;
 		mBatch.topology = topology;
 		mBatch.verticesCount += vertices.size();
 
-		if (mBatch.verticesCount > mBatch.positionColorVertices.size())
-			mBatch.positionColorVertices.resize(mBatch.verticesCount);
+		if (mBatch.verticesCount > mBatch.vertices.size())
+			mBatch.vertices.resize(mBatch.verticesCount);
 
 		auto start_vertex = mBatch.verticesCount - vertices.size();
 
 		for (const auto& src_vertex : vertices)
 		{
-			auto& dst_vertex = mBatch.positionColorVertices.at(start_vertex);
+			auto& dst_vertex = mBatch.vertices.at(start_vertex);
 			dst_vertex.pos = project(src_vertex.pos, model);
 			dst_vertex.col = src_vertex.col;
 			start_vertex += 1;
@@ -214,19 +202,19 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 			flush();
 
 		mBatch.mode = BatchMode::Textured;
-		mBatch.shader = mTexturedShader;
+		mBatch.shader = mBatchTextureShader;
 		mBatch.texture = texture;
 		mBatch.topology = topology;
 		mBatch.verticesCount += vertices.size();
 
-		if (mBatch.verticesCount > mBatch.positionColorTextureVertices.size())
-			mBatch.positionColorTextureVertices.resize(mBatch.verticesCount);
+		if (mBatch.verticesCount > mBatch.vertices.size())
+			mBatch.vertices.resize(mBatch.verticesCount);
 
 		auto start_vertex = mBatch.verticesCount - vertices.size();
 
 		for (const auto& src_vertex : vertices)
 		{
-			auto& dst_vertex = mBatch.positionColorTextureVertices.at(start_vertex);
+			auto& dst_vertex = mBatch.vertices.at(start_vertex);
 			dst_vertex.pos = project(src_vertex.pos, model);
 			dst_vertex.col = src_vertex.col;
 			dst_vertex.tex = src_vertex.tex;
@@ -388,34 +376,34 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 		if (mBatch.topology != topology ||
 			mBatch.texture != texture ||
 			mBatch.mode != BatchMode::Sdf ||
-			mSdfShader->getMaxValue() != maxValue ||
-			mSdfShader->getMinValue() != minValue ||
-			mSdfShader->getSmoothFactor() != smoothFactor ||
-			mSdfShader->getColor() != color)
+			mBatchSdfShader->getMaxValue() != maxValue ||
+			mBatchSdfShader->getMinValue() != minValue ||
+			mBatchSdfShader->getSmoothFactor() != smoothFactor ||
+			mBatchSdfShader->getColor() != color)
 		{
 			flush();
 		}
 
 		mBatch.mode = BatchMode::Sdf;
-		mBatch.shader = mSdfShader;
+		mBatch.shader = mBatchSdfShader;
 		mBatch.texture = texture;
 		mBatch.topology = topology;
 
-		mSdfShader->setMaxValue(maxValue);
-		mSdfShader->setMinValue(minValue);
-		mSdfShader->setSmoothFactor(smoothFactor);
-		mSdfShader->setColor(color);
+		mBatchSdfShader->setMaxValue(maxValue);
+		mBatchSdfShader->setMinValue(minValue);
+		mBatchSdfShader->setSmoothFactor(smoothFactor);
+		mBatchSdfShader->setColor(color);
 
 		mBatch.verticesCount += vertices.size();
 
-		if (mBatch.verticesCount > mBatch.positionTextureVertices.size())
-			mBatch.positionTextureVertices.resize(mBatch.verticesCount);
+		if (mBatch.verticesCount > mBatch.vertices.size())
+			mBatch.vertices.resize(mBatch.verticesCount);
 
 		auto start_vertex = mBatch.verticesCount - vertices.size();
 
 		for (const auto& src_vertex : vertices)
 		{
-			auto& dst_vertex = mBatch.positionTextureVertices.at(start_vertex);
+			auto& dst_vertex = mBatch.vertices.at(start_vertex);
 			dst_vertex.pos = project(src_vertex.pos, model);
 			dst_vertex.tex = src_vertex.tex;
 			start_vertex += 1;

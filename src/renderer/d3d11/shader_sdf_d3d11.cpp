@@ -74,7 +74,7 @@ namespace
 ShaderSDF::ShaderSDF(const Vertex::Layout& layout)
 {
     mImpl = std::make_unique<Impl>();
-	checkRequiredAttribs(requiredAttribs, layout);
+	checkRequiredAttribs(RequiredAttribs, layout);
 	
 	ID3DBlob* vertexShaderBlob;
 	ID3DBlob* pixelShaderBlob;

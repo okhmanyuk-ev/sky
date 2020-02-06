@@ -10,8 +10,18 @@ namespace Renderer
 {
 	class ShaderDefault : public Shader, public ShaderMatrices
 	{
+	public:
+		enum class Flag
+		{
+			Textured,
+			Colored
+		};
+
 	private:
-		const std::set< Vertex::Attribute::Type> requiredAttribs = {
+		static inline std::set<Flag> MakeFlagsFromLayout(const Vertex::Layout& layout);
+	
+	private:
+		const std::set< Vertex::Attribute::Type> RequiredAttribs = {
 			Vertex::Attribute::Type::Position
 		};
 
@@ -24,7 +34,8 @@ namespace Renderer
 		};
 
 	public:
-		ShaderDefault(const Vertex::Layout& layout);
+		ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>& flags);
+		ShaderDefault(const Vertex::Layout& layout) : ShaderDefault(layout, MakeFlagsFromLayout(layout)) { };
 		~ShaderDefault();
 
 	protected:
@@ -49,4 +60,17 @@ namespace Renderer
 		struct Impl;
         std::unique_ptr<Impl> mImpl;
 	};
+
+	std::set<ShaderDefault::Flag> ShaderDefault::MakeFlagsFromLayout(const Vertex::Layout& layout)
+	{
+		std::set<Flag> result = { };
+
+		if (layout.hasAttribute(Vertex::Attribute::Type::Color))
+			result.insert(Flag::Colored);
+
+		if (layout.hasAttribute(Vertex::Attribute::Type::TexCoord))
+			result.insert(Flag::Textured);
+
+		return result;
+	}
 }

@@ -76,11 +76,12 @@ namespace
 		})";
 }
 
-ShaderDefault::ShaderDefault(const Vertex::Layout& layout)
+
+ShaderDefault::ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>& flags)
 {
-    mImpl = std::make_unique<Impl>();
-	checkRequiredAttribs(requiredAttribs, layout);
-	
+	mImpl = std::make_unique<Impl>();
+	checkRequiredAttribs(RequiredAttribs, layout);
+
 	ID3DBlob* vertexShaderBlob;
 	ID3DBlob* pixelShaderBlob;
 
@@ -89,11 +90,17 @@ ShaderDefault::ShaderDefault(const Vertex::Layout& layout)
 
 	std::string source = shaderSource;
 
-	if (layout.hasAttribute(Vertex::Attribute::Type::Color))
+	if (flags.count(Flag::Colored) > 0)
+	{
+		assert(layout.hasAttribute(Renderer::Vertex::Attribute::Type::Color));
 		source = "#define HAS_COLOR_ATTRIB\n" + source;
+	}
 
-	if (layout.hasAttribute(Vertex::Attribute::Type::TexCoord))
+	if (flags.count(Flag::Textured) > 0)
+	{
+		assert(layout.hasAttribute(Renderer::Vertex::Attribute::Type::TexCoord));
 		source = "#define HAS_TEXCOORD_ATTRIB\n" + source;
+	}
 
 	D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, "vs_main", "vs_4_0", 0, 0, &vertexShaderBlob, &vertex_shader_error);
 	D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, "ps_main", "ps_4_0", 0, 0, &pixelShaderBlob, &pixel_shader_error);
@@ -127,7 +134,7 @@ ShaderDefault::ShaderDefault(const Vertex::Layout& layout)
 
 ShaderDefault::~ShaderDefault()
 {
-
+	//
 }
 
 void ShaderDefault::apply()
