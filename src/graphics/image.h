@@ -10,10 +10,11 @@ namespace Graphics
 		Image(int width, int height, int channels);
 		Image(void* data, size_t size);
 		Image(const Platform::Asset& asset);
-
 		Image(const Image& image);
-
 		~Image();
+
+	public:
+		uint8_t* getPixel(int x, int y) const;
 
 	public:
 		auto getMemory() const { return mMemory; }

@@ -116,7 +116,7 @@ Font::Font(void* data, size_t size)
 		{
 			for (int y = 0; y < r.h; y++)
 			{
-				auto pixel = &((uint8_t*)image.getMemory())[((r.x + (r.y * dst_width)) * channels) + ((x + (y * dst_width)) * channels)];
+				auto pixel = image.getPixel(r.x + x, r.y + y);
 				memset(pixel, g.pixels[x + (y * r.w)], channels);
 			}
 		}

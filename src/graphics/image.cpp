@@ -36,3 +36,8 @@ Image::~Image()
 {
 	free(mMemory);
 }
+
+uint8_t* Image::getPixel(int x, int y) const
+{
+	return &((uint8_t*)mMemory)[((y * mWidth) + x) * mChannels];
+}
