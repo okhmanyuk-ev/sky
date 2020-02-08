@@ -21,14 +21,13 @@ namespace Network
 		friend class System;
 
 	public:
-		typedef std::function<void(Packet&)> ReadCallback;
+		using ReadCallback = std::function<void(Packet&)>;
 
 	public:
 		void sendPacket(const Packet& packet);
 
 	public:
-		auto& setReadCallback(ReadCallback value) { mReadCallback = value; return *this; }
-
+		void setReadCallback(ReadCallback value) { mReadCallback = value; }
 		auto getPort() const { return mPort; }
 
 	private:
@@ -42,18 +41,18 @@ namespace Network
 #endif
 	};
 
-	class System :  public Common::FrameSystem::Frameable
+	class System : public Common::FrameSystem::Frameable
 	{
 	public:
 		System();
 		~System();
 
-	public:
+	private:
 		void frame() override;
 
 	public:
-		Socket& createSocket(uint16_t port = 0);
-		void destroySocket(Socket& socket);
+		Socket* createSocket(uint16_t port = 0);
+		void destroySocket(Socket* socket);
 	
 	private:
 		std::list<Socket*> mSockets;
