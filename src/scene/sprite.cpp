@@ -12,9 +12,10 @@ void Sprite::draw()
 
 	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
 	
-	GRAPHICS->push(mSampler);
+	GRAPHICS->push(getSampler());
+	GRAPHICS->push(getBlendMode());
 	GRAPHICS->draw(mTexture, model, mTexRegion, getColor());
-	GRAPHICS->pop();
+	GRAPHICS->pop(2);
 
 	Node::draw();
 }

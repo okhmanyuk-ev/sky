@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <Graphics/color.h>
 
 namespace Scene
 {
@@ -15,6 +16,6 @@ namespace Scene
 		void setAlpha(float value) { mColor.a = value; }
 
 	private:
-		glm::vec4 mColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glm::vec4 mColor = { Graphics::Color::White, 1.0f };
 	};
 }

@@ -2,11 +2,13 @@
 
 #include <Scene/node.h>
 #include <Scene/color.h>
+#include <Scene/blend.h>
+#include <Scene/sampler.h>
 #include <Graphics/tex_region.h>
 
 namespace Scene
 {
-	class Sprite : public Node, public Color
+	class Sprite : public Node, public Color, public Blend, public Sampler
 	{
 	protected:
 		void update() override;
@@ -18,13 +20,9 @@ namespace Scene
 
 		auto getTexRegion() const { return mTexRegion; }
 		void setTexRegion(const Graphics::TexRegion& value) { mTexRegion = value; }
-		
-		auto getSampler() const { return mSampler; }
-		void setSampler(Renderer::Sampler value) { mSampler = value; }
 
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
 		Graphics::TexRegion mTexRegion = {};
-		Renderer::Sampler mSampler = Renderer::Sampler::Nearest;
 	};
 }

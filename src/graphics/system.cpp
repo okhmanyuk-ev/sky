@@ -269,8 +269,8 @@ void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 	draw(Renderer::Topology::LineList, vertices, indices, model);
 }
 
-void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& color,
-	float fill, float begin, float end)
+void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& inner_color,
+	const glm::vec4& outer_color, float fill, float begin, float end)
 {
 	if (begin >= end)
 		return;
@@ -316,13 +316,13 @@ void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& c
 		auto p3 = glm::vec3({ v1_inner + radius_inner + delta_inner, 0.0f });
 		auto p4 = glm::vec3({ v2_inner + radius_inner + delta_inner, 0.0f });
 
-		vertices.push_back({ p1, color });
-		vertices.push_back({ p2, color });
-		vertices.push_back({ p3, color });
+		vertices.push_back({ p1, outer_color });
+		vertices.push_back({ p2, outer_color });
+		vertices.push_back({ p3, inner_color });
 
-		vertices.push_back({ p3, color });
-		vertices.push_back({ p2, color });
-		vertices.push_back({ p4, color });
+		vertices.push_back({ p3, inner_color });
+		vertices.push_back({ p2, outer_color });
+		vertices.push_back({ p4, inner_color });
 
 		r1 = r2;
 		v1_outer = v2_outer;

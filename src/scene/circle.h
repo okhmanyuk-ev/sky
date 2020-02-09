@@ -2,10 +2,11 @@
 
 #include <Scene/node.h>
 #include <Scene/color.h>
+#include <Scene/blend.h>
 
 namespace Scene
 {
-	class Circle : public Node, public Color
+	class Circle : public Node, public Color, public Blend
 	{
 	protected:
 		void draw() override;
@@ -23,10 +24,20 @@ namespace Scene
 		auto getEnd() const { return mEnd; }
 		void setEnd(float value) { mEnd = value; }
 
+		auto getInnerColor() const { return mInnerColor; }
+		void setInnerColor(const glm::vec4& value) { mInnerColor = value; }
+		void setInnerColor(const glm::vec3& value) { mInnerColor = { value, mInnerColor.a }; }
+
+		auto getOuterColor() const { return mOuterColor; }
+		void setOuterColor(const glm::vec4& value) { mOuterColor = value; }
+		void setOuterColor(const glm::vec3& value) { mOuterColor = { value, mOuterColor.a }; }
+
 	private:
 		int mSegments = 32;
 		float mFill = 1.0f;
 		float mBegin = 0.0f;
 		float mEnd = 1.0f;
+		glm::vec4 mInnerColor = { Graphics::Color::White, 1.0f };
+		glm::vec4 mOuterColor = { Graphics::Color::White, 1.0f };
 	};
 }
