@@ -110,6 +110,7 @@ void ImguiSystem::end()
 	mShader->setViewMatrix(view);
 	mShader->setModelMatrix(model);
 
+	RENDERER->setRenderTarget(nullptr);
 	RENDERER->setViewport(Renderer::Viewport::FullScreen());
 	RENDERER->setTopology(Renderer::Topology::TriangleList);
 	RENDERER->setSampler(Renderer::Sampler::Nearest);
