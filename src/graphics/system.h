@@ -28,9 +28,9 @@ namespace Graphics
 		struct State;
 
 	public:
-		void begin(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
-		void beginOrtho(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
-		void begin(const Camera& camera);
+		void begin(const State& state);
+		void begin(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
+		void begin(const Camera& camera, std::shared_ptr<Renderer::RenderTarget> target = nullptr);
 		void end();
 
 	private:

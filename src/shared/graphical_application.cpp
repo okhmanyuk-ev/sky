@@ -72,6 +72,7 @@ void GraphicalApplication::run()
 	while (!mPlatform->isFinished())
 	{
 		mPlatform->process();
+		mRenderer->setRenderTarget(nullptr);
 		mRenderer->clear();
 		preFrame();
 		mFrame->frame();

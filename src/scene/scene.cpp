@@ -110,7 +110,7 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const glm::vec2& 
 void Scene::Scene::frame()
 {
 	updateTransformations();
-	GRAPHICS->beginOrtho();
+	GRAPHICS->begin();
 	recursiveNodeDraw(mRoot);
 	GRAPHICS->end();
 }

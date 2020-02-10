@@ -75,7 +75,7 @@ void RichApplication::postFrame()
 {
 	if (mGameFade > 0.0f)
 	{
-		GRAPHICS->beginOrtho();
+		GRAPHICS->begin();
 		GRAPHICS->drawRectangle(glm::scale(glm::mat4(1.0f), { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 1.0f }),
 			{ Graphics::Color::Black, mGameFade });
 		GRAPHICS->end();
@@ -100,7 +100,7 @@ void RichApplication::postImguiPresent()
 	if (mLoadingFade <= 0.0f)
 		return;
 
-	GRAPHICS->beginOrtho();
+	GRAPHICS->begin();
 	GRAPHICS->drawRectangle(glm::scale(glm::mat4(1.0f), { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 1.0f }),
 		{ Graphics::Color::Black, mLoadingFade });
 	GRAPHICS->end();

@@ -5,35 +5,55 @@
 
 using namespace Graphics;
 
-void System::begin(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+void System::begin(const State& state)
 {
 	assert(!mWorking);
 	mWorking = true;
-
-	auto state = State();
-	state.viewport = Renderer::Viewport::FullScreen();
-	state.viewMatrix = viewMatrix;
-	state.projectionMatrix = projectionMatrix;
 	mStates.push(state);
 	mAppliedState = std::nullopt;
 }
 
-void System::beginOrtho(std::shared_ptr<Renderer::RenderTarget> target)
+void System::begin(std::shared_ptr<Renderer::RenderTarget> target)
 {
-	auto viewMatrix = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	auto state = State();
+
+	state.viewMatrix = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 
-	auto projectionMatrix = glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
-	
 	if (target)
-		projectionMatrix = glm::orthoLH(0.0f, (float)target->getWidth(), (float)target->getHeight(), 0.0f, -1.0f, 1.0f);
+	{
+		state.renderTarget = target;
+		state.blendMode = Renderer::BlendStates::AlphaBlend;
+		state.projectionMatrix = glm::orthoLH(0.0f, (float)target->getWidth(), (float)target->getHeight(), 0.0f, -1.0f, 1.0f);
+		state.viewport = Renderer::Viewport::FullRenderTarget(*target);
+	}
+	else
+	{
+		state.projectionMatrix = glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
+		state.viewport = Renderer::Viewport::FullScreen();
+	}
 
-	begin(viewMatrix, projectionMatrix);
+	begin(state);
 }
 
-void System::begin(const Camera& camera)
+void System::begin(const Camera& camera, std::shared_ptr<Renderer::RenderTarget> target)
 {
-	begin(camera.getViewMatrix(), camera.getProjectionMatrix());
+	auto state = State();
+	state.viewMatrix = camera.getViewMatrix();
+	state.projectionMatrix = camera.getProjectionMatrix();
+
+	if (target)
+	{
+		state.renderTarget = target;
+		state.blendMode = Renderer::BlendStates::AlphaBlend;
+		state.viewport = Renderer::Viewport::FullRenderTarget(*target);
+	}
+	else
+	{
+		state.viewport = Renderer::Viewport::FullScreen();
+	}
+
+	begin(state);
 }
 
 void System::end()
@@ -41,8 +61,8 @@ void System::end()
 	assert(mWorking);
 	assert(mStates.size() == 1);
 	mWorking = false;
-	flush();
 	applyState();
+	flush();
 	mStates.pop();
 }
 
