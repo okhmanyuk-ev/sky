@@ -18,13 +18,16 @@ void System::begin(const glm::mat4& viewMatrix, const glm::mat4& projectionMatri
 	mAppliedState = std::nullopt;
 }
 
-void System::beginOrtho()
+void System::beginOrtho(std::shared_ptr<Renderer::RenderTarget> target)
 {
 	auto viewMatrix = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 
 	auto projectionMatrix = glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
 	
+	if (target)
+		projectionMatrix = glm::orthoLH(0.0f, (float)target->getWidth(), (float)target->getHeight(), 0.0f, -1.0f, 1.0f);
+
 	begin(viewMatrix, projectionMatrix);
 }
 
