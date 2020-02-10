@@ -39,6 +39,7 @@ void System::end()
 	assert(mStates.size() == 1);
 	mWorking = false;
 	flush();
+	applyState();
 	mStates.pop();
 }
 
