@@ -4,6 +4,8 @@
 #include <Audio/sound.h>
 #include <fmod/fmod.hpp>
 
+#define AUDIO ENGINE->getSystem<Audio::System>()
+
 namespace Audio
 {
 	class System

@@ -9,10 +9,7 @@ using namespace Shared;
 
 RichApplication::RichApplication(const std::string& appname) : GraphicalApplication(appname)
 {
-	mAudio = std::make_shared<Audio::System>();
-	ENGINE->setAudio(&(*mAudio));
-
-	//
+	ENGINE->addSystem<Audio::System>(std::make_shared<Audio::System>());
 
 	STATS->setEnabled(false);
 	CONSOLE_DEVICE->setEnabled(false);

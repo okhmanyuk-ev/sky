@@ -14,6 +14,8 @@
 
 #include <Common/frame_system.h>
 
+#define NETWORK ENGINE->getSystem<Network::System>()
+
 namespace Network
 {
 	class Socket

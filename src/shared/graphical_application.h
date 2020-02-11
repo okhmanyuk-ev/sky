@@ -29,7 +29,7 @@ namespace Shared
 	{
 	public:
 		GraphicalApplication(const std::string& appname);
-		
+
 	public:
 		void run();
 
@@ -41,32 +41,16 @@ namespace Shared
 
 	private:
 		Core::Engine mEngine;
-
-		std::shared_ptr<Common::TaskSystem> mTaskSystem;
-		std::shared_ptr<Common::FrameSystem> mFrame;
-		std::shared_ptr<Common::EventSystem> mEvent;
 		
-		std::shared_ptr<Platform::System> mPlatform;
-		std::shared_ptr<RendererDebug<Renderer::SystemCrossplatform>> mRenderer;
-
-		std::shared_ptr<Shared::ConsoleDevice> mConsoleDevice;
-		std::shared_ptr<Console::System> mConsole;
-
-		std::shared_ptr<Graphics::System> mGraphics;
+	private:
 		std::shared_ptr<Shared::ImguiSystem> mImguiSystem;
 
-		std::shared_ptr<Network::System> mNetwork;
-
-	private:
 		std::shared_ptr<Common::ConsoleCommands> mConsoleCommands;
 		std::shared_ptr<Shared::GraphicalConsoleCommands> mGraphicalConsoleCommands;
 
 		std::shared_ptr<Shared::PerformanceConsoleCommands> mPerformanceConsoleCommands;
 		std::shared_ptr<Shared::ConsoleHelperCommands> mConsoleHelperCommands;
 
-		std::shared_ptr<Shared::LocalizationSystem> mLocalization;
-		std::shared_ptr<Shared::StatsSystem> mStats;
-		std::shared_ptr<Shared::CacheSystem> mCache;
 		std::shared_ptr<Shared::TouchEmulator> mTouchEmulator;
 		std::shared_ptr<Shared::GestureDetector> mGestureDetector;
 	};

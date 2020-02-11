@@ -5,6 +5,8 @@
 #include <tinyutf8.hpp>
 #include <fmt/format.h>
 
+#define LOCALIZATION ENGINE->getSystem<Shared::LocalizationSystem>()
+
 #define LOCALIZE(KEY) LOCALIZATION->getString(KEY)
 #define LOCALIZE_FMT(KEY, ...) LOCALIZATION->getStringFmt(KEY, __VA_ARGS__)
 

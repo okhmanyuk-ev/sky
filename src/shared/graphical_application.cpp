@@ -7,49 +7,26 @@ using namespace Shared;
 
 GraphicalApplication::GraphicalApplication(const std::string& appname)
 {
-	mTaskSystem = std::make_shared<Common::TaskSystem>();
-	ENGINE->setTask(&(*mTaskSystem));
-
-	mFrame = std::make_shared<Common::FrameSystem>();
-	ENGINE->setFrame(&(*mFrame));
-
-	mEvent = std::make_shared<Common::EventSystem>();
-	ENGINE->setEvent(&(*mEvent));
-
-	mPlatform = Platform::System::create(appname);
-	ENGINE->setPlatform(&(*mPlatform));
-
-	mRenderer = std::make_shared<RendererDebug<Renderer::SystemCrossplatform>>();
-	ENGINE->setRenderer(&(*mRenderer));
-
-	mConsoleDevice = std::make_shared<Shared::ConsoleDevice>();
-	ENGINE->setConsoleDevice(&(*mConsoleDevice));
-
-	mConsole = std::make_shared<Console::System>();
-	ENGINE->setConsole(&(*mConsole));
-
-	mGraphics = std::make_shared<Graphics::System>();
-	ENGINE->setGraphics(&(*mGraphics));
+	ENGINE->addSystem<Common::TaskSystem>(std::make_shared<Common::TaskSystem>());
+	ENGINE->addSystem<Common::FrameSystem>(std::make_shared<Common::FrameSystem>());
+	ENGINE->addSystem<Common::EventSystem>(std::make_shared<Common::EventSystem>());
+	ENGINE->addSystem<Platform::System>(Platform::System::create(appname));
+	ENGINE->addSystem<Renderer::System>(std::make_shared<RendererDebug<Renderer::SystemCrossplatform>>());
+	ENGINE->addSystem<Console::Device>(std::make_shared<Shared::ConsoleDevice>());
+	ENGINE->addSystem<Console::System>(std::make_shared<Console::System>());
+	ENGINE->addSystem<Graphics::System>(std::make_shared<Graphics::System>());
+	ENGINE->addSystem<Network::System>(std::make_shared<Network::System>());
+	ENGINE->addSystem<Shared::LocalizationSystem>(std::make_shared<Shared::LocalizationSystem>());
+	ENGINE->addSystem<Shared::StatsSystem>(std::make_shared<Shared::StatsSystem>());
+	ENGINE->addSystem<Shared::CacheSystem>(std::make_shared<Shared::CacheSystem>());
 
 	mImguiSystem = std::make_shared<Shared::ImguiSystem>();
-	
-	mNetwork = std::make_shared<Network::System>();
-	ENGINE->setNetwork(&(*mNetwork));
 
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
 
 	mPerformanceConsoleCommands = std::make_shared<Shared::PerformanceConsoleCommands>();
 	mConsoleHelperCommands = std::make_shared<Shared::ConsoleHelperCommands>();
-
-	mLocalization = std::make_shared<Shared::LocalizationSystem>();
-	ENGINE->setLocalization(&(*mLocalization));
-
-	mStats = std::make_shared<Shared::StatsSystem>();
-	ENGINE->setStats(&(*mStats));
-
-	mCache = std::make_shared<Shared::CacheSystem>();
-	ENGINE->setCache(&(*mCache));
 
 	mTouchEmulator = std::make_shared<Shared::TouchEmulator>();
 	mGestureDetector = std::make_shared<Shared::GestureDetector>();
@@ -63,22 +40,22 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	style.PopupBorderSize = 0.0f;
 
 	mConsoleCommands->setQuitCallback([this] {
-		mPlatform->quit();
+		PLATFORM->quit();
 	});
 }
 
 void GraphicalApplication::run()
 {
-	while (!mPlatform->isFinished())
+	while (!PLATFORM->isFinished())
 	{
-		mPlatform->process();
-		mRenderer->setRenderTarget(nullptr);
-		mRenderer->clear();
+		PLATFORM->process();
+		RENDERER->setRenderTarget(nullptr);
+		RENDERER->clear();
 		preFrame();
-		mFrame->frame();
+		FRAME->frame();
 		postFrame();
 		mImguiSystem->present();
 		postImguiPresent();
-		mRenderer->present();
+		RENDERER->present();
 	}
 }

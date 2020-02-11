@@ -8,6 +8,8 @@
 #define LOG(S) CONSOLE_DEVICE->writeLine(S)
 #define LOGC(S, C) CONSOLE_DEVICE->writeLine(S, C)
 
+#define CONSOLE_DEVICE ENGINE->getSystem<Console::Device>()
+
 namespace Console
 {
 	enum class Color

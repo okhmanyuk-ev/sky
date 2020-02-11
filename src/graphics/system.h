@@ -20,6 +20,8 @@
 #include <tinyutf8.hpp>
 #include "text_mesh.h"
 
+#define GRAPHICS ENGINE->getSystem<Graphics::System>()
+
 namespace Graphics
 {
 	class System

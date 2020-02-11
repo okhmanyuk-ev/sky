@@ -40,9 +40,6 @@ namespace Shared
 		void postFrame() override;
 		void postImguiPresent() override;
 
-	private:
-		std::shared_ptr<Audio::System> mAudio;
-	
 	public:
 		struct LoadingTask
 		{

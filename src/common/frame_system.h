@@ -5,6 +5,8 @@
 #include <list>
 #include <functional>
 
+#define FRAME ENGINE->getSystem<Common::FrameSystem>()
+
 namespace Common
 {
 	class FrameSystem

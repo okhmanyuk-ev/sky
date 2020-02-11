@@ -5,6 +5,8 @@
 #include <map>
 #include <list>
 
+#define EVENT ENGINE->getSystem<Common::EventSystem>()
+
 namespace Common
 {
 	class EventSystem
@@ -14,7 +16,7 @@ namespace Common
 		template <typename T> class Listener;
 
 	private:
-		template <typename T> auto getType()
+		template <typename T> auto getTypeIndex()
 		{
 			static auto type = mTypeCount++;
 			return type;
@@ -23,7 +25,7 @@ namespace Common
 	public:
 		template <typename T> void emit(const T& e)
 		{
-			auto type = getType<T>();
+			auto type = getTypeIndex<T>();
 		
 			if (mListeners.count(type) == 0)
 				return;
@@ -43,8 +45,8 @@ namespace Common
 	{
 		friend EventSystem;
 	public:
-		Listenable() { EVENT->mListeners[EVENT->getType<T>()].push_back(this); }
-		virtual ~Listenable() { EVENT->mListeners[EVENT->getType<T>()].remove(this); }
+		Listenable() { EVENT->mListeners[EVENT->getTypeIndex<T>()].push_back(this); }
+		virtual ~Listenable() { EVENT->mListeners[EVENT->getTypeIndex<T>()].remove(this); }
 
 	protected:
 		virtual void event(const T& e) = 0;

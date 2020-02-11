@@ -14,6 +14,8 @@
 #include <Renderer/rasterizer_state.h>
 #include <Renderer/blend.h>
 
+#define RENDERER ENGINE->getSystem<Renderer::System>()
+
 namespace Renderer
 {
 	class System

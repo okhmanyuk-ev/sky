@@ -11,6 +11,8 @@
 #include <vector>
 #include <functional>
 
+#define PLATFORM ENGINE->getSystem<Platform::System>()
+
 namespace Platform
 {
 	class System

@@ -7,6 +7,8 @@
 #include <future>
 #include <condition_variable>
 
+#define TASK ENGINE->getSystem<Common::TaskSystem>()
+
 namespace Common
 {
 	class TaskSystem

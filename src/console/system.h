@@ -8,6 +8,8 @@
 #include <vector>
 #include <list>
 
+#define CONSOLE ENGINE->getSystem<Console::System>()
+
 namespace Console
 {
 	class CVar
