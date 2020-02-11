@@ -5,6 +5,7 @@
 #include <Shared/touch_emulator.h>
 #include <glm/glm.hpp>
 #include <Core/clock.h>
+#include <map>
 
 namespace Shared 
 {

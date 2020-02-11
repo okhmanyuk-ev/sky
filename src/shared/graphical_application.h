@@ -27,8 +27,12 @@ namespace Shared
 {
 	class GraphicalApplication
 	{
+	private:
+		static inline Core::Engine Engine;
+
 	public:
 		GraphicalApplication(const std::string& appname);
+		~GraphicalApplication();
 
 	public:
 		void run();
@@ -38,9 +42,6 @@ namespace Shared
 		virtual void postFrame() {};
 
 		virtual void postImguiPresent() {};
-
-	private:
-		Core::Engine mEngine;
 		
 	private:
 		std::shared_ptr<Shared::ImguiSystem> mImguiSystem;

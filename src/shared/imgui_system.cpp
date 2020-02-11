@@ -57,7 +57,6 @@ ImguiSystem::ImguiSystem()
 
 ImguiSystem::~ImguiSystem()
 {
-	end();
 	ImGui::DestroyContext();
 	delete mTexture;
 }

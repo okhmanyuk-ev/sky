@@ -7,6 +7,7 @@
 #include <Common/event_system.h>
 #include <Common/hash.h>
 #include <Renderer/low_level_api.h>
+#include <map>
 
 namespace Renderer
 {

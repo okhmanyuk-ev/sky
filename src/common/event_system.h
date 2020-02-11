@@ -2,7 +2,7 @@
 
 #include <Core/engine.h>
 #include <functional>
-#include <map>
+#include <unordered_map>
 #include <list>
 
 #define EVENT ENGINE->getSystem<Common::EventSystem>()
@@ -37,7 +37,7 @@ namespace Common
 		}
 
 	private:
-		std::map<size_t, std::list<void*>> mListeners;
+		std::unordered_map<size_t, std::list<void*>> mListeners;
 		size_t mTypeCount = 0;
 	};
 

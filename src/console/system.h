@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 
 #define CONSOLE ENGINE->getSystem<Console::System>()
 
