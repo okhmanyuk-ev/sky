@@ -146,7 +146,8 @@ namespace Renderer
 			size_t operator()(const DepthStencilState& k) const
 			{
 				size_t seed = 0;
-				Common::Hash::combine(seed, k.depthMode);
+				Common::Hash::combine(seed, k.depthMode.enabled);
+				Common::Hash::combine(seed, k.depthMode.func);
 
 				Common::Hash::combine(seed, k.stencilMode.enabled);
 			

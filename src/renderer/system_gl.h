@@ -12,6 +12,7 @@
 #include <Renderer/low_level_api.h>
 
 #include <Platform/system_android.h>
+#include <map>
 
 namespace Renderer
 {
@@ -33,6 +34,7 @@ namespace Renderer
 		void setShader(std::shared_ptr<Shader> value) override;
 		void setSampler(const Sampler& value) override;
 		void setDepthMode(const DepthMode& value) override;
+		void setStencilMode(const StencilMode& value) override;
 		void setCullMode(const CullMode& value) override;
 		void setBlendMode(const BlendMode& value) override;
 
@@ -108,18 +110,26 @@ namespace Renderer
 		Scissor mScissorState;
 		std::shared_ptr<Shader> mAppliedShader = nullptr;
 		std::shared_ptr<Shader> mStateShader = nullptr;
-		DepthMode mDepthMode = DepthMode::None;
-		DepthMode mStateDepthMode = DepthMode::None;
+		
+		DepthMode mAppliedDepthMode = DepthMode();
+		DepthMode mDepthMode = DepthMode();
+		bool mDepthModeApplied = false;
+
+		CullMode mAppliedCullMode = CullMode::None;
 		CullMode mCullMode = CullMode::None;
-		CullMode mStateCullMode = CullMode::None;
+		bool mCullModeApplied = false;
+		
+		StencilMode mAppliedStencilMode = StencilMode();
+		StencilMode mStencilMode = StencilMode();
+		bool mStencilModeApplied = false;
+
 		bool mTextureBound = false;
 		Sampler mSampler = Sampler::Nearest;
 		
-		bool mDepthModeApplied = false;
-		bool mCullModeApplied = false;
 		
-		void setGLDepthMode(DepthMode depthMode);
+		void setGLDepthMode(const DepthMode& value);
 		void setGLCullMode(CullMode cullMode);
+		void setGLStencilMode(const StencilMode& value);
 		void updateGLSampler();
 	};
 

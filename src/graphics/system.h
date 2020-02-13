@@ -125,7 +125,7 @@ namespace Graphics
 			std::shared_ptr<Renderer::RenderTarget> renderTarget = nullptr;
 			std::optional<Renderer::Scissor> scissor = std::nullopt;
 			Renderer::Viewport viewport;
-			Renderer::DepthMode depthMode = Renderer::DepthMode::Always;
+			Renderer::DepthMode depthMode = Renderer::DepthMode();
 			Renderer::BlendMode blendMode = Renderer::BlendStates::NonPremultiplied;
 			Renderer::Sampler sampler = Renderer::Sampler::Nearest;
 

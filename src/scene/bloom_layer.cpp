@@ -67,7 +67,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		const std::vector<uint16_t> Indices = { 0, 1, 2, 0, 2, 3 };
 
 		RENDERER->setCullMode(Renderer::CullMode::None);
-		RENDERER->setDepthMode(Renderer::DepthMode::Always);
+		RENDERER->setDepthMode(Renderer::DepthMode());
 		RENDERER->setBlendMode(Renderer::BlendStates::AlphaBlend);
 
 		RENDERER->setTopology(Renderer::Topology::TriangleList);

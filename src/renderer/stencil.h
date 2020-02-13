@@ -19,6 +19,8 @@ namespace Renderer
 
 	struct StencilMode
 	{
+		StencilMode() { }
+
 		bool enabled = false;
 
 		uint8_t readMask = 0;

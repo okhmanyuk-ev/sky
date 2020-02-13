@@ -113,7 +113,7 @@ void ImguiSystem::end()
 	RENDERER->setViewport(Renderer::Viewport::FullScreen());
 	RENDERER->setTopology(Renderer::Topology::TriangleList);
 	RENDERER->setSampler(Renderer::Sampler::Nearest);
-	RENDERER->setDepthMode(Renderer::DepthMode::Always);
+	RENDERER->setDepthMode(Renderer::DepthMode());
 	RENDERER->setCullMode(Renderer::CullMode::None);
 	RENDERER->setBlendMode(Renderer::BlendStates::NonPremultiplied);
 	RENDERER->setShader(mShader);

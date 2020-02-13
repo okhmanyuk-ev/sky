@@ -431,9 +431,9 @@ void SystemD3D11::setD3D11DepthStencilState(const DepthStencilState& value)
 		};
 
 		D3D11_DEPTH_STENCIL_DESC desc = {};
-		desc.DepthEnable = true;
+		desc.DepthEnable = value.depthMode.enabled;
 		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		desc.DepthFunc = ComparisonFuncMap.at(value.depthMode);
+		desc.DepthFunc = ComparisonFuncMap.at(value.depthMode.func);
 
 		desc.StencilEnable = value.stencilMode.enabled;
 		desc.StencilReadMask = value.stencilMode.readMask;

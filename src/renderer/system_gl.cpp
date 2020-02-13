@@ -57,19 +57,18 @@ std::map<Vertex::Attribute::Format, GLboolean> SystemGL::Normalize = {
 
 namespace
 {
-	std::map<DepthMode, GLenum> glcomparisonfunc = {
-		{ DepthMode::None, GL_ALWAYS },
-		{ DepthMode::Always, GL_ALWAYS },
-		{ DepthMode::Never, GL_NEVER },
-		{ DepthMode::Less, GL_LESS },
-		{ DepthMode::Equal, GL_EQUAL },
-		{ DepthMode::NotEqual, GL_NOTEQUAL },
-		{ DepthMode::LessEqual, GL_LEQUAL },
-		{ DepthMode::Greater, GL_GREATER },
-		{ DepthMode::GreaterEqual, GL_GEQUAL }
+	std::map<ComparisonFunc, GLenum> ComparisonFuncMap = {
+		{ ComparisonFunc::Always, GL_ALWAYS },
+		{ ComparisonFunc::Never, GL_NEVER },
+		{ ComparisonFunc::Less, GL_LESS },
+		{ ComparisonFunc::Equal, GL_EQUAL },
+		{ ComparisonFunc::NotEqual, GL_NOTEQUAL },
+		{ ComparisonFunc::LessEqual, GL_LEQUAL },
+		{ ComparisonFunc::Greater, GL_GREATER },
+		{ ComparisonFunc::GreaterEqual, GL_GEQUAL }
 	};
 
-	std::map<CullMode, GLenum> glcull = {
+	std::map<CullMode, GLenum> CullMap = {
 		{ CullMode::None, GL_NONE },
 		{ CullMode::Front, GL_FRONT },
 		{ CullMode::Back, GL_BACK }
@@ -390,12 +389,17 @@ void SystemGL::setSampler(const Sampler& value)
 
 void SystemGL::setDepthMode(const DepthMode& value)
 {
-	mStateDepthMode = value;
+	mDepthMode = value;
+}
+
+void SystemGL::setStencilMode(const StencilMode& value)
+{
+	mStencilMode = value;
 }
 
 void SystemGL::setCullMode(const CullMode& value)
 {
-	mStateCullMode = value;
+	mCullMode = value;
 }
 
 void SystemGL::setBlendMode(const BlendMode& value)
@@ -540,31 +544,38 @@ void SystemGL::prepareForDrawing()
 
 	// depth mode
 
-	auto depthMode = mStateDepthMode;
-	if (!mDepthModeApplied || mDepthMode != depthMode)
+	if (!mDepthModeApplied || mAppliedDepthMode != mDepthMode)
 	{
-		setGLDepthMode(depthMode);
-		mDepthMode = depthMode;
+		setGLDepthMode(mDepthMode);
+		mAppliedDepthMode = mDepthMode;
 		mDepthModeApplied = true;
 	}
 
 	// cull mode
 
-	auto cullMode = mStateCullMode;
-	if (!mCullModeApplied || mCullMode != cullMode)
+	if (!mCullModeApplied || mAppliedCullMode != mCullMode)
 	{
-		setGLCullMode(cullMode);
-		mCullMode = cullMode;
+		setGLCullMode(mCullMode);
+		mAppliedCullMode = mCullMode;
 		mCullModeApplied = true;
-	}	
+	}
+
+	// stencil
+
+	if (!mStencilModeApplied || mAppliedStencilMode != mStencilMode)
+	{
+		setGLStencilMode(mStencilMode);
+		mAppliedStencilMode = mStencilMode;
+		mStencilModeApplied = true;
+	}
 }
 
-void SystemGL::setGLDepthMode(DepthMode depthMode)
+void SystemGL::setGLDepthMode(const DepthMode& value)
 {
-	if (depthMode != DepthMode::None)
+	if (value.enabled)
 	{
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(glcomparisonfunc.at(depthMode));
+		glDepthFunc(ComparisonFuncMap.at(value.func));
 	}
 	else
 	{
@@ -578,12 +589,37 @@ void SystemGL::setGLCullMode(CullMode cullMode)
 	{
 		glEnable(GL_CULL_FACE);
 		glFrontFace(GL_CW);
-		glCullFace(glcull.at(cullMode));
+		glCullFace(CullMap.at(cullMode));
 	}
 	else
 	{
 		glDisable(GL_CULL_FACE);
 	}
+}
+
+void SystemGL::setGLStencilMode(const StencilMode& value)
+{
+	if (!value.enabled) 
+	{
+		glDisable(GL_STENCIL_TEST);
+		return;
+	}
+
+	const std::map<StencilOp, GLenum> StencilOpMap = {
+		{ StencilOp::Keep, GL_KEEP },
+		{ StencilOp::Zero, GL_ZERO },
+		{ StencilOp::Replace, GL_REPLACE },
+		{ StencilOp::IncrementSaturation, GL_INCR },
+		{ StencilOp::DecrementSaturation, GL_DECR },
+		{ StencilOp::Invert, GL_INVERT },
+		{ StencilOp::Increment, GL_INCR_WRAP },
+		{ StencilOp::Decrement, GL_DECR_WRAP },
+	};
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(value.writeMask);
+	glStencilOp(StencilOpMap.at(value.failOp), StencilOpMap.at(value.depthFailOp), StencilOpMap.at(value.passOp));
+	glStencilFunc(ComparisonFuncMap.at(value.func), 1, value.readMask);
 }
 
 void SystemGL::updateGLSampler()
