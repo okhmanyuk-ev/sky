@@ -112,7 +112,7 @@ void System::flush()
 	RENDERER->setShader(mBatch.shader);
 
 	if (mBatch.texture.has_value())
-		RENDERER->setTexture(*mBatch.texture.value());
+		RENDERER->setTexture(mBatch.texture.value());
 
 	RENDERER->setTopology(mBatch.topology.value());
 	RENDERER->setIndexBuffer(mBatch.indices);
@@ -255,7 +255,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 		mTexturedShader->setViewMatrix(mStates.top().viewMatrix);
 		mTexturedShader->setModelMatrix(model);
 
-		RENDERER->setTexture(*texture);
+		RENDERER->setTexture(texture);
 		RENDERER->setTopology(topology);
 		RENDERER->setIndexBuffer(indices);
 		RENDERER->setVertexBuffer(vertices);
@@ -447,7 +447,7 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 		mSdfShader->setSmoothFactor(smoothFactor);
 		mSdfShader->setColor(color);
 
-		RENDERER->setTexture(*texture);
+		RENDERER->setTexture(texture);
 		RENDERER->setTopology(topology);
 		RENDERER->setIndexBuffer(indices);
 		RENDERER->setVertexBuffer(vertices);

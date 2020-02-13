@@ -83,14 +83,14 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 			mBlurShader->setDirection(Renderer::ShaderBlur::Direction::Horizontal);
 
 			RENDERER->setRenderTarget(mBlurTarget2);
-			RENDERER->setTexture(*mBlurTarget1);
+			RENDERER->setTexture(mBlurTarget1);
 			RENDERER->clear();
 			RENDERER->drawIndexed(Indices.size());
 
 			mBlurShader->setDirection(Renderer::ShaderBlur::Direction::Vertical);
 
 			RENDERER->setRenderTarget(mBlurTarget1);
-			RENDERER->setTexture(*mBlurTarget2);
+			RENDERER->setTexture(mBlurTarget2);
 			RENDERER->clear();
 			RENDERER->drawIndexed(Indices.size());
 		}

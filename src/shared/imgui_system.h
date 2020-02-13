@@ -52,7 +52,7 @@ namespace Shared
 		void event(const Platform::Touch::Event& e) override;
 
 	private:
-		Renderer::Texture* mTexture;
+		std::shared_ptr<Renderer::Texture> mTexture;
 		std::set<int> mReleasedKeyboardKeys;
 		std::set<int> mReleasedMouseButtons;
 		glm::vec2 mMousePos;

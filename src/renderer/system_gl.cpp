@@ -350,9 +350,9 @@ void SystemGL::setIndexBuffer(const Buffer& value)
 	mIndexBuffer = value;
 }
 
-void SystemGL::setTexture(const Texture& value) 
+void SystemGL::setTexture(std::shared_ptr<Texture> value)
 {
-	value.bindTexture();
+	value->bindTexture();
 	mTextureBound = true;
 	updateGLSampler();
 }

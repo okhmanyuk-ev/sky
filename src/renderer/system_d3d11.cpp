@@ -214,9 +214,9 @@ void SystemD3D11::setIndexBuffer(const Buffer& value)
 	Context->IASetIndexBuffer(mD3D11IndexBuffer, value.stride == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
 }
 
-void SystemD3D11::setTexture(const Texture& value) 
+void SystemD3D11::setTexture(std::shared_ptr<Texture> value)
 {
-	value.bindTexture();
+	value->bindTexture();
 }
 
 void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)

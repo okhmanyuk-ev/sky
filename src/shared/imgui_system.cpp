@@ -48,9 +48,9 @@ ImguiSystem::ImguiSystem()
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
-	mTexture = new Renderer::Texture(width, height, 4, data);
+	mTexture = std::make_shared<Renderer::Texture>(width, height, 4, data);
 	
-	io.Fonts->TexID = mTexture;
+	io.Fonts->TexID = &mTexture;
 
 	begin();
 }
@@ -58,7 +58,6 @@ ImguiSystem::ImguiSystem()
 ImguiSystem::~ImguiSystem()
 {
 	ImGui::DestroyContext();
-	delete mTexture;
 }
 
 void ImguiSystem::begin()
@@ -135,7 +134,7 @@ void ImguiSystem::end()
 			}
 			else
 			{
-				RENDERER->setTexture(*static_cast<Renderer::Texture*>(cmd.TextureId));
+				RENDERER->setTexture(*static_cast<std::shared_ptr<Renderer::Texture>*>(cmd.TextureId));
 				RENDERER->setScissor({ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });
 				RENDERER->drawIndexed(cmd.ElemCount, indexOffset);
 			}
