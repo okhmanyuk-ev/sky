@@ -2,9 +2,8 @@
 
 namespace Renderer
 {
-	enum class DepthMode
+	enum class ComparisonFunc
 	{
-		None,		// comparison disabled
 		Always,         // comparison always succeeds
 		Never,          // comparison always fails
 		Less,           // passes if source is less than the destination

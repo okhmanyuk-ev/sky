@@ -138,7 +138,7 @@ void SystemD3D11::setViewport(const Viewport& value)
 
 void SystemD3D11::setScissor(const Scissor& value) 
 {
-	mStateScissorEnabled = true;
+	mRasterizerState.scissorEnabled = true;
 
 	if (mScissor != value)
 	{
@@ -154,7 +154,7 @@ void SystemD3D11::setScissor(const Scissor& value)
 
 void SystemD3D11::setScissor(std::nullptr_t value)
 {
-	mStateScissorEnabled = false;
+	mRasterizerState.scissorEnabled = false;
 }
 
 void SystemD3D11::setVertexBuffer(const Buffer& value) 
@@ -256,53 +256,21 @@ void SystemD3D11::setSampler(const Sampler& value)
 	}
 
 	Context->PSSetSamplers(0, 1, &mD3D11SamplerStates.at(value));
-	//mStateSampler = value;
 }
 
 void SystemD3D11::setDepthMode(const DepthMode& value) 
 {
-	if (mD3D11DepthStencilStates.count(value) == 0)
-	{
-		const std::map<DepthMode, D3D11_COMPARISON_FUNC> ComparisonFunc = {
-			{ DepthMode::None, D3D11_COMPARISON_ALWAYS },
-			{ DepthMode::Always, D3D11_COMPARISON_ALWAYS },
-			{ DepthMode::Never, D3D11_COMPARISON_NEVER },
-			{ DepthMode::Less, D3D11_COMPARISON_LESS },
-			{ DepthMode::Equal, D3D11_COMPARISON_EQUAL },
-			{ DepthMode::NotEqual, D3D11_COMPARISON_NOT_EQUAL },
-			{ DepthMode::LessEqual, D3D11_COMPARISON_LESS_EQUAL },
-			{ DepthMode::Greater, D3D11_COMPARISON_GREATER },
-			{ DepthMode::GreaterEqual, D3D11_COMPARISON_GREATER_EQUAL }
-		};
+	mDepthStencilState.depthMode = value;
+}
 
-		D3D11_DEPTH_STENCIL_DESC desc = {};
-		desc.DepthEnable = value != DepthMode::None;
-		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		desc.DepthFunc = ComparisonFunc.at(value);
-
-		desc.StencilEnable = true;
-		desc.StencilReadMask = D3D11_STENCIL_OP_KEEP;
-		desc.StencilWriteMask = D3D11_STENCIL_OP_KEEP;
-
-		desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-		desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-
-		desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-		desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-
-		Device->CreateDepthStencilState(&desc, &mD3D11DepthStencilStates[value]);
-	}
-
-	Context->OMSetDepthStencilState(mD3D11DepthStencilStates.at(value), 1);
+void SystemD3D11::setStencilMode(const StencilMode& value)
+{
+	mDepthStencilState.stencilMode = value;
 }
 
 void SystemD3D11::setCullMode(const CullMode& value) 
 {
-	mStateCullMode = value;
+	mRasterizerState.cullMode = value;
 }
 
 void SystemD3D11::setBlendMode(const BlendMode& value)
@@ -399,18 +367,25 @@ void SystemD3D11::prepareForDrawing()
 
 	// rasterizer state
 
-	auto rasterizerState = RasterizerState({ mStateScissorEnabled, mStateCullMode });
-	if (!mRasterizerStateApplied || mRasterizerState != rasterizerState)
+	if (!mRasterizerStateApplied || mAppliedRasterizerState != mRasterizerState)
 	{
-		setD3D11RasterizerState(rasterizerState);
-		mRasterizerState = rasterizerState;
+		setD3D11RasterizerState(mRasterizerState);
+		mAppliedRasterizerState = mRasterizerState;
 		mRasterizerStateApplied = true;
 	}
-}
 
-void SystemD3D11::setD3D11RasterizerState(RasterizerState rasterizerState)
+	// depthstencil state
+
+	if (!mDepthStencilStateApplied || mAppliedDepthStencilState != mDepthStencilState)
+	{
+		setD3D11DepthStencilState(mDepthStencilState);
+		mAppliedDepthStencilState = mDepthStencilState;
+		mDepthStencilStateApplied = true;
+	}
+}
+void SystemD3D11::setD3D11RasterizerState(const RasterizerState& value)
 {
-	if (mD3D11RasterizerStates.count(rasterizerState) == 0)
+	if (mD3D11RasterizerStates.count(value) == 0)
 	{
 		const std::map<CullMode, D3D11_CULL_MODE> CullMap = {
 			{ CullMode::None, D3D11_CULL_NONE },
@@ -420,13 +395,61 @@ void SystemD3D11::setD3D11RasterizerState(RasterizerState rasterizerState)
 
 		D3D11_RASTERIZER_DESC desc = {};
 		desc.FillMode = D3D11_FILL_SOLID;
-		desc.CullMode = CullMap.at(rasterizerState.cullMode);
-		desc.ScissorEnable = rasterizerState.scissorEnabled;
+		desc.CullMode = CullMap.at(value.cullMode);
+		desc.ScissorEnable = value.scissorEnabled;
 		desc.DepthClipEnable = true;
-		Device->CreateRasterizerState(&desc, &mD3D11RasterizerStates[rasterizerState]);
+		Device->CreateRasterizerState(&desc, &mD3D11RasterizerStates[value]);
 	}
 
-	Context->RSSetState(mD3D11RasterizerStates.at(rasterizerState));
+	Context->RSSetState(mD3D11RasterizerStates.at(value));
+}
+
+void SystemD3D11::setD3D11DepthStencilState(const DepthStencilState& value)
+{
+	if (mD3D11DepthStencilStates.count(value) == 0)
+	{
+		const std::map<ComparisonFunc, D3D11_COMPARISON_FUNC> ComparisonFuncMap = {
+			{ ComparisonFunc::Always, D3D11_COMPARISON_ALWAYS },
+			{ ComparisonFunc::Never, D3D11_COMPARISON_NEVER },
+			{ ComparisonFunc::Less, D3D11_COMPARISON_LESS },
+			{ ComparisonFunc::Equal, D3D11_COMPARISON_EQUAL },
+			{ ComparisonFunc::NotEqual, D3D11_COMPARISON_NOT_EQUAL },
+			{ ComparisonFunc::LessEqual, D3D11_COMPARISON_LESS_EQUAL },
+			{ ComparisonFunc::Greater, D3D11_COMPARISON_GREATER },
+			{ ComparisonFunc::GreaterEqual, D3D11_COMPARISON_GREATER_EQUAL }
+		};
+
+		const std::map<StencilOp, D3D11_STENCIL_OP> StencilOpMap = {
+			{ StencilOp::Keep, D3D11_STENCIL_OP_KEEP },
+			{ StencilOp::Zero, D3D11_STENCIL_OP_ZERO },
+			{ StencilOp::Replace, D3D11_STENCIL_OP_REPLACE },
+			{ StencilOp::IncrementSaturation, D3D11_STENCIL_OP_INCR_SAT },
+			{ StencilOp::DecrementSaturation, D3D11_STENCIL_OP_DECR_SAT },
+			{ StencilOp::Invert, D3D11_STENCIL_OP_INVERT },
+			{ StencilOp::Increment, D3D11_STENCIL_OP_INCR },
+			{ StencilOp::Decrement, D3D11_STENCIL_OP_DECR },
+		};
+
+		D3D11_DEPTH_STENCIL_DESC desc = {};
+		desc.DepthEnable = true;
+		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		desc.DepthFunc = ComparisonFuncMap.at(value.depthMode);
+
+		desc.StencilEnable = value.stencilMode.enabled;
+		desc.StencilReadMask = value.stencilMode.readMask;
+		desc.StencilWriteMask = value.stencilMode.writeMask;
+
+		desc.FrontFace.StencilDepthFailOp = StencilOpMap.at(value.stencilMode.depthFailOp);
+		desc.FrontFace.StencilFailOp = StencilOpMap.at(value.stencilMode.failOp);
+		desc.FrontFace.StencilFunc = ComparisonFuncMap.at(value.stencilMode.func);
+		desc.FrontFace.StencilPassOp = StencilOpMap.at(value.stencilMode.passOp);
+
+		desc.BackFace = desc.FrontFace;
+
+		Device->CreateDepthStencilState(&desc, &mD3D11DepthStencilStates[value]);
+	}
+
+	Context->OMSetDepthStencilState(mD3D11DepthStencilStates.at(value), 1);
 }
 
 #endif

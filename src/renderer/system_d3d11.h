@@ -31,6 +31,7 @@ namespace Renderer
 		void setShader(std::shared_ptr<Shader> value) override;
 		void setSampler(const Sampler& value) override;
 		void setDepthMode(const DepthMode& value) override;
+		void setStencilMode(const StencilMode& value) override;
 		void setCullMode(const CullMode& value) override;
 		void setBlendMode(const BlendMode& value) override;
 
@@ -86,7 +87,7 @@ namespace Renderer
 
 			bool operator!=(const RasterizerState& value) const
 			{
-				return scissorEnabled != value.scissorEnabled || cullMode != value.cullMode;
+				return !(value == *this);
 			}
 		};
 
@@ -124,12 +125,57 @@ namespace Renderer
 			}
 		};
 
+		struct DepthStencilState
+		{
+			DepthMode depthMode;
+			StencilMode stencilMode;
+
+			bool operator==(const DepthStencilState& value) const
+			{
+				return depthMode == value.depthMode && stencilMode == value.stencilMode;
+			}
+
+			bool operator!=(const DepthStencilState& value) const
+			{
+				return !(value == *this);
+			}
+		};
+
+		struct DepthStencilHasher
+		{
+			size_t operator()(const DepthStencilState& k) const
+			{
+				size_t seed = 0;
+				Common::Hash::combine(seed, k.depthMode);
+
+				Common::Hash::combine(seed, k.stencilMode.enabled);
+			
+				Common::Hash::combine(seed, k.stencilMode.readMask);
+				Common::Hash::combine(seed, k.stencilMode.writeMask);
+
+				Common::Hash::combine(seed, k.stencilMode.depthFailOp);
+				Common::Hash::combine(seed, k.stencilMode.failOp);
+				Common::Hash::combine(seed, k.stencilMode.func);
+				Common::Hash::combine(seed, k.stencilMode.passOp);
+
+				return seed;
+			}
+		};
+
+		struct DepthStencilComparer
+		{
+			bool operator()(const DepthStencilState& left, const DepthStencilState& right) const
+			{
+				return left == right;
+			}
+		};
+
 	private:
 		ID3D11Buffer* mD3D11VertexBuffer = nullptr;
 		ID3D11Buffer* mD3D11IndexBuffer = nullptr;
 		std::unordered_map<Texture*, ID3D11ShaderResourceView*> mD3D11TextureViews;
 		std::unordered_map<Sampler, ID3D11SamplerState*> mD3D11SamplerStates;
-		std::unordered_map<DepthMode, ID3D11DepthStencilState*> mD3D11DepthStencilStates;
+		std::unordered_map<DepthStencilState, ID3D11DepthStencilState*, DepthStencilHasher, DepthStencilComparer> mD3D11DepthStencilStates;
 		std::unordered_map<RasterizerState, ID3D11RasterizerState*, RasterizerHasher, RasterizerComparer> mD3D11RasterizerStates;
 		std::unordered_map<BlendMode, ID3D11BlendState*, BlendModeHasher> mD3D11BlendModes;
 
@@ -139,11 +185,15 @@ namespace Renderer
 		std::shared_ptr<Shader> mAppliedShader = nullptr;
 		std::shared_ptr<Shader> mShader = nullptr;
 
+		RasterizerState mAppliedRasterizerState;
 		RasterizerState mRasterizerState;
-		bool mStateScissorEnabled = false;
-		CullMode mStateCullMode = CullMode::None;
 		bool mRasterizerStateApplied = false;
-		void setD3D11RasterizerState(RasterizerState rasterizerState);
+		void setD3D11RasterizerState(const RasterizerState& rasterizerState);
+
+		DepthStencilState mAppliedDepthStencilState;
+		DepthStencilState mDepthStencilState;
+		bool mDepthStencilStateApplied = false;
+		void setD3D11DepthStencilState(const DepthStencilState& value);
 	};
 }
 #endif

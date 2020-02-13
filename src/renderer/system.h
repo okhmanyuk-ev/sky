@@ -10,9 +10,10 @@
 #include <Renderer/render_target.h>
 #include <Renderer/shader.h>
 #include <Renderer/sampler.h>
-#include <Renderer/depth_mode.h>
+#include <Renderer/depth.h>
 #include <Renderer/rasterizer_state.h>
 #include <Renderer/blend.h>
+#include <Renderer/stencil.h>
 
 #define RENDERER ENGINE->getSystem<Renderer::System>()
 
@@ -32,6 +33,7 @@ namespace Renderer
 		virtual void setShader(std::shared_ptr<Shader> value) = 0;
 		virtual void setSampler(const Sampler& value) = 0;
 		virtual void setDepthMode(const DepthMode& value) = 0;
+		virtual void setStencilMode(const StencilMode& value) = 0;
 		virtual void setCullMode(const CullMode& value) = 0;
 		virtual void setBlendMode(const BlendMode& value) = 0;
 
