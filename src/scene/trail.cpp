@@ -49,7 +49,7 @@ void Trail::draw()
 		auto perp = glm::normalize(p1 - p2);
 		perp = { -perp.y, perp.x };
 
-		float thickness = (getSize().x + getSize().y) / 4.0f;
+		float thickness = (getSize().x + getSize().y) / 4.0f; // TODO: bad size effect when parent node was scaled
 
 		perp *= thickness;
 		
