@@ -96,8 +96,7 @@ namespace Graphics
 	private:
 		glm::vec3 project(const glm::vec3& pos, const glm::mat4& model);
 		void pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size);
-		std::vector<uint32_t> triangulate(Renderer::Topology topology, const std::vector<uint32_t>& indices);
-
+		
 	public:
 		void applyState();
 		void push(const State& value);

@@ -145,13 +145,6 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 {
 	assert(mWorking);
 	
-	if (topology == Renderer::Topology::TriangleStrip)
-	{
-		auto new_indices = triangulate(topology, indices);
-		draw(Renderer::Topology::TriangleList, vertices, new_indices, model);
-		return;
-	}
-
 	applyState();
 
 	if (mBatching)
@@ -210,13 +203,6 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	const std::vector<uint32_t>& indices, const glm::mat4& model)
 {
 	assert(mWorking);
-
-	if (topology == Renderer::Topology::TriangleStrip)
-	{
-		auto new_indices = triangulate(topology, indices);
-		draw(Renderer::Topology::TriangleList, texture, vertices, new_indices, model);
-		return;
-	}
 
 	applyState();
 	
@@ -386,13 +372,6 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 {
 	assert(mWorking);
 
-	if (topology == Renderer::Topology::TriangleStrip)
-	{
-		auto new_indices = triangulate(topology, indices);
-		drawSdf(Renderer::Topology::TriangleList, texture, vertices, new_indices, minValue, maxValue, smoothFactor, model, color);
-		return;
-	}
-
 	applyState();
 	
 	if (mBatching)
@@ -522,29 +501,6 @@ void System::pushBatchIndices(const std::vector<uint32_t>& indices, size_t verti
 		dst_index = static_cast<uint32_t>(mBatch.verticesCount - vertices_size) + src_index;
 		start_index += 1;
 	}
-}
-
-std::vector<uint32_t> System::triangulate(Renderer::Topology topology, const std::vector<uint32_t>& indices)
-{
-	assert(topology == Renderer::Topology::TriangleStrip);
-
-	std::vector<uint32_t> result;
-
-	for (int i = 0; i < indices.size() - 2; i++)
-	{
-		if (i % 2) {
-			result.push_back(indices.at(i + 1));
-			result.push_back(indices.at(i));
-			result.push_back(indices.at(i + 2));
-		}
-		else {
-			result.push_back(indices.at(i));
-			result.push_back(indices.at(i + 1));
-			result.push_back(indices.at(i + 2));
-		}
-	}
-
-	return result;
 }
 
 void System::push(const State& value)
