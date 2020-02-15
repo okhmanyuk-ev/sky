@@ -14,7 +14,7 @@ bool SystemGL::IsRenderTargetBound()
 
 bool SystemGL::mRenderTargetBound = false;
 
-std::map<Topology, GLenum> SystemGL::Topology = {
+const std::unordered_map<Topology, GLenum> SystemGL::Topology = {
 	{ Topology::PointList, GL_POINTS },
 	{ Topology::LineList, GL_LINES },
 	{ Topology::LineStrip, GL_LINE_STRIP },
@@ -22,7 +22,7 @@ std::map<Topology, GLenum> SystemGL::Topology = {
 	{ Topology::TriangleStrip, GL_TRIANGLE_STRIP }
 };
 
-std::map<Vertex::Attribute::Format, GLint> SystemGL::Size = {
+const std::unordered_map<Vertex::Attribute::Format, GLint> SystemGL::Size = {
 	{ Vertex::Attribute::Format::R32F, 1 },
 	{ Vertex::Attribute::Format::R32G32F, 2 },
 	{ Vertex::Attribute::Format::R32G32B32F, 3 },
@@ -33,7 +33,7 @@ std::map<Vertex::Attribute::Format, GLint> SystemGL::Size = {
 	{ Vertex::Attribute::Format::R8G8B8A8UN, 4 }
 };
 
-std::map<Vertex::Attribute::Format, GLenum> SystemGL::Type = {
+const std::unordered_map<Vertex::Attribute::Format, GLenum> SystemGL::Type = {
 	{ Vertex::Attribute::Format::R32F, GL_FLOAT },
 	{ Vertex::Attribute::Format::R32G32F, GL_FLOAT },
 	{ Vertex::Attribute::Format::R32G32B32F, GL_FLOAT },
@@ -44,7 +44,7 @@ std::map<Vertex::Attribute::Format, GLenum> SystemGL::Type = {
 	{ Vertex::Attribute::Format::R8G8B8A8UN, GL_UNSIGNED_BYTE }
 };
 
-std::map<Vertex::Attribute::Format, GLboolean> SystemGL::Normalize = {
+const std::unordered_map<Vertex::Attribute::Format, GLboolean> SystemGL::Normalize = {
 	{ Vertex::Attribute::Format::R32F, GL_FALSE },
 	{ Vertex::Attribute::Format::R32G32F, GL_FALSE },
 	{ Vertex::Attribute::Format::R32G32B32F, GL_FALSE },
@@ -57,7 +57,7 @@ std::map<Vertex::Attribute::Format, GLboolean> SystemGL::Normalize = {
 
 namespace
 {
-	std::map<ComparisonFunc, GLenum> ComparisonFuncMap = {
+	const std::unordered_map<ComparisonFunc, GLenum> ComparisonFuncMap = {
 		{ ComparisonFunc::Always, GL_ALWAYS },
 		{ ComparisonFunc::Never, GL_NEVER },
 		{ ComparisonFunc::Less, GL_LESS },
@@ -68,7 +68,7 @@ namespace
 		{ ComparisonFunc::GreaterEqual, GL_GEQUAL }
 	};
 
-	std::map<CullMode, GLenum> CullMap = {
+	const std::unordered_map<CullMode, GLenum> CullMap = {
 		{ CullMode::None, GL_NONE },
 		{ CullMode::Front, GL_FRONT },
 		{ CullMode::Back, GL_BACK }
@@ -319,7 +319,7 @@ SystemGL::~SystemGL()
 
 void SystemGL::setTopology(const Renderer::Topology& value) 
 {
-	mGLTopology = SystemGL::Topology[value];
+	mGLTopology = SystemGL::Topology.at(value);
 }
 
 void SystemGL::setViewport(const Viewport& value) 
@@ -404,7 +404,7 @@ void SystemGL::setCullMode(const CullMode& value)
 
 void SystemGL::setBlendMode(const BlendMode& value)
 {
-	const std::map<Blend, GLenum> BlendMap = {
+	const static std::unordered_map<Blend, GLenum> BlendMap = {
 		{ Blend::One, GL_ONE },
 		{ Blend::Zero, GL_ZERO },
 		{ Blend::SrcColor, GL_SRC_COLOR },
@@ -417,7 +417,7 @@ void SystemGL::setBlendMode(const BlendMode& value)
 		{ Blend::InvDstAlpha, GL_ONE_MINUS_DST_ALPHA }
 	};
 
-	const std::map<BlendFunction, GLenum> BlendOpMap = {
+	const static std::unordered_map<BlendFunction, GLenum> BlendOpMap = {
 		{ BlendFunction::Add, GL_FUNC_ADD },
 		{ BlendFunction::Subtract, GL_FUNC_SUBTRACT },
 		{ BlendFunction::ReverseSubtract, GL_FUNC_REVERSE_SUBTRACT },
@@ -605,7 +605,7 @@ void SystemGL::setGLStencilMode(const StencilMode& value)
 		return;
 	}
 
-	const std::map<StencilOp, GLenum> StencilOpMap = {
+	const static std::unordered_map<StencilOp, GLenum> StencilOpMap = {
 		{ StencilOp::Keep, GL_KEEP },
 		{ StencilOp::Zero, GL_ZERO },
 		{ StencilOp::Replace, GL_REPLACE },

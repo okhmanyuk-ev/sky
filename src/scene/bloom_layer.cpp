@@ -57,14 +57,14 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 		mBlurShader->setResolution({ mTargetWidth, mTargetHeight });
 
-		const std::vector<Renderer::Vertex::Position> Vertices = {
+		static const std::vector<Renderer::Vertex::Position> Vertices = {
 			{ { -1.0f, -1.0f, 0.0f } },
 			{ { -1.0f,  1.0f, 0.0f } },
 			{ {  1.0f,  1.0f, 0.0f } },
 			{ {  1.0f, -1.0f, 0.0f } }
 		};
 
-		const std::vector<uint16_t> Indices = { 0, 1, 2, 0, 2, 3 };
+		static const std::vector<uint16_t> Indices = { 0, 1, 2, 0, 2, 3 };
 
 		RENDERER->setCullMode(Renderer::CullMode::None);
 		RENDERER->setDepthMode(Renderer::DepthMode());

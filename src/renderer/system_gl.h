@@ -71,10 +71,10 @@ namespace Renderer
 #endif
 
 	public:
-		static std::map<Topology, GLenum> Topology;
-		static std::map<Vertex::Attribute::Format, GLint> Size;
-		static std::map<Vertex::Attribute::Format, GLenum> Type;
-		static std::map<Vertex::Attribute::Format, GLboolean> Normalize;
+		static const std::unordered_map<Topology, GLenum> Topology;
+		static const std::unordered_map<Vertex::Attribute::Format, GLint> Size;
+		static const std::unordered_map<Vertex::Attribute::Format, GLenum> Type;
+		static const std::unordered_map<Vertex::Attribute::Format, GLboolean> Normalize;
 
 
 

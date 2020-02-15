@@ -68,8 +68,8 @@ namespace Renderer
 		Common::EventSystem::Listener<Platform::System::ResizeEvent> mResizeListener;
 
 	public:
-		static std::map<Vertex::Attribute::Format, DXGI_FORMAT> Format;
-		static std::map<Vertex::Attribute::Type, std::string> Semantic;
+		const static std::unordered_map<Vertex::Attribute::Format, DXGI_FORMAT> Format;
+		const static std::unordered_map<Vertex::Attribute::Type, std::string> Semantic;
 
 	private:
 		void prepareForDrawing();

@@ -89,7 +89,7 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 
 	for (auto& attrib : layout.attributes)
 	{
-		input.push_back({ SystemD3D11::Semantic[attrib.type].c_str(), 0, SystemD3D11::Format[attrib.format], 0,
+		input.push_back({ SystemD3D11::Semantic.at(attrib.type).c_str(), 0, SystemD3D11::Format.at(attrib.format), 0,
 			static_cast<UINT>(attrib.offset), D3D11_INPUT_PER_VERTEX_DATA, 0 });
 	}
 

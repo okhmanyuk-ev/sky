@@ -8,7 +8,7 @@ using namespace Renderer;
 ID3D11Device* SystemD3D11::Device = nullptr;
 ID3D11DeviceContext* SystemD3D11::Context = nullptr;
 
-std::map<Vertex::Attribute::Format, DXGI_FORMAT> SystemD3D11::Format = {
+const std::unordered_map<Vertex::Attribute::Format, DXGI_FORMAT> SystemD3D11::Format = {
 	{ Vertex::Attribute::Format::R32F, DXGI_FORMAT_R32_FLOAT },
 	{ Vertex::Attribute::Format::R32G32F, DXGI_FORMAT_R32G32_FLOAT },
 	{ Vertex::Attribute::Format::R32G32B32F, DXGI_FORMAT_R32G32B32_FLOAT },
@@ -19,7 +19,7 @@ std::map<Vertex::Attribute::Format, DXGI_FORMAT> SystemD3D11::Format = {
 	{ Vertex::Attribute::Format::R8G8B8A8UN, DXGI_FORMAT_R8G8B8A8_UNORM }
 };
 
-std::map<Vertex::Attribute::Type, std::string> SystemD3D11::Semantic = {
+const std::unordered_map<Vertex::Attribute::Type, std::string> SystemD3D11::Semantic = {
 	{ Vertex::Attribute::Type::Position, "POSITION" },
 	{ Vertex::Attribute::Type::Color, "COLOR" },
 	{ Vertex::Attribute::Type::TexCoord, "TEXCOORD" },
@@ -109,7 +109,7 @@ void SystemD3D11::destroyRenderTarget()
 
 void SystemD3D11::setTopology(const Renderer::Topology& value) 
 {
-	const std::map<Topology, D3D11_PRIMITIVE_TOPOLOGY> TopologyMap = {
+	const static std::unordered_map<Topology, D3D11_PRIMITIVE_TOPOLOGY> TopologyMap = {
 		{ Topology::PointList, D3D11_PRIMITIVE_TOPOLOGY_POINTLIST },
 		{ Topology::LineList, D3D11_PRIMITIVE_TOPOLOGY_LINELIST },
 		{ Topology::LineStrip, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP },
@@ -277,7 +277,7 @@ void SystemD3D11::setBlendMode(const BlendMode& value)
 {
 	if (mD3D11BlendModes.count(value) == 0)
 	{		
-		const std::map<Blend, D3D11_BLEND> BlendMap = {
+		const static std::unordered_map<Blend, D3D11_BLEND> BlendMap = {
 			{ Blend::One, D3D11_BLEND_ONE },
 			{ Blend::Zero, D3D11_BLEND_ZERO },
 			{ Blend::SrcColor, D3D11_BLEND_SRC_COLOR },
@@ -290,7 +290,7 @@ void SystemD3D11::setBlendMode(const BlendMode& value)
 			{ Blend::InvDstAlpha, D3D11_BLEND_INV_DEST_ALPHA }
 		};
 
-		const std::map<BlendFunction, D3D11_BLEND_OP> BlendOpMap = {
+		const static std::unordered_map<BlendFunction, D3D11_BLEND_OP> BlendOpMap = {
 			{ BlendFunction::Add, D3D11_BLEND_OP_ADD },
 			{ BlendFunction::Subtract, D3D11_BLEND_OP_SUBTRACT },
 			{ BlendFunction::ReverseSubtract, D3D11_BLEND_OP_REV_SUBTRACT },
@@ -387,7 +387,7 @@ void SystemD3D11::setD3D11RasterizerState(const RasterizerState& value)
 {
 	if (mD3D11RasterizerStates.count(value) == 0)
 	{
-		const std::map<CullMode, D3D11_CULL_MODE> CullMap = {
+		const static std::unordered_map<CullMode, D3D11_CULL_MODE> CullMap = {
 			{ CullMode::None, D3D11_CULL_NONE },
 			{ CullMode::Front, D3D11_CULL_FRONT },
 			{ CullMode::Back, D3D11_CULL_BACK }
@@ -408,7 +408,7 @@ void SystemD3D11::setD3D11DepthStencilState(const DepthStencilState& value)
 {
 	if (mD3D11DepthStencilStates.count(value) == 0)
 	{
-		const std::map<ComparisonFunc, D3D11_COMPARISON_FUNC> ComparisonFuncMap = {
+		const static std::unordered_map<ComparisonFunc, D3D11_COMPARISON_FUNC> ComparisonFuncMap = {
 			{ ComparisonFunc::Always, D3D11_COMPARISON_ALWAYS },
 			{ ComparisonFunc::Never, D3D11_COMPARISON_NEVER },
 			{ ComparisonFunc::Less, D3D11_COMPARISON_LESS },
@@ -419,7 +419,7 @@ void SystemD3D11::setD3D11DepthStencilState(const DepthStencilState& value)
 			{ ComparisonFunc::GreaterEqual, D3D11_COMPARISON_GREATER_EQUAL }
 		};
 
-		const std::map<StencilOp, D3D11_STENCIL_OP> StencilOpMap = {
+		const static std::unordered_map<StencilOp, D3D11_STENCIL_OP> StencilOpMap = {
 			{ StencilOp::Keep, D3D11_STENCIL_OP_KEEP },
 			{ StencilOp::Zero, D3D11_STENCIL_OP_ZERO },
 			{ StencilOp::Replace, D3D11_STENCIL_OP_REPLACE },

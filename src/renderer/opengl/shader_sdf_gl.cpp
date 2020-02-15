@@ -193,8 +193,8 @@ void ShaderSDF::apply()
 		if (mImpl->attribLocations.count(attrib.type) == 0)
 			continue;
 
-		glVertexAttribPointer(mImpl->attribLocations[attrib.type], SystemGL::Size[attrib.format],
-			SystemGL::Type[attrib.format], SystemGL::Normalize[attrib.format], (GLsizei)mImpl->layout.stride,
+		glVertexAttribPointer(mImpl->attribLocations.at(attrib.type), SystemGL::Size.at(attrib.format),
+			SystemGL::Type.at(attrib.format), SystemGL::Normalize.at(attrib.format), (GLsizei)mImpl->layout.stride,
 			(void*)attrib.offset);
 	}
 

@@ -158,7 +158,7 @@ void System::destroySocket(Socket* socket)
 #if defined(PLATFORM_WINDOWS)
 	closesocket(socket->mSocket);
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	close(socket.mSocket);
+	close(socket->mSocket);
 #endif
 	mSockets.remove(socket);
 	delete socket;
