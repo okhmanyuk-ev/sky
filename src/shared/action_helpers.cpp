@@ -95,9 +95,23 @@ ActionHelpers::Action ActionHelpers::Log(const std::string& text)
 
 // interploate
 
-ActionHelpers::Action ActionHelpers::Interpolate(float startValue, float destValue, float duration, EasingFunction easingFunction, std::function<void(float)> callback)
+ActionHelpers::Action ActionHelpers::Interpolate(float start, float dest, float duration, EasingFunction easingFunction, std::function<void(float)> callback)
 {
-	return std::make_unique<Common::Actions::Interpolate>(startValue, destValue, Clock::FromSeconds(duration), easingFunction, callback);
+	return std::make_unique<Common::Actions::Interpolate>(start, dest, Clock::FromSeconds(duration), easingFunction, callback);
+}
+
+ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback)
+{
+	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
+		callback(glm::lerp(start, dest, value));
+	});
+}
+
+ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback)
+{
+	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
+		callback(glm::lerp(start, dest, value));
+	});
 }
 
 ActionHelpers::Action ActionHelpers::Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction)
@@ -114,12 +128,26 @@ ActionHelpers::Action ActionHelpers::Interpolate(float destValue, float duration
 	});
 }
 
+ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec3& startValue, const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction)
+{
+	return Interpolate(startValue, destValue, duration, easingFunction, [&value](const glm::vec3& _value) {
+		value = _value;
+	});
+}
+
+ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction)
+{
+	return Insert([destValue, duration, &value, easingFunction] {
+		return Interpolate(value, destValue, duration, value, easingFunction);
+	});
+}
+
 // color
 
 ActionHelpers::Action ActionHelpers::ChangeColor(SceneColor node, const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setColor(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](const glm::vec3& value) {
+		node->setColor(value);
 	});
 }
 
@@ -187,8 +215,8 @@ ActionHelpers::Action ActionHelpers::Kill(std::shared_ptr<Scene::Node> node)
 
 ActionHelpers::Action ActionHelpers::ChangeRotation(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setRotation(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setRotation(value);
 	});
 }
 
@@ -201,8 +229,8 @@ ActionHelpers::Action ActionHelpers::ChangeRotation(SceneTransform node, float d
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setHorizontalAnchor(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setHorizontalAnchor(value);
 	});
 }
 
@@ -215,8 +243,8 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalAnchor(SceneTransform node,
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setVerticalAnchor(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setVerticalAnchor(value);
 	});
 }
 
@@ -244,8 +272,8 @@ ActionHelpers::Action ActionHelpers::ChangeAnchor(SceneTransform node, const glm
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setHorizontalPivot(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setHorizontalPivot(value);
 	});
 }
 
@@ -258,8 +286,8 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalPivot(SceneTransform node, 
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setVerticalPivot(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setVerticalPivot(value);
 	});
 }
 
@@ -287,8 +315,8 @@ ActionHelpers::Action ActionHelpers::ChangePivot(SceneTransform node, const glm:
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalPosition(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setHorizontalPosition(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setHorizontalPosition(value);
 	});
 }
 
@@ -301,8 +329,8 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalPosition(SceneTransform nod
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalPosition(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setVerticalPosition(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setVerticalPosition(value);
 	});
 }
 
@@ -330,8 +358,8 @@ ActionHelpers::Action ActionHelpers::ChangePosition(SceneTransform node, const g
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalSize(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setHorizontalSize(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setHorizontalSize(value);
 	});
 }
 
@@ -344,8 +372,8 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalSize(SceneTransform node, f
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalSize(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setVerticalSize(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node, start, dest](float value) {
+		node->setVerticalSize(value);
 	});
 }
 
@@ -373,8 +401,8 @@ ActionHelpers::Action ActionHelpers::ChangeSize(SceneTransform node, const glm::
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalStretch(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setHorizontalStretch(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setHorizontalStretch(value);
 	});
 }
 
@@ -387,8 +415,8 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalStretch(SceneTransform node
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalStretch(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setVerticalStretch(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setVerticalStretch(value);
 	});
 }
 
@@ -416,8 +444,8 @@ ActionHelpers::Action ActionHelpers::ChangeStretch(SceneTransform node, const gl
 
 ActionHelpers::Action ActionHelpers::ChangeHorizontalScale(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setHorizontalScale(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setHorizontalScale(value);
 	});
 }
 
@@ -430,8 +458,8 @@ ActionHelpers::Action ActionHelpers::ChangeHorizontalScale(SceneTransform node, 
 
 ActionHelpers::Action ActionHelpers::ChangeVerticalScale(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [node, start, dest](float value) {
-		node->setVerticalScale(glm::lerp(start, dest, value));
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setVerticalScale(value);
 	});
 }
 
