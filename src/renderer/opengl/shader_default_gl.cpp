@@ -161,7 +161,7 @@ ShaderDefault::ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>&
 
 	glGenBuffers(1, &mImpl->ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, mImpl->ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), nullptr, GL_STATIC_DRAW);
 
 	mImpl->uniformBlock = glGetUniformBlockIndex(mImpl->program, "ConstantBuffer");
 	glUniformBlockBinding(mImpl->program, mImpl->uniformBlock, 0);
@@ -229,7 +229,7 @@ void ShaderDefault::update()
 		return;
 
 	mNeedUpdate = false;
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), &mConstantBufferData, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), &mConstantBufferData, GL_STATIC_DRAW);
 	glUniform1i(mImpl->uniformTexture, 0);
 }
 #endif

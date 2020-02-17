@@ -342,7 +342,11 @@ void SystemGL::setScissor(std::nullptr_t value)
 
 void SystemGL::setVertexBuffer(const Buffer& value) 
 {
-	glBufferData(GL_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
+	auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	memcpy(ptr, value.data, value.size);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 void SystemGL::setIndexBuffer(const Buffer& value) 
