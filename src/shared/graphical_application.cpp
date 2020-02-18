@@ -10,6 +10,7 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	ENGINE->addSystem<Common::EventSystem>(std::make_shared<Common::EventSystem>());
 	ENGINE->addSystem<Common::TaskSystem>(std::make_shared<Common::TaskSystem>());
 	ENGINE->addSystem<Common::FrameSystem>(std::make_shared<Common::FrameSystem>());
+	ENGINE->addSystem<Common::ProfilerSystem>(std::make_shared<Common::ProfilerSystem>());
 	ENGINE->addSystem<Platform::System>(Platform::System::create(appname));
 	ENGINE->addSystem<Renderer::System>(std::make_shared<RendererDebug<Renderer::SystemCrossplatform>>());
 	ENGINE->addSystem<Console::Device>(std::make_shared<Shared::ConsoleDevice>());
@@ -52,6 +53,7 @@ GraphicalApplication::~GraphicalApplication()
 	ENGINE->removeSystem<Console::Device>();
 	ENGINE->removeSystem<Renderer::System>();
 	ENGINE->removeSystem<Platform::System>();
+	ENGINE->removeSystem<Common::ProfilerSystem>();
 	ENGINE->removeSystem<Common::FrameSystem>();
 	ENGINE->removeSystem<Common::TaskSystem>();
 //	ENGINE->removeSystem<Common::EventSystem>(); // should be removed later

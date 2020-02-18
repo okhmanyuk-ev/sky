@@ -20,8 +20,8 @@ namespace Shared
 		void frame() override;
 
 	private:
-		bool mWantShowCVars = false;
-		bool mWantImguiDemo = false;
-		
+		bool mShowCVars = false;
+		bool mShowProfiler = false;
+		bool mShowImguiDemo = false;
 	};
 }

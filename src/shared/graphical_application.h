@@ -22,6 +22,7 @@
 #include <Renderer/system_gl.h>
 #include <Shared/touch_emulator.h>
 #include <Shared/gesture_detector.h>
+#include <Common/profiler_system.h>
 
 namespace Shared
 {
