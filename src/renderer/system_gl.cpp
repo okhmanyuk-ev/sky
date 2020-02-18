@@ -393,17 +393,54 @@ void SystemGL::setSampler(const Sampler& value)
 
 void SystemGL::setDepthMode(const DepthMode& value)
 {
-	mDepthMode = value;
+	if (value.enabled)
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(ComparisonFuncMap.at(value.func));
+	}
+	else
+	{
+		glDisable(GL_DEPTH_TEST);
+	}
 }
 
 void SystemGL::setStencilMode(const StencilMode& value)
 {
-	mStencilMode = value;
+	if (!value.enabled)
+	{
+		glDisable(GL_STENCIL_TEST);
+		return;
+	}
+
+	const static std::unordered_map<StencilOp, GLenum> StencilOpMap = {
+		{ StencilOp::Keep, GL_KEEP },
+		{ StencilOp::Zero, GL_ZERO },
+		{ StencilOp::Replace, GL_REPLACE },
+		{ StencilOp::IncrementSaturation, GL_INCR },
+		{ StencilOp::DecrementSaturation, GL_DECR },
+		{ StencilOp::Invert, GL_INVERT },
+		{ StencilOp::Increment, GL_INCR_WRAP },
+		{ StencilOp::Decrement, GL_DECR_WRAP },
+	};
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(value.writeMask);
+	glStencilOp(StencilOpMap.at(value.failOp), StencilOpMap.at(value.depthFailOp), StencilOpMap.at(value.passOp));
+	glStencilFunc(ComparisonFuncMap.at(value.func), 1, value.readMask);
 }
 
 void SystemGL::setCullMode(const CullMode& value)
 {
-	mCullMode = value;
+	if (value != CullMode::None)
+	{
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CW);
+		glCullFace(CullMap.at(value));
+	}
+	else
+	{
+		glDisable(GL_CULL_FACE);
+	}
 }
 
 void SystemGL::setBlendMode(const BlendMode& value)
@@ -545,85 +582,6 @@ void SystemGL::prepareForDrawing()
 	}
 
 	shader->update();
-
-	// depth mode
-
-	if (!mDepthModeApplied || mAppliedDepthMode != mDepthMode)
-	{
-		setGLDepthMode(mDepthMode);
-		mAppliedDepthMode = mDepthMode;
-		mDepthModeApplied = true;
-	}
-
-	// cull mode
-
-	if (!mCullModeApplied || mAppliedCullMode != mCullMode)
-	{
-		setGLCullMode(mCullMode);
-		mAppliedCullMode = mCullMode;
-		mCullModeApplied = true;
-	}
-
-	// stencil
-
-	if (!mStencilModeApplied || mAppliedStencilMode != mStencilMode)
-	{
-		setGLStencilMode(mStencilMode);
-		mAppliedStencilMode = mStencilMode;
-		mStencilModeApplied = true;
-	}
-}
-
-void SystemGL::setGLDepthMode(const DepthMode& value)
-{
-	if (value.enabled)
-	{
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(ComparisonFuncMap.at(value.func));
-	}
-	else
-	{
-		glDisable(GL_DEPTH_TEST);
-	}
-}
-
-void SystemGL::setGLCullMode(CullMode cullMode)
-{
-	if (cullMode != CullMode::None)
-	{
-		glEnable(GL_CULL_FACE);
-		glFrontFace(GL_CW);
-		glCullFace(CullMap.at(cullMode));
-	}
-	else
-	{
-		glDisable(GL_CULL_FACE);
-	}
-}
-
-void SystemGL::setGLStencilMode(const StencilMode& value)
-{
-	if (!value.enabled) 
-	{
-		glDisable(GL_STENCIL_TEST);
-		return;
-	}
-
-	const static std::unordered_map<StencilOp, GLenum> StencilOpMap = {
-		{ StencilOp::Keep, GL_KEEP },
-		{ StencilOp::Zero, GL_ZERO },
-		{ StencilOp::Replace, GL_REPLACE },
-		{ StencilOp::IncrementSaturation, GL_INCR },
-		{ StencilOp::DecrementSaturation, GL_DECR },
-		{ StencilOp::Invert, GL_INVERT },
-		{ StencilOp::Increment, GL_INCR_WRAP },
-		{ StencilOp::Decrement, GL_DECR_WRAP },
-	};
-
-	glEnable(GL_STENCIL_TEST);
-	glStencilMask(value.writeMask);
-	glStencilOp(StencilOpMap.at(value.failOp), StencilOpMap.at(value.depthFailOp), StencilOpMap.at(value.passOp));
-	glStencilFunc(ComparisonFuncMap.at(value.func), 1, value.readMask);
 }
 
 void SystemGL::updateGLSampler()

@@ -111,25 +111,9 @@ namespace Renderer
 		std::shared_ptr<Shader> mAppliedShader = nullptr;
 		std::shared_ptr<Shader> mStateShader = nullptr;
 		
-		DepthMode mAppliedDepthMode = DepthMode();
-		DepthMode mDepthMode = DepthMode();
-		bool mDepthModeApplied = false;
-
-		CullMode mAppliedCullMode = CullMode::None;
-		CullMode mCullMode = CullMode::None;
-		bool mCullModeApplied = false;
-		
-		StencilMode mAppliedStencilMode = StencilMode();
-		StencilMode mStencilMode = StencilMode();
-		bool mStencilModeApplied = false;
-
 		bool mTextureBound = false;
 		Sampler mSampler = Sampler::Nearest;
 		
-		
-		void setGLDepthMode(const DepthMode& value);
-		void setGLCullMode(CullMode cullMode);
-		void setGLStencilMode(const StencilMode& value);
 		void updateGLSampler();
 	};
 
