@@ -20,7 +20,7 @@ namespace Shared
 	{
 		static_assert(std::is_base_of<Renderer::System, T>::value, "T must be derived from Renderer::System");
 	public:
-		void setTopology(const Renderer::Topology& value) override
+		/*void setTopology(const Renderer::Topology& value) override
 		{
 			PROFILER->begin("Renderer::SetTopology");
 			T::setTopology(value);
@@ -123,13 +123,13 @@ namespace Shared
 			PROFILER->begin("Renderer::Clear");
 			T::clear(color);
 			PROFILER->end();
-		}
+		}*/
 
 		void draw(size_t vertexCount, size_t vertexOffset = 0) override
 		{
-			PROFILER->begin("Renderer::Draw");
+		//	PROFILER->begin("Renderer::Draw");
 			T::draw(vertexCount, vertexOffset);
-			PROFILER->end();
+		//	PROFILER->end();
 
 			auto drawcall = RendererDebugDrawCallEvent();
 			drawcall.indexed = false;
@@ -141,9 +141,9 @@ namespace Shared
 
 		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0) override
 		{
-			PROFILER->begin("Renderer::DrawIndexed");
+		//	PROFILER->begin("Renderer::DrawIndexed");
 			T::drawIndexed(indexCount, indexOffset, vertexOffset);
-			PROFILER->end();
+		//	PROFILER->end();
 
 			auto drawcall = RendererDebugDrawCallEvent();
 			drawcall.indexed = true;
@@ -154,11 +154,11 @@ namespace Shared
 			EVENT->emit(drawcall);
 		}
 
-		void present() override
+		/*void present() override
 		{
 			PROFILER->begin("Renderer::Present");
 			T::present();
 			PROFILER->end();
-		}
+		}*/
 	};
 }
