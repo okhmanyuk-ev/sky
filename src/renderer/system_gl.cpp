@@ -304,14 +304,15 @@ SystemGL::SystemGL()
 	setVsync(false);
 
 	glGenBuffers(1, &mGLVertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
-
+	glGenBuffers(1, &mGLIndexBuffer);
+	
 	setBlendMode(BlendStates::NonPremultiplied);
 }
 
 SystemGL::~SystemGL()
 {
 	glDeleteBuffers(1, &mGLVertexBuffer);
+	glDeleteBuffers(1, &mGLIndexBuffer);
 #if defined(RENDERER_GL44)
 	wglDeleteContext(mWglContext);
 #endif
@@ -324,15 +325,15 @@ void SystemGL::setTopology(const Renderer::Topology& value)
 
 void SystemGL::setViewport(const Viewport& value) 
 {
-	//assert(value.size.x > 0.0f && value.size.y > 0.0f);
-	mViewportState = value;
+	mViewport = value;
+	mViewportDirty = true;
 }
 
 void SystemGL::setScissor(const Scissor& value) 
 {
-	//assert(value.size.x > 0.0f && value.size.y > 0.0f);
 	glEnable(GL_SCISSOR_TEST);
-	mScissorState = value;
+	mScissor = value;
+	mScissorDirty = true;
 }
 
 void SystemGL::setScissor(std::nullptr_t value)
@@ -351,7 +352,13 @@ void SystemGL::setVertexBuffer(const Buffer& value)
 
 void SystemGL::setIndexBuffer(const Buffer& value) 
 {
-	mIndexBuffer = value;
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
+	auto ptr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+	memcpy(ptr, value.data, value.size);
+	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+
+	mGLIndexType = value.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 }
 
 void SystemGL::setTexture(std::shared_ptr<Texture> value)
@@ -382,7 +389,8 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 
 void SystemGL::setShader(std::shared_ptr<Shader> value)
 {
-	mStateShader = value;
+	value->apply();
+	mShader = value;
 }
 
 void SystemGL::setSampler(const Sampler& value) 
@@ -494,9 +502,8 @@ void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexO
 {
 	prepareForDrawing();
 #if defined(RENDERER_GL44) // TODO: fix
-	glDrawElementsBaseVertex(mGLTopology, (GLsizei)indexCount,
-		mIndexBuffer.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
-		(uint16_t*)mIndexBuffer.data + (int)indexOffset, (GLint)vertexOffset);
+	int indexSize = mGLIndexType == GL_UNSIGNED_INT ? 4 : 2;
+	glDrawElementsBaseVertex(mGLTopology, (GLsizei)indexCount, mGLIndexType, (void*)(indexOffset * indexSize), (GLint)vertexOffset);
 #elif defined(RENDERER_GLES3)
 	glDrawElements(mGLTopology, indexCount,
 		mIndexBuffer.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
@@ -543,10 +550,12 @@ void SystemGL::setVsync(bool value)
 
 void SystemGL::prepareForDrawing()
 {
-	if (mViewport != mViewportState)
-	{
-		mViewport = mViewportState;
+	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
 
+	if (mViewportDirty)
+	{
+		mViewportDirty = false;
 		glViewport(
 			(GLint)mViewport.position.x,
 			mRenderTargetBound ? (GLint)mViewport.position.y : (GLint)(PLATFORM->getHeight() - mViewport.position.y - mViewport.size.y),
@@ -560,9 +569,9 @@ void SystemGL::prepareForDrawing()
 #endif
 	}
 
-	if (mScissor != mScissorState)
+	if (mScissorDirty)
 	{
-		mScissor = mScissorState;
+		mScissorDirty = false;
 		glScissor(
 			(GLint)mScissor.position.x,
 			mRenderTargetBound ? (GLint)mScissor.position.y : (GLint)(PLATFORM->getHeight() - mScissor.position.y - mScissor.size.y),
@@ -572,16 +581,7 @@ void SystemGL::prepareForDrawing()
 
 	// shader
 
-	auto shader = mStateShader;
-	assert(shader != nullptr);
-
-	if (mAppliedShader != shader)
-	{
-		shader->apply();
-		mAppliedShader = shader;
-	}
-
-	shader->update();
+	mShader->update();
 }
 
 void SystemGL::updateGLSampler()

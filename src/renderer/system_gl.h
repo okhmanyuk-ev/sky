@@ -100,16 +100,19 @@ namespace Renderer
 	private:
 		GLenum mGLTopology;
 		GLuint mGLVertexBuffer;
-		
-		Buffer mIndexBuffer;
+		GLuint mGLIndexBuffer;
+		GLenum mGLIndexType;
+
+		//Buffer mIndexBuffer;
 		//Buffer mVertexBuffer;
 
 		Viewport mViewport;
-		Viewport mViewportState;
+		bool mViewportDirty = true;
+
 		Scissor mScissor;
-		Scissor mScissorState;
-		std::shared_ptr<Shader> mAppliedShader = nullptr;
-		std::shared_ptr<Shader> mStateShader = nullptr;
+		bool mScissorDirty = true;
+
+		std::shared_ptr<Shader> mShader = nullptr;
 		
 		bool mTextureBound = false;
 		Sampler mSampler = Sampler::Nearest;
