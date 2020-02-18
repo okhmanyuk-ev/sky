@@ -344,19 +344,21 @@ void SystemGL::setScissor(std::nullptr_t value)
 void SystemGL::setVertexBuffer(const Buffer& value) 
 {
 	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
-	auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	memcpy(ptr, value.data, value.size);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	//glBufferData(GL_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW); // TODO: no glMapBuffer in gles
+	//auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	//memcpy(ptr, value.data, value.size);
+	//glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBufferData(GL_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
 }
 
 void SystemGL::setIndexBuffer(const Buffer& value) 
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
-	auto ptr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-	memcpy(ptr, value.data, value.size);
-	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
+	//auto ptr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+	//memcpy(ptr, value.data, value.size);
+	//glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
 
 	mGLIndexType = value.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 }
@@ -501,15 +503,16 @@ void SystemGL::draw(size_t vertexCount, size_t vertexOffset)
 void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOffset)
 {
 	prepareForDrawing();
-#if defined(RENDERER_GL44) // TODO: fix
+#if defined(RENDERER_GL44) //| defined(RENDERER_GLES3)
 	int indexSize = mGLIndexType == GL_UNSIGNED_INT ? 4 : 2;
 	glDrawElementsBaseVertex(mGLTopology, (GLsizei)indexCount, mGLIndexType, (void*)(indexOffset * indexSize), (GLint)vertexOffset);
-#elif defined(RENDERER_GLES3) 
-	// TODO: https://www.khronos.org/registry/OpenGL-Refpages/es3/html/glDrawElementsBaseVertex.xhtml
+#elif defined(RENDERER_GLES3)
+    // TODO: https://www.khronos.org/registry/OpenGL-Refpages/es3/html/glDrawElementsBaseVertex.xhtml
 	// it says that opengles 3.2 has glDrawElementsBaseVertex function
-	glDrawElements(mGLTopology, indexCount,
-		mIndexBuffer.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
-		(uint16_t*)mIndexBuffer.data + indexOffset);
+    int indexSize = mGLIndexType == GL_UNSIGNED_INT ? 4 : 2;
+	glDrawElements(mGLTopology, indexCount, mGLIndexType,
+	    (void*)(indexOffset * indexSize));
+
 #endif
 }
 

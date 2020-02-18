@@ -20,6 +20,7 @@
         #include <EGL/eglext.h>
         #include <EGL/eglplatform.h>
         #include <GLES3/gl32.h>
+        #include <GLES3/gl3ext.h>
     #elif defined(PLATFORM_IOS)
         #include <OpenGLES/ES3/gl.h>
         #include <OpenGLES/ES3/glext.h>
