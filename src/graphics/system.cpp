@@ -147,7 +147,7 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	
 	applyState();
 
-	if (mBatching)
+	if (mBatching && vertices.size() <= 4)
 	{
 		if (mBatch.topology != topology || mBatch.texture != std::nullopt || mBatch.mode != BatchMode::Colored)
 			flush();
@@ -206,7 +206,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 
 	applyState();
 	
-	if (mBatching)
+	if (mBatching && vertices.size() <= 4)
 	{
 		if (mBatch.topology != topology || mBatch.texture != texture || mBatch.mode != BatchMode::Textured)
 			flush();
@@ -374,7 +374,7 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 
 	applyState();
 	
-	if (mBatching)
+	if (mBatching && vertices.size() <= 4)
 	{
 		if (mBatch.topology != topology ||
 			mBatch.texture != texture ||

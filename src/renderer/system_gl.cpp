@@ -343,24 +343,14 @@ void SystemGL::setScissor(std::nullptr_t value)
 
 void SystemGL::setVertexBuffer(const Buffer& value) 
 {
-	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
-	//glBufferData(GL_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW); // TODO: no glMapBuffer in gles
-	//auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	//memcpy(ptr, value.data, value.size);
-	//glUnmapBuffer(GL_ARRAY_BUFFER);
-    glBufferData(GL_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
+	mVertexBuffer = value;
+	mVertexBufferDirty = true;
 }
 
 void SystemGL::setIndexBuffer(const Buffer& value) 
 {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
-	//auto ptr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-	//memcpy(ptr, value.data, value.size);
-	//glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
-
-	mGLIndexType = value.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+	mIndexBuffer = value;
+	mIndexBufferDirty = true;
 }
 
 void SystemGL::setTexture(std::shared_ptr<Texture> value)
@@ -391,8 +381,8 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 
 void SystemGL::setShader(std::shared_ptr<Shader> value)
 {
-	value->apply();
 	mShader = value;
+	mShaderDirty = true;
 }
 
 void SystemGL::setSampler(const Sampler& value) 
@@ -586,7 +576,49 @@ void SystemGL::prepareForDrawing()
 
 	// shader
 
+	if (mShaderDirty)
+	{
+		mShader->apply();
+		mShaderDirty = false;
+	}
+
 	mShader->update();
+
+	// opengl crashes when index or vertex buffers are binded before VAO from shader classes 
+
+	if (mIndexBufferDirty) 
+	{
+		setGLIndexBuffer(mIndexBuffer);
+		mIndexBufferDirty = false;
+	}
+
+	if (mVertexBufferDirty)
+	{
+		setGLVertexBuffer(mVertexBuffer);
+		mVertexBufferDirty = false;
+	}
+}
+
+void SystemGL::setGLVertexBuffer(const Buffer& value)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
+	//glBufferData(GL_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW); // TODO: no glMapBuffer in gles
+	//auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	//memcpy(ptr, value.data, value.size);
+	//glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBufferData(GL_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
+}
+
+void SystemGL::setGLIndexBuffer(const Buffer& value)
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
+	//auto ptr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+	//memcpy(ptr, value.data, value.size);
+	//glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
+
+	mGLIndexType = value.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 }
 
 void SystemGL::updateGLSampler()

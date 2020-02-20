@@ -103,8 +103,11 @@ namespace Renderer
 		GLuint mGLIndexBuffer;
 		GLenum mGLIndexType;
 
-		//Buffer mIndexBuffer;
-		//Buffer mVertexBuffer;
+		Buffer mIndexBuffer;
+		bool mIndexBufferDirty = false;
+
+		Buffer mVertexBuffer;
+		bool mVertexBufferDirty = false;
 
 		Viewport mViewport;
 		bool mViewportDirty = true;
@@ -113,11 +116,15 @@ namespace Renderer
 		bool mScissorDirty = true;
 
 		std::shared_ptr<Shader> mShader = nullptr;
-		
+		bool mShaderDirty = false;
+
 		bool mTextureBound = false;
 		Sampler mSampler = Sampler::Nearest;
 		
 		void updateGLSampler();
+
+		void setGLVertexBuffer(const Buffer& value);
+		void setGLIndexBuffer(const Buffer& value);
 	};
 
 	using SystemCrossplatform = SystemGL;
