@@ -36,7 +36,7 @@ namespace Shared::SceneHelpers
 	class FastButton : public Scene::Clickable<Scene::Rectangle>
 	{
 	public:
-		FastButton(float fontSize);
+		FastButton();
 
 	public:
 		void setButtonActive(bool value);
