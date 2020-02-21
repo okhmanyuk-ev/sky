@@ -41,8 +41,7 @@ namespace Shared::SceneHelpers
 	public:
 		void setButtonActive(bool value);
 
-		void setLabelText(const utf8_string& value) { mLabel->setText(value); }
-		void setLabelFontSize(float value) { mLabel->setFontSize(value); }
+		auto getLabel() { return mLabel; }
 
 	private:
 		bool mButtonActive = true;
