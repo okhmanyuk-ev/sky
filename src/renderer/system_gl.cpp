@@ -493,17 +493,8 @@ void SystemGL::draw(size_t vertexCount, size_t vertexOffset)
 void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOffset)
 {
 	prepareForDrawing();
-#if defined(RENDERER_GL44) //| defined(RENDERER_GLES3)
 	int indexSize = mGLIndexType == GL_UNSIGNED_INT ? 4 : 2;
 	glDrawElementsBaseVertex(mGLTopology, (GLsizei)indexCount, mGLIndexType, (void*)(indexOffset * indexSize), (GLint)vertexOffset);
-#elif defined(RENDERER_GLES3)
-    // TODO: https://www.khronos.org/registry/OpenGL-Refpages/es3/html/glDrawElementsBaseVertex.xhtml
-	// it says that opengles 3.2 has glDrawElementsBaseVertex function
-    int indexSize = mGLIndexType == GL_UNSIGNED_INT ? 4 : 2;
-	glDrawElements(mGLTopology, indexCount, mGLIndexType,
-	    (void*)(indexOffset * indexSize));
-
-#endif
 }
 
 void SystemGL::present()
