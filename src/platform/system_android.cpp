@@ -4,6 +4,7 @@
 using namespace Platform;
 
 static jobject gSkyActivity = nullptr;
+static System::ProductsMap productsMap;
 
 extern "C"
 {
@@ -16,6 +17,16 @@ extern "C"
     {
         env->DeleteGlobalRef(gSkyActivity);
     }
+
+    void Java_com_skymunge_sky_SkyActivity_onConsume(JNIEnv *env, jobject thiz, jstring _id)
+	{
+        auto id = env->GetStringUTFChars(_id, 0);
+
+        if (productsMap.count(id) == 0)
+            return;
+
+        productsMap.at(id)();
+	}
 }
 
 namespace
@@ -693,8 +704,10 @@ JNIEnv* GetJNIEnv(){
     }
 }
 
-void SystemAndroid::initializeBilling(const std::vector<std::string>& products)
+void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallback>& products)
 {
+    productsMap = products;
+
     auto env = getEnv();
 
     auto list = env->FindClass("java/util/ArrayList");
@@ -702,7 +715,7 @@ void SystemAndroid::initializeBilling(const std::vector<std::string>& products)
     auto add = env->GetMethodID(list, "add", "(Ljava/lang/Object;)Z");
     auto list_obj = env->NewObject(list, init);
 
-    for (const auto& product : products)
+    for (const auto& [product, callback]: products)
     {
         auto element = env->NewStringUTF(product.c_str());
         env->CallBooleanMethod(list_obj, add, element);
@@ -716,7 +729,7 @@ void SystemAndroid::initializeBilling(const std::vector<std::string>& products)
 	env->DeleteLocalRef(list_obj);
 }
 
-void SystemAndroid::purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail)
+void SystemAndroid::purchase(const std::string& product)
 {
     auto env = getEnv();
     auto clazz = env->GetObjectClass(gSkyActivity);

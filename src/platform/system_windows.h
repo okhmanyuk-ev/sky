@@ -51,8 +51,8 @@ namespace Platform
 		void hideVirtualKeyboard() override { /*nothing*/ };
 		bool isVirtualKeyboardOpened() const override { return false; };
 
-		void initializeBilling(const std::vector<std::string>& products) override { /*nothing*/ };
-		void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail) override;
+		void initializeBilling(const ProductsMap& products) override;
+		void purchase(const std::string& product) override;
 
 	private:
 		bool mCursorHidden = false;
@@ -63,7 +63,8 @@ namespace Platform
 		bool mFinished = false;
 		std::set<Keyboard::Key> mKeyboardKeys;
 		std::set<Mouse::Button> mMouseButtons;
-		
+		ProductsMap mProducts;
+
 	public:
 		inline static HWND Window;
 		inline static HMODULE Instance;

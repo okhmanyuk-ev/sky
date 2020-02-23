@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include <functional>
+#include <map>
 
 #define PLATFORM ENGINE->getSystem<Platform::System>()
 
@@ -55,8 +56,13 @@ namespace Platform
 		virtual void hideVirtualKeyboard() = 0;
 		virtual bool isVirtualKeyboardOpened() const = 0;
 
-		virtual void initializeBilling(const std::vector<std::string>& products) = 0;
-		virtual void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail) = 0;
+	public:
+        using ConsumeCallback = std::function<void()>;
+        using ProductsMap = std::map<std::string /*id*/, ConsumeCallback>;
+
+	public:
+		virtual void initializeBilling(const ProductsMap& products) = 0;
+		virtual void purchase(const std::string& product) = 0;
 
 	public:
 		static std::shared_ptr<System> create(const std::string& appname);

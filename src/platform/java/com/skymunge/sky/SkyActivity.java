@@ -47,6 +47,8 @@ public class SkyActivity extends NativeActivity {
     private native void createSkyActivity();
     private native void destroySkyActivity();
 
+    private native void onConsume(String id);
+
     // ------------------
 
     private BillingClient mBillingClient;
@@ -126,25 +128,25 @@ public class SkyActivity extends NativeActivity {
 
     public void consume(List<Purchase> purchases) {
         for (Purchase purchase : purchases) {
-            consume(purchase.getPurchaseToken());
+            consume(purchase);
         }
     }
 
-    public void consume(String purchaseToken) {
+    public void consume(final Purchase purchase) {
         ConsumeParams consumeParams = ConsumeParams.newBuilder()
-                .setPurchaseToken(purchaseToken)
+                .setPurchaseToken(purchase.getPurchaseToken())
                 .build();
 
         ConsumeResponseListener consumeResponseListener = new ConsumeResponseListener() {
                 @Override
                 public void onConsumeResponse(BillingResult billingResult, String outToken) {
-                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                        // Handle the success of the consume operation.
-                        // For example, increase the number of coins inside the user's basket.
-                    }
+                    if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                        return;
+
+                    onConsume(purchase.getSku()); // TODO: this call may be unsafe, because consuming was in async state
                 }
             };
 
-        mBillingClient.consumeAsync(consumeParams,consumeResponseListener);
+        mBillingClient.consumeAsync(consumeParams, consumeResponseListener);
     }
 }

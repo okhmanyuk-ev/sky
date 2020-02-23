@@ -53,8 +53,8 @@ namespace Platform
 		void hideVirtualKeyboard() override { setKeyboardVisible(false); };
 		bool isVirtualKeyboardOpened() const override { return false; }; // TODO
 
-		void initializeBilling(const std::vector<std::string>& products) override;
-		void purchase(const std::string& product, std::function<void()> onSuccess, std::function<void()> onFail) override;
+		void initializeBilling(const ProductsMap& products) override;
+		void purchase(const std::string& product) override;
 
 	private:
 		JNIEnv* getEnv() const;
