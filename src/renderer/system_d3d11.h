@@ -183,8 +183,8 @@ namespace Renderer
 		Viewport mViewport;
 		Scissor mScissor;
 
-		std::shared_ptr<Shader> mAppliedShader = nullptr;
 		std::shared_ptr<Shader> mShader = nullptr;
+		bool mShaderDirty = false;
 
 		RasterizerState mAppliedRasterizerState;
 		RasterizerState mRasterizerState;

@@ -236,6 +236,7 @@ void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)
 void SystemD3D11::setShader(std::shared_ptr<Shader> value)
 {
 	mShader = value;
+	mShaderDirty = true;
 }
 
 void SystemD3D11::setSampler(const Sampler& value) 
@@ -357,10 +358,10 @@ void SystemD3D11::prepareForDrawing()
 
 	assert(mShader != nullptr);
 
-	if (mAppliedShader != mShader)
+	if (mShaderDirty)
 	{
 		mShader->apply();
-		mAppliedShader = mShader;
+		mShaderDirty = false;
 	}
 
 	mShader->update();
