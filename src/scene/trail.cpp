@@ -11,6 +11,11 @@ void Trail::update()
 {
 	Node::update();
 
+	auto now = FRAME->getUptime();
+
+	while (!mSegments.empty() && now - mSegments.front().time > Clock::FromSeconds(mLifetime))
+		mSegments.pop_front();
+
 	auto holder = mHolder.lock();
 	auto pos = holder->unproject(project(getSize() * 0.5f));
 
@@ -27,16 +32,9 @@ void Trail::draw()
 {
 	Node::draw();
 
-	auto holder = mHolder.lock();
-
-	auto now = FRAME->getUptime();
-
-	while (!mSegments.empty() && now - mSegments.front().time > Clock::FromSeconds(mLifetime))
-		mSegments.pop_front();
-
 	if (mSegments.size() < 2)
 		return;
-	
+
 	auto vertices = std::vector<Renderer::Vertex::PositionColor>();
 
 	for (int i = 0; i < mSegments.size(); i++)
@@ -68,6 +66,7 @@ void Trail::draw()
 		vertices.push_back({ { last ? v1 : v2, 0.0f }, color });
 	}
 
+	auto holder = mHolder.lock();
 	GRAPHICS->draw(Renderer::Topology::TriangleStrip, vertices, holder->getTransform());
 }
 
