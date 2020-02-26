@@ -2,11 +2,12 @@
 
 using namespace Graphics;
 
-TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end)
+Mesh Graphics::CreateTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end)
 {
-	TextMesh mesh;
+	Mesh mesh;
 
 	mesh.topology = Renderer::Topology::TriangleList;
+	mesh.texture = font.getTexture();
 
 	const auto texture = font.getTexture();
 
@@ -16,7 +17,8 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 	auto length = std::distance(begin, end);
 
 	mesh.vertices.resize(length * 4);
-	mesh.indices.resize(length * 6);
+	mesh.indices = std::vector<uint32_t>();
+	mesh.indices->resize(length * 6);
 
 	float pos_x = 0.0f;
 	float pos_y = 0.0f;
@@ -33,7 +35,7 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 		float glyph_y = static_cast<float>(glyph.y);
 
 		auto vtx = &mesh.vertices[i * 4];
-		auto idx = &mesh.indices[i * 6];
+		auto idx = &(*mesh.indices)[i * 6];
 
 		pos_x += glyph.xoff;
 		pos_y = font.getAscent() + glyph.yoff;
@@ -56,10 +58,10 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 		float u2 = (glyph_x + glyph_w) / tex_w;
 		float v2 = (glyph_y + glyph_h) / tex_h;
 
-		vtx[0] = { { x1, y1, 0.0f }, { u1, v1 } };
-		vtx[1] = { { x1, y2, 0.0f }, { u1, v2 } };
-		vtx[2] = { { x2, y2, 0.0f }, { u2, v2 } };
-		vtx[3] = { { x2, y1, 0.0f }, { u2, v1 } };
+		vtx[0] = { { x1, y1, 0.0f }, { Graphics::Color::White, 1.0f }, { u1, v1 } };
+		vtx[1] = { { x1, y2, 0.0f }, { Graphics::Color::White, 1.0f }, { u1, v2 } };
+		vtx[2] = { { x2, y2, 0.0f }, { Graphics::Color::White, 1.0f }, { u2, v2 } };
+		vtx[3] = { { x2, y1, 0.0f }, { Graphics::Color::White, 1.0f }, { u2, v1 } };
 
 		auto base_vtx = i * 4;
 
@@ -74,9 +76,9 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 	return mesh;
 }
 
-TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const utf8_string& text, float vertical_offset)
+Mesh Graphics::CreateSinglelineTextMesh(const Font& font, const utf8_string& text, float vertical_offset)
 {
-	auto mesh = createTextMesh(font, text.begin(), text.end());
+	auto mesh = CreateTextMesh(font, text.begin(), text.end());
 
 	for (auto& vertex : mesh.vertices)
 	{
@@ -86,29 +88,33 @@ TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const utf8_string&
 	return mesh;
 }
 
-std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, const utf8_string& text,
-	float maxWidth, float size, Align align)
+std::tuple<float, Mesh> Graphics::CreateMultilineTextMesh(const Font& font, const utf8_string& text,
+	float maxWidth, float size, TextAlign align)
 {
 	auto scale = font.getScaleFactorForSize(size);
 	float height = 0.0f;
 
 	float scaledMaxWidth = maxWidth / scale;
 
-	TextMesh result;
+	Mesh result;
+
+	result.topology = Renderer::Topology::TriangleList;
+	result.texture = font.getTexture();
+	result.indices = std::vector<uint32_t>();
 
 	auto appendTextMesh = [&font, scaledMaxWidth, &height, &result, align](utf8_string::iterator begin, utf8_string::iterator end) {
-		auto mesh = createTextMesh(font, begin, end);
-		for (auto index : mesh.indices)
+		auto mesh = CreateTextMesh(font, begin, end);
+		for (auto index : *mesh.indices)
 		{
 			index += result.vertices.size();
-			result.indices.push_back(index);
+			result.indices->push_back(index);
 		}
 		auto str_w = font.getStringWidth(begin, end);
 		for (auto vertex : mesh.vertices)
 		{
-			if (align == Align::Right)
+			if (align == TextAlign::Right)
 				vertex.pos.x += scaledMaxWidth - str_w;
-			else if (align == Align::Center)
+			else if (align == TextAlign::Center)
 				vertex.pos.x += (scaledMaxWidth - str_w) / 2.0f;
 
 			vertex.pos.y += height;
@@ -116,8 +122,6 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 		}
 		height += font.getAscent() - font.getDescent() + font.getLinegap();
 	};
-
-	result.topology = Renderer::Topology::TriangleList;
 
 	auto begin = text.begin();
 	auto it = begin;
