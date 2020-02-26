@@ -39,7 +39,7 @@ void Node::clear()
 
 glm::vec2 Node::project(const glm::vec2& value) const
 {
-	auto vp = Renderer::Viewport::FullScreen();
+	auto vp = Renderer::Viewport();
 
 	auto width = PLATFORM->getLogicalWidth();
 	auto height = PLATFORM->getLogicalHeight();
@@ -54,7 +54,7 @@ glm::vec2 Node::project(const glm::vec2& value) const
 
 glm::vec2 Node::unproject(const glm::vec2& value) const
 {
-	auto vp = Renderer::Viewport::FullScreen();
+	auto vp = Renderer::Viewport();
 
 	auto width = PLATFORM->getLogicalWidth();
 	auto height = PLATFORM->getLogicalHeight();

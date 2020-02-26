@@ -25,12 +25,12 @@ void System::begin(std::shared_ptr<Renderer::RenderTarget> target)
 		state.renderTarget = target;
 		state.blendMode = Renderer::BlendStates::AlphaBlend;
 		state.projectionMatrix = glm::orthoLH(0.0f, (float)target->getWidth(), (float)target->getHeight(), 0.0f, -1.0f, 1.0f);
-		state.viewport = Renderer::Viewport::FullRenderTarget(*target);
+		state.viewport = Renderer::Viewport(*target);
 	}
 	else
 	{
 		state.projectionMatrix = glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
-		state.viewport = Renderer::Viewport::FullScreen();
+		state.viewport = Renderer::Viewport();
 	}
 
 	begin(state);
@@ -46,11 +46,11 @@ void System::begin(const Camera& camera, std::shared_ptr<Renderer::RenderTarget>
 	{
 		state.renderTarget = target;
 		state.blendMode = Renderer::BlendStates::AlphaBlend;
-		state.viewport = Renderer::Viewport::FullRenderTarget(*target);
+		state.viewport = Renderer::Viewport(*target);
 	}
 	else
 	{
-		state.viewport = Renderer::Viewport::FullScreen();
+		state.viewport = Renderer::Viewport();
 	}
 
 	begin(state);

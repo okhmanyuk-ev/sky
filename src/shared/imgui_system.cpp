@@ -109,7 +109,7 @@ void ImguiSystem::end()
 	mShader->setModelMatrix(model);
 
 	RENDERER->setRenderTarget(nullptr);
-	RENDERER->setViewport(Renderer::Viewport::FullScreen());
+	RENDERER->setViewport(Renderer::Viewport());
 	RENDERER->setTopology(Renderer::Topology::TriangleList);
 	RENDERER->setSampler(Renderer::Sampler::Nearest);
 	RENDERER->setDepthMode(Renderer::DepthMode());

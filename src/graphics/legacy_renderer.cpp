@@ -59,7 +59,7 @@ void LegacyRenderer::end()
 	mShader->setViewMatrix(mViewMatrix);
 	mShader->setModelMatrix(mModelMatrix);
  
-	RENDERER->setViewport(Renderer::Viewport::FullScreen());
+	RENDERER->setViewport(Renderer::Viewport());
 	RENDERER->setScissor(nullptr);
 	RENDERER->setTopology(mTopology);
 	RENDERER->setVertexBuffer({ mVertices.data(), mVertexCount });

@@ -40,7 +40,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		auto state = GRAPHICS->getCurrentState();
 		state.renderTarget = mBlurTarget1;
 		state.blendMode = Renderer::BlendStates::AlphaBlend;
-		state.viewport = Renderer::Viewport::FullRenderTarget(*mBlurTarget1);
+		state.viewport = Renderer::Viewport(*mBlurTarget1);
 		state.projectionMatrix = glm::orthoLH(0.0f, mTargetWidth, mTargetHeight, 0.0f, -1.0f, 1.0f);
 		state.sampler = Renderer::Sampler::Linear;
 
@@ -74,7 +74,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		RENDERER->setShader(mBlurShader);
 		RENDERER->setVertexBuffer(Vertices);
 		RENDERER->setIndexBuffer(Indices);
-		RENDERER->setViewport(Renderer::Viewport::FullRenderTarget(*mBlurTarget1));
+		RENDERER->setViewport(Renderer::Viewport(*mBlurTarget1));
 		RENDERER->setSampler(Renderer::Sampler::Linear);
 		RENDERER->setScissor(nullptr);
 
@@ -102,7 +102,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		auto state = GRAPHICS->getCurrentState();
 		state.renderTarget = render_texture;
 		state.blendMode = Renderer::BlendStates::AlphaBlend;
-		state.viewport = Renderer::Viewport::FullRenderTarget(*render_texture);
+		state.viewport = Renderer::Viewport(*render_texture);
 		state.projectionMatrix = glm::orthoLH(0.0f, (float)render_texture->getWidth(), (float)render_texture->getHeight(), 0.0f, -1.0f, 1.0f);
 		state.sampler = Renderer::Sampler::Linear;
 
