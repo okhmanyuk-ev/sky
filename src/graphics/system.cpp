@@ -472,7 +472,7 @@ void System::drawString(const Mesh& mesh, const glm::mat4& model, float size,
 	float smoothFactor = 2.0f / size / PLATFORM->getScale();
 
 	if (fixedOutlineThickness > 0.0f)
-		drawSdf(mesh, outline, mid + (smoothFactor / 2.0f), smoothFactor, model, color);
+		drawSdf(mesh, outline, mid + (smoothFactor / 2.0f), smoothFactor, model, outlineColor);
 
 	drawSdf(mesh, mid, max, smoothFactor, model, color);
 }
