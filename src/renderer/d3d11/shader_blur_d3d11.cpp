@@ -17,7 +17,10 @@ namespace
 {
 	const char* shaderSource = R"(
 		cbuffer ConstantBuffer : register(b0)
-		{
+		{			
+			float4x4 viewMatrix;
+			float4x4 projectionMatrix;
+			float4x4 modelMatrix;
 			float2 direction;
 			float2 resolution;
 		};
@@ -38,7 +41,7 @@ namespace
 		PixelInput vs_main(VertexInput input)
 		{
 			PixelInput result;
-			result.pixelPosition = float4(input.pos, 1.0);
+			result.pixelPosition = mul(projectionMatrix, mul(viewMatrix, mul(modelMatrix, float4(input.pos, 1.0))));
 			return result;
 		};
 
