@@ -149,12 +149,11 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 
 	if (mBatching && vertices.size() <= 4)
 	{
-		if (mBatch.topology != topology || mBatch.texture != std::nullopt || mBatch.mode != BatchMode::Colored)
+		if (mBatch.topology != topology || mBatch.mode != BatchMode::Colored)
 			flush();
 
 		mBatch.mode = BatchMode::Colored;
 		mBatch.shader = mBatchColorShader;
-		mBatch.texture = std::nullopt;
 		mBatch.topology = topology;
 		mBatch.verticesCount += vertices.size();
 
@@ -253,13 +252,13 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 
 void System::drawRectangle(const glm::mat4& model, const glm::vec4& color)
 {
-	std::vector<Renderer::Vertex::PositionColor> vertices = {
-		{ { 0.0f, 0.0f, 0.0f }, color },
-		{ { 0.0f, 1.0f, 0.0f }, color },
-		{ { 1.0f, 1.0f, 0.0f }, color },
-		{ { 1.0f, 0.0f, 0.0f }, color }
-	};
-
+	static auto vertices = std::vector<Renderer::Vertex::PositionColor>(4);
+		
+	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color };
+	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color };
+	vertices[2] = { { 1.0f, 1.0f, 0.0f }, color };
+	vertices[3] = { { 1.0f, 0.0f, 0.0f }, color };
+	
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 
 	draw(Renderer::Topology::TriangleList, vertices, indices, model);
@@ -267,13 +266,13 @@ void System::drawRectangle(const glm::mat4& model, const glm::vec4& color)
 
 void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 {
-	std::vector<Renderer::Vertex::PositionColor> vertices = {
-		{ { 0.0f, 0.0f, 0.0f }, color },
-		{ { 0.0f, 1.0f, 0.0f }, color },
-		{ { 1.0f, 1.0f, 0.0f }, color },
-		{ { 1.0f, 0.0f, 0.0f }, color }
-	};
+	static auto vertices = std::vector<Renderer::Vertex::PositionColor>(4);
 
+	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color };
+	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color };
+	vertices[2] = { { 1.0f, 1.0f, 0.0f }, color };
+	vertices[3] = { { 1.0f, 0.0f, 0.0f }, color };
+	
 	static const std::vector<uint32_t> indices = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
 	draw(Renderer::Topology::LineList, vertices, indices, model);
@@ -353,12 +352,12 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	float s_x2 = (tex_region.size.x > 0.0f ? (tex_region.size.x / tex_w) : 1.0f) + s_x1;
 	float s_y2 = (tex_region.size.y > 0.0f ? (tex_region.size.y / tex_h) : 1.0f) + s_y1;
 
-	std::vector<Renderer::Vertex::PositionColorTexture> vertices = {
-		{ { 0.0f, 0.0f, 0.0f }, color, { s_x1, s_y1 } },
-		{ { 0.0f, 1.0f, 0.0f }, color, { s_x1, s_y2 } },
-		{ { 1.0f, 1.0f, 0.0f }, color, { s_x2, s_y2 } },
-		{ { 1.0f, 0.0f, 0.0f }, color, { s_x2, s_y1 } }
-	};
+	static auto vertices = std::vector<Renderer::Vertex::PositionColorTexture>(4);
+
+	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color, { s_x1, s_y1 } };
+	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color, { s_x1, s_y2 } };
+	vertices[2] = { { 1.0f, 1.0f, 0.0f }, color, { s_x2, s_y2 } };
+	vertices[3] = { { 1.0f, 0.0f, 0.0f }, color, { s_x2, s_y1 } };
 	
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 	
