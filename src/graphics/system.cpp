@@ -132,6 +132,26 @@ void System::clear(const glm::vec4& color)
 	RENDERER->clear(color);
 }
 
+void System::draw(const Mesh& mesh, std::shared_ptr<Renderer::ShaderMatrices> shader, const glm::mat4& model)
+{
+	assert(mWorking);
+
+	flush(); // !
+	
+	applyState();
+
+	shader->setProjectionMatrix(mStates.top().projectionMatrix);
+	shader->setViewMatrix(mStates.top().viewMatrix);
+	shader->setModelMatrix(model);
+
+	RENDERER->setTexture(mesh.texture);
+	RENDERER->setTopology(mesh.topology);
+	RENDERER->setIndexBuffer(mesh.indices);
+	RENDERER->setVertexBuffer(mesh.vertices);
+	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
+	RENDERER->drawIndexed(mesh.indices.size());
+}
+
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 	const glm::mat4& model)
 {
@@ -234,7 +254,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	}
 	else
 	{
-		flush();
+		/*flush();
 
 		mTexturedShader->setProjectionMatrix(mStates.top().projectionMatrix);
 		mTexturedShader->setViewMatrix(mStates.top().viewMatrix);
@@ -246,7 +266,16 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 		RENDERER->setVertexBuffer(vertices);
 		RENDERER->setShader(mTexturedShader);
 
-		RENDERER->drawIndexed(indices.size());
+		RENDERER->drawIndexed(indices.size());*/
+
+		Graphics::Mesh mesh;
+
+		mesh.texture = texture;
+		mesh.topology = topology;
+		mesh.vertices = vertices;
+		mesh.indices = indices;
+
+		draw(mesh, mTexturedShader, model);
 	}
 }
 

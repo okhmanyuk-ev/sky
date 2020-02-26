@@ -19,6 +19,7 @@
 #include <stack>
 #include <tinyutf8.hpp>
 #include "text_mesh.h"
+#include "mesh.h"
 
 #define GRAPHICS ENGINE->getSystem<Graphics::System>()
 
@@ -40,6 +41,10 @@ namespace Graphics
 
 	public:
 		void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f });
+
+		// draw mesh
+		void draw(const Mesh& mesh, std::shared_ptr<Renderer::ShaderMatrices> shader,
+			const glm::mat4& model = glm::mat4(1.0f));
 
 		// draw colored vertices
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
