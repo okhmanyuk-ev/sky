@@ -123,7 +123,7 @@ ShaderDefault::ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>&
 
 	{
 		D3D11_BUFFER_DESC desc = {};
-		desc.ByteWidth = sizeof(mConstantBufferData);
+		desc.ByteWidth = sizeof(mConstantBuffer);
 		desc.Usage = D3D11_USAGE_DEFAULT;
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags = 0;
@@ -144,17 +144,16 @@ void ShaderDefault::apply()
 	SystemD3D11::Context->PSSetShader(mImpl->pixelShader, nullptr, 0);
 	SystemD3D11::Context->VSSetConstantBuffers(0, 1, &mImpl->constantBuffer);
 	SystemD3D11::Context->PSSetConstantBuffers(0, 1, &mImpl->constantBuffer);
-	mNeedUpdate = true;
+	mConstantBufferDirty = true;
 }
 
 void ShaderDefault::update() 
 {
-	if (!mNeedUpdate)
+	if (!mConstantBufferDirty)
 		return;
 
-	mNeedUpdate = false;
-
-	SystemD3D11::Context->UpdateSubresource(mImpl->constantBuffer, 0, nullptr, &mConstantBufferData, 0, 0);
+	mConstantBufferDirty = false;
+	SystemD3D11::Context->UpdateSubresource(mImpl->constantBuffer, 0, nullptr, &mConstantBuffer, 0, 0);
 }
 
 #endif

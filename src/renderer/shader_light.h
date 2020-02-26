@@ -71,28 +71,28 @@ namespace Renderer
 
 	public:
 		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
-		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; mDirty = true; }
+		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; mConstantBufferDirty = true; }
 
 		glm::mat4 getViewMatrix() const override { return mConstantBuffer.view; }
-		void setViewMatrix(const glm::mat4& value) override { mConstantBuffer.view = value; mDirty = true; }
+		void setViewMatrix(const glm::mat4& value) override { mConstantBuffer.view = value; mConstantBufferDirty = true; }
 
 		glm::mat4 getModelMatrix() const override { return mConstantBuffer.model; }
-		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; mDirty = true; }
+		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; mConstantBufferDirty = true; }
 		
-		void setEyePosition(const glm::vec3& value) { mConstantBuffer.eyePosition = value; mDirty = true; }
+		void setEyePosition(const glm::vec3& value) { mConstantBuffer.eyePosition = value; mConstantBufferDirty = true; }
 
 		auto getDirectionalLight() const { return mConstantBuffer.directionalLight; }
-		void setDirectionalLight(const DirectionalLight& value) { mConstantBuffer.directionalLight = value; mDirty = true; }
+		void setDirectionalLight(const DirectionalLight& value) { mConstantBuffer.directionalLight = value; mConstantBufferDirty = true; }
 
 		auto getPointLight() const { return mConstantBuffer.pointLight; }
-		void setPointLight(const PointLight& value) { mConstantBuffer.pointLight = value; mDirty = true; }
+		void setPointLight(const PointLight& value) { mConstantBuffer.pointLight = value; mConstantBufferDirty = true; }
 
 		auto getMaterial() const { return mConstantBuffer.material; }
-		void setMaterial(const Material& value) { mConstantBuffer.material = value; mDirty = true; }
+		void setMaterial(const Material& value) { mConstantBuffer.material = value; mConstantBufferDirty = true; }
 
 	private:
 		ConstantBuffer mConstantBuffer;
-		bool mDirty = false;
+		bool mConstantBufferDirty = false;
 		
 	private:
 		struct Impl;

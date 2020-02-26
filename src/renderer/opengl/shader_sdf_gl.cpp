@@ -198,18 +198,18 @@ void ShaderSDF::apply()
 			(void*)attrib.offset);
 	}
 
-	mNeedUpdate = true;
+	mConstantBufferDirty = true;
 }
 
 void ShaderSDF::update()
 {
 	glUniform1ui(mImpl->uniformRenderTargetBound, (GLint)SystemGL::IsRenderTargetBound());
 
-	if (!mNeedUpdate)
+	if (!mConstantBufferDirty)
 		return;
 
-	mNeedUpdate = false;
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), &mConstantBufferData, GL_STATIC_DRAW);
+	mConstantBufferDirty = false;
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), &mConstantBuffer, GL_STATIC_DRAW);
 	glUniform1i(mImpl->uniformTexture, 0);
 }
 #endif

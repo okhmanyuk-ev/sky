@@ -43,18 +43,18 @@ namespace Renderer
 		void update() override;
 
 	public:
-		glm::mat4 getProjectionMatrix() const override { return mConstantBufferData.projection; }
-		void setProjectionMatrix(const glm::mat4& value) override { mConstantBufferData.projection = value; mNeedUpdate = true; }
+		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
+		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; mConstantBufferDirty = true; }
 
-		glm::mat4 getViewMatrix() const override { return mConstantBufferData.view; }
-		void setViewMatrix(const glm::mat4& value) override { mConstantBufferData.view = value; mNeedUpdate = true; }
+		glm::mat4 getViewMatrix() const override { return mConstantBuffer.view; }
+		void setViewMatrix(const glm::mat4& value) override { mConstantBuffer.view = value; mConstantBufferDirty = true; }
 
-		glm::mat4 getModelMatrix() const override { return mConstantBufferData.model; }
-		void setModelMatrix(const glm::mat4& value) override { mConstantBufferData.model = value; mNeedUpdate = true; }
+		glm::mat4 getModelMatrix() const override { return mConstantBuffer.model; }
+		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; mConstantBufferDirty = true; }
 
 	private:
-		ConstantBuffer mConstantBufferData;
-		bool mNeedUpdate = false;
+		ConstantBuffer mConstantBuffer;
+		bool mConstantBufferDirty = false;
 		
 	private:
 		struct Impl;

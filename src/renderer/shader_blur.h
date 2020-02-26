@@ -38,12 +38,12 @@ namespace Renderer
 		void update() override;
 
 	public:
-		void setDirection(Direction value) { mConstantBufferData.direction = (value == Direction::Horizontal ? glm::vec2(1.0f, 0.0f) : glm::vec2(0.0f, 1.0f)); mNeedUpdate = true; }
-		void setResolution(const glm::vec2& value) { mConstantBufferData.resolution = value; mNeedUpdate = true; }
+		void setDirection(Direction value) { mConstantBuffer.direction = (value == Direction::Horizontal ? glm::vec2(1.0f, 0.0f) : glm::vec2(0.0f, 1.0f)); mConstantBufferDirty = true; }
+		void setResolution(const glm::vec2& value) { mConstantBuffer.resolution = value; mConstantBufferDirty = true; }
 
 	private:
-		ConstantBuffer mConstantBufferData;
-		bool mNeedUpdate = false;
+		ConstantBuffer mConstantBuffer;
+		bool mConstantBufferDirty = false;
 
 	private:
 		struct Impl;

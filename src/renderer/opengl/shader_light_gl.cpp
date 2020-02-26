@@ -296,20 +296,19 @@ void ShaderLight::apply()
 			(void*)attrib.offset);
 	}
 	
-	mDirty = true;
+	mConstantBufferDirty = true;
 }
 
 void ShaderLight::update()
 {
 	glUniform1ui(mImpl->uniformRenderTargetBound, (GLint)SystemGL::IsRenderTargetBound());
 
-	if (!mDirty)
+	if (!mConstantBufferDirty)
 		return;
 
-	mDirty = false;
+	mConstantBufferDirty = false;
 
     glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), &mConstantBuffer, GL_STATIC_DRAW);
-
 	glUniform1i(mImpl->uniformTexture, 0);
 }
 #endif

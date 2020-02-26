@@ -219,16 +219,15 @@ void ShaderLight::apply()
 	SystemD3D11::Context->PSSetShader(mImpl->pixelShader, nullptr, 0);
 	SystemD3D11::Context->VSSetConstantBuffers(0, 1, &mImpl->constantBuffer);
 	SystemD3D11::Context->PSSetConstantBuffers(0, 1, &mImpl->constantBuffer);
-	mDirty = true;
+	mConstantBufferDirty = true;
 }
 
 void ShaderLight::update()
 {
-	if (!mDirty)
+	if (!mConstantBufferDirty)
 		return;
 
-	mDirty = false;
-
+	mConstantBufferDirty = false;
 	SystemD3D11::Context->UpdateSubresource(mImpl->constantBuffer, 0, nullptr, &mConstantBuffer, 0, 0);
 }
 
