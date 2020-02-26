@@ -19,7 +19,6 @@
 #include <stack>
 #include <tinyutf8.hpp>
 #include "text_mesh.h"
-#include "mesh.h"
 
 #define GRAPHICS ENGINE->getSystem<Graphics::System>()
 
@@ -41,10 +40,6 @@ namespace Graphics
 
 	public:
 		void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f });
-
-		// draw mesh
-		void draw(const Mesh& mesh, std::shared_ptr<Renderer::ShaderMatrices> shader,
-			const glm::mat4& model = glm::mat4(1.0f));
 
 		// draw colored vertices
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
@@ -79,11 +74,18 @@ namespace Graphics
 			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f });
 
 		// sdf mesh
-		void drawSdf(const Mesh& mesh, float minValue, float maxValue, 
+		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+			const std::vector<Renderer::Vertex::PositionTexture>& vertices,
+			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
 			float smoothFactor, const glm::mat4& model,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
-		void drawString(const Mesh& mesh, const glm::mat4& model, float size,
+		// text
+		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, 
+			float minValue, float maxValue, float smoothFactor, 
+			const glm::vec4& color = { Graphics::Color::White, 1.0f });
+
+		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size, 
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
 		
@@ -156,7 +158,7 @@ namespace Graphics
 		bool mBatching = true;
 		
 	private:
-		std::shared_ptr<Renderer::ShaderSDF> mSdfShader = std::make_shared<Renderer::ShaderSDF>(Renderer::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::ShaderSDF> mSdfShader = std::make_shared<Renderer::ShaderSDF>(Renderer::Vertex::PositionTexture::Layout);
 		std::shared_ptr<Renderer::ShaderDefault> mTexturedShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::ShaderDefault> mColoredShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColor::Layout);
 
@@ -165,6 +167,8 @@ namespace Graphics
 
 		std::shared_ptr<Renderer::ShaderDefault> mBatchTextureShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout,
 			std::set<Renderer::ShaderDefault::Flag>({ Renderer::ShaderDefault::Flag::Colored, Renderer::ShaderDefault::Flag::Textured }));
+
+		std::shared_ptr<Renderer::ShaderSDF> mBatchSdfShader = std::make_shared<Renderer::ShaderSDF>(Renderer::Vertex::PositionColorTexture::Layout);
 
 	private:
 		enum class BatchMode

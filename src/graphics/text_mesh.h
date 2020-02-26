@@ -5,22 +5,27 @@
 #include <Renderer/topology.h>
 #include "font.h"
 #include "tinyutf8.hpp"
-#include "mesh.h"
-#include "color.h"
 
 namespace Graphics
 {
-	enum class TextAlign
+	struct TextMesh
 	{
-		Left,
-		Center,
-		Right
-	};
+		enum class Align
+		{
+			Left, 
+			Center,
+			Right
+		};
+
+		Renderer::Topology topology;
+		std::vector<Renderer::Vertex::PositionTexture> vertices;
+		std::vector<uint32_t> indices;
 	
-	Mesh CreateTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end);
+		static TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end);
 
-	Mesh CreateSinglelineTextMesh(const Font& font, const utf8_string& text, float vertical_offset = 0.0f);
+		static TextMesh createSinglelineTextMesh(const Font& font, const utf8_string& text, float vertical_offset = 0.0f);
 
-	std::tuple<float, Mesh> CreateMultilineTextMesh(const Font& font, const utf8_string& text,
-		float maxWidth, float size, TextAlign align = TextAlign::Left);
+		static std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const utf8_string& text,
+			float maxWidth, float size, Align align = Align::Left);
+	};
 }

@@ -36,15 +36,15 @@ namespace Scene
 		void setOutlineAlpha(float value) { mOutlineColor.a = value; }
 
 		auto getMultilineAlign() const { return mMultilineAlign; }
-		void setMultilineAlign(Graphics::TextAlign value) { mMultilineAlign = value; }
+		void setMultilineAlign(Graphics::TextMesh::Align value) { mMultilineAlign = value; }
 
 	private:
 		std::shared_ptr<Graphics::Font> mFont;
 		float mFontSize = 24.0f;
 		utf8_string mText = "";
 		bool mMultiline = false;
-		Graphics::TextAlign mMultilineAlign = Graphics::TextAlign::Left;
-		Graphics::Mesh mMesh;
+		Graphics::TextMesh::Align mMultilineAlign = Graphics::TextMesh::Align::Left;
+		Graphics::TextMesh mMesh;
 		float mMeshWidth = 0.0f;
 		float mMeshHeight = 0.0f;
 		bool mMeshDirty = true;
@@ -55,6 +55,6 @@ namespace Scene
 		bool mPrevMultiline = false;
 		float mOutlineThickness = 0.0f;
 		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
-		Graphics::TextAlign mPrevMultilineAlign = Graphics::TextAlign::Left;
+		Graphics::TextMesh::Align mPrevMultilineAlign = Graphics::TextMesh::Align::Left;
 	};
 }

@@ -132,35 +132,6 @@ void System::clear(const glm::vec4& color)
 	RENDERER->clear(color);
 }
 
-void System::draw(const Mesh& mesh, std::shared_ptr<Renderer::ShaderMatrices> shader, const glm::mat4& model)
-{
-	assert(mWorking);
-
-	flush(); // !
-	
-	applyState();
-
-	shader->setProjectionMatrix(mStates.top().projectionMatrix);
-	shader->setViewMatrix(mStates.top().viewMatrix);
-	shader->setModelMatrix(model);
-
-	if (mesh.texture)
-		RENDERER->setTexture(mesh.texture);
-	
-	RENDERER->setTopology(mesh.topology);
-
-	if (mesh.indices.has_value())
-		RENDERER->setIndexBuffer(*mesh.indices);
-
-	RENDERER->setVertexBuffer(mesh.vertices);
-	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
-	
-	if (mesh.indices.has_value())
-		RENDERER->drawIndexed(mesh.indices->size());
-	else
-		RENDERER->draw(mesh.vertices.size());
-}
-
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 	const glm::mat4& model)
 {
@@ -232,7 +203,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 {
 	assert(mWorking);
 
-	/*applyState();
+	applyState();
 	
 	if (mBatching && vertices.size() <= 4)
 	{
@@ -275,17 +246,8 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 		RENDERER->setVertexBuffer(vertices);
 		RENDERER->setShader(mTexturedShader);
 
-		RENDERER->drawIndexed(indices.size());*/
-
-		Graphics::Mesh mesh;
-
-		mesh.texture = texture;
-		mesh.topology = topology;
-		mesh.vertices = vertices;
-		mesh.indices = indices;
-
-		draw(mesh, mTexturedShader, model);
-	//}
+		RENDERER->drawIndexed(indices.size());
+	}
 }
 
 void System::drawRectangle(const glm::mat4& model, const glm::vec4& color)
@@ -402,12 +364,14 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model);
 }
 
-void System::drawSdf(const Mesh& mesh, float minValue, float maxValue,
+void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+	const std::vector<Renderer::Vertex::PositionTexture>& vertices,
+	const std::vector<uint32_t>& indices, float minValue, float maxValue,
 	float smoothFactor, const glm::mat4& model, const glm::vec4& color)
 {
 	assert(mWorking);
 
-	/*applyState();
+	applyState();
 	
 	if (mBatching && vertices.size() <= 4)
 	{
@@ -449,18 +413,37 @@ void System::drawSdf(const Mesh& mesh, float minValue, float maxValue,
 
 		pushBatchIndices(indices, vertices.size());
 	}
-	else*/
+	else
 	{
+		flush();
+
+		mSdfShader->setProjectionMatrix(mStates.top().projectionMatrix);
+		mSdfShader->setViewMatrix(mStates.top().viewMatrix);
+		mSdfShader->setModelMatrix(model);
 		mSdfShader->setMinValue(minValue);
 		mSdfShader->setMaxValue(maxValue);
 		mSdfShader->setSmoothFactor(smoothFactor);
 		mSdfShader->setColor(color);
 
-		draw(mesh, mSdfShader, model);
+		RENDERER->setTexture(texture);
+		RENDERER->setTopology(topology);
+		RENDERER->setIndexBuffer(indices);
+		RENDERER->setVertexBuffer(vertices);
+		RENDERER->setShader(mSdfShader);
+
+		RENDERER->drawIndexed(indices.size());
 	}
 }
 
-void System::drawString(const Mesh& mesh, const glm::mat4& model, float size,
+void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model,
+	float minValue, float maxValue, float smoothFactor, const glm::vec4& color)
+{
+	assert(mWorking);
+	drawSdf(mesh.topology, font.getTexture(), mesh.vertices, mesh.indices, minValue, 
+		maxValue, smoothFactor, model, color);
+}
+
+void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
 	float fixedOutlineThickness = glm::lerp(0.0f, 0.75f, outlineThickness);
@@ -472,15 +455,15 @@ void System::drawString(const Mesh& mesh, const glm::mat4& model, float size,
 	float smoothFactor = 2.0f / size / PLATFORM->getScale();
 
 	if (fixedOutlineThickness > 0.0f)
-		drawSdf(mesh, outline, mid + (smoothFactor / 2.0f), smoothFactor, model, outlineColor);
+		drawString(font, mesh, model, outline, mid + (smoothFactor / 2.0f), smoothFactor, outlineColor);
 
-	drawSdf(mesh, mid, max, smoothFactor, model, color);
+	drawString(font, mesh, model, mid, max, smoothFactor, color);
 }
 
 void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(CreateSinglelineTextMesh(font, text), model, size, color, outlineThickness, outlineColor);
+	drawString(font, TextMesh::createSinglelineTextMesh(font, text), model, size, color, outlineThickness, outlineColor);
 }
 
 glm::vec3 System::project(const glm::vec3& pos, const glm::mat4& model)
