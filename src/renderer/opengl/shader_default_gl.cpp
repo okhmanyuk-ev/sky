@@ -3,6 +3,8 @@
 
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 #include <Renderer/system_gl.h>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 using namespace Renderer;
 
@@ -14,8 +16,8 @@ struct ShaderDefault::Impl
 	GLuint ubo;
 	GLuint uniformBlock;
 	GLint uniformTexture;
-	GLint uniformRenderTargetBound;
 	std::map<Vertex::Attribute::Type, GLint> attribLocations;
+	ConstantBuffer constantBuffer;
 };
 
 namespace
@@ -29,7 +31,6 @@ namespace
 		};
 
 		uniform sampler2D uTexture;
-		uniform bool uRenderTargetBound;
 
 		#ifdef VERTEX_SHADER
 		in vec3 aPosition;
@@ -54,9 +55,6 @@ namespace
 		#endif
 
 			gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
-
-			if (uRenderTargetBound)
-				gl_Position.y *= -1.0;
 		}
 		#endif
 
@@ -167,7 +165,6 @@ ShaderDefault::ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>&
 	glUniformBlockBinding(mImpl->program, mImpl->uniformBlock, 0);
 	
 	mImpl->uniformTexture = glGetUniformLocation(mImpl->program, "uTexture");
-	mImpl->uniformRenderTargetBound = glGetUniformLocation(mImpl->program, "uRenderTargetBound");
 	
 	static const std::map<Vertex::Attribute::Type, std::string> attribName = {
 		{ Vertex::Attribute::Type::Position, "aPosition" },
@@ -223,13 +220,19 @@ void ShaderDefault::apply()
 
 void ShaderDefault::update()
 {
-	glUniform1ui(mImpl->uniformRenderTargetBound, (GLint)SystemGL::IsRenderTargetBound());
-
 	if (!mConstantBufferDirty)
 		return;
 
+	mImpl->constantBuffer = mConstantBuffer;
+	
+	if (SystemGL::IsRenderTargetBound())
+	{
+		auto orientationMatrix = glm::scale(glm::mat4(1.0f), { 1.0f, -1.0f, 1.0f });
+		mImpl->constantBuffer.projection = orientationMatrix * mImpl->constantBuffer.projection;
+	}
+	
 	mConstantBufferDirty = false;
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), &mConstantBuffer, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), &mImpl->constantBuffer, GL_STATIC_DRAW);
 	glUniform1i(mImpl->uniformTexture, 0);
 }
 #endif
