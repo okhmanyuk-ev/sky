@@ -377,6 +377,9 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 		mRenderTargetBound = true;
 		value->bindRenderTarget();
 	}
+
+	mCullModeDirty = true;  // when render target is active, we using reversed culling,
+							// because image is flipped vertically
 }
 
 void SystemGL::setShader(std::shared_ptr<Shader> value)
@@ -431,16 +434,8 @@ void SystemGL::setStencilMode(const StencilMode& value)
 
 void SystemGL::setCullMode(const CullMode& value)
 {
-	if (value != CullMode::None)
-	{
-		glEnable(GL_CULL_FACE);
-		glFrontFace(GL_CW);
-		glCullFace(CullMap.at(value));
-	}
-	else
-	{
-		glDisable(GL_CULL_FACE);
-	}
+	mCullMode = value;
+	mCullModeDirty = true;
 }
 
 void SystemGL::setBlendMode(const BlendMode& value)
@@ -588,6 +583,12 @@ void SystemGL::prepareForDrawing()
 		setGLVertexBuffer(mVertexBuffer);
 		mVertexBufferDirty = false;
 	}
+
+	if (mCullModeDirty)
+	{
+		setGLCullMode(mCullMode);
+		mCullModeDirty = false;
+	}
 }
 
 void SystemGL::setGLVertexBuffer(const Buffer& value)
@@ -610,6 +611,31 @@ void SystemGL::setGLIndexBuffer(const Buffer& value)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
 
 	mGLIndexType = value.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+}
+
+void SystemGL::setGLCullMode(const CullMode& value)
+{
+	if (value != CullMode::None)
+	{
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CW);
+
+		auto cull = value;
+
+		if (IsRenderTargetBound())
+		{
+			if (cull == CullMode::Back)
+				cull = CullMode::Front;
+			else
+				cull = CullMode::Back;
+		}
+
+		glCullFace(CullMap.at(cull));	
+	}
+	else
+	{
+		glDisable(GL_CULL_FACE);
+	}
 }
 
 void SystemGL::updateGLSampler()

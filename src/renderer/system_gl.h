@@ -120,11 +120,15 @@ namespace Renderer
 
 		bool mTextureBound = false;
 		Sampler mSampler = Sampler::Nearest;
+
+		CullMode mCullMode = CullMode::None;
+		bool mCullModeDirty = true;
 		
 		void updateGLSampler();
 
 		void setGLVertexBuffer(const Buffer& value);
 		void setGLIndexBuffer(const Buffer& value);
+		void setGLCullMode(const CullMode& value);
 	};
 
 	using SystemCrossplatform = SystemGL;
