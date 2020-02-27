@@ -29,7 +29,7 @@ namespace Renderer
 		};
 
 	public:
-		ShaderSDF(const Vertex::Layout& laayout);
+		ShaderSDF(const Vertex::Layout& layout);
 		~ShaderSDF();
 
 	protected:

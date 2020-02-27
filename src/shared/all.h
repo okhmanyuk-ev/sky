@@ -67,6 +67,6 @@
 
 #include <Renderer/shader_default.h>
 #include <Renderer/shader_light.h>
-#include <Renderer/shader_blur.h>
+#include <Renderer/shaders/blur.h>
 
 #include <Network/system.h>

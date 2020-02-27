@@ -4,7 +4,7 @@
 #include <Renderer/render_target.h>
 #include <Common/event_system.h>
 #include <stack>
-#include <Renderer/shader_blur.h>
+#include <Renderer/shaders/blur.h>
 
 namespace Scene
 {

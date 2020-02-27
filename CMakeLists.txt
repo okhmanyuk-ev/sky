@@ -36,6 +36,11 @@ file(GLOB RENDERER_SRC
     sky/src/renderer/*.h
 )
 
+file (GLOB RENDERER_SHADERS_SRC
+	sky/src/renderer/shaders/*.cpp
+    sky/src/renderer/shaders/*.h
+)
+
 file(GLOB RENDERER_D3D11_SRC
 	sky/src/renderer/d3d11/*.cpp
 	sky/src/renderer/d3d11/*.mm
@@ -76,6 +81,7 @@ source_group("graphics" FILES ${GRAPHICS_SRC})
 source_group("renderer" FILES ${RENDERER_SRC})
 source_group("renderer\\d3d11" FILES ${RENDERER_D3D11_SRC})
 source_group("renderer\\opengl" FILES ${RENDERER_OPENGL_SRC})
+source_group("renderer\\shaders" FILES ${RENDERER_SHADERS_SRC})
 source_group("audio" FILES ${AUDIO_SRC})
 source_group("scene" FILES ${SCENE_SRC})
 source_group("shared" FILES ${SHARED_SRC})
@@ -89,6 +95,7 @@ add_library(sky STATIC
 	${PLATFORM_SRC}
 	${GRAPHICS_SRC}
 	${RENDERER_SRC}
+	${RENDERER_SHADERS_SRC}
 	${RENDERER_D3D11_SRC}
 	${RENDERER_OPENGL_SRC}
 	${AUDIO_SRC}

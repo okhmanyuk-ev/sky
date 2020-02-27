@@ -1,4 +1,4 @@
-#include <Renderer/shader_blur.h>
+#include <Renderer/shader_custom.h>
 #include <string>
 
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
@@ -8,7 +8,7 @@
 
 using namespace Renderer;
 
-struct ShaderBlur::Impl
+struct ShaderCustom::Impl
 {
 	Vertex::Layout layout;
 	GLuint program;
@@ -18,66 +18,18 @@ struct ShaderBlur::Impl
 	GLint uniformTexture;
 	std::map<Vertex::Attribute::Type, GLint> attribLocations;
 	ConstantBuffer constantBuffer;
+	size_t customConstantBufferSize;
 };
 
-namespace
-{
-	const char* shaderSource = R"(
-		layout (std140) uniform ConstantBuffer
-		{			
-			mat4 uViewMatrix;
-			mat4 uProjectionMatrix;
-			mat4 uModelMatrix;
-
-			vec2 uDirection;
-			vec2 uResolution;
-		};
-	
-		uniform sampler2D uTexture;
-
-		#ifdef VERTEX_SHADER
-		in vec3 aPosition;
-		
-		void main()
-		{
-			gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
-		}
-		#endif
-
-		#ifdef FRAGMENT_SHADER
-		out vec4 fragColor;
-
-		void main()
-		{
-			vec4 result = vec4(0.0);
-			
-			vec2 off1 = vec2(1.3846153846) * uDirection / uResolution;
-			vec2 off2 = vec2(3.2307692308) * uDirection / uResolution;
-			
-			vec2 uv = vec2(gl_FragCoord.xy / uResolution.xy);
-
-			result += texture(uTexture, uv) * 0.2270270270;
-	
-			result += texture(uTexture, uv + off1) * 0.3162162162;
-			result += texture(uTexture, uv - off1) * 0.3162162162;
-
-			result += texture(uTexture, uv + off2) * 0.0702702703;
-			result += texture(uTexture, uv - off2) * 0.0702702703;
-
-			fragColor = result;
-		}
-	#endif
-	)";
-}
-
-ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
+ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::Attribute::Type>& requiredAttribs, 
+	size_t customConstantBufferSize, const std::string& source)
 {
     mImpl = std::make_unique<Impl>();
 	mImpl->layout = layout;
-	checkRequiredAttribs(requiredAttribs, layout);
-	
-	auto source = std::string(shaderSource);
+	mImpl->customConstantBufferSize = customConstantBufferSize;
 
+	checkRequiredAttribs(requiredAttribs, layout); 
+	
 	auto vertexSource = "#define VERTEX_SHADER\n" + source;
 	auto fragmentSource = "#define FRAGMENT_SHADER\n" + source;
 
@@ -134,7 +86,7 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 
 	glGenBuffers(1, &mImpl->ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, mImpl->ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), nullptr, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer) + customConstantBufferSize, nullptr, GL_STATIC_DRAW);
 
 	mImpl->uniformBlock = glGetUniformBlockIndex(mImpl->program, "ConstantBuffer");
 	glUniformBlockBinding(mImpl->program, mImpl->uniformBlock, 0);
@@ -143,6 +95,9 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 
 	static const std::map<Vertex::Attribute::Type, std::string> attribName = {
 		{ Vertex::Attribute::Type::Position, "aPosition" },
+		{ Vertex::Attribute::Type::Color, "aColor" },
+		{ Vertex::Attribute::Type::TexCoord, "aTexCoord" },
+		{ Vertex::Attribute::Type::Normal, "aNormal" }
 	};
 
 	glGenVertexArrays(1, &mImpl->vao);
@@ -165,14 +120,14 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 	glBindVertexArray(0);
 }
 
-ShaderBlur::~ShaderBlur()
+ShaderCustom::~ShaderCustom()
 {
 	glDeleteVertexArrays(1, &mImpl->vao);
 	glDeleteProgram(mImpl->program);
 	glDeleteBuffers(1, &mImpl->ubo);
 }
 
-void ShaderBlur::apply()
+void ShaderCustom::apply()
 {
 	glUseProgram(mImpl->program);
 	glBindVertexArray(mImpl->vao);
@@ -192,7 +147,7 @@ void ShaderBlur::apply()
 	mConstantBufferDirty = true;
 }
 
-void ShaderBlur::update()
+void ShaderCustom::update()
 {
 	if (!mConstantBufferDirty)
 		return;
@@ -206,7 +161,8 @@ void ShaderBlur::update()
 	}
 
 	mConstantBufferDirty = false;
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), &mImpl->constantBuffer, GL_STATIC_DRAW);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ConstantBuffer), &mImpl->constantBuffer);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), mImpl->customConstantBufferSize, mCustomConstantBuffer);
 	glUniform1i(mImpl->uniformTexture, 0);
 }
 #endif

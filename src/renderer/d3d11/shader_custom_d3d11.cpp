@@ -1,74 +1,25 @@
-#include <Renderer/shader_blur.h>
+#include <Renderer/shader_custom.h>
 
 #if defined(RENDERER_D3D11)
 #include <Renderer/system_d3d11.h>
 
 using namespace Renderer;
 
-struct ShaderBlur::Impl
+struct ShaderCustom::Impl
 {
 	ID3D11VertexShader* vertexShader = nullptr;
 	ID3D11PixelShader* pixelShader = nullptr;
 	ID3D11Buffer* constantBuffer = nullptr;
 	ID3D11InputLayout* inputLayout = nullptr;
+	size_t customConstantBufferSize = 0;
 };
 
-namespace
-{
-	const char* shaderSource = R"(
-		cbuffer ConstantBuffer : register(b0)
-		{			
-			float4x4 viewMatrix;
-			float4x4 projectionMatrix;
-			float4x4 modelMatrix;
-			float2 direction;
-			float2 resolution;
-		};
-
-		struct VertexInput
-		{
-			float3 pos : POSITION0;
-		};
-
-		struct PixelInput
-		{
-			float4 pixelPosition : SV_POSITION;
-		};
-
-		sampler sampler0;
-		Texture2D texture0;
-
-		PixelInput vs_main(VertexInput input)
-		{
-			PixelInput result;
-			result.pixelPosition = mul(projectionMatrix, mul(viewMatrix, mul(modelMatrix, float4(input.pos, 1.0))));
-			return result;
-		};
-
-		float4 ps_main(PixelInput input) : SV_TARGET
-		{
-			float4 result = 0;
-			
-			float2 off1 = 1.3846153846 * direction / resolution;
-			float2 off2 = 3.2307692308 * direction / resolution;
-			
-			float2 uv = input.pixelPosition / resolution;
-
-			result += texture0.Sample(sampler0, uv) * 0.2270270270;
-
-			result += texture0.Sample(sampler0, uv + off1) * 0.3162162162;
-			result += texture0.Sample(sampler0, uv - off1) * 0.3162162162;
-
-			result += texture0.Sample(sampler0, uv + off2) * 0.0702702703;
-			result += texture0.Sample(sampler0, uv - off2) * 0.0702702703;
-
-			return result;
-		})";
-}
-
-ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
+ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::Attribute::Type>& requiredAttribs,
+	size_t customConstantBufferSize, const std::string& source)
 {
     mImpl = std::make_unique<Impl>();
+	mImpl->customConstantBufferSize = customConstantBufferSize;
+
 	checkRequiredAttribs(requiredAttribs, layout);
 	
 	ID3DBlob* vertexShaderBlob;
@@ -76,8 +27,6 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 
 	ID3DBlob* vertex_shader_error;
 	ID3DBlob* pixel_shader_error;
-
-	std::string source = shaderSource;
 
 	D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, "vs_main", "vs_4_0", 0, 0, &vertexShaderBlob, &vertex_shader_error);
 	D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, "ps_main", "ps_4_0", 0, 0, &pixelShaderBlob, &pixel_shader_error);
@@ -100,22 +49,21 @@ ShaderBlur::ShaderBlur(const Vertex::Layout& layout)
 
 	{
 		D3D11_BUFFER_DESC desc = {};
-		desc.ByteWidth = sizeof(mConstantBuffer);
-		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.ByteWidth = sizeof(mConstantBuffer) + customConstantBufferSize;
+		desc.Usage = D3D11_USAGE_DYNAMIC;
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		desc.CPUAccessFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		desc.MiscFlags = 0;
 		SystemD3D11::Device->CreateBuffer(&desc, NULL, &mImpl->constantBuffer);
 	}
-
 }
 
-ShaderBlur::~ShaderBlur()
+ShaderCustom::~ShaderCustom()
 {
 	
 }
 
-void ShaderBlur::apply()
+void ShaderCustom::apply()
 {
 	SystemD3D11::Context->IASetInputLayout(mImpl->inputLayout);
 	SystemD3D11::Context->VSSetShader(mImpl->vertexShader, nullptr, 0);
@@ -125,13 +73,21 @@ void ShaderBlur::apply()
 	mConstantBufferDirty = true;
 }
 
-void ShaderBlur::update()
+void ShaderCustom::update()
 {
 	if (!mConstantBufferDirty)
 		return;
 
 	mConstantBufferDirty = false;
-	SystemD3D11::Context->UpdateSubresource(mImpl->constantBuffer, 0, NULL, &mConstantBuffer, 0, 0);
+	
+	D3D11_MAPPED_SUBRESOURCE resource;
+	SystemD3D11::Context->Map(mImpl->constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	memcpy(resource.pData, &mConstantBuffer, sizeof(ConstantBuffer));
+	
+	if (mCustomConstantBuffer)
+		memcpy((void*)((size_t)resource.pData + sizeof(ConstantBuffer)), mCustomConstantBuffer, mImpl->customConstantBufferSize);
+	
+	SystemD3D11::Context->Unmap(mImpl->constantBuffer, 0);
 }
 
 #endif
