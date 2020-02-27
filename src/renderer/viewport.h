@@ -13,8 +13,8 @@ namespace Renderer
 		{
 			position = { 0.0f, 0.0f };
 			size = _size;
-			minDepth = minDepth;
-			maxDepth = maxDepth;
+			minDepth = _minDepth;
+			maxDepth = _maxDepth;
 		}
 
 		Viewport(float _minDepth = 0.0f, float _maxDepth = 1.0f) :
