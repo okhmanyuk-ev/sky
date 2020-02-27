@@ -60,6 +60,7 @@ SystemD3D11::SystemD3D11()
 		createRenderTarget();
 	});
 
+	setRenderTarget(nullptr);
 	setBlendMode(BlendStates::NonPremultiplied);
 }
 
@@ -96,8 +97,6 @@ void SystemD3D11::createRenderTarget()
 	mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 	Device->CreateRenderTargetView(pBackBuffer, nullptr, &renderTargetView);
 	pBackBuffer->Release();
-	
-	setRenderTarget(nullptr);
 }
 
 void SystemD3D11::destroyRenderTarget() 
@@ -122,34 +121,28 @@ void SystemD3D11::setTopology(const Renderer::Topology& value)
 
 void SystemD3D11::setViewport(const Viewport& value) 
 {
-	if (mViewport != value)
-	{
-		D3D11_VIEWPORT vp;
-		vp.Width = value.size.x;
-		vp.Height = value.size.y;
-		vp.MinDepth = value.minDepth;
-		vp.MaxDepth = value.maxDepth;
-		vp.TopLeftX = value.position.x;
-		vp.TopLeftY = value.position.y;
-		Context->RSSetViewports(1, &vp);
-		mViewport = value;
-	}
+	D3D11_VIEWPORT vp;
+	vp.Width = value.size.x;
+	vp.Height = value.size.y;
+	vp.MinDepth = value.minDepth;
+	vp.MaxDepth = value.maxDepth;
+	vp.TopLeftX = value.position.x;
+	vp.TopLeftY = value.position.y;
+	Context->RSSetViewports(1, &vp);
+	mViewport = value;
 }
 
 void SystemD3D11::setScissor(const Scissor& value) 
 {
 	mRasterizerState.scissorEnabled = true;
 
-	if (mScissor != value)
-	{
-		D3D11_RECT ss;
-		ss.left = static_cast<LONG>(value.position.x);
-		ss.top = static_cast<LONG>(value.position.y);
-		ss.right = static_cast<LONG>(value.position.x + value.size.x);
-		ss.bottom = static_cast<LONG>(value.position.y + value.size.y);
-		Context->RSSetScissorRects(1, &ss);
-		mScissor = value;
-	}
+	D3D11_RECT ss;
+	ss.left = static_cast<LONG>(value.position.x);
+	ss.top = static_cast<LONG>(value.position.y);
+	ss.right = static_cast<LONG>(value.position.x + value.size.x);
+	ss.bottom = static_cast<LONG>(value.position.y + value.size.y);
+	Context->RSSetScissorRects(1, &ss);
+	mScissor = value;
 }
 
 void SystemD3D11::setScissor(std::nullptr_t value)
