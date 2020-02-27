@@ -61,7 +61,13 @@ void FirstPersonCameraController::frame()
 			mCamera.setYaw(mCamera.getYaw() + (pi * 2.0f));
 	}
 	{
-		auto speed = mSpeed * Clock::ToSeconds(FRAME->getTimeDelta()) * 100.0f;
+		auto speed = mSpeed * Clock::ToSeconds(FRAME->getTimeDelta()) * 50.0f;
+
+		if (mKeyShift)
+			speed *= 3.0f;
+
+		if (mKeyCtrl)
+			speed /= 3.0f;
 
 		glm::vec2 direction = { 0.0f, 0.0f };
 
@@ -117,6 +123,11 @@ void FirstPersonCameraController::event(const Platform::Keyboard::Event& e)
 		mKeyS = value;
 	else if (e.key == Platform::Keyboard::Key::D)
 		mKeyD = value;
+
+	if (e.key == Platform::Keyboard::Key::Shift)
+		mKeyShift = value;
+	else if (e.key == Platform::Keyboard::Key::Ctrl)
+		mKeyCtrl = value;
 }
 
 void FirstPersonCameraController::event(const Platform::Mouse::Event& e)

@@ -46,6 +46,9 @@ namespace Shared
 		bool mKeyS = false;
 		bool mKeyD = false;
 
+		bool mKeyShift = false;
+		bool mKeyCtrl = false;
+
 	private:
 		Graphics::Camera3D& mCamera;
 
