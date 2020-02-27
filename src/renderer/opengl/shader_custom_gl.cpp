@@ -93,7 +93,7 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 
 	mImpl->uniformTexture = glGetUniformLocation(mImpl->program, "uTexture");
 
-	static const std::map<Vertex::Attribute::Type, std::string> attribName = {
+	static const std::unordered_map<Vertex::Attribute::Type, std::string> AttribNameMap = {
 		{ Vertex::Attribute::Type::Position, "aPosition" },
 		{ Vertex::Attribute::Type::Color, "aColor" },
 		{ Vertex::Attribute::Type::TexCoord, "aTexCoord" },
@@ -105,11 +105,11 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 
 	for (auto& attrib : layout.attributes)
 	{
-		if (attribName.count(attrib.type) == 0)
+		if (AttribNameMap.count(attrib.type) == 0)
 			continue;
 
-		auto location = glGetAttribLocation(mImpl->program, attribName.at(attrib.type).c_str());
-		assert(location != -1);
+		auto location = glGetAttribLocation(mImpl->program, AttribNameMap.at(attrib.type).c_str());
+		//assert(location != -1);
 		
 		if (location == -1)
 			continue;

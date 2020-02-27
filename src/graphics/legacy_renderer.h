@@ -3,7 +3,7 @@
 #include <Renderer/topology.h>
 #include <Renderer/vertex.h>
 #include <Renderer/system.h>
-#include <Renderer/shader_default.h>
+#include <Renderer/shaders/default.h>
 #include <Platform/system.h>
 #include <glm/glm.hpp>
 

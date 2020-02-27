@@ -5,8 +5,8 @@
 #include <Renderer/system.h>
 #include <Renderer/topology.h>
 #include <Renderer/vertex.h>
-#include <Renderer/shader_default.h>
-#include <Renderer/shader_sdf.h>
+#include <Renderer/shaders/default.h>
+#include <Renderer/shaders/sdf.h>
 
 #include <Graphics/color.h>
 #include <Graphics/font.h>
@@ -158,7 +158,7 @@ namespace Graphics
 		bool mBatching = true;
 		
 	private:
-		std::shared_ptr<Renderer::ShaderSDF> mSdfShader = std::make_shared<Renderer::ShaderSDF>(Renderer::Vertex::PositionTexture::Layout);
+		std::shared_ptr<Renderer::ShaderSdf> mSdfShader = std::make_shared<Renderer::ShaderSdf>(Renderer::Vertex::PositionTexture::Layout);
 		std::shared_ptr<Renderer::ShaderDefault> mTexturedShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::ShaderDefault> mColoredShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColor::Layout);
 
@@ -168,7 +168,7 @@ namespace Graphics
 		std::shared_ptr<Renderer::ShaderDefault> mBatchTextureShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout,
 			std::set<Renderer::ShaderDefault::Flag>({ Renderer::ShaderDefault::Flag::Colored, Renderer::ShaderDefault::Flag::Textured }));
 
-		std::shared_ptr<Renderer::ShaderSDF> mBatchSdfShader = std::make_shared<Renderer::ShaderSDF>(Renderer::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::ShaderSdf> mBatchSdfShader = std::make_shared<Renderer::ShaderSdf>(Renderer::Vertex::PositionColorTexture::Layout);
 
 	private:
 		enum class BatchMode

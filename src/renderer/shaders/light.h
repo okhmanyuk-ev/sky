@@ -1,21 +1,11 @@
 #pragma once
 
-#include <Renderer/system.h>
-#include <Renderer/shader.h>
-#include <Renderer/vertex.h>
-#include <Renderer/low_level_api.h>
-#include <map>
+#include <Renderer/shader_custom.h>
 
 namespace Renderer
 {
-	class ShaderLight : public Shader, public ShaderMatrices
+	class ShaderLight : public ShaderCustom
 	{
-	private:
-		const std::set< Vertex::Attribute::Type> requiredAttribs = {
-			Vertex::Attribute::Type::Position,
-			Vertex::Attribute::Type::Normal
-		};
-
 	public:
 		struct DirectionalLight
 		{
@@ -24,7 +14,7 @@ namespace Renderer
 			alignas(16) glm::vec3 diffuse = { 1.0f, 1.0f, 1.0f };
 			alignas(16) glm::vec3 specular = { 1.0f, 1.0f, 1.0f };
 		};
-			
+
 		struct PointLight
 		{
 			alignas(16) glm::vec3 position = { 0.0f, 0.0f, 0.0f };
@@ -47,56 +37,45 @@ namespace Renderer
 		};
 
 	private:
-		struct ConstantBuffer
+		struct CustomConstantBuffer
 		{
-			glm::mat4 view = glm::mat4(1.0f);
-			glm::mat4 projection = glm::mat4(1.0f);
-			glm::mat4 model = glm::mat4(1.0f);
-
 			alignas(16) glm::vec3 eyePosition = { 0.0f, 0.0f, 0.0 };
 
 			DirectionalLight directionalLight;
 			PointLight pointLight;
-
 			Material material;
 		};
 
 	public:
+		enum class Flag
+		{
+			Textured,
+			Colored
+		};
+
+	private:
+		static std::set<Flag> MakeFlagsFromLayout(const Vertex::Layout& layout);
+		static std::string MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags);
+
+	public:
+		ShaderLight(const Vertex::Layout& layout, const std::set<Flag>& flags);
 		ShaderLight(const Vertex::Layout& layout);
 		~ShaderLight();
 
-	protected:
-		void apply() override;
-		void update() override;
-
 	public:
-		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
-		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; mConstantBufferDirty = true; }
+		void setEyePosition(const glm::vec3& value) { mCustomConstantBuffer.eyePosition = value; markDirty(); }
 
-		glm::mat4 getViewMatrix() const override { return mConstantBuffer.view; }
-		void setViewMatrix(const glm::mat4& value) override { mConstantBuffer.view = value; mConstantBufferDirty = true; }
+		auto getDirectionalLight() const { return mCustomConstantBuffer.directionalLight; }
+		void setDirectionalLight(const DirectionalLight& value) { mCustomConstantBuffer.directionalLight = value; markDirty(); }
 
-		glm::mat4 getModelMatrix() const override { return mConstantBuffer.model; }
-		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; mConstantBufferDirty = true; }
-		
-		void setEyePosition(const glm::vec3& value) { mConstantBuffer.eyePosition = value; mConstantBufferDirty = true; }
+		auto getPointLight() const { return mCustomConstantBuffer.pointLight; }
+		void setPointLight(const PointLight& value) { mCustomConstantBuffer.pointLight = value; markDirty(); }
 
-		auto getDirectionalLight() const { return mConstantBuffer.directionalLight; }
-		void setDirectionalLight(const DirectionalLight& value) { mConstantBuffer.directionalLight = value; mConstantBufferDirty = true; }
-
-		auto getPointLight() const { return mConstantBuffer.pointLight; }
-		void setPointLight(const PointLight& value) { mConstantBuffer.pointLight = value; mConstantBufferDirty = true; }
-
-		auto getMaterial() const { return mConstantBuffer.material; }
-		void setMaterial(const Material& value) { mConstantBuffer.material = value; mConstantBufferDirty = true; }
+		auto getMaterial() const { return mCustomConstantBuffer.material; }
+		void setMaterial(const Material& value) { mCustomConstantBuffer.material = value; markDirty(); }
 
 	private:
-		ConstantBuffer mConstantBuffer;
-		bool mConstantBufferDirty = false;
-		
-	private:
-		struct Impl;
-		std::unique_ptr<Impl> mImpl;
+		CustomConstantBuffer mCustomConstantBuffer;
 	};
 
 	namespace Materials

@@ -65,8 +65,9 @@
 #include <Graphics/font.h>
 #include <Graphics/legacy_renderer.h>
 
-#include <Renderer/shader_default.h>
-#include <Renderer/shader_light.h>
+#include <Renderer/shaders/default.h>
+#include <Renderer/shaders/light.h>
 #include <Renderer/shaders/blur.h>
+#include <Renderer/shaders/sdf.h>
 
 #include <Network/system.h>
