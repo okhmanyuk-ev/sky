@@ -30,9 +30,15 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 
 	D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, "vs_main", "vs_4_0", 0, 0, &vertexShaderBlob, &vertex_shader_error);
 	D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, "ps_main", "ps_4_0", 0, 0, &pixelShaderBlob, &pixel_shader_error);
+	
+	std::string vertex_shader_error_string = "";
+	std::string pixel_shader_error_string = "";
 
-	//std::string vertex_shader_error_string = (char*)vertex_shader_error->GetBufferPointer();
-	//std::string pixel_shader_error_string = (char*)pixel_shader_error->GetBufferPointer();
+	if (vertex_shader_error != nullptr)
+		vertex_shader_error_string = std::string((char*)vertex_shader_error->GetBufferPointer(), vertex_shader_error->GetBufferSize());
+
+	if (pixel_shader_error != nullptr)
+		pixel_shader_error_string = std::string((char*)pixel_shader_error->GetBufferPointer(), pixel_shader_error->GetBufferSize());
 
 	SystemD3D11::Device->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &mImpl->vertexShader);
 	SystemD3D11::Device->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &mImpl->pixelShader);
