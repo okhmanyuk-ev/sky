@@ -57,7 +57,8 @@ namespace Graphics
 		// draw indexed colored and textured vertices
 		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, 
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
-			const std::vector<uint32_t>& indices, const glm::mat4& model = glm::mat4(1.0f));
+			const std::vector<uint32_t>& indices, const glm::mat4& model = glm::mat4(1.0f),
+			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 		
 		// colored rectangle
 		void drawRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f });
@@ -71,7 +72,7 @@ namespace Graphics
 
 		// sprite
 		void draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model, 
-			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f });
+			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// sdf mesh
 		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,

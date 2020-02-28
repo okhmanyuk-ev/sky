@@ -199,13 +199,13 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 }
 
 void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
-	const std::vector<uint32_t>& indices, const glm::mat4& model)
+	const std::vector<uint32_t>& indices, const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
 
 	applyState();
 	
-	if (mBatching && vertices.size() <= 4)
+	if (mBatching && vertices.size() <= 4 && !shader)
 	{
 		if (mBatch.topology != topology || mBatch.texture != texture || mBatch.mode != BatchMode::Textured)
 			flush();
@@ -236,15 +236,18 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	{
 		flush();
 
-		mTexturedShader->setProjectionMatrix(mStates.top().projectionMatrix);
-		mTexturedShader->setViewMatrix(mStates.top().viewMatrix);
-		mTexturedShader->setModelMatrix(model);
+		if (!shader)
+			shader = mTexturedShader;
+
+		shader->setProjectionMatrix(mStates.top().projectionMatrix);
+		shader->setViewMatrix(mStates.top().viewMatrix);
+		shader->setModelMatrix(model);
 
 		RENDERER->setTexture(texture);
 		RENDERER->setTopology(topology);
 		RENDERER->setIndexBuffer(indices);
 		RENDERER->setVertexBuffer(vertices);
-		RENDERER->setShader(mTexturedShader);
+		RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
 
 		RENDERER->drawIndexed(indices.size());
 	}
@@ -342,7 +345,7 @@ void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& i
 }
 
 void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
-	const TexRegion& tex_region, const glm::vec4& color)
+	const TexRegion& tex_region, const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	float tex_w = static_cast<float>(texture->getWidth());
 	float tex_h = static_cast<float>(texture->getHeight());
