@@ -14,6 +14,7 @@
 #include <Renderer/rasterizer_state.h>
 #include <Renderer/blend.h>
 #include <Renderer/stencil.h>
+#include <Renderer/texture_address.h>
 
 #define RENDERER ENGINE->getSystem<Renderer::System>()
 
@@ -36,6 +37,7 @@ namespace Renderer
 		virtual void setStencilMode(const StencilMode& value) = 0;
 		virtual void setCullMode(const CullMode& value) = 0;
 		virtual void setBlendMode(const BlendMode& value) = 0;
+		virtual void setTextureAddressMode(const TextureAddress& value) = 0;
 
 		virtual void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) = 0;
 

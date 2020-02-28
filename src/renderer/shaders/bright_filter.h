@@ -11,7 +11,7 @@ namespace Renderer
 	private:
 		struct alignas(16) CustomConstantBuffer
 		{
-			float threshold = 0.75f;
+			float threshold = 0.99f;
 		};
 
 	public:

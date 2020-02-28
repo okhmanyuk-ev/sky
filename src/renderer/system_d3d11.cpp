@@ -143,11 +143,14 @@ void SystemD3D11::setScissor(const Scissor& value)
 	ss.bottom = static_cast<LONG>(value.position.y + value.size.y);
 	Context->RSSetScissorRects(1, &ss);
 	mScissor = value;
+
+	mRasterizerStateDirty = true;
 }
 
 void SystemD3D11::setScissor(std::nullptr_t value)
 {
 	mRasterizerState.scissorEnabled = false;
+	mRasterizerStateDirty = true;
 }
 
 void SystemD3D11::setVertexBuffer(const Buffer& value) 
@@ -234,37 +237,26 @@ void SystemD3D11::setShader(std::shared_ptr<Shader> value)
 
 void SystemD3D11::setSampler(const Sampler& value) 
 {
-	if (mD3D11SamplerStates.count(value) == 0)
-	{
-		D3D11_SAMPLER_DESC desc = {};
-		desc.Filter = value == Sampler::Linear ? D3D11_FILTER_MIN_MAG_MIP_LINEAR : D3D11_FILTER_MIN_MAG_MIP_POINT; // see D3D11_ENCODE_BASIC_FILTER
-		desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-		desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-		desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-		desc.MaxAnisotropy = D3D11_MAX_MAXANISOTROPY;
-		desc.MipLODBias = 0.0f;
-		desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-		desc.MinLOD = 0.0f;
-		desc.MaxLOD = FLT_MAX;
-		Device->CreateSamplerState(&desc, &mD3D11SamplerStates[value]);
-	}
-
-	Context->PSSetSamplers(0, 1, &mD3D11SamplerStates.at(value));
+	mSamplerState.sampler = value;
+	mSamplerStateDirty = true;
 }
 
 void SystemD3D11::setDepthMode(const DepthMode& value) 
 {
 	mDepthStencilState.depthMode = value;
+	mDepthStencilStateDirty = true;
 }
 
 void SystemD3D11::setStencilMode(const StencilMode& value)
 {
 	mDepthStencilState.stencilMode = value;
+	mDepthStencilStateDirty = true;
 }
 
 void SystemD3D11::setCullMode(const CullMode& value) 
 {
 	mRasterizerState.cullMode = value;
+	mRasterizerStateDirty = true;
 }
 
 void SystemD3D11::setBlendMode(const BlendMode& value)
@@ -315,6 +307,12 @@ void SystemD3D11::setBlendMode(const BlendMode& value)
 	Context->OMSetBlendState(mD3D11BlendModes.at(value), blend_factor, 0xFFFFFFFF);
 }
 
+void SystemD3D11::setTextureAddressMode(const TextureAddress& value)
+{
+	mSamplerState.textureAddress = value;
+	mSamplerStateDirty = true;
+}
+
 void SystemD3D11::clear(const glm::vec4& color) 
 {
 	if (currentRenderTarget == nullptr) 
@@ -361,20 +359,26 @@ void SystemD3D11::prepareForDrawing()
 
 	// rasterizer state
 
-	if (!mRasterizerStateApplied || mAppliedRasterizerState != mRasterizerState)
+	if (mRasterizerStateDirty)
 	{
 		setD3D11RasterizerState(mRasterizerState);
-		mAppliedRasterizerState = mRasterizerState;
-		mRasterizerStateApplied = true;
+		mRasterizerStateDirty = false;
 	}
 
 	// depthstencil state
 
-	if (!mDepthStencilStateApplied || mAppliedDepthStencilState != mDepthStencilState)
+	if (mDepthStencilStateDirty)
 	{
 		setD3D11DepthStencilState(mDepthStencilState);
-		mAppliedDepthStencilState = mDepthStencilState;
-		mDepthStencilStateApplied = true;
+		mDepthStencilStateDirty = false;
+	}
+
+	// sampler state
+
+	if (mSamplerStateDirty)
+	{
+		setD3D11SamplerState(mSamplerState);
+		mSamplerStateDirty = false;
 	}
 }
 void SystemD3D11::setD3D11RasterizerState(const RasterizerState& value)
@@ -444,6 +448,38 @@ void SystemD3D11::setD3D11DepthStencilState(const DepthStencilState& value)
 	}
 
 	Context->OMSetDepthStencilState(mD3D11DepthStencilStates.at(value), 1);
+}
+
+void SystemD3D11::setD3D11SamplerState(const SamplerState& value)
+{
+	if (mD3D11SamplerStates.count(value) == 0)
+	{
+		// TODO: see D3D11_ENCODE_BASIC_FILTER
+
+		const static std::unordered_map<Sampler, D3D11_FILTER> SamplerMap = {
+			{ Sampler::Linear, D3D11_FILTER_MIN_MAG_MIP_LINEAR  },
+			{ Sampler::Nearest, D3D11_FILTER_MIN_MAG_MIP_POINT },
+		};
+
+		const static std::unordered_map<TextureAddress, D3D11_TEXTURE_ADDRESS_MODE> TextureAddressMap = {
+			{ TextureAddress::Clamp, D3D11_TEXTURE_ADDRESS_CLAMP },
+			{ TextureAddress::Wrap, D3D11_TEXTURE_ADDRESS_WRAP },
+		};
+
+		D3D11_SAMPLER_DESC desc = {};
+		desc.Filter = SamplerMap.at(value.sampler);
+		desc.AddressU = TextureAddressMap.at(value.textureAddress);
+		desc.AddressV = TextureAddressMap.at(value.textureAddress);
+		desc.AddressW = TextureAddressMap.at(value.textureAddress);
+		desc.MaxAnisotropy = D3D11_MAX_MAXANISOTROPY;
+		desc.MipLODBias = 0.0f;
+		desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		desc.MinLOD = 0.0f;
+		desc.MaxLOD = FLT_MAX;
+		Device->CreateSamplerState(&desc, &mD3D11SamplerStates[value]);
+	}
+
+	Context->PSSetSamplers(0, 1, &mD3D11SamplerStates.at(value));
 }
 
 #endif

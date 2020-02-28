@@ -37,6 +37,7 @@ namespace Renderer
 		void setStencilMode(const StencilMode& value) override;
 		void setCullMode(const CullMode& value) override;
 		void setBlendMode(const BlendMode& value) override;
+		void setTextureAddressMode(const TextureAddress& value) override;
 
 		void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 1.0f }) override;
 
@@ -120,6 +121,7 @@ namespace Renderer
 
 		bool mTextureBound = false;
 		Sampler mSampler = Sampler::Nearest;
+		TextureAddress mTextureAddress = TextureAddress::Clamp;
 
 		CullMode mCullMode = CullMode::None;
 		bool mCullModeDirty = true;

@@ -132,6 +132,7 @@ namespace Graphics
 			Renderer::DepthMode depthMode = Renderer::DepthMode();
 			Renderer::BlendMode blendMode = Renderer::BlendStates::NonPremultiplied;
 			Renderer::Sampler sampler = Renderer::Sampler::Nearest;
+			Renderer::TextureAddress textureAddress = Renderer::TextureAddress::Clamp;
 
 			inline bool operator==(const State& value) const
 			{
@@ -142,7 +143,8 @@ namespace Graphics
 					scissor == value.scissor &&
 					depthMode == value.depthMode &&
 					blendMode == value.blendMode &&
-					sampler == value.sampler;
+					sampler == value.sampler &&
+					textureAddress == value.textureAddress;
 			}
 
 			inline bool operator!=(const State& value) const

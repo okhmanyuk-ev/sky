@@ -88,6 +88,7 @@ void System::applyState()
 	RENDERER->setViewport(state.viewport);
 	RENDERER->setBlendMode(state.blendMode);
 	RENDERER->setSampler(state.sampler);
+	RENDERER->setTextureAddressMode(state.textureAddress);
 
 	mAppliedState = state;
 }

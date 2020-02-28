@@ -466,6 +466,12 @@ void SystemGL::setBlendMode(const BlendMode& value)
 	glBlendFuncSeparate(BlendMap.at(value.colorSrcBlend), BlendMap.at(value.colorDstBlend), BlendMap.at(value.alphaSrcBlend), BlendMap.at(value.alphaDstBlend));
 }
 
+void SystemGL::setTextureAddressMode(const TextureAddress& value)
+{
+	mTextureAddress = value;
+	updateGLSampler();
+}
+
 void SystemGL::clear(const glm::vec4& color) 
 {
 	GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
@@ -645,8 +651,8 @@ void SystemGL::updateGLSampler()
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mSampler == Sampler::Linear ? GL_LINEAR : GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mSampler == Sampler::Linear ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mTextureAddress == TextureAddress::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mTextureAddress == TextureAddress::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 }
 
 #endif
