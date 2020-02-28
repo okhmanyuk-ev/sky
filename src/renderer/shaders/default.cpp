@@ -73,6 +73,8 @@ namespace
 			float4x4 viewMatrix;
 			float4x4 projectionMatrix;
 			float4x4 modelMatrix;
+
+			float4 color;
 		};
 
 		struct VertexInput
@@ -124,6 +126,9 @@ namespace
 		#ifdef HAS_TEXCOORD_ATTRIB
 			result *= texture0.Sample(sampler0, input.uv);
 		#endif
+			
+			result *= color;
+
 			return result;
 		}
 		)";
@@ -131,10 +136,10 @@ namespace
 }
 
 ShaderDefault::ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>& flags) :
-	ShaderCustom(layout, { Vertex::Attribute::Type::Position }, 0, 
+	ShaderCustom(layout, { Vertex::Attribute::Type::Position }, sizeof(CustomConstantBuffer), 
 		MakeDefinesFromFlags(layout, shaderSource, flags))
 {
-	//
+	setCustomConstantBuffer(&mCustomConstantBuffer);
 }
 
 ShaderDefault::ShaderDefault(const Vertex::Layout& layout) : ShaderDefault(layout, MakeFlagsFromLayout(layout)) 

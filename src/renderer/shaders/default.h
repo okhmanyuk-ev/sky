@@ -6,6 +6,12 @@ namespace Renderer
 {
 	class ShaderDefault : public ShaderCustom
 	{
+	private:
+		struct alignas(16) CustomConstantBuffer
+		{
+			glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		};
+
 	public:
 		enum class Flag
 		{
@@ -21,5 +27,12 @@ namespace Renderer
 		ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>& flags);
 		ShaderDefault(const Vertex::Layout& layout);
 		~ShaderDefault();
+
+	public:
+		auto getColor() const { return mCustomConstantBuffer.color; }
+		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; markDirty(); }
+
+	private:
+		CustomConstantBuffer mCustomConstantBuffer;
 	};
 }
