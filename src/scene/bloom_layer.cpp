@@ -48,7 +48,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 		GRAPHICS->push(state);
 		GRAPHICS->clear();
-		GRAPHICS->draw(render_texture, model);
+		GRAPHICS->draw(render_texture, model, mBrightFilterShader);
 
 		mBlurShader->setResolution({ mTargetWidth, mTargetHeight });
 
