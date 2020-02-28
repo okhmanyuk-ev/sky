@@ -238,9 +238,9 @@ void SystemD3D11::setSampler(const Sampler& value)
 	{
 		D3D11_SAMPLER_DESC desc = {};
 		desc.Filter = value == Sampler::Linear ? D3D11_FILTER_MIN_MAG_MIP_LINEAR : D3D11_FILTER_MIN_MAG_MIP_POINT; // see D3D11_ENCODE_BASIC_FILTER
-		desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 		desc.MaxAnisotropy = D3D11_MAX_MAXANISOTROPY;
 		desc.MipLODBias = 0.0f;
 		desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
