@@ -1,6 +1,7 @@
 #include "bright_filter.h"
 
 using namespace Renderer;
+using namespace Renderer::Shaders;
 
 namespace
 {
@@ -99,13 +100,8 @@ namespace
 #endif
 }
 
-ShaderBrightFilter::ShaderBrightFilter(const Vertex::Layout& layout) :
+BrightFilter::BrightFilter(const Vertex::Layout& layout) :
 	ShaderCustom(layout, { Vertex::Attribute::Type::Position, Vertex::Attribute::Type::TexCoord }, sizeof(CustomConstantBuffer), shaderSource)
 {
 	setCustomConstantBuffer(&mCustomConstantBuffer);
-}
-
-ShaderBrightFilter::~ShaderBrightFilter()
-{
-	//
 }

@@ -2,9 +2,9 @@
 
 #include <Renderer/shader_custom.h>
 
-namespace Renderer
+namespace Renderer::Shaders
 {
-	class ShaderDefault : public ShaderCustom
+	class Default : public ShaderCustom
 	{
 	private:
 		struct alignas(16) CustomConstantBuffer
@@ -24,10 +24,9 @@ namespace Renderer
 		static std::string MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags);
 
 	public:
-		ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>& flags);
-		ShaderDefault(const Vertex::Layout& layout);
-		~ShaderDefault();
-
+		Default(const Vertex::Layout& layout, const std::set<Flag>& flags);
+		Default(const Vertex::Layout& layout);
+		
 	public:
 		auto getColor() const { return mCustomConstantBuffer.color; }
 		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; markDirty(); }

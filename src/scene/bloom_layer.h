@@ -32,9 +32,9 @@ namespace Scene
 		std::shared_ptr<Renderer::RenderTarget> mBlurTarget1;
 		std::shared_ptr<Renderer::RenderTarget> mBlurTarget2;
 		bool mTargetsDirty = true;
-		std::shared_ptr<Renderer::ShaderBlur> mBlurShader = std::make_shared<Renderer::ShaderBlur>(Renderer::Vertex::PositionColorTexture::Layout);
-		std::shared_ptr<Renderer::ShaderBrightFilter> mBrightFilterShader = std::make_shared<Renderer::ShaderBrightFilter>(Renderer::Vertex::PositionColorTexture::Layout);
-		std::shared_ptr<Renderer::ShaderDefault> mDefaultShader = std::make_shared<Renderer::ShaderDefault>(Renderer::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::Shaders::Blur> mBlurShader = std::make_shared<Renderer::Shaders::Blur>(Renderer::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::Shaders::BrightFilter> mBrightFilterShader = std::make_shared<Renderer::Shaders::BrightFilter>(Renderer::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::Shaders::Default> mDefaultShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout);
 		float mTargetWidth = 0.0f;
 		float mTargetHeight = 0.0f;
 		int mBlurPasses = 1;

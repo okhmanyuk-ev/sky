@@ -54,14 +54,14 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 		for (int i = 0; i < mBlurPasses; i++)
 		{
-			mBlurShader->setDirection(Renderer::ShaderBlur::Direction::Horizontal);
+			mBlurShader->setDirection(Renderer::Shaders::Blur::Direction::Horizontal);
 
 			GRAPHICS->push(mBlurTarget2);
 			GRAPHICS->clear();
 			GRAPHICS->draw(mBlurTarget1, model, mBlurShader);
 			GRAPHICS->pop();
 
-			mBlurShader->setDirection(Renderer::ShaderBlur::Direction::Vertical);
+			mBlurShader->setDirection(Renderer::Shaders::Blur::Direction::Vertical);
 
 			GRAPHICS->clear();
 			GRAPHICS->draw(mBlurTarget2, model, mBlurShader);

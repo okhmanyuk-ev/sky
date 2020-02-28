@@ -1,6 +1,7 @@
 #include "sdf.h"
 
 using namespace Renderer;
+using namespace Renderer::Shaders;
 
 namespace
 {
@@ -117,13 +118,8 @@ namespace
 #endif
 }
 
-ShaderSdf::ShaderSdf(const Vertex::Layout& layout) :
+Sdf::Sdf(const Vertex::Layout& layout) :
 	ShaderCustom(layout, { Vertex::Attribute::Type::Position, Vertex::Attribute::Type::TexCoord, }, sizeof(CustomConstantBuffer), shaderSource)
 {
 	setCustomConstantBuffer(&mCustomConstantBuffer);
-}
-
-ShaderSdf::~ShaderSdf()
-{
-	//
 }

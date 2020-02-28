@@ -2,9 +2,9 @@
 
 #include <Renderer/shader_custom.h>
 
-namespace Renderer
+namespace Renderer::Shaders
 {
-	class ShaderBlur : public ShaderCustom
+	class Blur : public ShaderCustom
 	{
 	public:
 		enum class Direction
@@ -21,8 +21,7 @@ namespace Renderer
 		};
 
 	public:
-		ShaderBlur(const Vertex::Layout& layout);
-		~ShaderBlur();
+		Blur(const Vertex::Layout& layout);
 
 	public:
 		void setDirection(Direction value) { mCustomConstantBuffer.direction = (value == Direction::Horizontal ? glm::vec2(1.0f, 0.0f) : glm::vec2(0.0f, 1.0f)); markDirty(); }

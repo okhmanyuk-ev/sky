@@ -1,6 +1,7 @@
 #include "default.h"
 
 using namespace Renderer;
+using namespace Renderer::Shaders;
 
 namespace
 {
@@ -136,24 +137,19 @@ namespace
 #endif
 }
 
-ShaderDefault::ShaderDefault(const Vertex::Layout& layout, const std::set<Flag>& flags) :
+Default::Default(const Vertex::Layout& layout, const std::set<Flag>& flags) :
 	ShaderCustom(layout, { Vertex::Attribute::Type::Position }, sizeof(CustomConstantBuffer), 
 		MakeDefinesFromFlags(layout, shaderSource, flags))
 {
 	setCustomConstantBuffer(&mCustomConstantBuffer);
 }
 
-ShaderDefault::ShaderDefault(const Vertex::Layout& layout) : ShaderDefault(layout, MakeFlagsFromLayout(layout)) 
+Default::Default(const Vertex::Layout& layout) : Default(layout, MakeFlagsFromLayout(layout))
 { 
 	//
 };
 
-ShaderDefault::~ShaderDefault()
-{
-	//
-}
-
-std::set<ShaderDefault::Flag> ShaderDefault::MakeFlagsFromLayout(const Vertex::Layout& layout)
+std::set<Default::Flag> Default::MakeFlagsFromLayout(const Vertex::Layout& layout)
 {
 	std::set<Flag> result = { };
 
@@ -166,7 +162,7 @@ std::set<ShaderDefault::Flag> ShaderDefault::MakeFlagsFromLayout(const Vertex::L
 	return result;
 }
 
-std::string ShaderDefault::MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags)
+std::string Default::MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags)
 {
 	auto result = source;
 

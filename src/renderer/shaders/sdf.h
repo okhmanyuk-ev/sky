@@ -2,9 +2,9 @@
 
 #include <Renderer/shader_custom.h>
 
-namespace Renderer
+namespace Renderer::Shaders
 {
-	class ShaderSdf : public ShaderCustom
+	class Sdf : public ShaderCustom
 	{
 	private:
 		struct alignas(16) CustomConstantBuffer
@@ -16,8 +16,7 @@ namespace Renderer
 		};
 
 	public:
-		ShaderSdf(const Vertex::Layout& layout);
-		~ShaderSdf();
+		Sdf(const Vertex::Layout& layout);
 
 	public:
 		auto getMinValue() const { return mCustomConstantBuffer.minValue; }

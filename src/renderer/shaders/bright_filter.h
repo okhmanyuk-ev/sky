@@ -2,11 +2,11 @@
 
 #include <Renderer/shader_custom.h>
 
-namespace Renderer
+namespace Renderer::Shaders
 {
 	// https://github.com/cansik/processing-bloom-filter
 
-	class ShaderBrightFilter : public ShaderCustom
+	class BrightFilter : public ShaderCustom
 	{
 	private:
 		struct alignas(16) CustomConstantBuffer
@@ -15,9 +15,8 @@ namespace Renderer
 		};
 
 	public:
-		ShaderBrightFilter(const Vertex::Layout& layout);
-		~ShaderBrightFilter();
-
+		BrightFilter(const Vertex::Layout& layout);
+		
 	public:
 		auto getThreshold() const { return mCustomConstantBuffer.threshold; }
 		void setThreshold(float value) { mCustomConstantBuffer.threshold = value; markDirty(); }

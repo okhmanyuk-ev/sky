@@ -1,6 +1,7 @@
 #include "blur.h"
 
 using namespace Renderer;
+using namespace Renderer::Shaders;
 
 namespace
 {
@@ -111,13 +112,8 @@ namespace
 #endif
 }
 
-ShaderBlur::ShaderBlur(const Vertex::Layout& layout) : 
+Blur::Blur(const Vertex::Layout& layout) :
 	ShaderCustom(layout, { Vertex::Attribute::Type::Position, Vertex::Attribute::Type::TexCoord }, sizeof(CustomConstantBuffer), shaderSource)
 {
 	setCustomConstantBuffer(&mCustomConstantBuffer);
-}
-
-ShaderBlur::~ShaderBlur()
-{
-	//
 }

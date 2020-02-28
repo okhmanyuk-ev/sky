@@ -44,7 +44,7 @@ namespace Shared
 			{ Renderer::Vertex::Attribute::Type::Color, Renderer::Vertex::Attribute::Format::R8G8B8A8UN, offsetof(ImDrawVert, col) },
 			{ Renderer::Vertex::Attribute::Type::TexCoord, Renderer::Vertex::Attribute::Format::R32G32F, offsetof(ImDrawVert, uv) } } };
 
-		std::shared_ptr<Renderer::ShaderDefault> mShader = std::make_shared<Renderer::ShaderDefault>(ImguiLayout);
+		std::shared_ptr<Renderer::Shaders::Default> mShader = std::make_shared<Renderer::Shaders::Default>(ImguiLayout);
 		
 	private:	
 		void event(const Platform::Keyboard::Event& e) override;

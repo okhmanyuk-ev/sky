@@ -1,6 +1,7 @@
 #include "light.h"
 
 using namespace Renderer;
+using namespace Renderer::Shaders;
 
 namespace
 {
@@ -295,24 +296,19 @@ namespace
 #endif
 }
 
-ShaderLight::ShaderLight(const Vertex::Layout& layout, const std::set<Flag>& flags) :
+Light::Light(const Vertex::Layout& layout, const std::set<Flag>& flags) :
 	ShaderCustom(layout, { Vertex::Attribute::Type::Position }, sizeof(CustomConstantBuffer),
 		MakeDefinesFromFlags(layout, shaderSource, flags))
 {
 	setCustomConstantBuffer(&mCustomConstantBuffer);
 }
 
-ShaderLight::ShaderLight(const Vertex::Layout& layout) : ShaderLight(layout, MakeFlagsFromLayout(layout))
+Light::Light(const Vertex::Layout& layout) : Light(layout, MakeFlagsFromLayout(layout))
 {
 	//
 };
 
-ShaderLight::~ShaderLight()
-{
-	//
-}
-
-std::set<ShaderLight::Flag> ShaderLight::MakeFlagsFromLayout(const Vertex::Layout& layout)
+std::set<Light::Flag> Light::MakeFlagsFromLayout(const Vertex::Layout& layout)
 {
 	std::set<Flag> result = { };
 
@@ -325,7 +321,7 @@ std::set<ShaderLight::Flag> ShaderLight::MakeFlagsFromLayout(const Vertex::Layou
 	return result;
 }
 
-std::string ShaderLight::MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags)
+std::string Light::MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags)
 {
 	auto result = source;
 
