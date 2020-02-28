@@ -585,6 +585,13 @@ void System::pushProjectionMatrix(const glm::mat4& value)
 	push(state);
 }
 
+void System::pushTextureAddress(Renderer::TextureAddress value)
+{
+	auto state = mStates.top();
+	state.textureAddress = value;
+	push(state);
+}
+
 void System::setBatching(bool value) 
 { 
 	if (!value && mBatching) 

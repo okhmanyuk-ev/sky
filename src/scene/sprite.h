@@ -16,13 +16,17 @@ namespace Scene
 
 	public:
 		auto getTexture() const { return mTexture; }
-		void setTexture(const std::shared_ptr<Renderer::Texture>& value) { mTexture = value; }
+		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexture = value; }
 
 		auto getTexRegion() const { return mTexRegion; }
 		void setTexRegion(const Graphics::TexRegion& value) { mTexRegion = value; }
 
+		auto getTextureAddress() const { return mTextureAddress; }
+		void setTextureAddress(Renderer::TextureAddress value) { mTextureAddress = value; }
+
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
 		Graphics::TexRegion mTexRegion = {};
+		Renderer::TextureAddress mTextureAddress = Renderer::TextureAddress::Wrap;
 	};
 }

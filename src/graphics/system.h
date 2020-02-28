@@ -115,6 +115,7 @@ namespace Graphics
 		void push(std::optional<Renderer::Scissor> value);
 		void pushViewMatrix(const glm::mat4& value);
 		void pushProjectionMatrix(const glm::mat4& value);
+		void pushTextureAddress(Renderer::TextureAddress value);
 
 		auto getCurrentState() const { return mStates.top(); }
 		
