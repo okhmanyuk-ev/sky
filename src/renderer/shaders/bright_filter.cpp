@@ -38,7 +38,7 @@ namespace
 
 		void main()
 		{
-			vec4 result = texture2D(uTexture, vTexCoord);
+			vec4 result = texture(uTexture, vTexCoord);
 
 			vec3 luminanceVector = vec3(0.2125, 0.7154, 0.0721);
 
