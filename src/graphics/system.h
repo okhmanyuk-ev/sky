@@ -72,7 +72,11 @@ namespace Graphics
 
 		// sprite
 		void draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model, 
-			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f }, 
+			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+
+		void draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
+			std::shared_ptr<Renderer::ShaderMatrices> shader);
 
 		// sdf mesh
 		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,

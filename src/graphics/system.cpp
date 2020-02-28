@@ -364,7 +364,13 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 	
-	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model);
+	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model, shader);
+}
+
+void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
+	std::shared_ptr<Renderer::ShaderMatrices> shader)
+{
+	draw(texture, model, {}, { Color::White, 1.0f }, shader);
 }
 
 void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
