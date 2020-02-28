@@ -12,6 +12,8 @@ namespace
 			mat4 uViewMatrix;
 			mat4 uProjectionMatrix;
 			mat4 uModelMatrix;
+
+			vec4 color;
 		};
 
 		uniform sampler2D uTexture;
@@ -62,6 +64,7 @@ namespace
 		#ifdef HAS_TEXCOORD_ATTRIB
 			result *= texture(uTexture, vTexCoord);
 		#endif
+			result *= color;
 			fragColor = result;
 		}
 		#endif
@@ -126,9 +129,7 @@ namespace
 		#ifdef HAS_TEXCOORD_ATTRIB
 			result *= texture0.Sample(sampler0, input.uv);
 		#endif
-			
 			result *= color;
-
 			return result;
 		}
 		)";
