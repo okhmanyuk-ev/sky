@@ -49,54 +49,25 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		GRAPHICS->push(state);
 		GRAPHICS->clear();
 		GRAPHICS->draw(render_texture, model);
-		GRAPHICS->pop();
-	}
-	{
-		GRAPHICS->push(Graphics::System::State());
-		GRAPHICS->applyState();
 
 		mBlurShader->setResolution({ mTargetWidth, mTargetHeight });
-
-		static const std::vector<Renderer::Vertex::Position> Vertices = {
-			{ { -1.0f, -1.0f, 0.0f } },
-			{ { -1.0f,  1.0f, 0.0f } },
-			{ {  1.0f,  1.0f, 0.0f } },
-			{ {  1.0f, -1.0f, 0.0f } }
-		};
-
-		static const std::vector<uint16_t> Indices = { 0, 1, 2, 0, 2, 3 };
-
-		RENDERER->setCullMode(Renderer::CullMode::None);
-		RENDERER->setDepthMode(Renderer::DepthMode());
-		RENDERER->setBlendMode(Renderer::BlendStates::AlphaBlend);
-
-		RENDERER->setTopology(Renderer::Topology::TriangleList);
-		RENDERER->setShader(mBlurShader);
-		RENDERER->setVertexBuffer(Vertices);
-		RENDERER->setIndexBuffer(Indices);
-		RENDERER->setViewport(Renderer::Viewport(*mBlurTarget1));
-		RENDERER->setSampler(Renderer::Sampler::Linear);
-		RENDERER->setScissor(nullptr);
 
 		for (int i = 0; i < mBlurPasses; i++)
 		{
 			mBlurShader->setDirection(Renderer::ShaderBlur::Direction::Horizontal);
 
-			RENDERER->setRenderTarget(mBlurTarget2);
-			RENDERER->setTexture(mBlurTarget1);
-			RENDERER->clear();
-			RENDERER->drawIndexed(Indices.size());
+			GRAPHICS->push(mBlurTarget2);
+			GRAPHICS->clear();
+			GRAPHICS->draw(mBlurTarget1, model, mBlurShader);
+			GRAPHICS->pop();
 
 			mBlurShader->setDirection(Renderer::ShaderBlur::Direction::Vertical);
 
-			RENDERER->setRenderTarget(mBlurTarget1);
-			RENDERER->setTexture(mBlurTarget2);
-			RENDERER->clear();
-			RENDERER->drawIndexed(Indices.size());
+			GRAPHICS->clear();
+			GRAPHICS->draw(mBlurTarget2, model, mBlurShader);
 		}
 
 		GRAPHICS->pop();
-		GRAPHICS->applyState();
 	}
 	{
 		auto state = GRAPHICS->getCurrentState();
@@ -108,12 +79,11 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 		auto model = glm::scale(glm::mat4(1.0f), { render_texture->getWidth(), render_texture->getHeight(), 1.0f });
 
+		mDefaultShader->setColor(glm::vec4(mGlowIntensity));
+
 		GRAPHICS->push(state);
-		//GRAPHICS->clear(); // uncomment to get only blur effect
-
-		for (int i = 0; i < mGlowPasses; i++)
-			GRAPHICS->draw(mBlurTarget1, model);
-
+	//	GRAPHICS->clear(); // uncomment to get only blur effect
+		GRAPHICS->draw(mBlurTarget1, model, mDefaultShader);
 		GRAPHICS->pop();
 	}
 }
