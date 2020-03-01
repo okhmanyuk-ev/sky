@@ -46,6 +46,7 @@ void System::applyState()
 	RENDERER->setBlendMode(state.blendMode);
 	RENDERER->setSampler(state.sampler);
 	RENDERER->setTextureAddressMode(state.textureAddress);
+	RENDERER->setStencilMode(state.stencilMode);
 
 	mAppliedState = state;
 }
@@ -570,6 +571,13 @@ void System::pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target)
 		pushOrthoMatrix((float)target->getWidth(), (float)target->getHeight());
 	else
 		pushOrthoMatrix(PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight());
+}
+
+void System::pushStencilMode(const Renderer::StencilMode& value)
+{
+	auto state = mStates.top();
+	state.stencilMode = value;
+	push(state);
 }
 
 void System::setBatching(bool value) 

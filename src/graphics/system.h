@@ -117,43 +117,27 @@ namespace Graphics
 		void pushTextureAddress(Renderer::TextureAddress value);
 		void pushOrthoMatrix(float width, float height);
 		void pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
+		void pushStencilMode(const Renderer::StencilMode& value);
 
 		auto getCurrentState() const { return mStates.top(); }
 		
-	private:
-		bool mWorking = false;
-
 	public:
-		struct State
+		struct System::State
 		{
 			glm::mat4 projectionMatrix = glm::mat4(1.0f);
 			glm::mat4 viewMatrix = glm::mat4(1.0f);
 			std::shared_ptr<Renderer::RenderTarget> renderTarget = nullptr;
 			std::optional<Renderer::Scissor> scissor = std::nullopt;
-			Renderer::Viewport viewport;
+			Renderer::Viewport viewport = Renderer::Viewport();
 			Renderer::DepthMode depthMode = Renderer::DepthMode();
 			Renderer::BlendMode blendMode = Renderer::BlendStates::NonPremultiplied;
 			Renderer::Sampler sampler = Renderer::Sampler::Nearest;
 			Renderer::TextureAddress textureAddress = Renderer::TextureAddress::Clamp;
-
-			inline bool operator==(const State& value) const
-			{
-				return
-					projectionMatrix == value.projectionMatrix &&
-					viewMatrix == value.viewMatrix &&
-					renderTarget == value.renderTarget &&
-					scissor == value.scissor &&
-					depthMode == value.depthMode &&
-					blendMode == value.blendMode &&
-					sampler == value.sampler &&
-					textureAddress == value.textureAddress;
-			}
-
-			inline bool operator!=(const State& value) const
-			{
-				return !(*this == value);
-			}
+			Renderer::StencilMode stencilMode = Renderer::StencilMode();
 		};
+
+	private:
+		bool mWorking = false;
 
 	private:
 		std::stack<State> mStates;
@@ -203,4 +187,23 @@ namespace Graphics
 			std::vector<Renderer::Vertex::PositionColorTexture> vertices;
 		} mBatch;
 	};
+
+	inline bool operator==(const System::State& left, const System::State& right)
+	{
+		return
+			left.projectionMatrix == right.projectionMatrix &&
+			left.viewMatrix == right.viewMatrix &&
+			left.renderTarget == right.renderTarget &&
+			left.scissor == right.scissor &&
+			left.depthMode == right.depthMode &&
+			left.blendMode == right.blendMode &&
+			left.sampler == right.sampler &&
+			left.textureAddress == right.textureAddress &&
+			left.stencilMode == right.stencilMode;
+	}
+
+	inline bool operator!=(const System::State& left, const System::State& right)
+	{
+		return !(left == right);
+	}
 }
