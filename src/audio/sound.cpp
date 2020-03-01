@@ -6,7 +6,7 @@ using namespace Audio;
 
 Sound::Sound(const Platform::Asset& asset, bool loop)
 {
-	FMOD_CREATESOUNDEXINFO exinfo;
+/*	FMOD_CREATESOUNDEXINFO exinfo;
 	memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
 	exinfo.length = static_cast<unsigned int>(asset.getSize());
@@ -18,7 +18,7 @@ Sound::Sound(const Platform::Asset& asset, bool loop)
 	else
 		mode |= FMOD_LOOP_OFF;
 
-	Audio::System::Fmod->createSound((const char*)asset.getMemory(), mode, &exinfo, &sound);
+	Audio::System::Fmod->createSound((const char*)asset.getMemory(), mode, &exinfo, &sound);*/
 }
 
 Sound::~Sound()

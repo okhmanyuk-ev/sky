@@ -2,7 +2,7 @@
 
 #include <Core/engine.h>
 #include <Audio/sound.h>
-#include <fmod/fmod.hpp>
+//#include <fmod/fmod.hpp>
 
 #define AUDIO ENGINE->getSystem<Audio::System>()
 
@@ -22,7 +22,7 @@ namespace Audio
 		void play(const Sound& sound);
 
 	private:
-		static FMOD::System* Fmod;
-		FMOD::Channel* channel = nullptr;
+	//	static FMOD::System* Fmod;
+	//	FMOD::Channel* channel = nullptr;
 	};
 }
