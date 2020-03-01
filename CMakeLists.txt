@@ -211,12 +211,8 @@ target_link_libraries(${PROJECT_NAME} imgui)
 
 # fmt
 
-file(GLOB FMT_SRC
-	lib/fmt/src/*.cc
-)
-add_library(fmt STATIC ${FMT_SRC})
+add_subdirectory(lib/fmt)
 target_link_libraries(${PROJECT_NAME} fmt)
-target_include_directories(fmt PUBLIC lib/fmt/include)
 
 # nlohmann_json
 
