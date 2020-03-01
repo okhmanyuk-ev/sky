@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Platform/asset.h>
-//#include <fmod/fmod.hpp>
+#include <fmod/fmod.hpp>
 
 namespace Audio
 {
@@ -14,6 +14,6 @@ namespace Audio
 		~Sound();
 
 	private:
-	//	FMOD::Sound* sound;
+		FMOD::Sound* sound;
 	};
 }

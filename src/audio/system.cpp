@@ -7,11 +7,11 @@
 
 using namespace Audio;
 
-//FMOD::System* System::Fmod = nullptr;
+FMOD::System* System::Fmod = nullptr;
 
 System::System()
 {
-/*	FMOD::System_Create(&Fmod);
+	FMOD::System_Create(&Fmod);
 	unsigned int version;
 	Fmod->getVersion(&version);
 	assert(version == FMOD_VERSION);
@@ -23,20 +23,20 @@ System::System()
 	assert(result == FMOD_RESULT::FMOD_OK);
 #if defined(PLATFORM_ANDROID)
 	Platform::SystemAndroid::Instance->activity->vm->DetachCurrentThread();
-#endif*/
+#endif
 }
 
 void System::update()
 {
-//	Fmod->update();
+	Fmod->update();
 }
 
 void System::play(const Sound& sound)
 {
-//	Fmod->playSound(sound.sound, nullptr, false, &channel);
+	Fmod->playSound(sound.sound, nullptr, false, &channel);
 }
 
 System::~System()
 {
-//	Fmod->release();
+	Fmod->release();
 }

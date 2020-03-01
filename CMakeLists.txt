@@ -4,6 +4,12 @@ project(sky)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(X64 TRUE)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(X86 TRUE)
+endif()
+
 file(GLOB CORE_SRC
     src/core/*.cpp
     src/core/*.h
@@ -103,6 +109,14 @@ add_library(${PROJECT_NAME} STATIC
 	${NETWORK_SRC}
 )
 
+if(APPLE)
+	set(OBJC_SOURCES
+		sky/src/renderer/system_gl.cpp
+		sky/src/platform/asset.cpp
+	)
+	set_source_files_properties(${OBJC_SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++ -fembed-bitcode")
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 # glm
@@ -130,58 +144,53 @@ add_library(tinyutf8 STATIC ${TINYUTF8_SRC})
 target_link_libraries(${PROJECT_NAME} tinyutf8)
 
 # fmod
+# TODO: make for all platforms
 
-#add_library(fmod SHARED IMPORTED)
-#target_link_libraries(${PROJECT_NAME} fmod)
-#target_include_directories(fmod INTERFACE lib/fmod/include)
-
+target_include_directories(${PROJECT_NAME} PUBLIC lib/fmod/include)
+	
 if(WIN32)
-	#if(X64)
-	#	target_link_libraries(${PROJECT_NAME} debug lib/fmod/x64/fmodL_vc)
-	#	target_link_libraries(${PROJECT_NAME} optimized lib/fmod/x64/fmod_vc)
-#		target_link_libraries(fmod INTERFACE lib/fmod/x64/fmod_vc)
-	#else()
-	#	target_link_libraries(${PROJECT_NAME} debug lib/fmod/x86/fmodL_vc)
-	#	target_link_libraries(${PROJECT_NAME} optimized lib/fmod/x86/fmod_vc)
-	#	target_link_libraries(fmod INTERFACE lib/fmod/x86/fmod_vc)
-	#endif()
-endif()    
+	add_library(fmod SHARED IMPORTED)
+	target_link_libraries(${PROJECT_NAME} fmod)
+endif()
 
-function(copy_required_dlls TARGET_NAME)
 if(WIN32)
 	if(X64)
-#		add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#			$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodL.dll">
-#			$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmod.dll">
-#			$<TARGET_FILE_DIR:${TARGET_NAME}>)
+		set_target_properties(fmod PROPERTIES
+			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x64/fmodL_vc.lib
+			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x64/fmod_vc.lib)
 	else()
-#		add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#			$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodL.dll">
-#			$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmod.dll">
-#			$<TARGET_FILE_DIR:${TARGET_NAME}>)
+		set_target_properties(fmod PROPERTIES IMPORTED_IMPLIB 
+			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodL_vc.lib
+			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmod_vc.lib)
 	endif()
-endif()    
+elseif(ANDROID)
+	#set_target_properties(fmod PROPERTIES IMPORTED_LOCATION lib/fmod/android/${ANDROID_ABI}/libfmod.so)
+endif()
+
+function(copy_required_libs TARGET_NAME)
+	if(WIN32)
+		if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set(X64 TRUE)
+		elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+			set(X86 TRUE)
+		endif()
+		if(X64)
+			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodL.dll">
+				$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmod.dll">
+				$<TARGET_FILE_DIR:${TARGET_NAME}>)
+		else()
+			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodL.dll">
+				$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmod.dll">
+				$<TARGET_FILE_DIR:${TARGET_NAME}>)
+		endif()
+	elseif(ANDROID)
+	#	add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
+	#		../../../../../../sky/lib/fmod/android/${ANDROID_ABI}/libfmod.so
+	#		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libfmod.so)
+	endif()
 endfunction()
-
-	
-
-#if(WIN32)
-#	if(X64)
-#		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodL_vc.lib)
-#		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmod_vc.lib)
-#		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#			$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodL.dll">
-#			$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmod.dll">
-#			$<TARGET_FILE_DIR:${PROJECT_NAME}>)
-#	else()
-#		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodL_vc.lib)
-#		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmod_vc.lib)
-#		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#			$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodL.dll">
-#			$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmod.dll">
-#			$<TARGET_FILE_DIR:${PROJECT_NAME}>)
-#	endif()
-#endif()
 
 if(APPLE)
 #	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmodL_iphonesimulator.a)
@@ -212,3 +221,14 @@ target_include_directories(fmt PUBLIC lib/fmt/include)
 # nlohmann_json
 
 target_include_directories(${PROJECT_NAME} PUBLIC lib/nlohmann_json/include)
+
+# glew
+
+file(GLOB GLEW_SRC 
+	lib/glew/src/glew.c
+    lib/glew/include/GL/glew.h
+)
+add_library(glew STATIC ${GLEW_SRC})
+target_link_libraries(${PROJECT_NAME} glew)
+target_include_directories(glew PUBLIC lib/glew/include)
+target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
