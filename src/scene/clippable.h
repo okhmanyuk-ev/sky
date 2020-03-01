@@ -28,7 +28,7 @@ namespace Scene
 			scissor.size.x = bounds.z - bounds.x;
 			scissor.size.y = bounds.w - bounds.y;
 
-			GRAPHICS->push(scissor);
+			GRAPHICS->pushScissor(scissor);
 		}
 
 		void endRender() override

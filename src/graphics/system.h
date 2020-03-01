@@ -122,7 +122,7 @@ namespace Graphics
 		auto getCurrentState() const { return mStates.top(); }
 		
 	public:
-		struct System::State
+		struct State
 		{
 			glm::mat4 projectionMatrix = glm::mat4(1.0f);
 			glm::mat4 viewMatrix = glm::mat4(1.0f);
