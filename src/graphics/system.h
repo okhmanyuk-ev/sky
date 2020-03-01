@@ -30,9 +30,7 @@ namespace Graphics
 		struct State;
 
 	public:
-		void begin(const State& state);
-		void begin(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
-		void begin(const Camera& camera, std::shared_ptr<Renderer::RenderTarget> target = nullptr);
+		void begin();
 		void end();
 
 	private:
@@ -107,15 +105,18 @@ namespace Graphics
 		void push(const State& value);
 		void pop(int count = 1);
 
-		void push(Renderer::Sampler value);
-		void push(Renderer::BlendMode value);
-		void push(Renderer::DepthMode value);
-		void push(const Renderer::Viewport& value);
-		void push(std::shared_ptr<Renderer::RenderTarget> value);
-		void push(std::optional<Renderer::Scissor> value);
+		void pushSampler(Renderer::Sampler value);
+		void pushBlendMode(Renderer::BlendMode value);
+		void pushDepthMode(Renderer::DepthMode value);
+		void pushViewport(const Renderer::Viewport& value);
+		void pushViewport(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
+		void pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value);
+		void pushScissor(std::optional<Renderer::Scissor> value);
 		void pushViewMatrix(const glm::mat4& value);
 		void pushProjectionMatrix(const glm::mat4& value);
 		void pushTextureAddress(Renderer::TextureAddress value);
+		void pushOrthoMatrix(float width, float height);
+		void pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
 
 		auto getCurrentState() const { return mStates.top(); }
 		

@@ -111,7 +111,9 @@ void Scene::Scene::frame()
 {
 	updateTransformations();
 	GRAPHICS->begin();
+	GRAPHICS->pushOrthoMatrix();
 	recursiveNodeDraw(mRoot);
+	GRAPHICS->pop();
 	GRAPHICS->end();
 }
 

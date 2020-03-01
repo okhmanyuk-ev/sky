@@ -12,8 +12,8 @@ void Sprite::draw()
 
 	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
 	
-	GRAPHICS->push(getSampler());
-	GRAPHICS->push(getBlendMode());
+	GRAPHICS->pushSampler(getSampler());
+	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->pushTextureAddress(mTextureAddress);
 	GRAPHICS->draw(mTexture, model, mTexRegion, getColor());
 	GRAPHICS->pop(3);

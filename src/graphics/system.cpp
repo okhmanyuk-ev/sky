@@ -5,55 +5,12 @@
 
 using namespace Graphics;
 
-void System::begin(const State& state)
+void System::begin()
 {
 	assert(!mWorking);
 	mWorking = true;
-	mStates.push(state);
+	mStates.push(State());
 	mAppliedState = std::nullopt;
-}
-
-void System::begin(std::shared_ptr<Renderer::RenderTarget> target)
-{
-	auto state = State();
-
-	state.viewMatrix = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f));
-
-	if (target)
-	{
-		state.renderTarget = target;
-		state.blendMode = Renderer::BlendStates::AlphaBlend;
-		state.projectionMatrix = glm::orthoLH(0.0f, (float)target->getWidth(), (float)target->getHeight(), 0.0f, -1.0f, 1.0f);
-		state.viewport = Renderer::Viewport(*target);
-	}
-	else
-	{
-		state.projectionMatrix = glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
-		state.viewport = Renderer::Viewport();
-	}
-
-	begin(state);
-}
-
-void System::begin(const Camera& camera, std::shared_ptr<Renderer::RenderTarget> target)
-{
-	auto state = State();
-	state.viewMatrix = camera.getViewMatrix();
-	state.projectionMatrix = camera.getProjectionMatrix();
-
-	if (target)
-	{
-		state.renderTarget = target;
-		state.blendMode = Renderer::BlendStates::AlphaBlend;
-		state.viewport = Renderer::Viewport(*target);
-	}
-	else
-	{
-		state.viewport = Renderer::Viewport();
-	}
-
-	begin(state);
 }
 
 void System::end()
@@ -529,45 +486,53 @@ void System::pop(int count)
 	}
 }
 
-void System::push(Renderer::Sampler value)
+void System::pushSampler(Renderer::Sampler value)
 {
 	auto state = mStates.top();
 	state.sampler = value;
 	push(state);
 }
 
-void System::push(std::shared_ptr<Renderer::RenderTarget> value)
-{
-	auto state = mStates.top();
-	state.renderTarget = value;
-	push(state);
-}
-
-void System::push(std::optional<Renderer::Scissor> value)
-{
-	auto state = mStates.top();
-	state.scissor = value;
-	push(state);
-}
-
-void System::push(Renderer::BlendMode value)
+void System::pushBlendMode(Renderer::BlendMode value)
 {
 	auto state = mStates.top();
 	state.blendMode = value;
 	push(state);
 }
 
-void System::push(Renderer::DepthMode value)
+void System::pushDepthMode(Renderer::DepthMode value)
 {
 	auto state = mStates.top();
 	state.depthMode = value;
 	push(state);
 }
 
-void System::push(const Renderer::Viewport& value)
+void System::pushViewport(const Renderer::Viewport& value)
 {
 	auto state = mStates.top();
 	state.viewport = value;
+	push(state);
+}
+
+void System::pushViewport(std::shared_ptr<Renderer::RenderTarget> target)
+{
+	if (target)
+		pushViewport(Renderer::Viewport(*target));
+	else
+		pushViewport(Renderer::Viewport());
+}
+
+void System::pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value)
+{
+	auto state = mStates.top();
+	state.renderTarget = value;
+	push(state);
+}
+
+void System::pushScissor(std::optional<Renderer::Scissor> value)
+{
+	auto state = mStates.top();
+	state.scissor = value;
 	push(state);
 }
 
@@ -590,6 +555,21 @@ void System::pushTextureAddress(Renderer::TextureAddress value)
 	auto state = mStates.top();
 	state.textureAddress = value;
 	push(state);
+}
+
+void System::pushOrthoMatrix(float width, float height)
+{
+	auto state = mStates.top();
+	state.projectionMatrix = glm::orthoLH(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+	push(state);
+}
+
+void System::pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target)
+{
+	if (target)
+		pushOrthoMatrix((float)target->getWidth(), (float)target->getHeight());
+	else
+		pushOrthoMatrix(PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight());
 }
 
 void System::setBatching(bool value) 

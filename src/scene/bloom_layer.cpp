@@ -36,19 +36,17 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 		mTargetsDirty = false;
 	}
+
+	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
+	GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
+
 	{
-		auto state = GRAPHICS->getCurrentState();
-		state.renderTarget = mBlurTarget1;
-		state.blendMode = Renderer::BlendStates::AlphaBlend;
-		state.viewport = Renderer::Viewport(*mBlurTarget1);
-		state.projectionMatrix = glm::orthoLH(0.0f, mTargetWidth, mTargetHeight, 0.0f, -1.0f, 1.0f);
-		state.sampler = Renderer::Sampler::Linear;
+		GRAPHICS->pushRenderTarget(mBlurTarget1);
+		GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
+		GRAPHICS->pushViewport(mBlurTarget1);
 
-		auto model = glm::scale(glm::mat4(1.0f), { mTargetWidth, mTargetHeight, 1.0f });
-
-		GRAPHICS->push(state);
 		GRAPHICS->clear();
-		GRAPHICS->draw(render_texture, model, mBrightFilterShader);
+		GRAPHICS->draw(render_texture, glm::mat4(1.0f), mBrightFilterShader);
 
 		mBlurShader->setResolution({ mTargetWidth, mTargetHeight });
 
@@ -56,34 +54,29 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		{
 			mBlurShader->setDirection(Renderer::Shaders::Blur::Direction::Horizontal);
 
-			GRAPHICS->push(mBlurTarget2);
+			GRAPHICS->pushRenderTarget(mBlurTarget2);
 			GRAPHICS->clear();
-			GRAPHICS->draw(mBlurTarget1, model, mBlurShader);
+			GRAPHICS->draw(mBlurTarget1, glm::mat4(1.0f), mBlurShader);
 			GRAPHICS->pop();
-
+			
 			mBlurShader->setDirection(Renderer::Shaders::Blur::Direction::Vertical);
-
+			
 			GRAPHICS->clear();
-			GRAPHICS->draw(mBlurTarget2, model, mBlurShader);
+			GRAPHICS->draw(mBlurTarget2, glm::mat4(1.0f), mBlurShader);
 		}
 
-		GRAPHICS->pop();
+		GRAPHICS->pop(3);
 	}
 	{
-		auto state = GRAPHICS->getCurrentState();
-		state.renderTarget = render_texture;
-		state.blendMode = Renderer::BlendStates::AlphaBlend;
-		state.viewport = Renderer::Viewport(*render_texture);
-		state.projectionMatrix = glm::orthoLH(0.0f, (float)render_texture->getWidth(), (float)render_texture->getHeight(), 0.0f, -1.0f, 1.0f);
-		state.sampler = Renderer::Sampler::Linear;
-
-		auto model = glm::scale(glm::mat4(1.0f), { render_texture->getWidth(), render_texture->getHeight(), 1.0f });
-
 		mDefaultShader->setColor(glm::vec4(mGlowIntensity));
-
-		GRAPHICS->push(state);
+		
+		GRAPHICS->pushRenderTarget(render_texture);
+		GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
+		GRAPHICS->pushViewport(render_texture);
 	//	GRAPHICS->clear(); // uncomment to get only blur effect
-		GRAPHICS->draw(mBlurTarget1, model, mDefaultShader);
-		GRAPHICS->pop();
+		GRAPHICS->draw(mBlurTarget1, glm::mat4(1.0f), mDefaultShader);
+		GRAPHICS->pop(3);
 	}
+
+	GRAPHICS->pop(2);
 }

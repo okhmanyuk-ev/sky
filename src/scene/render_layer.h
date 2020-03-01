@@ -25,17 +25,14 @@ namespace Scene
 		{
 			T::beginRender();
 
-			auto state = GRAPHICS->getCurrentState();
-			state.renderTarget = mTarget;
-			state.blendMode = { Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, Renderer::Blend::One, Renderer::Blend::InvSrcAlpha };
-
-			GRAPHICS->push(state);
+			GRAPHICS->pushRenderTarget(mTarget);
+			GRAPHICS->pushBlendMode({ Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, Renderer::Blend::One, Renderer::Blend::InvSrcAlpha });
 			GRAPHICS->clear();
 		}
 
 		void endRender() override
 		{
-			GRAPHICS->pop();
+			GRAPHICS->pop(2);
 
 			if (mPostprocessEnabled)
 				postprocess(mTarget);
@@ -43,17 +40,14 @@ namespace Scene
 			auto model = glm::scale(glm::mat4(1.0f), { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 1.0f });
 			auto color = getColor() * glm::vec4({ glm::vec3(getAlpha()), 1.0f });
 
-			GRAPHICS->push(Renderer::BlendStates::AlphaBlend);
+			GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
 			GRAPHICS->draw(mTarget, model, { }, color);
 			GRAPHICS->pop();
 			
 			T::endRender();
 		}
 
-		virtual void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) 
-		{
-			//
-		}
+		virtual void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) { }
 
 	private:
 		std::shared_ptr<Renderer::RenderTarget> mTarget = std::make_shared<Renderer::RenderTarget>(PLATFORM->getWidth(), PLATFORM->getHeight());

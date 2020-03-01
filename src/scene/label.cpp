@@ -82,7 +82,7 @@ void Label::draw()
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
-	GRAPHICS->push(Renderer::Sampler::Linear);
+	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
 	GRAPHICS->drawString(*mFont, mMesh, model, mFontSize, getColor(), mOutlineThickness, mOutlineColor);
 	GRAPHICS->pop();
 }
