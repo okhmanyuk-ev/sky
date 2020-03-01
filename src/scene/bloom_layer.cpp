@@ -39,10 +39,10 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
 	GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
+	GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
 
 	{
 		GRAPHICS->pushRenderTarget(mBlurTarget1);
-		GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
 		GRAPHICS->pushViewport(mBlurTarget1);
 
 		GRAPHICS->clear();
@@ -65,18 +65,17 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 			GRAPHICS->draw(mBlurTarget2, glm::mat4(1.0f), mBlurShader);
 		}
 
-		GRAPHICS->pop(3);
+		GRAPHICS->pop(2);
 	}
 	{
 		mDefaultShader->setColor(glm::vec4(mGlowIntensity));
 		
 		GRAPHICS->pushRenderTarget(render_texture);
-		GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
 		GRAPHICS->pushViewport(render_texture);
 	//	GRAPHICS->clear(); // uncomment to get only blur effect
 		GRAPHICS->draw(mBlurTarget1, glm::mat4(1.0f), mDefaultShader);
-		GRAPHICS->pop(3);
+		GRAPHICS->pop(2);
 	}
 
-	GRAPHICS->pop(2);
+	GRAPHICS->pop(3);
 }

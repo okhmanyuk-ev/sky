@@ -37,12 +37,12 @@ namespace Scene
 			if (mPostprocessEnabled)
 				postprocess(mTarget);
 
-			auto model = glm::scale(glm::mat4(1.0f), { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 1.0f });
 			auto color = getColor() * glm::vec4({ glm::vec3(getAlpha()), 1.0f });
 
 			GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
-			GRAPHICS->draw(mTarget, model, { }, color);
-			GRAPHICS->pop();
+			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
+			GRAPHICS->draw(mTarget, glm::mat4(1.0f), { }, color);
+			GRAPHICS->pop(2);
 			
 			T::endRender();
 		}
