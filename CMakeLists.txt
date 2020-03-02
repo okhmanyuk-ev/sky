@@ -121,7 +121,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 # glm
 
+add_subdirectory(lib/glm)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DGLM_ENABLE_EXPERIMENTAL)
+target_link_libraries(${PROJECT_NAME} glm)
 target_include_directories(${PROJECT_NAME} PUBLIC lib/glm)
 
 # stb
