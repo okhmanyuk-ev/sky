@@ -8,6 +8,8 @@
 #include <thread>
 #include <Windows.h>
 
+#define NATIVE_CONSOLE_DEVICE std::static_pointer_cast<Common::NativeConsoleDevice>(CONSOLE_DEVICE)
+
 namespace Common
 {
 	class NativeConsoleDevice : public Console::Device
