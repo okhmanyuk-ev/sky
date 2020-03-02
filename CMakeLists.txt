@@ -218,7 +218,7 @@ target_link_libraries(${PROJECT_NAME} fmt)
 
 # nlohmann_json
 
-target_include_directories(${PROJECT_NAME} PUBLIC lib/nlohmann_json/include)
+target_include_directories(${PROJECT_NAME} PUBLIC lib/nlohmann_json)
 
 # glew
 
