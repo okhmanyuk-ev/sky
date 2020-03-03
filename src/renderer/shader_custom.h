@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Renderer/system.h>
-#include <Renderer/shader.h>
-#include <Renderer/vertex.h>
-#include <Renderer/low_level_api.h>
+#include <renderer/system.h>
+#include <renderer/shader.h>
+#include <renderer/vertex.h>
+#include <renderer/low_level_api.h>
 #include <map>
 
 namespace Renderer

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Platform/mouse.h>
-#include <Platform/touch.h>
-#include <Common/event_system.h>
+#include <platform/mouse.h>
+#include <platform/touch.h>
+#include <common/event_system.h>
 
 namespace Shared 
 {

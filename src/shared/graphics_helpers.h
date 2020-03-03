@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Graphics/atlas.h>
-#include <Graphics/animation.h>
+#include <graphics/atlas.h>
+#include <graphics/animation.h>
 
 namespace Shared::GraphicsHelpers
 {

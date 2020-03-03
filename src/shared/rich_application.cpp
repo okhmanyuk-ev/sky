@@ -1,9 +1,9 @@
 #include "rich_application.h"
 
 #include <imgui.h>
-#include <Shared/imgui_user.h>
-#include <Common/easing.h>
-#include <Shared/action_helpers.h>
+#include <shared/imgui_user.h>
+#include <common/easing.h>
+#include <shared/action_helpers.h>
 
 using namespace Shared;
 

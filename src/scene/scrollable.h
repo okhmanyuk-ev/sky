@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Scene/node.h>
+#include <scene/node.h>
 
 namespace Scene
 {

@@ -1,5 +1,5 @@
 #include "graphical_console_commands.h"
-#include "Platform/system_windows.h"
+#include "platform/system_windows.h"
 
 using namespace Shared;
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Renderer/system.h>
-#include <Common/event_system.h>
-#include <Common/profiler_system.h>
+#include <core/engine.h>
+#include <renderer/system.h>
+#include <common/event_system.h>
+#include <common/profiler_system.h>
 
 namespace Shared
 {

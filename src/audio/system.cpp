@@ -1,7 +1,7 @@
 #include "system.h"
 
 #if defined(PLATFORM_ANDROID)
-#include <Platform/system_android.h>
+#include <platform/system_android.h>
 #endif
 #include <cassert>
 

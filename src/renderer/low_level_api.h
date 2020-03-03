@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/defines.h>
+#include <renderer/defines.h>
 
 #if defined(RENDERER_D3D11)
     #include <d3dcompiler.h>

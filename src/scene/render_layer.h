@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Scene/node.h>
-#include <Scene/color.h>
-#include <Renderer/render_target.h>
-#include <Common/event_system.h>
+#include <scene/node.h>
+#include <scene/color.h>
+#include <renderer/render_target.h>
+#include <common/event_system.h>
 #include <stack>
 
 namespace Scene

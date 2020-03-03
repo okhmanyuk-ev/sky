@@ -1,8 +1,8 @@
 #pragma once
 
 #include <list>
-#include <Graphics/system.h>
-#include <Scene/transform.h>
+#include <graphics/system.h>
+#include <scene/transform.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 

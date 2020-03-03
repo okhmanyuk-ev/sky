@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/shader_custom.h>
+#include <renderer/shader_custom.h>
 
 namespace Renderer::Shaders
 {

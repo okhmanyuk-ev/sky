@@ -1,6 +1,6 @@
 #include "imgui_user.h"
-#include <Core/engine.h>
-#include <Platform/system.h>
+#include <core/engine.h>
+#include <platform/system.h>
 
 namespace ImGui::User
 {

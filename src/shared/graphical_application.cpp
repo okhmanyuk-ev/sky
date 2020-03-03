@@ -1,7 +1,7 @@
 #include "graphical_application.h"
 
 #include <imgui.h>
-#include <Shared/imgui_user.h>
+#include <shared/imgui_user.h>
 
 using namespace Shared;
 

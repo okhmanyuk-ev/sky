@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Renderer/texture.h>
-#include <Graphics/font.h>
-#include <Graphics/image.h>
-#include <Platform/asset.h>
+#include <core/engine.h>
+#include <renderer/texture.h>
+#include <graphics/font.h>
+#include <graphics/image.h>
+#include <platform/asset.h>
 #include <map>
 #include <memory>
 

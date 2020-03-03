@@ -1,22 +1,22 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Common/frame_system.h>
-#include <Common/event_system.h>
-#include <Platform/system.h>
-#include <Renderer/system.h>
-#include <Renderer/texture.h>
+#include <core/engine.h>
+#include <common/frame_system.h>
+#include <common/event_system.h>
+#include <platform/system.h>
+#include <renderer/system.h>
+#include <renderer/texture.h>
 
-#include <Platform/keyboard.h>
-#include <Platform/mouse.h>
-#include <Platform/touch.h>
+#include <platform/keyboard.h>
+#include <platform/mouse.h>
+#include <platform/touch.h>
 
 #include <imgui.h>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include <Renderer/shaders/default.h>
+#include <renderer/shaders/default.h>
 
 #include <cstddef>
 

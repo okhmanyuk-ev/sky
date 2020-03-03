@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Scene/node.h>
+#include <scene/node.h>
 
 // TODO: we should make overridable callbacks,
 // see Pickable<..> class for help

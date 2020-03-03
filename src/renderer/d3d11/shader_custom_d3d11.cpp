@@ -1,7 +1,7 @@
-#include <Renderer/shader_custom.h>
+#include <renderer/shader_custom.h>
 
 #if defined(RENDERER_D3D11)
-#include <Renderer/system_d3d11.h>
+#include <renderer/system_d3d11.h>
 
 using namespace Renderer;
 
@@ -95,5 +95,4 @@ void ShaderCustom::update()
 	
 	SystemD3D11::Context->Unmap(mImpl->constantBuffer, 0);
 }
-
 #endif

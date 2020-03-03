@@ -1,20 +1,20 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Renderer/defines.h>
-#include <Renderer/topology.h>
-#include <Renderer/viewport.h>
-#include <Renderer/scissor.h>
-#include <Renderer/buffer.h>
-#include <Renderer/texture.h>
-#include <Renderer/render_target.h>
-#include <Renderer/shader.h>
-#include <Renderer/sampler.h>
-#include <Renderer/depth.h>
-#include <Renderer/rasterizer_state.h>
-#include <Renderer/blend.h>
-#include <Renderer/stencil.h>
-#include <Renderer/texture_address.h>
+#include <core/engine.h>
+#include <renderer/defines.h>
+#include <renderer/topology.h>
+#include <renderer/viewport.h>
+#include <renderer/scissor.h>
+#include <renderer/buffer.h>
+#include <renderer/texture.h>
+#include <renderer/render_target.h>
+#include <renderer/shader.h>
+#include <renderer/sampler.h>
+#include <renderer/depth.h>
+#include <renderer/rasterizer_state.h>
+#include <renderer/blend.h>
+#include <renderer/stencil.h>
+#include <renderer/texture_address.h>
 
 #define RENDERER ENGINE->getSystem<Renderer::System>()
 

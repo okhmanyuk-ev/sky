@@ -1,15 +1,15 @@
 #pragma once
 
-#include <Graphics/camera.h>
-#include <Common/event_system.h>
-#include <Common/frame_system.h>
-#include <Platform/system.h>
+#include <graphics/camera.h>
+#include <common/event_system.h>
+#include <common/frame_system.h>
+#include <platform/system.h>
 
-#include <Platform/keyboard.h>
-#include <Platform/mouse.h>
-#include <Platform/touch.h>
+#include <platform/keyboard.h>
+#include <platform/mouse.h>
+#include <platform/touch.h>
 
-#include <Shared/console_device.h>
+#include <shared/console_device.h>
 
 namespace Shared
 {

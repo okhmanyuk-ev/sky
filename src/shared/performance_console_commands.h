@@ -1,15 +1,15 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Console/system.h>
-#include <Common/task_system.h>
-#include <Platform/system.h>
-#include <Console/system.h>
-#include <Common/frame_system.h>
-#include <Common/framerate_counter.h>
-#include <Common/task_system.h>
+#include <core/engine.h>
+#include <console/system.h>
+#include <common/task_system.h>
+#include <platform/system.h>
+#include <console/system.h>
+#include <common/frame_system.h>
+#include <common/framerate_counter.h>
+#include <common/task_system.h>
 #include <deque>
-#include <Shared/drawcall_counter.h>
+#include <shared/drawcall_counter.h>
 
 namespace Shared
 {

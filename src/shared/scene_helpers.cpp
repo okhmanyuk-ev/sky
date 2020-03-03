@@ -1,6 +1,6 @@
 #include "scene_helpers.h"
-#include <Scene/actionable.h>
-#include <Shared/action_helpers.h>
+#include <scene/actionable.h>
+#include <shared/action_helpers.h>
 
 using namespace Shared;
 

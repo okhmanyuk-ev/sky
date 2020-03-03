@@ -1,8 +1,8 @@
-#include <Renderer/render_target.h>
+#include <renderer/render_target.h>
 #include <cassert>
 
 #if defined(RENDERER_D3D11)
-#include <Renderer/system_d3d11.h>
+#include <renderer/system_d3d11.h>
 
 using namespace Renderer;
 

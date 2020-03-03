@@ -1,18 +1,18 @@
 #pragma once
 
-#include <Core/engine.h>
+#include <core/engine.h>
 
 #include "packet.h"
 #include <functional>
 
-#include <Platform/defines.h>
+#include <platform/defines.h>
 
 #if defined(PLATFORM_WINDOWS)
 #include <Windows.h>
 #include <winsock.h>
 #endif
 
-#include <Common/frame_system.h>
+#include <common/frame_system.h>
 
 #define NETWORK ENGINE->getSystem<Network::System>()
 

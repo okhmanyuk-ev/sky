@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/sampler.h>
+#include <renderer/sampler.h>
 
 namespace Scene
 {

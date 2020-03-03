@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Scene/node.h>
-#include <Scene/color.h>
-#include <Scene/blend.h>
-#include <Scene/sampler.h>
-#include <Graphics/tex_region.h>
+#include <scene/node.h>
+#include <scene/color.h>
+#include <scene/blend.h>
+#include <scene/sampler.h>
+#include <graphics/tex_region.h>
 
 namespace Scene
 {

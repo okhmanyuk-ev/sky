@@ -1,17 +1,17 @@
 #pragma once
 
-#include <Common/frame_system.h>
-#include <Platform/system.h>
-#include <Renderer/system.h>
-#include <Renderer/topology.h>
-#include <Renderer/vertex.h>
-#include <Renderer/shaders/default.h>
-#include <Renderer/shaders/sdf.h>
+#include <common/frame_system.h>
+#include <platform/system.h>
+#include <renderer/system.h>
+#include <renderer/topology.h>
+#include <renderer/vertex.h>
+#include <renderer/shaders/default.h>
+#include <renderer/shaders/sdf.h>
 
-#include <Graphics/color.h>
-#include <Graphics/font.h>
-#include <Graphics/camera.h>
-#include <Graphics/tex_region.h>
+#include <graphics/color.h>
+#include <graphics/font.h>
+#include <graphics/camera.h>
+#include <graphics/tex_region.h>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>

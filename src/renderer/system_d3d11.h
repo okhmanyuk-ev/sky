@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/system.h>
+#include <renderer/system.h>
 
 #if defined(RENDERER_D3D11)
 #include <Platform/system.h>

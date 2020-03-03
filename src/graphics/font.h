@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Platform/asset.h>
-#include <Renderer/texture.h>
+#include <platform/asset.h>
+#include <renderer/texture.h>
 #include <unordered_map>
 #include <memory>
 #include <tinyutf8.hpp>

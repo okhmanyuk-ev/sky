@@ -1,13 +1,13 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Platform/system.h>
-#include <Graphics/system.h>
-#include <Common/event_system.h>
-#include <Scene/node.h>
+#include <core/engine.h>
+#include <platform/system.h>
+#include <graphics/system.h>
+#include <common/event_system.h>
+#include <scene/node.h>
 
-#include <Platform/mouse.h>
-#include <Platform/touch.h>
+#include <platform/mouse.h>
+#include <platform/touch.h>
 
 namespace Scene
 {

@@ -1,7 +1,7 @@
 #include "stats_system.h"
 
 #include <imgui.h>
-#include <Platform/system.h>
+#include <platform/system.h>
 #include <glm/glm.hpp>
 
 using namespace Shared;

@@ -10,64 +10,64 @@
 
 #include <nlohmann/json.hpp>
 
-#include <Common/timer.h>
-#include <Common/easing.h>
-#include <Common/hash.h>
-#include <Common/actions.h>
-#include <Common/frame_system.h>
+#include <common/timer.h>
+#include <common/easing.h>
+#include <common/hash.h>
+#include <common/actions.h>
+#include <common/frame_system.h>
 
-#include <Audio/sound.h>
+#include <audio/sound.h>
 
-#include <Platform/defines.h>
-#include <Platform/mouse.h>
+#include <platform/defines.h>
+#include <platform/mouse.h>
 
 #if defined(PLATFORM_WINDOWS)
-#include <Platform/system_windows.h>
+#include <platform/system_windows.h>
 #endif
 
-#include <Scene/scene.h>
-#include <Scene/node.h>
-#include <Scene/label.h>
-#include <Scene/render_layer.h>
-#include <Scene/bloom_layer.h>
-#include <Scene/sprite.h>
-#include <Scene/rectangle.h>
-#include <Scene/circle.h>
-#include <Scene/pickable.h>
-#include <Scene/clickable.h>
-#include <Scene/clippable.h>
-#include <Scene/debuggable.h>
-#include <Scene/scrollable.h>
-#include <Scene/actionable.h>
-#include <Scene/ani_sprite.h>
-#include <Scene/scrollbox.h>
-#include <Scene/transform.h>
-#include <Scene/color.h>
-#include <Scene/trail.h>
+#include <scene/scene.h>
+#include <scene/node.h>
+#include <scene/label.h>
+#include <scene/render_layer.h>
+#include <scene/bloom_layer.h>
+#include <scene/sprite.h>
+#include <scene/rectangle.h>
+#include <scene/circle.h>
+#include <scene/pickable.h>
+#include <scene/clickable.h>
+#include <scene/clippable.h>
+#include <scene/debuggable.h>
+#include <scene/scrollable.h>
+#include <scene/actionable.h>
+#include <scene/ani_sprite.h>
+#include <scene/scrollbox.h>
+#include <scene/transform.h>
+#include <scene/color.h>
+#include <scene/trail.h>
 
-#include <Shared/stats_system.h>
-#include <Shared/cache_system.h>
-#include <Shared/rich_application.h>
-#include <Shared/graphical_application.h>
-#include <Shared/localization_system.h>
-#include <Shared/graphics_helpers.h>
-#include <Shared/action_helpers.h>
-#include <Shared/first_person_camera_controller.h>
-#include <Shared/imgui_user.h>
-#include <Shared/renderer_debug.h>
-#include <Shared/touch_emulator.h>
-#include <Shared/gesture_detector.h>
-#include <Shared/scene_helpers.h>
-#include <Shared/scene_manager.h>
-#include <Shared/format_helpers.h>
-#include <Shared/scene_editor.h>
+#include <shared/stats_system.h>
+#include <shared/cache_system.h>
+#include <shared/rich_application.h>
+#include <shared/graphical_application.h>
+#include <shared/localization_system.h>
+#include <shared/graphics_helpers.h>
+#include <shared/action_helpers.h>
+#include <shared/first_person_camera_controller.h>
+#include <shared/imgui_user.h>
+#include <shared/renderer_debug.h>
+#include <shared/touch_emulator.h>
+#include <shared/gesture_detector.h>
+#include <shared/scene_helpers.h>
+#include <shared/scene_manager.h>
+#include <shared/format_helpers.h>
+#include <shared/scene_editor.h>
 
-#include <Graphics/font.h>
-#include <Graphics/legacy_renderer.h>
+#include <graphics/font.h>
+#include <graphics/legacy_renderer.h>
 
-#include <Renderer/shaders/default.h>
-#include <Renderer/shaders/light.h>
-#include <Renderer/shaders/blur.h>
-#include <Renderer/shaders/sdf.h>
+#include <renderer/shaders/default.h>
+#include <renderer/shaders/light.h>
+#include <renderer/shaders/blur.h>
+#include <renderer/shaders/sdf.h>
 
-#include <Network/system.h>
+#include <network/system.h>

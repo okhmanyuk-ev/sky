@@ -1,6 +1,6 @@
 #include "scene_editor.h"
 #include <imgui.h>
-#include <Scene/color.h>
+#include <scene/color.h>
 
 using namespace Shared;
 

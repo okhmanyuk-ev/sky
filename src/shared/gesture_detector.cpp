@@ -1,5 +1,5 @@
 #include "gesture_detector.h"
-#include <Platform/system.h>
+#include <platform/system.h>
 
 using namespace Shared;
 

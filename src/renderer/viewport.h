@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include <Platform/system.h>
-#include <Renderer/render_target.h>
+#include <platform/system.h>
+#include <renderer/render_target.h>
 
 namespace Renderer
 {

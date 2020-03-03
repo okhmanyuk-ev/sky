@@ -2,7 +2,7 @@
 
 #include <string>
 #include <list>
-#include <Common/timer.h>
+#include <common/timer.h>
 
 #define PROFILER ENGINE->getSystem<Common::ProfilerSystem>()
 

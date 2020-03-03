@@ -1,8 +1,8 @@
-#include <Renderer/shader_custom.h>
+#include <renderer/shader_custom.h>
 #include <string>
 
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
-#include <Renderer/system_gl.h>
+#include <renderer/system_gl.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Common/actions.h>
-#include <Scene/node.h>
+#include <common/actions.h>
+#include <scene/node.h>
 
 namespace Scene
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Platform/system.h>
+#include <platform/system.h>
 
 #if defined(PLATFORM_IOS)
 #import <UIKit/UIKit.h>

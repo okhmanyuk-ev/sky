@@ -222,11 +222,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC lib/nlohmann_json/include)
 
 # glew
 
-file(GLOB GLEW_SRC 
-	lib/glew/src/glew.c
-    lib/glew/include/GL/glew.h
-)
-add_library(glew STATIC ${GLEW_SRC})
-target_link_libraries(${PROJECT_NAME} glew)
-target_include_directories(glew PUBLIC lib/glew/include)
-target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
+if(WIN32)
+	file(GLOB GLEW_SRC 
+		lib/glew/src/glew.c
+		lib/glew/include/GL/glew.h
+	)
+	add_library(glew STATIC ${GLEW_SRC})
+	target_link_libraries(${PROJECT_NAME} glew)
+	target_include_directories(glew PUBLIC lib/glew/include)
+	target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
+endif()

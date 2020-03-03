@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Platform/asset.h>
+#include <platform/asset.h>
 #include <fmod/fmod.hpp>
 
 namespace Audio

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Common/frame_system.h>
-#include <Platform/system.h>
+#include <common/frame_system.h>
+#include <platform/system.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 

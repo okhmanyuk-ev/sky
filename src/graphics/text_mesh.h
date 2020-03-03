@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <Renderer/vertex.h>
-#include <Renderer/topology.h>
+#include <renderer/vertex.h>
+#include <renderer/topology.h>
 #include "font.h"
 #include "tinyutf8.hpp"
 

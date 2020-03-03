@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Core/engine.h>
+#include <core/engine.h>
 
-#include <Common/frame_system.h>
-#include <Console/system.h>
-#include <Platform/system.h>
+#include <common/frame_system.h>
+#include <console/system.h>
+#include <platform/system.h>
 
 #include <glm/glm.hpp>
 

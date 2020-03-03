@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Common/event_system.h>
-#include <Platform/keyboard.h>
-#include <Shared/touch_emulator.h>
+#include <common/event_system.h>
+#include <platform/keyboard.h>
+#include <shared/touch_emulator.h>
 #include <glm/glm.hpp>
-#include <Core/clock.h>
+#include <core/clock.h>
 #include <map>
 
 namespace Shared 

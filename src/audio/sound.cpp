@@ -1,6 +1,6 @@
 #include "sound.h"
 
-#include <Audio/system.h>
+#include <audio/system.h>
 
 using namespace Audio;
 

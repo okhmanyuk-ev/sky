@@ -1,7 +1,7 @@
 #include "asset.h"
 
-#include <Platform/low_level_api.h>
-#include <Platform/system_android.h>
+#include <platform/low_level_api.h>
+#include <platform/system_android.h>
 #include <fstream>
 #include <cassert>
 #if !defined(PLATFORM_IOS)

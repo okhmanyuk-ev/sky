@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Scene/scene.h>
+#include <scene/scene.h>
 
 namespace Shared
 {

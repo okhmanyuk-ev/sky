@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Core/engine.h>
+#include <core/engine.h>
 
-#include <Console/system.h>
-#include <Common/actions.h>
+#include <console/system.h>
+#include <common/actions.h>
 
 #define CVAR_GETTER(V) [this] { return std::vector<std::string>({ V }); }
 #define CVAR_GETTER2(V1, V2) [this] { return std::vector<std::string>({ V1, V2 }); }

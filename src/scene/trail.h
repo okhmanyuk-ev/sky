@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Scene/node.h>
-#include <Scene/color.h>
-#include <Common/easing.h>
+#include <scene/node.h>
+#include <scene/color.h>
+#include <common/easing.h>
 
 namespace Scene
 {

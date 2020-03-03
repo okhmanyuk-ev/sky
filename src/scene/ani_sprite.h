@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Scene/node.h>
-#include <Scene/sprite.h>
-#include <Graphics/animation.h>
+#include <scene/node.h>
+#include <scene/sprite.h>
+#include <graphics/animation.h>
 
 namespace Scene
 {

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Scene/render_layer.h>
-#include <Renderer/render_target.h>
-#include <Common/event_system.h>
+#include <scene/render_layer.h>
+#include <renderer/render_target.h>
+#include <common/event_system.h>
 #include <stack>
-#include <Renderer/shaders/blur.h>
-#include <Renderer/shaders/bright_filter.h>
+#include <renderer/shaders/blur.h>
+#include <renderer/shaders/bright_filter.h>
 
 namespace Scene
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/bitbuffer.h>
+#include <common/bitbuffer.h>
 #include "address.h"
 
 namespace Network

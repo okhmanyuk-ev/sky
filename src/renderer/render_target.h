@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Renderer/texture.h>
-#include <Renderer/low_level_api.h>
+#include <renderer/texture.h>
+#include <renderer/low_level_api.h>
 #include <glm/glm.hpp>
 
 namespace Renderer

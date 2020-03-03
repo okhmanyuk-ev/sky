@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Common/frame_system.h>
+#include <core/engine.h>
+#include <common/frame_system.h>
 
 namespace Common
 {

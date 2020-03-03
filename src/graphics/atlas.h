@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Graphics/image.h>
-#include <Graphics/tex_region.h>
+#include <graphics/image.h>
+#include <graphics/tex_region.h>
 #include <map>
 #include <optional>
 

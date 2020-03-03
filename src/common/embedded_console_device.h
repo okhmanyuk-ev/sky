@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Console/device.h>
+#include <console/device.h>
 
 namespace Common
 {

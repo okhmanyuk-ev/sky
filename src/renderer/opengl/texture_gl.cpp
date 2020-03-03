@@ -1,4 +1,4 @@
-#include <Renderer/texture.h>
+#include <renderer/texture.h>
 
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 

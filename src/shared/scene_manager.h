@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Shared/all.h>
+#include <shared/all.h>
 #include "scene_manager.h"
 
 namespace Shared

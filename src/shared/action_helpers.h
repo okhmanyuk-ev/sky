@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Scene/node.h>
-#include <Scene/color.h>
-#include <Common/actions.h>
-#include <Common/easing.h>
+#include <scene/node.h>
+#include <scene/color.h>
+#include <common/actions.h>
+#include <common/easing.h>
 
 namespace Shared::ActionHelpers
 {

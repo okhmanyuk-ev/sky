@@ -1,15 +1,15 @@
 #pragma once
 
-#include <Platform/system.h>
+#include <platform/system.h>
 
 #if defined(PLATFORM_ANDROID)
-#include <Platform/low_level_api.h>
+#include <platform/low_level_api.h>
 
-#include <Platform/touch.h>
-#include <Platform/keyboard.h>
+#include <platform/touch.h>
+#include <platform/keyboard.h>
 
-#include <Common/frame_system.h>
-#include <Common/event_system.h>
+#include <common/frame_system.h>
+#include <common/event_system.h>
 
 namespace Platform
 {

@@ -4,20 +4,20 @@
 // no cycle and checking,
 // just remove equal items when adding
 
-#include <Console/device.h>
-#include <Console/system.h>
-#include <Common/interpolator.h>
-#include <Common/event_system.h>
-#include <Common/frame_system.h>
-#include <Common/timer.h>
-#include <Platform/system.h>
-#include <Platform/keyboard.h>
-#include <Platform/mouse.h>
-#include <Platform/touch.h>
+#include <console/device.h>
+#include <console/system.h>
+#include <common/interpolator.h>
+#include <common/event_system.h>
+#include <common/frame_system.h>
+#include <common/timer.h>
+#include <platform/system.h>
+#include <platform/keyboard.h>
+#include <platform/mouse.h>
+#include <platform/touch.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <Graphics/color.h>
-#include <Shared/touch_emulator.h>
+#include <graphics/color.h>
+#include <shared/touch_emulator.h>
 
 #include <deque>
 #include <imgui.h>

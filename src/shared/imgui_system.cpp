@@ -1,9 +1,9 @@
 #include "imgui_system.h"
-#include <Platform/defines.h>
-#include <Common/event_system.h>
-#include <Platform/system.h>
-#include <Graphics/color.h>
-#include <Renderer/texture.h>
+#include <platform/defines.h>
+#include <common/event_system.h>
+#include <platform/system.h>
+#include <graphics/color.h>
+#include <renderer/texture.h>
 
 using namespace Shared;
 

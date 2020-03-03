@@ -1,9 +1,9 @@
 #include "system_gl.h"
 
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
-#include <Platform/system_windows.h>
-#include <Platform/system_android.h>
-#include <Platform/system_ios.h>
+#include <platform/system_windows.h>
+#include <platform/system_android.h>
+#include <platform/system_ios.h>
 
 using namespace Renderer;
 

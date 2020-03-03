@@ -1,14 +1,14 @@
 #pragma once
 
-#include <Shared/cache_system.h>
+#include <shared/cache_system.h>
 #include <tinyutf8.hpp>
-#include <Scene/label.h>
-#include <Scene/clickable.h>
-#include <Scene/rectangle.h>
-#include <Scene/actionable.h>
-#include <Scene/debuggable.h>
-#include <Scene/scene.h>
-#include <Scene/sprite.h>
+#include <scene/label.h>
+#include <scene/clickable.h>
+#include <scene/rectangle.h>
+#include <scene/actionable.h>
+#include <scene/debuggable.h>
+#include <scene/scene.h>
+#include <scene/sprite.h>
 
 namespace Shared::SceneHelpers
 {

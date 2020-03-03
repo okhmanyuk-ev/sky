@@ -1,14 +1,14 @@
 #include "console_device.h"
 
-#include <Platform/keyboard.h>
-#include <Platform/mouse.h>
-#include <Common/easing.h>
+#include <platform/keyboard.h>
+#include <platform/mouse.h>
+#include <common/easing.h>
 #include <algorithm>
 #include <cassert>
-#include <Shared/imgui_user.h>
-#include <Platform/defines.h>
-#include <Renderer/defines.h>
-#include <Platform/system_android.h>
+#include <shared/imgui_user.h>
+#include <platform/defines.h>
+#include <renderer/defines.h>
+#include <platform/system_android.h>
 
 using namespace Shared;
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Core/engine.h>
+#include <core/engine.h>
 #include <map>
 #include <string>
 #include <unordered_map>
-#include <Common/frame_system.h>
+#include <common/frame_system.h>
 
 #define STATS ENGINE->getSystem<Shared::StatsSystem>()
 

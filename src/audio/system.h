@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Audio/sound.h>
+#include <core/engine.h>
+#include <audio/sound.h>
 #include <fmod/fmod.hpp>
 
 #define AUDIO ENGINE->getSystem<Audio::System>()

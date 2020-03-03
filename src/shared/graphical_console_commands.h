@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Console/system.h>
-#include <Common/console_commands.h>
-#include <Platform/system.h>
-#include <Graphics/system.h>
+#include <core/engine.h>
+#include <console/system.h>
+#include <common/console_commands.h>
+#include <platform/system.h>
+#include <graphics/system.h>
 
 namespace Shared
 {

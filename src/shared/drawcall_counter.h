@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Core/clock.h>
-#include <Shared/renderer_debug.h>
-#include <Common/event_system.h>
-#include <Common/timer.h>
+#include <core/engine.h>
+#include <core/clock.h>
+#include <shared/renderer_debug.h>
+#include <common/event_system.h>
+#include <common/timer.h>
 
 namespace Shared
 {

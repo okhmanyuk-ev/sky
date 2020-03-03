@@ -1,4 +1,4 @@
-#include <Renderer/render_target.h>
+#include <renderer/render_target.h>
 #include <cassert>
 
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)

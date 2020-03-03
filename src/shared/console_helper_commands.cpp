@@ -1,9 +1,8 @@
 #include "console_helper_commands.h"
 #include <imgui.h>
-#include <Shared/imgui_user.h>
-#include <Common/profiler_system.h>
-
-#include <Common/console_commands.h>
+#include <shared/imgui_user.h>
+#include <common/profiler_system.h>
+#include <common/console_commands.h>
 
 using namespace Shared;
 

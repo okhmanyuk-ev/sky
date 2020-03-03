@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Platform/defines.h>
-#include <Platform/keyboard.h>
-#include <Platform/mouse.h>
-#include <Platform/touch.h>
+#include <core/engine.h>
+#include <platform/defines.h>
+#include <platform/keyboard.h>
+#include <platform/mouse.h>
+#include <platform/touch.h>
 
 #include <string>
 #include <memory>

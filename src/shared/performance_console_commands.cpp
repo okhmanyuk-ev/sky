@@ -1,11 +1,11 @@
 #include "performance_console_commands.h"
 
-#include <Common/console_commands.h>
+#include <common/console_commands.h>
 
 #include <imgui.h>
-#include <Shared/imgui_user.h>
-#include <Renderer/defines.h>
-#include <Shared/stats_system.h>
+#include <shared/imgui_user.h>
+#include <renderer/defines.h>
+#include <shared/stats_system.h>
 
 using namespace Shared;
 

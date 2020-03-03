@@ -1,17 +1,17 @@
 #pragma once
 
-#include <Renderer/system.h>
+#include <renderer/system.h>
 
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 
-#include <Platform/system.h>
-#include <Common/event_system.h>
-#include <Renderer/defines.h>
-#include <Renderer/vertex.h>
-#include <Renderer/topology.h>
-#include <Renderer/low_level_api.h>
+#include <platform/system.h>
+#include <common/event_system.h>
+#include <renderer/defines.h>
+#include <renderer/vertex.h>
+#include <renderer/topology.h>
+#include <renderer/low_level_api.h>
 
-#include <Platform/system_android.h>
+#include <platform/system_android.h>
 #include <map>
 
 namespace Renderer

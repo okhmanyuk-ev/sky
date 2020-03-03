@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/blend.h>
+#include <renderer/blend.h>
 
 namespace Scene
 {

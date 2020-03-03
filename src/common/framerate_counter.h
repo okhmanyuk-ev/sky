@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Common/timer.h>
-#include <Common/frame_system.h>
+#include <core/engine.h>
+#include <common/timer.h>
+#include <common/frame_system.h>
 
 namespace Common
 {

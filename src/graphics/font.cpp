@@ -2,7 +2,7 @@
 
 #include <stb_truetype.h>
 #include <rectpack2D/finders_interface.h>
-#include <Graphics/image.h>
+#include <graphics/image.h>
 #include <vector>
 
 using namespace Graphics;

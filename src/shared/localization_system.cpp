@@ -1,6 +1,6 @@
 #include "localization_system.h"
 
-#include <Platform/asset.h>
+#include <platform/asset.h>
 
 #include <sstream>
 #include <cassert>

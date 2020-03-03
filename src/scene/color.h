@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <Graphics/color.h>
+#include <graphics/color.h>
 
 namespace Scene
 {

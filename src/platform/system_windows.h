@@ -1,19 +1,19 @@
 #pragma once
 
-#include <Platform/system.h>
+#include <platform/system.h>
 
 #if defined(PLATFORM_WINDOWS)
-#include <Platform/low_level_api.h>
+#include <platform/low_level_api.h>
 
-#include <Platform/mouse.h>
-#include <Platform/keyboard.h>
+#include <platform/mouse.h>
+#include <platform/keyboard.h>
 
 #include <cassert>
 #include <set>
 
-#include <Common/frame_system.h>
-#include <Common/event_system.h>
-#include <Common/actions.h>
+#include <common/frame_system.h>
+#include <common/event_system.h>
+#include <common/actions.h>
 
 namespace Platform
 {

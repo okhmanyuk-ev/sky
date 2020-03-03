@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Platform/defines.h>
+#include <platform/defines.h>
 
 #if defined(PLATFORM_WINDOWS)
 	#define RENDERER_D3D11

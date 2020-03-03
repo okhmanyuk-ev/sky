@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Core/clock.h>
+#include <core/engine.h>
+#include <core/clock.h>
 #include <list>
 #include <functional>
 

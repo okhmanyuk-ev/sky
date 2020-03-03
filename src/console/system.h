@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Core/engine.h>
-#include <Common/event_system.h>
-#include <Console/device.h>
+#include <core/engine.h>
+#include <common/event_system.h>
+#include <console/device.h>
 
 #include <string>
 #include <vector>

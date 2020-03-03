@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Renderer/topology.h>
-#include <Renderer/vertex.h>
-#include <Renderer/system.h>
-#include <Renderer/shaders/default.h>
-#include <Platform/system.h>
+#include <renderer/topology.h>
+#include <renderer/vertex.h>
+#include <renderer/system.h>
+#include <renderer/shaders/default.h>
+#include <platform/system.h>
 #include <glm/glm.hpp>
 
 namespace Graphics

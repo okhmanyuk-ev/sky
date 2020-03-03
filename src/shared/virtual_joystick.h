@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Graphics/system.h>
+#include <graphics/system.h>
 
 namespace Shared 
 {

@@ -1,33 +1,33 @@
 #pragma once
 
-#include <Core/engine.h>
+#include <core/engine.h>
 
-#include <Common/task_system.h>
-#include <Common/frame_system.h>
-#include <Common/event_system.h>
+#include <common/task_system.h>
+#include <common/frame_system.h>
+#include <common/event_system.h>
 
-#include <Shared/console_device.h>
-#include <Console/system.h>
+#include <shared/console_device.h>
+#include <console/system.h>
 
-#include <Common/console_commands.h>
-#include <Shared/graphical_console_commands.h>
-#include <Shared/performance_console_commands.h>
-#include <Shared/console_helper_commands.h>
-#include <Shared/cache_system.h>
+#include <common/console_commands.h>
+#include <shared/graphical_console_commands.h>
+#include <shared/performance_console_commands.h>
+#include <shared/console_helper_commands.h>
+#include <shared/cache_system.h>
 
-#include <Shared/imgui_system.h>
+#include <shared/imgui_system.h>
 
-#include <Platform/system.h>
-#include <Renderer/system.h>
+#include <platform/system.h>
+#include <renderer/system.h>
 
-#include <Graphics/system.h>
-#include <Audio/system.h>
+#include <graphics/system.h>
+#include <audio/system.h>
 #include <vector>
-#include <Shared/renderer_debug.h>
-#include <Renderer/system_d3d11.h>
-#include <Renderer/system_gl.h>
+#include <shared/renderer_debug.h>
+#include <renderer/system_d3d11.h>
+#include <renderer/system_gl.h>
 
-#include <Shared/graphical_application.h>
+#include <shared/graphical_application.h>
 
 namespace Shared
 {

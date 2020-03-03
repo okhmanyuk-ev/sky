@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/vertex.h>
+#include <renderer/vertex.h>
 #include <set>
 #include <assert.h>
 
