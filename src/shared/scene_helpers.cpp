@@ -267,6 +267,7 @@ void SceneHelpers::Emitter::emit()
 	particle->setPivot({ 0.5f, 0.5f });
 	particle->setRotation(glm::radians(glm::linearRand(0.0f, 360.0f)));
 	particle->setColor(mBeginColor);
+	particle->setAlpha(0.0f);
 
 	auto direction = glm::linearRand(mMinDirection, mMaxDirection);
 	
@@ -274,8 +275,8 @@ void SceneHelpers::Emitter::emit()
 		Shared::ActionHelpers::MakeParallel(
 			Shared::ActionHelpers::ChangePosition(particle, particle->getPosition() + (direction * mDistance), mDuration, Common::Easing::CubicOut),
 			Shared::ActionHelpers::ChangeScale(particle, { 0.0f, 0.0f }, mDuration),
-			Shared::ActionHelpers::ChangeColor(particle, mEndColor, mDuration),
-			Shared::ActionHelpers::ChangeAlpha(particle, mEndColor.a, mDuration)
+			Shared::ActionHelpers::ChangeColor(particle, mBeginColor, mEndColor, mDuration),
+			Shared::ActionHelpers::ChangeAlpha(particle, mBeginColor.a, mEndColor.a, mDuration)
 		),
 		Shared::ActionHelpers::Kill(particle)
 	));
