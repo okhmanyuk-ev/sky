@@ -76,4 +76,63 @@ namespace Shared::SceneHelpers
 	private:
 		std::shared_ptr<Progressbar> mProgressbar;
 	};
+
+	class Emitter : public Scene::Actionable<Scene::Node>
+	{
+	public:
+		Emitter(std::weak_ptr<Scene::Node> holder);
+
+	public:
+		void emit();
+
+	private:
+		std::weak_ptr<Scene::Node> mHolder;
+
+	public:
+		auto getMinDelay() const { return mMinDelay; }
+		void setMinDelay(float value) { mMinDelay = value; }
+
+		auto getMaxDelay() const { return mMaxDelay; }
+		void setMaxDelay(float value) { mMaxDelay = value; }
+
+		void setDelay(float value) { setMinDelay(value); setMaxDelay(value); }
+
+		auto getParticleTexture() const { return mParticleTexture; }
+		void setParticleTexture(std::shared_ptr<Renderer::Texture> value) { mParticleTexture = value; }
+
+		auto getParticleSize() const { return mParticleSize; }
+		void setParticleSize(const glm::vec2& value) { mParticleSize = value; }
+
+		auto getDistance() const { return mDistance; }
+		void setDistance(float value) { mDistance = value; }
+
+		auto getDuration() const { return mDuration; }
+		void setDuration(float value) { mDuration = value; }
+
+		auto getBeginColor() const { return mBeginColor; }
+		void setBeginColor(const glm::vec4& value) { mBeginColor = value; }
+
+		auto getEndColor() const { return mEndColor; }
+		void setEndColor(const glm::vec4& value) { mEndColor = value; }
+
+		auto getMinDirection() const { return mMinDirection; }
+		void setMinDirection(const glm::vec2& value) { mMinDirection = value; }
+
+		auto getMaxDirection() const { return mMaxDirection; }
+		void setMaxDirection(const glm::vec2& value) { mMaxDirection = value; }
+
+		void setDirection(const glm::vec2& value) { setMinDirection(value); setMaxDirection(value); }
+
+	private:
+		float mMinDelay = 0.5f;
+		float mMaxDelay = 0.5f;
+		std::shared_ptr<Renderer::Texture> mParticleTexture = nullptr;
+		glm::vec2 mParticleSize = { 8.0f, 8.0f };
+		float mDistance = 32.0f;
+		float mDuration = 1.0f;
+		glm::vec4 mBeginColor = { Graphics::Color::White, 1.0f };
+		glm::vec4 mEndColor = { Graphics::Color::White, 0.0f };
+		glm::vec2 mMinDirection = { -1.0f, -1.0f };
+		glm::vec2 mMaxDirection = { 1.0f, 1.0f };
+	};
 }
