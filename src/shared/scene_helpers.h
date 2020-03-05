@@ -77,18 +77,67 @@ namespace Shared::SceneHelpers
 		std::shared_ptr<Progressbar> mProgressbar;
 	};
 
-	class Emitter : public Scene::Actionable<Scene::Node>
+	// TODO: this can be moved to 'scene' namespace
+	// but we should solve the problem with actions in 'shared'.
+	// 'scene' does not know anything about 'shared'
+	template <class T> class Emitter : public Scene::Actionable<Scene::Node>
 	{
 	public:
-		Emitter(std::weak_ptr<Scene::Node> holder);
+		Emitter(std::weak_ptr<Scene::Node> holder) : mHolder(holder)
+		{
+			runAction(Shared::ActionHelpers::RepeatInfinite([this]()->Shared::ActionHelpers::Action {
+				if (!mRunning)
+					return nullptr;
+
+				auto delay = glm::linearRand(mMinDelay, mMaxDelay);
+				return Shared::ActionHelpers::Delayed(delay, Shared::ActionHelpers::Execute([this] {
+					if (!mRunning)
+						return;
+
+					emit();
+				}));
+			}));
+		}
 
 	public:
-		void emit();
+		void emit()
+		{
+			auto holder = mHolder.lock();
+
+			auto particle = createParticle();			
+			particle->setColor(mBeginColor);
+			particle->setAlpha(0.0f);
+			particle->setPosition(holder->unproject(project(getSize() * glm::linearRand(glm::vec2(0.0f), glm::vec2(1.0f)))));
+			particle->setSize(mBeginSize);
+			particle->setPivot({ 0.5f, 0.5f });
+			particle->setRotation(glm::radians(glm::linearRand(0.0f, 360.0f)));
+
+			auto duration = glm::linearRand(mMinDuration, mMaxDuration);
+			auto direction = glm::linearRand(mMinDirection, mMaxDirection);
+
+			particle->runAction(Shared::ActionHelpers::MakeSequence(
+				Shared::ActionHelpers::MakeParallel(
+					Shared::ActionHelpers::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Common::Easing::CubicOut),
+					Shared::ActionHelpers::ChangeSize(particle, mEndSize, duration),
+					Shared::ActionHelpers::ChangeColor(particle, mBeginColor, mEndColor, duration),
+					Shared::ActionHelpers::ChangeAlpha(particle, mBeginColor.a, mEndColor.a, duration)
+				),
+				Shared::ActionHelpers::Kill(particle)
+			));
+
+			holder->attach(particle);
+		}
+
+	protected:
+		virtual std::shared_ptr<Scene::Actionable<T>> createParticle() const = 0;
 
 	private:
 		std::weak_ptr<Scene::Node> mHolder;
 
 	public:
+		bool isRunning() const { return mRunning; }
+		void setRunning(bool value) { mRunning = value; }
+
 		auto getMinDelay() const { return mMinDelay; }
 		void setMinDelay(float value) { mMinDelay = value; }
 
@@ -97,17 +146,22 @@ namespace Shared::SceneHelpers
 
 		void setDelay(float value) { setMinDelay(value); setMaxDelay(value); }
 
-		auto getParticleTexture() const { return mParticleTexture; }
-		void setParticleTexture(std::shared_ptr<Renderer::Texture> value) { mParticleTexture = value; }
+		auto getBeginSize() const { return mBeginSize; }
+		void setBeginSize(const glm::vec2& value) { mBeginSize = value; }
 
-		auto getParticleSize() const { return mParticleSize; }
-		void setParticleSize(const glm::vec2& value) { mParticleSize = value; }
+		auto getEndSize() const { return mEndSize; }
+		void setEndSize(const glm::vec2& value) { mEndSize = value; }
 
 		auto getDistance() const { return mDistance; }
 		void setDistance(float value) { mDistance = value; }
 
-		auto getDuration() const { return mDuration; }
-		void setDuration(float value) { mDuration = value; }
+		auto getMinDuration() const { return mMinDuration; }
+		void setMinDuration(float value) { mMinDuration = value; }
+
+		auto getMaxDuration() const { return mMaxDuration; }
+		void setMaxDuration(float value) { mMaxDuration = value; }
+
+		void setDuration(float value) { setMinDuration(value); setMaxDuration(value); }
 
 		auto getBeginColor() const { return mBeginColor; }
 		void setBeginColor(const glm::vec4& value) { mBeginColor = value; }
@@ -124,15 +178,51 @@ namespace Shared::SceneHelpers
 		void setDirection(const glm::vec2& value) { setMinDirection(value); setMaxDirection(value); }
 
 	private:
+		bool mRunning = true;
 		float mMinDelay = 0.5f;
 		float mMaxDelay = 0.5f;
-		std::shared_ptr<Renderer::Texture> mParticleTexture = nullptr;
-		glm::vec2 mParticleSize = { 8.0f, 8.0f };
+		glm::vec2 mBeginSize = { 8.0f, 8.0f };
+		glm::vec2 mEndSize = { 0.0f, 0.0f };
 		float mDistance = 32.0f;
-		float mDuration = 1.0f;
+		float mMinDuration = 1.0f;
+		float mMaxDuration = 1.0f;
 		glm::vec4 mBeginColor = { Graphics::Color::White, 1.0f };
 		glm::vec4 mEndColor = { Graphics::Color::White, 0.0f };
 		glm::vec2 mMinDirection = { -1.0f, -1.0f };
 		glm::vec2 mMaxDirection = { 1.0f, 1.0f };
+	};
+
+	class SpriteEmitter : public Emitter<Scene::Sprite>
+	{
+	public:
+		SpriteEmitter(std::weak_ptr<Scene::Node> holder) : Emitter(holder) { }
+
+	protected:
+		std::shared_ptr<Scene::Actionable<Scene::Sprite>> createParticle() const override
+		{
+			auto particle = std::make_shared<Scene::Actionable<Scene::Sprite>>();
+			particle->setTexture(mTexture);
+			return particle;
+		}
+
+	public:
+		auto getTexture() const { return mTexture; }
+		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexture = value; }
+
+	private:
+		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
+	};
+
+	class RectangleEmitter : public Emitter<Scene::Rectangle>
+	{
+	public:
+		RectangleEmitter(std::weak_ptr<Scene::Node> holder) : Emitter(holder) { }
+	
+	protected:
+		std::shared_ptr<Scene::Actionable<Scene::Rectangle>> createParticle() const override
+		{
+			auto particle = std::make_shared<Scene::Actionable<Scene::Rectangle>>();
+			return particle;
+		}
 	};
 }
