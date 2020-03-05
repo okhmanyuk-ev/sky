@@ -9,6 +9,7 @@
 #include <scene/debuggable.h>
 #include <scene/scene.h>
 #include <scene/sprite.h>
+#include <shared/action_helpers.h>
 
 namespace Shared::SceneHelpers
 {
