@@ -25,8 +25,12 @@ namespace Scene
 		{
 			T::beginRender();
 
+			// https://stackoverflow.com/questions/2171085/opengl-blending-with-previous-contents-of-framebuffer
+			// http://www.shawnhargreaves.com/blog/premultiplied-alpha-and-image-composition.html
+
 			GRAPHICS->pushRenderTarget(mTarget);
-			GRAPHICS->pushBlendMode({ Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, Renderer::Blend::One, Renderer::Blend::InvSrcAlpha });
+			GRAPHICS->pushBlendMode(Renderer::BlendMode(Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, 
+				Renderer::Blend::One, Renderer::Blend::InvSrcAlpha));
 			GRAPHICS->clear();
 		}
 

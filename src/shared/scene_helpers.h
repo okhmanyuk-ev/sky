@@ -193,7 +193,7 @@ namespace Shared::SceneHelpers
 		glm::vec2 mMaxDirection = { 1.0f, 1.0f };
 	};
 
-	class SpriteEmitter : public Emitter<Scene::Sprite>
+	class SpriteEmitter : public Emitter<Scene::Sprite>, public Scene::Blend, public Scene::Sampler
 	{
 	public:
 		SpriteEmitter(std::weak_ptr<Scene::Node> holder) : Emitter(holder) { }
@@ -203,6 +203,8 @@ namespace Shared::SceneHelpers
 		{
 			auto particle = std::make_shared<Scene::Actionable<Scene::Sprite>>();
 			particle->setTexture(mTexture);
+			particle->setSampler(getSampler());
+			particle->setBlendMode(getBlendMode());
 			return particle;
 		}
 
