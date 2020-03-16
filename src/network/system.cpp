@@ -16,26 +16,6 @@
 
 using namespace Network;
 
-void Socket::sendPacket(const Packet& packet)
-{
-#if defined(PLATFORM_WINDOWS)
-	SOCKADDR_IN adr;
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	sockaddr_in adr;
-#endif
-	adr.sin_family = AF_INET;
-	adr.sin_addr.s_addr = packet.adr.ip.l;
-	adr.sin_port = htons(packet.adr.port);
-
-#if defined(PLATFORM_WINDOWS)
-	sendto(mSocket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
-		(SOCKADDR*)&adr, sizeof(adr));
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	sendto(mSocket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
-			(sockaddr*)&adr, sizeof(adr));
-#endif
-}
-
 System::System()
 {
 #if defined(PLATFORM_WINDOWS)
@@ -46,8 +26,8 @@ System::System()
 
 System::~System()
 {
-	while (mSockets.size() > 0)
-		destroySocket(mSockets.front());
+	while (!mSockets.empty())
+		destroySocket(static_cast<SocketHandle>(*mSockets.begin()));
 
 #if defined(PLATFORM_WINDOWS)
 	WSACleanup();
@@ -69,9 +49,9 @@ void System::frame()
 		while (true)
 		{
 #if defined(PLATFORM_WINDOWS)
-			int size = recvfrom(socket->mSocket, mBuffer, 8192, 0, (SOCKADDR*)&adr, &adr_size);
+			int size = recvfrom(socket->socket, mBuffer, 8192, 0, (SOCKADDR*)&adr, &adr_size);
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-			int size = recvfrom(socket->mSocket, mBuffer, 8192, 0, (sockaddr*)&adr, &adr_size);
+			int size = recvfrom(socket->socket, mBuffer, 8192, 0, (sockaddr*)&adr, &adr_size);
 #endif
 			if (size == -1)
 				break;
@@ -83,26 +63,26 @@ void System::frame()
 
 			packet.buf.write(mBuffer, size);
 
-			if (socket->mReadCallback)
-				socket->mReadCallback(packet);
+			if (socket->readCallback)
+				socket->readCallback(packet);
 		}
 	}
 }
 
-Socket* System::createSocket(uint16_t port) // TODO: make good messages on throws
+System::SocketHandle System::createSocket(uint16_t port)
 {
-	auto result = new Socket();
+	auto socket_data = new SocketData;
 
-	result->mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	socket_data->socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 #if defined(PLATFORM_WINDOWS)
-	if (result->mSocket == INVALID_SOCKET)
+	if (socket_data->socket == INVALID_SOCKET)
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	if (result->mSocket == -1)
+	if (socket_data->socket == -1)
 #endif
 	{
-	//	auto a = errno;
-	//	throw std::runtime_error("error while creating socket");
+		//	auto a = errno;
+		//	throw std::runtime_error("error while creating socket");
 	}
 
 #if defined(PLATFORM_WINDOWS)
@@ -118,48 +98,109 @@ Socket* System::createSocket(uint16_t port) // TODO: make good messages on throw
 
 
 #if defined(PLATFORM_WINDOWS)
-	if (bind(result->mSocket, (SOCKADDR*)&adr, adr_size) == SOCKET_ERROR)
+	if (bind(socket_data->socket, (SOCKADDR*)&adr, adr_size) == SOCKET_ERROR)
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	if (bind(result->mSocket, (sockaddr*)&adr, adr_size) == -1)
+	if (bind(socket_data->socket, (sockaddr*)&adr, adr_size) == -1)
 #endif
 	{
-	//	throw std::runtime_error("error while binding socket");
+		//	throw std::runtime_error("error while binding socket");
 	}
 
 #if defined(PLATFORM_WINDOWS)
-	if (getsockname(result->mSocket, (SOCKADDR*)&adr, &adr_size) == SOCKET_ERROR)
+	if (getsockname(socket_data->socket, (SOCKADDR*)&adr, &adr_size) == SOCKET_ERROR)
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	if (getsockname(result->mSocket, (sockaddr*)&adr, &adr_size) == -1)
+	if (getsockname(socket_data->socket, (sockaddr*)&adr, &adr_size) == -1)
 #endif
 	{
-	//	throw std::runtime_error("error while getting sock port");
+		//	throw std::runtime_error("error while getting sock port");
 	}
 
-	result->mPort = ntohs(adr.sin_port);
-		
+	socket_data->port = ntohs(adr.sin_port);
+
 	u_long tr = 1;
 
 #if defined(PLATFORM_WINDOWS)
-	if (ioctlsocket(result->mSocket, FIONBIO, &tr) == SOCKET_ERROR)
+	if (ioctlsocket(socket_data->socket, FIONBIO, &tr) == SOCKET_ERROR)
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	if (fcntl(result->mSocket, F_SETFL, fcntl(result->mSocket, F_GETFL) | O_NONBLOCK) == -1)
+	if (fcntl(socket_data->socket, F_SETFL, fcntl(socket_data->socket, F_GETFL) | O_NONBLOCK) == -1)
 #endif
 	{
-	//	throw std::runtime_error("cannot set socket blocking state");
+		//	throw std::runtime_error("cannot set socket blocking state");
 	}
 
-	mSockets.push_back(result);
-		
-	return result;
+	mSockets.insert(socket_data);
+	return socket_data;
 }
 
-void System::destroySocket(Socket* socket)
+void System::destroySocket(SocketHandle handle)
 {
+	auto socket_data = static_cast<SocketData*>(handle);
+
 #if defined(PLATFORM_WINDOWS)
-	closesocket(socket->mSocket);
+	closesocket(socket_data->socket);
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	close(socket->mSocket);
+	close(socket_data->socket);
 #endif
-	mSockets.remove(socket);
-	delete socket;
+
+	mSockets.erase(socket_data);
+	delete socket_data;
+}
+
+void System::sendPacket(SocketHandle handle, const Packet& packet)
+{
+	auto socket_data = static_cast<SocketData*>(handle);
+
+#if defined(PLATFORM_WINDOWS)
+	SOCKADDR_IN adr;
+#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+	sockaddr_in adr;
+#endif
+	adr.sin_family = AF_INET;
+	adr.sin_addr.s_addr = packet.adr.ip.l;
+	adr.sin_port = htons(packet.adr.port);
+
+#if defined(PLATFORM_WINDOWS)
+	sendto(socket_data->socket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
+		(SOCKADDR*)&adr, sizeof(adr));
+#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+	sendto(socket_data->socket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
+		(sockaddr*)&adr, sizeof(adr));
+#endif
+}
+
+void System::setReadCallback(SocketHandle handle, ReadCallback value)
+{
+	auto socket_data = static_cast<SocketData*>(handle);
+	socket_data->readCallback = value;
+}
+
+uint64_t System::getPort(SocketHandle handle) const
+{
+	auto socket_data = static_cast<SocketData*>(handle);
+	return socket_data->port;
+}
+
+Socket::Socket(uint64_t port)
+{
+	mHandle = NETWORK->createSocket(port);
+}
+
+Socket::~Socket()
+{
+	NETWORK->destroySocket(mHandle);
+}
+
+void Socket::sendPacket(const Packet& packet)
+{
+	NETWORK->sendPacket(mHandle, packet);
+}
+
+void Socket::setReadCallback(System::ReadCallback value)
+{
+	NETWORK->setReadCallback(mHandle, value);
+}
+
+auto Socket::getPort() const
+{
+	return NETWORK->getPort(mHandle);
 }

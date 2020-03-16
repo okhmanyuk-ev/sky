@@ -13,36 +13,12 @@
 #endif
 
 #include <common/frame_system.h>
+#include <unordered_set>
 
 #define NETWORK ENGINE->getSystem<Network::System>()
 
 namespace Network
 {
-	class Socket
-	{
-		friend class System;
-
-	public:
-		using ReadCallback = std::function<void(Packet&)>;
-
-	public:
-		void sendPacket(const Packet& packet);
-
-	public:
-		void setReadCallback(ReadCallback value) { mReadCallback = value; }
-		auto getPort() const { return mPort; }
-
-	private:
-		ReadCallback mReadCallback = nullptr;
-		uint16_t mPort = 0;
-
-#if defined(PLATFORM_WINDOWS)
-		SOCKET mSocket;
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-		int mSocket;
-#endif
-	};
-
 	class System : public Common::FrameSystem::Frameable
 	{
 	public:
@@ -51,14 +27,52 @@ namespace Network
 
 	private:
 		void frame() override;
+	
+	public:
+		using SocketHandle = void*;
+		using ReadCallback = std::function<void(Packet&)>;
 
 	public:
-		Socket* createSocket(uint16_t port = 0);
-		void destroySocket(Socket* socket);
-	
-	private:
-		std::list<Socket*> mSockets;
+		SocketHandle createSocket(uint16_t port = 0);
+		void destroySocket(SocketHandle handle);
 
+		void sendPacket(SocketHandle handle, const Packet& packet);
+
+		void setReadCallback(SocketHandle handle, ReadCallback value);
+		uint64_t getPort(SocketHandle handle) const;
+
+	private:
+		struct SocketData
+		{
+			uint64_t port;
+			ReadCallback readCallback = nullptr;
+#if defined(PLATFORM_WINDOWS)
+			SOCKET socket;
+#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+			int socket;
+#endif
+		};
+
+	private:
+		std::unordered_set<SocketData*> mSockets;
 		char mBuffer[8192];
 	};
+
+	class Socket
+	{
+	public:
+		Socket(uint64_t port = 0);
+		~Socket();
+
+	public:
+		void sendPacket(const Packet& packet);
+
+	public:
+		void setReadCallback(System::ReadCallback value);
+		auto getPort() const;
+
+	private:
+		System::SocketHandle mHandle = 0;
+	};
+
 }
