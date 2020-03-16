@@ -2,6 +2,8 @@
 
 #include <console/device.h>
 
+#define EMBEDDED_CONSOLE_DEVICE std::static_pointer_cast<Common::EmbeddedConsoleDevice>(CONSOLE_DEVICE)
+
 namespace Common
 {
 	class EmbeddedConsoleDevice : public Console::Device
