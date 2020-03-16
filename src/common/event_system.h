@@ -3,7 +3,7 @@
 #include <core/engine.h>
 #include <functional>
 #include <unordered_map>
-#include <list>
+#include <unordered_set>
 
 #define EVENT ENGINE->getSystem<Common::EventSystem>()
 
@@ -37,7 +37,7 @@ namespace Common
 		}
 
 	private:
-		std::unordered_map<size_t, std::list<void*>> mListeners;
+		std::unordered_map<size_t, std::unordered_set<void*>> mListeners;
 		size_t mTypeCount = 0;
 	};
 
@@ -45,8 +45,8 @@ namespace Common
 	{
 		friend EventSystem;
 	public:
-		Listenable() { EVENT->mListeners[EVENT->getTypeIndex<T>()].push_back(this); }
-		virtual ~Listenable() { EVENT->mListeners[EVENT->getTypeIndex<T>()].remove(this); }
+		Listenable() { EVENT->mListeners[EVENT->getTypeIndex<T>()].insert(this); }
+		virtual ~Listenable() { EVENT->mListeners[EVENT->getTypeIndex<T>()].erase(this); }
 
 	protected:
 		virtual void event(const T& e) = 0;
