@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.8.0)
 project(sky)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -9,6 +11,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
     set(X86 TRUE)
 endif()
+
+set(LIBS_FOLDER "libs")
 
 file(GLOB CORE_SRC
     src/core/*.cpp
@@ -121,6 +125,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 # glm
 
+set(GLM_QUIET ON)
+set(BUILD_SHARED_LIBS OFF)
+set(GLM_TEST_ENABLE OFF)
 add_subdirectory(lib/glm)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DGLM_ENABLE_EXPERIMENTAL)
 target_link_libraries(${PROJECT_NAME} glm)
@@ -144,6 +151,7 @@ file(GLOB TINYUTF8_SRC
 target_include_directories(${PROJECT_NAME} PUBLIC lib/tinyutf8)
 add_library(tinyutf8 STATIC ${TINYUTF8_SRC})
 target_link_libraries(${PROJECT_NAME} tinyutf8)
+set_property(TARGET tinyutf8 PROPERTY FOLDER ${LIBS_FOLDER})
 
 # fmod
 # TODO: make for all platforms
@@ -210,11 +218,13 @@ file(GLOB IMGUI_SRC
 target_include_directories(${PROJECT_NAME} PUBLIC lib/imgui)
 add_library(imgui STATIC ${IMGUI_SRC})
 target_link_libraries(${PROJECT_NAME} imgui)
+set_property(TARGET imgui PROPERTY FOLDER ${LIBS_FOLDER})
 
 # fmt
 
 add_subdirectory(lib/fmt)
 target_link_libraries(${PROJECT_NAME} fmt)
+set_property(TARGET fmt PROPERTY FOLDER ${LIBS_FOLDER})
 
 # nlohmann_json
 
@@ -231,4 +241,5 @@ if(WIN32)
 	target_link_libraries(${PROJECT_NAME} glew)
 	target_include_directories(glew PUBLIC lib/glew/include)
 	target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
+	set_property(TARGET glew PROPERTY FOLDER ${LIBS_FOLDER})
 endif()
