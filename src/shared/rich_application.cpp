@@ -47,7 +47,7 @@ RichApplication::RichApplication(const std::string& appname) : GraphicalApplicat
 
 		mLoaded = true;
 
-		if (!mLoadingTasks.empty() && Clock::Now() - mStartLoadingTime <= Clock::FromSeconds(2.0f))
+		if (!mLoadingTasks.empty() && Clock::Now() - mStartLoadingTime <= Clock::FromSeconds(mPayloadWaiting))
 			return;
 
 		mLoading = false;

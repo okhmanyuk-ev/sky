@@ -52,6 +52,9 @@ namespace Shared
 
 	public:
 		bool isInitialized() const { return mInitialized; }
+		
+		auto getPayloadWaiting() const { return mPayloadWaiting; }
+		void setPayloadWaiting(float value) { mPayloadWaiting = value; }
 
 	private:
 		std::vector<LoadingTask> mLoadingTasks;
@@ -62,6 +65,7 @@ namespace Shared
 		bool mInitialized = false;
 		float mGameFade = 1.0f;
 		float mLoadingFade = 1.0f;
+		float mPayloadWaiting = 2.0f;
 		
 	private:
 		void initInternal();
