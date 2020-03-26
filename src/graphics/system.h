@@ -7,6 +7,7 @@
 #include <renderer/vertex.h>
 #include <renderer/shaders/default.h>
 #include <renderer/shaders/sdf.h>
+#include <renderer/shaders/circle.h>
 
 #include <graphics/color.h>
 #include <graphics/font.h>
@@ -45,12 +46,14 @@ namespace Graphics
 
 		// draw indexed colored vertices
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
-			const std::vector<uint32_t>& indices, const glm::mat4& model = glm::mat4(1.0f));
+			const std::vector<uint32_t>& indices, const glm::mat4& model = glm::mat4(1.0f),
+			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw colored and textured vertices
 		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
-			const glm::mat4& model = glm::mat4(1.0f));
+			const glm::mat4& model = glm::mat4(1.0f),
+			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw indexed colored and textured vertices
 		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, 
@@ -59,13 +62,17 @@ namespace Graphics
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 		
 		// colored rectangle
-		void drawRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f });
+		void drawRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f },
+			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// colored line rectangle
 		void drawLineRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f });
 
+		void drawCircle(const glm::mat4& model, const glm::vec4& inner_color = { Color::White, 1.0f },
+			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f, float begin = 0.0f, float end = 1.0f);
+
 		// colored circle
-		void drawCircle(const glm::mat4& model, int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
+		void drawSegmentedCircle(const glm::mat4& model, int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
 			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f, float begin = 0.0f, float end = 1.0f);
 
 		// sprite
@@ -154,6 +161,8 @@ namespace Graphics
 		std::shared_ptr<Renderer::Shaders::Sdf> mSdfShader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionTexture::Layout);
 		std::shared_ptr<Renderer::Shaders::Default> mTexturedShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::Shaders::Default> mColoredShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColor::Layout);
+
+		std::shared_ptr<Renderer::Shaders::Circle> mCircleShader = std::make_shared<Renderer::Shaders::Circle>(Renderer::Vertex::PositionColor::Layout);
 
 		std::shared_ptr<Renderer::Shaders::Default> mBatchColorShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout,
 			std::set<Renderer::Shaders::Default::Flag>({ Renderer::Shaders::Default::Flag::Colored }));

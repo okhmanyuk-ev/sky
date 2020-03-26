@@ -1,4 +1,4 @@
-#include "circle.h"
+#include <scene/circle.h>
 
 using namespace Scene;
 
@@ -9,7 +9,14 @@ void Circle::draw()
 	auto inner_color = mInnerColor * color;
 	auto outer_color = mOuterColor * color;
 	GRAPHICS->pushBlendMode(getBlendMode());
-	GRAPHICS->drawCircle(model, mSegments, inner_color, outer_color, mFill, mBegin, mEnd);
+	if (mSegments > 0)
+	{
+		GRAPHICS->drawSegmentedCircle(model, mSegments, inner_color, outer_color, mFill, mBegin, mEnd);
+	}
+	else
+	{
+		GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mBegin, mEnd);
+	}
 	GRAPHICS->pop();
 	Node::draw();
 }

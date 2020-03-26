@@ -65,7 +65,7 @@ namespace Shared
 		bool mInitialized = false;
 		float mGameFade = 1.0f;
 		float mLoadingFade = 1.0f;
-		float mPayloadWaiting = 2.0f;
+		float mPayloadWaiting = 0.0f;
 		
 	private:
 		void initInternal();

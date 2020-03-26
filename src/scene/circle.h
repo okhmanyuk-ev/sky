@@ -33,7 +33,7 @@ namespace Scene
 		void setOuterColor(const glm::vec3& value) { mOuterColor = { value, mOuterColor.a }; }
 
 	private:
-		int mSegments = 32;
+		int mSegments = 0;
 		float mFill = 1.0f;
 		float mBegin = 0.0f;
 		float mEnd = 1.0f;

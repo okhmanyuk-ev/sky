@@ -69,5 +69,6 @@
 #include <renderer/shaders/light.h>
 #include <renderer/shaders/blur.h>
 #include <renderer/shaders/sdf.h>
+#include <renderer/shaders/circle.h>
 
 #include <network/system.h>

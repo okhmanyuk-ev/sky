@@ -100,13 +100,13 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 }
 
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
-	const std::vector<uint32_t>& indices, const glm::mat4& model)
+	const std::vector<uint32_t>& indices, const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
 	
 	applyState();
 
-	if (mBatching && vertices.size() <= 4)
+	if (mBatching && vertices.size() <= 4 && !shader)
 	{
 		if (mBatch.topology != topology || mBatch.mode != BatchMode::Colored)
 			flush();
@@ -135,14 +135,17 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	{
 		flush();
 
-		mColoredShader->setProjectionMatrix(mStates.top().projectionMatrix);
-		mColoredShader->setViewMatrix(mStates.top().viewMatrix);
-		mColoredShader->setModelMatrix(model);
+		if (!shader)
+			shader = mColoredShader;
+
+		shader->setProjectionMatrix(mStates.top().projectionMatrix);
+		shader->setViewMatrix(mStates.top().viewMatrix);
+		shader->setModelMatrix(model);
 
 		RENDERER->setTopology(topology);
 		RENDERER->setIndexBuffer(indices);
 		RENDERER->setVertexBuffer(vertices);
-		RENDERER->setShader(mColoredShader);
+		RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
 
 		RENDERER->drawIndexed(indices.size());
 	}
@@ -150,11 +153,11 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 
 void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
-	const glm::mat4& model)
+	const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	auto indices = std::vector<uint32_t>(vertices.size());
 	std::iota(indices.begin(), indices.end(), 0);
-	draw(topology, texture, vertices, indices, model);
+	draw(topology, texture, vertices, indices, model, shader);
 }
 
 void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
@@ -212,7 +215,8 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	}
 }
 
-void System::drawRectangle(const glm::mat4& model, const glm::vec4& color)
+void System::drawRectangle(const glm::mat4& model, const glm::vec4& color,
+	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	static auto vertices = std::vector<Renderer::Vertex::PositionColor>(4);
 		
@@ -223,7 +227,7 @@ void System::drawRectangle(const glm::mat4& model, const glm::vec4& color)
 	
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 
-	draw(Renderer::Topology::TriangleList, vertices, indices, model);
+	draw(Renderer::Topology::TriangleList, vertices, indices, model, shader);
 }
 
 void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
@@ -240,7 +244,18 @@ void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 	draw(Renderer::Topology::LineList, vertices, indices, model);
 }
 
-void System::drawCircle(const glm::mat4& model, int segments, const glm::vec4& inner_color,
+void System::drawCircle(const glm::mat4& model, const glm::vec4& inner_color, const glm::vec4& outer_color, 
+	float fill, float begin, float end)
+{
+	mCircleShader->setFill(fill);
+	mCircleShader->setBegin(begin);
+	mCircleShader->setEnd(end);
+	mCircleShader->setInnerColor(inner_color);
+	mCircleShader->setOuterColor(outer_color);
+	drawRectangle(model, { Color::White, 1.0f }, mCircleShader);
+}
+
+void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm::vec4& inner_color,
 	const glm::vec4& outer_color, float fill, float begin, float end)
 {
 	if (begin >= end)
