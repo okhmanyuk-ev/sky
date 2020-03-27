@@ -256,10 +256,9 @@ void System::drawCircle(const glm::mat4& model, const glm::vec4& inner_color, co
 }
 
 void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm::vec4& inner_color,
-	const glm::vec4& outer_color, float fill, float begin, float end)
+	const glm::vec4& outer_color, float fill)
 {
-	if (begin >= end)
-		return;
+	assert(segments >= 3);
 
 	const float Radius = 0.5f;
 	float increment = 2.0f * glm::pi<float>() / segments;
@@ -281,14 +280,6 @@ void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm
 
 	for (int i = 0; i < segments; i++)
 	{
-		float progress = (float)(i + 1) / (float)segments;
-
-		if (progress < begin)
-			continue;
-
-		if (progress > end)
-			continue;
-
 		auto r2 = glm::vec2({
 			(cosInc * r1.x) - (sinInc * r1.y),
 			(sinInc * r1.x) + (cosInc * r1.y)
@@ -296,7 +287,7 @@ void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm
 
 		auto v2_outer = radius_outer * r2;
 		auto v2_inner = radius_inner * r2;
-
+		 
 		auto p1 = glm::vec3({ v1_outer + radius_outer - delta_outer, 0.0f });
 		auto p2 = glm::vec3({ v2_outer + radius_outer - delta_outer, 0.0f });
 		auto p3 = glm::vec3({ v1_inner + radius_inner + delta_inner, 0.0f });

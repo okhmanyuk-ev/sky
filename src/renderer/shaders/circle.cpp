@@ -15,6 +15,13 @@ namespace
 			mat4 uModelMatrix;
 
 			vec4 color;
+
+			vec4 inner_color;
+			vec4 outer_color;
+
+			float fill;
+			float begin;
+			float end;
 		};
 
 		uniform sampler2D uTexture;
@@ -58,7 +65,30 @@ namespace
 
 		void main()
 		{
+			const float Pi = 3.14159265;
+
+			vec2 center = vec2(0.5, 0.5);
+
+			vec2 p = vPosition.xy - center;
+			float angle = atan(-p.x, p.y);
+			float normalized_angle = (angle + Pi) / 2.0 / Pi;			
+
+			if (normalized_angle < begin || normalized_angle > end)
+				discard;
+
+			float maxRadius = 0.5;
+			float minRadius = maxRadius * (1.0f - fill);
+			
+			float radius = distance(vPosition.xy, center);
+
+			if (radius > maxRadius || radius < minRadius)
+				discard;
+
 			vec4 result = vec4(1.0, 1.0, 1.0, 1.0);
+
+			float t = (radius - minRadius) / (maxRadius - minRadius);
+			result *= mix(inner_color, outer_color, t);
+
 		#ifdef HAS_COLOR_ATTRIB
 			result *= vColor;
 		#endif
@@ -86,7 +116,6 @@ namespace
 			float fill;
 			float begin;
 			float end;
-
 		};
 
 		struct VertexInput
@@ -154,7 +183,8 @@ namespace
 
 			float4 result = float4(1.0, 1.0, 1.0, 1.0);
 
-			result *= lerp(inner_color, outer_color, smoothstep(minRadius, maxRadius, radius));
+			float t = (radius - minRadius) / (maxRadius - minRadius);
+			result *= lerp(inner_color, outer_color, t);
 
 		#ifdef HAS_COLOR_ATTRIB
 			result *= input.col;
