@@ -18,7 +18,7 @@ namespace Graphics
 		};
 
 		Renderer::Topology topology;
-		std::vector<Renderer::Vertex::PositionTexture> vertices;
+		std::vector<Renderer::Vertex::PositionColorTexture> vertices;
 		std::vector<uint32_t> indices;
 	
 		static TextMesh createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end);

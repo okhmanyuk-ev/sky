@@ -138,8 +138,10 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 		if (!shader)
 			shader = mColoredShader;
 
-		shader->setProjectionMatrix(mStates.top().projectionMatrix);
-		shader->setViewMatrix(mStates.top().viewMatrix);
+		const auto& state = mStates.top();
+
+		shader->setProjectionMatrix(state.projectionMatrix);
+		shader->setViewMatrix(state.viewMatrix);
 		shader->setModelMatrix(model);
 
 		RENDERER->setTopology(topology);
@@ -173,7 +175,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 			flush();
 
 		mBatch.mode = BatchMode::Textured;
-		mBatch.shader = mBatchTextureShader;
+		mBatch.shader = mTexturedShader;
 		mBatch.texture = texture;
 		mBatch.topology = topology;
 		mBatch.verticesCount += vertices.size();
@@ -201,8 +203,10 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 		if (!shader)
 			shader = mTexturedShader;
 
-		shader->setProjectionMatrix(mStates.top().projectionMatrix);
-		shader->setViewMatrix(mStates.top().viewMatrix);
+		const auto& state = mStates.top();
+
+		shader->setProjectionMatrix(state.projectionMatrix);
+		shader->setViewMatrix(state.viewMatrix);
 		shader->setModelMatrix(model);
 
 		RENDERER->setTexture(texture);
@@ -335,84 +339,24 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	draw(texture, model, {}, { Color::White, 1.0f }, shader);
+	draw(texture, model, { }, { Color::White, 1.0f }, shader);
 }
 
 void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-	const std::vector<Renderer::Vertex::PositionTexture>& vertices,
+	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
 	float smoothFactor, const glm::mat4& model, const glm::vec4& color)
 {
-	assert(mWorking);
-
-	applyState();
-	
-	if (mBatching && vertices.size() <= 4)
-	{
-		if (mBatch.topology != topology ||
-			mBatch.texture != texture ||
-			mBatch.mode != BatchMode::Sdf ||
-			mBatchSdfShader->getMaxValue() != maxValue ||
-			mBatchSdfShader->getMinValue() != minValue ||
-			mBatchSdfShader->getSmoothFactor() != smoothFactor ||
-			mBatchSdfShader->getColor() != color)
-		{
-			flush();
-		}
-
-		mBatch.mode = BatchMode::Sdf;
-		mBatch.shader = mBatchSdfShader;
-		mBatch.texture = texture;
-		mBatch.topology = topology;
-
-		mBatchSdfShader->setMaxValue(maxValue);
-		mBatchSdfShader->setMinValue(minValue);
-		mBatchSdfShader->setSmoothFactor(smoothFactor);
-		mBatchSdfShader->setColor(color);
-
-		mBatch.verticesCount += vertices.size();
-
-		if (mBatch.verticesCount > mBatch.vertices.size())
-			mBatch.vertices.resize(mBatch.verticesCount);
-
-		auto start_vertex = mBatch.verticesCount - vertices.size();
-
-		for (const auto& src_vertex : vertices)
-		{
-			auto& dst_vertex = mBatch.vertices.at(start_vertex);
-			dst_vertex.pos = project(src_vertex.pos, model);
-			dst_vertex.tex = src_vertex.tex;
-			start_vertex += 1;
-		}
-
-		pushBatchIndices(indices, vertices.size());
-	}
-	else
-	{
-		flush();
-
-		mSdfShader->setProjectionMatrix(mStates.top().projectionMatrix);
-		mSdfShader->setViewMatrix(mStates.top().viewMatrix);
-		mSdfShader->setModelMatrix(model);
-		mSdfShader->setMinValue(minValue);
-		mSdfShader->setMaxValue(maxValue);
-		mSdfShader->setSmoothFactor(smoothFactor);
-		mSdfShader->setColor(color);
-
-		RENDERER->setTexture(texture);
-		RENDERER->setTopology(topology);
-		RENDERER->setIndexBuffer(indices);
-		RENDERER->setVertexBuffer(vertices);
-		RENDERER->setShader(mSdfShader);
-
-		RENDERER->drawIndexed(indices.size());
-	}
+	mSdfShader->setMinValue(minValue);
+	mSdfShader->setMaxValue(maxValue);
+	mSdfShader->setSmoothFactor(smoothFactor);
+	mSdfShader->setColor(color);
+	draw(topology, texture, vertices, indices, model, mSdfShader);	
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model,
 	float minValue, float maxValue, float smoothFactor, const glm::vec4& color)
 {
-	assert(mWorking);
 	drawSdf(mesh.topology, font.getTexture(), mesh.vertices, mesh.indices, minValue, 
 		maxValue, smoothFactor, model, color);
 }

@@ -1,4 +1,5 @@
 #include "text_mesh.h"
+#include <graphics/color.h>
 
 using namespace Graphics;
 
@@ -56,10 +57,10 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 		float u2 = (glyph_x + glyph_w) / tex_w;
 		float v2 = (glyph_y + glyph_h) / tex_h;
 
-		vtx[0] = { { x1, y1, 0.0f }, { u1, v1 } };
-		vtx[1] = { { x1, y2, 0.0f }, { u1, v2 } };
-		vtx[2] = { { x2, y2, 0.0f }, { u2, v2 } };
-		vtx[3] = { { x2, y1, 0.0f }, { u2, v1 } };
+		vtx[0] = { { x1, y1, 0.0f }, { Color::White, 1.0f }, { u1, v1 } };
+		vtx[1] = { { x1, y2, 0.0f }, { Color::White, 1.0f }, { u1, v2 } };
+		vtx[2] = { { x2, y2, 0.0f }, { Color::White, 1.0f }, { u2, v2 } };
+		vtx[3] = { { x2, y1, 0.0f }, { Color::White, 1.0f }, { u2, v1 } };
 
 		auto base_vtx = i * 4;
 

@@ -85,7 +85,7 @@ namespace Graphics
 
 		// sdf mesh
 		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-			const std::vector<Renderer::Vertex::PositionTexture>& vertices,
+			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
 			float smoothFactor, const glm::mat4& model,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f });
@@ -158,7 +158,7 @@ namespace Graphics
 		bool mBatching = true;
 		
 	private:
-		std::shared_ptr<Renderer::Shaders::Sdf> mSdfShader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionTexture::Layout);
+		std::shared_ptr<Renderer::Shaders::Sdf> mSdfShader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::Shaders::Default> mTexturedShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::Shaders::Default> mColoredShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColor::Layout);
 
@@ -167,18 +167,12 @@ namespace Graphics
 		std::shared_ptr<Renderer::Shaders::Default> mBatchColorShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout,
 			std::set<Renderer::Shaders::Default::Flag>({ Renderer::Shaders::Default::Flag::Colored }));
 
-		std::shared_ptr<Renderer::Shaders::Default> mBatchTextureShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout,
-			std::set<Renderer::Shaders::Default::Flag>({ Renderer::Shaders::Default::Flag::Colored, Renderer::Shaders::Default::Flag::Textured }));
-
-		std::shared_ptr<Renderer::Shaders::Sdf> mBatchSdfShader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionColorTexture::Layout);
-
 	private:
 		enum class BatchMode
 		{
 			None,
 			Colored,
-			Textured,
-			Sdf
+			Textured
 		};
 
 		struct
