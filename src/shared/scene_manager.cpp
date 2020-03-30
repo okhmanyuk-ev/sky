@@ -4,7 +4,15 @@ using namespace Shared;
 
 SceneManager::SceneManager()
 {
-	setStretch({ 1.0f, 1.0f });
+	setStretch(1.0f);
+
+	mScreenHolder = std::make_shared<Scene::Node>();
+	mScreenHolder->setStretch(1.0f);
+	attach(mScreenHolder);
+
+	mWindowHolder = std::make_shared<Scene::Node>();
+	mWindowHolder->setStretch(1.0f);
+	attach(mWindowHolder);
 }
 
 void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<void()> finishCallback)
@@ -26,7 +34,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 			ActionHelpers::Execute([this] {
 				mCurrentScreen->mState = Screen::State::Leaved;
 				mCurrentScreen->onLeaveEnd();
-				detach(mCurrentScreen);
+				mScreenHolder->detach(mCurrentScreen);
 				mCurrentScreen = nullptr;
 			})
 		);
@@ -35,7 +43,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 	auto createEnterAction = [this, screen] {
 		return ActionHelpers::MakeSequence(
 			ActionHelpers::Execute([this, screen] {
-				attach(screen);
+				mScreenHolder->attach(screen);
 				mCurrentScreen = screen;
 				mCurrentScreen->mState = Screen::State::Entering;
 				mCurrentScreen->onEnterBegin();
@@ -99,7 +107,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window)
 	mWindows.push(window);
 	
 	window->setSceneManager(weak_from_this());
-	attach(window);
+	mWindowHolder->attach(window);
 
 	window->onOpenBegin();
 	window->mState = Window::State::Opening;
@@ -128,7 +136,7 @@ void SceneManager::popWindow(std::function<void()> finishCallback)
 		ActionHelpers::Execute([this, window, finishCallback] {
 			window->onCloseEnd();
 			window->mState = Window::State::Closed;
-			detach(window);
+			mWindowHolder->detach(window);
 
 			mWindows.pop(); 
 			

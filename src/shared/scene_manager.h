@@ -25,7 +25,12 @@ namespace Shared
 
 		bool isWindowsBusy() const;
 
+		auto getScreenHolder() { return mScreenHolder; }
+		auto getWindowHolder() { return mWindowHolder; }
+
 	private:
+		std::shared_ptr<Scene::Node> mScreenHolder = nullptr;
+		std::shared_ptr<Scene::Node> mWindowHolder = nullptr;
 		std::shared_ptr<Screen> mCurrentScreen = nullptr;
 		std::stack<std::shared_ptr<Window>> mWindows;
 		bool mInTransition = false;
