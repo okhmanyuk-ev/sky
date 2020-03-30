@@ -147,4 +147,14 @@ namespace Graphics::Color
 	glm::vec4 ToNormalized(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
 	glm::vec4 ToNormalized(uint32_t value);
 	uint32_t ToUInt32(glm::vec4 color);
+
+	namespace Hsv
+	{
+		const float HueRed = 0.0f;
+		const float HueYellow = 60.0f;
+		const float HueGreen = 120.0f;
+		const float HueCyan = 180.0f;
+		const float HueBlue = 240.0f;
+		const float HuePink = 300.0f;
+	}
 }

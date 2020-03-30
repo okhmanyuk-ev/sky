@@ -58,7 +58,7 @@ namespace Scene
 		auto getVerticalSize() const { return mSize.y; }
 		void setVerticalSize(float value) { mSize.y = value; }
 
-		void setSize(float value) { mSize = { value, value }; }
+		void setSize(float value) { setSize({ value, value }); }
 
 		auto getHorizontalStretch() const { return mStretch.x; }
 		void setHorizontalStretch(float value) { mStretch.x = value; }
@@ -66,7 +66,7 @@ namespace Scene
 		auto getVerticalStretch() const { return mStretch.y; }
 		void setVerticalStretch(float value) { mStretch.y = value; }
 
-		void setStretch(float value) { mStretch = { value, value }; }
+		void setStretch(float value) { setStretch({ value, value }); }
 
 		auto getX() const { return mPosition.x; }
 		void setX(float value) { mPosition.x = value; }
@@ -92,24 +92,30 @@ namespace Scene
 		auto getVerticalMargin() const { return mMargin.y; }
 		void setVerticalMargin(float value) { mMargin.y = value; }
 
+		void setMargin(float value) { setMargin({ value, value }); }
+
 		auto getHorizontalAnchor() const { return mAnchor.x; }
 		void setHorizontalAnchor(float value) { mAnchor.x = value; }
 
 		auto getVerticalAnchor() const { return mAnchor.y; }
 		void setVerticalAnchor(float value) { mAnchor.y = value; }
 
+		void setAnchor(float value) { setAnchor({ value, value }); }
+
 		auto getHorizontalPivot() const { return mPivot.x; }
 		void setHorizontalPivot(float value) { mPivot.x = value; }
 	
 		auto getVerticalPivot() const { return mPivot.y; }
 		void setVerticalPivot(float value) { mPivot.y = value; }
-	
+
+		void setPivot(float value) { setPivot({ value, value }); }
+
 		auto getHorizontalScale() const { return mScale.x; }
 		void setHorizontalScale(float value) { mScale.x = value; }
 
 		auto getVerticalScale() const { return mScale.y; }
 		void setVerticalScale(float value) { mScale.y = value; }
 
-		void setScale(float value) { mScale = { value, value }; }
+		void setScale(float value) { setScale({ value, value }); }
 	};
 }
