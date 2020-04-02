@@ -2,7 +2,7 @@
 
 Scene::Scene::Scene()
 {
-	mRoot->setStretch({ 1.0f, 1.0f });
+	mRoot->setStretch(1.0f);
 }
 
 Scene::Scene::~Scene()
@@ -15,6 +15,7 @@ void Scene::Scene::recursiveNodeUpdate(const std::shared_ptr<Node>& node)
 	if (!node->isEnabled())
 		return;
 
+	node->mViewport = mViewport; // TODO: find better solution to store viewport in node
 	node->update();
 
 	for (const auto& _node : node->getNodes())
@@ -109,11 +110,18 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const glm::vec2& 
 
 void Scene::Scene::frame()
 {
+	if (mRenderTarget != nullptr)
+		mViewport = Renderer::Viewport(*mRenderTarget);
+	else
+		mViewport = Renderer::Viewport();
+
 	updateTransformations();
 	GRAPHICS->begin();
-	GRAPHICS->pushOrthoMatrix();
+	GRAPHICS->pushRenderTarget(mRenderTarget);
+	GRAPHICS->pushViewport(mRenderTarget);
+	GRAPHICS->pushOrthoMatrix(mRenderTarget);
 	recursiveNodeDraw(mRoot);
-	GRAPHICS->pop();
+	GRAPHICS->pop(3);
 	GRAPHICS->end();
 }
 

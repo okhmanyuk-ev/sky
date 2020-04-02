@@ -20,7 +20,7 @@ namespace Shared
 		void pushWindow(std::shared_ptr<Window> window);
 		void popWindow(std::function<void()> finishCallback = nullptr);
 		
-		int getOpenedWindowsCount() const { return mWindows.size(); }
+		size_t getOpenedWindowsCount() const { return mWindows.size(); }
 		bool hasOpenedWindows() const { return getOpenedWindowsCount() > 0; }
 
 		bool isWindowsBusy() const;

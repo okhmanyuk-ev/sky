@@ -71,6 +71,7 @@ namespace Scene
 		Node* mParent = nullptr;
 		std::list<std::shared_ptr<Node>> mNodes;
 		glm::mat4 mTransform = glm::mat4(1.0f);
+		Renderer::Viewport mViewport;
 		bool mEnabled = true;
 		bool mInteractions = true;
 		bool mTouchable = false;

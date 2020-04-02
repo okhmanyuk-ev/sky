@@ -41,11 +41,10 @@ glm::vec2 Node::project(const glm::vec2& value) const
 {
 	auto vp = Renderer::Viewport();
 
-	auto width = PLATFORM->getLogicalWidth();
-	auto height = PLATFORM->getLogicalHeight();
+	auto scaled_size = mViewport.size / PLATFORM->getScale();
 
 	glm::vec3 original = { value, 0.0f };
-	glm::mat4 projection = glm::orthoLH(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::orthoLH(0.0f, scaled_size.x, scaled_size.y, 0.0f, -1.0f, 1.0f);
 	glm::vec4 viewport = { 0.0f, vp.size.y, vp.size.x, -vp.size.y };
 	glm::vec3 result = glm::project(original, getTransform(), projection, viewport);
 
@@ -56,11 +55,10 @@ glm::vec2 Node::unproject(const glm::vec2& value) const
 {
 	auto vp = Renderer::Viewport();
 
-	auto width = PLATFORM->getLogicalWidth();
-	auto height = PLATFORM->getLogicalHeight();
+	auto scaled_size = mViewport.size / PLATFORM->getScale();
 
 	glm::vec3 original = { value, 0.0f };
-	glm::mat4 projection = glm::orthoLH(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::orthoLH(0.0f, scaled_size.x, scaled_size.y, 0.0f, -1.0f, 1.0f);
 	glm::vec4 viewport = { 0.0f, vp.size.y, vp.size.x, -vp.size.y };
 	glm::vec3 result = glm::unProject(original, getTransform(), projection, viewport);
 
@@ -101,7 +99,7 @@ void Node::updateTransform()
 	auto verticalMargin = getVerticalMargin();
 	auto horizontalMargin = getHorizontalMargin();
 
-	auto parent_size = hasParent() ? getParent()->getSize() : glm::vec2(PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight());
+	auto parent_size = hasParent() ? getParent()->getSize() : (mViewport.size / PLATFORM->getScale());
 
 	if (horizontalStretch >= 0.0f)
 		setWidth((parent_size.x * horizontalStretch) - horizontalMargin);

@@ -42,10 +42,15 @@ namespace Scene
 		std::list<std::shared_ptr<Node>> getNodes(const glm::vec2& pos);
 
 	public:
-		auto& getRoot() { return mRoot; }
+		auto getRoot() const { return mRoot; }
+
+		auto getRenderTarget() const { return mRenderTarget; }
+		void setRenderTarget(std::shared_ptr<Renderer::RenderTarget> value) { mRenderTarget = value; }
 
 	private:
 		std::shared_ptr<Node> mRoot = std::make_shared<Node>();
 		std::list<std::weak_ptr<Node>> mTouchedNodes;
+		std::shared_ptr<Renderer::RenderTarget> mRenderTarget = nullptr;
+		Renderer::Viewport mViewport;
 	};
 }
