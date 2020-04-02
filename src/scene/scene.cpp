@@ -110,10 +110,7 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const glm::vec2& 
 
 void Scene::Scene::frame()
 {
-	if (mRenderTarget != nullptr)
-		mViewport = Renderer::Viewport(*mRenderTarget);
-	else
-		mViewport = Renderer::Viewport();
+	mViewport = Renderer::Viewport(mRenderTarget);
 
 	updateTransformations();
 	GRAPHICS->begin();

@@ -17,12 +17,11 @@ namespace Renderer
 			maxDepth = _maxDepth;
 		}
 
-		Viewport(float _minDepth = 0.0f, float _maxDepth = 1.0f) :
-			Viewport(glm::vec2({ static_cast<float>(PLATFORM->getWidth()), static_cast<float>(PLATFORM->getHeight()) }), _minDepth, _maxDepth)
-		{ }
-
-		Viewport(const RenderTarget& target, float _minDepth = 0.0f, float _maxDepth = 1.0f) :
-			Viewport(glm::vec2({ static_cast<float>(target.getWidth()), static_cast<float>(target.getHeight()) }), _minDepth, _maxDepth)
+		Viewport(std::shared_ptr<RenderTarget> target = nullptr, float _minDepth = 0.0f, float _maxDepth = 1.0f) :
+			Viewport(target 
+				? glm::vec2({ static_cast<float>(target->getWidth()), static_cast<float>(target->getHeight()) }) 
+				: glm::vec2({ static_cast<float>(PLATFORM->getWidth()), static_cast<float>(PLATFORM->getHeight()) }), 
+				_minDepth, _maxDepth)
 		{ }
 
 		glm::vec2 position = { 0.0f, 0.0f };

@@ -467,10 +467,7 @@ void System::pushViewport(const Renderer::Viewport& value)
 
 void System::pushViewport(std::shared_ptr<Renderer::RenderTarget> target)
 {
-	if (target)
-		pushViewport(Renderer::Viewport(*target));
-	else
-		pushViewport(Renderer::Viewport());
+	pushViewport(Renderer::Viewport(target));
 }
 
 void System::pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value)
