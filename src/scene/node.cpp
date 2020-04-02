@@ -101,28 +101,16 @@ void Node::updateTransform()
 	auto verticalMargin = getVerticalMargin();
 	auto horizontalMargin = getHorizontalMargin();
 
-	if (hasParent())
-	{
-		if (verticalStretch >= 0.0f)
-			setHeight((getParent()->getHeight() * verticalStretch) - verticalMargin);
+	auto parent_size = hasParent() ? getParent()->getSize() : glm::vec2(PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight());
 
-		if (horizontalStretch >= 0.0f)
-			setWidth((getParent()->getWidth() * horizontalStretch) - horizontalMargin);
+	if (horizontalStretch >= 0.0f)
+		setWidth((parent_size.x * horizontalStretch) - horizontalMargin);
 
-		mTransform = getParent()->getTransform();
-		mTransform = glm::translate(mTransform, { getAnchor() * getParent()->getSize(), 0.0f });
-	}
-	else
-	{
-		if (verticalStretch >= 0.0f)
-			setHeight((PLATFORM->getLogicalHeight() * verticalStretch) - verticalMargin);
+	if (verticalStretch >= 0.0f)
+		setHeight((parent_size.y * verticalStretch) - verticalMargin);
 
-		if (horizontalStretch >= 0.0f)
-			setWidth((PLATFORM->getLogicalWidth() * horizontalStretch) - horizontalMargin);
-
-		mTransform = glm::mat4(1.0f);
-	}
-
+	mTransform = hasParent() ? getParent()->getTransform() : glm::mat4(1.0f);
+	mTransform = glm::translate(mTransform, { getAnchor() * parent_size, 0.0f });
 	mTransform = glm::translate(mTransform, { getPosition(), 0.0f });
 	mTransform = glm::rotate(mTransform, getRotation(), { 0.0f, 0.0f, 1.0f });
 	mTransform = glm::scale(mTransform, { getScale(), 1.0f });
