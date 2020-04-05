@@ -8,9 +8,11 @@
 
 namespace Scene
 {
+	class Scene;
+
 	class Node : public Transform
 	{
-		friend class Scene;
+		friend Scene;
 	
 	protected:
 		enum class Touch
@@ -34,6 +36,7 @@ namespace Scene
 		glm::vec2 unproject(const glm::vec2& value) const;
 		glm::vec4 getGlobalBounds() const;
 
+		virtual Scene* getScene() const;
 		virtual bool hitTest(const glm::vec2& value) const;
 		virtual bool interactTest(const glm::vec2& value) const;
 
@@ -71,7 +74,6 @@ namespace Scene
 		Node* mParent = nullptr;
 		std::list<std::shared_ptr<Node>> mNodes;
 		glm::mat4 mTransform = glm::mat4(1.0f);
-		Renderer::Viewport mViewport;
 		bool mEnabled = true;
 		bool mInteractions = true;
 		bool mTouchable = false;

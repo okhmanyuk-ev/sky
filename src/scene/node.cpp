@@ -1,4 +1,5 @@
 #include "node.h"
+#include <scene/scene.h>
 
 #include <algorithm>
 #include <cassert>
@@ -39,9 +40,8 @@ void Node::clear()
 
 glm::vec2 Node::project(const glm::vec2& value) const
 {
-	auto vp = Renderer::Viewport();
-
-	auto scaled_size = mViewport.size / PLATFORM->getScale();
+	auto vp = getScene()->getViewport();
+	auto scaled_size = vp.size / PLATFORM->getScale();
 
 	glm::vec3 original = { value, 0.0f };
 	glm::mat4 projection = glm::orthoLH(0.0f, scaled_size.x, scaled_size.y, 0.0f, -1.0f, 1.0f);
@@ -53,9 +53,8 @@ glm::vec2 Node::project(const glm::vec2& value) const
 
 glm::vec2 Node::unproject(const glm::vec2& value) const
 {
-	auto vp = Renderer::Viewport();
-
-	auto scaled_size = mViewport.size / PLATFORM->getScale();
+	auto vp = getScene()->getViewport();
+	auto scaled_size = vp.size / PLATFORM->getScale();
 
 	glm::vec3 original = { value, 0.0f };
 	glm::mat4 projection = glm::orthoLH(0.0f, scaled_size.x, scaled_size.y, 0.0f, -1.0f, 1.0f);
@@ -76,6 +75,12 @@ glm::vec4 Node::getGlobalBounds() const
 		glm::min(glm::min(tl, tr), glm::min(bl, br)),
 		glm::max(glm::max(tl, tr), glm::max(bl, br))
 	};
+}
+
+::Scene::Scene* Node::getScene() const
+{
+	assert(hasParent());
+	return getParent()->getScene();
 }
 
 bool Node::hitTest(const glm::vec2& value) const
@@ -99,7 +104,7 @@ void Node::updateTransform()
 	auto verticalMargin = getVerticalMargin();
 	auto horizontalMargin = getHorizontalMargin();
 
-	auto parent_size = hasParent() ? getParent()->getSize() : (mViewport.size / PLATFORM->getScale());
+	auto parent_size = hasParent() ? getParent()->getSize() : (getScene()->getViewport().size / PLATFORM->getScale());
 
 	if (horizontalStretch >= 0.0f)
 		setWidth((parent_size.x * horizontalStretch) - horizontalMargin);

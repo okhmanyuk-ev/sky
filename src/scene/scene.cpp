@@ -3,6 +3,7 @@
 Scene::Scene::Scene()
 {
 	mRoot->setStretch(1.0f);
+	mRoot->setScene(this);
 }
 
 Scene::Scene::~Scene()
@@ -15,7 +16,6 @@ void Scene::Scene::recursiveNodeUpdate(const std::shared_ptr<Node>& node)
 	if (!node->isEnabled())
 		return;
 
-	node->mViewport = mViewport; // TODO: find better solution to store viewport in node
 	node->update();
 
 	for (const auto& _node : node->getNodes())

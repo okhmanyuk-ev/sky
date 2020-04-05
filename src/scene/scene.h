@@ -15,6 +15,9 @@ namespace Scene
 		public Common::EventSystem::Listenable<Platform::Mouse::Event>,
 		public Common::EventSystem::Listenable<Platform::Touch::Event>
 	{
+	private:
+		class RootNode;
+
 	public:
 		Scene();
 		~Scene();
@@ -47,10 +50,22 @@ namespace Scene
 		auto getRenderTarget() const { return mRenderTarget; }
 		void setRenderTarget(std::shared_ptr<Renderer::RenderTarget> value) { mRenderTarget = value; }
 
+		auto getViewport() const { return mViewport; }
+
 	private:
-		std::shared_ptr<Node> mRoot = std::make_shared<Node>();
+		std::shared_ptr<RootNode> mRoot = std::make_shared<RootNode>();
 		std::list<std::weak_ptr<Node>> mTouchedNodes;
 		std::shared_ptr<Renderer::RenderTarget> mRenderTarget = nullptr;
 		Renderer::Viewport mViewport;
+	};
+
+	class Scene::RootNode : public Node
+	{
+	public:
+		void setScene(Scene* value) { mScene = value; }
+		Scene* getScene() const override { return mScene; }
+
+	private:
+		Scene* mScene = nullptr;
 	};
 }
