@@ -243,3 +243,7 @@ if(WIN32)
 	target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
 	set_property(TARGET glew PROPERTY FOLDER ${LIBS_FOLDER})
 endif()
+
+# tinyobjloader
+
+target_include_directories(${PROJECT_NAME} PUBLIC lib/tinyobjloader)
