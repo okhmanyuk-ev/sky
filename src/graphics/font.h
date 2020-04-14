@@ -46,6 +46,9 @@ namespace Graphics
 		float getDescent() const { return mDescent; }
 		float getLinegap() const { return mLinegap; }
 
+		float getCustomVerticalOffset() const { return mCustomVerticalOffset; }
+		void setCustomVerticalOffset(float value) { mCustomVerticalOffset = value; }
+
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
 		std::unordered_map<uint16_t, Glyph> mGlyphs;
@@ -53,5 +56,6 @@ namespace Graphics
 		float mAscent = 0.0f;
 		float mDescent = 0.0f;
 		float mLinegap = 0.0f;
+		float mCustomVerticalOffset = 0.0f; // TODO: should be removed, code must work without this
 	};
 }

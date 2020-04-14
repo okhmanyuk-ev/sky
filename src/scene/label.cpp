@@ -53,7 +53,7 @@ void Label::update()
 		{
 			mMeshWidth = mFont->getStringWidth(mText, mFontSize);
 			mMeshHeight = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
-			mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText, -mFont->getDescent());
+			mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText, -mFont->getDescent() + mFont->getCustomVerticalOffset());
 		}
 		else if (width > 0.0f)
 		{
