@@ -10,6 +10,9 @@ namespace Scene
 {
 	class Sprite : public Node, public Color, public Blend, public Sampler
 	{
+	public:
+		inline static Renderer::TextureAddress DefaultTextureAddress = Renderer::TextureAddress::Wrap;
+
 	protected:
 		void update() override;
 		void draw() override;
@@ -27,6 +30,6 @@ namespace Scene
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
 		Graphics::TexRegion mTexRegion = {};
-		Renderer::TextureAddress mTextureAddress = Renderer::TextureAddress::Wrap;
+		Renderer::TextureAddress mTextureAddress = DefaultTextureAddress;
 	};
 }
