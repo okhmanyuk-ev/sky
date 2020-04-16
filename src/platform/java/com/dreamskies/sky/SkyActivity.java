@@ -1,4 +1,4 @@
-package com.skymunge.sky;
+package com.dreamskies.sky;
 
 import android.app.NativeActivity;
 import android.app.AlertDialog;
