@@ -20,6 +20,8 @@
 
 #include <cstddef>
 
+#define IMGUI_SYSTEM ENGINE->getSystem<Shared::ImguiSystem>()
+
 namespace Shared
 {
 	class ImguiSystem :
@@ -31,12 +33,10 @@ namespace Shared
 		ImguiSystem();
 		~ImguiSystem();
 
-	private:
-		void begin();
-		void end();
-		
 	public:
-		void present();
+		void begin();
+		void end();	
+		void ensureFont();
 
 	private:
 		const Renderer::Vertex::Layout ImguiLayout = { sizeof(ImDrawVert), {
@@ -46,6 +46,23 @@ namespace Shared
 
 		std::shared_ptr<Renderer::Shaders::Default> mShader = std::make_shared<Renderer::Shaders::Default>(ImguiLayout);
 		
+	public:
+		auto getSampler() const { return mSampler; }
+		void setSampler(Renderer::Sampler value) { mSampler = value; }
+
+		auto isScaleIndependence() const { return mScaleIndependence; }
+		void setScaleIndependence(bool value) { mScaleIndependence = value; }
+
+		auto getLogicalSize() const { return mLogicalSize; }
+		auto getLogicalWidth() const { return mLogicalSize.x; }
+		auto getLogicalHeight() const { return mLogicalSize.y; }
+
+	private:
+		Renderer::Sampler mSampler = Renderer::Sampler::Nearest;
+		bool mScaleIndependence = false;
+		glm::vec2 mLogicalSize = { 0.0f, 0.0f };
+		float mScale = 1.0f;
+
 	private:	
 		void event(const Platform::Keyboard::Event& e) override;
 		void event(const Platform::Mouse::Event& e) override;

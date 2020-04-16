@@ -1,6 +1,7 @@
 #include "imgui_user.h"
 #include <core/engine.h>
 #include <platform/system.h>
+#include <shared/imgui_system.h>
 
 namespace ImGui::User
 {
@@ -100,16 +101,16 @@ namespace ImGui::User
 
 	ImVec2 TopRightCorner(float margin)
 	{ 
-		return ImVec2(PLATFORM->getLogicalWidth() - GetWindowWidth() - margin, margin);
+		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin, margin);
 	}
 
 	ImVec2 BottomLeftCorner(float margin)
 	{
-		return ImVec2(margin, PLATFORM->getLogicalHeight() - GetWindowHeight() - margin);
+		return ImVec2(margin, IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin);
 	}
 
 	ImVec2 BottomRightCorner(float margin)
 	{
-		return ImVec2(PLATFORM->getLogicalWidth() - GetWindowWidth() - margin, PLATFORM->getLogicalHeight() - GetWindowHeight() - margin);
+		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin, IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin);
 	}
 }

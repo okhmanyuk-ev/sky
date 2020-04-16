@@ -20,8 +20,8 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	ENGINE->addSystem<Shared::LocalizationSystem>(std::make_shared<Shared::LocalizationSystem>());
 	ENGINE->addSystem<Shared::StatsSystem>(std::make_shared<Shared::StatsSystem>());
 	ENGINE->addSystem<Shared::CacheSystem>(std::make_shared<Shared::CacheSystem>());
-
-	mImguiSystem = std::make_shared<Shared::ImguiSystem>();
+	ENGINE->addSystem<Shared::ImguiSystem>(std::make_shared<Shared::ImguiSystem>());
+	
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
 	mPerformanceConsoleCommands = std::make_shared<Shared::PerformanceConsoleCommands>();
@@ -44,6 +44,7 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 
 GraphicalApplication::~GraphicalApplication()
 {
+	ENGINE->removeSystem<Shared::ImguiSystem>();
 	ENGINE->removeSystem<Shared::CacheSystem>();
 	ENGINE->removeSystem<Shared::StatsSystem>();
 	ENGINE->removeSystem<Shared::LocalizationSystem>();
@@ -66,10 +67,11 @@ void GraphicalApplication::run()
 		PLATFORM->process();
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
+		IMGUI_SYSTEM->begin();
 		preFrame();
 		FRAME->frame();
 		postFrame();
-		mImguiSystem->present();
+		IMGUI_SYSTEM->end();
 		postImguiPresent();
 		RENDERER->present();
 	}

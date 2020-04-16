@@ -9,6 +9,7 @@
 #include <platform/defines.h>
 #include <renderer/defines.h>
 #include <platform/system_android.h>
+#include <shared/imgui_system.h>
 
 using namespace Shared;
 
@@ -69,7 +70,7 @@ void ConsoleDevice::frame()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0001f);
 		ImGui::Begin("ConsoleButton", nullptr, ImGui::User::ImGuiWindowFlags_Overlay & ~ImGuiWindowFlags_NoInputs);
-		ImGui::SetWindowPos(ImVec2((PLATFORM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10, 10));
+		ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10, 10));
 
 		if (ImGui::Button("Console"))
 		{
@@ -100,9 +101,9 @@ void ConsoleDevice::frame()
 	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoDecoration);
 	
 #if defined(PLATFORM_MOBILE) // TODO: make adaptive to keyboard
-	ImGui::SetWindowSize(ImVec2(PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight() * 0.25f));
+	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.25f));
 #else
-	ImGui::SetWindowSize(ImVec2(PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight() * 0.75f));
+	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.75f));
 #endif
 
 	ImGui::SetWindowPos(ImVec2(0, -ImGui::GetWindowHeight() * mInterpolator.getValue()));
@@ -228,7 +229,7 @@ void ConsoleDevice::showCandidates(float height, float top)
 		return;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
-	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, PLATFORM->getLogicalHeight() - height - top - 10));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, IMGUI_SYSTEM->getLogicalHeight() - height - top - 10));
 	ImGui::SetNextWindowFocus();
 
 	ImGui::Begin("ConsoleCandidates", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel & ~ImGuiWindowFlags_NoBringToFrontOnFocus);
@@ -288,8 +289,8 @@ void ConsoleDevice::showFastLogs()
 		ImGuiWindowFlags_NoNav |
 		ImGuiWindowFlags_NoBackground);
 
-	ImGui::SetWindowSize(ImVec2(PLATFORM->getLogicalWidth(), 0));
-	ImGui::SetWindowPos(ImVec2(0, PLATFORM->getLogicalHeight() - ImGui::GetWindowHeight()));
+	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), 0));
+	ImGui::SetWindowPos(ImVec2(0, IMGUI_SYSTEM->getLogicalHeight() - ImGui::GetWindowHeight()));
 
 	auto now = Clock::Now();
 

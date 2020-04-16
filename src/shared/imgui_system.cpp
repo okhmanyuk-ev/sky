@@ -15,7 +15,6 @@ ImguiSystem::ImguiSystem()
 	auto& io = ImGui::GetIO();
 
 	io.IniFilename = NULL;
-	io.FontDefault = io.Fonts->AddFontDefault();
 	
 	{
 		using Platform::Keyboard::Key;
@@ -41,18 +40,6 @@ ImguiSystem::ImguiSystem()
 		io.KeyMap[ImGuiKey_Y] = static_cast<int>(Key::Y);
 		io.KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);
 	}
-	
-	uint8_t* data;
-	int32_t width;
-	int32_t height;
-
-	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
-
-	mTexture = std::make_shared<Renderer::Texture>(width, height, 4, data);
-	
-	io.Fonts->TexID = &mTexture;
-
-	begin();
 }
 
 ImguiSystem::~ImguiSystem()
@@ -62,15 +49,23 @@ ImguiSystem::~ImguiSystem()
 
 void ImguiSystem::begin()
 {
+	if (mScaleIndependence)
+		mScale = 1.0f / PLATFORM->getScale();
+
+	mLogicalSize.x = PLATFORM->getLogicalWidth() / mScale;
+	mLogicalSize.y = PLATFORM->getLogicalHeight() / mScale;
+
+	ensureFont();
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.DeltaTime = Clock::ToSeconds(FRAME->getTimeDelta());
 	
-	io.DisplaySize.x = PLATFORM->getLogicalWidth();
-	io.DisplaySize.y = PLATFORM->getLogicalHeight();
+	io.DisplaySize.x = getLogicalWidth();
+	io.DisplaySize.y = getLogicalHeight();
 
-	io.MousePos.x = mMousePos.x / PLATFORM->getScale();
-	io.MousePos.y = mMousePos.y / PLATFORM->getScale();
+	io.MousePos.x = mMousePos.x / PLATFORM->getScale() / mScale;
+	io.MousePos.y = mMousePos.y / PLATFORM->getScale() / mScale;
 
 	io.MouseWheel += mMouseWheel.y;
 
@@ -98,10 +93,10 @@ void ImguiSystem::end()
 	ImGui::Render();
 
 	auto drawData = ImGui::GetDrawData();
-	drawData->ScaleClipRects({ PLATFORM->getScale(), PLATFORM->getScale() });
+	drawData->ScaleClipRects({ PLATFORM->getScale() * mScale, PLATFORM->getScale() * mScale });
 
 	auto view = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	auto projection = glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
+	auto projection = glm::orthoLH(0.0f, getLogicalWidth(), getLogicalHeight(), 0.0f, -1.0f, 1.0f);
 	auto model = glm::mat4(1.0f);
 	
 	mShader->setProjectionMatrix(projection);
@@ -111,7 +106,7 @@ void ImguiSystem::end()
 	RENDERER->setRenderTarget(nullptr);
 	RENDERER->setViewport(Renderer::Viewport());
 	RENDERER->setTopology(Renderer::Topology::TriangleList);
-	RENDERER->setSampler(Renderer::Sampler::Nearest);
+	RENDERER->setSampler(mSampler);
 	RENDERER->setDepthMode(Renderer::DepthMode());
 	RENDERER->setCullMode(Renderer::CullMode::None);
 	RENDERER->setBlendMode(Renderer::BlendStates::NonPremultiplied);
@@ -143,10 +138,20 @@ void ImguiSystem::end()
 	}
 }
 
-void ImguiSystem::present()
+void ImguiSystem::ensureFont() 
 {
-	end();
-	begin();
+	auto& io = ImGui::GetIO();
+	
+	if (io.Fonts->IsBuilt()) 
+		return;
+
+	uint8_t* data;
+	int32_t width;
+	int32_t height;
+
+	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
+	mTexture = std::make_shared<Renderer::Texture>(width, height, 4, data);
+	io.Fonts->TexID = &mTexture;
 }
 
 void ImguiSystem::event(const Platform::Touch::Event& e)

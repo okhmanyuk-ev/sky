@@ -45,8 +45,6 @@ namespace Shared
 		virtual void postImguiPresent() {};
 		
 	private:
-		std::shared_ptr<Shared::ImguiSystem> mImguiSystem;
-
 		std::shared_ptr<Common::ConsoleCommands> mConsoleCommands;
 		std::shared_ptr<Shared::GraphicalConsoleCommands> mGraphicalConsoleCommands;
 
