@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <platform/system.h>
 #include <glm/glm.hpp>
+#include <shared/imgui_user.h>
 
 using namespace Shared;
 
@@ -83,13 +84,13 @@ void StatsSystem::frame()
 	ImGui::SetWindowSize(ImVec2(key_column_width + value_column_width, 0.0f));
 
 	if (mAlignment == Align::TopLeft)
-		ImGui::SetWindowPos(ImVec2(0, 0));
+		ImGui::SetWindowPos(ImGui::User::TopLeftCorner(0.0f));
 	else if (mAlignment == Align::TopRight)
-		ImGui::SetWindowPos(ImVec2(PLATFORM->getLogicalWidth() - ImGui::GetWindowWidth(), 0.0f));
+		ImGui::SetWindowPos(ImGui::User::TopRightCorner(0.0f));
 	else if (mAlignment == Align::BottomLeft)
-		ImGui::SetWindowPos(ImVec2(0.0f, PLATFORM->getLogicalHeight() - ImGui::GetWindowHeight()));
+		ImGui::SetWindowPos(ImGui::User::BottomLeftCorner(0.0f));
 	else if (mAlignment == Align::BottomRight)
-		ImGui::SetWindowPos(ImVec2(PLATFORM->getLogicalWidth() - ImGui::GetWindowWidth(), PLATFORM->getLogicalHeight() - ImGui::GetWindowHeight()));
+		ImGui::SetWindowPos(ImGui::User::BottomRightCorner(0.0f));
 
 
 	ImGui::End();

@@ -20,6 +20,10 @@ GraphicalConsoleCommands::GraphicalConsoleCommands()
 	CONSOLE->registerCVar("r_vsync", { "bool" },
 		CVAR_GETTER_BOOL_FUNC(RENDERER->isVsync),
 		CVAR_SETTER_BOOL_FUNC(RENDERER->setVsync));
+
+	CONSOLE->registerCommand("rescale", "smart scaling", { "float" }, [](CON_ARGS) {
+		PLATFORM->rescale(CON_ARG_FLOAT(0));
+	});
 }
 
 GraphicalConsoleCommands::~GraphicalConsoleCommands()

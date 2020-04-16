@@ -29,8 +29,6 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	mTouchEmulator = std::make_shared<Shared::TouchEmulator>();
 	mGestureDetector = std::make_shared<Shared::GestureDetector>();
 
-	//
-
 	ImGui::User::SetupStyleFromColor(1.0f, 1.0f, 0.75f);
 	
 	auto& style = ImGui::GetStyle();
@@ -40,6 +38,10 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	mConsoleCommands->setQuitCallback([this] {
 		PLATFORM->quit();
 	});
+
+#if !defined(PLATFORM_MOBILE)
+	IMGUI_SYSTEM->setScaleIndependence(true);
+#endif
 }
 
 GraphicalApplication::~GraphicalApplication()

@@ -40,11 +40,11 @@ namespace Platform
 		bool isKeyPressed(Keyboard::Key key) const override { return false; }
 		bool isKeyPressed(Mouse::Button key) const override { return false; };
 
-		void resize(int width, int height) override { /*notging*/ }
-		void setTitle(const std::string& text) override { /*notging*/ }
-		void hideCursor() override { /*notging*/ }
-		void showCursor() override { /*notging*/ }
-		void setCursorPos(int x, int y) override { /*notging*/ }
+		void resize(int width, int height) override { /*nothing*/ }
+		void setTitle(const std::string& text) override { /*nothing*/ }
+		void hideCursor() override { /*nothing*/ }
+		void showCursor() override { /*nothing*/ }
+		void setCursorPos(int x, int y) override { /*nothing*/ }
 
 		std::string getAppName() const override;
 		std::string getAppFolder() const override;

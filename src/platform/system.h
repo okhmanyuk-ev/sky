@@ -34,9 +34,6 @@ namespace Platform
 		virtual int getWidth() const = 0;
 		virtual int getHeight() const = 0;
 
-        float getLogicalWidth() const { return getWidth() / getScale(); };
-        float getLogicalHeight() const { return getHeight() / getScale(); };
-
 		virtual float getScale() const = 0;
 		virtual void setScale(float value) = 0;
 
@@ -55,6 +52,12 @@ namespace Platform
 		virtual void showVirtualKeyboard() = 0;
 		virtual void hideVirtualKeyboard() = 0;
 		virtual bool isVirtualKeyboardOpened() const = 0;
+
+	public:        
+		float getLogicalWidth() const;
+		float getLogicalHeight() const;
+
+		void rescale(float value);
 
 	public:
         using ConsumeCallback = std::function<void()>;
