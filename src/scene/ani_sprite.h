@@ -32,9 +32,9 @@ namespace Scene
 		auto getProgress() const { return mProgress; }
 		void setProgress(size_t value) { mProgress = value; }
 
-		const auto& getAnimation() const { return mAnimation; }
-		void setAnimation(const std::shared_ptr<Renderer::Texture>& texture, const std::shared_ptr<Graphics::Animation>& animation) { mAnimation = animation; mSprite->setTexture(texture); mMaxRegionSizeFound = false; }
-		void setAnimation(const std::shared_ptr<Graphics::Animation>& value);
+		auto getAnimation() const { return mAnimation; }
+		void setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Animation> animation);
+		void setAnimation(std::shared_ptr<Graphics::Animation> value);
 
 		bool isPlaying() const { return mPlaying; }
 		void setPlaying(bool value) { mPlaying = value; }
@@ -59,10 +59,7 @@ namespace Scene
 		using StateMap = std::map<T, std::string>;
 
 	public:
-		MappedAniSprite(const StateMap& state_map) : mStateMap(state_map)
-		{
-			//
-		}
+		MappedAniSprite(const StateMap& state_map) : mStateMap(state_map) { }
 
 	public:
 		void setStateType(T value)

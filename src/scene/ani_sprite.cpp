@@ -71,7 +71,14 @@ void AniSprite::update()
 	Node::update();
 }
 
-void AniSprite::setAnimation(const std::shared_ptr<Graphics::Animation>& value)
+void AniSprite::setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Animation> animation) 
+{ 
+	mAnimation = animation; 
+	mSprite->setTexture(texture); 
+	mMaxRegionSizeFound = false; 
+}
+
+void AniSprite::setAnimation(std::shared_ptr<Graphics::Animation> value)
 { 
 	auto& image = value->getAtlas().getImage();
 	setAnimation(std::make_shared<Renderer::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory()), value); 
