@@ -36,18 +36,18 @@ void GraphicsHelpers::SaveAtlasToFile(const std::string& path, const Graphics::A
 	Platform::Asset::Write(path + "_atlas.json", json_dump.data(), json_dump.size(), pathType);
 }
 
-Graphics::Atlas GraphicsHelpers::OpenAtlasFromFile(const std::string& path, Platform::Asset::Path pathType)
+Graphics::Atlas GraphicsHelpers::OpenAtlasFromFile(const std::string& image_path, const std::string& atlas_path, Platform::Asset::Path path_type)
 {
-	auto png_file = Platform::Asset(path + ".png", pathType);
-	auto json_file = Platform::Asset(path + "_atlas.json", pathType);
+	auto image_file = Platform::Asset(image_path, path_type);
+	auto json_file = Platform::Asset(atlas_path, path_type);
 	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
 	auto json = nlohmann::json::parse(json_string);
 	auto regions = Graphics::Atlas::TexRegionMap();
-	for (const auto& [key, value]  : json.items())
+	for (const auto& [key, value] : json.items())
 	{
 		regions.insert({ key, { { value[0], value[1] }, { value[2], value[3] } } });
 	}
-	return Graphics::Atlas(png_file, regions);
+	return Graphics::Atlas(image_file, regions);
 }
 
 void GraphicsHelpers::SaveAnimationToFile(const std::string& path, const Graphics::Animation& animation, Platform::Asset::Path pathType)
@@ -65,10 +65,11 @@ void GraphicsHelpers::SaveAnimationToFile(const std::string& path, const Graphic
 	Platform::Asset::Write(path + "_animation.json", json_dump.data(), json_dump.size(), pathType);
 }
 
-Graphics::Animation GraphicsHelpers::OpenAnimationFromFile(const std::string& path, Platform::Asset::Path pathType)
+Graphics::Animation GraphicsHelpers::OpenAnimationFromFile(const std::string& image_path, const std::string& atlas_path,
+	const std::string& animation_path, Platform::Asset::Path path_type)
 {
-	auto atlas = OpenAtlasFromFile(path, pathType);
-	auto json_file = Platform::Asset(path + "_animation.json", pathType);
+	auto atlas = OpenAtlasFromFile(image_path, atlas_path, path_type);
+	auto json_file = Platform::Asset(animation_path, path_type);
 	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
 	auto json = nlohmann::json::parse(json_string);
 	auto states = Graphics::Animation::StatesMap();
