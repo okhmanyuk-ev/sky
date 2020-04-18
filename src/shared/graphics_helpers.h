@@ -16,6 +16,9 @@ namespace Shared::GraphicsHelpers
 	void SaveAnimationToFile(const std::string& path, const Graphics::Animation& animation, Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
 
 	// open animation from assets
-	Graphics::Animation OpenAnimationFromFile(const std::string& image_path, const std::string& atlas_path, 
+	Graphics::Animation OpenAnimationFromFile(const std::string& image_path, const std::string& atlas_path,
 		const std::string& animation_path, Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
+
+	Graphics::Animation OpenAnimationFromFile(const std::string& smart_path, 
+		Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
 }

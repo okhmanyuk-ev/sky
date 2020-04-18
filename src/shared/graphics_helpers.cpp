@@ -82,3 +82,11 @@ Graphics::Animation GraphicsHelpers::OpenAnimationFromFile(const std::string& im
 	}
 	return Graphics::Animation(atlas, states);
 }
+
+Graphics::Animation GraphicsHelpers::OpenAnimationFromFile(const std::string& smart_path, Platform::Asset::Path path_type)
+{
+	auto image_path = smart_path + ".png";
+	auto atlas_path = smart_path + "_atlas.json";
+	auto animation_path = smart_path + "_animation.json";
+	return OpenAnimationFromFile(image_path, atlas_path, animation_path, path_type);
+}
