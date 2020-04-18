@@ -15,6 +15,9 @@ namespace Scene
 		void update() override;
 		
 	public:
+		void randomizeProgress();
+
+	public:
 		auto getTexture() const { return mSprite->getTexture(); }
 	
 		auto getColor() const { return mSprite->getColor(); }
@@ -56,7 +59,8 @@ namespace Scene
 		static_assert(std::is_enum<T>::value, "T must be enum");
 
 	public:
-		using StateMap = std::map<T, std::string>;
+		using Animation = T;
+		using StateMap = std::map<Animation, std::string>;
 
 	public:
 		MappedAniSprite(const StateMap& state_map) : mStateMap(state_map) { }

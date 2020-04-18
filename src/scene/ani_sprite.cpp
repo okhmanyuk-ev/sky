@@ -71,6 +71,18 @@ void AniSprite::update()
 	Node::update();
 }
 
+void AniSprite::randomizeProgress()
+{
+	const auto& states = mAnimation->getStates();
+
+	if (states.count(mState) == 0)
+		return;
+
+	const auto& frames = states.at(mState);
+
+	mProgress = glm::linearRand<size_t>(0, frames.size() - 1);
+}
+
 void AniSprite::setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Animation> animation) 
 { 
 	mAnimation = animation; 
