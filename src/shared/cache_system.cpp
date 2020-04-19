@@ -31,7 +31,7 @@ void CacheSystem::loadTexture(std::shared_ptr<Graphics::Image> image, const std:
 
 void CacheSystem::loadTexture(const std::string& path, const std::string& name)
 {
-	if (mAnimations.count(name) > 0)
+	if (mTextures.count(name) > 0)
 		return;
 
 	loadTexture(std::make_shared<Graphics::Image>(path), name);
