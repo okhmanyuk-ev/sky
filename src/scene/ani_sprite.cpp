@@ -32,7 +32,7 @@ void AniSprite::update()
 
 		const auto duration = Clock::FromSeconds(1.0f / mFrequency);
 
-		if (mAccumulator >= duration)
+		while (mAccumulator >= duration)
 		{
 			mAccumulator -= duration;
 			mProgress += 1;
@@ -41,8 +41,8 @@ void AniSprite::update()
 
 	const auto& frames = states.at(mState);
 
-	if (mProgress >= frames.size())
-		mProgress = 0;
+	while (mProgress >= frames.size())
+		mProgress -= frames.size();
 
 	const auto& frame = frames.at(mProgress);
 	const auto& regions = mAnimation->getAtlas().getTexRegions();
