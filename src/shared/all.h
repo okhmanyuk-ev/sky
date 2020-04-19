@@ -33,11 +33,9 @@
 #include <scene/sprite.h>
 #include <scene/rectangle.h>
 #include <scene/circle.h>
-#include <scene/pickable.h>
 #include <scene/clickable.h>
 #include <scene/clippable.h>
 #include <scene/debuggable.h>
-#include <scene/scrollable.h>
 #include <scene/actionable.h>
 #include <scene/ani_sprite.h>
 #include <scene/scrollbox.h>
