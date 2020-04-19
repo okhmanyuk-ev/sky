@@ -162,6 +162,12 @@ void SceneEditor::highlightHoveredNode()
 
 void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node)
 {
+	if (node == nullptr)
+		return;
+
+	if (!node->hasParent())
+		return;
+
 	auto bounds = node->getGlobalBounds();
 
 	bounds /= PLATFORM->getScale();
