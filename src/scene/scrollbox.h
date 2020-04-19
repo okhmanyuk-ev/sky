@@ -23,9 +23,18 @@ namespace Scene
 		auto getSensitivity() const { return mSensitivity; }
 		void setSensitivity(const glm::vec2& value) { mSensitivity = value; }
 
+		auto getInertiaFriction() const { return mInertiaFriction; }
+		void setInertiaFriction(float value) { mInertiaFriction = value; }
+
+		auto isInertiaEnabled() const { return mInertiaEnabled; }
+		void setInertiaEnabled(bool value) { mInertiaEnabled = value; }
+
 	private:
 		std::shared_ptr<Node> mBounding = std::make_shared<Node>();
 		std::shared_ptr<Node> mContent = std::make_shared<Node>();
 		glm::vec2 mSensitivity = { 1.0f, 1.0f };
+		glm::vec2 mSpeed = { 0.0f, 0.0f };
+		float mInertiaFriction = 0.03f;
+		bool mInertiaEnabled = true;
 	};
 }

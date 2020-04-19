@@ -1,4 +1,5 @@
 #include "scrollbox.h"
+#include "console/device.h"
 
 using namespace Scene;
 
@@ -14,6 +15,13 @@ Scrollbox::Scrollbox()
 void Scrollbox::update()
 {
 	Node::update();
+
+	mContent->setPosition(mContent->getPosition() + (mSpeed * mSensitivity));
+
+	if (mInertiaEnabled && !isTouching())
+		mSpeed *= 1.0f - (mInertiaFriction * Clock::ToSeconds(FRAME->getTimeDelta()) * 100.0f);
+	else
+		mSpeed = { 0.0f, 0.0f };
 
 	if (mContent->getX() + mContent->getWidth() < mBounding->getWidth())
 		mContent->setX(mBounding->getWidth() - mContent->getWidth());
@@ -38,15 +46,8 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 	}
 	else if (type == Touch::Continue)
 	{
-		auto diff = pos - mPrevPosition;
-		diff /= PLATFORM->getScale();
-		mContent->setPosition(mContent->getPosition() + (diff * mSensitivity));
+		mSpeed = pos - mPrevPosition;
+		mSpeed /= PLATFORM->getScale();
 		mPrevPosition = pos;
-	}
-	else
-	{
-		auto diff = pos - mPrevPosition;
-		//LOG("touch end diff x: " + std::to_string(diff.x));
-		// log always 0.0
 	}
 }
