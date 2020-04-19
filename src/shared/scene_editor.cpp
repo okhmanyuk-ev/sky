@@ -2,6 +2,7 @@
 #include <imgui.h>
 #include <scene/color.h>
 #include <scene/sprite.h>
+#include <scene/label.h>
 
 using namespace Shared;
 
@@ -21,18 +22,8 @@ void SceneEditor::show()
 	showRecursiveNodeTree(mScene.getRoot());
 	ImGui::End();
 
-	/*auto nodes = mScene.getNodes(mMousePos);
-
-	if (!nodes.empty()) 
-	{
-		ImGui::BeginTooltip();
-		for (auto node : nodes)
-		{
-			auto name = typeid(node).name();
-			ImGui::Text(name);
-		}
-		ImGui::EndTooltip();
-	}*/
+	highlightNodeUnderCursor();
+	highlightHoveredNode();
 }
 
 void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
@@ -99,6 +90,7 @@ void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
 	}
 	else if (ImGui::IsItemHovered())
 	{
+		mHoveredNode = node;
 		showTooltip(node);
 	}
 
@@ -135,4 +127,58 @@ void SceneEditor::showTooltip(std::shared_ptr<Scene::Node> node)
 		ImGui::Image((ImTextureID)&mSpriteTexture, ImVec2(size.x, size.y));
 		ImGui::EndTooltip();
 	}
+	else if (auto label = std::dynamic_pointer_cast<Scene::Label>(node); label != nullptr)
+	{
+		auto str = label->getText().cpp_str();
+		ImGui::BeginTooltip();
+		ImGui::Text("Label: %s", str.c_str());
+		ImGui::EndTooltip();
+	}
+}
+
+void SceneEditor::highlightNodeUnderCursor()
+{
+	/*auto nodes = mScene.getNodes(mMousePos);
+
+	if (nodes.empty())
+		return;
+
+	ImGui::BeginTooltip();
+	for (auto node : nodes)
+	{
+		auto name = typeid(node).name();
+		ImGui::Text(name);
+	}
+	ImGui::EndTooltip();*/
+}
+
+void SceneEditor::highlightHoveredNode()
+{
+	if (mHoveredNode == nullptr)
+		return;
+
+	highlightNode(mHoveredNode);
+}
+
+void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node)
+{
+	auto bounds = node->getGlobalBounds();
+
+	bounds /= PLATFORM->getScale();
+
+	auto top_y = bounds.y;
+	auto bottom_y = bounds.w;
+	auto left_x = bounds.x;
+	auto right_x = bounds.z;
+
+	auto model = glm::mat4(1.0f);
+	model = glm::translate(model, { left_x, top_y, 0.0f });
+	model = glm::scale(model, { right_x - left_x, bottom_y - top_y, 1.0f });
+
+	GRAPHICS->begin();
+	GRAPHICS->pushOrthoMatrix();
+	GRAPHICS->drawRectangle(model, { Graphics::Color::White, 0.25f });
+	GRAPHICS->drawLineRectangle(model, { Graphics::Color::White, 1.0f });
+	GRAPHICS->pop();
+	GRAPHICS->end();
 }

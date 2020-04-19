@@ -18,7 +18,6 @@ namespace Scene
 
 			auto top_y = bounds.y;
 			auto bottom_y = bounds.w;
-
 			auto left_x = bounds.x;
 			auto right_x = bounds.z;
 
