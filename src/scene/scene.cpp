@@ -27,6 +27,9 @@ void Scene::Scene::recursiveNodeDraw(const std::shared_ptr<Node>& node)
 	if (!node->isEnabled())
 		return;
 
+	if (!node->isVisible())
+		return;
+
 	node->beginRender();
 	node->draw();
 

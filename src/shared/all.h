@@ -44,6 +44,7 @@
 #include <scene/transform.h>
 #include <scene/color.h>
 #include <scene/trail.h>
+#include <scene/cullable.h>
 
 #include <shared/stats_system.h>
 #include <shared/cache_system.h>

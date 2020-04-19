@@ -59,6 +59,9 @@ namespace Scene
 		bool isEnabled() const { return mEnabled; }
 		void setEnabled(bool value) { mEnabled = value; }
 
+		bool isVisible() const { return mVisible; }
+		void setVisible(bool value) { mVisible = value; }
+
 		bool isInteractions() const { return mInteractions; }
 		void setInteractions(bool value) { mInteractions = value; }
 
@@ -75,6 +78,7 @@ namespace Scene
 		std::list<std::shared_ptr<Node>> mNodes;
 		glm::mat4 mTransform = glm::mat4(1.0f);
 		bool mEnabled = true;
+		bool mVisible = true;
 		bool mInteractions = true;
 		bool mTouchable = false;
 		int mTouchMask = 1 << 0;

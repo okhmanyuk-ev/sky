@@ -39,15 +39,9 @@ void Scrollbox::update()
 void Scrollbox::touch(Touch type, const glm::vec2& pos)
 {
 	Node::touch(type, pos);
+	
+	if (type == Touch::Continue)
+		mSpeed += (pos - mPrevPosition) / PLATFORM->getScale();
 
-	if (type == Touch::Begin)
-	{
-		mPrevPosition = pos;
-	}
-	else if (type == Touch::Continue)
-	{
-		mSpeed = pos - mPrevPosition;
-		mSpeed /= PLATFORM->getScale();
-		mPrevPosition = pos;
-	}
+	mPrevPosition = pos;
 }

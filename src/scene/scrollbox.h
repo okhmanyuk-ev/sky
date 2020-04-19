@@ -15,7 +15,8 @@ namespace Scene
 
 	private:
 		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
-		
+		glm::vec2 mSpeed = { 0.0f, 0.0f };
+
 	public:
 		auto getContent() { return mContent; }
 		auto getBounding() { return std::static_pointer_cast<Transform>(mBounding); }
@@ -33,7 +34,6 @@ namespace Scene
 		std::shared_ptr<Node> mBounding = std::make_shared<Node>();
 		std::shared_ptr<Node> mContent = std::make_shared<Node>();
 		glm::vec2 mSensitivity = { 1.0f, 1.0f };
-		glm::vec2 mSpeed = { 0.0f, 0.0f };
 		float mInertiaFriction = 0.03f;
 		bool mInertiaEnabled = true;
 	};
