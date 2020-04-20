@@ -28,7 +28,6 @@ import java.util.Map;
 
 public class SkyActivity extends NativeActivity {
     static {
-        System.loadLibrary("main");
         System.loadLibrary("fmod");
     }
 
