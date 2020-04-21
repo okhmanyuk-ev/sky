@@ -50,8 +50,7 @@ namespace Scene
 		std::shared_ptr<Graphics::Animation> mAnimation;
 		size_t mProgress = 0;
 		bool mPlaying = true;
-		glm::vec2 mMaxRegionSize;
-		bool mMaxRegionSizeFound = false;
+		glm::vec2 mMaxRegionSize = { 0.0f, 0.0f };
 	};
 
 	template <typename T> class MappedAniSprite : public AniSprite

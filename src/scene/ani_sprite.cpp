@@ -50,16 +50,6 @@ void AniSprite::update()
 
 	mSprite->setTexRegion(region);
 	mSprite->setSize(region.size);
-	
-	if (!mMaxRegionSizeFound)
-	{
-		for (const auto& [name, region] : regions)
-		{
-			mMaxRegionSize.x = glm::max(mMaxRegionSize.x, region.size.x);
-			mMaxRegionSize.y = glm::max(mMaxRegionSize.y, region.size.y);
-		}
-		mMaxRegionSizeFound = true;
-	}
 
 	auto w_scale = getWidth() / mMaxRegionSize.x;
 	auto h_scale = getHeight() / mMaxRegionSize.y;
@@ -87,7 +77,16 @@ void AniSprite::setAnimation(std::shared_ptr<Renderer::Texture> texture, std::sh
 { 
 	mAnimation = animation; 
 	mSprite->setTexture(texture); 
-	mMaxRegionSizeFound = false; 
+	
+	const auto& regions = mAnimation->getAtlas().getTexRegions();
+
+	mMaxRegionSize = { 0.0f, 0.0f };
+
+	for (const auto& [name, region] : regions)
+	{
+		mMaxRegionSize.x = glm::max(mMaxRegionSize.x, region.size.x);
+		mMaxRegionSize.y = glm::max(mMaxRegionSize.y, region.size.y);
+	}
 }
 
 void AniSprite::setAnimation(std::shared_ptr<Graphics::Animation> value)
