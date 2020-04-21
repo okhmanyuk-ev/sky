@@ -13,7 +13,13 @@ Node::Node()
 
 Node::~Node()
 {
-	//
+	// we should setup parent to nullptr for every child, 
+	// because they can be stored locally somewhere
+
+	for (auto node : mNodes) 
+	{
+		node->mParent = nullptr;
+	}
 }
 
 void Node::attach(std::shared_ptr<Node> node)
@@ -79,8 +85,10 @@ glm::vec4 Node::getGlobalBounds() const
 
 ::Scene::Scene* Node::getScene() const
 {
-	assert(hasParent());
-	return getParent()->getScene();
+	if (hasParent())
+		return getParent()->getScene();
+	else
+		return nullptr;
 }
 
 bool Node::hitTest(const glm::vec2& value) const

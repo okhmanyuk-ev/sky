@@ -52,6 +52,7 @@ namespace Scene
 	public:
 		auto getParent() const { return mParent; }
 		auto hasParent() const { return mParent != nullptr; }
+		auto hasScene() const { return getScene() != nullptr; }
 		const auto& getNodes() const { return mNodes; }
 		auto hasNodes() const { return !mNodes.empty(); }
 		const auto& getTransform() const { return mTransform; }

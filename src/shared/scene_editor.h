@@ -17,6 +17,7 @@ namespace Shared
 
 	private:
 		void showRecursiveNodeTree(std::shared_ptr<Scene::Node> node);
+		void showNodeEditor(std::shared_ptr<Scene::Node> node);
 		void showTooltip(std::shared_ptr<Scene::Node> node);
 		void highlightNodeUnderCursor();
 		void highlightHoveredNode();
@@ -26,6 +27,7 @@ namespace Shared
 		Scene::Scene& mScene;
 		glm::vec2 mMousePos = { 0.0f, 0.0f };
 		std::shared_ptr<Renderer::Texture> mSpriteTexture = nullptr;
+		std::shared_ptr<Renderer::Texture> mEditorSpriteTexture = nullptr;
 		std::shared_ptr<Scene::Node> mHoveredNode = nullptr;
 	};
 }
