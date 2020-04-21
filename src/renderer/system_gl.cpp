@@ -495,7 +495,11 @@ void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexO
 {
 	prepareForDrawing();
 	int indexSize = mGLIndexType == GL_UNSIGNED_INT ? 4 : 2;
+#if defined(PLATFORM_ANDROID)
+	glDrawElements(mGLTopology, (GLsizei)indexCount, mGLIndexType, (void*)(indexOffset * indexSize));
+#else
 	glDrawElementsBaseVertex(mGLTopology, (GLsizei)indexCount, mGLIndexType, (void*)(indexOffset * indexSize), (GLint)vertexOffset);
+#endif
 }
 
 void SystemGL::present()
