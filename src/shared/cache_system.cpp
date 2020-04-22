@@ -1,12 +1,16 @@
 #include "cache_system.h"
 #include "graphics_helpers.h"
+#include <console/device.h>
 
 using namespace Shared;
 
 std::shared_ptr<Renderer::Texture> CacheSystem::getTexture(const std::string& name)
 {
 	loadTexture(name);
-	return mTextures.at(name);
+	if (mTextures.count(name) == 0)
+		return nullptr;
+	else
+		return mTextures.at(name);
 }
 
 std::shared_ptr<Graphics::Font> CacheSystem::getFont(const std::string& name)
@@ -21,18 +25,32 @@ std::shared_ptr<Graphics::Animation> CacheSystem::getAnimation(const std::string
 	return mAnimations.at(name);
 }
 
+void CacheSystem::loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name)
+{
+	if (mTextures.count(name) > 0)
+		return;
+
+	mTextures[name] = texture;
+}
+
 void CacheSystem::loadTexture(std::shared_ptr<Graphics::Image> image, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
 		return;
 
-	mTextures[name] = std::make_shared<Renderer::Texture>(image->getWidth(), image->getHeight(), image->getChannels(), image->getMemory());
+	loadTexture(std::make_shared<Renderer::Texture>(image->getWidth(), image->getHeight(), image->getChannels(), image->getMemory()), name);
 }
 
 void CacheSystem::loadTexture(const std::string& path, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
 		return;
+
+	if (!Platform::Asset::Exists(path))
+	{
+		CONSOLE_DEVICE->writeLine("cannot find texture: " + path, Console::Color::Red);
+		return;
+	}
 
 	loadTexture(std::make_shared<Graphics::Image>(path), name);
 }
