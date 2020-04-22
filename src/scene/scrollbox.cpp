@@ -24,16 +24,28 @@ void Scrollbox::update()
 		mSpeed = { 0.0f, 0.0f };
 
 	if (mContent->getX() + mContent->getWidth() < mBounding->getWidth())
+	{
 		mContent->setX(mBounding->getWidth() - mContent->getWidth());
+		mSpeed.x = 0.0f;
+	}
 
 	if (mContent->getY() + mContent->getHeight() < mBounding->getHeight())
+	{
 		mContent->setY(mBounding->getHeight() - mContent->getHeight());
+		mSpeed.y = 0.0f;
+	}
 
 	if (mContent->getX() > 0.0f)
+	{
 		mContent->setX(0.0f);
+		mSpeed.x = 0.0f;
+	}
 
 	if (mContent->getY() > 0.0f)
+	{
 		mContent->setY(0.0f);
+		mSpeed.y = 0.0f;
+	}
 }
 
 void Scrollbox::touch(Touch type, const glm::vec2& pos)
