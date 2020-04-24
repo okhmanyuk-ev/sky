@@ -63,6 +63,9 @@ void AniSprite::update()
 
 void AniSprite::randomizeProgress()
 {
+	if (mAnimation == nullptr)
+		return;
+
 	const auto& states = mAnimation->getStates();
 
 	if (states.count(mState) == 0)
