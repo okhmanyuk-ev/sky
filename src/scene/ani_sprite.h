@@ -43,7 +43,7 @@ namespace Scene
 		void setPlaying(bool value) { mPlaying = value; }
 
 	private:
-		std::shared_ptr<Sprite> mSprite = std::make_shared<Sprite>();
+		std::shared_ptr<Sprite> mSprite = nullptr;
 		float mFrequency = 10.0f;
 		std::string mState = "idle";
 		Clock::Duration mAccumulator = Clock::Duration::zero();

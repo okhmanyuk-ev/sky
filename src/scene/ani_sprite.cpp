@@ -4,9 +4,9 @@ using namespace Scene;
 
 AniSprite::AniSprite()
 {
-	//mSprite->setStretch(true);
-	mSprite->setAnchor({ 0.5f, 0.5f });
-	mSprite->setPivot({ 0.5f, 0.5f });
+	mSprite = std::make_shared<Sprite>();
+	mSprite->setAnchor(0.5f);
+	mSprite->setPivot(0.5f);
 	attach(mSprite);
 }
 
