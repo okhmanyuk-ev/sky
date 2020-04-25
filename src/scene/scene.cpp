@@ -11,7 +11,7 @@ Scene::Scene::~Scene()
 	//
 }
 
-void Scene::Scene::recursiveNodeUpdate(const std::shared_ptr<Node>& node)
+void Scene::Scene::recursiveNodeUpdate(std::shared_ptr<Node> node)
 {
 	if (!node->isEnabled())
 		return;
@@ -22,7 +22,7 @@ void Scene::Scene::recursiveNodeUpdate(const std::shared_ptr<Node>& node)
 		recursiveNodeUpdate(_node);
 }
 
-void Scene::Scene::recursiveNodeDraw(const std::shared_ptr<Node>& node)
+void Scene::Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
 {
 	if (!node->isEnabled())
 		return;
@@ -39,7 +39,15 @@ void Scene::Scene::recursiveNodeDraw(const std::shared_ptr<Node>& node)
 	node->endRender();
 }
 
-std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(const std::shared_ptr<Node>& node, const glm::vec2& pos)
+bool Scene::Scene::interactTest(const glm::vec2& pos)
+{
+	if (!mInteractTestCallback)
+		return true;
+
+	return mInteractTestCallback(pos);
+}
+
+std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(std::shared_ptr<Node> node, const glm::vec2& pos)
 {
 	if (!node->isEnabled())
 		return { };
@@ -78,7 +86,7 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(const gl
 	return getTouchableNodes(mRoot, pos);
 }
 
-std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const std::shared_ptr<Node>& node, const glm::vec2& pos)
+std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(std::shared_ptr<Node> node, const glm::vec2& pos)
 {
 	if (!node->isEnabled())
 		return { };
@@ -175,7 +183,7 @@ void Scene::Scene::event(const Platform::Touch::Event& e)
 		}
 	};
 
-	if (e.type == Platform::Touch::Event::Type::Begin && mTouchedNodes.empty())
+	if (e.type == Platform::Touch::Event::Type::Begin && mTouchedNodes.empty() && interactTest(pos))
 	{
 		int mask = 0;
 
