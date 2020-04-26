@@ -28,12 +28,33 @@ void StatsSystem::frame()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
 
-	ImGui::Begin("Statistics", nullptr,
-		ImGuiWindowFlags_NoInputs |
-		ImGuiWindowFlags_NoDecoration |
-		ImGuiWindowFlags_NoNav );
-
+	ImGui::Begin("Statistics", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 	ImGui::Columns(2, nullptr, false);
+	
+	if (ImGui::BeginPopupContextWindow(nullptr, 0))
+	{
+		if (ImGui::BeginMenu("Align"))
+		{
+			if (ImGui::MenuItem("Top Left"))
+				mAlignment = Align::TopLeft;
+
+			if (ImGui::MenuItem("Top Right"))
+				mAlignment = Align::TopRight;
+
+			if (ImGui::MenuItem("Bottom Left"))
+				mAlignment = Align::BottomLeft;
+
+			if (ImGui::MenuItem("Bottom Right"))
+				mAlignment = Align::BottomRight;
+			
+			ImGui::EndMenu();
+		}
+		if (ImGui::MenuItem("Close"))
+		{
+			mEnabled = false;
+		}
+		ImGui::EndPopup();
+	}
 
 	float key_width = 0.0f;
 	float value_width = 0.0f;
