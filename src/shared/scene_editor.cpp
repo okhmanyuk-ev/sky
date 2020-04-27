@@ -16,9 +16,12 @@ void SceneEditor::event(const Platform::Mouse::Event& e)
 	mMousePos = { e.x, e.y };
 }
 
-void SceneEditor::show()
+void SceneEditor::frame()
 {
-	ImGui::Begin("Scene");
+	if (!mEnabled)
+		return;
+
+	ImGui::Begin("Scene", &mEnabled);
 	showRecursiveNodeTree(mScene.getRoot());
 	ImGui::End();
 

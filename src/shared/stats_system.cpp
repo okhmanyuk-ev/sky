@@ -35,16 +35,16 @@ void StatsSystem::frame()
 	{
 		if (ImGui::BeginMenu("Align"))
 		{
-			if (ImGui::MenuItem("Top Left"))
+			if (ImGui::MenuItem("Top Left", "", mAlignment == Align::TopLeft))
 				mAlignment = Align::TopLeft;
 
-			if (ImGui::MenuItem("Top Right"))
+			if (ImGui::MenuItem("Top Right", "", mAlignment == Align::TopRight))
 				mAlignment = Align::TopRight;
 
-			if (ImGui::MenuItem("Bottom Left"))
+			if (ImGui::MenuItem("Bottom Left", "", mAlignment == Align::BottomLeft))
 				mAlignment = Align::BottomLeft;
-
-			if (ImGui::MenuItem("Bottom Right"))
+			
+			if (ImGui::MenuItem("Bottom Right", "", mAlignment == Align::BottomRight))
 				mAlignment = Align::BottomRight;
 			
 			ImGui::EndMenu();

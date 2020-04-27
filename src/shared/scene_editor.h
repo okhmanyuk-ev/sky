@@ -4,7 +4,8 @@
 
 namespace Shared
 {
-	class SceneEditor : public Common::EventSystem::Listenable<Platform::Mouse::Event>
+	class SceneEditor : public Common::FrameSystem::Frameable,
+		public Common::EventSystem::Listenable<Platform::Mouse::Event>
 	{
 	public:
 		SceneEditor(Scene::Scene& scene);
@@ -12,8 +13,8 @@ namespace Shared
 	private:
 		void event(const Platform::Mouse::Event& e) override;
 
-	public:
-		void show();
+	private:
+		void frame() override;
 
 	private:
 		void showRecursiveNodeTree(std::shared_ptr<Scene::Node> node);
@@ -23,7 +24,12 @@ namespace Shared
 		void highlightHoveredNode();
 		void highlightNode(std::shared_ptr<Scene::Node> node);
 
+	public:
+		bool isEnabled() const { return mEnabled; }
+		void setEnabled(bool value) { mEnabled = value; }
+
 	private:
+		bool mEnabled = false;
 		Scene::Scene& mScene;
 		glm::vec2 mMousePos = { 0.0f, 0.0f };
 		std::shared_ptr<Renderer::Texture> mSpriteTexture = nullptr;
