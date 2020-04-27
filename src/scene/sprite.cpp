@@ -15,7 +15,7 @@ void Sprite::draw()
 	GRAPHICS->pushSampler(getSampler());
 	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->pushTextureAddress(mTextureAddress);
-	GRAPHICS->draw(mTexture, model, mTexRegion, getColor());
+	GRAPHICS->drawSprite(mTexture, model, mTexRegion, getColor());
 	GRAPHICS->pop(3);
 
 	Node::draw();

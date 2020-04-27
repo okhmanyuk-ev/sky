@@ -313,7 +313,7 @@ void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm
 	draw(Renderer::Topology::TriangleList, vertices, model);
 }
 
-void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
+void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
 	const TexRegion& tex_region, const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	float tex_w = static_cast<float>(texture->getWidth());
@@ -336,10 +336,106 @@ void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& m
 	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model, shader);
 }
 
-void System::draw(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
+void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	draw(texture, model, { }, { Color::White, 1.0f }, shader);
+	drawSprite(texture, model, { }, { Color::White, 1.0f }, shader);
+}
+
+void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
+	const TexRegion& center_region, const glm::vec2& size, const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
+{
+	float tex_w = static_cast<float>(texture->getWidth());
+	float tex_h = static_cast<float>(texture->getHeight());
+
+	float s_x1 = center_region.pos.x / tex_w;
+	float s_y1 = center_region.pos.y / tex_h;
+	float s_x2 = (center_region.size.x / tex_w) + s_x1;
+	float s_y2 = (center_region.size.y / tex_h) + s_y1;
+
+	float p_x1 = center_region.pos.x / size.x;
+	float p_y1 = center_region.pos.y / size.y;
+	float p_x2 = 1.0f - ((tex_w - (center_region.pos.x + center_region.size.x)) / size.x);
+	float p_y2 = 1.0f - ((tex_h - (center_region.pos.y + center_region.size.y)) / size.y);
+
+	static auto vertices = std::vector<Renderer::Vertex::PositionColorTexture>(36);
+
+	// top left
+
+	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color, { 0.0f, 0.0f } };
+	vertices[1] = { { 0.0f, p_y1, 0.0f }, color, { 0.0f, s_y1 } };
+	vertices[2] = { { p_x1, p_y1, 0.0f }, color, { s_x1, s_y1 } };
+	vertices[3] = { { p_x1, 0.0f, 0.0f }, color, { s_x1, 0.0f } };
+	
+	// top center
+
+	vertices[4] = { { p_x1, 0.0f, 0.0f }, color, { s_x1, 0.0f } };
+	vertices[5] = { { p_x1, p_y1, 0.0f }, color, { s_x1, s_y1 } };
+	vertices[6] = { { p_x2, p_y1, 0.0f }, color, { s_x2, s_y1 } };
+	vertices[7] = { { p_x2, 0.0f, 0.0f }, color, { s_x2, 0.0f } };
+
+	// top right
+
+	vertices[8] = { { p_x2, 0.0f, 0.0f }, color, { s_x2, 0.0f } };
+	vertices[9] = { { p_x2, p_y1, 0.0f }, color, { s_x2, s_y1 } };
+	vertices[10] = { { 1.0f, p_y1, 0.0f }, color, { 1.0f, s_y1 } };
+	vertices[11] = { { 1.0f, 0.0f, 0.0f }, color, { 1.0f, 0.0f } };
+
+	// center left
+
+	vertices[12] = { { 0.0f, p_y1, 0.0f }, color, { 0.0f, s_y1 } };
+	vertices[13] = { { 0.0f, p_y2, 0.0f }, color, { 0.0f, s_y2 } };
+	vertices[14] = { { p_x1, p_y2, 0.0f }, color, { s_x1, s_y2 } };
+	vertices[15] = { { p_x1, p_y1, 0.0f }, color, { s_x1, s_y1 } };
+
+	// center
+
+	vertices[16] = { { p_x1, p_y1, 0.0f }, color, { s_x1, s_y1 } };
+	vertices[17] = { { p_x1, p_y2, 0.0f }, color, { s_x1, s_y2 } };
+	vertices[18] = { { p_x2, p_y2, 0.0f }, color, { s_x2, s_y2 } };
+	vertices[19] = { { p_x2, p_y1, 0.0f }, color, { s_x2, s_y1 } };
+
+	// center right
+
+	vertices[20] = { { p_x2, p_y1, 0.0f }, color, { s_x2, s_y1 } };
+	vertices[21] = { { p_x2, p_y2, 0.0f }, color, { s_x2, s_y2 } };
+	vertices[22] = { { 1.0f, p_y2, 0.0f }, color, { 1.0f, s_y2 } };
+	vertices[23] = { { 1.0f, p_y1, 0.0f }, color, { 1.0f, s_y1 } };
+
+	// bottom left
+
+	vertices[24] = { { 0.0f, p_y2, 0.0f }, color, { 0.0f, s_y2 } };
+	vertices[25] = { { 0.0f, 1.0f, 0.0f }, color, { 0.0f, 1.0f } };
+	vertices[26] = { { p_x1, 1.0f, 0.0f }, color, { s_x1, 1.0f } };
+	vertices[27] = { { p_x1, p_y2, 0.0f }, color, { s_x1, s_y2 } };
+
+	// bottom center
+
+	vertices[28] = { { p_x1, p_y2, 0.0f }, color, { s_x1, s_y2 } };
+	vertices[29] = { { p_x1, 1.0f, 0.0f }, color, { s_x1, 1.0f } };
+	vertices[30] = { { p_x2, 1.0f, 0.0f }, color, { s_x2, 1.0f } };
+	vertices[31] = { { p_x2, p_y2, 0.0f }, color, { s_x2, s_y2 } };
+
+	// bottom right
+
+	vertices[32] = { { p_x2, p_y2, 0.0f }, color, { s_x2, s_y2 } };
+	vertices[33] = { { p_x2, 1.0f, 0.0f }, color, { s_x2, 1.0f } };
+	vertices[34] = { { 1.0f, 1.0f, 0.0f }, color, { 1.0f, 1.0f } };
+	vertices[35] = { { 1.0f, p_y2, 0.0f }, color, { 1.0f, s_y2 } };
+
+	static const std::vector<uint32_t> indices = { 
+		0, 1, 2, 0, 2, 3,
+		4, 5, 6, 4, 6, 7,
+		8, 9, 10, 8, 10, 11,
+		12, 13, 14, 12, 14, 15,
+		16, 17, 18, 16, 18, 19,
+		20, 21, 22, 20, 22, 23,
+		24, 25, 26, 24, 26, 27,
+		28, 29, 30, 28, 30, 31,
+		32, 33, 34, 32, 34, 35
+	};
+
+	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model, shader);
 }
 
 void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,

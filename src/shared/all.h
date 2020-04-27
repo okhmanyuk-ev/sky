@@ -28,9 +28,10 @@
 #include <scene/scene.h>
 #include <scene/node.h>
 #include <scene/label.h>
+#include <scene/sprite.h>
+#include <scene/sliced_sprite.h>
 #include <scene/render_layer.h>
 #include <scene/bloom_layer.h>
-#include <scene/sprite.h>
 #include <scene/rectangle.h>
 #include <scene/circle.h>
 #include <scene/clickable.h>

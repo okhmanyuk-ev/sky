@@ -45,7 +45,7 @@ namespace Scene
 
 			GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
 			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
-			GRAPHICS->draw(mTarget, glm::mat4(1.0f), { }, color);
+			GRAPHICS->drawSprite(mTarget, glm::mat4(1.0f), { }, color);
 			GRAPHICS->pop(2);
 			
 			T::endRender();

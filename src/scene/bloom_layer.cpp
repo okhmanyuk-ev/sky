@@ -46,7 +46,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		GRAPHICS->pushViewport(mBlurTarget1);
 
 		GRAPHICS->clear();
-		GRAPHICS->draw(render_texture, glm::mat4(1.0f), mBrightFilterShader);
+		GRAPHICS->drawSprite(render_texture, glm::mat4(1.0f), mBrightFilterShader);
 
 		mBlurShader->setResolution({ mTargetWidth, mTargetHeight });
 
@@ -56,13 +56,13 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 
 			GRAPHICS->pushRenderTarget(mBlurTarget2);
 			GRAPHICS->clear();
-			GRAPHICS->draw(mBlurTarget1, glm::mat4(1.0f), mBlurShader);
+			GRAPHICS->drawSprite(mBlurTarget1, glm::mat4(1.0f), mBlurShader);
 			GRAPHICS->pop();
 			
 			mBlurShader->setDirection(Renderer::Shaders::Blur::Direction::Vertical);
 			
 			GRAPHICS->clear();
-			GRAPHICS->draw(mBlurTarget2, glm::mat4(1.0f), mBlurShader);
+			GRAPHICS->drawSprite(mBlurTarget2, glm::mat4(1.0f), mBlurShader);
 		}
 
 		GRAPHICS->pop(2);
@@ -73,7 +73,7 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		GRAPHICS->pushRenderTarget(render_texture);
 		GRAPHICS->pushViewport(render_texture);
 	//	GRAPHICS->clear(); // uncomment to get only blur effect
-		GRAPHICS->draw(mBlurTarget1, glm::mat4(1.0f), mDefaultShader);
+		GRAPHICS->drawSprite(mBlurTarget1, glm::mat4(1.0f), mDefaultShader);
 		GRAPHICS->pop(2);
 	}
 

@@ -28,7 +28,7 @@ namespace Scene
 		void setTextureAddress(Renderer::TextureAddress value) { mTextureAddress = value; }
 
 	private:
-		std::shared_ptr<Renderer::Texture> mTexture;
+		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
 		Graphics::TexRegion mTexRegion = {};
 		Renderer::TextureAddress mTextureAddress = DefaultTextureAddress;
 	};
