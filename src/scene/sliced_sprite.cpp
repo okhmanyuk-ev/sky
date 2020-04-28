@@ -27,6 +27,15 @@ void SlicedSprite::update()
 		Node::update();
 		return;
 	}
+	
+	auto width = static_cast<float>(mTexture->getWidth());
+	auto height = static_cast<float>(mTexture->getHeight());
+
+	if (getWidth() < width)
+		setWidth(width);
+
+	if (getHeight() < height)
+		setHeight(height);
 
 	Node::update();
 }
