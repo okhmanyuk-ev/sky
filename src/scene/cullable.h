@@ -16,16 +16,21 @@ namespace Scene
 			auto bounds = T::getGlobalBounds();			
 			auto viewport = T::getScene()->getViewport();
 
-			auto top_y = bounds.y;
-			auto bottom_y = bounds.w;
-			auto left_x = bounds.x;
-			auto right_x = bounds.z;
+			auto b_top = bounds.y;
+			auto b_bottom = bounds.w;
+			auto b_left = bounds.x;
+			auto b_right = bounds.z;
+
+			auto v_top = viewport.position.y;
+			auto v_bottom = viewport.position.y + viewport.size.y;
+			auto v_left = viewport.position.x;
+			auto v_right = viewport.position.x + viewport.size.x;
 
 			auto visible =
-				left_x >= viewport.position.x &&
-				right_x <= viewport.position.x + viewport.size.x &&
-				bottom_y >= viewport.position.y &&
-				top_y <= viewport.position.y + viewport.size.y;
+				b_right > v_left &&
+				b_left < v_right &&
+				b_bottom > v_top &&
+				b_top < v_bottom;
 
 			T::setVisible(visible);
 		}
