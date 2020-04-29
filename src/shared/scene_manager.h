@@ -10,18 +10,21 @@ namespace Shared
 	public:
 		class Screen;
 		class Window;
+	
+	public:
+		using Callback = std::function<void()>;
 
 	public:
 		SceneManager();
 
 	public:
-		void switchScreen(std::shared_ptr<Screen> screen, std::function<void()> finishCallback = nullptr);
+		void switchScreen(std::shared_ptr<Screen> screen, Callback finishCallback = nullptr);
 		
-		void pushWindow(std::shared_ptr<Window> window);
-		void popWindow(std::function<void()> finishCallback = nullptr);
+		void pushWindow(std::shared_ptr<Window> window, Callback finishCallback = nullptr);
+		void popWindow(int count = 1, Callback finishCallback = nullptr);
 		
-		size_t getOpenedWindowsCount() const { return mWindows.size(); }
-		bool hasOpenedWindows() const { return getOpenedWindowsCount() > 0; }
+		size_t getWindowsCount() const { return mWindows.size(); }
+		bool hasWindows() const { return getWindowsCount() > 0; }
 
 		bool isWindowsBusy() const;
 

@@ -15,9 +15,9 @@ SceneManager::SceneManager()
 	attach(mWindowHolder);
 }
 
-void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<void()> finishCallback)
+void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishCallback)
 {
-	assert(!hasOpenedWindows());
+	assert(!hasWindows());
 
 	if (mInTransition)
 		return;
@@ -96,7 +96,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, std::function<vo
 	}
 }
 
-void SceneManager::pushWindow(std::shared_ptr<Window> window)
+void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCallback)
 {
 	assert(window->getState() == Window::State::Closed);
 	assert(!isWindowsBusy());
@@ -114,37 +114,48 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window)
 
 	runAction(ActionHelpers::MakeSequence(
 		window->createOpenAction(),
-		ActionHelpers::Execute([window] {
+		ActionHelpers::Execute([window, finishCallback] {
 			window->onOpenEnd();
 			window->mState = Window::State::Opened;
+			if (finishCallback)
+			{
+				finishCallback();
+			}
 		})
 	));
 }
 
-void SceneManager::popWindow(std::function<void()> finishCallback)
+void SceneManager::popWindow(int count, Callback finishCallback)
 {
+	if (count <= 0)
+	{
+		if (finishCallback)
+		{
+			finishCallback();
+		}
+		return;
+	}
+
 	assert(!mWindows.empty());
 	assert(!isWindowsBusy());
+	assert(count <= mWindows.size());
 
 	auto window = mWindows.top();
-
 	window->onCloseBegin();
 	window->mState = Window::State::Closing;
 
 	runAction(ActionHelpers::MakeSequence(
 		window->createCloseAction(),
-		ActionHelpers::Execute([this, window, finishCallback] {
+		ActionHelpers::Execute([this, window, count, finishCallback] {
 			window->onCloseEnd();
 			window->mState = Window::State::Closed;
 			mWindowHolder->detach(window);
-
 			mWindows.pop(); 
 			
 			if (mWindows.empty())
 				mCurrentScreen->onWindowDisappearing(); // only on last window in stack
-			
-			if (finishCallback)
-				finishCallback();
+
+			popWindow(count - 1, finishCallback);
 		})
 	));
 }
