@@ -18,7 +18,7 @@ void Scene::Scene::recursiveNodeUpdate(std::shared_ptr<Node> node)
 
 	node->update();
 
-	for (const auto& _node : node->getNodes())
+	for (auto _node : node->getNodes())
 		recursiveNodeUpdate(_node);
 }
 
@@ -33,7 +33,7 @@ void Scene::Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
 	node->beginRender();
 	node->draw();
 
-	for (const auto& _node : node->getNodes())
+	for (auto _node : node->getNodes())
 		recursiveNodeDraw(_node);
 
 	node->endRender();
@@ -145,7 +145,7 @@ size_t Scene::Scene::getNodesCount(std::shared_ptr<Node> node) const
 	
 	size_t result = 1;
 
-	for (const auto& _node : node->getNodes())
+	for (auto _node : node->getNodes())
 	{
 		result += getNodesCount(_node);
 	}
