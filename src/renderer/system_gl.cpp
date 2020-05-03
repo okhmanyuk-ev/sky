@@ -204,6 +204,8 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 SystemGL::SystemGL()
 {
 #if defined(RENDERER_GL44)
+	// https://mariuszbartosik.com/opengl-4-x-initialization-in-windows-without-a-framework/
+
 	mHDC = GetDC(Platform::SystemWindows::Window);
 
 	PIXELFORMATDESCRIPTOR pfd;
@@ -254,7 +256,7 @@ SystemGL::SystemGL()
 	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
 
 	DescribePixelFormat(mHDC, pixelFormatID, sizeof(pfd), &pfd);
-	auto asd = SetPixelFormat(mHDC, pixelFormatID, &pfd);
+	SetPixelFormat(mHDC, pixelFormatID, &pfd);
 
 	int attribs[] =
 	{
