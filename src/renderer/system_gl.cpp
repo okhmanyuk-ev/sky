@@ -204,6 +204,8 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 SystemGL::SystemGL()
 {
 #if defined(RENDERER_GL44)
+	mHDC = GetDC(Platform::SystemWindows::Window);
+
 	PIXELFORMATDESCRIPTOR pfd;
 	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
 	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
@@ -216,17 +218,44 @@ SystemGL::SystemGL()
 	pfd.cStencilBits = 8;
 	pfd.cAlphaBits = 8;
 
-	mHDC = GetDC(Platform::SystemWindows::Window);
-
 	int nPixelFormat = ChoosePixelFormat(mHDC, &pfd);
-
 	SetPixelFormat(mHDC, nPixelFormat, &pfd);
 
-	HGLRC tempContext = wglCreateContext(mHDC);
-	wglMakeCurrent(mHDC, tempContext);
+	mWglContext = wglCreateContext(mHDC);
+	wglMakeCurrent(mHDC, mWglContext);
 
 	glewInit();
-	
+
+	auto win_system = std::dynamic_pointer_cast<Platform::SystemWindows>(PLATFORM);
+	win_system->destroyWindow();
+	win_system->makeWindow();
+
+	mHDC = GetDC(Platform::SystemWindows::Window);
+
+	const int pixelAttribs[] = {
+		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+		WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+		WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+		WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+		WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
+		WGL_COLOR_BITS_ARB, 32,
+		WGL_ALPHA_BITS_ARB, 8,
+		WGL_DEPTH_BITS_ARB, 24,
+		WGL_STENCIL_BITS_ARB, 8,
+		WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
+		WGL_SAMPLES_ARB, 2,
+		0
+	};
+
+	int pixelFormatID; 
+	UINT numFormats;
+	wglChoosePixelFormatARB(mHDC, pixelAttribs, NULL, 1, &pixelFormatID, &numFormats);
+
+	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
+
+	DescribePixelFormat(mHDC, pixelFormatID, sizeof(pfd), &pfd);
+	auto asd = SetPixelFormat(mHDC, pixelFormatID, &pfd);
+
 	int attribs[] =
 	{
 		WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -236,17 +265,10 @@ SystemGL::SystemGL()
 		0
 	};
 
-	if (wglewIsSupported("WGL_ARB_create_context") == 1)
-	{
-		mWglContext = wglCreateContextAttribsARB(mHDC, 0, attribs);
-		wglMakeCurrent(NULL, NULL);
-		wglDeleteContext(tempContext);
-		wglMakeCurrent(mHDC, mWglContext);
-	}
-	else
-	{	
-		mWglContext = tempContext;
-	}
+	wglMakeCurrent(NULL, NULL);
+	wglDeleteContext(mWglContext);
+	mWglContext = wglCreateContextAttribsARB(mHDC, 0, attribs);
+	wglMakeCurrent(mHDC, mWglContext);
 
 	auto version = glGetString(GL_VERSION);
 
@@ -307,6 +329,8 @@ SystemGL::SystemGL()
 	glGenBuffers(1, &mGLIndexBuffer);
 	
 	setBlendMode(BlendStates::NonPremultiplied);
+
+	glEnable(GL_MULTISAMPLE);
 }
 
 SystemGL::~SystemGL()

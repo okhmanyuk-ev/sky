@@ -10,36 +10,13 @@ std::shared_ptr<System> System::create(const std::string& appname)
 
 SystemWindows::SystemWindows(const std::string& appname) : mAppName(appname)
 {
-	WNDCLASSEX windowClass = { };
-	windowClass.cbSize = sizeof(WNDCLASSEX);
-	windowClass.style = CS_HREDRAW | CS_VREDRAW;
-	windowClass.lpfnWndProc = WndProc;
-	windowClass.hInstance = GetModuleHandle(nullptr);
-	windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	windowClass.lpszClassName = appname.c_str();
-
-	RegisterClassEx(&windowClass);
-
-	RECT windowRect = { 0, 0, mWidth, mHeight }; 
-	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
-
-	int realWidth = windowRect.right - windowRect.left;
-	int realHeight = windowRect.bottom - windowRect.top;
-
-	int windowLeft = (GetSystemMetrics(SM_CXSCREEN) - realWidth) / 2;
-	int windowTop = (GetSystemMetrics(SM_CYSCREEN) - realHeight) / 2;
-
-	Window = CreateWindow(windowClass.lpszClassName, appname.c_str(), WS_OVERLAPPEDWINDOW,
-		windowLeft, windowTop, realWidth, realHeight, nullptr, nullptr, windowClass.hInstance, this);
-
 	Instance = GetModuleHandle(nullptr);
-
-	ShowWindow(Window, SW_SHOWDEFAULT);
+	makeWindow();
 }
 
 SystemWindows::~SystemWindows()
 {
-	//
+	destroyWindow();
 }
 
 void SystemWindows::process()
@@ -132,7 +109,7 @@ std::string SystemWindows::getAppFolder() const
 
 LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	auto& system = *(SystemWindows*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	auto thiz = (SystemWindows*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	switch (msg)
 	{
@@ -152,7 +129,7 @@ LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 	case WM_SYSKEYDOWN:
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
-		system.dispatchKeyboardEvent(wParam, msg == WM_KEYDOWN);
+		thiz->dispatchKeyboardEvent(wParam, msg == WM_KEYDOWN);
 		break;
 
 	case WM_MOUSEMOVE:
@@ -163,20 +140,20 @@ LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONUP:
 	case WM_MOUSEWHEEL:
-		system.dispatchMouseEvent(msg, wParam, lParam);
+		thiz->dispatchMouseEvent(msg, wParam, lParam);
 		break;
 
 	case WM_SIZE:
 		if (wParam != SIZE_MINIMIZED)
 		{
-			system.mWidth = GET_X_LPARAM(lParam);
-			system.mHeight = GET_Y_LPARAM(lParam);
-			EVENT->emit(ResizeEvent({ system.mWidth, system.mHeight }));
+			thiz->mWidth = GET_X_LPARAM(lParam);
+			thiz->mHeight = GET_Y_LPARAM(lParam);
+			EVENT->emit(ResizeEvent({ thiz->mWidth, thiz->mHeight }));
 		}
 		break;
 
 	case WM_DESTROY:
-		system.quit();
+		thiz->quit();
 		break;
 
 	default:
@@ -289,5 +266,40 @@ void SystemWindows::purchase(const std::string& product)
 		mProducts.at(product)();
 	}));
 	Common::Actions::Run(std::move(seq));
+}
+
+void SystemWindows::makeWindow()
+{
+	WNDCLASSEX windowClass = { };
+	windowClass.cbSize = sizeof(WNDCLASSEX);
+	windowClass.style = CS_HREDRAW | CS_VREDRAW;
+	windowClass.lpfnWndProc = WndProc;
+	windowClass.hInstance = GetModuleHandle(nullptr);
+	windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	windowClass.lpszClassName = mAppName.c_str();
+
+	RegisterClassEx(&windowClass);
+
+	RECT windowRect = { 0, 0, mWidth, mHeight };
+	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+
+	int realWidth = windowRect.right - windowRect.left;
+	int realHeight = windowRect.bottom - windowRect.top;
+
+	int windowLeft = (GetSystemMetrics(SM_CXSCREEN) - realWidth) / 2;
+	int windowTop = (GetSystemMetrics(SM_CYSCREEN) - realHeight) / 2;
+
+	Window = CreateWindow(windowClass.lpszClassName, mAppName.c_str(), WS_OVERLAPPEDWINDOW,
+		windowLeft, windowTop, realWidth, realHeight, nullptr, nullptr, windowClass.hInstance, this);
+
+	ShowWindow(Window, SW_SHOWDEFAULT);
+
+	mFinished = false;
+}
+
+void SystemWindows::destroyWindow()
+{
+	ReleaseDC(Window, GetDC(Window));
+	DestroyWindow(Window);
 }
 #endif

@@ -75,6 +75,10 @@ namespace Platform
 	private:
 		void dispatchMouseEvent(UINT msg, WPARAM wParam, LPARAM lParam);
 		void dispatchKeyboardEvent(WPARAM keyCode, bool isKeyDown);
+
+	public:
+		void makeWindow();
+		void destroyWindow();
 	};
 }
 #endif
