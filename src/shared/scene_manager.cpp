@@ -160,6 +160,11 @@ void SceneManager::popWindow(int count, Callback finishCallback)
 	));
 }
 
+void SceneManager::popWindow(Callback finishCallback)
+{
+	popWindow(1, finishCallback);
+}
+
 bool SceneManager::isWindowsBusy() const
 {
 	if (mWindows.empty())
