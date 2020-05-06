@@ -63,12 +63,11 @@ namespace Shared
 		bool mLoaded = false;
 		size_t mLoadingPos = 0;
 		bool mInitialized = false;
-		float mGameFade = 1.0f;
-		float mLoadingFade = 1.0f;
+		float mFade = 1.0f;
 		float mPayloadWaiting = 0.0f;
 		
 	private:
-		void initInternal();
+		void frameInternal();
 
 	protected:
 		virtual void initialize() = 0;

@@ -10,14 +10,11 @@ using namespace Shared;
 RichApplication::RichApplication(const std::string& appname) : GraphicalApplication(appname)
 {
 	ENGINE->addSystem<Audio::System>(std::make_shared<Audio::System>());
-
-	STATS->setEnabled(false);
-	CONSOLE_DEVICE->setEnabled(false);
 	
 	FRAME->addOne([this] {
 		Common::Actions::Run(ActionHelpers::Delayed(1.0f,
 			ActionHelpers::MakeSequence(
-				ActionHelpers::Interpolate(1.0f, 0.0f, 0.5f, mLoadingFade),
+				ActionHelpers::Interpolate(1.0f, 0.0f, 0.5f, mFade),
 				ActionHelpers::Execute([this] {
 					mLoading = true;
 					mStartLoadingTime = Clock::Now();
@@ -27,58 +24,12 @@ RichApplication::RichApplication(const std::string& appname) : GraphicalApplicat
 	});
 
 	FRAME->addInfinity([this] {
-		if (mInitialized)
-		{
-			frame();
-			return;
-		}
-		
-		if (!mLoading)
-			return;
-	
-		if (!mLoaded && !mLoadingTasks.empty())
-		{
-			mLoadingTasks[mLoadingPos].callback();
-			mLoadingPos += 1;
-		}
-		
-		if (mLoadingPos < mLoadingTasks.size())
-			return;
-
-		mLoaded = true;
-
-		if (!mLoadingTasks.empty() && Clock::Now() - mStartLoadingTime <= Clock::FromSeconds(mPayloadWaiting))
-			return;
-
-		mLoading = false;
-
-		FRAME->addOne([this] {
-			Common::Actions::Run(ActionHelpers::Delayed(0.25f,
-				ActionHelpers::MakeSequence(
-					ActionHelpers::Interpolate(0.0f, 1.0f, 0.5f, mLoadingFade),
-					ActionHelpers::Execute([this] {
-						initInternal();
-						initialize();
-						mInitialized = true;
-					}),
-					ActionHelpers::Interpolate(1.0f, 0.0f, 0.5f, mGameFade)
-				)
-			));
-		});
+		frameInternal();
 	});
 }
 
 void RichApplication::postFrame()
 {
-	if (mGameFade > 0.0f)
-	{
-		GRAPHICS->begin();
-		GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
-		GRAPHICS->drawRectangle(glm::mat4(1.0f), { Graphics::Color::Black, mGameFade });
-		GRAPHICS->pop();
-		GRAPHICS->end();
-	}
-
 	if (mInitialized)
 		return;
 
@@ -92,23 +43,57 @@ void RichApplication::postFrame()
 
 void RichApplication::postImguiPresent()
 {
-	if (mInitialized)
-		return;
-
-	if (mLoadingFade <= 0.0f)
+	if (mFade <= 0.0f)
 		return;
 
 	GRAPHICS->begin();
 	GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
-	GRAPHICS->drawRectangle(glm::mat4(1.0f), { Graphics::Color::Black, mLoadingFade });
+	GRAPHICS->drawRectangle(glm::mat4(1.0f), { Graphics::Color::Black, mFade });
 	GRAPHICS->pop();
 	GRAPHICS->end();
 }
 
-void RichApplication::initInternal()
+void RichApplication::frameInternal()
 {
-	STATS->setEnabled(true);
-	CONSOLE_DEVICE->setEnabled(true);
+	if (mInitialized)
+	{
+		frame();
+		return;
+	}
+
+	if (!mLoading)
+		return;
+
+	if (mLoaded)
+	{
+		if (!mLoadingTasks.empty() && Clock::Now() - mStartLoadingTime <= Clock::FromSeconds(mPayloadWaiting))
+			return;
+
+		Common::Actions::Run(ActionHelpers::Delayed(0.25f,
+			ActionHelpers::MakeSequence(
+				ActionHelpers::Interpolate(0.0f, 1.0f, 0.5f, mFade),
+				ActionHelpers::Execute([this] {
+					initialize();
+					mInitialized = true;
+				}),
+				ActionHelpers::Interpolate(1.0f, 0.0f, 0.5f, mFade)
+			)
+		));
+
+		mLoading = false;
+		return;
+	}
+
+	if (!mLoadingTasks.empty())
+	{
+		mLoadingTasks[mLoadingPos].callback();
+		mLoadingPos += 1;
+	}
+
+	if (mLoadingPos < mLoadingTasks.size())
+		return;
+
+	mLoaded = true;
 }
 
 void RichApplication::loading(const std::string& stage, float progress)
