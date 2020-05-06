@@ -331,8 +331,6 @@ SystemGL::SystemGL()
 	glGenBuffers(1, &mGLIndexBuffer);
 	
 	setBlendMode(BlendStates::NonPremultiplied);
-
-	glEnable(GL_MULTISAMPLE);
 }
 
 SystemGL::~SystemGL()
