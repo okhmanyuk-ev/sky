@@ -66,6 +66,9 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(std::sha
 	if (!node->isInteractions())
 		return { };
 
+	if (!node->isTransformReady())
+		return { };
+
 	if (!node->interactTest(node->unproject(pos)))
 		return { };
 
