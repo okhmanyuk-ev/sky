@@ -16,7 +16,9 @@ TaskSystem::TaskSystem(int threadsCount)
 				std::function<void()> task;
 				{
 					std::unique_lock<std::mutex> lock(mMutex);
-					mCondition.wait(lock, [this] { return mFinished || !mTasks.empty(); });
+					mCondition.wait(lock, [this] {
+						return mFinished || !mTasks.empty(); 
+					});
 					
 					if (mFinished && mTasks.empty())
 						return;

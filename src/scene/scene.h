@@ -27,7 +27,6 @@ namespace Scene
 
 	public:
 		void frame();
-		void updateTransformations();
 		
 		size_t getNodesCount(std::shared_ptr<Node> node = nullptr) const;
 
@@ -36,6 +35,7 @@ namespace Scene
 		void event(const Platform::Touch::Event& e) override;
 
 	private:
+		void recursiveNodeUpdateTransform(std::shared_ptr<Node> node);
 		void recursiveNodeUpdate(std::shared_ptr<Node> node);
 		void recursiveNodeDraw(std::shared_ptr<Node> node);
 		bool interactTest(const glm::vec2& pos);

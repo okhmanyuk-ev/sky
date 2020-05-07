@@ -11,6 +11,17 @@ Scene::Scene::~Scene()
 	//
 }
 
+void Scene::Scene::recursiveNodeUpdateTransform(std::shared_ptr<Node> node)
+{
+	if (!node->isEnabled())
+		return;
+
+	node->updateTransform();
+
+	for (auto _node : node->getNodes())
+		recursiveNodeUpdateTransform(_node);
+}
+
 void Scene::Scene::recursiveNodeUpdate(std::shared_ptr<Node> node)
 {
 	if (!node->isEnabled())
@@ -123,7 +134,9 @@ void Scene::Scene::frame()
 {
 	mViewport = Renderer::Viewport(mRenderTarget);
 
-	updateTransformations();
+	recursiveNodeUpdate(mRoot);
+	recursiveNodeUpdateTransform(mRoot);
+
 	GRAPHICS->begin();
 	GRAPHICS->pushRenderTarget(mRenderTarget);
 	GRAPHICS->pushViewport(mRenderTarget);
@@ -131,11 +144,6 @@ void Scene::Scene::frame()
 	recursiveNodeDraw(mRoot);
 	GRAPHICS->pop(3);
 	GRAPHICS->end();
-}
-
-void Scene::Scene::updateTransformations()
-{
-	recursiveNodeUpdate(mRoot);
 }
 
 size_t Scene::Scene::getNodesCount(std::shared_ptr<Node> node) const

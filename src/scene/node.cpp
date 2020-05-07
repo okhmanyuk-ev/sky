@@ -141,7 +141,7 @@ void Node::endRender()
 
 void Node::update()
 {
-	updateTransform();
+	//
 }
 
 void Node::draw()

@@ -41,13 +41,12 @@ namespace Common
 		auto task = std::make_shared<std::packaged_task<return_type()>>(
 			std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 		
-		auto res = task->get_future();
 		{
 			std::unique_lock<std::mutex> lock(mMutex);
 			mTasks.emplace_back([task] { (*task)(); });
 		}
 
 		mCondition.notify_one();
-		return res;
+		return task->get_future();
 	}
 }

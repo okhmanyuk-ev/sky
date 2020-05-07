@@ -61,11 +61,6 @@ void Label::update()
 			std::tie(mMeshHeight, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, mText, width, mFontSize, mMultilineAlign);
 		}
 		mMeshDirty = false;
-
-		setWidth(mMeshWidth);
-		setHeight(mMeshHeight);
-		
-		Node::update();
 	}
 
 	setWidth(mMeshWidth);
