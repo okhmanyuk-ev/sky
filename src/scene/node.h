@@ -74,6 +74,8 @@ namespace Scene
 
 		auto isTouching() const { return mTouching; }
 
+		auto isTransformReady() const { return mTransformReady; }
+
 	private:
 		Node* mParent = nullptr;
 		std::list<std::shared_ptr<Node>> mNodes;
@@ -84,5 +86,6 @@ namespace Scene
 		bool mTouchable = false;
 		int mTouchMask = 1 << 0;
 		bool mTouching = false;
+		bool mTransformReady = false;
 	};
 }

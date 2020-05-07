@@ -11,6 +11,9 @@ void Trail::update()
 {
 	Node::update();
 
+	if (!isTransformReady())
+		return;
+
 	auto now = FRAME->getUptime();
 
 	while (!mSegments.empty() && now - mSegments.front().time > Clock::FromSeconds(mLifetime))

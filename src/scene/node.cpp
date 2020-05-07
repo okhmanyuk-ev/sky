@@ -46,6 +46,8 @@ void Node::clear()
 
 glm::vec2 Node::project(const glm::vec2& value) const
 {
+	assert(mTransformReady);
+
 	auto vp = getScene()->getViewport();
 	auto scaled_size = vp.size / PLATFORM->getScale();
 
@@ -59,6 +61,8 @@ glm::vec2 Node::project(const glm::vec2& value) const
 
 glm::vec2 Node::unproject(const glm::vec2& value) const
 {
+	assert(mTransformReady);
+	
 	auto vp = getScene()->getViewport();
 	auto scaled_size = vp.size / PLATFORM->getScale();
 
@@ -127,6 +131,8 @@ void Node::updateTransform()
 	mTransform = glm::scale(mTransform, { getScale(), 1.0f });
 	mTransform = glm::translate(mTransform, { -getPivot() * getSize(), 0.0f });
 	mTransform = glm::translate(mTransform, { -getOrigin(), 0.0f });
+
+	mTransformReady = true;
 }
 
 void Node::beginRender()
