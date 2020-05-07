@@ -16,10 +16,16 @@ void Scrollbox::update()
 {
 	Node::update();
 
-	mContent->setPosition(mContent->getPosition() + (mSpeed * mSensitivity));
+	auto speed = mSpeed * mSensitivity;
+	auto delta = Clock::ToSeconds(FRAME->getTimeDelta()) * 100.0f;
+
+	if (!isTouching())
+		speed *= delta;
+
+	mContent->setPosition(mContent->getPosition() + speed);
 
 	if (mInertiaEnabled && !isTouching())
-		mSpeed *= 1.0f - (mInertiaFriction * Clock::ToSeconds(FRAME->getTimeDelta()) * 100.0f);
+		mSpeed *= 1.0f - (mInertiaFriction * delta);
 	else
 		mSpeed = { 0.0f, 0.0f };
 
