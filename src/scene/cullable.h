@@ -13,7 +13,7 @@ namespace Scene
 		{
 			T::update();
 
-			if (!isTransformReady())
+			if (!T::isTransformReady())
 				return;
 
 			auto bounds = T::getGlobalBounds();			
