@@ -3,6 +3,13 @@
 
 using namespace Platform;
 
+extern int sky_main(int argc, char* argv[]);
+
+int main(int argc, char* argv[])
+{
+	sky_main(argc, argv);
+}
+
 std::shared_ptr<System> System::create(const std::string& appname)
 {
 	return std::make_shared<SystemWindows>(appname);
