@@ -13,6 +13,9 @@ namespace Scene
 		{
 			T::update();
 
+			if (!isTransformReady())
+				return;
+
 			auto bounds = T::getGlobalBounds();			
 			auto viewport = T::getScene()->getViewport();
 

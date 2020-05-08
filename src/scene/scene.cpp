@@ -41,6 +41,9 @@ void Scene::Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
 	if (!node->isVisible())
 		return;
 
+	if (!node->isTransformReady())
+		return;
+
 	node->beginRender();
 	node->draw();
 
@@ -137,8 +140,8 @@ void Scene::Scene::frame()
 {
 	mViewport = Renderer::Viewport(mRenderTarget);
 
-	recursiveNodeUpdate(mRoot);
 	recursiveNodeUpdateTransform(mRoot);
+	recursiveNodeUpdate(mRoot);
 
 	GRAPHICS->begin();
 	GRAPHICS->pushRenderTarget(mRenderTarget);
