@@ -40,7 +40,7 @@ namespace Scene
 		virtual bool hitTest(const glm::vec2& value) const;
 		virtual bool interactTest(const glm::vec2& value) const;
 
-		void updateTransform();
+		virtual void updateTransform();
 
 	protected:
 		virtual void beginRender();

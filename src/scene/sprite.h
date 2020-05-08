@@ -14,7 +14,7 @@ namespace Scene
 		inline static Renderer::TextureAddress DefaultTextureAddress = Renderer::TextureAddress::Wrap;
 
 	protected:
-		void update() override;
+		void updateTransform() override;
 		void draw() override;
 
 	public:

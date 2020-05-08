@@ -201,6 +201,9 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node)
 	if (!node->hasScene())
 		return;
 
+	if (!node->isTransformReady())
+		return;
+
 	auto bounds = node->getGlobalBounds();
 
 	bounds /= PLATFORM->getScale();
