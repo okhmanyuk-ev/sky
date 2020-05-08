@@ -13,7 +13,6 @@ namespace Shared
 		void load(const std::string& path_to_json);
 		void clear();
 
-		void apply(Scene::Node& node, const std::string& name);
 		void apply(std::shared_ptr<Scene::Node> node, const std::string& name);
 
 	private:
