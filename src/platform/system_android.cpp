@@ -39,8 +39,6 @@ std::shared_ptr<System> System::create(const std::string& appname)
 	return std::make_shared<SystemAndroid>(appname);
 }
 
-extern int sky_main(int argc, char *argv[]);
-
 void android_main(android_app* app)
 {
 	SystemAndroid::Instance = app;
@@ -67,7 +65,7 @@ void android_main(android_app* app)
 			source->process(app, source);
 	}
 
-	sky_main(0, NULL);
+	sky_main();
 }
 
 void SystemAndroid::calcScale() // TODO: find better solution

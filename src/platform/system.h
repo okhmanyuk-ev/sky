@@ -14,6 +14,8 @@
 
 #define PLATFORM ENGINE->getSystem<Platform::System>()
 
+extern void sky_main();
+
 namespace Platform
 {
 	class System
