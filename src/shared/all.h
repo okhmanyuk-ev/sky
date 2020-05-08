@@ -25,25 +25,7 @@
 #include <platform/system_windows.h>
 #endif
 
-#include <scene/scene.h>
-#include <scene/node.h>
-#include <scene/label.h>
-#include <scene/sprite.h>
-#include <scene/sliced_sprite.h>
-#include <scene/render_layer.h>
-#include <scene/bloom_layer.h>
-#include <scene/rectangle.h>
-#include <scene/circle.h>
-#include <scene/clickable.h>
-#include <scene/clippable.h>
-#include <scene/debuggable.h>
-#include <scene/actionable.h>
-#include <scene/ani_sprite.h>
-#include <scene/scrollbox.h>
-#include <scene/transform.h>
-#include <scene/color.h>
-#include <scene/trail.h>
-#include <scene/cullable.h>
+#include <scene/all.h>
 
 #include <shared/stats_system.h>
 #include <shared/cache_system.h>
@@ -59,8 +41,9 @@
 #include <shared/gesture_detector.h>
 #include <shared/scene_helpers.h>
 #include <shared/scene_manager.h>
-#include <shared/format_helpers.h>
 #include <shared/scene_editor.h>
+#include <shared/scene_stylebook.h>
+#include <shared/format_helpers.h>
 
 #include <graphics/font.h>
 #include <graphics/legacy_renderer.h>

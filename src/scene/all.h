@@ -1,0 +1,23 @@
+#pragma once
+
+#include <scene/actionable.h>
+#include <scene/ani_sprite.h>
+#include <scene/blend.h>
+#include <scene/bloom_layer.h>
+#include <scene/circle.h>
+#include <scene/clickable.h>
+#include <scene/clippable.h>
+#include <scene/color.h>
+#include <scene/cullable.h>
+#include <scene/debuggable.h>
+#include <scene/label.h>
+#include <scene/node.h>
+#include <scene/rectangle.h>
+#include <scene/render_layer.h>
+#include <scene/sampler.h>
+#include <scene/scene.h>
+#include <scene/scrollbox.h>
+#include <scene/sliced_sprite.h>
+#include <scene/sprite.h>
+#include <scene/trail.h>
+#include <scene/transform.h>
