@@ -7,12 +7,9 @@ Trail::Trail(std::weak_ptr<Node> holder) : mHolder(holder)
 	//
 }
 
-void Trail::update()
+void Trail::updateTransform()
 {
-	Node::update();
-
-	if (!isTransformReady())
-		return;
+	Node::updateTransform();
 
 	auto now = FRAME->getUptime();
 

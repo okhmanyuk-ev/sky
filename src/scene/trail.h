@@ -11,8 +11,10 @@ namespace Scene
 	public:
 		Trail(std::weak_ptr<Node> holder);
 
+	public:
+		void updateTransform() override;
+	
 	protected:
-		void update() override;
 		void draw() override;
 
 	public:
