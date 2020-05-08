@@ -1,0 +1,22 @@
+#pragma once
+
+#include <scene/all.h>
+#include <nlohmann/json.hpp>
+
+#define STYLEBOOK ENGINE->getSystem<Shared::Stylebook>()
+
+namespace Shared
+{
+	class Stylebook
+	{
+	public:
+		void load(const std::string& path_to_json);
+		void clear();
+
+		void apply(Scene::Node& node, const std::string& name);
+		void apply(std::shared_ptr<Scene::Node> node, const std::string& name);
+
+	private:
+		nlohmann::json mJson;
+	};
+}

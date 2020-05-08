@@ -21,6 +21,7 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	ENGINE->addSystem<Shared::StatsSystem>(std::make_shared<Shared::StatsSystem>());
 	ENGINE->addSystem<Shared::CacheSystem>(std::make_shared<Shared::CacheSystem>());
 	ENGINE->addSystem<Shared::ImguiSystem>(std::make_shared<Shared::ImguiSystem>());
+	ENGINE->addSystem<Shared::Stylebook>(std::make_shared<Shared::Stylebook>());
 	
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
@@ -46,6 +47,7 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 
 GraphicalApplication::~GraphicalApplication()
 {
+	ENGINE->removeSystem<Shared::Stylebook>();
 	ENGINE->removeSystem<Shared::ImguiSystem>();
 	ENGINE->removeSystem<Shared::CacheSystem>();
 	ENGINE->removeSystem<Shared::StatsSystem>();
