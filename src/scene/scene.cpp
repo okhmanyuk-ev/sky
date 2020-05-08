@@ -140,8 +140,8 @@ void Scene::Scene::frame()
 {
 	mViewport = Renderer::Viewport(mRenderTarget);
 
-	recursiveNodeUpdateTransform(mRoot);
 	recursiveNodeUpdate(mRoot);
+	recursiveNodeUpdateTransform(mRoot);
 
 	GRAPHICS->begin();
 	GRAPHICS->pushRenderTarget(mRenderTarget);

@@ -21,11 +21,11 @@ void Sprite::draw()
 	Node::draw();
 }
 
-void Sprite::updateTransform()
+void Sprite::update()
 {
 	if (mTexture == nullptr)
 	{
-		Node::updateTransform();
+		Node::update();
 		return;
 	}
 
@@ -45,5 +45,5 @@ void Sprite::updateTransform()
 			setHeight(static_cast<float>(mTexture->getHeight()));
 	}
 
-	Node::updateTransform();
+	Node::update();
 }
