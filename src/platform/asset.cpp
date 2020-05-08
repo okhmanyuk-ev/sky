@@ -9,10 +9,6 @@
 #endif
 #include <sys/stat.h>
 
-#if defined(PLATFORM_IOS)
-#import <Foundation/Foundation.h>
-#endif
-
 using namespace Platform;
 
 Asset::Asset(const std::string& path, Path pathType)

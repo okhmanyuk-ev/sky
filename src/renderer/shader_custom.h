@@ -21,7 +21,7 @@ namespace Renderer
 	public:
 		ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::Attribute::Type>& requiredAttribs,
 			size_t customConstantBufferSize, const std::string& source);
-		~ShaderCustom();
+		virtual ~ShaderCustom();
 
 	protected:
 		void apply() override;

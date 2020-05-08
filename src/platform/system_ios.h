@@ -3,7 +3,7 @@
 #include <platform/system.h>
 
 #if defined(PLATFORM_IOS)
-#import <UIKit/UIKit.h>
+#include <platform/low_level_api.h>
 
 namespace Platform
 {
@@ -13,8 +13,11 @@ namespace Platform
         SystemIos(const std::string& appname);
         ~SystemIos();
         
+    public:
         void process() override;
         void quit() override { /* nothing */ }
+
+        bool isFinished() const override { return false; }
         
         int getWidth() const override { return mWidth; }
         int getHeight() const override { return mHeight; }
@@ -38,6 +41,9 @@ namespace Platform
         void hideVirtualKeyboard() override;
         bool isVirtualKeyboardOpened() const override;
         
+        void initializeBilling(const ProductsMap& products) override { /*nothing*/ }
+        void purchase(const std::string& product) override { /*nothing*/ }
+
     public:
         void setSize(int w, int h) { mWidth = w; mHeight = h; }
         

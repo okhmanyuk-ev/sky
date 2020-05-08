@@ -179,7 +179,7 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
 {
-    static_cast<Platform::SystemIos*>(PLATFORM)->setSize(size.width * PLATFORM->getScale(), size.height * PLATFORM->getScale());
+    std::static_pointer_cast<Platform::SystemIos>(PLATFORM)->setSize(size.width * PLATFORM->getScale(), size.height * PLATFORM->getScale());
 }
 
 -(void)textFieldDidChange:(UITextField *) textField
@@ -519,7 +519,7 @@ void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexO
 {
 	prepareForDrawing();
 	int indexSize = mGLIndexType == GL_UNSIGNED_INT ? 4 : 2;
-#if defined(PLATFORM_ANDROID)
+#if defined(PLATFORM_ANDROID) | defined(PLATFORM_IOS)
 	glDrawElements(mGLTopology, (GLsizei)indexCount, mGLIndexType, (void*)(indexOffset * indexSize));
 #else
 	glDrawElementsBaseVertex(mGLTopology, (GLsizei)indexCount, mGLIndexType, (void*)(indexOffset * indexSize), (GLint)vertexOffset);
@@ -682,5 +682,4 @@ void SystemGL::updateGLSampler()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mTextureAddress == TextureAddress::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mTextureAddress == TextureAddress::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 }
-
 #endif

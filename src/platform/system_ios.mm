@@ -60,5 +60,4 @@ bool SystemIos::isVirtualKeyboardOpened() const
 {
     return [TextField isFirstResponder];
 }
-
 #endif

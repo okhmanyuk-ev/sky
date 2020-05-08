@@ -13,5 +13,6 @@
     #include <android/keycodes.h>
     #include <jni.h>
 #elif defined(PLATFORM_IOS)
-
+    #import <Foundation/Foundation.h>
+    #import <UIKit/UIKit.h>
 #endif

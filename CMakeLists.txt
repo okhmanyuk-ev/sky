@@ -115,10 +115,20 @@ add_library(${PROJECT_NAME} STATIC
 
 if(APPLE)
 	set(OBJC_SOURCES
-		sky/src/renderer/system_gl.cpp
-		sky/src/platform/asset.cpp
+		src/renderer/system_gl.cpp
+		src/platform/asset.cpp
 	)
 	set_source_files_properties(${OBJC_SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++ -fembed-bitcode")
+
+	target_link_libraries(${PROJECT_NAME}
+		"-framework UIKit"
+		"-framework CoreGraphics"
+		"-framework GLKit"
+		"-framework OpenGLES"
+		"-framework Foundation"
+		"-framework AVFoundation"
+		"-framework AudioToolbox"
+	)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)
@@ -161,9 +171,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC lib/fmod/include)
 if(WIN32)
 	add_library(fmod SHARED IMPORTED)
 	target_link_libraries(${PROJECT_NAME} fmod)
-endif()
-
-if(WIN32)
 	if(X64)
 		set_target_properties(fmod PROPERTIES
 			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x64/fmodL_vc.lib
@@ -175,6 +182,11 @@ if(WIN32)
 	endif()
 elseif(ANDROID)
 	#set_target_properties(fmod PROPERTIES IMPORTED_LOCATION lib/fmod/android/${ANDROID_ABI}/libfmod.so)
+elseif(APPLE)
+	target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodL_iphonesimulator.a)
+	target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodL_iphoneos.a)
+	target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmod_iphonesimulator.a)
+	target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmod_iphoneos.a)
 endif()
 
 function(copy_required_libs TARGET_NAME)
@@ -201,13 +213,6 @@ function(copy_required_libs TARGET_NAME)
 	#		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libfmod.so)
 	endif()
 endfunction()
-
-if(APPLE)
-#	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmodL_iphonesimulator.a)
-#	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmodL_iphoneos.a)
-##	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmod_iphonesimulator.a) --- this two was commented 
-##	target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/sky/lib/fmod/ios/libfmod_iphoneos.a)
-endif()
 
 # imgui
 
