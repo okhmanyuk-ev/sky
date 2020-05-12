@@ -2,6 +2,8 @@
 
 #if defined(PLATFORM_IOS)
 
+#include <common/event_system.h>
+
 using namespace Platform;
 
 @interface AppDelegate : UIResponder<UIApplicationDelegate>
@@ -34,6 +36,50 @@ using namespace Platform;
 - (void)applicationWillTerminate:(UIApplication *)application {
 }
 
+- (void)emitTouchEvent:(UITouch*)touch withType:(Platform::Touch::Event::Type)type {
+    auto location = [touch locationInView:SystemIos::Window];
+    auto e = Platform::Touch::Event();
+    e.type = type;
+    e.x = location.x * PLATFORM->getScale();
+    e.y = location.y * PLATFORM->getScale();
+    EVENT->emit(e);
+}
+
+-(void)touchesBegan:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
+{
+    for (auto touch in touches)
+    {
+        [self emitTouchEvent:touch withType:Platform::Touch::Event::Type::Begin];
+        break;
+    }
+}
+
+- (void)touchesMoved:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
+{
+    for (auto touch in touches)
+    {
+        [self emitTouchEvent:touch withType:Platform::Touch::Event::Type::Continue];
+        break;
+    }
+}
+
+- (void)touchesCancelled:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
+{
+    for (auto touch in touches)
+    {
+        [self emitTouchEvent:touch withType:Platform::Touch::Event::Type::End];
+        break;
+    }
+}
+
+- (void)touchesEnded:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
+{
+    for (auto touch in touches)
+    {
+        [self emitTouchEvent:touch withType:Platform::Touch::Event::Type::End];
+        break;
+    }
+}
 @end
 
 int main(int argc, char * argv[]) {
@@ -54,7 +100,7 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
     
     Window = [[UIWindow alloc]initWithFrame:bounds];
     [Window makeKeyAndVisible];
-    
+        
     TextField = [[UITextField alloc] init];
     TextField.hidden = YES;
     TextField.keyboardType = UIKeyboardTypeDefault;
