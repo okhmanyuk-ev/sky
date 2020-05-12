@@ -4,7 +4,7 @@
 
 using namespace Platform;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder<UIApplicationDelegate>
 
 @end
 
@@ -45,11 +45,6 @@ int main(int argc, char * argv[]) {
 std::shared_ptr<System> System::create(const std::string& appname)
 {
     return std::make_shared<SystemIos>(appname);
-}
-
-void deviceOrientationDidChange()
-{
-    
 }
 
 SystemIos::SystemIos(const std::string& appname) : mAppName(appname)

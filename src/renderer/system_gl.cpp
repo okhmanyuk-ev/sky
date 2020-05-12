@@ -96,34 +96,15 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 - (id)init
 {
     auto result = [super init];
-    GLKView* view  = (GLKView*)self.view;
-
-   // view.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
-   // view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
-   // view.drawableStencilFormat = GLKViewDrawableStencilFormat8;
-
+    auto view  = (GLKView*)self.view;
     view.context = [[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES3];
     [EAGLContext setCurrentContext:view.context];
     return result;
 }
 
--(void)glkView:(GLKView *)view drawInRect:(CGRect)rect
-{
-    //glClear(GL_COLOR_BUFFER_BIT);
-}
-
-- (void)dealloc
-{
-    GLKView* view = (GLKView*)self.view;
-    [EAGLContext setCurrentContext:view.context];
-    [EAGLContext setCurrentContext:nil];
-    [super dealloc];
-}
-
-
 -(void)touchesBegan:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    for (UITouch* touch in touches)
+    for (auto touch in touches)
     {
         auto location = [touch locationInView:self.view];
         auto e = Platform::Touch::Event();
@@ -137,7 +118,7 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 
 - (void)touchesMoved:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    for (UITouch* touch in touches)
+    for (auto touch in touches)
     {
         auto location = [touch locationInView:self.view];
         auto e = Platform::Touch::Event();
@@ -151,7 +132,7 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 
 - (void)touchesCancelled:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    for (UITouch* touch in touches)
+    for (auto touch in touches)
     {
         auto location = [touch locationInView:self.view];
         auto e = Platform::Touch::Event();
@@ -165,7 +146,7 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 
 - (void)touchesEnded:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    for (UITouch* touch in touches)
+    for (auto touch in touches)
     {
         auto location = [touch locationInView:self.view];
         auto e = Platform::Touch::Event();
