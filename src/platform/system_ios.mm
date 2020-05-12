@@ -97,19 +97,13 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
 {
     auto screen = [UIScreen mainScreen];
     auto bounds = [screen bounds];
-    
+
     Window = [[UIWindow alloc]initWithFrame:bounds];
     [Window makeKeyAndVisible];
         
     TextField = [[UITextField alloc] init];
     TextField.hidden = YES;
     TextField.keyboardType = UIKeyboardTypeDefault;
-    
-    mWidth = static_cast<int>(bounds.size.width);
-    mHeight = static_cast<int>(bounds.size.height);
-    mScale = screen.scale;
-    mWidth *= mScale;
-    mHeight *= mScale;
 }
 
 SystemIos::~SystemIos()
@@ -123,6 +117,8 @@ void SystemIos::process()
     do {
         result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, TRUE);
     } while (result == kCFRunLoopRunHandledSource);
+    
+    refreshDimensions();
 }
 
 void SystemIos::showVirtualKeyboard()
@@ -139,4 +135,17 @@ bool SystemIos::isVirtualKeyboardOpened() const
 {
     return [TextField isFirstResponder];
 }
+
+void SystemIos::refreshDimensions()
+{
+    auto screen = [UIScreen mainScreen];
+    auto bounds = [screen bounds];
+    
+    mWidth = static_cast<int>(bounds.size.width);
+    mHeight = static_cast<int>(bounds.size.height);
+    mScale = screen.scale;
+    mWidth *= mScale;
+    mHeight *= mScale;
+}
+
 #endif

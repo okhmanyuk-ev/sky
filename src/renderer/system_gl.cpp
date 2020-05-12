@@ -102,11 +102,6 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
     return result;
 }
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
-{
-    std::static_pointer_cast<Platform::SystemIos>(PLATFORM)->setSize(size.width * PLATFORM->getScale(), size.height * PLATFORM->getScale());
-}
-
 -(void)textFieldDidChange:(UITextField *) textField
 {
     auto c = textField.text;

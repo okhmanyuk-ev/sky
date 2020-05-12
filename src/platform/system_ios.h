@@ -52,6 +52,9 @@ namespace Platform
         static inline UITextField* TextField = nullptr;
 
     private:
+        void refreshDimensions();
+        
+    private:
         int mWidth = 0;
         int mHeight = 0;
         float mScale = 0.0f;
