@@ -102,22 +102,6 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
     return result;
 }
 
--(void)textFieldDidChange:(UITextField *) textField
-{
-    auto c = textField.text;
-    textField.text = @"";
-    auto e = Platform::Keyboard::Event();
-    
-    e.asciiChar = std::string([c UTF8String])[0];
-    e.key = Platform::Keyboard::Key::None;
-
-    e.type = Platform::Keyboard::Event::Type::Pressed;
-    EVENT->emit(e);
-    
-    e.type = Platform::Keyboard::Event::Type::Released;
-    EVENT->emit(e);
-}
-
 @end
 #endif
 
@@ -238,10 +222,7 @@ SystemGL::SystemGL()
 	});
     #elif defined(PLATFORM_IOS)
     auto view = [[ViewController alloc] init];
-    [view.view addSubview:Platform::SystemIos::TextField];
-    Platform::SystemIos::Window.rootViewController = view;
-    [Platform::SystemIos::TextField addTarget:view action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
-    
+    [Platform::SystemIos::Window setRootViewController: view];
     #endif
 #endif
 

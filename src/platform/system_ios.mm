@@ -6,6 +6,8 @@
 
 using namespace Platform;
 
+// UIApplicationDelegate
+
 @interface AppDelegate : UIResponder<UIApplicationDelegate>
 
 @end
@@ -36,57 +38,49 @@ using namespace Platform;
 - (void)applicationWillTerminate:(UIApplication *)application {
 }
 
-- (void)emitTouchEvent:(UITouch*)touch withType:(Platform::Touch::Event::Type)type {
-    auto location = [touch locationInView:SystemIos::Window];
-    auto e = Platform::Touch::Event();
-    e.type = type;
-    e.x = location.x * PLATFORM->getScale();
-    e.y = location.y * PLATFORM->getScale();
-    EVENT->emit(e);
+- (void)emitTouchEvent:(NSSet*)touches withType:(Platform::Touch::Event::Type)type {
+    for (UITouch* touch in touches)
+    {
+        auto location = [touch locationInView:SystemIos::Window];
+        auto e = Platform::Touch::Event();
+        e.type = type;
+        e.x = location.x * PLATFORM->getScale();
+        e.y = location.y * PLATFORM->getScale();
+        EVENT->emit(e);
+        break;
+    }
 }
 
 -(void)touchesBegan:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    for (auto touch in touches)
-    {
-        [self emitTouchEvent:touch withType:Platform::Touch::Event::Type::Begin];
-        break;
-    }
+    [self emitTouchEvent:touches withType:Platform::Touch::Event::Type::Begin];
 }
 
 - (void)touchesMoved:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    for (auto touch in touches)
-    {
-        [self emitTouchEvent:touch withType:Platform::Touch::Event::Type::Continue];
-        break;
-    }
+    [self emitTouchEvent:touches withType:Platform::Touch::Event::Type::Continue];
 }
 
 - (void)touchesCancelled:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    for (auto touch in touches)
-    {
-        [self emitTouchEvent:touch withType:Platform::Touch::Event::Type::End];
-        break;
-    }
+    [self emitTouchEvent:touches withType:Platform::Touch::Event::Type::End];
 }
 
 - (void)touchesEnded:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    for (auto touch in touches)
-    {
-        [self emitTouchEvent:touch withType:Platform::Touch::Event::Type::End];
-        break;
-    }
+    [self emitTouchEvent:touches withType:Platform::Touch::Event::Type::End];
 }
 @end
+
+// entry point
 
 int main(int argc, char * argv[]) {
     @autoreleasepool {
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }
+
+// ios system
 
 std::shared_ptr<System> System::create(const std::string& appname)
 {
@@ -101,9 +95,24 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
     Window = [[UIWindow alloc]initWithFrame:bounds];
     [Window makeKeyAndVisible];
         
-    TextField = [[UITextField alloc] init];
-    TextField.hidden = YES;
-    TextField.keyboardType = UIKeyboardTypeDefault;
+    mTextField = [[UITextField alloc] init];
+    [Window addSubview:mTextField];
+    
+    /*-(void)textFieldDidChange:(UITextField *) textField
+    {
+        auto c = textField.text;
+        textField.text = @"";
+        auto e = Platform::Keyboard::Event();
+        
+        e.asciiChar = std::string([c UTF8String])[0];
+        e.key = Platform::Keyboard::Key::None;
+
+        e.type = Platform::Keyboard::Event::Type::Pressed;
+        EVENT->emit(e);
+        
+        e.type = Platform::Keyboard::Event::Type::Released;
+        EVENT->emit(e);
+    }*/
 }
 
 SystemIos::~SystemIos()
@@ -123,17 +132,17 @@ void SystemIos::process()
 
 void SystemIos::showVirtualKeyboard()
 {
-    [TextField becomeFirstResponder];
+    [mTextField becomeFirstResponder];
 }
 
 void SystemIos::hideVirtualKeyboard()
 {
-    [TextField resignFirstResponder];
+    [mTextField resignFirstResponder];
 }
 
 bool SystemIos::isVirtualKeyboardOpened() const
 {
-    return [TextField isFirstResponder];
+    return [mTextField isFirstResponder];
 }
 
 void SystemIos::refreshDimensions()

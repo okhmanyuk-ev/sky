@@ -49,8 +49,10 @@ namespace Platform
         
     public:
         static inline UIWindow* Window = nullptr;
-        static inline UITextField* TextField = nullptr;
 
+    private:
+        UITextField* mTextField = nullptr;
+        
     private:
         void refreshDimensions();
         
