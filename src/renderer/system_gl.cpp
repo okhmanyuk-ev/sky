@@ -529,21 +529,37 @@ void SystemGL::prepareForDrawing()
 void SystemGL::setGLVertexBuffer(const Buffer& value)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
-	//glBufferData(GL_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW); // TODO: no glMapBuffer in gles
+	
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+
+	if ((size_t)size < value.size)
+		glBufferData(GL_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
+	else
+		glBufferSubData(GL_ARRAY_BUFFER, 0, value.size, value.data);
+	
+	//glBufferData(GL_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
 	//auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 	//memcpy(ptr, value.data, value.size);
 	//glUnmapBuffer(GL_ARRAY_BUFFER);
-	glBufferData(GL_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
 }
 
 void SystemGL::setGLIndexBuffer(const Buffer& value)
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
+
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+
+	if ((size_t)size < value.size)
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
+	else
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, value.size, value.data);
+
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, nullptr, GL_STATIC_DRAW);
 	//auto ptr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
 	//memcpy(ptr, value.data, value.size);
 	//glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, value.size, value.data, GL_STATIC_DRAW);
 
 	mGLIndexType = value.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 }
