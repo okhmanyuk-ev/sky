@@ -11,7 +11,7 @@ namespace Scene
 	class Sprite : public Node, public Color, public Blend, public Sampler
 	{
 	public:
-		inline static Renderer::TextureAddress DefaultTextureAddress = Renderer::TextureAddress::Wrap;
+		inline static Renderer::TextureAddress DefaultTextureAddress = Renderer::TextureAddress::Clamp;
 
 	protected:
 		void update() override;
