@@ -142,6 +142,7 @@ namespace Graphics
 			std::optional<Renderer::Scissor> scissor = std::nullopt;
 			Renderer::Viewport viewport = Renderer::Viewport();
 			Renderer::DepthMode depthMode = Renderer::DepthMode();
+			Renderer::CullMode cullMode = Renderer::CullMode::None;
 			Renderer::BlendMode blendMode = Renderer::BlendStates::NonPremultiplied;
 			Renderer::Sampler sampler = Renderer::Sampler::Nearest;
 			Renderer::TextureAddress textureAddress = Renderer::TextureAddress::Clamp;

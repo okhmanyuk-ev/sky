@@ -34,19 +34,62 @@ void System::applyState()
 
 	flush();
 
-	if (state.scissor.has_value())
-		RENDERER->setScissor(state.scissor.value());
-	else
-		RENDERER->setScissor(nullptr);
+	bool scissorChanged = true;
+	bool renderTargetChanged = true;
+	bool depthModeChanged = true;
+	bool cullModeChanged = true;
+	bool viewportChanged = true;
+	bool blendModeChanged = true;
+	bool samplerChanged = true;
+	bool textureAddressChanged = true;
+	bool stencilChanged = true;
 
-	RENDERER->setRenderTarget(state.renderTarget);
-	RENDERER->setDepthMode(state.depthMode);
-	RENDERER->setCullMode(Renderer::CullMode::None);
-	RENDERER->setViewport(state.viewport);
-	RENDERER->setBlendMode(state.blendMode);
-	RENDERER->setSampler(state.sampler);
-	RENDERER->setTextureAddressMode(state.textureAddress);
-	RENDERER->setStencilMode(state.stencilMode);
+	if (mAppliedState.has_value())
+	{
+		if (mAppliedState->scissor.has_value() && state.scissor.has_value())
+			scissorChanged = mAppliedState->scissor.value() != state.scissor.value();
+		else if (!mAppliedState->scissor.has_value() && !state.scissor.has_value())
+			scissorChanged = false;
+
+		renderTargetChanged = mAppliedState->renderTarget != state.renderTarget;
+		depthModeChanged = mAppliedState->depthMode != state.depthMode;
+		cullModeChanged = mAppliedState->cullMode != state.cullMode;
+		viewportChanged = mAppliedState->viewport != state.viewport;
+		blendModeChanged = mAppliedState->blendMode != state.blendMode;
+		samplerChanged = mAppliedState->sampler != state.sampler;
+		textureAddressChanged = mAppliedState->textureAddress != state.textureAddress;
+		stencilChanged = mAppliedState->stencilMode != state.stencilMode;
+	}
+
+	if (scissorChanged)
+		if (state.scissor.has_value())
+			RENDERER->setScissor(state.scissor.value());
+		else
+			RENDERER->setScissor(nullptr);
+	
+	if (renderTargetChanged)
+		RENDERER->setRenderTarget(state.renderTarget);
+
+	if (depthModeChanged)
+		RENDERER->setDepthMode(state.depthMode);
+	
+	if (cullModeChanged)
+		RENDERER->setCullMode(state.cullMode);
+	
+	if (viewportChanged)
+		RENDERER->setViewport(state.viewport);
+	
+	if (blendModeChanged)
+		RENDERER->setBlendMode(state.blendMode);
+
+	if (samplerChanged)
+		RENDERER->setSampler(state.sampler);
+	
+	if (textureAddressChanged)
+		RENDERER->setTextureAddressMode(state.textureAddress);
+	
+	if (stencilChanged)
+		RENDERER->setStencilMode(state.stencilMode);
 
 	mAppliedState = state;
 }
