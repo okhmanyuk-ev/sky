@@ -94,7 +94,10 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
 
     Window = [[UIWindow alloc]initWithFrame:bounds];
     [Window makeKeyAndVisible];
-        
+    
+    ViewController = [[UIViewController alloc] init];
+    [Window setRootViewController:ViewController];
+    
     mTextField = [[UITextField alloc] init];
     [Window addSubview:mTextField];
     

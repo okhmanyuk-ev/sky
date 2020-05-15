@@ -87,26 +87,7 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 #if defined(PLATFORM_IOS)
 #import <GLKit/GLKit.h>
 
-@interface ViewController : GLKViewController
-
-@end
-
-@implementation ViewController
-
-- (id)init
-{
-    auto result = [super init];
-    auto view  = (GLKView*)self.view;
-    view.context = [[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES3];
-    [view setDrawableColorFormat:GLKViewDrawableColorFormatRGBA8888];
-    [view setDrawableDepthFormat:GLKViewDrawableDepthFormat24];
-    [view setDrawableStencilFormat:GLKViewDrawableStencilFormat8];
-    [view setDrawableMultisample:GLKViewDrawableMultisampleNone];
-    [EAGLContext setCurrentContext:view.context];
-    return result;
-}
-
-@end
+GLKView* mGLKView = nullptr;
 #endif
 
 SystemGL::SystemGL()
@@ -225,8 +206,17 @@ SystemGL::SystemGL()
 		mSurface = EGL_NO_SURFACE;
 	});
     #elif defined(PLATFORM_IOS)
-    auto view = [[ViewController alloc] init];
-    [Platform::SystemIos::Window setRootViewController: view];
+    auto screen = [UIScreen mainScreen];
+    auto bounds = [screen bounds];
+    
+    mGLKView = [[GLKView alloc] initWithFrame:bounds];
+    [mGLKView setContext:[[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES3]];
+    [mGLKView setDrawableColorFormat:GLKViewDrawableColorFormatRGBA8888];
+    [mGLKView setDrawableDepthFormat:GLKViewDrawableDepthFormat24];
+    [mGLKView setDrawableStencilFormat:GLKViewDrawableStencilFormat8];
+    [mGLKView setDrawableMultisample:GLKViewDrawableMultisampleNone];
+    [EAGLContext setCurrentContext:mGLKView.context];
+    [Platform::SystemIos::ViewController addSubview:mGLKView];
     #endif
 #endif
 
@@ -295,8 +285,7 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 	{
 		mRenderTargetBound = false;
 #if defined(PLATFORM_IOS)
-		auto view = (GLKView*)Platform::SystemIos::Window.rootViewController.view;
-		[view bindDrawable] ;
+		[mGLKView bindDrawable];
 #else
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
@@ -439,8 +428,7 @@ void SystemGL::present()
     #if defined(PLATFORM_ANDROID)
 	eglSwapBuffers(mDisplay, mSurface);
     #elif defined(PLATFORM_IOS)
-    auto view = (GLKView*)Platform::SystemIos::Window.rootViewController.view;
-    [view display];
+    [mGLKView display];
     #endif
 #endif
 }
