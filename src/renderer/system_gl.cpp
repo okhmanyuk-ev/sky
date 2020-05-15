@@ -98,6 +98,10 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
     auto result = [super init];
     auto view  = (GLKView*)self.view;
     view.context = [[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES3];
+    [view setDrawableColorFormat:GLKViewDrawableColorFormatRGBA8888];
+    [view setDrawableDepthFormat:GLKViewDrawableDepthFormat24];
+    [view setDrawableStencilFormat:GLKViewDrawableStencilFormat8];
+    [view setDrawableMultisample:GLKViewDrawableMultisampleNone];
     [EAGLContext setCurrentContext:view.context];
     return result;
 }
