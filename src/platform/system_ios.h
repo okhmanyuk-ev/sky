@@ -49,7 +49,6 @@ namespace Platform
         
     public:
         static inline UIWindow* Window = nullptr;
-        static inline UIViewController* ViewController = nullptr;
 
     private:
         UITextField* mTextField = nullptr;

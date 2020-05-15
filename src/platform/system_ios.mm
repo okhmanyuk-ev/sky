@@ -95,8 +95,7 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
     Window = [[UIWindow alloc]initWithFrame:bounds];
     [Window makeKeyAndVisible];
     
-    ViewController = [[UIViewController alloc] init];
-    [Window setRootViewController:ViewController];
+    [Window setRootViewController: [[UIViewController alloc] init]];
     
     mTextField = [[UITextField alloc] init];
     [Window addSubview:mTextField];
@@ -153,11 +152,19 @@ void SystemIos::refreshDimensions()
     auto screen = [UIScreen mainScreen];
     auto bounds = [screen bounds];
     
+    auto prev_width = mWidth;
+    auto prev_height = mHeight;
+    
     mWidth = static_cast<int>(bounds.size.width);
     mHeight = static_cast<int>(bounds.size.height);
     mScale = screen.scale;
     mWidth *= mScale;
     mHeight *= mScale;
+    
+    if (prev_width != mWidth || prev_height != mHeight)
+    {
+        EVENT->emit(ResizeEvent({ mWidth, mHeight }));
+    }
 }
 
 #endif

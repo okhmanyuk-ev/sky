@@ -206,17 +206,14 @@ SystemGL::SystemGL()
 		mSurface = EGL_NO_SURFACE;
 	});
     #elif defined(PLATFORM_IOS)
-    auto screen = [UIScreen mainScreen];
-    auto bounds = [screen bounds];
-    
-    mGLKView = [[GLKView alloc] initWithFrame:bounds];
+    mGLKView = [[GLKView alloc] initWithFrame:[Platform::SystemIos::Window frame]];
     [mGLKView setContext:[[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES3]];
     [mGLKView setDrawableColorFormat:GLKViewDrawableColorFormatRGBA8888];
     [mGLKView setDrawableDepthFormat:GLKViewDrawableDepthFormat24];
     [mGLKView setDrawableStencilFormat:GLKViewDrawableStencilFormat8];
     [mGLKView setDrawableMultisample:GLKViewDrawableMultisampleNone];
     [EAGLContext setCurrentContext:mGLKView.context];
-    [Platform::SystemIos::ViewController addSubview:mGLKView];
+    [[Platform::SystemIos::Window rootViewController] setView:mGLKView];
     #endif
 #endif
 
@@ -234,6 +231,13 @@ SystemGL::~SystemGL()
 	glDeleteBuffers(1, &mGLIndexBuffer);
 #if defined(RENDERER_GL44)
 	wglDeleteContext(mWglContext);
+#endif
+}
+
+void SystemGL::event(const Platform::System::ResizeEvent& e)
+{
+#if defined(PLATFORM_IOS)
+  //  [mGLKView deleteDrawable];
 #endif
 }
 

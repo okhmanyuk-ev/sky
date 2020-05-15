@@ -16,13 +16,17 @@
 
 namespace Renderer
 {
-	class SystemGL : public System
+	class SystemGL : public System,
+        public Common::EventSystem::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
 		SystemGL();
 		~SystemGL();
 
-	public:
+    private:
+        void event(const Platform::System::ResizeEvent& e) override;
+
+    public:
 		void setTopology(const Topology& value) override;
 		void setViewport(const Viewport& value) override;
 		void setScissor(const Scissor& value) override;
@@ -48,7 +52,7 @@ namespace Renderer
 
 		bool isVsync() const override;
 		void setVsync(bool value) override;
-
+        
 	private:
 		bool mVsync = false;
 
