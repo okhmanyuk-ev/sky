@@ -129,6 +129,8 @@ if(APPLE)
 		"-framework AVFoundation"
 		"-framework AudioToolbox"
 	)
+
+	add_definitions(-DGLES_SILENCE_DEPRECATION)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)

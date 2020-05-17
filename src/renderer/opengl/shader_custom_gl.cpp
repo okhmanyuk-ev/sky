@@ -86,7 +86,7 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 
 	glGenBuffers(1, &mImpl->ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, mImpl->ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer) + customConstantBufferSize, nullptr, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer) + customConstantBufferSize, nullptr, GL_DYNAMIC_DRAW);
 
 	mImpl->uniformBlock = glGetUniformBlockIndex(mImpl->program, "ConstantBuffer");
 	glUniformBlockBinding(mImpl->program, mImpl->uniformBlock, 0);
@@ -161,8 +161,12 @@ void ShaderCustom::update()
 	}
 
 	mConstantBufferDirty = false;
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ConstantBuffer), &mImpl->constantBuffer);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), mImpl->customConstantBufferSize, mCustomConstantBuffer);
-	glUniform1i(mImpl->uniformTexture, 0);
+	    
+    auto ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(ConstantBuffer) + mImpl->customConstantBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+    memcpy(ptr, &mImpl->constantBuffer, sizeof(ConstantBuffer));
+    memcpy((void*)((size_t)ptr + sizeof(ConstantBuffer)), mCustomConstantBuffer, mImpl->customConstantBufferSize);
+    glUnmapBuffer(GL_UNIFORM_BUFFER);
+        
+    glUniform1i(mImpl->uniformTexture, 0);
 }
 #endif
