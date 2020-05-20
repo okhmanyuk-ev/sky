@@ -13,11 +13,15 @@ namespace Renderer
 {
 	using SystemCrossplatform = SystemD3D11;
 
-	class SystemD3D11 : public System
+	class SystemD3D11 : public System,
+		Common::EventSystem::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
 		SystemD3D11();
 		~SystemD3D11();
+
+	private:
+		void event(const Platform::System::ResizeEvent& e) override;
 
 	public:
 		void setTopology(const Topology& value) override;
@@ -64,9 +68,6 @@ namespace Renderer
 		void destroyRenderTarget();
 
 		std::shared_ptr<RenderTarget> currentRenderTarget = nullptr;
-
-	private:
-		Common::EventSystem::Listener<Platform::System::ResizeEvent> mResizeListener;
 
 	public:
 		const static std::unordered_map<Vertex::Attribute::Format, DXGI_FORMAT> Format;

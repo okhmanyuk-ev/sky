@@ -54,12 +54,6 @@ SystemD3D11::SystemD3D11()
 
 	createRenderTarget();
 
-	mResizeListener.setCallback([this] (const auto& e) {
-		destroyRenderTarget();
-		mSwapChain->ResizeBuffers(0, e.width, e.height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
-		createRenderTarget();
-	});
-
 	setRenderTarget(nullptr);
 	setBlendMode(BlendStates::NonPremultiplied);
 }
@@ -69,6 +63,13 @@ SystemD3D11::~SystemD3D11()
 	mSwapChain->Release();
 	Context->Release();
 	Device->Release();
+}
+
+void SystemD3D11::event(const Platform::System::ResizeEvent& e)
+{
+	destroyRenderTarget();
+	mSwapChain->ResizeBuffers(0, e.width, e.height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	createRenderTarget();
 }
 
 void SystemD3D11::createRenderTarget() 
