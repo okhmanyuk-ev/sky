@@ -150,14 +150,15 @@ bool SystemIos::isVirtualKeyboardOpened() const
 void SystemIos::refreshDimensions()
 {
     auto screen = [UIScreen mainScreen];
-    auto bounds = [screen bounds];
-    
+
     auto prev_width = mWidth;
     auto prev_height = mHeight;
     
-    mWidth = static_cast<int>(bounds.size.width);
-    mHeight = static_cast<int>(bounds.size.height);
+    mWidth = static_cast<int>(screen.bounds.size.width);
+    mHeight = static_cast<int>(screen.bounds.size.height);
+    
     mScale = screen.scale;
+    
     mWidth *= mScale;
     mHeight *= mScale;
     
