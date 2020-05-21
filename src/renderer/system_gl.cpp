@@ -206,14 +206,17 @@ SystemGL::SystemGL()
 		mSurface = EGL_NO_SURFACE;
 	});
     #elif defined(PLATFORM_IOS)
-    mGLKView = [[GLKView alloc] initWithFrame:[Platform::SystemIos::Window frame]];
+    auto window = Platform::SystemIos::Window;
+    auto rootViewController = [window rootViewController];
+    mGLKView = [[GLKView alloc] initWithFrame:[window frame]];
     [mGLKView setContext:[[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES3]];
     [mGLKView setDrawableColorFormat:GLKViewDrawableColorFormatRGBA8888];
     [mGLKView setDrawableDepthFormat:GLKViewDrawableDepthFormat24];
     [mGLKView setDrawableStencilFormat:GLKViewDrawableStencilFormat8];
     [mGLKView setDrawableMultisample:GLKViewDrawableMultisampleNone];
+    [mGLKView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
     [EAGLContext setCurrentContext:mGLKView.context];
-    [[Platform::SystemIos::Window rootViewController] setView:mGLKView];
+    [rootViewController setView:mGLKView];
     #endif
 #endif
 
@@ -236,9 +239,7 @@ SystemGL::~SystemGL()
 
 void SystemGL::event(const Platform::System::ResizeEvent& e)
 {
-#if defined(PLATFORM_IOS)
-  //  [mGLKView deleteDrawable];
-#endif
+    //
 }
 
 void SystemGL::setTopology(const Renderer::Topology& value) 
