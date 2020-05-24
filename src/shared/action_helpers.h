@@ -81,6 +81,15 @@ namespace Shared::ActionHelpers
 	Action ChangePosition(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 	Action ChangePosition(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 
+	Action ChangeHorizontalOrigin(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+	Action ChangeHorizontalOrigin(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+
+	Action ChangeVerticalOrigin(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+	Action ChangeVerticalOrigin(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+
+	Action ChangeOrigin(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+	Action ChangeOrigin(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+
 	Action ChangeHorizontalSize(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 	Action ChangeHorizontalSize(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 	

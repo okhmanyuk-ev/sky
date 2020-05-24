@@ -356,6 +356,49 @@ ActionHelpers::Action ActionHelpers::ChangePosition(SceneTransform node, const g
 	});
 }
 
+ActionHelpers::Action ActionHelpers::ChangeHorizontalOrigin(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setHorizontalOrigin(value);
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeHorizontalOrigin(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([node, dest, duration, easingFunction] {
+		return ChangeHorizontalOrigin(node, node->getHorizontalOrigin(), dest, duration, easingFunction);
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeVerticalOrigin(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setVerticalOrigin(value);
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeVerticalOrigin(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([node, dest, duration, easingFunction] {
+		return ChangeVerticalOrigin(node, node->getVerticalOrigin(), dest, duration, easingFunction);
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeOrigin(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction)
+{
+	return MakeParallel(
+		ChangeHorizontalOrigin(node, start.x, dest.x, duration, easingFunction),
+		ChangeVerticalOrigin(node, start.y, dest.y, duration, easingFunction)
+	);
+}
+
+ActionHelpers::Action ActionHelpers::ChangeOrigin(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([node, dest, duration, easingFunction] {
+		return ChangeOrigin(node, node->getOrigin(), dest, duration, easingFunction);
+	});
+}
+
 ActionHelpers::Action ActionHelpers::ChangeHorizontalSize(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
 {
 	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
