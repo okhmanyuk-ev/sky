@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -35,6 +36,8 @@ public class SkyActivity extends NativeActivity {
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         createSkyActivity();
+
+        hideSystemUI();
     }
 
     @Override
@@ -147,5 +150,28 @@ public class SkyActivity extends NativeActivity {
             };
 
         mBillingClient.consumeAsync(consumeParams, consumeResponseListener);
+    }
+
+    // ------------
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        if (!hasFocus)
+            return;
+
+        hideSystemUI();
+    }
+
+    private void hideSystemUI() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+            View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 }
