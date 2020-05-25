@@ -31,17 +31,17 @@ ActionHelpers::Action ActionHelpers::ChangePositionByDirection(SceneTransform no
 
 ActionHelpers::Action ActionHelpers::ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed, float duration)
 {
-	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
-		Wait(duration),
-		ChangePositionByDirection(node, direction, speed)
-	);
+	return Limit(duration, ChangePositionByDirection(node, direction, speed));
 }
 
 // wait
 
 ActionHelpers::Action ActionHelpers::Wait(float duration)
 {
-	return std::make_unique<Common::Actions::Wait>(Clock::FromSeconds(duration));
+	return Wait([duration]() mutable {
+		duration -= Clock::ToSeconds(FRAME->getTimeDelta());
+		return duration > 0.0f;
+	});
 }
 
 ActionHelpers::Action ActionHelpers::Wait(std::function<bool()> while_callback)
@@ -68,6 +68,16 @@ ActionHelpers::Action ActionHelpers::Delayed(std::function<bool()> while_callbac
 {
 	return MakeSequence(
 		Wait(while_callback),
+		std::move(action)
+	);
+}
+
+// limit
+
+ActionHelpers::Action ActionHelpers::Limit(float duration, Action action)
+{
+	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
+		Wait(duration),
 		std::move(action)
 	);
 }
@@ -189,14 +199,11 @@ ActionHelpers::Action ActionHelpers::Show(SceneColor node, float duration, Easin
 ActionHelpers::Action ActionHelpers::Shake(SceneTransform node, float radius, float duration)
 {
 	return MakeSequence(
-		MakeParallel(Common::Actions::Parallel::Awaiting::Any,
-			Wait(duration),
-			RepeatInfinite([node, radius] {
-				return Execute([node, radius] {
-					node->setOrigin(glm::circularRand(radius));
-				});
-			})
-		),
+		Limit(duration, RepeatInfinite([node, radius] {
+			return Execute([node, radius] {
+				node->setOrigin(glm::circularRand(radius));
+			});
+		})),
 		Execute([node] {
 			node->setOrigin({ 0.0f, 0.0f });
 		})
