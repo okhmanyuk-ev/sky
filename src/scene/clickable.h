@@ -2,9 +2,6 @@
 
 #include <scene/node.h>
 
-// TODO: we should make overridable callbacks,
-// see Pickable<..> class for help
-
 namespace Scene
 {
 	template <typename T> class Clickable : public T
@@ -28,28 +25,45 @@ namespace Scene
 			if (!mClickEnabled && mChooseCancelled)
 				return;
 
-			auto executeCallback = [](auto callback) { if (callback) callback(); };
-
 			if (type == Node::Touch::Begin)
 			{
 				mStartPos = pos;
 				mChooseCancelled = false;
-				executeCallback(mChooseCallback);
+				onChoose();
 			}
 			else if (type == Node::Touch::Continue)
 			{
 				if (glm::distance(pos, mStartPos) > mChooseTolerance * PLATFORM->getScale())
 				{
 					mChooseCancelled = true;
-					executeCallback(mCancelChooseCallback);
+					onCancelChoose();
 				}
 			}
 			else if (!mChooseCancelled)
 			{
 				mChooseCancelled = true;
-				executeCallback(mCancelChooseCallback);
-				executeCallback(mClickCallback);
+				onCancelChoose();
+				onClick();
 			}
+		}
+
+	protected:
+		virtual void onClick()
+		{
+			if (mClickCallback)
+				mClickCallback();
+		}
+
+		virtual void onChoose()
+		{
+			if (mChooseCallback)
+				mChooseCallback();
+		}
+
+		virtual void onCancelChoose()
+		{
+			if (mCancelChooseCallback)
+				mCancelChooseCallback();
 		}
 
 	public:
