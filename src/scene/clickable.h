@@ -14,7 +14,7 @@ namespace Scene
 	public:
 		Clickable()
 		{
-			Node::setTouchable(true);
+			T::setTouchable(true);
 		}
 	
 	protected:
@@ -22,28 +22,28 @@ namespace Scene
 		{
 			T::touch(type, pos);
 
-			if (!mClickEnabled && mChooseCancelled)
+			if (!mClickEnabled && !mChoosed)
 				return;
 
 			if (type == Node::Touch::Begin)
 			{
 				mStartPos = pos;
-				mChooseCancelled = false;
-				onChoose();
+				mChoosed = true;
+				onChooseBegin();
 			}
 			else if (type == Node::Touch::Continue)
 			{
 				if (glm::distance(pos, mStartPos) > mChooseTolerance * PLATFORM->getScale())
 				{
-					mChooseCancelled = true;
-					onCancelChoose();
+					mChoosed = false;
+					onChooseEnd();
 				}
 			}
-			else if (!mChooseCancelled)
+			else if (mChoosed)
 			{
-				mChooseCancelled = true;
-				onCancelChoose();
+				mChoosed = false;
 				onClick();
+				onChooseEnd();
 			}
 		}
 
@@ -54,21 +54,21 @@ namespace Scene
 				mClickCallback();
 		}
 
-		virtual void onChoose()
+		virtual void onChooseBegin()
 		{
-			if (mChooseCallback)
-				mChooseCallback();
+			if (mChooseBeginCallback)
+				mChooseBeginCallback();
 		}
 
-		virtual void onCancelChoose()
+		virtual void onChooseEnd()
 		{
-			if (mCancelChooseCallback)
-				mCancelChooseCallback();
+			if (mChooseEndCallback)
+				mChooseEndCallback();
 		}
 
 	public:
-		void setChooseCallback(Callback value) { mChooseCallback = value; }
-		void setCancelChooseCallback(Callback value) { mCancelChooseCallback = value; }
+		void setChooseBeginCallback(Callback value) { mChooseBeginCallback = value; }
+		void setChooseEndCallback(Callback value) { mChooseEndCallback = value; }
 		void setClickCallback(Callback value) { mClickCallback = value; }
 	
 		float getChooseTolerance() const { return mChooseTolerance; }
@@ -77,15 +77,17 @@ namespace Scene
 		bool isClickEnabled() const { return mClickEnabled; }
 		void setClickEnabled(bool value) { mClickEnabled = value; }
 
+		bool isChoosed() const { return mChoosed; }
+
 	private:
-		Callback mChooseCallback = nullptr;
-		Callback mCancelChooseCallback = nullptr;
+		Callback mChooseBeginCallback = nullptr;
+		Callback mChooseEndCallback = nullptr;
 		Callback mClickCallback = nullptr;
 		float mChooseTolerance = 32.0f;
 		bool mClickEnabled = true;
 
 	private:
 		glm::vec2 mStartPos = { 0.0f, 0.0f };
-		bool mChooseCancelled = true;
+		bool mChoosed = false;
 	};
 }

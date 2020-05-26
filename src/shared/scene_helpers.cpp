@@ -62,8 +62,8 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 		inner_rect->setEnabled(!inner_rect->isEnabled());
 		changeCallback(inner_rect->isEnabled());
 	});
-	holder->setChooseCallback([outer_rect] { outer_rect->setAlpha(0.66f); });
-	holder->setCancelChooseCallback([outer_rect] { outer_rect->setAlpha(0.33f); });
+	holder->setChooseBeginCallback([outer_rect] { outer_rect->setAlpha(0.66f); });
+	holder->setChooseEndCallback([outer_rect] { outer_rect->setAlpha(0.33f); });
 
 	auto setter = [inner_rect](bool value) {
 		inner_rect->setEnabled(value);
@@ -179,8 +179,8 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const glm::vec2& cel
 
 SceneHelpers::FastButton::FastButton()
 {
-	setChooseCallback([this] { setAlpha(0.66f); });
-	setCancelChooseCallback([this] { setAlpha(0.33f); });
+	setChooseBeginCallback([this] { setAlpha(0.66f); });
+	setChooseEndCallback([this] { setAlpha(0.33f); });
 
 	mLabel = std::make_shared<Scene::Label>();
 	mLabel->setFont(FONT("default"));
