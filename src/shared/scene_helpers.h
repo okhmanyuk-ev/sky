@@ -101,8 +101,15 @@ namespace Shared::SceneHelpers
 		}
 
 	public:
-		void emit()
+		void emit(int count = 1)
 		{
+			assert(count > 0);
+
+			for (int i = 0; i < count - 1; i++)
+			{
+				emit();
+			}
+			
 			auto holder = mHolder.lock();
 
 			auto particle = createParticle();			
