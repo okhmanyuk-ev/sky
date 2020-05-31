@@ -68,24 +68,24 @@ void android_main(android_app* app)
 	sky_main();
 }
 
-void SystemAndroid::calcScale() // TODO: find better solution
+void SystemAndroid::setupScale()
 {
-	JNIEnv* jni;
-	Instance->activity->vm->AttachCurrentThread(&jni, NULL);
-	jclass activityClass = jni->FindClass("android/app/NativeActivity");
-	jmethodID getWindowManager = jni->GetMethodID (activityClass, "getWindowManager" , "()Landroid/view/WindowManager;");
-	jobject wm = jni->CallObjectMethod(Instance->activity->clazz, getWindowManager);
-	jclass windowManagerClass = jni->FindClass("android/view/WindowManager");
-	jmethodID getDefaultDisplay = jni->GetMethodID(windowManagerClass, "getDefaultDisplay" , "()Landroid/view/Display;");
-	jobject display = jni->CallObjectMethod(wm, getDefaultDisplay);
-	jclass displayClass = jni->FindClass("android/view/Display");
-	jclass displayMetricsClass = jni->FindClass("android/util/DisplayMetrics");
-	jmethodID displayMetricsConstructor = jni->GetMethodID(displayMetricsClass, "<init>", "()V");
-	jobject displayMetrics = jni->NewObject(displayMetricsClass, displayMetricsConstructor);
-	jmethodID getMetrics = jni->GetMethodID(displayClass, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
-	jni->CallVoidMethod(display, getMetrics, displayMetrics);
-	jfieldID xdpi_id = jni->GetFieldID(displayMetricsClass, "density", "F");
-	Scale = jni->GetFloatField( displayMetrics, xdpi_id);
+	auto env = getEnv();
+    auto clazz = env->GetObjectClass(gSkyActivity);
+
+    auto getWindowManagerMethod = env->GetMethodID(clazz, "getWindowManager" , "()Landroid/view/WindowManager;");
+    auto windowManager = env->CallObjectMethod(Instance->activity->clazz, getWindowManagerMethod);
+    auto windowManagerClass = env->FindClass("android/view/WindowManager");
+    auto getDefaultDisplayMethod = env->GetMethodID(windowManagerClass, "getDefaultDisplay" , "()Landroid/view/Display;");
+    auto display = env->CallObjectMethod(windowManager, getDefaultDisplayMethod);
+    auto displayClass = env->FindClass("android/view/Display");
+    auto displayMetricsClass = env->FindClass("android/util/DisplayMetrics");
+    auto displayMetricsConstructor = env->GetMethodID(displayMetricsClass, "<init>", "()V");
+    auto displayMetrics = env->NewObject(displayMetricsClass, displayMetricsConstructor);
+    auto getMetricsMethod = env->GetMethodID(displayClass, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
+    env->CallVoidMethod(display, getMetricsMethod, displayMetrics);
+    auto densityField = env->GetFieldID(displayMetricsClass, "density", "F");
+	Scale = env->GetFloatField(displayMetrics, densityField);
 }
 
 Keyboard::Key translateKey(int32_t key)
@@ -215,57 +215,32 @@ Keyboard::Key translateKey(int32_t key)
 	}
 }
 
-int SystemAndroid::getUnicode(AInputEvent* event) // TODO: refactor (this code from sfml library)
+int SystemAndroid::getUnicode(AInputEvent* event)
 {
-	// Retrieve activity states
-	//ActivityStates* states = getActivity(NULL);
-	//Lock lock(states->mutex);
+    auto downTime = AKeyEvent_getDownTime(event);
+    auto eventTime = AKeyEvent_getEventTime(event);
+    auto action = AKeyEvent_getAction(event);
+    auto code = AKeyEvent_getKeyCode(event);
+    auto repeat = AKeyEvent_getRepeatCount(event); // not sure!
+    auto metaState = AKeyEvent_getMetaState(event);
+    auto deviceId = AInputEvent_getDeviceId(event);
+    auto scancode = AKeyEvent_getScanCode(event);
+    auto flags = AKeyEvent_getFlags(event);
+    auto source = AInputEvent_getSource(event);
 
-	// Initializes JNI
-	jint lResult;
-	jint lFlags = 0;
+	auto env = getEnv();
 
-	JavaVM* lJavaVM = Instance->activity->vm;
-	JNIEnv* lJNIEnv = Instance->activity->env;
+	auto keyEventClass = env->FindClass("android/view/KeyEvent");
+    auto KeyEventConstructor = env->GetMethodID(keyEventClass, "<init>", "(JJIIIIIIII)V");
+    auto keyEventObject = env->NewObject(keyEventClass, KeyEventConstructor, downTime, eventTime, action, code, repeat, metaState, deviceId, scancode, flags, source);
 
-	JavaVMAttachArgs lJavaVMAttachArgs;
-	lJavaVMAttachArgs.version = JNI_VERSION_1_6;
-	lJavaVMAttachArgs.name = "NativeThread";
-	lJavaVMAttachArgs.group = NULL;
+    auto getUnicodeCharMethod = env->GetMethodID(keyEventClass, "getUnicodeChar", "(I)I");
+    auto result = env->CallIntMethod(keyEventObject, getUnicodeCharMethod, metaState);
 
-	lResult=lJavaVM->AttachCurrentThread(&lJNIEnv, &lJavaVMAttachArgs);
+    env->DeleteLocalRef(keyEventClass);
+    env->DeleteLocalRef(keyEventObject);
 
-	//if (lResult == JNI_ERR)
-	//	err() << "Failed to initialize JNI, couldn't get the Unicode value" << std::endl;
-
-	// Retrieve key data from the input event
-	jlong downTime = AKeyEvent_getDownTime(event);
-	jlong eventTime = AKeyEvent_getEventTime(event);
-	jint action = AKeyEvent_getAction(event);
-	jint code = AKeyEvent_getKeyCode(event);
-	jint repeat = AKeyEvent_getRepeatCount(event); // not sure!
-	jint metaState = AKeyEvent_getMetaState(event);
-	jint deviceId = AInputEvent_getDeviceId(event);
-	jint scancode = AKeyEvent_getScanCode(event);
-	jint flags = AKeyEvent_getFlags(event);
-	jint source = AInputEvent_getSource(event);
-
-	// Construct a KeyEvent object from the event data
-	jclass ClassKeyEvent = lJNIEnv->FindClass("android/view/KeyEvent");
-	jmethodID KeyEventConstructor = lJNIEnv->GetMethodID(ClassKeyEvent, "<init>", "(JJIIIIIIII)V");
-	jobject ObjectKeyEvent = lJNIEnv->NewObject(ClassKeyEvent, KeyEventConstructor, downTime, eventTime, action, code, repeat, metaState, deviceId, scancode, flags, source);
-
-	// Call its getUnicodeChar() method to get the Unicode value
-	jmethodID MethodGetUnicode = lJNIEnv->GetMethodID(ClassKeyEvent, "getUnicodeChar", "(I)I");
-	int unicode = lJNIEnv->CallIntMethod(ObjectKeyEvent, MethodGetUnicode, metaState);
-
-	lJNIEnv->DeleteLocalRef(ClassKeyEvent);
-	lJNIEnv->DeleteLocalRef(ObjectKeyEvent);
-
-	// Detach this thread from the JVM
-	lJavaVM->DetachCurrentThread();
-
-	return unicode;
+	return result;
 }
 
 int32_t SystemAndroid::handle_key_event(android_app* app, AInputEvent* event)
@@ -345,7 +320,7 @@ void SystemAndroid::handle_cmd(android_app* app, int32_t cmd)
 			Width = ANativeWindow_getWidth(Window);
 			Height = ANativeWindow_getHeight(Window);
 
-			calcScale();
+            setupScale();
 
 			initialized = true;
 
@@ -473,163 +448,10 @@ void SystemAndroid::handle_content_rect_changed(ANativeActivity* activity, const
 	Height = rect->bottom - rect->top;
 }
 
-void SystemAndroid::setKeyboardVisible(bool visible)
-{
-	// Attaches the current thread to the JVM.
-	jint lResult;
-	jint lFlags = 0;
-
-	JavaVM* lJavaVM = Instance->activity->vm;
-	JNIEnv* lJNIEnv = Instance->activity->env;
-
-	JavaVMAttachArgs lJavaVMAttachArgs;
-	lJavaVMAttachArgs.version = JNI_VERSION_1_6;
-	lJavaVMAttachArgs.name = "NativeThread";
-	lJavaVMAttachArgs.group = NULL;
-
-	lResult=lJavaVM->AttachCurrentThread(&lJNIEnv, &lJavaVMAttachArgs);
-	if (lResult == JNI_ERR) {
-		return;
-	}
-
-	// Retrieves NativeActivity.
-	jobject lNativeActivity = Instance->activity->clazz;
-	jclass ClassNativeActivity = lJNIEnv->GetObjectClass(lNativeActivity);
-
-	// Retrieves Context.INPUT_METHOD_SERVICE.
-	jclass ClassContext = lJNIEnv->FindClass("android/content/Context");
-	jfieldID FieldINPUT_METHOD_SERVICE =
-			lJNIEnv->GetStaticFieldID(ClassContext,
-									  "INPUT_METHOD_SERVICE", "Ljava/lang/String;");
-	jobject INPUT_METHOD_SERVICE =
-			lJNIEnv->GetStaticObjectField(ClassContext,
-										  FieldINPUT_METHOD_SERVICE);
-	//jniCheck(INPUT_METHOD_SERVICE);
-
-	// Runs getSystemService(Context.INPUT_METHOD_SERVICE).
-	jclass ClassInputMethodManager = lJNIEnv->FindClass(
-			"android/view/inputmethod/InputMethodManager");
-	jmethodID MethodGetSystemService = lJNIEnv->GetMethodID(
-			ClassNativeActivity, "getSystemService",
-			"(Ljava/lang/String;)Ljava/lang/Object;");
-	jobject lInputMethodManager = lJNIEnv->CallObjectMethod(
-			lNativeActivity, MethodGetSystemService,
-			INPUT_METHOD_SERVICE);
-
-	// Runs getWindow().getDecorView().
-	jmethodID MethodGetWindow = lJNIEnv->GetMethodID(
-			ClassNativeActivity, "getWindow",
-			"()Landroid/view/Window;");
-	jobject lWindow = lJNIEnv->CallObjectMethod(lNativeActivity,
-												MethodGetWindow);
-	jclass ClassWindow = lJNIEnv->FindClass(
-			"android/view/Window");
-	jmethodID MethodGetDecorView = lJNIEnv->GetMethodID(
-			ClassWindow, "getDecorView", "()Landroid/view/View;");
-	jobject lDecorView = lJNIEnv->CallObjectMethod(lWindow,
-												   MethodGetDecorView);
-
-	if (visible) {
-		// Runs lInputMethodManager.showSoftInput(...).
-		jmethodID MethodShowSoftInput = lJNIEnv->GetMethodID(
-				ClassInputMethodManager, "showSoftInput",
-				"(Landroid/view/View;I)Z");
-		jboolean lResult = lJNIEnv->CallBooleanMethod(
-				lInputMethodManager, MethodShowSoftInput,
-				lDecorView, lFlags);
-	} else {
-		// Runs lWindow.getViewToken()
-		jclass ClassView = lJNIEnv->FindClass(
-				"android/view/View");
-		jmethodID MethodGetWindowToken = lJNIEnv->GetMethodID(
-				ClassView, "getWindowToken", "()Landroid/os/IBinder;");
-		jobject lBinder = lJNIEnv->CallObjectMethod(lDecorView,
-													MethodGetWindowToken);
-
-		// lInputMethodManager.hideSoftInput(...).
-		jmethodID MethodHideSoftInput = lJNIEnv->GetMethodID(
-				ClassInputMethodManager, "hideSoftInputFromWindow",
-				"(Landroid/os/IBinder;I)Z");
-		jboolean lRes = lJNIEnv->CallBooleanMethod(
-				lInputMethodManager, MethodHideSoftInput,
-				lBinder, lFlags);
-	}
-
-	// Finished with the JVM.
-	lJavaVM->DetachCurrentThread();
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 SystemAndroid::SystemAndroid(const std::string& appname) :
 	mAppName(appname)
 {
 	Instance->userData = this;
-	//mScale = scale;
 
 	lastWidth = Width;
 	lastHeight = Height;
@@ -690,16 +512,22 @@ std::string SystemAndroid::getAppFolder() const
 	return Instance->activity->internalDataPath;
 }
 
-JNIEnv* GetJNIEnv(){
-    auto jvm = SystemAndroid::Instance->activity->vm;
-    JNIEnv* env;
-    int getEnvStat = jvm->GetEnv((void **)&env, JNI_VERSION_1_6);
-    switch(getEnvStat){
-        case JNI_OK:
-            return env;
-        case JNI_EDETACHED:
-            return env;
-    }
+void SystemAndroid::showVirtualKeyboard()
+{
+    auto env = getEnv();
+    auto clazz = env->GetObjectClass(gSkyActivity);
+    auto method = env->GetMethodID(clazz, "showKeyboard", "()V");
+    env->CallVoidMethod(gSkyActivity, method);
+    env->DeleteLocalRef(clazz);
+}
+
+void SystemAndroid::hideVirtualKeyboard()
+{
+    auto env = getEnv();
+    auto clazz = env->GetObjectClass(gSkyActivity);
+    auto method = env->GetMethodID(clazz, "hideKeyboard", "()V");
+    env->CallVoidMethod(gSkyActivity, method);
+    env->DeleteLocalRef(clazz);
 }
 
 void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallback>& products)
@@ -738,7 +566,7 @@ void SystemAndroid::purchase(const std::string& product)
     env->DeleteLocalRef(clazz);
 }
 
-JNIEnv* SystemAndroid::getEnv() const
+JNIEnv* SystemAndroid::getEnv()
 {
     auto jvm = Instance->activity->vm;
     auto env = Instance->activity->env;

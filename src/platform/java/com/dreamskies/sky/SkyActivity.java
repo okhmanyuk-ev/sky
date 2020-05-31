@@ -3,10 +3,14 @@ package com.dreamskies.sky;
 import android.app.NativeActivity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -51,7 +55,21 @@ public class SkyActivity extends NativeActivity {
 
     private native void onConsume(String id);
 
-    // ------------------
+    // keyboard
+
+    public void showKeyboard() {
+        View view = getWindow().getDecorView();
+        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.showSoftInput(view, 0);
+    }
+
+    public void hideKeyboard() {
+        View view = getWindow().getDecorView();
+        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    // billing
 
     private BillingClient mBillingClient;
     private Map<String, SkuDetails> mSkuDetails = new HashMap<>();

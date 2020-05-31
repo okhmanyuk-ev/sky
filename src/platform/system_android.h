@@ -49,15 +49,15 @@ namespace Platform
 		std::string getAppName() const override;
 		std::string getAppFolder() const override;
 
-		void showVirtualKeyboard() override { setKeyboardVisible(true); };
-		void hideVirtualKeyboard() override { setKeyboardVisible(false); };
+		void showVirtualKeyboard() override;
+		void hideVirtualKeyboard() override;
 		bool isVirtualKeyboardOpened() const override { return false; }; // TODO
 
 		void initializeBilling(const ProductsMap& products) override;
 		void purchase(const std::string& product) override;
 
 	private:
-		JNIEnv* getEnv() const;
+        static JNIEnv* getEnv();
 
 	public:
 		static void handle_cmd(android_app* app, int32_t cmd);
@@ -75,13 +75,12 @@ namespace Platform
 		int lastWidth = 0;
 		int lastHeight = 0;
 
-		static void calcScale();
+		static void setupScale();
 		static int getUnicode(AInputEvent* event);
 
 		inline static int Width = 0;
 		inline static int Height = 0;
 		inline static float Scale = 1.0f;
-		static void setKeyboardVisible(bool visible);
 
 	private:
 		bool mQuited = false;
