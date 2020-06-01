@@ -8,9 +8,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.renderscript.ScriptGroup;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -40,7 +45,7 @@ public class SkyActivity extends NativeActivity {
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         createSkyActivity();
-
+        initKeyboard();
         hideSystemUI();
     }
 
@@ -57,16 +62,44 @@ public class SkyActivity extends NativeActivity {
 
     // keyboard
 
+    private EditText mEditText;
+
+    private native void onKeyboardTextChanged(String text);
+
+    private void initKeyboard() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        mEditText = new EditText(this);
+        mEditText.setFocusable(true);
+        mEditText.setFocusableInTouchMode(true);
+        mEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                onKeyboardTextChanged(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // nothing
+            }
+        });
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        addContentView(mEditText, layoutParams);
+    }
+
     public void showKeyboard() {
-        View view = getWindow().getDecorView();
         InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.showSoftInput(view, 0);
+        inputMethodManager.showSoftInput(mEditText, InputMethodManager.SHOW_FORCED);
     }
 
     public void hideKeyboard() {
-        View view = getWindow().getDecorView();
         InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        inputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
     }
 
     // billing

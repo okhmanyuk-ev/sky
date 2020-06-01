@@ -8,17 +8,17 @@ static System::ProductsMap productsMap;
 
 extern "C"
 {
-    void Java_com_dreamskies_sky_SkyActivity_createSkyActivity(JNIEnv *env, jobject thiz)
+    void Java_com_dreamskies_sky_SkyActivity_createSkyActivity(JNIEnv* env, jobject thiz)
     {
         gSkyActivity = env->NewGlobalRef(thiz);
     }
 
-    void Java_com_dreamskies_sky_SkyActivity_destroySkyActivity(JNIEnv *env, jobject thiz)
+    void Java_com_dreamskies_sky_SkyActivity_destroySkyActivity(JNIEnv* env, jobject thiz)
     {
         env->DeleteGlobalRef(gSkyActivity);
     }
 
-    void Java_com_dreamskies_sky_SkyActivity_onConsume(JNIEnv *env, jobject thiz, jstring _id)
+    void Java_com_dreamskies_sky_SkyActivity_onConsume(JNIEnv* env, jobject thiz, jstring _id)
 	{
         auto id = env->GetStringUTFChars(_id, 0);
 
@@ -27,6 +27,12 @@ extern "C"
 
         productsMap.at(id)();
 	}
+
+	void Java_com_dreamskies_sky_SkyActivity_onKeyboardTextChanged(JNIEnv* env, jobject thiz, jstring text)
+    {
+        auto _text = env->GetStringUTFChars(text, 0);
+        // TODO: complete
+    }
 }
 
 namespace
