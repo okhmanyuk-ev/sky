@@ -5,6 +5,8 @@ using namespace Platform;
 
 static jobject gSkyActivity = nullptr;
 static System::ProductsMap productsMap;
+static std::string virtualKeyboardText;
+static bool gInitialized = false;
 
 extern "C"
 {
@@ -30,14 +32,16 @@ extern "C"
 
 	void Java_com_dreamskies_sky_SkyActivity_onKeyboardTextChanged(JNIEnv* env, jobject thiz, jstring text)
     {
-        auto _text = env->GetStringUTFChars(text, 0);
-        // TODO: complete
-    }
-}
+		virtualKeyboardText = env->GetStringUTFChars(text, 0);
 
-namespace
-{
-    bool initialized = false;
+		if (gInitialized)
+			EVENT->emit(Platform::System::VirtualKeyboardTextChanged({ virtualKeyboardText }));
+    }
+
+	void Java_com_dreamskies_sky_SkyActivity_onKeyboardEnterPressed(JNIEnv* env, jobject thiz)
+	{
+		EVENT->emit(Platform::System::VirtualKeyboardEnterPressed());
+	}
 }
 
 std::shared_ptr<System> System::create(const std::string& appname)
@@ -57,7 +61,7 @@ void android_main(android_app* app)
 	ANativeActivity_setWindowFlags(app->activity, AWINDOW_FLAG_KEEP_SCREEN_ON |
 		AWINDOW_FLAG_FULLSCREEN, 0);
 
-	while (!initialized)
+	while (!gInitialized)
 	{
 		if (app->destroyRequested != 0)
 			return;
@@ -262,7 +266,7 @@ int32_t SystemAndroid::handle_key_event(android_app* app, AInputEvent* event)
 	e.key = translateKey(AKeyEvent_getKeyCode(event));
 	e.asciiChar = getUnicode(event);
 
-	EVENT->emit(e);
+	//EVENT->emit(e); // new keyboard events
 
 	if (e.key == Keyboard::Key::Escape)
 		return 1;
@@ -328,7 +332,7 @@ void SystemAndroid::handle_cmd(android_app* app, int32_t cmd)
 
             setupScale();
 
-			initialized = true;
+			gInitialized = true;
 
 			if (app->userData != nullptr)
 				EVENT->emit(InitWindowEvent());
@@ -534,6 +538,28 @@ void SystemAndroid::hideVirtualKeyboard()
     auto method = env->GetMethodID(clazz, "hideKeyboard", "()V");
     env->CallVoidMethod(gSkyActivity, method);
     env->DeleteLocalRef(clazz);
+}
+
+bool SystemAndroid::isVirtualKeyboardOpened() const
+{
+	return false; // TODO
+}
+
+std::string SystemAndroid::getVirtualKeyboardText() const
+{
+	return virtualKeyboardText;
+}
+
+void SystemAndroid::setVirtualKeyboardText(const std::string& text)
+{
+	auto env = getEnv();
+
+	auto clazz = env->GetObjectClass(gSkyActivity);
+	auto method = env->GetMethodID(clazz, "setKeyboardText", "(Ljava/lang/String;)V");
+	auto _text = env->NewStringUTF(text.c_str());
+	env->CallVoidMethod(gSkyActivity, method, _text);
+	env->DeleteLocalRef(_text);
+	env->DeleteLocalRef(clazz);
 }
 
 void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallback>& products)

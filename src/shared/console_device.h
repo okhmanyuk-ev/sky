@@ -27,7 +27,9 @@ namespace Shared
 	class ConsoleDevice : public Console::Device, 
 		public Common::FrameSystem::Frameable,
 		public Common::EventSystem::Listenable<Platform::Keyboard::Event>,
-		public Common::EventSystem::Listenable<TouchEmulator::Event>
+		public Common::EventSystem::Listenable<TouchEmulator::Event>,
+		public Common::EventSystem::Listenable<Platform::System::VirtualKeyboardTextChanged>,
+		public Common::EventSystem::Listenable<Platform::System::VirtualKeyboardEnterPressed>
 	{
 	public:
 		enum class State
@@ -80,9 +82,12 @@ namespace Shared
 		void showCandidates(float height, float top);
 		void showFastLogs();
 		void drawText(const Text& text, glm::vec4 colorMultiplier = { 1.0f, 1.0f, 1.0f, 1.0f });
+		void enterInput();
 
 		void event(const Platform::Keyboard::Event& e) override;
 		void event(const TouchEmulator::Event& e) override;
+		void event(const Platform::System::VirtualKeyboardTextChanged& e) override;
+		void event(const Platform::System::VirtualKeyboardEnterPressed& e) override;
 		
 		void handleInputCompletion(ImGuiTextEditCallbackData* data);
 		void handleInputHistory(ImGuiTextEditCallbackData* data);

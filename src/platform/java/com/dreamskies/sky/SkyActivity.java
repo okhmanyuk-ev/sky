@@ -11,11 +11,14 @@ import android.renderscript.ScriptGroup;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -65,6 +68,7 @@ public class SkyActivity extends NativeActivity {
     private EditText mEditText;
 
     private native void onKeyboardTextChanged(String text);
+    private native void onKeyboardEnterPressed();
 
     private void initKeyboard() {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -72,6 +76,7 @@ public class SkyActivity extends NativeActivity {
         mEditText = new EditText(this);
         mEditText.setFocusable(true);
         mEditText.setFocusableInTouchMode(true);
+        mEditText.setSingleLine();
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -88,6 +93,16 @@ public class SkyActivity extends NativeActivity {
                 // nothing
             }
         });
+        mEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    onKeyboardEnterPressed();
+                    return true;
+                }
+                return false;
+            }
+        });
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         addContentView(mEditText, layoutParams);
     }
@@ -100,6 +115,11 @@ public class SkyActivity extends NativeActivity {
     public void hideKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+    }
+
+    public void setKeyboardText(String text) {
+        mEditText.setText(text);
+        mEditText.setSelection(text.length());
     }
 
     // billing

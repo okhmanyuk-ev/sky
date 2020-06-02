@@ -149,13 +149,14 @@ void ConsoleDevice::frame()
 	ImGui::EndChild();
 
 	static auto filterLetters = [](ImGuiTextEditCallbackData* data) {
+	    auto thiz = (ConsoleDevice*)data->UserData;
 		if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackCompletion)
 		{
-			((ConsoleDevice*)data->UserData)->handleInputCompletion(data);
+            thiz->handleInputCompletion(data);
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackHistory)
 		{
-			((ConsoleDevice*)data->UserData)->handleInputHistory(data);
+            thiz->handleInputHistory(data);
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackCharFilter)
 		{
@@ -168,15 +169,16 @@ void ConsoleDevice::frame()
 			if (data->EventChar == '~')
 				return 1;
 
-			((ConsoleDevice*)data->UserData)->mInputState = ConsoleDevice::InputState::Standart;
+            thiz->mInputState = ConsoleDevice::InputState::Standart;
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackAlways)
 		{
-			if (((ConsoleDevice*)data->UserData)->mNeedToComplete)
+			if (thiz->mNeedToComplete)
 			{
-				((ConsoleDevice*)data->UserData)->handleInputCompletion(data);
-				((ConsoleDevice*)data->UserData)->mNeedToComplete = false;
+                thiz->handleInputCompletion(data);
+                thiz->mNeedToComplete = false;
 			}
+			// TODO: in mobile platform set caret to end here
 		}
 
 		return 0;
@@ -184,24 +186,24 @@ void ConsoleDevice::frame()
 
 	ImGui::PushItemWidth(-1);
 
-	if (ImGui::InputText("Input", mInputText, sizeof(mInputText), ImGuiInputTextFlags_EnterReturnsTrue |
-		ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_CallbackCompletion |
-		ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackAlways, filterLetters, this))
+	int input_flags =
+		ImGuiInputTextFlags_EnterReturnsTrue |
+		ImGuiInputTextFlags_CallbackCharFilter |
+		ImGuiInputTextFlags_CallbackCompletion |
+		ImGuiInputTextFlags_CallbackHistory |
+		ImGuiInputTextFlags_CallbackAlways;
+
+#if defined(PLATFORM_MOBILE)
+	input_flags |= ImGuiInputTextFlags_ReadOnly;
+#endif
+
+	if (ImGui::InputText("Input", mInputText, sizeof(mInputText), input_flags, filterLetters, this))
 	{
-		if (mInputState == InputState::Candidates)
-		{
-			mNeedToComplete = true;
-		}
-		else
-		{
-			std::string line(mInputText);
-			mInputText[0] = 0x00;
-			mInputHistory.push_back(line);
-			mInputHistoryPos = static_cast<int>(mInputHistory.size());
-			writeLine("] " + line);
-			EVENT->emit(ReadEvent({ line }));
-		}
+		enterInput();
 	}
+
+	if (ImGui::IsItemClicked())
+		PLATFORM->showVirtualKeyboard();
 
 	ImGui::PopItemWidth();
 	ImGui::SetKeyboardFocusHere();
@@ -257,9 +259,13 @@ void ConsoleDevice::showCandidates(float height, float top)
 
 		if (mCheckMouseForCandidates && ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 		{
+		#if defined(PLATFORM_MOBILE)
+			PLATFORM->setVirtualKeyboardText(candidate.name);
+		#else
 			mInputState = InputState::Candidates;
 			mSelectedCandidate = i;
 			mNeedToComplete = true;
+		#endif
 		}
 
 		if (auto args = candidate.args; !args.empty())
@@ -379,6 +385,24 @@ void ConsoleDevice::drawText(const Text& text, glm::vec4 colorMultiplier)
 		ImGui::SameLine();
 }
 
+void ConsoleDevice::enterInput()
+{
+	if (mInputState == InputState::Candidates)
+	{
+		mNeedToComplete = true;
+	}
+	else
+	{
+		std::string line(mInputText);
+		PLATFORM->setVirtualKeyboardText("");
+		mInputText[0] = 0x00;
+		mInputHistory.push_back(line);
+		mInputHistoryPos = static_cast<int>(mInputHistory.size());
+		writeLine("] " + line);
+		EVENT->emit(ReadEvent({ line }));
+	}
+}
+
 void ConsoleDevice::event(const Platform::Keyboard::Event& e)
 {
 	if (e.type == Platform::Keyboard::Event::Type::Pressed && e.key == Platform::Keyboard::Key::Tilde)
@@ -402,6 +426,16 @@ void ConsoleDevice::event(const TouchEmulator::Event& e)
 	}
 }
 
+void ConsoleDevice::event(const Platform::System::VirtualKeyboardTextChanged& e)
+{
+	strcpy(mInputText, e.text.c_str());
+}
+
+void ConsoleDevice::event(const Platform::System::VirtualKeyboardEnterPressed& e)
+{
+	enterInput();
+}
+
 void ConsoleDevice::handleInputCompletion(ImGuiTextEditCallbackData* data)
 {
 	if (mInputState != InputState::Candidates)
@@ -409,8 +443,7 @@ void ConsoleDevice::handleInputCompletion(ImGuiTextEditCallbackData* data)
 
 	auto s = mCandidates[mSelectedCandidate].name;
 
-	memcpy(data->Buf, s.data(), s.size());
-	data->Buf[s.size()] = 0x00;
+	strcpy(data->Buf, s.c_str()); // TODO: confirm in win32
 	data->CursorPos = data->SelectionStart = data->SelectionEnd = data->BufTextLen = static_cast<int>(s.size());
 	data->BufDirty = true;
 	mInputState = InputState::Completion;

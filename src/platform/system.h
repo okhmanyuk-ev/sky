@@ -27,6 +27,13 @@ namespace Platform
 			int height;
 		};
 
+		struct VirtualKeyboardTextChanged
+		{
+			std::string text;
+		};
+
+		struct VirtualKeyboardEnterPressed { };
+
 	public:
 		virtual void process() = 0;
 		virtual void quit() = 0;
@@ -54,6 +61,9 @@ namespace Platform
 		virtual void showVirtualKeyboard() = 0;
 		virtual void hideVirtualKeyboard() = 0;
 		virtual bool isVirtualKeyboardOpened() const = 0;
+
+		virtual std::string getVirtualKeyboardText() const = 0;
+		virtual void setVirtualKeyboardText(const std::string& text) = 0;
 
 	public:        
 		float getLogicalWidth() const;
