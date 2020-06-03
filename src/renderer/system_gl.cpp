@@ -207,7 +207,7 @@ SystemGL::SystemGL()
 	});
     #elif defined(PLATFORM_IOS)
     auto window = Platform::SystemIos::Window;
-    auto rootViewController = [window rootViewController];
+    auto rootView = [[window rootViewController] view];
     mGLKView = [[GLKView alloc] initWithFrame:[window frame]];
     [mGLKView setContext:[[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES3]];
     [mGLKView setDrawableColorFormat:GLKViewDrawableColorFormatRGBA8888];
@@ -216,7 +216,7 @@ SystemGL::SystemGL()
     [mGLKView setDrawableMultisample:GLKViewDrawableMultisampleNone];
     [mGLKView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
     [EAGLContext setCurrentContext:mGLKView.context];
-    [rootViewController setView:mGLKView];
+    [rootView addSubview:mGLKView];
     #endif
 #endif
 

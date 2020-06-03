@@ -72,6 +72,25 @@ using namespace Platform;
 }
 @end
 
+@interface ViewController : UIViewController<UITextFieldDelegate>
+
+@end
+
+@implementation ViewController
+
+-(void)textFieldDidChange:(UITextField*)textField
+{
+    EVENT->emit(System::VirtualKeyboardTextChanged({ std::string(textField.text.UTF8String) }));
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    EVENT->emit(System::VirtualKeyboardEnterPressed());
+    return NO;
+}
+
+@end
+
 // entry point
 
 int main(int argc, char * argv[]) {
@@ -95,26 +114,20 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
     Window = [[UIWindow alloc]initWithFrame:bounds];
     [Window makeKeyAndVisible];
     
-    [Window setRootViewController: [[UIViewController alloc] init]];
+    auto rootViewController = [[ViewController alloc] init];
+    [Window setRootViewController: rootViewController];
+    
+    auto rootView = [[UIView alloc] initWithFrame:Window.frame];
+    [rootView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+    [rootViewController setView:rootView];
     
     mTextField = [[UITextField alloc] init];
-    [Window addSubview:mTextField];
-    
-    /*-(void)textFieldDidChange:(UITextField *) textField
-    {
-        auto c = textField.text;
-        textField.text = @"";
-        auto e = Platform::Keyboard::Event();
-        
-        e.asciiChar = std::string([c UTF8String])[0];
-        e.key = Platform::Keyboard::Key::None;
-
-        e.type = Platform::Keyboard::Event::Type::Pressed;
-        EVENT->emit(e);
-        
-        e.type = Platform::Keyboard::Event::Type::Released;
-        EVENT->emit(e);
-    }*/
+    [mTextField setDelegate:rootViewController];
+    [mTextField setKeyboardType:UIKeyboardTypeDefault];
+    [mTextField setReturnKeyType:UIReturnKeyDone];
+    [mTextField setSmartInsertDeleteType:UITextSmartInsertDeleteTypeYes];
+    [mTextField addTarget:rootViewController action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
+    [rootView addSubview:mTextField];
 }
 
 SystemIos::~SystemIos()
@@ -145,6 +158,17 @@ void SystemIos::hideVirtualKeyboard()
 bool SystemIos::isVirtualKeyboardOpened() const
 {
     return [mTextField isFirstResponder];
+}
+
+std::string SystemIos::getVirtualKeyboardText() const
+{
+    return [[mTextField text] UTF8String];
+}
+
+void SystemIos::setVirtualKeyboardText(const std::string& text)
+{
+    [mTextField setText:[NSString stringWithUTF8String:text.c_str()]];
+    EVENT->emit(System::VirtualKeyboardTextChanged({ text }));
 }
 
 void SystemIos::refreshDimensions()
