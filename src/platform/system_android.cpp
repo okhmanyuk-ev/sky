@@ -4,8 +4,8 @@
 using namespace Platform;
 
 static jobject gSkyActivity = nullptr;
-static System::ProductsMap productsMap;
-static std::string virtualKeyboardText;
+static System::ProductsMap gProductsMap;
+static std::string gVirtualKeyboardText;
 static bool gInitialized = false;
 
 extern "C"
@@ -24,18 +24,18 @@ extern "C"
 	{
         auto id = env->GetStringUTFChars(_id, 0);
 
-        if (productsMap.count(id) == 0)
+        if (gProductsMap.count(id) == 0)
             return;
 
-        productsMap.at(id)();
+		gProductsMap.at(id)();
 	}
 
 	void Java_com_dreamskies_sky_SkyActivity_onKeyboardTextChanged(JNIEnv* env, jobject thiz, jstring text)
     {
-		virtualKeyboardText = env->GetStringUTFChars(text, 0);
+		gVirtualKeyboardText = env->GetStringUTFChars(text, 0);
 
 		if (gInitialized)
-			EVENT->emit(Platform::System::VirtualKeyboardTextChanged({ virtualKeyboardText }));
+			EVENT->emit(Platform::System::VirtualKeyboardTextChanged({ gVirtualKeyboardText }));
     }
 
 	void Java_com_dreamskies_sky_SkyActivity_onKeyboardEnterPressed(JNIEnv* env, jobject thiz)
@@ -547,7 +547,7 @@ bool SystemAndroid::isVirtualKeyboardOpened() const
 
 std::string SystemAndroid::getVirtualKeyboardText() const
 {
-	return virtualKeyboardText;
+	return gVirtualKeyboardText;
 }
 
 void SystemAndroid::setVirtualKeyboardText(const std::string& text)
@@ -564,7 +564,7 @@ void SystemAndroid::setVirtualKeyboardText(const std::string& text)
 
 void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallback>& products)
 {
-    productsMap = products;
+    gProductsMap = products;
 
     auto env = getEnv();
 

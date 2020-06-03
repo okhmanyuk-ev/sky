@@ -16,7 +16,7 @@ namespace Platform
 	class SystemAndroid : public System
 	{
 	public:
-		struct PauseEvent {};
+		struct PauseEvent {}; // TODO: move this to Platform::System and make more common (eg. MinimizeEvent, MaximizeEvent)
 		struct ResumeEvent {};
 		struct InitWindowEvent {};
 		struct TerminateWindowEvent {};

@@ -100,7 +100,7 @@ void ConsoleDevice::frame()
 
 	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoDecoration);
 	
-#if defined(PLATFORM_MOBILE) // TODO: make adaptive to keyboard
+#if defined(PLATFORM_MOBILE)
 	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.25f));
 #else
 	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.75f));
@@ -169,7 +169,7 @@ void ConsoleDevice::frame()
 			if (data->EventChar == '~')
 				return 1;
 
-            thiz->mInputState = ConsoleDevice::InputState::Standart;
+            thiz->mInputState = InputState::Text;
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackAlways)
 		{
@@ -178,7 +178,6 @@ void ConsoleDevice::frame()
                 thiz->handleInputCompletion(data);
                 thiz->mNeedToComplete = false;
 			}
-			// TODO: in mobile platform set caret to end here
 		}
 
 		return 0;
@@ -207,9 +206,14 @@ void ConsoleDevice::frame()
 
 	ImGui::PopItemWidth();
 	ImGui::SetKeyboardFocusHere();
+
+	auto closeButtonY = ImGui::GetWindowHeight();
+
 	ImGui::End();
 	showCandidates(height, top);
 	ImGui::PopStyleVar(2);
+
+	showCloseButton(closeButtonY);
 
 	style.ScrollbarSize = prevscrollsize;
 }
@@ -261,6 +265,7 @@ void ConsoleDevice::showCandidates(float height, float top)
 		{
 		#if defined(PLATFORM_MOBILE)
 			PLATFORM->setVirtualKeyboardText(candidate.name);
+			mInputState = InputState::Completion;
 		#else
 			mInputState = InputState::Candidates;
 			mSelectedCandidate = i;
@@ -315,6 +320,32 @@ void ConsoleDevice::showFastLogs()
 	}
 
 	ImGui::End();
+}
+
+void ConsoleDevice::showCloseButton(float pos_y)
+{
+	if (mState != State::Opened)
+		return;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
+
+	ImGui::Begin("ConsoleCloseButton", nullptr, ImGuiWindowFlags_NoDecoration);
+	ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10.0f, pos_y + 4.0f));
+
+	ImGui::Button("Close");
+
+	if (mCheckMouseForClose && ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
+	{
+		close();
+	}
+
+	mCheckMouseForClose = false;
+
+	ImGui::End();
+	
+	ImGui::PopStyleVar(3);
 }
 
 void ConsoleDevice::drawText(const Text& text, glm::vec4 colorMultiplier)
@@ -423,12 +454,14 @@ void ConsoleDevice::event(const TouchEmulator::Event& e)
 	if (e.type == TouchEmulator::Event::Type::End)
 	{
 		mCheckMouseForCandidates = true;
+		mCheckMouseForClose = true;
 	}
 }
 
 void ConsoleDevice::event(const Platform::System::VirtualKeyboardTextChanged& e)
 {
 	strcpy(mInputText, e.text.c_str());
+	mInputState = InputState::Text;
 }
 
 void ConsoleDevice::event(const Platform::System::VirtualKeyboardEnterPressed& e)
@@ -443,7 +476,7 @@ void ConsoleDevice::handleInputCompletion(ImGuiTextEditCallbackData* data)
 
 	auto s = mCandidates[mSelectedCandidate].name;
 
-	strcpy(data->Buf, s.c_str()); // TODO: confirm in win32
+	strcpy(data->Buf, s.c_str());
 	data->CursorPos = data->SelectionStart = data->SelectionEnd = data->BufTextLen = static_cast<int>(s.size());
 	data->BufDirty = true;
 	mInputState = InputState::Completion;
@@ -548,7 +581,7 @@ std::vector<ConsoleDevice::Candidate> ConsoleDevice::getCandidates(const std::st
 		result.push_back(candidate);
 	}
 
-	for (auto& [name, value] : CONSOLE->getAliases()) // TODO: fix
+	for (auto& [name, value] : CONSOLE->getAliases())
 	{
 		if (name.find(match) == std::string::npos)
 			continue;
@@ -591,6 +624,7 @@ void ConsoleDevice::close()
 
 void ConsoleDevice::open()
 {
+    PLATFORM->setVirtualKeyboardText("");
 	PLATFORM->showVirtualKeyboard();
 
 	mState = State::Opening;

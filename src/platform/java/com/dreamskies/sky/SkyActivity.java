@@ -117,9 +117,14 @@ public class SkyActivity extends NativeActivity {
         inputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
     }
 
-    public void setKeyboardText(String text) {
-        mEditText.setText(text);
-        mEditText.setSelection(text.length());
+    public void setKeyboardText(final String text) {
+        runOnUiThread(new Runnable() { // TODO: make without runOnUiThread
+            @Override
+            public void run() {
+                mEditText.setText(text);
+                mEditText.setSelection(text.length());
+            }
+        });
     }
 
     // billing

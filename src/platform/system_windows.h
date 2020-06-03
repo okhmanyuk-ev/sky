@@ -51,6 +51,9 @@ namespace Platform
 		void hideVirtualKeyboard() override { /*nothing*/ };
 		bool isVirtualKeyboardOpened() const override { return false; };
 
+		std::string getVirtualKeyboardText() const override { return ""; };
+		void setVirtualKeyboardText(const std::string& text) override { /*nothing*/ };
+
 		void initializeBilling(const ProductsMap& products) override;
 		void purchase(const std::string& product) override;
 

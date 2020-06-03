@@ -43,7 +43,7 @@ namespace Shared
 		enum class InputState
 		{
 			None,
-			Standart, // enter from keyboard
+			Text, // enter from keyboard
 			Candidates, // choosing between candidates
 			History, // choosing between history
 			Completion // just completed from candidates
@@ -81,6 +81,7 @@ namespace Shared
 		void frame() override;
 		void showCandidates(float height, float top);
 		void showFastLogs();
+		void showCloseButton(float pos_y);
 		void drawText(const Text& text, glm::vec4 colorMultiplier = { 1.0f, 1.0f, 1.0f, 1.0f });
 		void enterInput();
 
@@ -127,6 +128,7 @@ namespace Shared
 		int mSelectedCandidate = 0;
 		bool mNeedToComplete = false;
 		bool mCheckMouseForCandidates = false;
+		bool mCheckMouseForClose = false;
 		bool mCheckScrollForCandidates = false;
 		InputState mInputState = InputState::None;
 		bool mEnabled = true;
