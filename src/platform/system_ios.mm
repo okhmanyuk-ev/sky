@@ -192,4 +192,9 @@ void SystemIos::refreshDimensions()
     }
 }
 
+std::string SystemIos::getAppFolder() const
+{
+    return std::string([NSHomeDirectory() UTF8String]) + "/Documents/";
+}
+
 #endif

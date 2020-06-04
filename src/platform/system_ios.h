@@ -35,7 +35,7 @@ namespace Platform
         void setCursorPos(int x, int y) override { /* nothing */ }
         
         std::string getAppName() const override { return mAppName; }
-        std::string getAppFolder() const override { return ""; }
+        std::string getAppFolder() const override;
         
         void showVirtualKeyboard() override;
         void hideVirtualKeyboard() override;

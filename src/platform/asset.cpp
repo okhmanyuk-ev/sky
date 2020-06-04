@@ -48,12 +48,12 @@ Asset::Asset(const std::string& path, Path pathType)
 	file.close();
 #elif defined(PLATFORM_IOS)
     auto p = path;
-    auto ios_path = std::string([[[NSBundle mainBundle] bundlePath] UTF8String]);
     
     if (pathType == Path::Relative)
+    {
+        auto ios_path = std::string([[[NSBundle mainBundle] bundlePath] UTF8String]);
         p = ios_path + "/assets/" + p;
-    else
-        p = ios_path + "/" + p;
+    }
 
     std::ifstream file(p, std::ios::in | std::ios::binary);
     file.seekg(0, file.end);
@@ -106,11 +106,7 @@ void Asset::Write(const std::string& path, void* memory, size_t size, Path pathT
     assert(pathType == Path::Absolute);
     
     auto p = path;
-    auto ios_path = std::string([[[NSBundle mainBundle] bundlePath] UTF8String]);
-    p = ios_path + "/" + p;
 
-    //std::filesystem::create_directories(std::filesystem::path(p).remove_filename().string());
-    
     std::ofstream file(p, std::ios::out | std::ios::binary);
     file.write((char*)memory, size);
     file.close();
@@ -143,12 +139,12 @@ bool Asset::Exists(const std::string& path, Path pathType)
 	}
 #elif defined(PLATFORM_IOS)
     auto p = path;
-    auto ios_path = std::string([[[NSBundle mainBundle] bundlePath] UTF8String]);
     
     if (pathType == Path::Relative)
+    {
+        auto ios_path = std::string([[[NSBundle mainBundle] bundlePath] UTF8String]);
         p = ios_path + "/assets/" + p;
-    else
-        p = ios_path + "/" + p;
+    }
     
     auto file = std::ifstream(p.c_str());
     return file.good();
