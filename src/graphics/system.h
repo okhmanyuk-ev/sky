@@ -160,8 +160,12 @@ namespace Graphics
 		bool isBatching() const { return mBatching; }
 		void setBatching(bool value);
 
+		auto getSdfSmoothFactor() const { return mSdfSmoothFactor; }
+		void setSdfSmoothFactor(float value) { mSdfSmoothFactor = value; }
+
 	private:
 		bool mBatching = true;
+		float mSdfSmoothFactor = 1.0f;
 		
 	private:
 		std::shared_ptr<Renderer::Shaders::Sdf> mSdfShader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionColorTexture::Layout);

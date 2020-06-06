@@ -511,6 +511,8 @@ void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4&
 	const float outline = glm::lerp(mid, min, fixedOutlineThickness);
 	float smoothFactor = 2.0f / size / PLATFORM->getScale();
 
+	smoothFactor *= mSdfSmoothFactor;
+
 	if (fixedOutlineThickness > 0.0f)
 		drawString(font, mesh, model, outline, mid + (smoothFactor / 2.0f), smoothFactor, outlineColor);
 
