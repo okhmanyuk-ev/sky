@@ -7,8 +7,10 @@ Scrollbox::Scrollbox()
 {
 	setTouchable(true);
 
+	mBounding = std::make_shared<Node>();
 	attach(mBounding);
 
+	mContent = std::make_shared<Node>();
 	mBounding->attach(mContent);
 }
 
@@ -57,9 +59,11 @@ void Scrollbox::update()
 void Scrollbox::touch(Touch type, const glm::vec2& pos)
 {
 	Node::touch(type, pos);
-	
-	if (type == Touch::Continue)
-		mSpeed += (pos - mPrevPosition) / PLATFORM->getScale();
 
-	mPrevPosition = pos;
+	auto local_pos = unproject(pos);
+
+	if (type == Touch::Continue)
+		mSpeed += local_pos - mPrevPosition;
+
+	mPrevPosition = local_pos;
 }
