@@ -17,6 +17,13 @@ namespace Scene
 		void update() override;
 		void draw() override;
 
+	private:
+		void applyTextureWidth();
+		void applyTextureHeight();
+
+	public:
+		void applyTextureSize();
+
 	public:
 		auto getTexture() const { return mTexture; }
 		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexture = value; }

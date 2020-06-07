@@ -235,4 +235,38 @@ namespace Shared::SceneHelpers
 			return particle;
 		}
 	};
+
+	// TODO: can be moved to 'scene'
+	template <typename T> class Adaptive : public T
+	{
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
+
+	protected:
+		void update() override
+		{
+			adapt();
+			T::update();
+		}
+
+	private:
+		void adapt()
+		{
+			if (mAdaptSize.x <= 0.0f)
+				return;
+
+			if (mAdaptSize.y <= 0.0f)
+				return;
+
+			auto scale = mAdaptSize / T::getSize();
+
+			T::setScale(glm::min(scale.x, scale.y));
+		}
+
+	public:
+		auto getAdaptSize() const { return mAdaptSize; }
+		void setAdaptSize(const glm::vec2& value) { mAdaptSize = value; }
+
+	private:
+		glm::vec2 mAdaptSize = { 0.0f, 0.0f };
+	};
 }
