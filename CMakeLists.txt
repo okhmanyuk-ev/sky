@@ -131,6 +131,21 @@ if(APPLE)
 	)
 
 	add_definitions(-DGLES_SILENCE_DEPRECATION)
+elseif(ANDROID)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -frtti -fexceptions -Wno-error=format-security")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+
+	add_library(native_app_glue STATIC ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+	target_include_directories(${PROJECT_NAME} PUBLIC ${ANDROID_NDK}/sources/android/native_app_glue)
+
+	target_link_libraries(${PROJECT_NAME}
+		android
+		native_app_glue
+		EGL
+		GLESv3
+		log
+		m
+	)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)
@@ -166,7 +181,6 @@ target_link_libraries(${PROJECT_NAME} tinyutf8)
 set_property(TARGET tinyutf8 PROPERTY FOLDER ${LIBS_FOLDER})
 
 # fmod
-# TODO: make for all platforms
 
 target_include_directories(${PROJECT_NAME} PUBLIC lib/fmod/include)
 	
@@ -183,7 +197,12 @@ if(WIN32)
 			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmod_vc.lib)
 	endif()
 elseif(ANDROID)
-	#set_target_properties(fmod PROPERTIES IMPORTED_LOCATION lib/fmod/android/${ANDROID_ABI}/libfmod.so)
+	add_library(fmod SHARED IMPORTED)
+
+	set_target_properties(fmod PROPERTIES IMPORTED_LOCATION
+		${PROJECT_SOURCE_DIR}/lib/fmod/android/${ANDROID_ABI}/libfmod.so)
+
+	target_link_libraries(${PROJECT_NAME} fmod)
 elseif(APPLE)
 	target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodL_iphonesimulator.a)
 	target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodL_iphoneos.a)
@@ -210,9 +229,9 @@ function(copy_required_libs TARGET_NAME)
 				$<TARGET_FILE_DIR:${TARGET_NAME}>)
 		endif()
 	elseif(ANDROID)
-	#	add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
-	#		../../../../../../sky/lib/fmod/android/${ANDROID_ABI}/libfmod.so
-	#		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libfmod.so)
+		add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
+			${PROJECT_SOURCE_DIR}/sky/lib/fmod/android/${ANDROID_ABI}/libfmod.so
+			${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libfmod.so)
 	endif()
 endfunction()
 
