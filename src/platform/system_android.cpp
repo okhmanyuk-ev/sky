@@ -22,25 +22,33 @@ extern "C"
 
     void Java_com_dreamskies_sky_SkyActivity_onConsume(JNIEnv* env, jobject thiz, jstring _id)
 	{
-        auto id = env->GetStringUTFChars(_id, 0);
+		auto id = env->GetStringUTFChars(_id, 0);
 
-        if (gProductsMap.count(id) == 0)
-            return;
+    	SystemAndroid::ExecuteInMainLoop([id] {
+			if (gProductsMap.count(id) == 0)
+				return;
 
-		gProductsMap.at(id)();
+			gProductsMap.at(id)();
+    	});
 	}
 
-	void Java_com_dreamskies_sky_SkyActivity_onKeyboardTextChanged(JNIEnv* env, jobject thiz, jstring text)
+	void Java_com_dreamskies_sky_SkyActivity_onKeyboardTextChanged(JNIEnv* env, jobject thiz, jstring _text)
     {
-		gVirtualKeyboardText = env->GetStringUTFChars(text, 0);
+		auto text = env->GetStringUTFChars(_text, 0);
 
-		if (gInitialized)
-			EVENT->emit(Platform::System::VirtualKeyboardTextChanged({ gVirtualKeyboardText }));
+    	SystemAndroid::ExecuteInMainLoop([text] {
+			gVirtualKeyboardText = text;
+
+    		if (gInitialized)
+				EVENT->emit(Platform::System::VirtualKeyboardTextChanged({ gVirtualKeyboardText }));
+    	});
     }
 
 	void Java_com_dreamskies_sky_SkyActivity_onKeyboardEnterPressed(JNIEnv* env, jobject thiz)
 	{
-		EVENT->emit(Platform::System::VirtualKeyboardEnterPressed());
+		SystemAndroid::ExecuteInMainLoop([] {
+			EVENT->emit(Platform::System::VirtualKeyboardEnterPressed());
+		});
 	}
 }
 
@@ -80,7 +88,8 @@ void android_main(android_app* app)
 
 void SystemAndroid::setupScale()
 {
-	auto env = getEnv();
+	auto env = BeginEnv();
+
     auto clazz = env->GetObjectClass(gSkyActivity);
 
     auto getWindowManagerMethod = env->GetMethodID(clazz, "getWindowManager" , "()Landroid/view/WindowManager;");
@@ -96,6 +105,8 @@ void SystemAndroid::setupScale()
     env->CallVoidMethod(display, getMetricsMethod, displayMetrics);
     auto densityField = env->GetFieldID(displayMetricsClass, "density", "F");
 	Scale = env->GetFloatField(displayMetrics, densityField);
+
+	EndEnv();
 }
 
 Keyboard::Key translateKey(int32_t key)
@@ -238,7 +249,7 @@ int SystemAndroid::getUnicode(AInputEvent* event)
     auto flags = AKeyEvent_getFlags(event);
     auto source = AInputEvent_getSource(event);
 
-	auto env = getEnv();
+	auto env = BeginEnv();
 
 	auto keyEventClass = env->FindClass("android/view/KeyEvent");
     auto KeyEventConstructor = env->GetMethodID(keyEventClass, "<init>", "(JJIIIIIIII)V");
@@ -249,6 +260,8 @@ int SystemAndroid::getUnicode(AInputEvent* event)
 
     env->DeleteLocalRef(keyEventClass);
     env->DeleteLocalRef(keyEventObject);
+
+    EndEnv();
 
 	return result;
 }
@@ -495,6 +508,8 @@ void SystemAndroid::process()
 		lastHeight = Height;
 		EVENT->emit(ResizeEvent({ Width, Height }));
 	}
+
+	ProcessNativeCallbacks();
 }
 
 void SystemAndroid::quit()
@@ -524,20 +539,22 @@ std::string SystemAndroid::getAppFolder() const
 
 void SystemAndroid::showVirtualKeyboard()
 {
-    auto env = getEnv();
+    auto env = BeginEnv();
     auto clazz = env->GetObjectClass(gSkyActivity);
     auto method = env->GetMethodID(clazz, "showKeyboard", "()V");
     env->CallVoidMethod(gSkyActivity, method);
     env->DeleteLocalRef(clazz);
+    EndEnv();
 }
 
 void SystemAndroid::hideVirtualKeyboard()
 {
-    auto env = getEnv();
+    auto env = BeginEnv();
     auto clazz = env->GetObjectClass(gSkyActivity);
     auto method = env->GetMethodID(clazz, "hideKeyboard", "()V");
     env->CallVoidMethod(gSkyActivity, method);
     env->DeleteLocalRef(clazz);
+    EndEnv();
 }
 
 bool SystemAndroid::isVirtualKeyboardOpened() const
@@ -552,22 +569,21 @@ std::string SystemAndroid::getVirtualKeyboardText() const
 
 void SystemAndroid::setVirtualKeyboardText(const std::string& text)
 {
-	auto env = getEnv();
-
+	auto env = BeginEnv();
 	auto clazz = env->GetObjectClass(gSkyActivity);
 	auto method = env->GetMethodID(clazz, "setKeyboardText", "(Ljava/lang/String;)V");
 	auto _text = env->NewStringUTF(text.c_str());
 	env->CallVoidMethod(gSkyActivity, method, _text);
 	env->DeleteLocalRef(_text);
 	env->DeleteLocalRef(clazz);
+	EndEnv();
 }
 
 void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallback>& products)
 {
     gProductsMap = products;
 
-    auto env = getEnv();
-
+    auto env = BeginEnv();
     auto list = env->FindClass("java/util/ArrayList");
     auto init = env->GetMethodID(list, "<init>", "()V");
     auto add = env->GetMethodID(list, "add", "(Ljava/lang/Object;)Z");
@@ -585,20 +601,22 @@ void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallbac
 	env->CallVoidMethod(gSkyActivity, method, list_obj);
 	env->DeleteLocalRef(clazz);
 	env->DeleteLocalRef(list_obj);
+	EndEnv();
 }
 
 void SystemAndroid::purchase(const std::string& product)
 {
-    auto env = getEnv();
+    auto env = BeginEnv();
     auto clazz = env->GetObjectClass(gSkyActivity);
     auto method = env->GetMethodID(clazz, "purchase", "(Ljava/lang/String;)V");
     auto str_arg = env->NewStringUTF(product.c_str());
     env->CallVoidMethod(gSkyActivity, method, str_arg);
     env->DeleteLocalRef(str_arg);
     env->DeleteLocalRef(clazz);
+    EndEnv();
 }
 
-JNIEnv* SystemAndroid::getEnv()
+JNIEnv* SystemAndroid::BeginEnv()
 {
     auto jvm = Instance->activity->vm;
     auto env = Instance->activity->env;
@@ -606,6 +624,30 @@ JNIEnv* SystemAndroid::getEnv()
     jvm->AttachCurrentThread(&env, NULL);
 
     return env;
+}
+
+void SystemAndroid::EndEnv()
+{
+	auto jvm = Instance->activity->vm;
+	jvm->DetachCurrentThread();
+}
+
+void SystemAndroid::ExecuteInMainLoop(NativeCallback callback)
+{
+	NativeCallbacksMutex.lock();
+	NativeCallbacks.push_back(callback);
+	NativeCallbacksMutex.unlock();
+}
+
+void SystemAndroid::ProcessNativeCallbacks()
+{
+	NativeCallbacksMutex.lock();
+	for (auto callback : NativeCallbacks)
+	{
+		callback();
+	}
+	NativeCallbacks.clear();
+	NativeCallbacksMutex.unlock();
 }
 
 #endif

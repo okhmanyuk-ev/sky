@@ -11,6 +11,8 @@
 #include <common/frame_system.h>
 #include <common/event_system.h>
 
+#include <mutex>
+
 namespace Platform
 {
 	class SystemAndroid : public System
@@ -59,8 +61,9 @@ namespace Platform
 		void initializeBilling(const ProductsMap& products) override;
 		void purchase(const std::string& product) override;
 
-	private:
-        static JNIEnv* getEnv();
+	public:
+		static JNIEnv* BeginEnv();
+		static void EndEnv();
 
 	public:
 		static void handle_cmd(android_app* app, int32_t cmd);
@@ -87,6 +90,19 @@ namespace Platform
 
 	private:
 		bool mQuited = false;
+
+	private: // mainloop callbacks
+		using NativeCallback = std::function<void()>;
+
+	public:
+		static void ExecuteInMainLoop(NativeCallback callback);
+
+	private:
+		static void ProcessNativeCallbacks();
+
+	private:
+		static inline std::list<NativeCallback> NativeCallbacks;
+		static inline std::mutex NativeCallbacksMutex;
 	};
 }
 #endif

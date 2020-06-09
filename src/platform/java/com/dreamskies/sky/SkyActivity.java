@@ -93,15 +93,12 @@ public class SkyActivity extends NativeActivity {
                 // nothing
             }
         });
-        mEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    onKeyboardEnterPressed();
-                    return true;
-                }
-                return false;
+        mEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                onKeyboardEnterPressed();
+                return true;
             }
+            return false;
         });
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         addContentView(mEditText, layoutParams);
@@ -118,12 +115,9 @@ public class SkyActivity extends NativeActivity {
     }
 
     public void setKeyboardText(final String text) {
-        runOnUiThread(new Runnable() { // TODO: make without runOnUiThread
-            @Override
-            public void run() {
-                mEditText.setText(text);
-                mEditText.setSelection(text.length());
-            }
+        runOnUiThread(() -> {
+            mEditText.setText(text);
+            mEditText.setSelection(text.length());
         });
     }
 
@@ -133,18 +127,15 @@ public class SkyActivity extends NativeActivity {
     private Map<String, SkuDetails> mSkuDetails = new HashMap<>();
 
     public void initializeBilling(final List products) {
-        PurchasesUpdatedListener purchasesUpdatedListener = new PurchasesUpdatedListener() {
-                @Override
-                public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
-                    if (purchases == null)
-                        return;
+        PurchasesUpdatedListener purchasesUpdatedListener = (billingResult, purchases) -> {
+            if (purchases == null)
+                return;
 
-                    if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
-                        return;
+            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                return;
 
-                    consume(purchases);
-                }
-            };
+            consume(purchases);
+        };
 
         mBillingClient = BillingClient.newBuilder(this)
                 .enablePendingPurchases()
@@ -176,17 +167,14 @@ public class SkyActivity extends NativeActivity {
                 .setType(BillingClient.SkuType.INAPP)
                 .build();
 
-        SkuDetailsResponseListener skuDetailsResponseListener = new SkuDetailsResponseListener() {
-                @Override
-                public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-                    if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
-                        return;
+        SkuDetailsResponseListener skuDetailsResponseListener = (billingResult, skuDetailsList) -> {
+            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                return;
 
-                    for (SkuDetails skuDetails : skuDetailsList) {
-                        mSkuDetails.put(skuDetails.getSku(), skuDetails);
-                    }
-                }
-            };
+            for (SkuDetails skuDetails : skuDetailsList) {
+                mSkuDetails.put(skuDetails.getSku(), skuDetails);
+            }
+        };
 
         mBillingClient.querySkuDetailsAsync(params, skuDetailsResponseListener);
     }
@@ -215,15 +203,12 @@ public class SkyActivity extends NativeActivity {
                 .setPurchaseToken(purchase.getPurchaseToken())
                 .build();
 
-        ConsumeResponseListener consumeResponseListener = new ConsumeResponseListener() {
-                @Override
-                public void onConsumeResponse(BillingResult billingResult, String outToken) {
-                    if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
-                        return;
+        ConsumeResponseListener consumeResponseListener = (billingResult, outToken) -> {
+            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+                return;
 
-                    onConsume(purchase.getSku()); // TODO: this call may be unsafe, because consuming was in async state
-                }
-            };
+            onConsume(purchase.getSku());
+        };
 
         mBillingClient.consumeAsync(consumeParams, consumeResponseListener);
     }

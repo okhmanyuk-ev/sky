@@ -16,13 +16,12 @@ System::System()
 	Fmod->getVersion(&version);
 	assert(version == FMOD_VERSION);
 #if defined(PLATFORM_ANDROID)
-	JNIEnv* pEnv = nullptr;
-	Platform::SystemAndroid::Instance->activity->vm->AttachCurrentThread(&pEnv, nullptr);
+	Platform::SystemAndroid::BeginEnv();
 #endif
 	auto result = Fmod->init(32, FMOD_INIT_NORMAL, nullptr);
 	assert(result == FMOD_RESULT::FMOD_OK);
 #if defined(PLATFORM_ANDROID)
-	Platform::SystemAndroid::Instance->activity->vm->DetachCurrentThread();
+	Platform::SystemAndroid::EndEnv();
 #endif
 }
 
