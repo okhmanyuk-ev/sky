@@ -42,7 +42,7 @@ namespace Scene
 			else if (mChoosed)
 			{
 				mChoosed = false;
-				onClick();
+				click();
 				onChooseEnd();
 			}
 		}
@@ -64,6 +64,12 @@ namespace Scene
 		{
 			if (mChooseEndCallback)
 				mChooseEndCallback();
+		}
+
+	public:
+		void click()
+		{
+			onClick();
 		}
 
 	public:
