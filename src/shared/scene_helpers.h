@@ -269,4 +269,25 @@ namespace Shared::SceneHelpers
 	private:
 		glm::vec2 mAdaptSize = { 0.0f, 0.0f };
 	};
+
+	template <typename T> class Backshaded : public T
+	{
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
+
+	protected:
+		void enterDraw() override
+		{
+			T::enterDraw();
+
+			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
+			GRAPHICS->drawRectangle(glm::mat4(1.0f), mBackshadeColor->getColor());
+			GRAPHICS->pop();
+		}
+
+	public:
+		auto getBackshadeColor() const { return mBackshadeColor; }
+
+	private:
+		std::shared_ptr<Scene::Color> mBackshadeColor = std::make_shared<Scene::Color>();
+	};
 }
