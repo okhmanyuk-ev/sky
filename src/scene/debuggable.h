@@ -15,9 +15,9 @@ namespace Scene
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 
 	protected:
-		void endRender() override
+		void leaveDraw() override
 		{
-			T::endRender();
+			T::leaveDraw();
 			
 			auto model = glm::scale(T::getTransform(), { T::getSize(), 1.0f });
 
