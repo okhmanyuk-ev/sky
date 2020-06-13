@@ -21,9 +21,9 @@ namespace Scene
 			mTarget = std::make_shared<Renderer::RenderTarget>(e.width, e.height);
 		}
 
-		void beginRender() override
+		void enterDraw() override
 		{
-			T::beginRender();
+			T::enterDraw();
 
 			// https://stackoverflow.com/questions/2171085/opengl-blending-with-previous-contents-of-framebuffer
 			// http://www.shawnhargreaves.com/blog/premultiplied-alpha-and-image-composition.html
@@ -34,7 +34,7 @@ namespace Scene
 			GRAPHICS->clear();
 		}
 
-		void endRender() override
+		void leaveDraw() override
 		{
 			GRAPHICS->pop(2);
 
@@ -48,7 +48,7 @@ namespace Scene
 			GRAPHICS->drawSprite(mTarget, glm::mat4(1.0f), { }, color);
 			GRAPHICS->pop(2);
 			
-			T::endRender();
+			T::leaveDraw();
 		}
 
 		virtual void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) { }

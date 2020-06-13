@@ -43,8 +43,8 @@ namespace Scene
 		virtual void updateTransform();
 
 	protected:
-		virtual void beginRender();
-		virtual void endRender();
+		virtual void enterDraw();
+		virtual void leaveDraw();
 		virtual void update();
 		virtual void draw();
 		virtual void touch(Touch type, const glm::vec2& pos);

@@ -44,13 +44,13 @@ void Scene::Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
 	if (!node->isTransformReady())
 		return;
 
-	node->beginRender();
+	node->enterDraw();
 	node->draw();
 
 	for (auto _node : node->getNodes())
 		recursiveNodeDraw(_node);
 
-	node->endRender();
+	node->leaveDraw();
 }
 
 bool Scene::Scene::interactTest(const glm::vec2& pos)

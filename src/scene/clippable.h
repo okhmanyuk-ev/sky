@@ -16,9 +16,9 @@ namespace Scene
 		}
 
 	protected:
-		void beginRender() override
+		void enterDraw() override
 		{
-			T::beginRender();
+			T::enterDraw();
 			
 			auto bounds = T::getGlobalBounds();
 
@@ -31,10 +31,11 @@ namespace Scene
 			GRAPHICS->pushScissor(scissor);
 		}
 
-		void endRender() override
+		void leaveDraw() override
 		{
 			GRAPHICS->pop();
-			T::endRender();
+
+			T::leaveDraw();
 		}
 	};
 }

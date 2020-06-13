@@ -135,12 +135,12 @@ void Node::updateTransform()
 	mTransformReady = true;
 }
 
-void Node::beginRender()
+void Node::enterDraw()
 {
 	//
 }
 
-void Node::endRender()
+void Node::leaveDraw()
 {
 	//
 }
