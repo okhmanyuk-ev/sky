@@ -67,7 +67,21 @@ void Trail::draw()
 	}
 
 	auto holder = mHolder.lock();
+
+	auto stencil = Renderer::StencilMode::StencilMode();
+
+	stencil.enabled = true;
+	stencil.writeMask = 255;
+	stencil.readMask = 255;
+
+	stencil.func = Renderer::ComparisonFunc::Greater;
+	stencil.depthFailOp = Renderer::StencilOp::Increment;
+	stencil.failOp = Renderer::StencilOp::Increment;
+	stencil.passOp = Renderer::StencilOp::Increment;
+
+	GRAPHICS->pushStencilMode(stencil);
 	GRAPHICS->draw(Renderer::Topology::TriangleStrip, vertices, holder->getTransform());
+	GRAPHICS->pop();
 }
 
 void Trail::clearTrail()
