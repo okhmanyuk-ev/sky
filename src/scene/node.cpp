@@ -48,7 +48,10 @@ glm::vec2 Node::project(const glm::vec2& value) const
 {
 	assert(mTransformReady);
 
-	auto vp = getScene()->getViewport();
+	auto scene = getScene();
+	assert(scene != nullptr);
+
+	auto vp = scene->getViewport();
 	auto scaled_size = vp.size / PLATFORM->getScale();
 
 	glm::vec3 original = { value, 0.0f };
@@ -63,7 +66,10 @@ glm::vec2 Node::unproject(const glm::vec2& value) const
 {
 	assert(mTransformReady);
 	
-	auto vp = getScene()->getViewport();
+	auto scene = getScene();
+	assert(scene != nullptr);
+
+	auto vp = scene->getViewport();
 	auto scaled_size = vp.size / PLATFORM->getScale();
 
 	glm::vec3 original = { value, 0.0f };
