@@ -82,6 +82,14 @@ ActionHelpers::Action ActionHelpers::Limit(float duration, Action action)
 	);
 }
 
+ActionHelpers::Action ActionHelpers::Limit(std::function<bool()> while_callback, Action action)
+{
+	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
+		Wait(while_callback),
+		std::move(action)
+	);
+}
+
 // generic execute
 
 ActionHelpers::Action ActionHelpers::Execute(std::function<void()> callback)
