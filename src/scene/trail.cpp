@@ -68,7 +68,7 @@ void Trail::draw()
 
 	auto holder = mHolder.lock();
 
-	auto stencil = Renderer::StencilMode::StencilMode();
+	auto stencil = Renderer::StencilMode();
 
 	stencil.enabled = true;
 	stencil.writeMask = 255;
