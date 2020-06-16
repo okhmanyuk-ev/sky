@@ -47,7 +47,6 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishC
 				mCurrentScreen = screen;
 				mCurrentScreen->mState = Screen::State::Entering;
 				mCurrentScreen->onEnterBegin();
-				mCurrentScreen->setSceneManager(weak_from_this());
 			}),
 			screen->createEnterAction(),
 			ActionHelpers::Execute([this] {
@@ -105,8 +104,6 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 		mCurrentScreen->onWindowAppearing(); // only on first window in stack
 
 	mWindows.push(window);
-	
-	window->setSceneManager(weak_from_this());
 	mWindowHolder->attach(window);
 
 	window->onOpenBegin();

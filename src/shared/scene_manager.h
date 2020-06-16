@@ -5,7 +5,7 @@
 
 namespace Shared
 {
-	class SceneManager : public Scene::Actionable<Scene::Node>, public std::enable_shared_from_this<SceneManager>
+	class SceneManager : public Scene::Actionable<Scene::Node>
 	{
 	public:
 		class Screen;
@@ -70,15 +70,6 @@ namespace Shared
 	public:
 		virtual std::unique_ptr<Common::Actions::Action> createEnterAction() = 0;
 		virtual std::unique_ptr<Common::Actions::Action> createLeaveAction() = 0;
-
-	public:
-		auto getSceneManager() const { return mSceneManager.lock(); }
-
-	private:
-		void setSceneManager(std::weak_ptr<SceneManager> value) { mSceneManager = value; }
-
-	private:
-		std::weak_ptr<SceneManager> mSceneManager;
 	};
 
 	class SceneManager::Window : public Scene::Node
@@ -109,14 +100,5 @@ namespace Shared
 	public:
 		virtual std::unique_ptr<Common::Actions::Action> createOpenAction() = 0;
 		virtual std::unique_ptr<Common::Actions::Action> createCloseAction() = 0;
-
-	public:
-		auto getSceneManager() const { return mSceneManager.lock(); }
-
-	private:
-		void setSceneManager(std::weak_ptr<SceneManager> value) { mSceneManager = value; }
-
-	private:
-		std::weak_ptr<SceneManager> mSceneManager;
 	};
 }
