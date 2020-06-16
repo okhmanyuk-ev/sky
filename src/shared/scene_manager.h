@@ -3,6 +3,8 @@
 #include <shared/all.h>
 #include "scene_manager.h"
 
+#define SCENE_MANAGER ENGINE->getSystem<Shared::SceneManager>()
+
 namespace Shared
 {
 	class SceneManager : public Scene::Actionable<Scene::Node>
