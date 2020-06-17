@@ -38,5 +38,12 @@ namespace Scene
 			{ Corner::BottomLeft, { Graphics::Color::White, 1.0f } },
 			{ Corner::BottomRight, { Graphics::Color::White, 1.0f } },
 		};
+
+	public:
+		auto getRounding() const { return mRounding; }
+		void setRounding(float value) { mRounding = value; }
+
+	private:
+		float mRounding = 0.0f;
 	};
 }

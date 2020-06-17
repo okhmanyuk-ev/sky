@@ -1,8 +1,5 @@
 #include "scene_editor.h"
 #include <imgui.h>
-#include <scene/color.h>
-#include <scene/sprite.h>
-#include <scene/label.h>
 
 using namespace Shared;
 
@@ -81,6 +78,25 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::DragFloat("Font Size", &fontSize, 1.0f, 0.0f, 96.0f);
 		label->setFontSize(fontSize);
 		ImGui::Separator();
+
+		auto texture = label->getFont()->getTexture();
+
+		if (texture != nullptr)
+		{
+			mEditorFontTexture = texture;
+
+			glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
+
+			const float MaxSize = 128.0f;
+
+			auto max = glm::max(size.x, size.y);
+
+			if (max > MaxSize)
+				size *= (MaxSize / max);
+
+			ImGui::Image((ImTextureID)&mEditorFontTexture, ImVec2(size.x, size.y));
+			ImGui::Separator();
+		}
 	}
 
 	if (auto sprite = std::dynamic_pointer_cast<Scene::Sprite>(node); sprite != nullptr)
@@ -103,6 +119,14 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 			ImGui::Image((ImTextureID)&mEditorSpriteTexture, ImVec2(size.x, size.y));
 			ImGui::Separator();
 		}
+	}
+
+	if (auto rectangle = std::dynamic_pointer_cast<Scene::Rectangle>(node); rectangle != nullptr)
+	{
+		auto rounding = rectangle->getRounding();
+		ImGui::DragFloat("Rounding", (float*)&rounding, 0.01f, 0.0f, 1.0f);
+		rectangle->setRounding(rounding);
+		ImGui::Separator();
 	}
 
 	auto position = node->getPosition();

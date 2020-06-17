@@ -224,8 +224,16 @@ namespace Shared::SceneHelpers
 		std::shared_ptr<Scene::Actionable<Scene::Rectangle>> createParticle() const override
 		{
 			auto particle = std::make_shared<Scene::Actionable<Scene::Rectangle>>();
+			particle->setRounding(mRounding);
 			return particle;
 		}
+
+	public:
+		auto getRounding() const { return mRounding; }
+		void setRounding(float value) { mRounding = value; }
+
+	private:
+		float mRounding = 0.0f;
 	};
 
 	// TODO: can be moved to 'scene'

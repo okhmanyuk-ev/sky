@@ -1,4 +1,5 @@
 #include "rectangle.h"
+#include <renderer/shaders/rounded.h>
 
 using namespace Scene;
 
@@ -16,7 +17,14 @@ void Rectangle::draw()
 
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 
-	GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model);
+	static auto shader = std::make_shared<Renderer::Shaders::Rounded>(Renderer::Vertex::PositionColor::Layout);
+	
+	auto size = getSize();
+
+	shader->setSize(size);
+	shader->setRadius((mRounding * glm::min(size.x, size.y)) / 2.0f);
+
+	GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model, shader);
 
 	Node::draw();
 }

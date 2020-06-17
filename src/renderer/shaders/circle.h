@@ -37,19 +37,19 @@ namespace Renderer::Shaders
 		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; markDirty(); }
 
 		auto getFill() const { return mCustomConstantBuffer.fill; }
-		void setFill(float value) { mCustomConstantBuffer.fill = value; }
+		void setFill(float value) { mCustomConstantBuffer.fill = value;  markDirty(); }
 
 		auto getBegin() const { return mCustomConstantBuffer.begin; }
-		void setBegin(float value) { mCustomConstantBuffer.begin = value; }
+		void setBegin(float value) { mCustomConstantBuffer.begin = value;  markDirty(); }
 
 		auto getEnd() const { return mCustomConstantBuffer.end; }
-		void setEnd(float value) { mCustomConstantBuffer.end = value; }
+		void setEnd(float value) { mCustomConstantBuffer.end = value;  markDirty(); }
 
 		auto getInnerColor() const { return mCustomConstantBuffer.inner_color; }
-		void setInnerColor(const glm::vec4& value) { mCustomConstantBuffer.inner_color = value; }
+		void setInnerColor(const glm::vec4& value) { mCustomConstantBuffer.inner_color = value;  markDirty(); }
 
 		auto getOuterColor() const { return mCustomConstantBuffer.outer_color; }
-		void setOuterColor(const glm::vec4& value) { mCustomConstantBuffer.outer_color = value; }
+		void setOuterColor(const glm::vec4& value) { mCustomConstantBuffer.outer_color = value;  markDirty(); }
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;

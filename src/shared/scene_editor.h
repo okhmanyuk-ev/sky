@@ -1,6 +1,6 @@
 #pragma once
 
-#include <scene/scene.h>
+#include <scene/all.h>
 
 namespace Shared
 {
@@ -34,6 +34,7 @@ namespace Shared
 		glm::vec2 mMousePos = { 0.0f, 0.0f };
 		std::shared_ptr<Renderer::Texture> mSpriteTexture = nullptr;
 		std::shared_ptr<Renderer::Texture> mEditorSpriteTexture = nullptr;
+		std::shared_ptr<Renderer::Texture> mEditorFontTexture = nullptr;
 		std::shared_ptr<Scene::Node> mHoveredNode = nullptr;
 	};
 }
