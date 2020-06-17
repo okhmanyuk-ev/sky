@@ -1,6 +1,6 @@
 #include "scene_helpers.h"
-#include <scene/actionable.h>
 #include <shared/action_helpers.h>
+#include <shared/cache_system.h>
 
 using namespace Shared;
 
@@ -12,7 +12,7 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	label->setFontSize(text_size);
 	label->setText(text);
 	label->setPosition(holder->unproject(target->project({ target->getSize() / 2.0f })));
-	label->setPivot({ 0.5f, 0.5f });
+	label->setPivot(0.5f);
 	label->setAlpha(0.0f);
 	label->runAction(ActionHelpers::MakeSequence(
 		ActionHelpers::Show(label, 0.5f),

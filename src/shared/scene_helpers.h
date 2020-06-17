@@ -1,15 +1,7 @@
 #pragma once
 
-#include <shared/cache_system.h>
 #include <tinyutf8.hpp>
-#include <scene/label.h>
-#include <scene/clickable.h>
-#include <scene/rectangle.h>
-#include <scene/actionable.h>
-#include <scene/debuggable.h>
-#include <scene/scene.h>
-#include <scene/sprite.h>
-#include <shared/action_helpers.h>
+#include <scene/all.h>
 
 namespace Shared::SceneHelpers
 {
@@ -289,5 +281,20 @@ namespace Shared::SceneHelpers
 
 	private:
 		std::shared_ptr<Scene::Color> mBackshadeColor = std::make_shared<Scene::Color>();
+	};
+
+	template <typename T> class Outlined : public T
+	{
+		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
+
+	protected:
+		void leaveDraw() override
+		{
+			T::leaveDraw();
+
+			auto model = glm::scale(T::getTransform(), { T::getSize(), 1.0f });
+
+			GRAPHICS->drawLineRectangle(model, { 1.0f, 1.0f, 1.0f, 1.0 });
+		}
 	};
 }
