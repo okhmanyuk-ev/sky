@@ -233,36 +233,34 @@ void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture)
 {
 	glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
 
-	const float MaxSize = 128.0f;
+	const float MaxSize = 256.0f;
 
 	auto max = glm::max(size.x, size.y);
 
 	if (max > MaxSize)
 		size *= (MaxSize / max);
 
-	ImVec2 pos = ImGui::GetCursorScreenPos();
+	auto pos = ImGui::GetCursorScreenPos();
+	
+	ImGui::Text("%dx%d", texture->getWidth(), texture->getHeight());
 	ImGui::Image((ImTextureID)&texture, ImVec2(size.x, size.y));
 
 	if (ImGui::IsItemHovered())
 	{
 		const auto& io = ImGui::GetIO();
 
-		float region_sz = 64.0f;
+		float region_sz = 96.0f;
+
+		region_sz = glm::min(region_sz, size.x, size.y);
+
 		float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
 		float region_y = io.MousePos.y - pos.y - region_sz * 0.5f;
 
-		if (region_x < 0.0f)
-			region_x = 0.0f;
-		else if (region_x > size.x - region_sz)
-			region_x = size.x - region_sz;
-
-		if (region_y < 0.0f)
-			region_y = 0.0f;
-		else if (region_y > size.y - region_sz)
-			region_y = size.x - region_sz;
+		region_x = glm::clamp(region_x, 0.0f, size.x - region_sz);
+		region_y = glm::clamp(region_y, 0.0f, size.y - region_sz);
 
 		float zoom = 4.0f;
-		auto uv0 = ImVec2((region_x) / size.x, (region_y) / size.y);
+		auto uv0 = ImVec2(region_x / size.x, region_y / size.y);
 		auto uv1 = ImVec2((region_x + region_sz) / size.x, (region_y + region_sz) / size.y);
 
 		ImGui::BeginTooltip();
