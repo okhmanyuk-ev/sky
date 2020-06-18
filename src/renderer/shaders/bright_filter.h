@@ -19,7 +19,7 @@ namespace Renderer::Shaders
 		
 	public:
 		auto getThreshold() const { return mCustomConstantBuffer.threshold; }
-		void setThreshold(float value) { mCustomConstantBuffer.threshold = value; markDirty(); }
+		void setThreshold(float value) { mCustomConstantBuffer.threshold = value; }
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;

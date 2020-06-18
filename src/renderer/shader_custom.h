@@ -27,26 +27,22 @@ namespace Renderer
 		void apply() override;
 		void update() override;
 
-	protected:
-		void markDirty() { mConstantBufferDirty = true; }
-
 	public:
-		void setCustomConstantBuffer(void* value) { mCustomConstantBuffer = value; markDirty(); }
+		void setCustomConstantBuffer(void* value) { mCustomConstantBuffer = value; }
 
 	public:
 		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
-		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; markDirty(); }
+		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; }
 
 		glm::mat4 getViewMatrix() const override { return mConstantBuffer.view; }
-		void setViewMatrix(const glm::mat4& value) override { mConstantBuffer.view = value; markDirty(); }
+		void setViewMatrix(const glm::mat4& value) override { mConstantBuffer.view = value; }
 
 		glm::mat4 getModelMatrix() const override { return mConstantBuffer.model; }
-		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; markDirty(); }
+		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; }
 
 	private:
 		ConstantBuffer mConstantBuffer;
 		void* mCustomConstantBuffer = nullptr;
-		bool mConstantBufferDirty = false;
 
 	private:
 		struct Impl;

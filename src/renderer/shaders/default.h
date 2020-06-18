@@ -29,7 +29,7 @@ namespace Renderer::Shaders
 		
 	public:
 		auto getColor() const { return mCustomConstantBuffer.color; }
-		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; markDirty(); }
+		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; }
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;

@@ -19,6 +19,10 @@ struct ShaderCustom::Impl
 	std::map<Vertex::Attribute::Type, GLint> attribLocations;
 	ConstantBuffer constantBuffer;
 	size_t customConstantBufferSize;
+
+	void* appliedConstantBuffer = nullptr;
+	void* appliedCustomConstantBuffer = nullptr;
+	bool forceDirty = false;
 };
 
 ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::Attribute::Type>& requiredAttribs, 
@@ -117,14 +121,24 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 		glEnableVertexAttribArray(location);
 		mImpl->attribLocations[attrib.type] = location;
 	}
-	glBindVertexArray(0);
+	glBindVertexArray(0);	
+	
+	mImpl->appliedConstantBuffer = malloc(sizeof(ConstantBuffer));
+
+	if (customConstantBufferSize > 0)
+		mImpl->appliedCustomConstantBuffer = malloc(customConstantBufferSize);
 }
 
 ShaderCustom::~ShaderCustom()
 {
 	glDeleteVertexArrays(1, &mImpl->vao);
 	glDeleteProgram(mImpl->program);
-	glDeleteBuffers(1, &mImpl->ubo);
+	glDeleteBuffers(1, &mImpl->ubo);	
+	
+	free(mImpl->appliedConstantBuffer);
+
+	if (mImpl->appliedCustomConstantBuffer != nullptr)
+		free(mImpl->appliedCustomConstantBuffer);
 }
 
 void ShaderCustom::apply()
@@ -144,13 +158,27 @@ void ShaderCustom::apply()
 			(void*)attrib.offset);
 	}
 
-	mConstantBufferDirty = true;
+	mImpl->forceDirty = true;
 }
 
 void ShaderCustom::update()
 {
-	if (!mConstantBufferDirty)
+	bool dirty = mImpl->forceDirty;
+
+	if (!dirty && memcmp(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer)) != 0)
+		dirty = true;
+
+	if (mCustomConstantBuffer && !dirty && memcmp(mImpl->appliedCustomConstantBuffer, mCustomConstantBuffer, mImpl->customConstantBufferSize) != 0)
+		dirty = true;
+
+	if (!dirty)
 		return;
+
+	mImpl->forceDirty = false;
+	memcpy(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer));
+
+	if (mCustomConstantBuffer)
+		memcpy(mImpl->appliedCustomConstantBuffer, mCustomConstantBuffer, mImpl->customConstantBufferSize);
 
 	mImpl->constantBuffer = mConstantBuffer;
 
@@ -160,13 +188,11 @@ void ShaderCustom::update()
 		mImpl->constantBuffer.projection = orientationMatrix * mImpl->constantBuffer.projection;
 	}
 
-	mConstantBufferDirty = false;
-	    
     auto ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(ConstantBuffer) + mImpl->customConstantBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     memcpy(ptr, &mImpl->constantBuffer, sizeof(ConstantBuffer));
     memcpy((void*)((size_t)ptr + sizeof(ConstantBuffer)), mCustomConstantBuffer, mImpl->customConstantBufferSize);
     glUnmapBuffer(GL_UNIFORM_BUFFER);
-        
-    glUniform1i(mImpl->uniformTexture, 0);
+
+	glUniform1i(mImpl->uniformTexture, 0);
 }
 #endif

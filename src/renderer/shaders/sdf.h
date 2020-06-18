@@ -20,16 +20,16 @@ namespace Renderer::Shaders
 
 	public:
 		auto getMinValue() const { return mCustomConstantBuffer.minValue; }
-		void setMinValue(float value) { mCustomConstantBuffer.minValue = value; markDirty(); }
+		void setMinValue(float value) { mCustomConstantBuffer.minValue = value; }
 
 		auto getMaxValue() const { return mCustomConstantBuffer.maxValue; }
-		void setMaxValue(float value) { mCustomConstantBuffer.maxValue = value; markDirty(); }
+		void setMaxValue(float value) { mCustomConstantBuffer.maxValue = value; }
 
 		auto getSmoothFactor() const { return mCustomConstantBuffer.smoothFactor; }
-		void setSmoothFactor(float value) { mCustomConstantBuffer.smoothFactor = value; markDirty(); }
+		void setSmoothFactor(float value) { mCustomConstantBuffer.smoothFactor = value; }
 
 		auto getColor() const { return mCustomConstantBuffer.color; }
-		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; markDirty(); }
+		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; }
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;

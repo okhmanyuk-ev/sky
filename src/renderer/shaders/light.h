@@ -62,16 +62,16 @@ namespace Renderer::Shaders
 		Light(const Vertex::Layout& layout);
 
 	public:
-		void setEyePosition(const glm::vec3& value) { mCustomConstantBuffer.eyePosition = value; markDirty(); }
+		void setEyePosition(const glm::vec3& value) { mCustomConstantBuffer.eyePosition = value; }
 
 		auto getDirectionalLight() const { return mCustomConstantBuffer.directionalLight; }
-		void setDirectionalLight(const DirectionalLight& value) { mCustomConstantBuffer.directionalLight = value; markDirty(); }
+		void setDirectionalLight(const DirectionalLight& value) { mCustomConstantBuffer.directionalLight = value; }
 
 		auto getPointLight() const { return mCustomConstantBuffer.pointLight; }
-		void setPointLight(const PointLight& value) { mCustomConstantBuffer.pointLight = value; markDirty(); }
+		void setPointLight(const PointLight& value) { mCustomConstantBuffer.pointLight = value; }
 
 		auto getMaterial() const { return mCustomConstantBuffer.material; }
-		void setMaterial(const Material& value) { mCustomConstantBuffer.material = value; markDirty(); }
+		void setMaterial(const Material& value) { mCustomConstantBuffer.material = value; }
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;

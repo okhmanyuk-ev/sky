@@ -31,13 +31,13 @@ namespace Renderer::Shaders
 		
 	public:
 		auto getSize() const { return mCustomConstantBuffer.size; }
-		void setSize(const glm::vec2& value) { mCustomConstantBuffer.size = value; markDirty(); }
+		void setSize(const glm::vec2& value) { mCustomConstantBuffer.size = value; }
 
 		auto getRadius() const { return mCustomConstantBuffer.radius; }
-		void setRadius(float value) { mCustomConstantBuffer.radius = value; markDirty(); }
+		void setRadius(float value) { mCustomConstantBuffer.radius = value; }
 
 		auto getColor() const { return mCustomConstantBuffer.color; }
-		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; markDirty(); }
+		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; }
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;

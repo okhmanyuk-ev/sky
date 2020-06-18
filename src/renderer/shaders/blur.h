@@ -24,8 +24,8 @@ namespace Renderer::Shaders
 		Blur(const Vertex::Layout& layout);
 
 	public:
-		void setDirection(Direction value) { mCustomConstantBuffer.direction = (value == Direction::Horizontal ? glm::vec2(1.0f, 0.0f) : glm::vec2(0.0f, 1.0f)); markDirty(); }
-		void setResolution(const glm::vec2& value) { mCustomConstantBuffer.resolution = value; markDirty(); }
+		void setDirection(Direction value) { mCustomConstantBuffer.direction = (value == Direction::Horizontal ? glm::vec2(1.0f, 0.0f) : glm::vec2(0.0f, 1.0f)); }
+		void setResolution(const glm::vec2& value) { mCustomConstantBuffer.resolution = value; }
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;

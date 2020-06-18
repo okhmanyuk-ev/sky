@@ -12,6 +12,10 @@ struct ShaderCustom::Impl
 	ID3D11Buffer* constantBuffer = nullptr;
 	ID3D11InputLayout* inputLayout = nullptr;
 	size_t customConstantBufferSize = 0;
+
+	void* appliedConstantBuffer = nullptr;
+	void* appliedCustomConstantBuffer = nullptr;
+	bool forceDirty = false;
 };
 
 ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::Attribute::Type>& requiredAttribs,
@@ -62,11 +66,19 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 		desc.MiscFlags = 0;
 		SystemD3D11::Device->CreateBuffer(&desc, NULL, &mImpl->constantBuffer);
 	}
+
+	mImpl->appliedConstantBuffer = malloc(sizeof(ConstantBuffer));
+
+	if (customConstantBufferSize > 0)
+		mImpl->appliedCustomConstantBuffer = malloc(customConstantBufferSize);
 }
 
 ShaderCustom::~ShaderCustom()
 {
-	
+	free(mImpl->appliedConstantBuffer);
+
+	if (mImpl->appliedCustomConstantBuffer != nullptr)
+		free(mImpl->appliedCustomConstantBuffer);
 }
 
 void ShaderCustom::apply()
@@ -76,16 +88,28 @@ void ShaderCustom::apply()
 	SystemD3D11::Context->PSSetShader(mImpl->pixelShader, nullptr, 0);
 	SystemD3D11::Context->VSSetConstantBuffers(0, 1, &mImpl->constantBuffer);
 	SystemD3D11::Context->PSSetConstantBuffers(0, 1, &mImpl->constantBuffer);
-	mConstantBufferDirty = true;
+	mImpl->forceDirty = true;
 }
 
 void ShaderCustom::update()
 {
-	if (!mConstantBufferDirty)
+	bool dirty = mImpl->forceDirty;
+
+	if (!dirty && memcmp(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer)) != 0)
+		dirty = true;
+
+	if (mCustomConstantBuffer && !dirty && memcmp(mImpl->appliedCustomConstantBuffer, mCustomConstantBuffer, mImpl->customConstantBufferSize) != 0)
+		dirty = true;
+
+	if (!dirty)
 		return;
 
-	mConstantBufferDirty = false;
-	
+	mImpl->forceDirty = false;
+	memcpy(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer));
+
+	if (mCustomConstantBuffer)
+		memcpy(mImpl->appliedCustomConstantBuffer, mCustomConstantBuffer, mImpl->customConstantBufferSize);
+
 	D3D11_MAPPED_SUBRESOURCE resource;
 	SystemD3D11::Context->Map(mImpl->constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	memcpy(resource.pData, &mConstantBuffer, sizeof(ConstantBuffer));
