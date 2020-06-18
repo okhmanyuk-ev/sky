@@ -84,17 +84,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		if (texture != nullptr)
 		{
 			mEditorFontTexture = texture;
-
-			glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
-
-			const float MaxSize = 128.0f;
-
-			auto max = glm::max(size.x, size.y);
-
-			if (max > MaxSize)
-				size *= (MaxSize / max);
-
-			ImGui::Image((ImTextureID)&mEditorFontTexture, ImVec2(size.x, size.y));
+			drawImage(mEditorFontTexture);
 			ImGui::Separator();
 		}
 	}
@@ -106,17 +96,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		if (texture != nullptr)
 		{
 			mEditorSpriteTexture = texture;
-
-			glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
-
-			const float MaxSize = 128.0f;
-
-			auto max = glm::max(size.x, size.y);
-
-			if (max > MaxSize)
-				size *= (MaxSize / max);
-
-			ImGui::Image((ImTextureID)&mEditorSpriteTexture, ImVec2(size.x, size.y));
+			drawImage(mEditorSpriteTexture);
 			ImGui::Separator();
 		}
 	}
@@ -247,4 +227,46 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node)
 	GRAPHICS->drawLineRectangle(model, { Graphics::Color::White, 1.0f });
 	GRAPHICS->pop();
 	GRAPHICS->end();
+}
+
+void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture)
+{
+	glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
+
+	const float MaxSize = 128.0f;
+
+	auto max = glm::max(size.x, size.y);
+
+	if (max > MaxSize)
+		size *= (MaxSize / max);
+
+	ImVec2 pos = ImGui::GetCursorScreenPos();
+	ImGui::Image((ImTextureID)&texture, ImVec2(size.x, size.y));
+
+	if (ImGui::IsItemHovered())
+	{
+		const auto& io = ImGui::GetIO();
+
+		float region_sz = 64.0f;
+		float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
+		float region_y = io.MousePos.y - pos.y - region_sz * 0.5f;
+
+		if (region_x < 0.0f)
+			region_x = 0.0f;
+		else if (region_x > size.x - region_sz)
+			region_x = size.x - region_sz;
+
+		if (region_y < 0.0f)
+			region_y = 0.0f;
+		else if (region_y > size.y - region_sz)
+			region_y = size.x - region_sz;
+
+		float zoom = 4.0f;
+		auto uv0 = ImVec2((region_x) / size.x, (region_y) / size.y);
+		auto uv1 = ImVec2((region_x + region_sz) / size.x, (region_y + region_sz) / size.y);
+
+		ImGui::BeginTooltip();
+		ImGui::Image((ImTextureID)&texture, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
+		ImGui::EndTooltip();
+	}
 }

@@ -23,6 +23,7 @@ namespace Shared
 		void highlightNodeUnderCursor();
 		void highlightHoveredNode();
 		void highlightNode(std::shared_ptr<Scene::Node> node);
+		void drawImage(const std::shared_ptr<Renderer::Texture>& texture);
 
 	public:
 		bool isEnabled() const { return mEnabled; }
