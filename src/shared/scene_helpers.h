@@ -2,6 +2,7 @@
 
 #include <tinyutf8.hpp>
 #include <scene/all.h>
+#include <shared/action_helpers.h>
 
 namespace Shared::SceneHelpers
 {
@@ -293,7 +294,7 @@ namespace Shared::SceneHelpers
 
 	template <typename T> class Outlined : public T
 	{
-		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
 
 	protected:
 		void leaveDraw() override
