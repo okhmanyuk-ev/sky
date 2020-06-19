@@ -5,6 +5,9 @@
 #if defined(PLATFORM_IOS)
 #include <platform/low_level_api.h>
 
+@interface SkyDelegate : UIResponder<UIApplicationDelegate>
+@end
+
 namespace Platform
 {
     class SystemIos : public System

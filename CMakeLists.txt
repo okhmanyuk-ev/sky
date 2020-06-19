@@ -121,6 +121,7 @@ if(APPLE)
 	set_source_files_properties(${OBJC_SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++ -fembed-bitcode")
 
 	target_link_libraries(${PROJECT_NAME}
+		"-ObjC"
 		"-framework UIKit"
 		"-framework CoreGraphics"
 		"-framework GLKit"

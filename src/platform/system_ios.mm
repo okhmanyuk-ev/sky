@@ -6,39 +6,23 @@
 
 using namespace Platform;
 
-// UIApplicationDelegate
+// SkyDelegate
 
-@interface AppDelegate : UIResponder<UIApplicationDelegate>
+@implementation SkyDelegate
 
-@end
-
-@implementation AppDelegate
-
-- (void)runMain {
+- (void)runMain
+{
     sky_main();
 }
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
     [self performSelectorOnMainThread:@selector(runMain) withObject:nil waitUntilDone:NO];
     return YES;
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-}
-
-- (void)emitTouchEvent:(NSSet*)touches withType:(Platform::Touch::Event::Type)type {
+- (void)emitTouchEvent:(NSSet*)touches withType:(Platform::Touch::Event::Type)type
+{
     for (UITouch* touch in touches)
     {
         auto location = [touch locationInView:SystemIos::Window];
@@ -93,9 +77,11 @@ using namespace Platform;
 
 // entry point
 
-int main(int argc, char * argv[]) {
+int main(int argc, char * argv[])
+{
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+        // AppDelegate must be implemented in the project
+        return UIApplicationMain(argc, argv, nil, @"AppDelegate");
     }
 }
 
