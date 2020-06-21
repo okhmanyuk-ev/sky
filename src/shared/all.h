@@ -25,6 +25,7 @@
 #include <platform/system_windows.h>
 #endif
 
+#include <renderer/all.h>
 #include <scene/all.h>
 
 #include <shared/stats_system.h>
@@ -47,11 +48,5 @@
 
 #include <graphics/font.h>
 #include <graphics/legacy_renderer.h>
-
-#include <renderer/shaders/default.h>
-#include <renderer/shaders/light.h>
-#include <renderer/shaders/blur.h>
-#include <renderer/shaders/sdf.h>
-#include <renderer/shaders/circle.h>
 
 #include <network/system.h>
