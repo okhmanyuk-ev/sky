@@ -117,8 +117,8 @@ bool Node::interactTest(const glm::vec2& value) const
 
 void Node::updateTransform()
 {
-	auto verticalStretch = getVerticalStretch();
-	auto horizontalStretch = getHorizontalStretch();
+	auto verticalStretch = getVerticalStretch() / getVerticalScale();
+	auto horizontalStretch = getHorizontalStretch() / getHorizontalScale();
 	auto verticalMargin = getVerticalMargin();
 	auto horizontalMargin = getHorizontalMargin();
 
