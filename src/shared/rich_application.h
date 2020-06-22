@@ -35,43 +35,5 @@ namespace Shared
 	{
 	public:
 		RichApplication(const std::string& appname);
-
-	protected:
-		void postFrame() override;
-		void postImguiPresent() override;
-
-	public:
-		struct LoadingTask
-		{
-			std::string name;
-			std::function<void()> callback;
-		};
-
-	public:
-		void addLoadingTasks(const std::vector<LoadingTask>& tasks);
-
-	public:
-		bool isInitialized() const { return mInitialized; }
-		
-		auto getPayloadWaiting() const { return mPayloadWaiting; }
-		void setPayloadWaiting(float value) { mPayloadWaiting = value; }
-
-	private:
-		std::vector<LoadingTask> mLoadingTasks;
-		bool mLoading = false;
-		Clock::TimePoint mStartLoadingTime;
-		bool mLoaded = false;
-		size_t mLoadingPos = 0;
-		bool mInitialized = false;
-		float mFade = 1.0f;
-		float mPayloadWaiting = 0.0f;
-		
-	private:
-		void frameInternal();
-
-	protected:
-		virtual void initialize() = 0;
-		virtual void frame() = 0;
-		virtual void loading(const std::string& stage, float progress);
 	};
 }

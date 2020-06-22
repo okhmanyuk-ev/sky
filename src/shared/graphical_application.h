@@ -38,12 +38,6 @@ namespace Shared
 
 	public:
 		void run();
-
-	protected:
-		virtual void preFrame() {};
-		virtual void postFrame() {};
-
-		virtual void postImguiPresent() {};
 		
 	private:
 		std::shared_ptr<Common::ConsoleCommands> mConsoleCommands;

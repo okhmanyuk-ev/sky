@@ -72,11 +72,8 @@ void GraphicalApplication::run()
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
 		IMGUI_SYSTEM->begin();
-		preFrame();
 		FRAME->frame();
-		postFrame();
 		IMGUI_SYSTEM->end();
-		postImguiPresent();
 		RENDERER->present();
 	}
 }
