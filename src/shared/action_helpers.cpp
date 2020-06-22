@@ -54,6 +54,11 @@ ActionHelpers::Action ActionHelpers::Wait(std::function<bool()> while_callback)
 	});
 }
 
+ActionHelpers::Action ActionHelpers::WaitOneFrame()
+{
+	return Execute(nullptr);
+}
+
 // delayed
 
 ActionHelpers::Action ActionHelpers::Delayed(float duration, Action action)

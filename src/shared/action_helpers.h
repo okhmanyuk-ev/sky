@@ -20,7 +20,8 @@ namespace Shared::ActionHelpers
 
 	Action Wait(float duration);
 	Action Wait(std::function<bool()> while_callback);
-    
+	Action WaitOneFrame();
+
 	Action Delayed(float duration, Action action);
 	Action Delayed(std::function<bool()> while_callback, Action action);
 
