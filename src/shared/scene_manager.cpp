@@ -169,3 +169,8 @@ bool SceneManager::isWindowsBusy() const
 
 	return mWindows.top()->getState() != Window::State::Opened;
 }
+
+bool SceneManager::isScreenBusy() const
+{
+	return mInTransition;
+}

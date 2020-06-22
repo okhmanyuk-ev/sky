@@ -30,6 +30,7 @@ namespace Shared
 		bool hasWindows() const { return getWindowsCount() > 0; }
 
 		bool isWindowsBusy() const;
+		bool isScreenBusy() const;
 
 		auto getScreenHolder() { return mScreenHolder; }
 		auto getWindowHolder() { return mWindowHolder; }
