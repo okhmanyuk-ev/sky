@@ -163,6 +163,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC lib/glm)
 # stb
 
 target_include_directories(${PROJECT_NAME} PUBLIC lib/stb)
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DSTB_IMAGE_IMPLEMENTATION)
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DSTB_RECT_PACK_IMPLEMENTATION)
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DSTB_TRUETYPE_IMPLEMENTATION)
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DSTB_IMAGE_WRITE_IMPLEMENTATION)
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DSTBI_WRITE_NO_STDIO)
 
 # rectpack2D
 
