@@ -62,7 +62,7 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 
 	auto local_pos = unproject(pos);
 
-	if (type == Touch::Continue)
+	if (type != Touch::Begin)
 		mSpeed += local_pos - mPrevPosition;
 
 	mPrevPosition = local_pos;
