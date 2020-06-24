@@ -59,18 +59,6 @@ namespace Shared::SceneHelpers
 		std::shared_ptr<Scene::Rectangle> mProgress;
 	};
 
-	class SplashScene : public Scene::Scene
-	{
-	public:
-		SplashScene(std::shared_ptr<Renderer::Texture> logo);
-
-	public:
-		void updateProgress(float value);
-
-	private:
-		std::shared_ptr<Progressbar> mProgressbar;
-	};
-
 	// TODO: this can be moved to 'scene' namespace
 	// but we should solve the problem with actions in 'shared'.
 	// 'scene' does not know anything about 'shared'
