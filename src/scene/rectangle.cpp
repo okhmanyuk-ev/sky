@@ -19,12 +19,19 @@ void Rectangle::draw()
 
 	static auto shader = std::make_shared<Renderer::Shaders::Rounded>(Renderer::Vertex::PositionColor::Layout);
 	
-	auto size = getSize();
+	if (mRounding >= 0.0f)
+	{
+		auto size = getSize();
 
-	shader->setSize(size);
-	shader->setRadius((mRounding * glm::min(size.x, size.y)) / 2.0f);
+		shader->setSize(size);
+		shader->setRadius((mRounding * glm::min(size.x, size.y)) / 2.0f);
 
-	GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model, shader);
+		GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model, shader);
+	}
+	else
+	{
+		GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model);
+	}
 
 	Node::draw();
 }
