@@ -27,6 +27,7 @@
 
 #include <renderer/all.h>
 #include <scene/all.h>
+#include <imscene/all.h>
 
 #include <shared/stats_system.h>
 #include <shared/cache_system.h>
