@@ -261,7 +261,7 @@ set_property(TARGET fmt PROPERTY FOLDER ${LIBS_FOLDER})
 
 # nlohmann_json
 
-target_include_directories(${PROJECT_NAME} PUBLIC lib/nlohmann_json/include)
+target_include_directories(${PROJECT_NAME} PUBLIC lib/nlohmann_json)
 
 # glew
 

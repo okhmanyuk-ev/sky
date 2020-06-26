@@ -23,7 +23,7 @@ namespace Shared
 		void switchScreen(std::shared_ptr<Screen> screen, Callback finishCallback = nullptr);
 		
 		void pushWindow(std::shared_ptr<Window> window, Callback finishCallback = nullptr);
-		void popWindow(int count = 1, Callback finishCallback = nullptr);
+		void popWindow(size_t count = 1, Callback finishCallback = nullptr);
 		void popWindow(Callback finishCallback);
 		
 		size_t getWindowsCount() const { return mWindows.size(); }

@@ -101,7 +101,7 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 		auto mesh = createTextMesh(font, begin, end);
 		for (auto index : mesh.indices)
 		{
-			index += result.vertices.size();
+			index += static_cast<uint32_t>(result.vertices.size());
 			result.indices.push_back(index);
 		}
 		auto str_w = font.getStringWidth(begin, end);

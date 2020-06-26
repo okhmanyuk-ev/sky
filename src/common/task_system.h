@@ -19,7 +19,7 @@ namespace Common
 		~TaskSystem();
 
 	public:
-		template<class F, class... Args> auto addTask(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
+		template<class F, class... Args> auto addTask(F&& f, Args&&... args) -> std::future<decltype(f(args...))>;
 
 	public:
 		auto getTasksCount() const { return mTasks.size() + mBusyThreads; }
@@ -34,16 +34,16 @@ namespace Common
 		std::atomic<int> mBusyThreads = 0;
 	};
 
-	template<class F, class... Args> auto TaskSystem::addTask(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>
+	template<class F, class... Args> auto TaskSystem::addTask(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
 	{
-		using return_type = typename std::result_of<F(Args...)>::type;
-
-		auto task = std::make_shared<std::packaged_task<return_type()>>(
-			std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+		auto func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+		auto task = std::make_shared<std::packaged_task<decltype(f(args...))()>>(func);
 		
 		{
 			std::unique_lock<std::mutex> lock(mMutex);
-			mTasks.emplace_back([task] { (*task)(); });
+			mTasks.emplace_back([task] { 
+				(*task)(); 
+			});
 		}
 
 		mCondition.notify_one();

@@ -180,7 +180,7 @@ uint64_t System::getPort(SocketHandle handle) const
 	return socket_data->port;
 }
 
-Socket::Socket(uint64_t port)
+Socket::Socket(uint16_t port)
 {
 	mHandle = NETWORK->createSocket(port);
 }

@@ -110,7 +110,11 @@ std::string SystemWindows::getAppName() const
 
 std::string SystemWindows::getAppFolder() const
 {
-	return getenv("APPDATA") + ("\\" + mAppName) + "\\";
+	char* path;
+	size_t len;
+	errno_t err = _dupenv_s(&path, &len, "APPDATA");
+
+	return path + ("\\" + mAppName) + "\\";
 }
 
 LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

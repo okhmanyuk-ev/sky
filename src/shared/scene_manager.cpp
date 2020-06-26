@@ -122,7 +122,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 	));
 }
 
-void SceneManager::popWindow(int count, Callback finishCallback)
+void SceneManager::popWindow(size_t count, Callback finishCallback)
 {
 	if (count <= 0)
 	{

@@ -61,7 +61,7 @@ namespace Network
 	class Socket
 	{
 	public:
-		Socket(uint64_t port = 0);
+		Socket(uint16_t port = 0);
 		~Socket();
 
 	public:
