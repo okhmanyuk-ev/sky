@@ -182,13 +182,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC lib/rectpack2D/include)
 
 # tinyutf8
 
-file(GLOB TINYUTF8_SRC
-	lib/tinyutf8/*.cpp
-	lib/tinyutf8/*.h
-	lib/tinyutf8/*.hpp
-)
+add_subdirectory(lib/tinyutf8)
 target_include_directories(${PROJECT_NAME} PUBLIC lib/tinyutf8)
-add_library(tinyutf8 STATIC ${TINYUTF8_SRC})
 target_link_libraries(${PROJECT_NAME} tinyutf8)
 set_property(TARGET tinyutf8 PROPERTY FOLDER ${LIBS_FOLDER})
 

@@ -152,7 +152,7 @@ float Font::getScaleFactorForSize(float size)
 	return size / GlyphSize;
 }
 
-const Font::Glyph& Font::getGlyph(uint16_t symbol) const
+const Font::Glyph& Font::getGlyph(utf8_string::value_type symbol) const
 {
 	if (mGlyphs.count(symbol) == 0)
 		return mGlyphs.at(0);
@@ -181,7 +181,7 @@ float Font::getStringWidth(const utf8_string& text, float size) const
 	return getStringWidth(text.begin(), text.end(), size);
 }
 
-float Font::getKerning(uint16_t left, uint16_t right) const
+float Font::getKerning(utf8_string::value_type left, utf8_string::value_type right) const
 {
 	if (mKernings.count(left) == 0)
 		return 0.0f;

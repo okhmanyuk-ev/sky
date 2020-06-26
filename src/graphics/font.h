@@ -33,14 +33,14 @@ namespace Graphics
 		~Font();
 
 		const auto getTexture() const { return mTexture; }
-		const Glyph& getGlyph(uint16_t symbol) const;
+		const Glyph& getGlyph(utf8_string::value_type symbol) const;
 
 		static float getScaleFactorForSize(float size);
 
 		float getStringWidth(utf8_string::iterator begin, utf8_string::iterator end, float size = GlyphSize) const;
 		float getStringWidth(const utf8_string& text, float size = GlyphSize) const;
 
-		float getKerning(uint16_t left, uint16_t right) const;
+		float getKerning(utf8_string::value_type left, utf8_string::value_type right) const;
 
 		float getAscent() const { return mAscent; }
 		float getDescent() const { return mDescent; }
@@ -51,8 +51,8 @@ namespace Graphics
 
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;
-		std::unordered_map<uint16_t, Glyph> mGlyphs;
-		std::unordered_map<uint16_t, std::unordered_map<uint16_t, float>> mKernings;
+		std::unordered_map<utf8_string::value_type, Glyph> mGlyphs;
+		std::unordered_map<utf8_string::value_type, std::unordered_map<utf8_string::value_type, float>> mKernings;
 		float mAscent = 0.0f;
 		float mDescent = 0.0f;
 		float mLinegap = 0.0f;
