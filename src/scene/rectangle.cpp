@@ -16,11 +16,11 @@ void Rectangle::draw()
 	};
 
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
-
-	static auto shader = std::make_shared<Renderer::Shaders::Rounded>(Renderer::Vertex::PositionColor::Layout);
 	
-	if (mRounding >= 0.0f)
+	if (mRounding > 0.0f)
 	{
+        static auto shader = std::make_shared<Renderer::Shaders::Rounded>(Renderer::Vertex::PositionColor::Layout);
+
 		auto size = getSize();
 
 		shader->setSize(size);
