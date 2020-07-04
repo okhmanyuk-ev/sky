@@ -27,6 +27,8 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(const glm::vec2& cell_size,
 		const std::vector<std::shared_ptr<Scene::Node>> items); // TODO: std::span<..>
 
+	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
+
 	class FastButton : public Scene::Clickable<Scene::Rectangle>
 	{
 	public:

@@ -177,6 +177,21 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const glm::vec2& cel
 	return MakeVerticalGrid(cell_size.x, items_height);
 }
 
+void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color)
+{
+	for (auto child : node->getNodes())
+	{
+		RecursiveColorSet(child, color);
+	}
+
+	auto color_node = std::dynamic_pointer_cast<Scene::Color>(node);
+
+	if (!color_node)
+		return;
+
+	color_node->setColor(color);
+}
+
 SceneHelpers::FastButton::FastButton()
 {
 	setChooseBeginCallback([this] { setAlpha(0.66f); });
