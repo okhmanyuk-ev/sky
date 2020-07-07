@@ -296,4 +296,15 @@ namespace Shared::SceneHelpers
 			GRAPHICS->drawLineRectangle(model, { 1.0f, 1.0f, 1.0f, 1.0 });
 		}
 	};
+
+	// automatically stretching to full safe area of the screen
+	// should be attached to fullscreen node or scene root
+	class Hud : public Scene::Node
+	{
+	public:
+		Hud();
+
+	protected:
+		void update() override;
+	};
 }
