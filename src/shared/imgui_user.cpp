@@ -96,21 +96,25 @@ namespace ImGui::User
 
 	ImVec2 TopLeftCorner(float margin)
 	{ 
-		return ImVec2(margin, margin); 
+		return ImVec2(margin + PLATFORM->getSafeAreaLeftMargin(),
+            margin + PLATFORM->getSafeAreaTopMargin()); 
 	}
 
 	ImVec2 TopRightCorner(float margin)
 	{ 
-		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin, margin);
+		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - PLATFORM->getSafeAreaRightMargin(),
+            margin + PLATFORM->getSafeAreaTopMargin());
 	}
 
 	ImVec2 BottomLeftCorner(float margin)
 	{
-		return ImVec2(margin, IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin);
+		return ImVec2(margin + PLATFORM->getSafeAreaLeftMargin(),
+            IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - PLATFORM->getSafeAreaBottomMargin());
 	}
 
 	ImVec2 BottomRightCorner(float margin)
 	{
-		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin, IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin);
+		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - PLATFORM->getSafeAreaRightMargin(),
+            IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - PLATFORM->getSafeAreaBottomMargin());
 	}
 }
