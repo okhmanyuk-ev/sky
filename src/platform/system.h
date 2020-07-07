@@ -45,6 +45,11 @@ namespace Platform
 
 		virtual float getScale() const = 0;
 		virtual void setScale(float value) = 0;
+        
+        virtual float getSafeAreaTopMargin() const = 0;
+        virtual float getSafeAreaBottomMargin() const = 0;
+        virtual float getSafeAreaLeftMargin() const = 0;
+        virtual float getSafeAreaRightMargin() const = 0;
 
 		virtual bool isKeyPressed(Keyboard::Key key) const = 0;
 		virtual bool isKeyPressed(Mouse::Button key) const = 0;

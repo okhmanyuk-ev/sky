@@ -171,6 +171,8 @@ void SystemIos::refreshDimensions()
     
     mWidth *= mScale;
     mHeight *= mScale;
+
+    mSafeAreaInsets = [Window safeAreaInsets];
     
     if (prev_width != mWidth || prev_height != mHeight)
     {

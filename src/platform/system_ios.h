@@ -28,6 +28,11 @@ namespace Platform
         float getScale() const override { return mScale; }
         void setScale(float value) override { /* nothing */ }
         
+        float getSafeAreaTopMargin() const override { return mSafeAreaInsets.top; }
+        float getSafeAreaBottomMargin() const override { return mSafeAreaInsets.bottom; }
+        float getSafeAreaLeftMargin() const override { return mSafeAreaInsets.left; }
+        float getSafeAreaRightMargin() const override { return mSafeAreaInsets.right; }
+        
         bool isKeyPressed(Keyboard::Key key) const override { return false; }
         bool isKeyPressed(Mouse::Button key) const override { return false; }
         
@@ -67,6 +72,7 @@ namespace Platform
         int mHeight = 0;
         float mScale = 0.0f;
         std::string mAppName;
+        UIEdgeInsets mSafeAreaInsets;
     };
 }
 #endif
