@@ -96,25 +96,25 @@ namespace ImGui::User
 
 	ImVec2 TopLeftCorner(float margin)
 	{ 
-		return ImVec2(margin + PLATFORM->getSafeAreaLeftMargin(),
-            margin + PLATFORM->getSafeAreaTopMargin()); 
+		return ImVec2(margin + (PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale()),
+            margin + (PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale())); 
 	}
 
 	ImVec2 TopRightCorner(float margin)
 	{ 
-		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - PLATFORM->getSafeAreaRightMargin(),
-            margin + PLATFORM->getSafeAreaTopMargin());
+		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - (PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale()),
+            margin + (PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale()));
 	}
 
 	ImVec2 BottomLeftCorner(float margin)
 	{
-		return ImVec2(margin + PLATFORM->getSafeAreaLeftMargin(),
-            IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - PLATFORM->getSafeAreaBottomMargin());
+		return ImVec2(margin + (PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale()),
+            IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - (PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale()));
 	}
 
 	ImVec2 BottomRightCorner(float margin)
 	{
-		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - PLATFORM->getSafeAreaRightMargin(),
-            IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - PLATFORM->getSafeAreaBottomMargin());
+		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - (PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale()),
+            IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - (PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale()));
 	}
 }

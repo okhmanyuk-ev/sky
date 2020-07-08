@@ -244,8 +244,14 @@ void SceneHelpers::Hud::update()
 {
 	Scene::Node::update();
 
-	setVerticalPosition(PLATFORM->getSafeAreaTopMargin());
-	setHorizontalPosition(PLATFORM->getSafeAreaLeftMargin());
-	setVerticalMargin(PLATFORM->getSafeAreaTopMargin() + PLATFORM->getSafeAreaBottomMargin());
-	setHorizontalMargin(PLATFORM->getSafeAreaLeftMargin() + PLATFORM->getSafeAreaRightMargin());
+	auto scale = PLATFORM->getScale();
+	auto left = PLATFORM->getSafeAreaLeftMargin() / scale;
+	auto top = PLATFORM->getSafeAreaTopMargin() / scale;
+	auto bottom = PLATFORM->getSafeAreaBottomMargin() / scale;
+	auto right = PLATFORM->getSafeAreaRightMargin() / scale;
+
+	setVerticalPosition(top);
+	setHorizontalPosition(left);
+	setVerticalMargin(top + bottom);
+	setHorizontalMargin(left + right);
 }

@@ -172,7 +172,12 @@ void SystemIos::refreshDimensions()
     mWidth *= mScale;
     mHeight *= mScale;
 
-    mSafeAreaInsets = [Window safeAreaInsets];
+    auto safeArea = [Window safeAreaInsets];
+    
+    mSafeAreaTopMargin = safeArea.top * mScale;
+    mSafeAreaBottomMargin = safeArea.bottom * mScale;
+    mSafeAreaLeftMargin = safeArea.left * mScale;
+    mSafeAreaRightMargin = safeArea.right * mScale;
     
     if (prev_width != mWidth || prev_height != mHeight)
     {
