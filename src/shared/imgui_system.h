@@ -57,11 +57,12 @@ namespace Shared
 		auto getLogicalWidth() const { return mLogicalSize.x; }
 		auto getLogicalHeight() const { return mLogicalSize.y; }
 
+		float getScale() const;
+
 	private:
 		Renderer::Sampler mSampler = Renderer::Sampler::Nearest;
 		bool mScaleIndependence = false;
 		glm::vec2 mLogicalSize = { 0.0f, 0.0f };
-		float mScale = 1.0f;
 
 	private:	
 		void event(const Platform::Keyboard::Event& e) override;

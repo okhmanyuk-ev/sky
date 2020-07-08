@@ -49,11 +49,8 @@ ImguiSystem::~ImguiSystem()
 
 void ImguiSystem::begin()
 {
-	if (mScaleIndependence)
-		mScale = 1.0f / PLATFORM->getScale();
-
-	mLogicalSize.x = PLATFORM->getLogicalWidth() / mScale;
-	mLogicalSize.y = PLATFORM->getLogicalHeight() / mScale;
+	mLogicalSize = { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight() };
+	mLogicalSize /= getScale();
 
 	ensureFont();
 
@@ -64,8 +61,8 @@ void ImguiSystem::begin()
 	io.DisplaySize.x = getLogicalWidth();
 	io.DisplaySize.y = getLogicalHeight();
 
-	io.MousePos.x = mMousePos.x / PLATFORM->getScale() / mScale;
-	io.MousePos.y = mMousePos.y / PLATFORM->getScale() / mScale;
+	io.MousePos.x = mMousePos.x / PLATFORM->getScale() / getScale();
+	io.MousePos.y = mMousePos.y / PLATFORM->getScale() / getScale();
 
 	io.MouseWheel += mMouseWheel.y;
 
@@ -93,7 +90,7 @@ void ImguiSystem::end()
 	ImGui::Render();
 
 	auto drawData = ImGui::GetDrawData();
-	drawData->ScaleClipRects({ PLATFORM->getScale() * mScale, PLATFORM->getScale() * mScale });
+	drawData->ScaleClipRects({ PLATFORM->getScale() * getScale(), PLATFORM->getScale() * getScale() });
 
 	auto view = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	auto projection = glm::orthoLH(0.0f, getLogicalWidth(), getLogicalHeight(), 0.0f, -1.0f, 1.0f);
@@ -212,4 +209,14 @@ void ImguiSystem::event(const Platform::Mouse::Event& e)
 		else if (e.button == Platform::Mouse::Button::Middle)
 			mReleasedMouseButtons.insert(2);
 	}
+}
+
+float ImguiSystem::getScale() const
+{
+	float result = 1.0f;
+
+	if (mScaleIndependence)
+		result /= PLATFORM->getScale();
+
+	return result;
 }
