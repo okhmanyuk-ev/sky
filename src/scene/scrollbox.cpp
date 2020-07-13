@@ -12,14 +12,35 @@ Scrollbox::Scrollbox()
 
 	mContent = std::make_shared<Node>();
 	mBounding->attach(mContent);
+
+	mTimestepFixer.setTimestep(1.0f / 120.0f);
+	mTimestepFixer.setCallback([this](float dTime) {
+		physics(dTime);
+	});
 }
 
 void Scrollbox::update()
 {
 	Node::update();
+	mTimestepFixer.execute();
+}
 
+void Scrollbox::touch(Touch type, const glm::vec2& pos)
+{
+	Node::touch(type, pos);
+
+	auto local_pos = unproject(pos);
+
+	if (type != Touch::Begin)
+		mSpeed += local_pos - mPrevPosition;
+
+	mPrevPosition = local_pos;
+}
+
+void Scrollbox::physics(float dTime)
+{
 	auto speed = mSpeed * mSensitivity;
-	auto delta = Clock::ToSeconds(FRAME->getTimeDelta()) * 100.0f;
+	auto delta = dTime * 100.0f;
 
 	if (!isTouching())
 		speed *= delta;
@@ -54,16 +75,4 @@ void Scrollbox::update()
 		mContent->setY(0.0f);
 		mSpeed.y = 0.0f;
 	}
-}
-
-void Scrollbox::touch(Touch type, const glm::vec2& pos)
-{
-	Node::touch(type, pos);
-
-	auto local_pos = unproject(pos);
-
-	if (type != Touch::Begin)
-		mSpeed += local_pos - mPrevPosition;
-
-	mPrevPosition = local_pos;
 }

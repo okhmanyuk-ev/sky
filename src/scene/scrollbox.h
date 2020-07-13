@@ -1,6 +1,7 @@
 #pragma once
 
 #include <scene/node.h>
+#include <common/timestep_fixer.h>
 
 namespace Scene
 {
@@ -12,6 +13,9 @@ namespace Scene
 	protected:
 		void update() override;
 		void touch(Touch type, const glm::vec2& pos) override;
+
+	private:
+		void physics(float dTime);
 
 	private:
 		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
@@ -39,5 +43,6 @@ namespace Scene
 		glm::vec2 mSpeed = { 0.0f, 0.0f };
 		float mInertiaFriction = 0.03f;
 		bool mInertiaEnabled = true;
+		Common::TimestepFixer mTimestepFixer;
 	};
 }
