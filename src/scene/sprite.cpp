@@ -4,12 +4,14 @@ using namespace Scene;
 
 void Sprite::draw()
 {
+	Node::draw();
+	
 	if (mTexture == nullptr)
-	{
-		Node::draw();
 		return;
-	}
-
+	
+	if (getAlpha() <= 0.0f)
+		return;
+	
 	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
 	
 	GRAPHICS->pushSampler(getSampler());
@@ -17,8 +19,6 @@ void Sprite::draw()
 	GRAPHICS->pushTextureAddress(mTextureAddress);
 	GRAPHICS->drawSprite(mTexture, model, mTexRegion, getColor());
 	GRAPHICS->pop(3);
-
-	Node::draw();
 }
 
 void Sprite::update()

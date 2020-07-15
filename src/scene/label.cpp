@@ -74,6 +74,9 @@ void Label::draw()
 	if (mFont == nullptr || mFontSize <= 0.0f || (mMultiline && getWidth() <= 0.0f))
 		return;
 
+	if (getAlpha() <= 0.0f)
+		return;
+
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 

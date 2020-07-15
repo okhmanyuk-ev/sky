@@ -4,11 +4,13 @@ using namespace Scene;
 
 void SlicedSprite::draw()
 {
+	Node::draw();
+	
 	if (mTexture == nullptr)
-	{
-		Node::draw();
 		return;
-	}
+	
+	if (getAlpha() <= 0.0f)
+		return;
 
 	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
 	
@@ -16,8 +18,6 @@ void SlicedSprite::draw()
 	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->drawSlicedSprite(mTexture, model, mCenterRegion, getSize(), getColor());
 	GRAPHICS->pop(2);
-
-	Node::draw();
 }
 
 void SlicedSprite::update()

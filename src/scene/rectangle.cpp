@@ -5,6 +5,11 @@ using namespace Scene;
 
 void Rectangle::draw()
 {
+	Node::draw();
+
+	if (getAlpha() <= 0.0f)
+		return;
+
 	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
 	auto color = getColor();
 
@@ -32,8 +37,6 @@ void Rectangle::draw()
 	{
 		GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model);
 	}
-
-	Node::draw();
 }
 
 void Rectangle::setHorizontalGradient(const glm::vec4& left, const glm::vec4& right)
