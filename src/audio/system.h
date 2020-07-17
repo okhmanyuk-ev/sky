@@ -19,7 +19,7 @@ namespace Audio
 		void update();
 
 	public:
-		void play(const Sound& sound);
+		void play(std::shared_ptr<Sound> sound);
 
 	private:
 		static FMOD::System* Fmod;

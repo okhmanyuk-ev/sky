@@ -30,9 +30,12 @@ void System::update()
 	Fmod->update();
 }
 
-void System::play(const Sound& sound)
+void System::play(std::shared_ptr<Sound> sound)
 {
-	Fmod->playSound(sound.sound, nullptr, false, &channel);
+	if (sound == nullptr)
+		return;
+
+	Fmod->playSound(sound->sound, nullptr, false, &channel);
 }
 
 System::~System()
