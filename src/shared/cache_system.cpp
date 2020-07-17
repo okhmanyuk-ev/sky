@@ -25,6 +25,12 @@ std::shared_ptr<Graphics::Animation> CacheSystem::getAnimation(const std::string
 	return mAnimations.at(name);
 }
 
+std::shared_ptr<Audio::Sound> CacheSystem::getSound(const std::string& name)
+{
+	loadSound(name);
+	return mSounds.at(name);
+}
+
 void CacheSystem::loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
@@ -92,4 +98,31 @@ void CacheSystem::loadAnimation(const std::string& path, const std::string& name
 void CacheSystem::loadAnimation(const std::string& path)
 {
 	loadAnimation(path, path);
+}
+
+void CacheSystem::loadSound(std::shared_ptr<Audio::Sound> sound, const std::string& name)
+{
+	if (mSounds.count(name) > 0)
+		return;
+
+	mSounds[name] = sound;
+}
+
+void CacheSystem::loadSound(const std::string& path, const std::string& name)
+{
+	if (mSounds.count(name) > 0)
+		return;
+
+	if (!Platform::Asset::Exists(path))
+	{
+		CONSOLE_DEVICE->writeLine("cannot find sound: " + path, Console::Color::Red);
+		return;
+	}
+
+	loadSound(std::make_shared<Audio::Sound>(path), name);
+}
+
+void CacheSystem::loadSound(const std::string& path)
+{
+	loadSound(path, path);
 }

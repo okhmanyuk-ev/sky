@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <memory>
 #include <graphics/animation.h>
+#include <audio/sound.h>
 
 #define CACHE ENGINE->getSystem<Shared::CacheSystem>()
 
@@ -20,6 +21,7 @@
 #define TEXTURE(NAME) CACHE->getTexture(NAME)
 #define FONT(NAME) CACHE->getFont(NAME)
 #define ANIMATION(NAME) CACHE->getAnimation(NAME)
+#define SOUND(NAME) CACHE->getSound(NAME)
 
 namespace Shared 
 {
@@ -29,6 +31,7 @@ namespace Shared
 		std::shared_ptr<Renderer::Texture> getTexture(const std::string& name);
 		std::shared_ptr<Graphics::Font> getFont(const std::string& name);
 		std::shared_ptr<Graphics::Animation> getAnimation(const std::string& name);
+		std::shared_ptr<Audio::Sound> getSound(const std::string& name);
 		
 		void loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name);
 		void loadTexture(std::shared_ptr<Graphics::Image> image, const std::string& name);
@@ -42,9 +45,14 @@ namespace Shared
 		void loadAnimation(const std::string& path, const std::string& name);
 		void loadAnimation(const std::string& path);
 
+		void loadSound(std::shared_ptr<Audio::Sound> sound, const std::string& name);
+		void loadSound(const std::string& path, const std::string& name);
+		void loadSound(const std::string& path);
+
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Renderer::Texture>> mTextures;
 		std::unordered_map<std::string, std::shared_ptr<Graphics::Font>> mFonts;
 		std::unordered_map<std::string, std::shared_ptr<Graphics::Animation>> mAnimations;
+		std::unordered_map<std::string, std::shared_ptr<Audio::Sound>> mSounds;
 	};
 }
