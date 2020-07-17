@@ -2,7 +2,7 @@
 
 #include <core/engine.h>
 #include <audio/sound.h>
-#include <fmod/fmod.hpp>
+#include <fmod/fmod_studio.hpp>
 
 #define AUDIO ENGINE->getSystem<Audio::System>()
 
@@ -22,7 +22,8 @@ namespace Audio
 		void play(std::shared_ptr<Sound> sound);
 
 	private:
-		static FMOD::System* Fmod;
+		static inline FMOD::System* Fmod = nullptr;
+		static inline FMOD::Studio::System* FmodStudio = nullptr;
 		FMOD::Channel* channel = nullptr;
 	};
 }

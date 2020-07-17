@@ -1,6 +1,6 @@
 /* ======================================================================================== */
 /* FMOD Core API - Common C/C++ header file.                                                */
-/* Copyright (c), Firelight Technologies Pty, Ltd. 2004-2019.                               */
+/* Copyright (c), Firelight Technologies Pty, Ltd. 2004-2020.                               */
 /*                                                                                          */
 /* This header is included by fmod.hpp (C++ interface) and fmod.h (C interface)             */
 /*                                                                                          */
@@ -15,15 +15,13 @@
 */
 #if defined(_WIN32) || defined(__CYGWIN__)
     #define F_CALL __stdcall
-#elif defined(__ANDROID__) && defined(__arm__) && !defined(__LP64__) && !defined(__clang__)
-    #define F_CALL __attribute__((pcs("aapcs")))
 #else
     #define F_CALL
 #endif
 
-#if defined(_WIN32) || defined(__CYGWIN__) || defined(__ORBIS__)
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__ORBIS__) || defined(F_USE_DECLSPEC)
     #define F_EXPORT __declspec(dllexport)
-#elif defined(__APPLE__) || defined(__ANDROID__) || defined(__linux__)
+#elif defined(__APPLE__) || defined(__ANDROID__) || defined(__linux__) || defined(F_USE_ATTRIBUTE)
     #define F_EXPORT __attribute__((visibility("default")))
 #else
     #define F_EXPORT
@@ -60,7 +58,7 @@ typedef unsigned long long         FMOD_PORT_INDEX;
 /*
     FMOD constants
 */
-#define FMOD_VERSION                                0x00020000                     /* 0xaaaabbcc -> aaaa = product version, bb = major version, cc = minor version.*/
+#define FMOD_VERSION    0x00020010                     /* 0xaaaabbcc -> aaaa = product version, bb = major version, cc = minor version.*/
 
 typedef unsigned int FMOD_DEBUG_FLAGS;
 #define FMOD_DEBUG_LEVEL_NONE                       0x00000000
@@ -98,6 +96,7 @@ typedef unsigned int FMOD_INITFLAGS;
 #define FMOD_INIT_PREFER_DOLBY_DOWNMIX              0x00080000
 #define FMOD_INIT_THREAD_UNSAFE                     0x00100000
 #define FMOD_INIT_PROFILE_METER_ALL                 0x00200000
+#define FMOD_INIT_MEMORY_TRACKING                   0x00400000
 
 typedef unsigned int FMOD_DRIVER_STATE;
 #define FMOD_DRIVER_STATE_CONNECTED                 0x00000001
@@ -330,6 +329,7 @@ typedef enum FMOD_OUTPUTTYPE
     FMOD_OUTPUTTYPE_WEBAUDIO,
     FMOD_OUTPUTTYPE_NNAUDIO,
     FMOD_OUTPUTTYPE_WINSONIC,
+    FMOD_OUTPUTTYPE_AAUDIO,
 
     FMOD_OUTPUTTYPE_MAX,
     FMOD_OUTPUTTYPE_FORCEINT = 65536
@@ -362,7 +362,8 @@ typedef enum FMOD_SPEAKERMODE
 
 typedef enum FMOD_SPEAKER
 {
-    FMOD_SPEAKER_FRONT_LEFT,
+    FMOD_SPEAKER_NONE = -1,
+    FMOD_SPEAKER_FRONT_LEFT = 0,
     FMOD_SPEAKER_FRONT_RIGHT,
     FMOD_SPEAKER_FRONT_CENTER,
     FMOD_SPEAKER_LOW_FREQUENCY,
@@ -428,6 +429,7 @@ typedef enum FMOD_SOUND_TYPE
     FMOD_SOUND_TYPE_MEDIA_FOUNDATION,
     FMOD_SOUND_TYPE_MEDIACODEC,
     FMOD_SOUND_TYPE_FADPCM,
+    FMOD_SOUND_TYPE_OPUS,
 
     FMOD_SOUND_TYPE_MAX,
     FMOD_SOUND_TYPE_FORCEINT = 65536

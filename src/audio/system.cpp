@@ -7,19 +7,14 @@
 
 using namespace Audio;
 
-FMOD::System* System::Fmod = nullptr;
-
 System::System()
 {
-	FMOD::System_Create(&Fmod);
-	unsigned int version;
-	Fmod->getVersion(&version);
-	assert(version == FMOD_VERSION);
+	FMOD::Studio::System::create(&FmodStudio);
+	FmodStudio->getCoreSystem(&Fmod);
 #if defined(PLATFORM_ANDROID)
 	Platform::SystemAndroid::BeginEnv();
 #endif
-	auto result = Fmod->init(32, FMOD_INIT_NORMAL, nullptr);
-	assert(result == FMOD_RESULT::FMOD_OK);
+	FmodStudio->initialize(32, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_NORMAL, NULL);
 #if defined(PLATFORM_ANDROID)
 	Platform::SystemAndroid::EndEnv();
 #endif
@@ -27,7 +22,7 @@ System::System()
 
 void System::update()
 {
-	Fmod->update();
+	//Fmod->update(); // TODO: why everything working without it ?
 }
 
 void System::play(std::shared_ptr<Sound> sound)
@@ -40,5 +35,5 @@ void System::play(std::shared_ptr<Sound> sound)
 
 System::~System()
 {
-	Fmod->release();
+	FmodStudio->release();
 }
