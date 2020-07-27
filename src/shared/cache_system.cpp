@@ -7,10 +7,11 @@ using namespace Shared;
 std::shared_ptr<Renderer::Texture> CacheSystem::getTexture(const std::string& name)
 {
 	loadTexture(name);
+	
 	if (mTextures.count(name) == 0)
 		return nullptr;
-	else
-		return mTextures.at(name);
+	
+	return mTextures.at(name);
 }
 
 std::shared_ptr<Graphics::Font> CacheSystem::getFont(const std::string& name)
@@ -28,6 +29,10 @@ std::shared_ptr<Graphics::Animation> CacheSystem::getAnimation(const std::string
 std::shared_ptr<Audio::Sound> CacheSystem::getSound(const std::string& name)
 {
 	loadSound(name);
+
+	if (mSounds.count(name) == 0)
+		return nullptr;
+
 	return mSounds.at(name);
 }
 
@@ -44,7 +49,9 @@ void CacheSystem::loadTexture(std::shared_ptr<Graphics::Image> image, const std:
 	if (mTextures.count(name) > 0)
 		return;
 
-	loadTexture(std::make_shared<Renderer::Texture>(image->getWidth(), image->getHeight(), image->getChannels(), image->getMemory()), name);
+	auto texture = std::make_shared<Renderer::Texture>(image->getWidth(), image->getHeight(), image->getChannels(), image->getMemory());
+
+	loadTexture(texture, name);
 }
 
 void CacheSystem::loadTexture(const std::string& path, const std::string& name)
@@ -58,7 +65,9 @@ void CacheSystem::loadTexture(const std::string& path, const std::string& name)
 		return;
 	}
 
-	loadTexture(std::make_shared<Graphics::Image>(path), name);
+	auto image = std::make_shared<Graphics::Image>(path);
+
+	loadTexture(image, name);
 }
 
 void CacheSystem::loadTexture(const std::string& path)
@@ -92,7 +101,9 @@ void CacheSystem::loadAnimation(const std::string& path, const std::string& name
 	if (mAnimations.count(name) > 0)
 		return;
 
-	loadAnimation(std::make_shared<Graphics::Animation>(Shared::GraphicsHelpers::OpenAnimationFromFile(path)), name);
+	auto animation = std::make_shared<Graphics::Animation>(Shared::GraphicsHelpers::OpenAnimationFromFile(path));
+
+	loadAnimation(animation, name);
 }
 
 void CacheSystem::loadAnimation(const std::string& path)
@@ -119,7 +130,9 @@ void CacheSystem::loadSound(const std::string& path, const std::string& name)
 		return;
 	}
 
-	loadSound(std::make_shared<Audio::Sound>(path), name);
+	auto sound = std::make_shared<Audio::Sound>(path);
+
+	loadSound(sound, name);
 }
 
 void CacheSystem::loadSound(const std::string& path)
