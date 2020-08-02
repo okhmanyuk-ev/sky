@@ -25,6 +25,7 @@ namespace Common
 
 		void fill(uint8_t value);
 		void ensureSpace(size_t value);
+        void ensureCapacity(size_t value);
 
 		uint32_t readBits(int size);
 		void writeBits(uint32_t value, int size);
@@ -64,7 +65,6 @@ namespace Common
 		bool hasRemaining() { return getRemaining() > 0; }
 
 		auto getCapacity() const { return mCapacity; }
-		void setCapacity(size_t value);
 
 		int getBitPosition() { return mBitPosition; }
 		void setBitPosition(int value) { mBitPosition = value; }

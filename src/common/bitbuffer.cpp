@@ -5,27 +5,10 @@
 
 using namespace Common;
 
-namespace
-{
-	uint32_t nextPowerOfTwo(uint32_t n)
-	{
-		--n;
-
-		n |= n >> 1;
-		n |= n >> 2;
-		n |= n >> 4;
-		n |= n >> 8;
-		n |= n >> 16;
-
-		return n + 1;
-	}
-}
-
-using namespace Common;
-
 BitBuffer::~BitBuffer()
 {
-	setCapacity(0);
+	if (mMemory != nullptr)
+        free(mMemory);
 }
 
 void BitBuffer::clear()
@@ -51,28 +34,26 @@ void BitBuffer::fill(uint8_t value)
 
 void BitBuffer::ensureSpace(size_t value)
 {
-	if (mSize < mPosition + value)
-	{
-		setSize(mPosition + value);
-	}
+    value += mPosition;
+    
+    if (mSize >= value)
+        return;
+    
+    setSize(value);
 }
 
 void BitBuffer::setSize(size_t value)
 {
-	if (value > mCapacity)
-		setCapacity(value);
-
+    ensureCapacity(value + 4);
 	mSize = value;
 }
 
-void BitBuffer::setCapacity(size_t value)
+void BitBuffer::ensureCapacity(size_t value)
 {
-	value *= 2;
-
 	if (mCapacity >= value)
 		return;
-	
-	mCapacity = value;
+    
+    mCapacity = value * 2;
 	mMemory = realloc(mMemory, mCapacity);
 }
 
@@ -88,7 +69,7 @@ uint32_t BitBuffer::readBits(int size)
 		return read<uint32_t>();
 
 	auto& src_value = *(uint32_t*)((size_t)mMemory + mPosition);
-	auto max_value = (1UL << size) - 1;
+	auto max_value = (1U << size) - 1;
 
 	auto result = max_value & (src_value >> mBitPosition);
 
@@ -115,7 +96,7 @@ void BitBuffer::writeBits(uint32_t value, int size)
 		return;
 	}
 
-	auto max_value = (1UL << size) - 1;
+	auto max_value = (1U << size) - 1;
 
 	if (value > max_value)
 		value = max_value;
@@ -131,9 +112,9 @@ void BitBuffer::writeBits(uint32_t value, int size)
 	ensureSpace(byte_count + 1);
 
 	auto& src_value = *(uint32_t*)((size_t)mMemory + mPosition);
-	auto row = (1UL << mBitPosition) - 1;
-
-	src_value = (src_value & row) | (value << mBitPosition);
+	auto row = (1U << mBitPosition) - 1;
+    
+    src_value = (src_value & row) | (value << mBitPosition);
 
 	if (bit_count > 0)
 		mBitPosition = bit_count;
