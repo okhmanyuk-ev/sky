@@ -102,39 +102,43 @@ FirstPersonCameraController::~FirstPersonCameraController()
 	//
 }
 
-void FirstPersonCameraController::event(const Platform::Keyboard::Event& e)
+void FirstPersonCameraController::event(const Platform::Input::Keyboard::Event& e)
 {
-	bool value = e.type == Platform::Keyboard::Event::Type::Pressed ? true : false;
+	using namespace Platform::Input::Keyboard;
 
-	if (e.key == Platform::Keyboard::Key::Left)
+	bool value = e.type == Event::Type::Pressed ? true : false;
+
+	if (e.key == Key::Left)
 		mLeftArrow = value;
-	else if (e.key == Platform::Keyboard::Key::Right)
+	else if (e.key == Key::Right)
 		mRightArrow = value;
-	else if (e.key == Platform::Keyboard::Key::Up)
+	else if (e.key == Key::Up)
 		mUpArrow = value;
-	else if (e.key == Platform::Keyboard::Key::Down)
+	else if (e.key == Key::Down)
 		mDownArrow = value;
 
-	if (e.key == Platform::Keyboard::Key::W)
+	if (e.key == Key::W)
 		mKeyW = value;
-	else if (e.key == Platform::Keyboard::Key::A)
+	else if (e.key == Key::A)
 		mKeyA = value;
-	else if (e.key == Platform::Keyboard::Key::S)
+	else if (e.key == Key::S)
 		mKeyS = value;
-	else if (e.key == Platform::Keyboard::Key::D)
+	else if (e.key == Key::D)
 		mKeyD = value;
 
-	if (e.key == Platform::Keyboard::Key::Shift)
+	if (e.key == Key::Shift)
 		mKeyShift = value;
-	else if (e.key == Platform::Keyboard::Key::Ctrl)
+	else if (e.key == Key::Ctrl)
 		mKeyCtrl = value;
 }
 
-void FirstPersonCameraController::event(const Platform::Mouse::Event& e)
+void FirstPersonCameraController::event(const Platform::Input::Mouse::Event& e)
 {
-	if (e.button == Platform::Mouse::Button::Left)
+	using namespace Platform::Input::Mouse;
+
+	if (e.button == Button::Left)
 	{
-		if (e.type == Platform::Mouse::Event::Type::ButtonDown && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+		if (e.type == Event::Type::ButtonDown && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 		{
 			mLookAround = true;
 			PLATFORM->hideCursor();
@@ -143,14 +147,14 @@ void FirstPersonCameraController::event(const Platform::Mouse::Event& e)
 			mPrevAngles = mStartAngles;
 		}
 
-		if (e.type == Platform::Mouse::Event::Type::ButtonUp)
+		if (e.type == Event::Type::ButtonUp)
 		{
 			mLookAround = false;
 			PLATFORM->showCursor();
 		}
 	}
 
-	if (e.type == Platform::Mouse::Event::Type::Move && mLookAround && !mMouseCaptured)
+	if (e.type == Event::Type::Move && mLookAround && !mMouseCaptured)
 	{
 		mMouseCaptured = true;
 		mCurrentAngles = { e.x, e.y };
@@ -158,15 +162,15 @@ void FirstPersonCameraController::event(const Platform::Mouse::Event& e)
 		mPrevAngles = mStartAngles;
 	}
 
-	if (e.type == Platform::Mouse::Event::Type::Wheel)
+	if (e.type == Event::Type::Wheel)
 	{
 		mCamera.setFieldOfView(mCamera.getFieldOfView() - e.wheelY * 0.05f);
 	}
 }
 
-void FirstPersonCameraController::event(const Platform::Touch::Event& e)
+void FirstPersonCameraController::event(const Platform::Input::Touch::Event& e)
 {
-	if (e.type == Platform::Touch::Event::Type::Begin && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+	if (e.type == Platform::Input::Touch::Event::Type::Begin && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 	{
 		mLookAround = true;
 		mCurrentAngles = { e.x, e.y };
@@ -182,7 +186,7 @@ void FirstPersonCameraController::event(const Platform::Touch::Event& e)
 			mKeyD = true;
 	}
 
-	if (e.type == Platform::Touch::Event::Type::End)
+	if (e.type == Platform::Input::Touch::Event::Type::End)
 	{
 		mLookAround = false;
 
@@ -192,7 +196,7 @@ void FirstPersonCameraController::event(const Platform::Touch::Event& e)
 		mKeyD = false;
 	}
 
-	if (e.type == Platform::Touch::Event::Type::Continue)
+	if (e.type == Platform::Input::Touch::Event::Type::Continue)
 	{
 		mCurrentAngles = { e.x, e.y };
 	}

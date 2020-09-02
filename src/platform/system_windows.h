@@ -4,9 +4,7 @@
 
 #if defined(PLATFORM_WINDOWS)
 #include <platform/low_level_api.h>
-
-#include <platform/mouse.h>
-#include <platform/keyboard.h>
+#include <platform/input.h>
 
 #include <cassert>
 #include <set>
@@ -40,8 +38,8 @@ namespace Platform
         float getSafeAreaLeftMargin() const override { return 0.0f; }
         float getSafeAreaRightMargin() const override { return 0.0f; }
         
-		bool isKeyPressed(Keyboard::Key key) const override;
-		bool isKeyPressed(Mouse::Button key) const override;
+		bool isKeyPressed(Input::Keyboard::Key key) const override;
+		bool isKeyPressed(Input::Mouse::Button key) const override;
 
 		void resize(int width, int height) override;
 		void setTitle(const std::string& text) override;
@@ -69,8 +67,8 @@ namespace Platform
 		int mWidth = 800;
 		int mHeight = 600;
 		bool mFinished = false;
-		std::set<Keyboard::Key> mKeyboardKeys;
-		std::set<Mouse::Button> mMouseButtons;
+		std::set<Input::Keyboard::Key> mKeyboardKeys;
+		std::set<Input::Mouse::Button> mMouseButtons;
 		ProductsMap mProducts;
 
 	public:

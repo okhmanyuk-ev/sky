@@ -2,9 +2,7 @@
 
 #include <core/engine.h>
 #include <platform/defines.h>
-#include <platform/keyboard.h>
-#include <platform/mouse.h>
-#include <platform/touch.h>
+#include <platform/input.h>
 
 #include <string>
 #include <memory>
@@ -51,8 +49,8 @@ namespace Platform
         virtual float getSafeAreaLeftMargin() const = 0;
         virtual float getSafeAreaRightMargin() const = 0;
 
-		virtual bool isKeyPressed(Keyboard::Key key) const = 0;
-		virtual bool isKeyPressed(Mouse::Button key) const = 0;
+		virtual bool isKeyPressed(Input::Keyboard::Key key) const = 0;
+		virtual bool isKeyPressed(Input::Mouse::Button key) const = 0;
 
 		virtual void resize(int width, int height) = 0;
 		virtual void setTitle(const std::string& text) = 0;

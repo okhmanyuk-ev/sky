@@ -8,7 +8,7 @@ SceneEditor::SceneEditor(Scene::Scene& scene) : mScene(scene)
 	//
 }
 
-void SceneEditor::event(const Platform::Mouse::Event& e)
+void SceneEditor::event(const Platform::Input::Mouse::Event& e)
 {
 	mMousePos = { e.x, e.y };
 }

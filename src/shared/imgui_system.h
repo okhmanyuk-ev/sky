@@ -3,13 +3,11 @@
 #include <core/engine.h>
 #include <common/frame_system.h>
 #include <common/event_system.h>
-#include <platform/system.h>
 #include <renderer/system.h>
 #include <renderer/texture.h>
 
-#include <platform/keyboard.h>
-#include <platform/mouse.h>
-#include <platform/touch.h>
+#include <platform/system.h>
+#include <platform/input.h>
 
 #include <imgui.h>
 
@@ -25,9 +23,9 @@
 namespace Shared
 {
 	class ImguiSystem :
-		public Common::EventSystem::Listenable<Platform::Keyboard::Event>,
-		public Common::EventSystem::Listenable<Platform::Mouse::Event>,
-		public Common::EventSystem::Listenable<Platform::Touch::Event>
+		public Common::EventSystem::Listenable<Platform::Input::Keyboard::Event>,
+		public Common::EventSystem::Listenable<Platform::Input::Mouse::Event>,
+		public Common::EventSystem::Listenable<Platform::Input::Touch::Event>
 	{
 	public:
 		ImguiSystem();
@@ -65,9 +63,9 @@ namespace Shared
 		glm::vec2 mLogicalSize = { 0.0f, 0.0f };
 
 	private:	
-		void event(const Platform::Keyboard::Event& e) override;
-		void event(const Platform::Mouse::Event& e) override;
-		void event(const Platform::Touch::Event& e) override;
+		void event(const Platform::Input::Keyboard::Event& e) override;
+		void event(const Platform::Input::Mouse::Event& e) override;
+		void event(const Platform::Input::Touch::Event& e) override;
 
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture;

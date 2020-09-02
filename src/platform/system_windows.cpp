@@ -40,12 +40,12 @@ void SystemWindows::quit()
 	mFinished = true;
 }
 
-bool SystemWindows::isKeyPressed(Keyboard::Key key) const
+bool SystemWindows::isKeyPressed(Input::Keyboard::Key key) const
 {
 	return mKeyboardKeys.count(key) > 0;
 }
 
-bool SystemWindows::isKeyPressed(Mouse::Button key) const 
+bool SystemWindows::isKeyPressed(Input::Mouse::Button key) const
 {
 	return mMouseButtons.count(key) > 0;
 }
@@ -175,51 +175,51 @@ LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 
 void SystemWindows::dispatchMouseEvent(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	Mouse::Event evt;
+	Input::Mouse::Event evt;
 		
 	switch (msg)
 	{
 	case WM_MOUSEMOVE:
-		evt.type = Mouse::Event::Type::Move;
+		evt.type = Input::Mouse::Event::Type::Move;
 		break;
 
 	case WM_LBUTTONDOWN:
-		evt.type = Mouse::Event::Type::ButtonDown;
-		evt.button = Mouse::Button::Left;
+		evt.type = Input::Mouse::Event::Type::ButtonDown;
+		evt.button = Input::Mouse::Button::Left;
 		break;
 
 	case WM_MBUTTONDOWN:
-		evt.type = Mouse::Event::Type::ButtonDown;
-		evt.button = Mouse::Button::Middle;
+		evt.type = Input::Mouse::Event::Type::ButtonDown;
+		evt.button = Input::Mouse::Button::Middle;
 		break;
 
 	case WM_RBUTTONDOWN:
-		evt.type = Mouse::Event::Type::ButtonDown;
-		evt.button = Mouse::Button::Right;
+		evt.type = Input::Mouse::Event::Type::ButtonDown;
+		evt.button = Input::Mouse::Button::Right;
 		break;
 
 	case WM_LBUTTONUP:
-		evt.type = Mouse::Event::Type::ButtonUp;
-		evt.button = Mouse::Button::Left;
+		evt.type = Input::Mouse::Event::Type::ButtonUp;
+		evt.button = Input::Mouse::Button::Left;
 		break;
 
 	case WM_MBUTTONUP:
-		evt.type = Mouse::Event::Type::ButtonUp;
-		evt.button = Mouse::Button::Middle;
+		evt.type = Input::Mouse::Event::Type::ButtonUp;
+		evt.button = Input::Mouse::Button::Middle;
 		break;
 
 	case WM_RBUTTONUP:
-		evt.type = Mouse::Event::Type::ButtonUp;
-		evt.button = Mouse::Button::Right;
+		evt.type = Input::Mouse::Event::Type::ButtonUp;
+		evt.button = Input::Mouse::Button::Right;
 		break;
 
 	case WM_MOUSEWHEEL:
-		evt.type = Mouse::Event::Type::Wheel;
+		evt.type = Input::Mouse::Event::Type::Wheel;
 		evt.wheelY = ((float)GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA;
 		break;
 
 	case WM_MOUSEHWHEEL:
-		evt.type = Mouse::Event::Type::Wheel;
+		evt.type = Input::Mouse::Event::Type::Wheel;
 		evt.wheelX = ((float)GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA;
 		break;
 	}
@@ -227,9 +227,9 @@ void SystemWindows::dispatchMouseEvent(UINT msg, WPARAM wParam, LPARAM lParam)
 	evt.x = GET_X_LPARAM(lParam);
 	evt.y = GET_Y_LPARAM(lParam);
 
-	if (evt.type == Mouse::Event::Type::ButtonDown)
+	if (evt.type == Input::Mouse::Event::Type::ButtonDown)
 		mMouseButtons.insert(evt.button);
-	else if (evt.type == Mouse::Event::Type::ButtonUp)
+	else if (evt.type == Input::Mouse::Event::Type::ButtonUp)
 		mMouseButtons.erase(evt.button);
 
 	EVENT->emit(evt);
@@ -237,10 +237,10 @@ void SystemWindows::dispatchMouseEvent(UINT msg, WPARAM wParam, LPARAM lParam)
 
 void SystemWindows::dispatchKeyboardEvent(WPARAM keyCode, bool isKeyDown)
 {
-	Keyboard::Event evt;
+	Input::Keyboard::Event evt;
 
-	evt.type = isKeyDown ? Keyboard::Event::Type::Pressed : Keyboard::Event::Type::Released;
-	evt.key = (Keyboard::Key)keyCode;
+	evt.type = isKeyDown ? Input::Keyboard::Event::Type::Pressed : Input::Keyboard::Event::Type::Released;
+	evt.key = (Input::Keyboard::Key)keyCode;
 	evt.asciiChar = 0;
 
 	BYTE keyboardState[256];
@@ -252,7 +252,7 @@ void SystemWindows::dispatchKeyboardEvent(WPARAM keyCode, bool isKeyDown)
 	if (ToAscii((UINT)keyCode, 0, keyboardState, (WORD*)c, 0) != 0)
 		evt.asciiChar = c[0];
 
-	if (evt.type == Keyboard::Event::Type::Pressed)
+	if (evt.type == Input::Keyboard::Event::Type::Pressed)
 		mKeyboardKeys.insert(evt.key);
 	else
 		mKeyboardKeys.erase(evt.key);

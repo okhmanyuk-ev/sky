@@ -19,7 +19,7 @@
 #include <audio/sound.h>
 
 #include <platform/defines.h>
-#include <platform/mouse.h>
+#include <platform/input.h>
 
 #if defined(PLATFORM_WINDOWS)
 #include <platform/system_windows.h>

@@ -1,7 +1,5 @@
 #include "console_device.h"
 
-#include <platform/keyboard.h>
-#include <platform/mouse.h>
 #include <common/easing.h>
 #include <algorithm>
 #include <cassert>
@@ -434,13 +432,13 @@ void ConsoleDevice::enterInput()
 	}
 }
 
-void ConsoleDevice::event(const Platform::Keyboard::Event& e)
+void ConsoleDevice::event(const Platform::Input::Keyboard::Event& e)
 {
-	if (e.type == Platform::Keyboard::Event::Type::Pressed && e.key == Platform::Keyboard::Key::Tilde)
+	if (e.type == Platform::Input::Keyboard::Event::Type::Pressed && e.key == Platform::Input::Keyboard::Key::Tilde)
 	{
 		toggle();
 	}
-	else if (isOpened() && e.type == Platform::Keyboard::Event::Type::Pressed && e.key == Platform::Keyboard::Key::Escape)
+	else if (isOpened() && e.type == Platform::Input::Keyboard::Event::Type::Pressed && e.key == Platform::Input::Keyboard::Key::Escape)
 	{
 		close();
 	}

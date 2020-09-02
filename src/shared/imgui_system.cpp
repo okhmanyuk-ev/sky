@@ -17,7 +17,7 @@ ImguiSystem::ImguiSystem()
 	io.IniFilename = NULL;
 	
 	{
-		using Platform::Keyboard::Key;
+		using Platform::Input::Keyboard::Key;
 		io.KeyMap[ImGuiKey_Tab] = static_cast<int>(Key::Tab);
 		io.KeyMap[ImGuiKey_LeftArrow] = static_cast<int>(Key::Left);
 		io.KeyMap[ImGuiKey_RightArrow] = static_cast<int>(Key::Right);
@@ -66,9 +66,9 @@ void ImguiSystem::begin()
 
 	io.MouseWheel += mMouseWheel.y;
 
-	io.KeyCtrl = PLATFORM->isKeyPressed(Platform::Keyboard::Key::Ctrl);
-	io.KeyShift = PLATFORM->isKeyPressed(Platform::Keyboard::Key::Shift);
-	io.KeyAlt = PLATFORM->isKeyPressed(Platform::Keyboard::Key::Alt);
+	io.KeyCtrl = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::Ctrl);
+	io.KeyShift = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::Shift);
+	io.KeyAlt = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::Alt);
 
 	mMouseWheel = { 0.0f, 0.0f };
 	
@@ -151,62 +151,62 @@ void ImguiSystem::ensureFont()
 	io.Fonts->TexID = &mTexture;
 }
 
-void ImguiSystem::event(const Platform::Touch::Event& e)
+void ImguiSystem::event(const Platform::Input::Touch::Event& e)
 {
 	mMousePos = { static_cast<float>(e.x), static_cast<float>(e.y) };
 
 	auto& io = ImGui::GetIO();
 
-	if (e.type == Platform::Touch::Event::Type::Begin)
+	if (e.type == Platform::Input::Touch::Event::Type::Begin)
 		io.MouseDown[0] = true;
-	else if (e.type == Platform::Touch::Event::Type::End)
+	else if (e.type == Platform::Input::Touch::Event::Type::End)
 		mReleasedMouseButtons.insert(0);
 }
 
-void ImguiSystem::event(const Platform::Keyboard::Event& e)
+void ImguiSystem::event(const Platform::Input::Keyboard::Event& e)
 {
 	auto& io = ImGui::GetIO();
 
 	int key = static_cast<int>(e.key);
 
-	if (e.type == Platform::Keyboard::Event::Type::Pressed)
+	if (e.type == Platform::Input::Keyboard::Event::Type::Pressed)
 		io.KeysDown[key] = true;
 	else
 		mReleasedKeyboardKeys.insert(key);
 
-	if (e.asciiChar != 0 && e.type == Platform::Keyboard::Event::Type::Pressed)
+	if (e.asciiChar != 0 && e.type == Platform::Input::Keyboard::Event::Type::Pressed)
 		io.AddInputCharacter(e.asciiChar);
 }
 
-void ImguiSystem::event(const Platform::Mouse::Event& e)
+void ImguiSystem::event(const Platform::Input::Mouse::Event& e)
 {
 	auto& io = ImGui::GetIO();
 
-	if (e.type == Platform::Mouse::Event::Type::Move)
+	if (e.type == Platform::Input::Mouse::Event::Type::Move)
 	{
 		mMousePos = { static_cast<float>(e.x), static_cast<float>(e.y) };
 	}
-	else if (e.type == Platform::Mouse::Event::Type::Wheel)
+	else if (e.type == Platform::Input::Mouse::Event::Type::Wheel)
 	{
 		mMouseWheel.x += e.wheelX;
 		mMouseWheel.y += e.wheelY;
 	}
-	else if (e.type == Platform::Mouse::Event::Type::ButtonDown)
+	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonDown)
 	{
-		if (e.button == Platform::Mouse::Button::Left)
+		if (e.button == Platform::Input::Mouse::Button::Left)
 			io.MouseDown[0] = true;
-		else if (e.button == Platform::Mouse::Button::Right)
+		else if (e.button == Platform::Input::Mouse::Button::Right)
 			io.MouseDown[1] = true;
-		else if (e.button == Platform::Mouse::Button::Middle)
+		else if (e.button == Platform::Input::Mouse::Button::Middle)
 			io.MouseDown[2] = true;
 	}
-	else if (e.type == Platform::Mouse::Event::Type::ButtonUp)
+	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp)
 	{
-		if (e.button == Platform::Mouse::Button::Left)
+		if (e.button == Platform::Input::Mouse::Button::Left)
 			mReleasedMouseButtons.insert(0);
-		else if (e.button == Platform::Mouse::Button::Right)
+		else if (e.button == Platform::Input::Mouse::Button::Right)
 			mReleasedMouseButtons.insert(1);
-		else if (e.button == Platform::Mouse::Button::Middle)
+		else if (e.button == Platform::Input::Mouse::Button::Middle)
 			mReleasedMouseButtons.insert(2);
 	}
 }

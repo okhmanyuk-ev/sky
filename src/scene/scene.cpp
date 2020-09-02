@@ -167,23 +167,23 @@ size_t Scene::Scene::getNodesCount(std::shared_ptr<Node> node) const
 	return result;
 }
 
-void Scene::Scene::event(const Platform::Mouse::Event& e)
+void Scene::Scene::event(const Platform::Input::Mouse::Event& e)
 {
-	if (e.type == Platform::Mouse::Event::Type::ButtonDown)
+	if (e.type == Platform::Input::Mouse::Event::Type::ButtonDown)
 	{
-		event(Platform::Touch::Event({ Platform::Touch::Event::Type::Begin, e.x, e.y }));
+		event(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Begin, e.x, e.y }));
 	}
-	else if (e.type == Platform::Mouse::Event::Type::Move)
+	else if (e.type == Platform::Input::Mouse::Event::Type::Move)
 	{
-		event(Platform::Touch::Event({ Platform::Touch::Event::Type::Continue, e.x, e.y }));
+		event(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Continue, e.x, e.y }));
 	}
-	else if (e.type == Platform::Mouse::Event::Type::ButtonUp)
+	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp)
 	{
-		event(Platform::Touch::Event({ Platform::Touch::Event::Type::End, e.x, e.y }));
+		event(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::End, e.x, e.y }));
 	}
 }
 
-void Scene::Scene::event(const Platform::Touch::Event& e)
+void Scene::Scene::event(const Platform::Input::Touch::Event& e)
 {
 	auto pos = glm::vec2(static_cast<float>(e.x), static_cast<float>(e.y));
 
@@ -197,7 +197,7 @@ void Scene::Scene::event(const Platform::Touch::Event& e)
 		}
 	};
 
-	if (e.type == Platform::Touch::Event::Type::Begin && mTouchedNodes.empty() && interactTest(pos))
+	if (e.type == Platform::Input::Touch::Event::Type::Begin && mTouchedNodes.empty() && interactTest(pos))
 	{
 		int mask = 0;
 
@@ -213,11 +213,11 @@ void Scene::Scene::event(const Platform::Touch::Event& e)
 
 		executeTouchedNodes(Node::Touch::Begin, pos);
 	}
-	else if (e.type == Platform::Touch::Event::Type::Continue && !mTouchedNodes.empty())
+	else if (e.type == Platform::Input::Touch::Event::Type::Continue && !mTouchedNodes.empty())
 	{
 		executeTouchedNodes(Node::Touch::Continue, pos);	
 	}
-	else if (e.type == Platform::Touch::Event::Type::End && !mTouchedNodes.empty())
+	else if (e.type == Platform::Input::Touch::Event::Type::End && !mTouchedNodes.empty())
 	{
 		executeTouchedNodes(Node::Touch::End, pos);
 		mTouchedNodes.clear();

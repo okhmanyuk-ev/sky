@@ -3,18 +3,18 @@
 
 using namespace Shared;
 
-void GestureDetector::event(const Platform::Keyboard::Event& e)
+void GestureDetector::event(const Platform::Input::Keyboard::Event& e)
 {
-	if (e.type != Platform::Keyboard::Event::Type::Pressed)
+	if (e.type != Platform::Input::Keyboard::Event::Type::Pressed)
 		return;
 
-	if (e.key == Platform::Keyboard::Key::W || e.key == Platform::Keyboard::Key::Up)
+	if (e.key == Platform::Input::Keyboard::Key::W || e.key == Platform::Input::Keyboard::Key::Up)
 		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Up }));
-	else if (e.key == Platform::Keyboard::Key::A || e.key == Platform::Keyboard::Key::Left)
+	else if (e.key == Platform::Input::Keyboard::Key::A || e.key == Platform::Input::Keyboard::Key::Left)
 		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Left }));
-	else if (e.key == Platform::Keyboard::Key::S || e.key == Platform::Keyboard::Key::Down)
+	else if (e.key == Platform::Input::Keyboard::Key::S || e.key == Platform::Input::Keyboard::Key::Down)
 		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Down }));
-	else if (e.key == Platform::Keyboard::Key::D || e.key == Platform::Keyboard::Key::Right)
+	else if (e.key == Platform::Input::Keyboard::Key::D || e.key == Platform::Input::Keyboard::Key::Right)
 		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Right }));
 }
 
