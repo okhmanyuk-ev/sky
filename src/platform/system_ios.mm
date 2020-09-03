@@ -21,12 +21,12 @@ using namespace Platform;
     return YES;
 }
 
-- (void)emitTouchEvent:(NSSet*)touches withType:(Platform::Touch::Event::Type)type
+- (void)emitTouchEvent:(NSSet*)touches withType:(Input::Touch::Event::Type)type
 {
     for (UITouch* touch in touches)
     {
         auto location = [touch locationInView:SystemIos::Window];
-        auto e = Platform::Touch::Event();
+        auto e = Input::Touch::Event();
         e.type = type;
         e.x = location.x * PLATFORM->getScale();
         e.y = location.y * PLATFORM->getScale();
@@ -37,22 +37,22 @@ using namespace Platform;
 
 -(void)touchesBegan:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    [self emitTouchEvent:touches withType:Platform::Touch::Event::Type::Begin];
+    [self emitTouchEvent:touches withType:Input::Touch::Event::Type::Begin];
 }
 
 - (void)touchesMoved:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    [self emitTouchEvent:touches withType:Platform::Touch::Event::Type::Continue];
+    [self emitTouchEvent:touches withType:Input::Touch::Event::Type::Continue];
 }
 
 - (void)touchesCancelled:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    [self emitTouchEvent:touches withType:Platform::Touch::Event::Type::End];
+    [self emitTouchEvent:touches withType:Input::Touch::Event::Type::End];
 }
 
 - (void)touchesEnded:(NSSet*)touches withEvent:(__unused ::UIEvent*)event
 {
-    [self emitTouchEvent:touches withType:Platform::Touch::Event::Type::End];
+    [self emitTouchEvent:touches withType:Input::Touch::Event::Type::End];
 }
 @end
 

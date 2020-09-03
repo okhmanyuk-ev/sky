@@ -33,8 +33,8 @@ namespace Platform
         float getSafeAreaLeftMargin() const override { return mSafeAreaLeftMargin; }
         float getSafeAreaRightMargin() const override { return mSafeAreaRightMargin; }
         
-        bool isKeyPressed(Keyboard::Key key) const override { return false; }
-        bool isKeyPressed(Mouse::Button key) const override { return false; }
+        bool isKeyPressed(Input::Keyboard::Key key) const override { return false; }
+        bool isKeyPressed(Input::Mouse::Button key) const override { return false; }
         
         void resize(int width, int height) override { /* nothing */ }
         void setTitle(const std::string& text) override { /* nothing */ }
