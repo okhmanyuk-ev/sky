@@ -75,6 +75,9 @@ namespace Shared
 		bool isEnabled() const override { return mEnabled; }
 		void setEnabled(bool value) override { mEnabled = value; }
 
+		auto isHiddenButtonEnabled() const { return mHiddenButtonEnabled; }
+		void setHiddenButtonEnabled(bool value) { mHiddenButtonEnabled = value; }
+
 	private:
 		void frame() override;
 		void showCandidates(float height, float top);
@@ -99,6 +102,7 @@ namespace Shared
 		std::deque<Text> mBuffer;
 		bool mScrollToBack = false;
 		Common::Interpolator mInterpolator;
+		bool mHiddenButtonEnabled = true;
 		
 	private:
 		struct Candidate

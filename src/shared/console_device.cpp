@@ -66,22 +66,26 @@ void ConsoleDevice::frame()
 
 	if (mState == State::Closed)
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0001f);
-		ImGui::Begin("ConsoleButton", nullptr, ImGui::User::ImGuiWindowFlags_Overlay & ~ImGuiWindowFlags_NoInputs);
-		ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10, 10));
-
-		if (ImGui::Button("Console"))
+		if (mHiddenButtonEnabled) 
 		{
-			mButtonAttempts += 1;
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0001f);
+			ImGui::Begin("ConsoleButton", nullptr, ImGui::User::ImGuiWindowFlags_Overlay & ~ImGuiWindowFlags_NoInputs);
+			ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10, 10));
 
-			if (mButtonAttempts >= MaxButtonAttempts)
+			if (ImGui::Button("Console"))
 			{
-				mButtonAttempts = 0;
-				toggle();
+				mButtonAttempts += 1;
+
+				if (mButtonAttempts >= MaxButtonAttempts)
+				{
+					mButtonAttempts = 0;
+					toggle();
+				}
 			}
+		
+			ImGui::End();
+			ImGui::PopStyleVar(1);
 		}
-		ImGui::End();
-		ImGui::PopStyleVar(1);
 
 		showFastLogs();
 		return;
