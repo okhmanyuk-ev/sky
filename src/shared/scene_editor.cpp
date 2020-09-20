@@ -1,11 +1,18 @@
 #include "scene_editor.h"
 #include <imgui.h>
+#include <console/system.h>
+#include <common/console_commands.h>
 
 using namespace Shared;
 
 SceneEditor::SceneEditor(Scene::Scene& scene) : mScene(scene)
 {
-	//
+	CONSOLE->registerCVar("g_editor", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
+}
+
+SceneEditor::~SceneEditor()
+{
+	CONSOLE->removeCVar("g_editor");
 }
 
 void SceneEditor::event(const Platform::Input::Mouse::Event& e)

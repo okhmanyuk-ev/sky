@@ -85,7 +85,8 @@ namespace Console
 			Command::Callback callback);
 		
 		void registerCommand(const std::string& name, Command::Callback callback);
-		
+		void removeCommand(const std::string& name);
+
 	public:
 		void registerCVar(const std::string& name, const std::string& description, 
 			const std::vector<std::string>& args, const std::vector<std::string>& optional_args, 
@@ -99,6 +100,8 @@ namespace Console
 
 		void registerCVar(const std::string& name, const std::vector<std::string>& args, 
 			CVar::Getter getter, CVar::Setter setter = nullptr);
+
+		void removeCVar(const std::string& name);
 
 	public:
 		void addAlias(const std::string& name, const std::vector<std::string>& value);

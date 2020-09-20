@@ -9,6 +9,7 @@ namespace Shared
 	{
 	public:
 		SceneEditor(Scene::Scene& scene);
+		~SceneEditor();
 
 	private:
 		void event(const Platform::Input::Mouse::Event& e) override;
