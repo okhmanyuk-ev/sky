@@ -9,63 +9,148 @@
 #include <memory>
 #include <stack>
 #include <platform/system.h>
+#include <renderer/all.h>
+#include <graphics/tex_region.h>
+#include <graphics/color.h>
+#include <graphics/font.h>
 
 #define IMSCENE ENGINE->getSystem<ImScene::ImScene>()
 
 namespace ImScene
 {
-	class Transform
+	class Node
 	{
 	public:
-		auto getPosition() const { return mPosition; }
-		auto& setPosition(const glm::vec2& value) { mPosition = value; return *this; }
-		auto& setPosition(float value) { return setPosition({ value, value }); }
+		glm::vec2 parent_size = { 0.0f, 0.0f };
+		glm::mat4 parent_matrix = glm::mat4(1.0f);
 
-		auto getSize() const { return mSize; }
-		auto& setSize(const glm::vec2& value) { mSize = value; return *this; }
-		auto& setSize(float value) { return setSize({ value, value }); }
+		glm::vec2 size = { 0.0f, 0.0f };
+		glm::vec2 scale = { 1.0f, 1.0f };
+		glm::vec2 margin = { 0.0f, 0.0f };
+		glm::vec2 stretch = { -1.0f, -1.0f };
+		glm::vec2 anchor = { 0.0f, 0.0f };
+		glm::vec2 pivot = { 0.0f, 0.0f };
+		glm::vec2 position = { 0.0f, 0.0f };
+		glm::vec2 origin = { 0.0f, 0.0f };
+		float rotation = 0.0f;
 
-		auto getScale() const { return mScale; }
-		auto& setScale(const glm::vec2& value) { mScale = value; return *this; }
-		auto& setScale(float value) { return setScale({ value, value }); }
+		glm::mat4 matrix = glm::mat4(1.0f);
 
-		auto getStretch() const { return mStretch; }
-		auto& setStretch(const glm::vec2& value) { mStretch = value; return *this; }
-		auto& setStretch(float value) { return setStretch({ value, value }); }
+		bool dirty = true;
 
-		auto getAnchor() const { return mAnchor; }
-		auto& setAnchor(const glm::vec2& value) { mAnchor = value; return *this; }
-		auto& setAnchor(float value) { return setAnchor({ value, value }); }
-
-		auto getPivot() const { return mPivot; }
-		auto& setPivot(const glm::vec2& value) { mPivot = value; return *this; }
-		auto& setPivot(float value) { return setPivot({ value, value }); }
-
-	private:
-		glm::vec2 mPosition = { 0.0f, 0.0f };
-		glm::vec2 mSize = { 0.0f, 0.0f };
-		glm::vec2 mScale = { 1.0f, 1.0f };
-		glm::vec2 mStretch = { -1.0f, -1.0f };
-		glm::vec2 mAnchor = { 0.0f, 0.0f };
-		glm::vec2 mPivot = { 0.0f, 0.0f };
-	};
-
-	struct Node
-	{
-		glm::vec2 size;
-		glm::mat4 matrix;
+		void ensureMatrix();
 	};
 
 	class ImScene
 	{
 	public:
+		class Drawable;
+
+	public:
 		void begin();
-		glm::mat4 push(const std::string& name, const Transform& transform = Transform());
-		void pop(int count = 1);
+		void begin(const glm::mat4& matrix, const glm::vec2& size);
 		void end();
+		
+		void push();
+		void pop(int count = 1);
+		
+		glm::vec2 size() const;
+		void size(const glm::vec2& value);
+		void size(float value);
+
+		glm::vec2 position() const;
+		void position(const glm::vec2& value);
+		void position(float value);
+
+		glm::vec2 stretch() const;
+		void stretch(const glm::vec2& value);
+		void stretch(float value);
+
+		glm::vec2 anchor() const;
+		void anchor(const glm::vec2& value);
+		void anchor(float value);
+
+		glm::vec2 pivot() const;
+		void pivot(const glm::vec2& value);
+		void pivot(float value);
+
+		float rotation() const;
+		void rotation(float value);
+
+		void draw(Drawable& drawable);
 
 	private:
 		std::stack<Node> mNodeStack;
 		bool mWorking = false;
+		glm::mat4 mDefaultMatrix = glm::mat4(1.0f);
+		glm::vec2 mDefaultSize = { 0.0f, 0.0f };
+	};
+
+	class ImScene::Drawable
+	{
+		friend ImScene;
+
+	protected:
+		virtual void draw(Node& node) = 0;
+	};
+
+	class Label : public ImScene::Drawable
+	{
+	public:
+		Label& font(std::shared_ptr<Graphics::Font> value);
+		Label& fontSize(float value);
+		Label& text(const utf8_string& value);
+
+	protected:
+		void draw(Node& node) override;
+	
+	private:
+		std::shared_ptr<Graphics::Font> mFont = nullptr;
+		float mFontSize = 24.0f;
+		utf8_string mText;
+	};
+
+	class Rectangle : public ImScene::Drawable
+	{
+	public:
+		Rectangle& color(const glm::vec4& value);
+
+	protected:
+		void draw(Node& node) override;
+
+	private:
+		glm::vec4 mColor = { Graphics::Color::White, 1.0f };
+	};
+
+	class Sprite : public ImScene::Drawable
+	{
+	public:
+		Sprite& texture(std::shared_ptr<Renderer::Texture> value);
+		Sprite& region(const Graphics::TexRegion& value);
+		
+	protected:
+		void draw(Node& node) override;
+
+	private:
+		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
+		Graphics::TexRegion mRegion = {};
+	};
+
+	class Circle : public ImScene::Drawable
+	{
+	public:
+		Circle& color(const glm::vec4& value);
+		Circle& fill(float value);
+		Circle& begin(float value);
+		Circle& end(float value);
+
+	protected:
+		void draw(Node& node) override;
+
+	private:
+		glm::vec4 mColor = { Graphics::Color::White, 1.0f };
+		float mFill = 1.0f;
+		float mBegin = 0.0f;
+		float mEnd = 1.0f;
 	};
 }

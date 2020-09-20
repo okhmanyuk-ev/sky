@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 #include <shared/imgui_user.h>
+#include <imscene/imscene.h>
 
 using namespace Shared;
 
@@ -22,6 +23,7 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	ENGINE->addSystem<Shared::CacheSystem>(std::make_shared<Shared::CacheSystem>());
 	ENGINE->addSystem<Shared::ImguiSystem>(std::make_shared<Shared::ImguiSystem>());
 	ENGINE->addSystem<Shared::Stylebook>(std::make_shared<Shared::Stylebook>());
+	ENGINE->addSystem<ImScene::ImScene>(std::make_shared<ImScene::ImScene>());
 	
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
@@ -47,6 +49,7 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 
 GraphicalApplication::~GraphicalApplication()
 {
+	ENGINE->removeSystem<ImScene::ImScene>();
 	ENGINE->removeSystem<Shared::Stylebook>();
 	ENGINE->removeSystem<Shared::ImguiSystem>();
 	ENGINE->removeSystem<Shared::CacheSystem>();
