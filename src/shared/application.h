@@ -34,6 +34,7 @@ namespace Shared
 		enum class Flag
 		{
 			Audio,
+			Network,
 			Scene
 		};
 

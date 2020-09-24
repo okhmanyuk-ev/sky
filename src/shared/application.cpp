@@ -21,7 +21,10 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	ENGINE->addSystem<Console::Device>(std::make_shared<Shared::ConsoleDevice>());
 	ENGINE->addSystem<Console::System>(std::make_shared<Console::System>());
 	ENGINE->addSystem<Graphics::System>(std::make_shared<Graphics::System>());
-	ENGINE->addSystem<Network::System>(std::make_shared<Network::System>());
+	if (flags.count(Flag::Network))
+	{
+		ENGINE->addSystem<Network::System>(std::make_shared<Network::System>());
+	}
 	ENGINE->addSystem<Shared::LocalizationSystem>(std::make_shared<Shared::LocalizationSystem>());
 	ENGINE->addSystem<Shared::StatsSystem>(std::make_shared<Shared::StatsSystem>());
 	ENGINE->addSystem<Shared::CacheSystem>(std::make_shared<Shared::CacheSystem>());
@@ -85,7 +88,10 @@ Application::~Application()
 	ENGINE->removeSystem<Shared::CacheSystem>();
 	ENGINE->removeSystem<Shared::StatsSystem>();
 	ENGINE->removeSystem<Shared::LocalizationSystem>();
-	ENGINE->removeSystem<Network::System>();
+	if (mFlags.count(Flag::Network))
+	{
+		ENGINE->removeSystem<Network::System>();
+	}
 	ENGINE->removeSystem<Graphics::System>();
 	ENGINE->removeSystem<Console::System>();
 	ENGINE->removeSystem<Console::Device>();
