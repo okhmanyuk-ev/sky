@@ -22,10 +22,17 @@ Node::~Node()
 	}
 }
 
-void Node::attach(std::shared_ptr<Node> node)
+void Node::attach(std::shared_ptr<Node> node, int position)
 {
 	assert(node->mParent == nullptr);
-	mNodes.push_back(node);
+	if (position < 0) 
+	{
+		mNodes.push_back(node);
+	}
+	else
+	{
+		mNodes.insert(std::next(mNodes.begin(), position), node);
+	}
 	node->mParent = this;
 }
 

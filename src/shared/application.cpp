@@ -1,13 +1,17 @@
-#include "graphical_application.h"
+#include "application.h"
 
 #include <imgui.h>
 #include <shared/imgui_user.h>
 #include <imscene/imscene.h>
+#include <audio/system.h>
+#include <shared/scene_manager.h>
 
 using namespace Shared;
 
-GraphicalApplication::GraphicalApplication(const std::string& appname)
+Application::Application(const std::string& appname, const Flags& flags) : mFlags(flags)
 {
+	std::srand((unsigned int)std::time(nullptr));
+
 	ENGINE->addSystem<Common::EventSystem>(std::make_shared<Common::EventSystem>());
 	ENGINE->addSystem<Common::TaskSystem>(std::make_shared<Common::TaskSystem>());
 	ENGINE->addSystem<Common::FrameSystem>(std::make_shared<Common::FrameSystem>());
@@ -24,7 +28,11 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	ENGINE->addSystem<Shared::ImguiSystem>(std::make_shared<Shared::ImguiSystem>());
 	ENGINE->addSystem<Shared::Stylebook>(std::make_shared<Shared::Stylebook>());
 	ENGINE->addSystem<ImScene::ImScene>(std::make_shared<ImScene::ImScene>());
-	
+	if (flags.count(Flag::Audio))
+	{
+		ENGINE->addSystem<Audio::System>(std::make_shared<Audio::System>());
+	}
+
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
 	mPerformanceConsoleCommands = std::make_shared<Shared::PerformanceConsoleCommands>();
@@ -33,7 +41,7 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 	mGestureDetector = std::make_shared<Shared::GestureDetector>();
 
 	ImGui::User::SetupStyleFromColor(1.0f, 1.0f, 0.75f);
-	
+
 	auto& style = ImGui::GetStyle();
 	style.WindowBorderSize = 0.0f;
 	style.PopupBorderSize = 0.0f;
@@ -45,10 +53,35 @@ GraphicalApplication::GraphicalApplication(const std::string& appname)
 #if !defined(PLATFORM_MOBILE)
 	IMGUI_SYSTEM->setScaleIndependence(true);
 #endif
+
+	if (flags.count(Flag::Scene))
+	{
+		mScene = std::make_shared<Scene::Scene>();
+		mScene->setInteractTestCallback([](const auto& pos) {
+			return !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup);
+		});
+		mSceneEditor = std::make_shared<SceneEditor>(*mScene);
+
+		ENGINE->addSystem<Shared::SceneManager>(std::make_shared<Shared::SceneManager>());
+		mScene->getRoot()->attach(SCENE_MANAGER);
+	}
+
+	LOCALIZATION->loadDicrionaries("localization");
+	LOCALIZATION->setLanguage(Shared::LocalizationSystem::Language::English);
 }
 
-GraphicalApplication::~GraphicalApplication()
+Application::~Application()
 {
+	if (mFlags.count(Flag::Scene))
+	{
+		ENGINE->removeSystem<Shared::SceneManager>();
+		mSceneEditor = nullptr;
+		mScene = nullptr;
+	}
+	if (mFlags.count(Flag::Audio))
+	{
+		ENGINE->removeSystem<Audio::System>();
+	}
 	ENGINE->removeSystem<ImScene::ImScene>();
 	ENGINE->removeSystem<Shared::Stylebook>();
 	ENGINE->removeSystem<Shared::ImguiSystem>();
@@ -64,10 +97,10 @@ GraphicalApplication::~GraphicalApplication()
 	ENGINE->removeSystem<Common::ProfilerSystem>();
 	ENGINE->removeSystem<Common::FrameSystem>();
 	ENGINE->removeSystem<Common::TaskSystem>();
-//	ENGINE->removeSystem<Common::EventSystem>(); // should be removed later
+	//	ENGINE->removeSystem<Common::EventSystem>(); // should be removed later
 }
 
-void GraphicalApplication::run()
+void Application::run()
 {
 	while (!PLATFORM->isFinished())
 	{
@@ -75,6 +108,10 @@ void GraphicalApplication::run()
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
 		IMGUI_SYSTEM->begin();
+		if (mFlags.count(Flag::Scene))
+		{
+			mScene->frame();
+		}
 		FRAME->frame();
 		IMGUI_SYSTEM->end();
 		RENDERER->present();

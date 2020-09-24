@@ -16,6 +16,7 @@
 #include <common/actions.h>
 #include <common/frame_system.h>
 
+#include <audio/system.h>
 #include <audio/sound.h>
 
 #include <platform/defines.h>
@@ -31,8 +32,7 @@
 
 #include <shared/stats_system.h>
 #include <shared/cache_system.h>
-#include <shared/rich_application.h>
-#include <shared/graphical_application.h>
+#include <shared/application.h>
 #include <shared/localization_system.h>
 #include <shared/graphics_helpers.h>
 #include <shared/action_helpers.h>
