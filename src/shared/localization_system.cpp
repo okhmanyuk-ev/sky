@@ -6,12 +6,22 @@
 
 using namespace Shared;
 
+LocalizationSystem::LocalizationSystem()
+{
+	loadDicrionaries("localization");
+	setLanguage(Shared::LocalizationSystem::Language::English);
+}
+
 void LocalizationSystem::loadDicrionaries(const std::string& path)
 {
 	auto loadDictionary = [this, path](Language language) {
 		auto& dictionary = mDictionaries[language];
+		auto _path = path + "/" + getLanguageName(language) + ".txt";
 
-		auto asset = Platform::Asset(path + "/" + getLanguageName(language) + ".txt");
+		if (!Platform::Asset::Exists(_path))
+			return;
+
+		auto asset = Platform::Asset(_path);
 
 		auto s = std::string((char*)asset.getMemory(), asset.getSize());
 		auto ss = std::stringstream(s);

@@ -10,6 +10,9 @@ namespace Shared
 	class Stylebook
 	{
 	public:
+		Stylebook();
+
+	public:
 		void load(const std::string& path_to_json);
 		void clear();
 

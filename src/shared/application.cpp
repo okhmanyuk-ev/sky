@@ -65,9 +65,6 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		ENGINE->addSystem<Shared::SceneManager>(std::make_shared<Shared::SceneManager>());
 		mScene->getRoot()->attach(SCENE_MANAGER);
 	}
-
-	LOCALIZATION->loadDicrionaries("localization");
-	LOCALIZATION->setLanguage(Shared::LocalizationSystem::Language::English);
 }
 
 Application::~Application()
