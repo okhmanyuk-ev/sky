@@ -125,6 +125,8 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	auto pivot = node->getPivot();
 	auto scale = node->getScale();
 	auto rotation = node->getRotation();
+	auto radial_anchor = node->getRadialAnchor();
+	auto radial_pivot = node->getRadialPivot();
 
 	ImGui::DragFloat2("Position", (float*)&position);
 	ImGui::DragFloat2("Size", (float*)&size);
@@ -135,6 +137,8 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	ImGui::DragFloat2("Pivot", (float*)&pivot, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat2("Scale", (float*)&scale, 0.01f, 0.0f, 2.0f);
 	ImGui::SliderAngle("Rotation", &rotation);
+	ImGui::SliderFloat("Radial Anchor", &radial_anchor, 0.0f, 1.0f);
+	ImGui::SliderFloat("Radial Pivot", &radial_pivot, 0.0f, 1.0f);
 
 	node->setPosition(position);
 	node->setSize(size);
@@ -145,6 +149,8 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	node->setPivot(pivot);
 	node->setScale(scale);
 	node->setRotation(rotation);
+	node->setRadialAnchor(radial_anchor);
+	node->setRadialPivot(radial_pivot);
 }
 
 void SceneEditor::showTooltip(std::shared_ptr<Scene::Node> node)

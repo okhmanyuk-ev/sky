@@ -153,6 +153,8 @@ void Node::updateTransform()
 	mTransform = glm::translate(mTransform, { getAnchor() * parent_size, 0.0f });
 	mTransform = glm::translate(mTransform, { getPosition(), 0.0f });
 	mTransform = glm::rotate(mTransform, getRotation(), { 0.0f, 0.0f, 1.0f });
+	mTransform = glm::rotate(mTransform, getRadialAnchor() * glm::pi<float>() * 2.0f, { 0.0f, 0.0f, 1.0f });
+	mTransform = glm::rotate(mTransform, -getRadialPivot() * glm::pi<float>() * 2.0f, { 0.0f, 0.0f, 1.0f });
 	mTransform = glm::scale(mTransform, { getScale(), 1.0f });
 	mTransform = glm::translate(mTransform, { -getPivot() * getSize(), 0.0f });
 	mTransform = glm::translate(mTransform, { -getOrigin(), 0.0f });
