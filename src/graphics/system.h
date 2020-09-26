@@ -70,7 +70,7 @@ namespace Graphics
 
 		// circle
 		void drawCircle(const glm::mat4& model, const glm::vec4& inner_color = { Color::White, 1.0f },
-			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f, float begin = 0.0f, float end = 1.0f);
+			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f, float pie = 1.0f);
 
 		void drawSegmentedCircle(const glm::mat4& model, int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
 			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f);

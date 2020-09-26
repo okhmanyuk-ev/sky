@@ -340,15 +340,9 @@ ImScene::Circle& ImScene::Circle::fill(float value)
 	return *this;
 }
 
-ImScene::Circle& ImScene::Circle::begin(float value)
+ImScene::Circle& ImScene::Circle::pie(float value)
 {
-	mBegin = value;
-	return *this;
-}
-
-ImScene::Circle& ImScene::Circle::end(float value)
-{
-	mEnd = value;
+	mPie = value;
 	return *this;
 }
 
@@ -362,6 +356,6 @@ void ImScene::Circle::draw(Node& node)
 	auto inner_color = mColor;
 	auto outer_color = mColor;
 	//GRAPHICS->pushBlendMode(getBlendMode());
-	GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mBegin, mEnd);
+	GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mPie);
 	//GRAPHICS->pop();
 }

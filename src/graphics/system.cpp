@@ -292,11 +292,10 @@ void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 }
 
 void System::drawCircle(const glm::mat4& model, const glm::vec4& inner_color, const glm::vec4& outer_color, 
-	float fill, float begin, float end)
+	float fill, float pie)
 {
 	mCircleShader->setFill(fill);
-	mCircleShader->setBegin(begin);
-	mCircleShader->setEnd(end);
+	mCircleShader->setPie(pie);
 	mCircleShader->setInnerColor(inner_color);
 	mCircleShader->setOuterColor(outer_color);
 	drawRectangle(model, { Color::White, 1.0f }, mCircleShader);

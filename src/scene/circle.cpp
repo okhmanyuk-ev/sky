@@ -14,7 +14,7 @@ void Circle::draw()
 	auto inner_color = mInnerColor * color;
 	auto outer_color = mOuterColor * color;
 	GRAPHICS->pushBlendMode(getBlendMode());
-	GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mBegin, mEnd);
+	GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mPie);
 	GRAPHICS->pop();
 }
 

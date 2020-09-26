@@ -15,11 +15,8 @@ namespace Scene
 		auto getFill() const { return mFill; }
 		void setFill(float value) { mFill = value; }
 
-		auto getBegin() const { return mBegin; }
-		void setBegin(float value) { mBegin = value; }
-
-		auto getEnd() const { return mEnd; }
-		void setEnd(float value) { mEnd = value; }
+		auto getPie() const { return mPie; }
+		void setPie(float value) { mPie = value; }
 
 		auto getInnerColor() const { return mInnerColor; }
 		void setInnerColor(const glm::vec4& value) { mInnerColor = value; }
@@ -31,8 +28,7 @@ namespace Scene
 
 	private:
 		float mFill = 1.0f;
-		float mBegin = 0.0f;
-		float mEnd = 1.0f;
+		float mPie = 1.0f;
 		glm::vec4 mInnerColor = { Graphics::Color::White, 1.0f };
 		glm::vec4 mOuterColor = { Graphics::Color::White, 1.0f };
 	};

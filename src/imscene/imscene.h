@@ -141,16 +141,14 @@ namespace ImScene
 	public:
 		Circle& color(const glm::vec4& value);
 		Circle& fill(float value);
-		Circle& begin(float value);
-		Circle& end(float value);
-
+		Circle& pie(float value);
+		
 	protected:
 		void draw(Node& node) override;
 
 	private:
 		glm::vec4 mColor = { Graphics::Color::White, 1.0f };
 		float mFill = 1.0f;
-		float mBegin = 0.0f;
-		float mEnd = 1.0f;
+		float mPie = 1.0f;
 	};
 }
