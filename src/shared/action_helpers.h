@@ -11,6 +11,7 @@ namespace Shared::ActionHelpers
     using Action = std::unique_ptr<Common::Actions::Action>;
 	using SceneTransform = std::shared_ptr<Scene::Transform>;
 	using SceneColor = std::shared_ptr<Scene::Color>;
+	using SceneNode = std::shared_ptr<Scene::Node>;
 
 	Action Insert(std::function<Action()> action);
 	Action RepeatInfinite(std::function<Action()> action);
@@ -38,6 +39,7 @@ namespace Shared::ActionHelpers
 	Action Interpolate(float start, float dest, float duration, EasingFunction easingFunction, std::function<void(float)> callback);	
 	Action Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback);
 	Action Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback);
+	Action Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback);
 
 	Action Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
 	Action Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
@@ -47,6 +49,7 @@ namespace Shared::ActionHelpers
 
 	Action ChangeColor(SceneColor node, const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 	Action ChangeColor(SceneColor node, const glm::vec3& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+	Action ChangeColorRecursive(SceneNode node, const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 
 	Action ChangeAlpha(SceneColor node, float start, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 	Action ChangeAlpha(SceneColor node, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);

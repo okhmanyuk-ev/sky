@@ -1,5 +1,6 @@
 #include "action_helpers.h"
 #include <console/device.h>
+#include <shared/scene_helpers.h>
 
 using namespace Shared;
 
@@ -157,6 +158,13 @@ ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec3& start, const g
 	});
 }
 
+ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback)
+{
+	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
+		callback(glm::lerp(start, dest, value));
+	});
+}
+
 ActionHelpers::Action ActionHelpers::Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction)
 {
 	return Interpolate(startValue, destValue, duration, easingFunction, [&value](float _value) {
@@ -198,6 +206,13 @@ ActionHelpers::Action ActionHelpers::ChangeColor(SceneColor node, const glm::vec
 {
 	return Insert([node, dest, duration, easingFunction] {
 		return ChangeColor(node, node->getColor(), dest, duration, easingFunction);
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeColorRecursive(SceneNode node, const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [node](const glm::vec4& value) {
+		SceneHelpers::RecursiveColorSet(node, value);
 	});
 }
 
