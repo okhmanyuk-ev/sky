@@ -45,7 +45,7 @@
 #include <shared/scene_manager.h>
 #include <shared/scene_editor.h>
 #include <shared/scene_stylebook.h>
-#include <shared/format_helpers.h>
+#include <shared/helpers.h>
 #include <shared/profile.h>
 
 #include <graphics/font.h>

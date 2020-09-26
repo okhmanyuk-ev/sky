@@ -2,7 +2,8 @@
 
 #include <fmt/format.h>
 
-namespace Shared::FormatHelpers
+namespace Shared::Helpers
 {
 	std::string SecondsToFmtString(int seconds);
+	bool Chance(float normalized_percent);
 }
