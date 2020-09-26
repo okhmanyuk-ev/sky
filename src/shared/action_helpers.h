@@ -25,8 +25,10 @@ namespace Shared::ActionHelpers
 	Action Delayed(float duration, Action action);
 	Action Delayed(std::function<bool()> while_callback, Action action);
 
-	Action Limit(float duration, Action action);
-	Action Limit(std::function<bool()> while_callback, Action action);
+	Action Breakable(float duration, Action action);
+	Action Breakable(std::function<bool()> while_callback, Action action);
+
+	Action Pausable(std::function<bool()> run_callback, Action action);
 
 	Action Execute(std::function<void()> callback);
 	Action ExecuteInfinite(std::function<void()> callback);

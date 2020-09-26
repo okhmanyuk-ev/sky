@@ -31,7 +31,7 @@ ActionHelpers::Action ActionHelpers::ChangePositionByDirection(SceneTransform no
 
 ActionHelpers::Action ActionHelpers::ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed, float duration)
 {
-	return Limit(duration, ChangePositionByDirection(node, direction, speed));
+	return Breakable(duration, ChangePositionByDirection(node, direction, speed));
 }
 
 // wait
@@ -77,9 +77,9 @@ ActionHelpers::Action ActionHelpers::Delayed(std::function<bool()> while_callbac
 	);
 }
 
-// limit
+// breakable
 
-ActionHelpers::Action ActionHelpers::Limit(float duration, Action action)
+ActionHelpers::Action ActionHelpers::Breakable(float duration, Action action)
 {
 	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
 		Wait(duration),
@@ -87,12 +87,32 @@ ActionHelpers::Action ActionHelpers::Limit(float duration, Action action)
 	);
 }
 
-ActionHelpers::Action ActionHelpers::Limit(std::function<bool()> while_callback, Action action)
+ActionHelpers::Action ActionHelpers::Breakable(std::function<bool()> while_callback, Action action)
 {
 	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
 		Wait(while_callback),
 		std::move(action)
 	);
+}
+
+// pausable
+
+ActionHelpers::Action ActionHelpers::Pausable(std::function<bool()> run_callback, ActionHelpers::Action action)
+{
+	auto player = std::make_shared<Common::Actions::GenericActionsPlayer<Common::Actions::Parallel>>();
+	player->add(std::move(action));
+
+	return std::make_unique<Common::Actions::Generic>([run_callback, player]() {
+		if (!run_callback())
+			return Common::Actions::Action::Status::Continue;
+
+		player->update();
+
+		if (player->hasActions())
+			return Common::Actions::Action::Status::Continue;
+
+		return Common::Actions::Action::Status::Finished;
+	});
 }
 
 // generic execute
@@ -212,7 +232,7 @@ ActionHelpers::Action ActionHelpers::Show(SceneColor node, float duration, Easin
 ActionHelpers::Action ActionHelpers::Shake(SceneTransform node, float radius, float duration)
 {
 	return MakeSequence(
-		Limit(duration, RepeatInfinite([node, radius] {
+		Breakable(duration, RepeatInfinite([node, radius] {
 			return Execute([node, radius] {
 				node->setOrigin(glm::circularRand(radius));
 			});

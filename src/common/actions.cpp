@@ -179,7 +179,7 @@ void Common::Actions::Run(std::unique_ptr<Action> action)
 	//		return action->frame() == Status::Continue ? FrameSystem::Status::Continue : FrameSystem::Status::Finished;
 	//	});
 
-	auto player = new GenericActionsPlayer<Parallel>();
+	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
 	player->add(std::move(action));
 	FRAME->add([player] {
 		player->update();
@@ -187,7 +187,6 @@ void Common::Actions::Run(std::unique_ptr<Action> action)
 		if (player->hasActions())
 			return FrameSystem::Status::Continue;
 
-		delete player;
 		return FrameSystem::Status::Finished;
 	});
 }
