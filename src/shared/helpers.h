@@ -2,6 +2,9 @@
 
 #include <fmt/format.h>
 
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
 namespace Shared::Helpers
 {
 	std::string SecondsToFmtString(int seconds);

@@ -1,8 +1,5 @@
 #include "helpers.h"
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-
 using namespace Shared;
 
 std::string Helpers::SecondsToFmtString(int seconds)
