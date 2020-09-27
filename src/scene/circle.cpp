@@ -10,7 +10,12 @@ void Circle::update()
 		setRadialPivot(mPie * mPiePivot);
 
 	if (mRadius >= 0.0f)
+	{
 		setSize(mRadius * 2.0f);
+
+		if (mThickness >= 0.0f)
+			setFill(mThickness / mRadius);
+	}
 }
 
 void Circle::draw()

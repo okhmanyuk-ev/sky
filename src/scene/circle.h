@@ -16,6 +16,9 @@ namespace Scene
 		auto getRadius() const { return mRadius; }
 		void setRadius(float value) { mRadius = value; }
 
+		auto getThickness() const { return mThickness; }
+		void setThickness(float value) { mThickness = value; }
+
 		auto getFill() const { return mFill; }
 		void setFill(float value) { mFill = value; }
 
@@ -35,6 +38,7 @@ namespace Scene
 
 	private:
 		float mRadius = -1.0f;
+		float mThickness = -1.0f; // working only when we have radius
 		float mFill = 1.0f;
 		float mPie = 1.0f;
 		float mPiePivot = -1.0f;

@@ -119,6 +119,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	if (auto circle = std::dynamic_pointer_cast<Scene::Circle>(node); circle != nullptr)
 	{
 		auto radius = circle->getRadius();
+		auto thickness = circle->getThickness();
 		auto fill = circle->getFill();
 		auto pie = circle->getPie();
 		auto pie_pivot = circle->getPiePivot();
@@ -126,6 +127,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		auto outer_color = circle->getOuterColor();
 
 		ImGui::DragFloat("Radius", &radius);
+		ImGui::DragFloat("Thickness", &thickness);
 		ImGui::SliderFloat("Fill", &fill, 0.0f, 1.0f);
 		ImGui::SliderFloat("Pie", &pie, 0.0f, 1.0f);
 		ImGui::SliderFloat("Pie Pivot", &pie_pivot, -1.0f, 1.0f);
@@ -133,6 +135,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::ColorEdit4("Outer Color", (float*)&outer_color);
 
 		circle->setRadius(radius);
+		circle->setThickness(thickness);
 		circle->setFill(fill);
 		circle->setPie(pie);
 		circle->setPiePivot(pie_pivot);
