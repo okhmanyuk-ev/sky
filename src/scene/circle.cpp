@@ -2,6 +2,14 @@
 
 using namespace Scene;
 
+void Circle::update()
+{
+	Node::update();
+
+	if (mPiePivot >= 0.0f)
+		setRadialPivot(mPie * mPiePivot);
+}
+
 void Circle::draw()
 {
 	Node::draw();

@@ -9,6 +9,7 @@ namespace Scene
 	class Circle : public Node, public Color, public Blend
 	{
 	protected:
+		void update() override;
 		void draw() override;
 
 	public:
@@ -17,6 +18,9 @@ namespace Scene
 
 		auto getPie() const { return mPie; }
 		void setPie(float value) { mPie = value; }
+
+		auto getPiePivot() const { return mPiePivot; }
+		void setPiePivot(float value) { mPiePivot = value; }
 
 		auto getInnerColor() const { return mInnerColor; }
 		void setInnerColor(const glm::vec4& value) { mInnerColor = value; }
@@ -29,6 +33,7 @@ namespace Scene
 	private:
 		float mFill = 1.0f;
 		float mPie = 1.0f;
+		float mPiePivot = -1.0f;
 		glm::vec4 mInnerColor = { Graphics::Color::White, 1.0f };
 		glm::vec4 mOuterColor = { Graphics::Color::White, 1.0f };
 	};
