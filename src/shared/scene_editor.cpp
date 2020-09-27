@@ -82,7 +82,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	if (auto label = std::dynamic_pointer_cast<Scene::Label>(node); label != nullptr)
 	{
 		auto fontSize = label->getFontSize();
-		ImGui::DragFloat("Font Size", &fontSize, 1.0f, 0.0f, 96.0f);
+		ImGui::SliderFloat("Font Size", &fontSize, 0.0f, 96.0f);
 		label->setFontSize(fontSize);
 		ImGui::Separator();
 
@@ -111,8 +111,31 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	if (auto rectangle = std::dynamic_pointer_cast<Scene::Rectangle>(node); rectangle != nullptr)
 	{
 		auto rounding = rectangle->getRounding();
-		ImGui::DragFloat("Rounding", (float*)&rounding, 0.01f, 0.0f, 1.0f);
+		ImGui::SliderFloat("Rounding", &rounding, 0.0f, 1.0f);
 		rectangle->setRounding(rounding);
+		ImGui::Separator();
+	}
+
+	if (auto circle = std::dynamic_pointer_cast<Scene::Circle>(node); circle != nullptr)
+	{
+		auto fill = circle->getFill();
+		auto pie = circle->getPie();
+		auto pie_pivot = circle->getPiePivot();
+		auto inner_color = circle->getInnerColor();
+		auto outer_color = circle->getOuterColor();
+
+		ImGui::SliderFloat("Fill", &fill, 0.0f, 1.0f);
+		ImGui::SliderFloat("Pie", &pie, 0.0f, 1.0f);
+		ImGui::SliderFloat("Pie Pivot", &pie_pivot, -1.0f, 1.0f);
+		ImGui::ColorEdit4("Inner Color", (float*)&inner_color);
+		ImGui::ColorEdit4("Outer Color", (float*)&outer_color);
+
+		circle->setFill(fill);
+		circle->setPie(pie);
+		circle->setPiePivot(pie_pivot);
+		circle->setInnerColor(inner_color);
+		circle->setOuterColor(outer_color);
+	
 		ImGui::Separator();
 	}
 
