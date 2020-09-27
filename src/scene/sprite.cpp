@@ -23,19 +23,16 @@ void Sprite::draw()
 
 void Sprite::update()
 {
-	if (mTexture == nullptr)
-	{
-		Node::update();
+	Node::update();
+
+	if (mTexture == nullptr) 
 		return;
-	}
 
 	if (getWidth() <= 0.0f)
 		applyTextureWidth();
 
 	if (getHeight() <= 0.0f)
 		applyTextureHeight();
-
-	Node::update();
 }
 
 void Sprite::applyTextureWidth()

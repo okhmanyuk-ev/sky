@@ -136,18 +136,7 @@ bool Node::interactTest(const glm::vec2& value) const
 
 void Node::updateTransform()
 {
-	auto verticalStretch = getVerticalStretch() / getVerticalScale();
-	auto horizontalStretch = getHorizontalStretch() / getHorizontalScale();
-	auto verticalMargin = getVerticalMargin();
-	auto horizontalMargin = getHorizontalMargin();
-
 	auto parent_size = hasParent() ? getParent()->getSize() : (getScene()->getViewport().size / PLATFORM->getScale());
-
-	if (horizontalStretch >= 0.0f)
-		setWidth((parent_size.x * horizontalStretch) - horizontalMargin);
-
-	if (verticalStretch >= 0.0f)
-		setHeight((parent_size.y * verticalStretch) - verticalMargin);
 
 	mTransform = hasParent() ? getParent()->getTransform() : glm::mat4(1.0f);
 	mTransform = glm::translate(mTransform, { getAnchor() * parent_size, 0.0f });
@@ -174,7 +163,16 @@ void Node::leaveDraw()
 
 void Node::update()
 {
-	//
+	auto stretch = getStretch() / getScale();
+	auto margin = getMargin();
+	
+	auto parent_size = hasParent() ? getParent()->getSize() : (getScene()->getViewport().size / PLATFORM->getScale());
+
+	if (stretch.x >= 0.0f)
+		setWidth((parent_size.x * stretch.x) - margin.x);
+
+	if (stretch.y >= 0.0f)
+		setHeight((parent_size.y * stretch.y) - margin.y);
 }
 
 void Node::draw()
