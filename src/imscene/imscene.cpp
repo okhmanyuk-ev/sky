@@ -105,6 +105,28 @@ void ImScene::ImScene::size(float value)
 	size({ value, value });
 }
 
+glm::vec2 ImScene::ImScene::scale() const
+{
+	auto& node = mNodeStack.top();
+	return node.scale;
+}
+
+void ImScene::ImScene::scale(const glm::vec2& value)
+{
+	auto& node = mNodeStack.top();
+
+	if (node.scale == value)
+		return;
+
+	node.scale = value;
+	node.dirty = true;
+}
+
+void ImScene::ImScene::scale(float value)
+{
+	scale({ value, value });
+}
+
 glm::vec2 ImScene::ImScene::position() const
 {
 	auto& node = mNodeStack.top();

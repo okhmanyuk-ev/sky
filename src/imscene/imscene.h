@@ -58,6 +58,10 @@ namespace ImScene
 		void size(const glm::vec2& value);
 		void size(float value);
 
+		glm::vec2 scale() const;
+		void scale(const glm::vec2& value);
+		void scale(float value);
+
 		glm::vec2 position() const;
 		void position(const glm::vec2& value);
 		void position(float value);
