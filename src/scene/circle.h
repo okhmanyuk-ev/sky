@@ -13,6 +13,9 @@ namespace Scene
 		void draw() override;
 
 	public:
+		auto getRadius() const { return mRadius; }
+		void setRadius(float value) { mRadius = value; }
+
 		auto getFill() const { return mFill; }
 		void setFill(float value) { mFill = value; }
 
@@ -31,6 +34,7 @@ namespace Scene
 		void setOuterColor(const glm::vec3& value) { mOuterColor = { value, mOuterColor.a }; }
 
 	private:
+		float mRadius = -1.0f;
 		float mFill = 1.0f;
 		float mPie = 1.0f;
 		float mPiePivot = -1.0f;

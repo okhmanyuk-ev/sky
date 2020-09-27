@@ -8,6 +8,9 @@ void Circle::update()
 
 	if (mPiePivot >= 0.0f)
 		setRadialPivot(mPie * mPiePivot);
+
+	if (mRadius >= 0.0f)
+		setSize(mRadius * 2.0f);
 }
 
 void Circle::draw()
