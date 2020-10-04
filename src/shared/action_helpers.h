@@ -2,6 +2,7 @@
 
 #include <scene/node.h>
 #include <scene/color.h>
+#include <scene/circle.h>
 #include <common/actions.h>
 #include <common/easing.h>
 
@@ -125,6 +126,9 @@ namespace Shared::ActionHelpers
 
 	Action ChangeScale(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 	Action ChangeScale(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+
+	Action ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
+	Action ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Common::Easing::Linear);
 }
 
 namespace Shared::ActionHelpers

@@ -582,3 +582,17 @@ ActionHelpers::Action ActionHelpers::ChangeScale(SceneTransform node, const glm:
 		return ChangeScale(node, node->getScale(), dest, duration, easingFunction);
 	});
 }
+
+ActionHelpers::Action ActionHelpers::ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [circle](float value) {
+		circle->setPie(value);
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([circle, dest, duration, easingFunction] {
+		return ChangeCirclePie(circle, circle->getPie(), dest, duration, easingFunction);
+	});
+}
