@@ -15,7 +15,7 @@ SceneEditor::~SceneEditor()
 	CONSOLE->removeCVar("g_editor");
 }
 
-void SceneEditor::event(const Platform::Input::Mouse::Event& e)
+void SceneEditor::onEvent(const Platform::Input::Mouse::Event& e)
 {
 	mMousePos = { e.x, e.y };
 }

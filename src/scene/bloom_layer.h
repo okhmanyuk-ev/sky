@@ -12,7 +12,7 @@ namespace Scene
 	class BloomLayer : public RenderLayer<Node>
 	{
 	protected:
-		void event(const Platform::System::ResizeEvent& e) override;
+		void onEvent(const Platform::System::ResizeEvent& e) override;
 		void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) override;
 
 	public:

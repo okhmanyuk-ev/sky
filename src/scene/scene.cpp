@@ -167,23 +167,23 @@ size_t Scene::Scene::getNodesCount(std::shared_ptr<Node> node) const
 	return result;
 }
 
-void Scene::Scene::event(const Platform::Input::Mouse::Event& e)
+void Scene::Scene::onEvent(const Platform::Input::Mouse::Event& e)
 {
 	if (e.type == Platform::Input::Mouse::Event::Type::ButtonDown)
 	{
-		event(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Begin, e.x, e.y }));
+		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Begin, e.x, e.y }));
 	}
 	else if (e.type == Platform::Input::Mouse::Event::Type::Move)
 	{
-		event(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Continue, e.x, e.y }));
+		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Continue, e.x, e.y }));
 	}
 	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp)
 	{
-		event(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::End, e.x, e.y }));
+		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::End, e.x, e.y }));
 	}
 }
 
-void Scene::Scene::event(const Platform::Input::Touch::Event& e)
+void Scene::Scene::onEvent(const Platform::Input::Touch::Event& e)
 {
 	auto pos = glm::vec2(static_cast<float>(e.x), static_cast<float>(e.y));
 

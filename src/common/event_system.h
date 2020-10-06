@@ -5,21 +5,45 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#define EVENT ENGINE->getSystem<Common::EventSystem>()
+#define EVENT ENGINE->getSystem<Common::Event::System>()
 
-namespace Common
+namespace Common::Event
 {
-	class EventSystem
+	class System
 	{
 	public:
-		template <typename T> class Listenable;
-		template <typename T> class Listener;
+		using ListenerHandle = void*;
+		template <typename T> using ListenerCallback = std::function<void(const T&)>;
+
+	private:
+		template <typename T> struct ListenerData
+		{
+			ListenerCallback<T> callback;
+		};
 
 	private:
 		template <typename T> auto getTypeIndex()
 		{
 			static auto type = mTypeCount++;
 			return type;
+		}
+
+	public:
+		template <typename T> ListenerHandle createListener(ListenerCallback<T> callback)
+		{
+			auto listener = new ListenerData<T>;
+			listener->callback = callback;
+			auto type_index = getTypeIndex<T>();
+			mListeners[type_index].insert(listener);
+			return listener;
+		}
+
+		template <typename T> void destroyListener(ListenerHandle handle)
+		{
+			auto listener = static_cast<ListenerData<T>*>(handle);
+			auto type_index = getTypeIndex<T>();
+			mListeners[type_index].erase(listener);
+			delete listener;
 		}
 
 	public:
@@ -30,9 +54,10 @@ namespace Common
 			if (mListeners.count(type) == 0)
 				return;
 
-			for (auto listener : mListeners.at(type))
+			for (auto handle : mListeners.at(type))
 			{
-				static_cast<Listenable<T>*>(listener)->event(e);
+				auto listener = static_cast<ListenerData<T>*>(handle);
+				listener->callback(e);
 			}
 		}
 
@@ -41,27 +66,38 @@ namespace Common
 		size_t mTypeCount = 0;
 	};
 
-	template <typename T> class EventSystem::Listenable
+	template <typename T> class Listenable
 	{
-		friend EventSystem;
 	public:
-		Listenable() { EVENT->mListeners[EVENT->getTypeIndex<T>()].insert(this); }
-		virtual ~Listenable() { EVENT->mListeners[EVENT->getTypeIndex<T>()].erase(this); }
+		Listenable() 
+		{ 
+			mHandle = EVENT->createListener<T>([this](const T& e) {
+				onEvent(e);
+			});
+		}
+
+		virtual ~Listenable() 
+		{ 
+			EVENT->destroyListener<T>(mHandle);
+		}
 
 	protected:
-		virtual void event(const T& e) = 0;
+		virtual void onEvent(const T& e) = 0;
+
+	private:
+		System::ListenerHandle mHandle;
 	};
 
-	template <typename T> class EventSystem::Listener final : public EventSystem::Listenable<T>
+	template <typename T> class Listener final : public Listenable<T>
 	{
 	public:
-		using Callback = std::function<void(const T&)>;
+		using Callback = System::ListenerCallback<T>;
 
 	public:
 		Listener(Callback callback = nullptr) : Listenable<T>(), mCallback(callback) { }
 
 	private:
-		void event(const T& e) override
+		void onEvent(const T& e) override
 		{
 			if (mCallback != nullptr)
 			{

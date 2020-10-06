@@ -65,7 +65,7 @@ SystemD3D11::~SystemD3D11()
 	Device->Release();
 }
 
-void SystemD3D11::event(const Platform::System::ResizeEvent& e)
+void SystemD3D11::onEvent(const Platform::System::ResizeEvent& e)
 {
 	destroyRenderTarget();
 	mSwapChain->ResizeBuffers(0, e.width, e.height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);

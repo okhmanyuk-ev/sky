@@ -9,8 +9,9 @@
 
 namespace Shared 
 {
-	class GestureDetector : public Common::EventSystem::Listenable<Platform::Input::Keyboard::Event>,
-		public Common::EventSystem::Listenable<TouchEmulator::Event>
+	class GestureDetector : 
+		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
+		public Common::Event::Listenable<TouchEmulator::Event>
 	{
 	public:
 		struct SwipeEvent
@@ -29,8 +30,8 @@ namespace Shared
 	public:
 
 	private:
-		void event(const Platform::Input::Keyboard::Event& e) override;
-		void event(const TouchEmulator::Event& e) override;
+		void onEvent(const Platform::Input::Keyboard::Event& e) override;
+		void onEvent(const TouchEmulator::Event& e) override;
 
 	private:
 		std::map<Clock::TimePoint, glm::vec2> mPositions;

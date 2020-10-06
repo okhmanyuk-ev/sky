@@ -102,7 +102,7 @@ FirstPersonCameraController::~FirstPersonCameraController()
 	//
 }
 
-void FirstPersonCameraController::event(const Platform::Input::Keyboard::Event& e)
+void FirstPersonCameraController::onEvent(const Platform::Input::Keyboard::Event& e)
 {
 	using namespace Platform::Input::Keyboard;
 
@@ -132,7 +132,7 @@ void FirstPersonCameraController::event(const Platform::Input::Keyboard::Event& 
 		mKeyCtrl = value;
 }
 
-void FirstPersonCameraController::event(const Platform::Input::Mouse::Event& e)
+void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::Event& e)
 {
 	using namespace Platform::Input::Mouse;
 
@@ -168,7 +168,7 @@ void FirstPersonCameraController::event(const Platform::Input::Mouse::Event& e)
 	}
 }
 
-void FirstPersonCameraController::event(const Platform::Input::Touch::Event& e)
+void FirstPersonCameraController::onEvent(const Platform::Input::Touch::Event& e)
 {
 	if (e.type == Platform::Input::Touch::Event::Type::Begin && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 	{

@@ -12,7 +12,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 {
 	std::srand((unsigned int)std::time(nullptr));
 
-	ENGINE->addSystem<Common::EventSystem>(std::make_shared<Common::EventSystem>());
+	ENGINE->addSystem<Common::Event::System>(std::make_shared<Common::Event::System>());
 	ENGINE->addSystem<Common::TaskSystem>(std::make_shared<Common::TaskSystem>());
 	ENGINE->addSystem<Common::FrameSystem>(std::make_shared<Common::FrameSystem>());
 	ENGINE->addSystem<Common::ProfilerSystem>(std::make_shared<Common::ProfilerSystem>());

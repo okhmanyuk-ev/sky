@@ -436,7 +436,7 @@ void ConsoleDevice::enterInput()
 	}
 }
 
-void ConsoleDevice::event(const Platform::Input::Keyboard::Event& e)
+void ConsoleDevice::onEvent(const Platform::Input::Keyboard::Event& e)
 {
 	if (e.type == Platform::Input::Keyboard::Event::Type::Pressed && e.key == Platform::Input::Keyboard::Key::Tilde)
 	{
@@ -448,7 +448,7 @@ void ConsoleDevice::event(const Platform::Input::Keyboard::Event& e)
 	}
 }
 
-void ConsoleDevice::event(const TouchEmulator::Event& e)
+void ConsoleDevice::onEvent(const TouchEmulator::Event& e)
 {
 	if (mState == State::Closed)
 		return;
@@ -460,13 +460,13 @@ void ConsoleDevice::event(const TouchEmulator::Event& e)
 	}
 }
 
-void ConsoleDevice::event(const Platform::System::VirtualKeyboardTextChanged& e)
+void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardTextChanged& e)
 {
 	strcpy(mInputText, e.text.c_str());
 	mInputState = InputState::Text;
 }
 
-void ConsoleDevice::event(const Platform::System::VirtualKeyboardEnterPressed& e)
+void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardEnterPressed& e)
 {
 	enterInput();
 }

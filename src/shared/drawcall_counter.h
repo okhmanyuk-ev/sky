@@ -9,11 +9,11 @@
 namespace Shared
 {
 	class DrawCallCounter : public Common::FrameSystem::Frameable,
-		public Common::EventSystem::Listenable<Shared::RendererDebugDrawCallEvent>
+		public Common::Event::Listenable<Shared::RendererDebugDrawCallEvent>
 	{
 	private:
 		void frame() override;
-		void event(const Shared::RendererDebugDrawCallEvent& e) override;
+		void onEvent(const Shared::RendererDebugDrawCallEvent& e) override;
 
 	public:
 		auto getDrawCalls() const { return mDrawCalls; }

@@ -98,7 +98,7 @@ void System::removeAlias(const std::string& name)
 	mAliases.erase(name);
 }
 
-void System::event(const Device::ReadEvent& e)
+void System::onEvent(const Device::ReadEvent& e)
 {
 	execute(e.text);
 }

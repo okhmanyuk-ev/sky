@@ -11,9 +11,9 @@
 namespace Shared
 {
 	class FirstPersonCameraController : public Common::FrameSystem::Frameable,
-		public Common::EventSystem::Listenable<Platform::Input::Keyboard::Event>,
-		public Common::EventSystem::Listenable<Platform::Input::Mouse::Event>,
-		public Common::EventSystem::Listenable<Platform::Input::Touch::Event>
+		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
+		public Common::Event::Listenable<Platform::Input::Mouse::Event>,
+		public Common::Event::Listenable<Platform::Input::Touch::Event>
 	{
 	public:
 		FirstPersonCameraController(Graphics::Camera3D& camera);
@@ -23,9 +23,9 @@ namespace Shared
 		void frame() override;
 
 	private:
-		void event(const Platform::Input::Keyboard::Event& e) override;
-		void event(const Platform::Input::Mouse::Event& e) override;
-		void event(const Platform::Input::Touch::Event& e) override;
+		void onEvent(const Platform::Input::Keyboard::Event& e) override;
+		void onEvent(const Platform::Input::Mouse::Event& e) override;
+		void onEvent(const Platform::Input::Touch::Event& e) override;
 
 	private:
 		bool mLookAround = false;

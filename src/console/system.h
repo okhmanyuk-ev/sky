@@ -65,7 +65,7 @@ namespace Console
 		Callback mCallback;
 	};
 
-	class System : public Common::EventSystem::Listenable<Device::ReadEvent>
+	class System : public Common::Event::Listenable<Device::ReadEvent>
 	{
 	public:
 		void execute(const std::string& cmd);
@@ -113,7 +113,7 @@ namespace Console
 		const auto& getAliases() const { return mAliases; }
 
 	public:
-		void event(const Device::ReadEvent& e) override;
+		void onEvent(const Device::ReadEvent& e) override;
 
 	public:
 		static std::vector<std::string> ParseCommandLine(const std::string& cmds);

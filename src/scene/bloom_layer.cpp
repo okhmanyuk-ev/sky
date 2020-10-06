@@ -2,9 +2,9 @@
 
 using namespace Scene;
 
-void BloomLayer::event(const Platform::System::ResizeEvent& e)
+void BloomLayer::onEvent(const Platform::System::ResizeEvent& e)
 {
-	RenderLayer<Node>::event(e);
+	RenderLayer<Node>::onEvent(e);
 	mTargetsDirty = true;
 }
 
