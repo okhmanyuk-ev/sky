@@ -33,7 +33,11 @@ void ImScene::ImScene::begin()
 	assert(!mWorking);
 	mWorking = true;
 	mDefaultMatrix = glm::mat4(1.0f);
-	mDefaultSize = { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight() };
+
+	const auto& state = GRAPHICS->getCurrentState();
+	
+	auto viewport = Renderer::Viewport(state.renderTarget);
+	mDefaultSize = viewport.size / PLATFORM->getScale();
 }
 
 void ImScene::ImScene::begin(const glm::mat4& matrix, const glm::vec2& size)

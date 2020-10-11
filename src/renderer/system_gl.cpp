@@ -237,11 +237,6 @@ SystemGL::~SystemGL()
 #endif
 }
 
-void SystemGL::event(const Platform::System::ResizeEvent& e)
-{
-    //
-}
-
 void SystemGL::setTopology(const Renderer::Topology& value) 
 {
 	mGLTopology = SystemGL::Topology.at(value);

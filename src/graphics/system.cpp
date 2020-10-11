@@ -209,6 +209,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	const std::vector<uint32_t>& indices, const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
+	assert(texture);
 
 	applyState();
 	
@@ -382,6 +383,11 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::m
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	drawSprite(texture, model, { }, { Color::White, 1.0f }, shader);
+}
+
+void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader)
+{
+	drawSprite(texture, glm::mat4(1.0f), shader);
 }
 
 void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,

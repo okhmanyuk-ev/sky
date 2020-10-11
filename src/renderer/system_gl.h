@@ -16,15 +16,11 @@
 
 namespace Renderer
 {
-	class SystemGL : public System,
-        public Common::EventSystem::Listenable<Platform::System::ResizeEvent>
+	class SystemGL : public System
 	{
 	public:
 		SystemGL();
 		~SystemGL();
-
-    private:
-        void event(const Platform::System::ResizeEvent& e) override;
 
     public:
 		void setTopology(const Topology& value) override;
