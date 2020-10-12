@@ -118,38 +118,6 @@ Blur::Blur(const Vertex::Layout& layout) :
 	setCustomConstantBuffer(&mConstantBuffer);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 namespace
 {
 	const char* shaderSource2 =
@@ -232,7 +200,84 @@ namespace
 		#endif
 		)";
 #elif defined(RENDERER_D3D11)
-		R"(TODO)";
+		R"(
+		cbuffer ConstantBuffer : register(b0)
+		{			
+			float4x4 viewMatrix;
+			float4x4 projectionMatrix;
+			float4x4 modelMatrix;
+
+			float2 direction;
+			float2 resolution;
+			float sigma;
+			float iterations;
+		};
+
+		struct VertexInput
+		{
+			float3 pos : POSITION0;
+			float2 uv : TEXCOORD0;
+		};
+
+		struct PixelInput
+		{
+			float4 pixelPosition : SV_POSITION;
+			float2 uv : TEXCOORD0;
+		};
+
+		sampler sampler0;
+		Texture2D texture0;
+
+		PixelInput vs_main(VertexInput input)
+		{
+			PixelInput result;
+			result.pixelPosition = mul(projectionMatrix, mul(viewMatrix, mul(modelMatrix, float4(input.pos, 1.0))));
+			result.uv = input.uv;
+			return result;
+		};
+
+		float calcGauss(float offset, float sigma)
+		{
+			if (sigma <= 0.0)
+				return 0.0;
+
+			return exp(-pow(offset, 2.0) / sigma) / (sigma * 3.14157);
+		}
+
+		float4 blur(float2 uv)
+		{
+			float4 src = texture0.Sample(sampler0, uv);
+			float4 result = float4(src.rgb, 1.0);
+			float2 step = direction / resolution;
+
+			for (int i = 1; i <= int(iterations); i++)
+			{
+				float weight = calcGauss(float(i) / iterations, sigma);
+				
+				if (weight < 1.0 / 255.0)
+		            break;
+
+				float2 offset = step * float(i);
+
+				src = texture0.Sample(sampler0, uv + offset);
+				result += float4(src.rgb * weight, weight);
+
+				src = texture0.Sample(sampler0, uv - offset);
+				result += float4(src.rgb * weight, weight);
+			}
+
+			result.rgb = clamp(result.rgb / result.w, 0.0, 1.0);
+			return float4(result.rgb, 1.0);
+		}
+
+		float4 ps_main(PixelInput input) : SV_TARGET
+		{
+			float4 result = 0;
+			
+			result += blur(input.uv);
+
+			return result;
+		})";
 #endif
 }
 
