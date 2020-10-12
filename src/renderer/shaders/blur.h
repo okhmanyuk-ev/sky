@@ -46,7 +46,7 @@ namespace Renderer::Shaders
 			glm::vec2 direction = { 0.0f, 0.0f };
 			glm::vec2 resolution = { 0.0f, 0.0f };
 			float sigma = 1.0f;
-			int iterations = 32;
+            float iterations = 32;
 		};
 
 	public:
@@ -59,8 +59,8 @@ namespace Renderer::Shaders
 		auto getSigma() const { return mConstantBuffer.sigma; }
 		void setSigma(float value) { mConstantBuffer.sigma = value; }
 
-		auto getIterations() const { return mConstantBuffer.iterations; }
-		void setIterations(int value) { mConstantBuffer.iterations = value; }
+		auto getIterations() const { return (int)mConstantBuffer.iterations; }
+		void setIterations(int value) { mConstantBuffer.iterations = (float)value; }
 
 	private:
 		ConstantBuffer mConstantBuffer;

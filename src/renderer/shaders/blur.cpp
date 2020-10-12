@@ -164,7 +164,7 @@ namespace
 			vec2 uDirection;
 			vec2 uResolution;
 			float uSigma;
-			int uIterations;
+			float uIterations;
 		};
 
 		uniform sampler2D uTexture;
@@ -192,7 +192,7 @@ namespace
 			if (sigma <= 0.0)
 				return 0.0;
 
-			return exp(-pow(offset, 2) / sigma) / (sigma * 3.14157);
+			return exp(-pow(offset, 2.0) / sigma) / (sigma * 3.14157);
 		}
 
 		vec4 blur()
@@ -201,19 +201,19 @@ namespace
 			vec4 result = vec4(src.rgb, 1.0);
 			vec2 step = uDirection / uResolution;
 
-			for (int i = 1; i <= uIterations; i++)
+			for (int i = 1; i <= int(uIterations); i++)
 			{
-				float weight = calcGauss(float(i) / float(uIterations), uSigma);
+				float weight = calcGauss(float(i) / uIterations, uSigma);
 				
 				if (weight < 1.0 / 255.0)
 		            break;
 
 				vec2 offset = step * float(i);
 
-				src = texture2D(uTexture, vTexCoord + offset);
+				src = texture(uTexture, vTexCoord + offset);
 				result += vec4(src.rgb * weight, weight);
 
-				src = texture2D(uTexture, vTexCoord - offset);
+				src = texture(uTexture, vTexCoord - offset);
 				result += vec4(src.rgb * weight, weight);
 			}
 
