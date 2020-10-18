@@ -139,6 +139,11 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const glm::vec2& 
 void Scene::Scene::frame()
 {
 	mViewport = Renderer::Viewport(mRenderTarget);
+	
+	if (!mRenderTarget)
+	{
+		mViewport.size /= PLATFORM->getScale();
+	}
 
 	recursiveNodeUpdate(mRoot);
 	recursiveNodeUpdateTransform(mRoot);

@@ -166,7 +166,7 @@ void Node::update()
 	auto stretch = getStretch() / getScale();
 	auto margin = getMargin();
 	
-	auto parent_size = hasParent() ? getParent()->getSize() : (getScene()->getViewport().size / PLATFORM->getScale());
+	auto parent_size = hasParent() ? getParent()->getSize() : getScene()->getViewport().size;
 
 	if (stretch.x >= 0.0f)
 		setWidth((parent_size.x * stretch.x) - margin.x);
