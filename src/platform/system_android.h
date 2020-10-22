@@ -4,10 +4,6 @@
 
 #if defined(PLATFORM_ANDROID)
 #include <platform/low_level_api.h>
-
-#include <platform/touch.h>
-#include <platform/keyboard.h>
-
 #include <common/frame_system.h>
 #include <common/event_system.h>
 
@@ -44,8 +40,8 @@ namespace Platform
         float getSafeAreaLeftMargin() const override { return 0.0f; }
         float getSafeAreaRightMargin() const override { return 0.0f; }
 
-		bool isKeyPressed(Keyboard::Key key) const override { return false; }
-		bool isKeyPressed(Mouse::Button key) const override { return false; };
+		bool isKeyPressed(Input::Keyboard::Key key) const override { return false; }
+		bool isKeyPressed(Input::Mouse::Button key) const override { return false; };
 
 		void resize(int width, int height) override { /*nothing*/ }
 		void setTitle(const std::string& text) override { /*nothing*/ }

@@ -109,30 +109,31 @@ void SystemAndroid::setupScale()
 	EndEnv();
 }
 
-Keyboard::Key translateKey(int32_t key)
+Input::Keyboard::Key translateKey(int32_t key)
 {
+	using Input::Keyboard::Key;
 	switch (key)
 	{
 		case AKEYCODE_UNKNOWN:
 		case AKEYCODE_SOFT_LEFT:
 		case AKEYCODE_SOFT_RIGHT:
-		case AKEYCODE_HOME:               return Keyboard::Key::None;
+		case AKEYCODE_HOME:               return Key::None;
 
-		case AKEYCODE_BACK:               return Keyboard::Key::Escape;
+		case AKEYCODE_BACK:               return Key::Escape;
 
 		case AKEYCODE_CALL:
-		case AKEYCODE_ENDCALL:            return Keyboard::Key::None;
+		case AKEYCODE_ENDCALL:            return Key::None;
 
-		case AKEYCODE_0:                  return Keyboard::Key::NumPad0;
-		case AKEYCODE_1:                  return Keyboard::Key::NumPad1;
-		case AKEYCODE_2:                  return Keyboard::Key::NumPad2;
-		case AKEYCODE_3:                  return Keyboard::Key::NumPad3;
-		case AKEYCODE_4:                  return Keyboard::Key::NumPad4;
-		case AKEYCODE_5:                  return Keyboard::Key::NumPad5;
-		case AKEYCODE_6:                  return Keyboard::Key::NumPad6;
-		case AKEYCODE_7:                  return Keyboard::Key::NumPad7;
-		case AKEYCODE_8:                  return Keyboard::Key::NumPad8;
-		case AKEYCODE_9:                  return Keyboard::Key::NumPad9;
+		case AKEYCODE_0:                  return Key::NumPad0;
+		case AKEYCODE_1:                  return Key::NumPad1;
+		case AKEYCODE_2:                  return Key::NumPad2;
+		case AKEYCODE_3:                  return Key::NumPad3;
+		case AKEYCODE_4:                  return Key::NumPad4;
+		case AKEYCODE_5:                  return Key::NumPad5;
+		case AKEYCODE_6:                  return Key::NumPad6;
+		case AKEYCODE_7:                  return Key::NumPad7;
+		case AKEYCODE_8:                  return Key::NumPad8;
+		case AKEYCODE_9:                  return Key::NumPad9;
 
 		case AKEYCODE_STAR:
 		case AKEYCODE_POUND:
@@ -145,56 +146,56 @@ Keyboard::Key translateKey(int32_t key)
 		case AKEYCODE_VOLUME_DOWN:
 		case AKEYCODE_POWER:
 		case AKEYCODE_CAMERA:
-		case AKEYCODE_CLEAR:              return Keyboard::Key::None;
+		case AKEYCODE_CLEAR:              return Key::None;
 
-		case AKEYCODE_A:                  return Keyboard::Key::A;
-		case AKEYCODE_B:                  return Keyboard::Key::B;
-		case AKEYCODE_C:                  return Keyboard::Key::C;
-		case AKEYCODE_D:                  return Keyboard::Key::D;
-		case AKEYCODE_E:                  return Keyboard::Key::E;
-		case AKEYCODE_F:                  return Keyboard::Key::F;
-		case AKEYCODE_G:                  return Keyboard::Key::G;
-		case AKEYCODE_H:                  return Keyboard::Key::H;
-		case AKEYCODE_I:                  return Keyboard::Key::I;
-		case AKEYCODE_J:                  return Keyboard::Key::J;
-		case AKEYCODE_K:                  return Keyboard::Key::K;
-		case AKEYCODE_L:                  return Keyboard::Key::L;
-		case AKEYCODE_M:                  return Keyboard::Key::M;
-		case AKEYCODE_N:                  return Keyboard::Key::N;
-		case AKEYCODE_O:                  return Keyboard::Key::O;
-		case AKEYCODE_P:                  return Keyboard::Key::P;
-		case AKEYCODE_Q:                  return Keyboard::Key::Q;
-		case AKEYCODE_R:                  return Keyboard::Key::R;
-		case AKEYCODE_S:                  return Keyboard::Key::S;
-		case AKEYCODE_T:                  return Keyboard::Key::T;
-		case AKEYCODE_U:                  return Keyboard::Key::U;
-		case AKEYCODE_V:                  return Keyboard::Key::V;
-		case AKEYCODE_W:                  return Keyboard::Key::W;
-		case AKEYCODE_X:                  return Keyboard::Key::X;
-		case AKEYCODE_Y:                  return Keyboard::Key::Y;
-		case AKEYCODE_Z:                  return Keyboard::Key::Z;
-		case AKEYCODE_COMMA:              return Keyboard::Key::None;//Comma;
-		case AKEYCODE_PERIOD:             return Keyboard::Key::None;//Period;
-		case AKEYCODE_ALT_LEFT:           return Keyboard::Key::Alt;//LeftAlt;
-		case AKEYCODE_ALT_RIGHT:          return Keyboard::Key::Alt;//RightAlt;
-		case AKEYCODE_SHIFT_LEFT:         return Keyboard::Key::Shift;//LeftShift;
-		case AKEYCODE_SHIFT_RIGHT:        return Keyboard::Key::Shift;//RightShift;
-		case AKEYCODE_TAB:                return Keyboard::Key::Tab;
-		case AKEYCODE_SPACE:              return Keyboard::Key::Space;
+		case AKEYCODE_A:                  return Key::A;
+		case AKEYCODE_B:                  return Key::B;
+		case AKEYCODE_C:                  return Key::C;
+		case AKEYCODE_D:                  return Key::D;
+		case AKEYCODE_E:                  return Key::E;
+		case AKEYCODE_F:                  return Key::F;
+		case AKEYCODE_G:                  return Key::G;
+		case AKEYCODE_H:                  return Key::H;
+		case AKEYCODE_I:                  return Key::I;
+		case AKEYCODE_J:                  return Key::J;
+		case AKEYCODE_K:                  return Key::K;
+		case AKEYCODE_L:                  return Key::L;
+		case AKEYCODE_M:                  return Key::M;
+		case AKEYCODE_N:                  return Key::N;
+		case AKEYCODE_O:                  return Key::O;
+		case AKEYCODE_P:                  return Key::P;
+		case AKEYCODE_Q:                  return Key::Q;
+		case AKEYCODE_R:                  return Key::R;
+		case AKEYCODE_S:                  return Key::S;
+		case AKEYCODE_T:                  return Key::T;
+		case AKEYCODE_U:                  return Key::U;
+		case AKEYCODE_V:                  return Key::V;
+		case AKEYCODE_W:                  return Key::W;
+		case AKEYCODE_X:                  return Key::X;
+		case AKEYCODE_Y:                  return Key::Y;
+		case AKEYCODE_Z:                  return Key::Z;
+		case AKEYCODE_COMMA:              return Key::None;//Comma;
+		case AKEYCODE_PERIOD:             return Key::None;//Period;
+		case AKEYCODE_ALT_LEFT:           return Key::Alt;//LeftAlt;
+		case AKEYCODE_ALT_RIGHT:          return Key::Alt;//RightAlt;
+		case AKEYCODE_SHIFT_LEFT:         return Key::Shift;//LeftShift;
+		case AKEYCODE_SHIFT_RIGHT:        return Key::Shift;//RightShift;
+		case AKEYCODE_TAB:                return Key::Tab;
+		case AKEYCODE_SPACE:              return Key::Space;
 		case AKEYCODE_SYM:
 		case AKEYCODE_EXPLORER:
-		case AKEYCODE_ENVELOPE:           return Keyboard::Key::None;
-		case AKEYCODE_ENTER:              return Keyboard::Key::Enter;
-		case AKEYCODE_DEL:                return Keyboard::Key::Backspace; // delete ?
-		case AKEYCODE_GRAVE:              return Keyboard::Key::Tilde;
-		case AKEYCODE_MINUS:              return Keyboard::Key::Subtract;
-		case AKEYCODE_EQUALS:             return Keyboard::Key::None;//Equal;
-		case AKEYCODE_LEFT_BRACKET:       return Keyboard::Key::None;//LBracket;
-		case AKEYCODE_RIGHT_BRACKET:      return Keyboard::Key::None;//RBracket;
-		case AKEYCODE_BACKSLASH:          return Keyboard::Key::None;//Backslash;
-		case AKEYCODE_SEMICOLON:          return Keyboard::Key::None;//Semicolon;
-		case AKEYCODE_APOSTROPHE:         return Keyboard::Key::None;//OemQuotes;
-		case AKEYCODE_SLASH:              return Keyboard::Key::None;//Slash;
+		case AKEYCODE_ENVELOPE:           return Key::None;
+		case AKEYCODE_ENTER:              return Key::Enter;
+		case AKEYCODE_DEL:                return Key::Backspace; // delete ?
+		case AKEYCODE_GRAVE:              return Key::Tilde;
+		case AKEYCODE_MINUS:              return Key::Subtract;
+		case AKEYCODE_EQUALS:             return Key::None;//Equal;
+		case AKEYCODE_LEFT_BRACKET:       return Key::None;//LBracket;
+		case AKEYCODE_RIGHT_BRACKET:      return Key::None;//RBracket;
+		case AKEYCODE_BACKSLASH:          return Key::None;//Backslash;
+		case AKEYCODE_SEMICOLON:          return Key::None;//Semicolon;
+		case AKEYCODE_APOSTROPHE:         return Key::None;//OemQuotes;
+		case AKEYCODE_SLASH:              return Key::None;//Slash;
 
 		case AKEYCODE_AT:
 		case AKEYCODE_NUM:
@@ -210,10 +211,10 @@ Keyboard::Key translateKey(int32_t key)
 		case AKEYCODE_MEDIA_PREVIOUS:
 		case AKEYCODE_MEDIA_REWIND:
 		case AKEYCODE_MEDIA_FAST_FORWARD:
-		case AKEYCODE_MUTE:               return Keyboard::Key::None;
+		case AKEYCODE_MUTE:               return Key::None;
 
-		case AKEYCODE_PAGE_UP:            return Keyboard::Key::PageUp;
-		case AKEYCODE_PAGE_DOWN:          return Keyboard::Key::PageDown;
+		case AKEYCODE_PAGE_UP:            return Key::PageUp;
+		case AKEYCODE_PAGE_DOWN:          return Key::PageDown;
 
 		case AKEYCODE_PICTSYMBOLS:
 		case AKEYCODE_SWITCH_CHARSET:
@@ -231,8 +232,8 @@ Keyboard::Key translateKey(int32_t key)
 		case AKEYCODE_BUTTON_THUMBR:
 		case AKEYCODE_BUTTON_START:
 		case AKEYCODE_BUTTON_SELECT:
-		case AKEYCODE_BUTTON_MODE:        return Keyboard::Key::None;
-		default: return Keyboard::Key::None;
+		case AKEYCODE_BUTTON_MODE:        return Key::None;
+		default: return Key::None;
 	}
 }
 
@@ -269,19 +270,19 @@ int SystemAndroid::getUnicode(AInputEvent* event)
 int32_t SystemAndroid::handle_key_event(android_app* app, AInputEvent* event)
 {
 	auto action = AKeyEvent_getAction(event);
-	auto e = Keyboard::Event();
+	auto e = Input::Keyboard::Event();
 
 	if (action == AKEY_EVENT_ACTION_DOWN)
-		e.type = Keyboard::Event::Type::Pressed;
+		e.type = Input::Keyboard::Event::Type::Pressed;
 	else if (action == AKEY_EVENT_ACTION_UP)
-		e.type = Keyboard::Event::Type::Released;
+		e.type = Input::Keyboard::Event::Type::Released;
 
 	e.key = translateKey(AKeyEvent_getKeyCode(event));
 	e.asciiChar = getUnicode(event);
 
 	//EVENT->emit(e); // new keyboard events
 
-	if (e.key == Keyboard::Key::Escape)
+	if (e.key == Input::Keyboard::Key::Escape)
 		return 1;
 
 	return 0;
@@ -289,16 +290,16 @@ int32_t SystemAndroid::handle_key_event(android_app* app, AInputEvent* event)
 
 int32_t SystemAndroid::handle_motion_event(android_app* app, AInputEvent* event)
 {
-	auto e = Touch::Event();
+	auto e = Input::Touch::Event();
 
 	auto action = AMotionEvent_getAction(event);
 
 	if (action == AMOTION_EVENT_ACTION_DOWN)
-		e.type = Touch::Event::Type::Begin;
+		e.type = Input::Touch::Event::Type::Begin;
 	else if (action == AMOTION_EVENT_ACTION_MOVE)
-		e.type = Touch::Event::Type::Continue;
+		e.type = Input::Touch::Event::Type::Continue;
 	else if (action == AMOTION_EVENT_ACTION_UP)
-		e.type = Touch::Event::Type::End;
+		e.type = Input::Touch::Event::Type::End;
 
 	e.x = AMotionEvent_getX(event, 0);
 	e.y = AMotionEvent_getY(event, 0);
@@ -320,7 +321,6 @@ int32_t SystemAndroid::handle_input(android_app* app, AInputEvent* event)
 
 void SystemAndroid::handle_cmd(android_app* app, int32_t cmd)
 {
-
 	switch (cmd)
 	{
 		case APP_CMD_INPUT_CHANGED:

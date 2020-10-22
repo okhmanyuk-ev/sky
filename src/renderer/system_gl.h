@@ -53,10 +53,10 @@ namespace Renderer
 		bool mVsync = false;
 
 #if defined(RENDERER_GLES3) && defined(PLATFORM_ANDROID)
-		Common::EventSystem::Listener<Platform::SystemAndroid::ResumeEvent> mResumeListener;
-		Common::EventSystem::Listener<Platform::SystemAndroid::PauseEvent> mPauseListener;
-		Common::EventSystem::Listener<Platform::SystemAndroid::InitWindowEvent> mInitWindowListener;
-		Common::EventSystem::Listener<Platform::SystemAndroid::TerminateWindowEvent> mTerminateWindowListener;
+		Common::Event::Listener<Platform::SystemAndroid::ResumeEvent> mResumeListener;
+		Common::Event::Listener<Platform::SystemAndroid::PauseEvent> mPauseListener;
+		Common::Event::Listener<Platform::SystemAndroid::InitWindowEvent> mInitWindowListener;
+		Common::Event::Listener<Platform::SystemAndroid::TerminateWindowEvent> mTerminateWindowListener;
 #endif
 
 #if defined(RENDERER_GL44)
