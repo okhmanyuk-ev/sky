@@ -136,6 +136,7 @@ if(APPLE)
 		"-framework Foundation"
 		"-framework AVFoundation"
 		"-framework AudioToolbox"
+		"-framework StoreKit"
 	)
 
 	add_definitions(-DGLES_SILENCE_DEPRECATION)

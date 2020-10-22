@@ -56,11 +56,13 @@ using namespace Platform;
 }
 @end
 
-@interface ViewController : UIViewController<UITextFieldDelegate>
+@interface ViewController : UIViewController<UITextFieldDelegate, SKProductsRequestDelegate>
 
 @end
 
 @implementation ViewController
+
+// UITextFieldDelegate
 
 -(void)textFieldDidChange:(UITextField*)textField
 {
@@ -71,6 +73,13 @@ using namespace Platform;
 {
     EVENT->emit(System::VirtualKeyboardEnterPressed());
     return NO;
+}
+
+// SKProductsRequestDelegate
+
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
+{
+    //assert(false);
 }
 
 @end
@@ -190,6 +199,29 @@ void SystemIos::refreshDimensions()
 std::string SystemIos::getAppFolder() const
 {
     return std::string([NSHomeDirectory() UTF8String]) + "/Documents/";
+}
+
+void SystemIos::initializeBilling(const ProductsMap& _products)
+{
+    products = _products;
+    
+    auto viewController = (ViewController*)[Window rootViewController];
+    auto names = [[NSMutableSet alloc] init];
+    
+    for (auto [_name, callback] : products)
+    {
+        auto name = [NSString stringWithUTF8String:_name.c_str()];
+        [names addObject:name];
+    }
+    
+    auto productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:names];
+    productsRequest.delegate = viewController;
+    [productsRequest start];
+}
+
+void SystemIos::purchase(const std::string& product)
+{
+    //
 }
 
 #endif

@@ -15,4 +15,5 @@
 #elif defined(PLATFORM_IOS)
     #import <Foundation/Foundation.h>
     #import <UIKit/UIKit.h>
+    #import <StoreKit/StoreKit.h>
 #endif

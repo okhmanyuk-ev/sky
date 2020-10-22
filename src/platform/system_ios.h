@@ -52,8 +52,8 @@ namespace Platform
         std::string getVirtualKeyboardText() const override;
         void setVirtualKeyboardText(const std::string& text) override;
         
-        void initializeBilling(const ProductsMap& products) override { /*nothing*/ }
-        void purchase(const std::string& product) override { /*nothing*/ }
+        void initializeBilling(const ProductsMap& products) override;
+        void purchase(const std::string& product) override;
 
     public:
         void setSize(int w, int h) { mWidth = w; mHeight = h; }
@@ -77,6 +77,8 @@ namespace Platform
         float mSafeAreaBottomMargin = 0.0f;
         float mSafeAreaLeftMargin = 0.0f;
         float mSafeAreaRightMargin = 0.0f;
+        
+        ProductsMap products;
     };
 }
 #endif
