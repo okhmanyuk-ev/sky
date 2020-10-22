@@ -3,6 +3,15 @@
 
 using namespace Shared;
 
+Stylebook::Stylebook()
+{
+	auto path = "stylebook.json";
+	if (Platform::Asset::Exists(path))
+	{
+		load(path);
+	}
+}
+
 void Stylebook::load(const std::string& path_to_json)
 {
 	auto json_file = Platform::Asset(path_to_json);

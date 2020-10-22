@@ -20,8 +20,7 @@ namespace
 			vec4 outer_color;
 
 			float fill;
-			float begin;
-			float end;
+			float pie;
 		};
 
 		uniform sampler2D uTexture;
@@ -73,7 +72,7 @@ namespace
 			float angle = atan(-p.x, p.y);
 			float normalized_angle = (angle + Pi) / 2.0 / Pi;			
 
-			if (normalized_angle < begin || normalized_angle > end)
+			if (normalized_angle > pie)
 				discard;
 
 			float maxRadius = 0.5;
@@ -114,8 +113,7 @@ namespace
 			float4 outer_color;
 
 			float fill;
-			float begin;
-			float end;
+			float pie;
 		};
 
 		struct VertexInput
@@ -170,7 +168,7 @@ namespace
 			float angle = atan2(-p.x, p.y);
 			float normalized_angle = (angle + Pi) / 2.0 / Pi;			
 
-			if (normalized_angle < begin || normalized_angle > end)
+			if (normalized_angle > pie)
 				discard;
 
 			float maxRadius = 0.5;

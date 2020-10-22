@@ -25,6 +25,9 @@ namespace Shared
 		static std::string getLanguageName(Language language);
 
 	public:
+		LocalizationSystem();
+
+	public:
 		void loadDicrionaries(const std::string& path);
 
 		utf8_string getString(const std::string& key) const;

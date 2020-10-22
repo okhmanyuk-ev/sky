@@ -14,14 +14,14 @@ namespace Renderer
 	using SystemCrossplatform = SystemD3D11;
 
 	class SystemD3D11 : public System,
-		Common::EventSystem::Listenable<Platform::System::ResizeEvent>
+		Common::Event::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
 		SystemD3D11();
 		~SystemD3D11();
 
 	private:
-		void event(const Platform::System::ResizeEvent& e) override;
+		void onEvent(const Platform::System::ResizeEvent& e) override;
 
 	public:
 		void setTopology(const Topology& value) override;

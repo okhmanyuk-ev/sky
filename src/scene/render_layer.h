@@ -9,13 +9,13 @@
 namespace Scene
 {
 	template <typename T> class RenderLayer : public T, public Color,
-		public Common::EventSystem::Listenable<Platform::System::ResizeEvent>
+		public Common::Event::Listenable<Platform::System::ResizeEvent>
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 		static_assert(!std::is_base_of<Color, T>::value, "T must NOT be derived from Color");
 
 	protected:
-		void event(const Platform::System::ResizeEvent& e) override
+		void onEvent(const Platform::System::ResizeEvent& e) override
 		{
 			mTarget.reset();
 			mTarget = std::make_shared<Renderer::RenderTarget>(e.width, e.height);

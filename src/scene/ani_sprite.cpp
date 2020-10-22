@@ -12,6 +12,8 @@ AniSprite::AniSprite()
 
 void AniSprite::update()
 {
+	Node::update();
+
 	if (getWidth() <= 0.0f)
 		setWidth(mSprite->getTexRegion().size.x);
 
@@ -21,11 +23,8 @@ void AniSprite::update()
 	const auto& states = mAnimation->getStates();
 
 	if (states.count(mState) == 0)
-	{
-		Node::update();
 		return;
-	}
-
+	
 	if (mPlaying)
 	{
 		mAccumulator += FRAME->getTimeDelta();
@@ -57,8 +56,6 @@ void AniSprite::update()
 	auto min_scale = glm::min(w_scale, h_scale);
 
 	mSprite->setScale(min_scale);
-
-	Node::update();
 }
 
 void AniSprite::randomizeProgress()

@@ -34,6 +34,12 @@ namespace Scene
 		auto getRotation() const { return mRotation; }
 		void setRotation(float value) { mRotation = value; }
 
+		auto getRadialAnchor() const { return mRadialAnchor; }
+		void setRadialAnchor(float value) { mRadialAnchor = value; }
+
+		auto getRadialPivot() const { return mRadialPivot; }
+		void setRadialPivot(float value) { mRadialPivot = value; }
+
 	private:
 		glm::vec2 mSize = { 0.0f, 0.0f };
 		glm::vec2 mStretch = { -1.0f, -1.0f };
@@ -44,6 +50,8 @@ namespace Scene
 		glm::vec2 mPivot = { 0.0f, 0.0f };
 		glm::vec2 mScale = { 1.0f, 1.0f };
 		float mRotation = 0.0f; // radians
+		float mRadialAnchor = 0.0f;
+		float mRadialPivot = 0.0f;
 
 	public:
 		auto getWidth() const { return mSize.x; }

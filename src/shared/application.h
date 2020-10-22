@@ -24,21 +24,41 @@
 #include <shared/gesture_detector.h>
 #include <common/profiler_system.h>
 #include <shared/scene_stylebook.h>
+#include <shared/scene_editor.h>
 
 namespace Shared
 {
-	class GraphicalApplication
+	class Application
 	{
+	public:
+		enum class Flag
+		{
+			Audio,
+			Network,
+			Scene
+		};
+
+		using Flags = std::set<Flag>;
+
 	private:
 		static inline Core::Engine Engine;
-
+	
 	public:
-		GraphicalApplication(const std::string& appname);
-		~GraphicalApplication();
+		Application(const std::string& appname, const Flags& flags = {});
+		~Application();
 
 	public:
 		void run();
-		
+
+	private:
+		Flags mFlags;
+
+	protected: // Scene
+		std::shared_ptr<Scene::Scene> mScene;
+	
+	private: // Scene
+		std::shared_ptr<SceneEditor> mSceneEditor;
+
 	private:
 		std::shared_ptr<Common::ConsoleCommands> mConsoleCommands;
 		std::shared_ptr<Shared::GraphicalConsoleCommands> mGraphicalConsoleCommands;

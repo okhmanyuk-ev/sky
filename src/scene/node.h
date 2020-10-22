@@ -23,11 +23,18 @@ namespace Scene
 		};
 
 	public:
+		enum class AttachDirection
+		{
+			Front,
+			Back
+		};
+
+	public:
 		Node();
 		virtual ~Node();
 
 	public:
-		void attach(std::shared_ptr<Node> node);
+		void attach(std::shared_ptr<Node> node, AttachDirection attachDirection = AttachDirection::Back);
 		void detach(std::shared_ptr<Node> node);
 		void clear();
 

@@ -12,12 +12,10 @@ namespace Scene
 	protected:
 		void update() override
 		{
+			if (mActionsEnabled)
+				mActions.update();
+
 			T::update();
-
-			if (!mActionsEnabled)
-				return;
-
-			mActions.update();
 		}
 
 	public:

@@ -2,7 +2,7 @@
 
 using namespace Shared;
 
-void TouchEmulator::event(const Platform::Input::Mouse::Event& e)
+void TouchEmulator::onEvent(const Platform::Input::Mouse::Event& e)
 {
 	if (e.type == Platform::Input::Mouse::Event::Type::Wheel)
 		return;
@@ -30,7 +30,7 @@ void TouchEmulator::event(const Platform::Input::Mouse::Event& e)
 	}
 }
 
-void TouchEmulator::event(const Platform::Input::Touch::Event& e)
+void TouchEmulator::onEvent(const Platform::Input::Touch::Event& e)
 {
 	auto fwd = Event();
 	fwd.x = e.x;

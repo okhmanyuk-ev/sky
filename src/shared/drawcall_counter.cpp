@@ -8,7 +8,7 @@ void DrawCallCounter::frame()
 	mDrawCallsInternal = 0;
 }
 
-void DrawCallCounter::event(const Shared::RendererDebugDrawCallEvent& e)
+void DrawCallCounter::onEvent(const Shared::RendererDebugDrawCallEvent& e)
 {
 	mDrawCallsInternal++;
 }

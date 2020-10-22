@@ -2,6 +2,22 @@
 
 using namespace Scene;
 
+void Circle::update()
+{
+	Node::update();
+
+	if (mPiePivot >= 0.0f)
+		setRadialPivot(mPie * mPiePivot);
+
+	if (mRadius >= 0.0f)
+	{
+		setSize(mRadius * 2.0f);
+
+		if (mThickness >= 0.0f)
+			setFill(mThickness / mRadius);
+	}
+}
+
 void Circle::draw()
 {
 	Node::draw();
@@ -14,7 +30,7 @@ void Circle::draw()
 	auto inner_color = mInnerColor * color;
 	auto outer_color = mOuterColor * color;
 	GRAPHICS->pushBlendMode(getBlendMode());
-	GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mBegin, mEnd);
+	GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mPie);
 	GRAPHICS->pop();
 }
 

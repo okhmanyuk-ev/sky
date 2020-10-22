@@ -66,22 +66,26 @@ void ConsoleDevice::frame()
 
 	if (mState == State::Closed)
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0001f);
-		ImGui::Begin("ConsoleButton", nullptr, ImGui::User::ImGuiWindowFlags_Overlay & ~ImGuiWindowFlags_NoInputs);
-		ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10, 10));
-
-		if (ImGui::Button("Console"))
+		if (mHiddenButtonEnabled) 
 		{
-			mButtonAttempts += 1;
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0001f);
+			ImGui::Begin("ConsoleButton", nullptr, ImGui::User::ImGuiWindowFlags_Overlay & ~ImGuiWindowFlags_NoInputs);
+			ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10, 10));
 
-			if (mButtonAttempts >= MaxButtonAttempts)
+			if (ImGui::Button("Console"))
 			{
-				mButtonAttempts = 0;
-				toggle();
+				mButtonAttempts += 1;
+
+				if (mButtonAttempts >= MaxButtonAttempts)
+				{
+					mButtonAttempts = 0;
+					toggle();
+				}
 			}
+		
+			ImGui::End();
+			ImGui::PopStyleVar(1);
 		}
-		ImGui::End();
-		ImGui::PopStyleVar(1);
 
 		showFastLogs();
 		return;
@@ -432,7 +436,7 @@ void ConsoleDevice::enterInput()
 	}
 }
 
-void ConsoleDevice::event(const Platform::Input::Keyboard::Event& e)
+void ConsoleDevice::onEvent(const Platform::Input::Keyboard::Event& e)
 {
 	if (e.type == Platform::Input::Keyboard::Event::Type::Pressed && e.key == Platform::Input::Keyboard::Key::Tilde)
 	{
@@ -444,7 +448,7 @@ void ConsoleDevice::event(const Platform::Input::Keyboard::Event& e)
 	}
 }
 
-void ConsoleDevice::event(const TouchEmulator::Event& e)
+void ConsoleDevice::onEvent(const TouchEmulator::Event& e)
 {
 	if (mState == State::Closed)
 		return;
@@ -456,13 +460,13 @@ void ConsoleDevice::event(const TouchEmulator::Event& e)
 	}
 }
 
-void ConsoleDevice::event(const Platform::System::VirtualKeyboardTextChanged& e)
+void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardTextChanged& e)
 {
 	strcpy(mInputText, e.text.c_str());
 	mInputState = InputState::Text;
 }
 
-void ConsoleDevice::event(const Platform::System::VirtualKeyboardEnterPressed& e)
+void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardEnterPressed& e)
 {
 	enterInput();
 }

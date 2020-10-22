@@ -151,7 +151,7 @@ void ImguiSystem::ensureFont()
 	io.Fonts->TexID = &mTexture;
 }
 
-void ImguiSystem::event(const Platform::Input::Touch::Event& e)
+void ImguiSystem::onEvent(const Platform::Input::Touch::Event& e)
 {
 	mMousePos = { static_cast<float>(e.x), static_cast<float>(e.y) };
 
@@ -163,7 +163,7 @@ void ImguiSystem::event(const Platform::Input::Touch::Event& e)
 		mReleasedMouseButtons.insert(0);
 }
 
-void ImguiSystem::event(const Platform::Input::Keyboard::Event& e)
+void ImguiSystem::onEvent(const Platform::Input::Keyboard::Event& e)
 {
 	auto& io = ImGui::GetIO();
 
@@ -178,7 +178,7 @@ void ImguiSystem::event(const Platform::Input::Keyboard::Event& e)
 		io.AddInputCharacter(e.asciiChar);
 }
 
-void ImguiSystem::event(const Platform::Input::Mouse::Event& e)
+void ImguiSystem::onEvent(const Platform::Input::Mouse::Event& e)
 {
 	auto& io = ImGui::GetIO();
 

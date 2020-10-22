@@ -3,7 +3,7 @@
 
 using namespace Shared;
 
-void GestureDetector::event(const Platform::Input::Keyboard::Event& e)
+void GestureDetector::onEvent(const Platform::Input::Keyboard::Event& e)
 {
 	if (e.type != Platform::Input::Keyboard::Event::Type::Pressed)
 		return;
@@ -18,7 +18,7 @@ void GestureDetector::event(const Platform::Input::Keyboard::Event& e)
 		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Right }));
 }
 
-void GestureDetector::event(const TouchEmulator::Event& e)
+void GestureDetector::onEvent(const TouchEmulator::Event& e)
 {	
 	auto now = Clock::Now();
 

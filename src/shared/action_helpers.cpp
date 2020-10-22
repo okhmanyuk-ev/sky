@@ -1,5 +1,6 @@
 #include "action_helpers.h"
 #include <console/device.h>
+#include <shared/scene_helpers.h>
 
 using namespace Shared;
 
@@ -31,7 +32,7 @@ ActionHelpers::Action ActionHelpers::ChangePositionByDirection(SceneTransform no
 
 ActionHelpers::Action ActionHelpers::ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed, float duration)
 {
-	return Limit(duration, ChangePositionByDirection(node, direction, speed));
+	return Breakable(duration, ChangePositionByDirection(node, direction, speed));
 }
 
 // wait
@@ -77,9 +78,9 @@ ActionHelpers::Action ActionHelpers::Delayed(std::function<bool()> while_callbac
 	);
 }
 
-// limit
+// breakable
 
-ActionHelpers::Action ActionHelpers::Limit(float duration, Action action)
+ActionHelpers::Action ActionHelpers::Breakable(float duration, Action action)
 {
 	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
 		Wait(duration),
@@ -87,12 +88,32 @@ ActionHelpers::Action ActionHelpers::Limit(float duration, Action action)
 	);
 }
 
-ActionHelpers::Action ActionHelpers::Limit(std::function<bool()> while_callback, Action action)
+ActionHelpers::Action ActionHelpers::Breakable(std::function<bool()> while_callback, Action action)
 {
 	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
 		Wait(while_callback),
 		std::move(action)
 	);
+}
+
+// pausable
+
+ActionHelpers::Action ActionHelpers::Pausable(std::function<bool()> run_callback, ActionHelpers::Action action)
+{
+	auto player = std::make_shared<Common::Actions::GenericActionsPlayer<Common::Actions::Parallel>>();
+	player->add(std::move(action));
+
+	return std::make_unique<Common::Actions::Generic>([run_callback, player]() {
+		if (!run_callback())
+			return Common::Actions::Action::Status::Continue;
+
+		player->update();
+
+		if (player->hasActions())
+			return Common::Actions::Action::Status::Continue;
+
+		return Common::Actions::Action::Status::Finished;
+	});
 }
 
 // generic execute
@@ -131,6 +152,13 @@ ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec2& start, const g
 }
 
 ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback)
+{
+	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
+		callback(glm::lerp(start, dest, value));
+	});
+}
+
+ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback)
 {
 	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
 		callback(glm::lerp(start, dest, value));
@@ -181,6 +209,13 @@ ActionHelpers::Action ActionHelpers::ChangeColor(SceneColor node, const glm::vec
 	});
 }
 
+ActionHelpers::Action ActionHelpers::ChangeColorRecursive(SceneNode node, const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [node](const glm::vec4& value) {
+		SceneHelpers::RecursiveColorSet(node, value);
+	});
+}
+
 // alpha
 
 ActionHelpers::Action ActionHelpers::ChangeAlpha(SceneColor node, float start, float dest, float duration, EasingFunction easingFunction)
@@ -212,7 +247,7 @@ ActionHelpers::Action ActionHelpers::Show(SceneColor node, float duration, Easin
 ActionHelpers::Action ActionHelpers::Shake(SceneTransform node, float radius, float duration)
 {
 	return MakeSequence(
-		Limit(duration, RepeatInfinite([node, radius] {
+		Breakable(duration, RepeatInfinite([node, radius] {
 			return Execute([node, radius] {
 				node->setOrigin(glm::circularRand(radius));
 			});
@@ -545,5 +580,19 @@ ActionHelpers::Action ActionHelpers::ChangeScale(SceneTransform node, const glm:
 {
 	return Insert([node, dest, duration, easingFunction] {
 		return ChangeScale(node, node->getScale(), dest, duration, easingFunction);
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [circle](float value) {
+		circle->setPie(value);
+	});
+}
+
+ActionHelpers::Action ActionHelpers::ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([circle, dest, duration, easingFunction] {
+		return ChangeCirclePie(circle, circle->getPie(), dest, duration, easingFunction);
 	});
 }

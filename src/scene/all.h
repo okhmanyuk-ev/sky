@@ -20,3 +20,4 @@
 #include <scene/sprite.h>
 #include <scene/trail.h>
 #include <scene/transform.h>
+#include <scene/tappable.h>

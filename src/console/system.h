@@ -65,7 +65,7 @@ namespace Console
 		Callback mCallback;
 	};
 
-	class System : public Common::EventSystem::Listenable<Device::ReadEvent>
+	class System : public Common::Event::Listenable<Device::ReadEvent>
 	{
 	public:
 		void execute(const std::string& cmd);
@@ -85,7 +85,8 @@ namespace Console
 			Command::Callback callback);
 		
 		void registerCommand(const std::string& name, Command::Callback callback);
-		
+		void removeCommand(const std::string& name);
+
 	public:
 		void registerCVar(const std::string& name, const std::string& description, 
 			const std::vector<std::string>& args, const std::vector<std::string>& optional_args, 
@@ -100,6 +101,8 @@ namespace Console
 		void registerCVar(const std::string& name, const std::vector<std::string>& args, 
 			CVar::Getter getter, CVar::Setter setter = nullptr);
 
+		void removeCVar(const std::string& name);
+
 	public:
 		void addAlias(const std::string& name, const std::vector<std::string>& value);
 		void removeAlias(const std::string& name);
@@ -110,7 +113,7 @@ namespace Console
 		const auto& getAliases() const { return mAliases; }
 
 	public:
-		void event(const Device::ReadEvent& e) override;
+		void onEvent(const Device::ReadEvent& e) override;
 
 	public:
 		static std::vector<std::string> ParseCommandLine(const std::string& cmds);

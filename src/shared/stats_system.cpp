@@ -4,17 +4,19 @@
 #include <platform/system.h>
 #include <glm/glm.hpp>
 #include <shared/imgui_user.h>
+#include <console/system.h>
+#include <common/console_commands.h>
 
 using namespace Shared;
 
 StatsSystem::StatsSystem()
 {
-	// 
+	CONSOLE->registerCVar("g_stats", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
 }
 
 StatsSystem::~StatsSystem()
 {
-	//
+	CONSOLE->removeCVar("g_stats");
 }
 
 void StatsSystem::frame()

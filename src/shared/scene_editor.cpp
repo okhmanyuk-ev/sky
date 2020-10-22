@@ -1,14 +1,21 @@
 #include "scene_editor.h"
 #include <imgui.h>
+#include <console/system.h>
+#include <common/console_commands.h>
 
 using namespace Shared;
 
 SceneEditor::SceneEditor(Scene::Scene& scene) : mScene(scene)
 {
-	//
+	CONSOLE->registerCVar("g_editor", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
 }
 
-void SceneEditor::event(const Platform::Input::Mouse::Event& e)
+SceneEditor::~SceneEditor()
+{
+	CONSOLE->removeCVar("g_editor");
+}
+
+void SceneEditor::onEvent(const Platform::Input::Mouse::Event& e)
 {
 	mMousePos = { e.x, e.y };
 }
@@ -75,7 +82,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	if (auto label = std::dynamic_pointer_cast<Scene::Label>(node); label != nullptr)
 	{
 		auto fontSize = label->getFontSize();
-		ImGui::DragFloat("Font Size", &fontSize, 1.0f, 0.0f, 96.0f);
+		ImGui::SliderFloat("Font Size", &fontSize, 0.0f, 96.0f);
 		label->setFontSize(fontSize);
 		ImGui::Separator();
 
@@ -104,8 +111,37 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	if (auto rectangle = std::dynamic_pointer_cast<Scene::Rectangle>(node); rectangle != nullptr)
 	{
 		auto rounding = rectangle->getRounding();
-		ImGui::DragFloat("Rounding", (float*)&rounding, 0.01f, 0.0f, 1.0f);
+		ImGui::SliderFloat("Rounding", &rounding, 0.0f, 1.0f);
 		rectangle->setRounding(rounding);
+		ImGui::Separator();
+	}
+
+	if (auto circle = std::dynamic_pointer_cast<Scene::Circle>(node); circle != nullptr)
+	{
+		auto radius = circle->getRadius();
+		auto thickness = circle->getThickness();
+		auto fill = circle->getFill();
+		auto pie = circle->getPie();
+		auto pie_pivot = circle->getPiePivot();
+		auto inner_color = circle->getInnerColor();
+		auto outer_color = circle->getOuterColor();
+
+		ImGui::DragFloat("Radius", &radius);
+		ImGui::DragFloat("Thickness", &thickness);
+		ImGui::SliderFloat("Fill", &fill, 0.0f, 1.0f);
+		ImGui::SliderFloat("Pie", &pie, 0.0f, 1.0f);
+		ImGui::SliderFloat("Pie Pivot", &pie_pivot, -1.0f, 1.0f);
+		ImGui::ColorEdit4("Inner Color", (float*)&inner_color);
+		ImGui::ColorEdit4("Outer Color", (float*)&outer_color);
+
+		circle->setRadius(radius);
+		circle->setThickness(thickness);
+		circle->setFill(fill);
+		circle->setPie(pie);
+		circle->setPiePivot(pie_pivot);
+		circle->setInnerColor(inner_color);
+		circle->setOuterColor(outer_color);
+	
 		ImGui::Separator();
 	}
 
@@ -118,6 +154,8 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	auto pivot = node->getPivot();
 	auto scale = node->getScale();
 	auto rotation = node->getRotation();
+	auto radial_anchor = node->getRadialAnchor();
+	auto radial_pivot = node->getRadialPivot();
 
 	ImGui::DragFloat2("Position", (float*)&position);
 	ImGui::DragFloat2("Size", (float*)&size);
@@ -128,6 +166,8 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	ImGui::DragFloat2("Pivot", (float*)&pivot, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat2("Scale", (float*)&scale, 0.01f, 0.0f, 2.0f);
 	ImGui::SliderAngle("Rotation", &rotation);
+	ImGui::SliderFloat("Radial Anchor", &radial_anchor, 0.0f, 1.0f);
+	ImGui::SliderFloat("Radial Pivot", &radial_pivot, 0.0f, 1.0f);
 
 	node->setPosition(position);
 	node->setSize(size);
@@ -138,6 +178,8 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	node->setPivot(pivot);
 	node->setScale(scale);
 	node->setRotation(rotation);
+	node->setRadialAnchor(radial_anchor);
+	node->setRadialPivot(radial_pivot);
 }
 
 void SceneEditor::showTooltip(std::shared_ptr<Scene::Node> node)

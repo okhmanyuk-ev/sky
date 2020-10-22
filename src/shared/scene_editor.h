@@ -5,13 +5,14 @@
 namespace Shared
 {
 	class SceneEditor : public Common::FrameSystem::Frameable,
-		public Common::EventSystem::Listenable<Platform::Input::Mouse::Event>
+		public Common::Event::Listenable<Platform::Input::Mouse::Event>
 	{
 	public:
 		SceneEditor(Scene::Scene& scene);
+		~SceneEditor();
 
 	private:
-		void event(const Platform::Input::Mouse::Event& e) override;
+		void onEvent(const Platform::Input::Mouse::Event& e) override;
 
 	private:
 		void frame() override;

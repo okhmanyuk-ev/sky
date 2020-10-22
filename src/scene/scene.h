@@ -11,8 +11,8 @@
 namespace Scene
 {
 	class Scene : 
-		public Common::EventSystem::Listenable<Platform::Input::Mouse::Event>,
-		public Common::EventSystem::Listenable<Platform::Input::Touch::Event>
+		public Common::Event::Listenable<Platform::Input::Mouse::Event>,
+		public Common::Event::Listenable<Platform::Input::Touch::Event>
 	{
 	private:
 		class RootNode;
@@ -30,8 +30,8 @@ namespace Scene
 		size_t getNodesCount(std::shared_ptr<Node> node = nullptr) const;
 
 	private:
-		void event(const Platform::Input::Mouse::Event& e) override;
-		void event(const Platform::Input::Touch::Event& e) override;
+		void onEvent(const Platform::Input::Mouse::Event& e) override;
+		void onEvent(const Platform::Input::Touch::Event& e) override;
 
 	private:
 		void recursiveNodeUpdateTransform(std::shared_ptr<Node> node);

@@ -209,6 +209,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	const std::vector<uint32_t>& indices, const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
+	assert(texture);
 
 	applyState();
 	
@@ -292,11 +293,10 @@ void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 }
 
 void System::drawCircle(const glm::mat4& model, const glm::vec4& inner_color, const glm::vec4& outer_color, 
-	float fill, float begin, float end)
+	float fill, float pie)
 {
 	mCircleShader->setFill(fill);
-	mCircleShader->setBegin(begin);
-	mCircleShader->setEnd(end);
+	mCircleShader->setPie(pie);
 	mCircleShader->setInnerColor(inner_color);
 	mCircleShader->setOuterColor(outer_color);
 	drawRectangle(model, { Color::White, 1.0f }, mCircleShader);
@@ -383,6 +383,11 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::m
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	drawSprite(texture, model, { }, { Color::White, 1.0f }, shader);
+}
+
+void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader)
+{
+	drawSprite(texture, glm::mat4(1.0f), shader);
 }
 
 void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,

@@ -22,10 +22,17 @@ Node::~Node()
 	}
 }
 
-void Node::attach(std::shared_ptr<Node> node)
+void Node::attach(std::shared_ptr<Node> node, AttachDirection attachDirection)
 {
 	assert(node->mParent == nullptr);
-	mNodes.push_back(node);
+	if (attachDirection == AttachDirection::Back) 
+	{
+		mNodes.push_back(node);
+	}
+	else
+	{
+		mNodes.push_front(node);
+	}
 	node->mParent = this;
 }
 
@@ -129,23 +136,14 @@ bool Node::interactTest(const glm::vec2& value) const
 
 void Node::updateTransform()
 {
-	auto verticalStretch = getVerticalStretch() / getVerticalScale();
-	auto horizontalStretch = getHorizontalStretch() / getHorizontalScale();
-	auto verticalMargin = getVerticalMargin();
-	auto horizontalMargin = getHorizontalMargin();
-
 	auto parent_size = hasParent() ? getParent()->getSize() : (getScene()->getViewport().size / PLATFORM->getScale());
-
-	if (horizontalStretch >= 0.0f)
-		setWidth((parent_size.x * horizontalStretch) - horizontalMargin);
-
-	if (verticalStretch >= 0.0f)
-		setHeight((parent_size.y * verticalStretch) - verticalMargin);
 
 	mTransform = hasParent() ? getParent()->getTransform() : glm::mat4(1.0f);
 	mTransform = glm::translate(mTransform, { getAnchor() * parent_size, 0.0f });
 	mTransform = glm::translate(mTransform, { getPosition(), 0.0f });
 	mTransform = glm::rotate(mTransform, getRotation(), { 0.0f, 0.0f, 1.0f });
+	mTransform = glm::rotate(mTransform, getRadialAnchor() * glm::pi<float>() * 2.0f, { 0.0f, 0.0f, 1.0f });
+	mTransform = glm::rotate(mTransform, -getRadialPivot() * glm::pi<float>() * 2.0f, { 0.0f, 0.0f, 1.0f });
 	mTransform = glm::scale(mTransform, { getScale(), 1.0f });
 	mTransform = glm::translate(mTransform, { -getPivot() * getSize(), 0.0f });
 	mTransform = glm::translate(mTransform, { -getOrigin(), 0.0f });
@@ -165,7 +163,16 @@ void Node::leaveDraw()
 
 void Node::update()
 {
-	//
+	auto stretch = getStretch() / getScale();
+	auto margin = getMargin();
+	
+	auto parent_size = hasParent() ? getParent()->getSize() : getScene()->getViewport().size;
+
+	if (stretch.x >= 0.0f)
+		setWidth((parent_size.x * stretch.x) - margin.x);
+
+	if (stretch.y >= 0.0f)
+		setHeight((parent_size.y * stretch.y) - margin.y);
 }
 
 void Node::draw()

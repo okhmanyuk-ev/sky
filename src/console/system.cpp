@@ -17,6 +17,7 @@ void System::registerCommand(const std::string& name, const std::string& descrip
 	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 	Command::Callback callback)
 {
+	assert(mCommands.count(name) == 0);
 	auto cmd = Command();
 	cmd.mDescription = description;
 	cmd.mCallback = callback;
@@ -45,10 +46,16 @@ void System::registerCommand(const std::string& name, Command::Callback callback
 	registerCommand(name, {}, {}, callback);
 }
 
+void System::removeCommand(const std::string& name)
+{
+	mCommands.erase(name);
+}
+
 void System::registerCVar(const std::string& name, const std::string& description,
 	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 	CVar::Getter getter, CVar::Setter setter)
 {
+	assert(mCVars.count(name) == 0);
 	auto cvar = CVar();
 	cvar.mDescription = description;
 	cvar.mArguments = args;
@@ -76,6 +83,11 @@ void System::registerCVar(const std::string& name, const std::vector<std::string
 	registerCVar(name, "", args, getter, setter);
 }
 
+void System::removeCVar(const std::string& name)
+{
+	mCVars.erase(name);
+}
+
 void System::addAlias(const std::string& name, const std::vector<std::string>& value)
 {
 	mAliases[name] = value;
@@ -86,7 +98,7 @@ void System::removeAlias(const std::string& name)
 	mAliases.erase(name);
 }
 
-void System::event(const Device::ReadEvent& e)
+void System::onEvent(const Device::ReadEvent& e)
 {
 	execute(e.text);
 }

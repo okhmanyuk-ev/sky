@@ -24,10 +24,10 @@ namespace Shared
 {
 	class ConsoleDevice : public Console::Device, 
 		public Common::FrameSystem::Frameable,
-		public Common::EventSystem::Listenable<Platform::Input::Keyboard::Event>,
-		public Common::EventSystem::Listenable<TouchEmulator::Event>,
-		public Common::EventSystem::Listenable<Platform::System::VirtualKeyboardTextChanged>,
-		public Common::EventSystem::Listenable<Platform::System::VirtualKeyboardEnterPressed>
+		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
+		public Common::Event::Listenable<TouchEmulator::Event>,
+		public Common::Event::Listenable<Platform::System::VirtualKeyboardTextChanged>,
+		public Common::Event::Listenable<Platform::System::VirtualKeyboardEnterPressed>
 	{
 	public:
 		enum class State
@@ -75,6 +75,9 @@ namespace Shared
 		bool isEnabled() const override { return mEnabled; }
 		void setEnabled(bool value) override { mEnabled = value; }
 
+		auto isHiddenButtonEnabled() const { return mHiddenButtonEnabled; }
+		void setHiddenButtonEnabled(bool value) { mHiddenButtonEnabled = value; }
+
 	private:
 		void frame() override;
 		void showCandidates(float height, float top);
@@ -83,10 +86,10 @@ namespace Shared
 		void drawText(const Text& text, glm::vec4 colorMultiplier = { 1.0f, 1.0f, 1.0f, 1.0f });
 		void enterInput();
 
-		void event(const Platform::Input::Keyboard::Event& e) override;
-		void event(const TouchEmulator::Event& e) override;
-		void event(const Platform::System::VirtualKeyboardTextChanged& e) override;
-		void event(const Platform::System::VirtualKeyboardEnterPressed& e) override;
+		void onEvent(const Platform::Input::Keyboard::Event& e) override;
+		void onEvent(const TouchEmulator::Event& e) override;
+		void onEvent(const Platform::System::VirtualKeyboardTextChanged& e) override;
+		void onEvent(const Platform::System::VirtualKeyboardEnterPressed& e) override;
 		
 		void handleInputCompletion(ImGuiTextEditCallbackData* data);
 		void handleInputHistory(ImGuiTextEditCallbackData* data);
@@ -99,6 +102,7 @@ namespace Shared
 		std::deque<Text> mBuffer;
 		bool mScrollToBack = false;
 		Common::Interpolator mInterpolator;
+		bool mHiddenButtonEnabled = true;
 		
 	private:
 		struct Candidate

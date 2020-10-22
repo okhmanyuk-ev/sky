@@ -13,8 +13,7 @@ namespace Renderer::Shaders
 			glm::vec4 inner_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 			glm::vec4 outer_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 			float fill = 1.0f;
-			float begin = 0.0f;
-			float end = 1.0f;
+			float pie = 1.0f;
 		};
 
 	public:
@@ -39,11 +38,8 @@ namespace Renderer::Shaders
 		auto getFill() const { return mCustomConstantBuffer.fill; }
 		void setFill(float value) { mCustomConstantBuffer.fill = value; }
 
-		auto getBegin() const { return mCustomConstantBuffer.begin; }
-		void setBegin(float value) { mCustomConstantBuffer.begin = value; }
-
-		auto getEnd() const { return mCustomConstantBuffer.end; }
-		void setEnd(float value) { mCustomConstantBuffer.end = value; }
+		auto getPie() const { return mCustomConstantBuffer.pie; }
+		void setPie(float value) { mCustomConstantBuffer.pie = value; }
 
 		auto getInnerColor() const { return mCustomConstantBuffer.inner_color; }
 		void setInnerColor(const glm::vec4& value) { mCustomConstantBuffer.inner_color = value; }

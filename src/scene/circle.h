@@ -9,17 +9,24 @@ namespace Scene
 	class Circle : public Node, public Color, public Blend
 	{
 	protected:
+		void update() override;
 		void draw() override;
 
 	public:
+		auto getRadius() const { return mRadius; }
+		void setRadius(float value) { mRadius = value; }
+
+		auto getThickness() const { return mThickness; }
+		void setThickness(float value) { mThickness = value; }
+
 		auto getFill() const { return mFill; }
 		void setFill(float value) { mFill = value; }
 
-		auto getBegin() const { return mBegin; }
-		void setBegin(float value) { mBegin = value; }
+		auto getPie() const { return mPie; }
+		void setPie(float value) { mPie = value; }
 
-		auto getEnd() const { return mEnd; }
-		void setEnd(float value) { mEnd = value; }
+		auto getPiePivot() const { return mPiePivot; }
+		void setPiePivot(float value) { mPiePivot = value; }
 
 		auto getInnerColor() const { return mInnerColor; }
 		void setInnerColor(const glm::vec4& value) { mInnerColor = value; }
@@ -30,9 +37,11 @@ namespace Scene
 		void setOuterColor(const glm::vec3& value) { mOuterColor = { value, mOuterColor.a }; }
 
 	private:
+		float mRadius = -1.0f;
+		float mThickness = -1.0f; // working only when we have radius
 		float mFill = 1.0f;
-		float mBegin = 0.0f;
-		float mEnd = 1.0f;
+		float mPie = 1.0f;
+		float mPiePivot = -1.0f;
 		glm::vec4 mInnerColor = { Graphics::Color::White, 1.0f };
 		glm::vec4 mOuterColor = { Graphics::Color::White, 1.0f };
 	};

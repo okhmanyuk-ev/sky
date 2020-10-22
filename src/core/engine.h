@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <cassert>
 
 #define ENGINE Core::Engine::Context
 
@@ -25,12 +26,16 @@ namespace Core
 	public:
 		template <class T> void addSystem(std::shared_ptr<T> value)
 		{
-			mSystems[getTypeIndex<T>()] = value;
+			auto index = getTypeIndex<T>();
+			assert(mSystems.count(index) == 0);
+			mSystems[index] = value;
 		}
 
 		template <class T> void removeSystem()
 		{
-			mSystems.erase(getTypeIndex<T>());
+			auto index = getTypeIndex<T>();
+			assert(mSystems.count(index) > 0);
+			mSystems.erase(index);
 		}
 
 		template <class T> std::shared_ptr<T> getSystem()
