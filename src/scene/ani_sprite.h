@@ -18,13 +18,7 @@ namespace Scene
 		void randomizeProgress();
 
 	public:
-		auto getTexture() const { return mSprite->getTexture(); }
-	
-		auto getColor() const { return mSprite->getColor(); }
-		void setColor(const glm::vec4& value) { mSprite->setColor(value); }
-
-		float getAlpha() const { return mSprite->getAlpha(); }
-		void setAlpha(float value) { mSprite->setAlpha(value); }
+		auto getSprite() { return mSprite; }
 
 		float getFrequency() const { return mFrequency; }
 		void setFrequency(float value) { mFrequency = value; }
