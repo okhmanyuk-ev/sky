@@ -8,6 +8,7 @@
 #include <renderer/shaders/default.h>
 #include <renderer/shaders/sdf.h>
 #include <renderer/shaders/circle.h>
+#include <renderer/shaders/rounded.h>
 
 #include <graphics/color.h>
 #include <graphics/font.h>
@@ -62,8 +63,19 @@ namespace Graphics
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 		
 		// colored rectangle
+		void drawRectangle(const glm::mat4& model, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color,
+			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+
 		void drawRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f },
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+
+		// rounded rectangle
+		void drawRoundedRectangle(const glm::mat4& model, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding);
+
+		void drawRoundedRectangle(const glm::mat4& model, const glm::vec4& color,
+			const glm::vec2& size, float rounding, bool absolute_rounding);
 
 		// colored line rectangle
 		void drawLineRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f });
@@ -170,12 +182,8 @@ namespace Graphics
 		float mSdfSmoothFactor = 1.0f;
 		
 	private:
-		std::shared_ptr<Renderer::Shaders::Sdf> mSdfShader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::Shaders::Default> mTexturedShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::Shaders::Default> mColoredShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColor::Layout);
-
-		std::shared_ptr<Renderer::Shaders::Circle> mCircleShader = std::make_shared<Renderer::Shaders::Circle>(Renderer::Vertex::PositionColor::Layout);
-
 		std::shared_ptr<Renderer::Shaders::Default> mBatchColorShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout,
 			std::set<Renderer::Shaders::Default::Flag>({ Renderer::Shaders::Default::Flag::Colored }));
 

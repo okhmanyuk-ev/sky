@@ -263,19 +263,48 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	}
 }
 
-void System::drawRectangle(const glm::mat4& model, const glm::vec4& color,
+void System::drawRectangle(const glm::mat4& model, const glm::vec4& top_left_color,
+	const glm::vec4& top_right_color, const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, 
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	static auto vertices = std::vector<Renderer::Vertex::PositionColor>(4);
-		
-	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color };
-	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color };
-	vertices[2] = { { 1.0f, 1.0f, 0.0f }, color };
-	vertices[3] = { { 1.0f, 0.0f, 0.0f }, color };
-	
+
+	vertices[0] = { { 0.0f, 0.0f, 0.0f }, top_left_color };
+	vertices[1] = { { 0.0f, 1.0f, 0.0f }, bottom_left_color };
+	vertices[2] = { { 1.0f, 1.0f, 0.0f }, bottom_right_color };
+	vertices[3] = { { 1.0f, 0.0f, 0.0f }, top_right_color };
+
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 
 	draw(Renderer::Topology::TriangleList, vertices, indices, model, shader);
+}
+
+void System::drawRectangle(const glm::mat4& model, const glm::vec4& color,
+	std::shared_ptr<Renderer::ShaderMatrices> shader)
+{
+	drawRectangle(model, color, color, color, color, shader);
+}
+
+void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding)
+{
+	static auto shader = std::make_shared<Renderer::Shaders::Rounded>(Renderer::Vertex::PositionColor::Layout);
+	shader->setSize(size);
+	if (absolute_rounding)
+	{
+		shader->setRadius(rounding);
+	}
+	else
+	{
+		shader->setRadius((glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f);
+	}
+	drawRectangle(model, top_left_color, top_right_color, bottom_left_color, bottom_right_color, shader);
+}
+
+void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& color,
+	const glm::vec2& size, float rounding, bool absolute_rounding)
+{
+	drawRoundedRectangle(model, color, color, color, color, size, rounding, absolute_rounding);
 }
 
 void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
@@ -295,11 +324,12 @@ void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 void System::drawCircle(const glm::mat4& model, const glm::vec4& inner_color, const glm::vec4& outer_color, 
 	float fill, float pie)
 {
-	mCircleShader->setFill(fill);
-	mCircleShader->setPie(pie);
-	mCircleShader->setInnerColor(inner_color);
-	mCircleShader->setOuterColor(outer_color);
-	drawRectangle(model, { Color::White, 1.0f }, mCircleShader);
+	static auto shader = std::make_shared<Renderer::Shaders::Circle>(Renderer::Vertex::PositionColor::Layout);
+	shader->setFill(fill);
+	shader->setPie(pie);
+	shader->setInnerColor(inner_color);
+	shader->setOuterColor(outer_color);
+	drawRectangle(model, { Color::White, 1.0f }, shader);
 }
 
 void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm::vec4& inner_color,
@@ -491,11 +521,12 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
 	float smoothFactor, const glm::mat4& model, const glm::vec4& color)
 {
-	mSdfShader->setMinValue(minValue);
-	mSdfShader->setMaxValue(maxValue);
-	mSdfShader->setSmoothFactor(smoothFactor);
-	mSdfShader->setColor(color);
-	draw(topology, texture, vertices, indices, model, mSdfShader);	
+	static auto shader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionColorTexture::Layout);
+	shader->setMinValue(minValue);
+	shader->setMaxValue(maxValue);
+	shader->setSmoothFactor(smoothFactor);
+	shader->setColor(color);
+	draw(topology, texture, vertices, indices, model, shader);
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model,
