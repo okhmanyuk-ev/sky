@@ -382,6 +382,7 @@ void SystemGL::setBlendMode(const BlendMode& value)
 	glEnable(GL_BLEND);
 	glBlendEquationSeparate(BlendOpMap.at(value.colorBlendFunction), BlendOpMap.at(value.alphaBlendFunction));
 	glBlendFuncSeparate(BlendMap.at(value.colorSrcBlend), BlendMap.at(value.colorDstBlend), BlendMap.at(value.alphaSrcBlend), BlendMap.at(value.alphaDstBlend));
+	glColorMask(value.colorMask.red, value.colorMask.green, value.colorMask.blue, value.colorMask.alpha);
 }
 
 void SystemGL::setTextureAddressMode(const TextureAddress& value)

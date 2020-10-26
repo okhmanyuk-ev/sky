@@ -290,7 +290,18 @@ void SystemD3D11::setBlendMode(const BlendMode& value)
 		
 		auto& blend = desc.RenderTarget[0];
 
-		blend.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		if (value.colorMask.red)
+			blend.RenderTargetWriteMask |= D3D11_COLOR_WRITE_ENABLE_RED;
+
+		if (value.colorMask.green)
+			blend.RenderTargetWriteMask |= D3D11_COLOR_WRITE_ENABLE_GREEN;
+		
+		if (value.colorMask.blue)
+			blend.RenderTargetWriteMask |= D3D11_COLOR_WRITE_ENABLE_BLUE;
+		
+		if (value.colorMask.alpha)
+			blend.RenderTargetWriteMask |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
+
 		blend.BlendEnable = true;
 
 		blend.SrcBlend = BlendMap.at(value.colorSrcBlend);

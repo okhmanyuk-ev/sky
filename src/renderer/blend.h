@@ -28,6 +28,14 @@ namespace Renderer
 		Max // The function will extracts maximum of the source and destination. max((srcColor * srcBlend),(destColor * destBlend))
 	};
 
+	struct ColorMask
+	{
+		bool red = true;
+		bool green = true;
+		bool blue = true;
+		bool alpha = true;
+	};
+
 	struct BlendMode
 	{
 		BlendMode(Blend srcColorBlend, Blend dstColorBlend, Blend srcAlphaBlend, Blend dstAlphaBlend)
@@ -47,6 +55,8 @@ namespace Renderer
 		BlendFunction alphaBlendFunction = BlendFunction::Add;
 		Blend alphaSrcBlend;
 		Blend alphaDstBlend;
+
+		ColorMask colorMask;
 	};
 
 	inline bool operator==(const BlendMode& left, const BlendMode& right)
