@@ -7,7 +7,7 @@ namespace Scene
 {
 	inline static int ClipLayer = 0;
 	
-	template <typename T> class Clippable : public T
+	template <typename T> class ClippableStencil : public T
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 
@@ -73,7 +73,7 @@ namespace Scene
 		}
 	};
 
-	template <typename T> class Scissored : public T // ex. clippable
+	template <typename T> class ClippableScissor : public T
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 	
