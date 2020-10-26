@@ -59,6 +59,20 @@ namespace Renderer
 		ColorMask colorMask;
 	};
 
+	inline bool operator==(const ColorMask& left, const ColorMask& right)
+	{
+		return
+			left.red == right.red &&
+			left.green == right.green &&
+			left.blue == right.blue &&
+			left.alpha == right.alpha;
+	}
+
+	inline bool operator!=(const ColorMask& left, const ColorMask& right)
+	{
+		return !(left == right);
+	}
+
 	inline bool operator==(const BlendMode& left, const BlendMode& right)
 	{
 		return
@@ -67,7 +81,8 @@ namespace Renderer
 			left.colorDstBlend == right.colorDstBlend &&
 			left.alphaBlendFunction == right.alphaBlendFunction &&
 			left.alphaSrcBlend == right.alphaSrcBlend &&
-			left.alphaDstBlend == right.alphaDstBlend;
+			left.alphaDstBlend == right.alphaDstBlend &&
+			left.colorMask == right.colorMask;
 	}
 
 	inline bool operator!=(const BlendMode& left, const BlendMode& right)

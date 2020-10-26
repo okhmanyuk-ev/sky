@@ -459,7 +459,7 @@ void SystemD3D11::setD3D11DepthStencilState(const DepthStencilState& value)
 		Device->CreateDepthStencilState(&desc, &mD3D11DepthStencilStates[value]);
 	}
 
-	Context->OMSetDepthStencilState(mD3D11DepthStencilStates.at(value), 1);
+	Context->OMSetDepthStencilState(mD3D11DepthStencilStates.at(value), value.stencilMode.reference);
 }
 
 void SystemD3D11::setD3D11SamplerState(const SamplerState& value)

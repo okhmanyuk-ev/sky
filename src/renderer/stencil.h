@@ -23,13 +23,15 @@ namespace Renderer
 
 		bool enabled = false;
 
-		uint8_t readMask = 0;
-		uint8_t writeMask = 0;
+		uint8_t readMask = 255;
+		uint8_t writeMask = 255;
 
 		StencilOp depthFailOp = StencilOp::Keep;
 		StencilOp failOp = StencilOp::Keep;
 		ComparisonFunc func = ComparisonFunc::Always;
 		StencilOp passOp = StencilOp::Keep;
+
+		uint8_t reference = 1;
 	};
 
 	inline bool operator==(const StencilMode& left, const StencilMode& right)
@@ -43,7 +45,9 @@ namespace Renderer
 			left.depthFailOp == right.failOp &&
 			left.failOp == right.failOp &&
 			left.func == right.func &&
-			left.passOp == right.passOp;
+			left.passOp == right.passOp &&
+			
+			left.reference == right.reference;
 	}
 
 	inline bool operator!=(const StencilMode& left, const StencilMode& right) 

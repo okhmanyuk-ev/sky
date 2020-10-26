@@ -347,7 +347,7 @@ void SystemGL::setStencilMode(const StencilMode& value)
 	glEnable(GL_STENCIL_TEST);
 	glStencilMask(value.writeMask);
 	glStencilOp(StencilOpMap.at(value.failOp), StencilOpMap.at(value.depthFailOp), StencilOpMap.at(value.passOp));
-	glStencilFunc(ComparisonFuncMap.at(value.func), 1, value.readMask);
+	glStencilFunc(ComparisonFuncMap.at(value.func), value.reference, value.readMask);
 }
 
 void SystemGL::setCullMode(const CullMode& value)
