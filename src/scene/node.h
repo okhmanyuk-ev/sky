@@ -83,6 +83,11 @@ namespace Scene
 
 		auto isTransformReady() const { return mTransformReady; }
 
+		bool hasBatchGroup() const { return !mBatchGroup.empty(); }
+
+		const auto& getBatchGroup() const { return mBatchGroup; }
+		void setBatchGroup(const std::string& value) { mBatchGroup = value; }
+
 	private:
 		Node* mParent = nullptr;
 		std::list<std::shared_ptr<Node>> mNodes;
@@ -94,5 +99,6 @@ namespace Scene
 		int mTouchMask = 1 << 0;
 		bool mTouching = false;
 		bool mTransformReady = false;
+		std::string mBatchGroup = "";
 	};
 }

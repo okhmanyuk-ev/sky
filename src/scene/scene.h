@@ -19,6 +19,7 @@ namespace Scene
 
 	public:
 		using InteractTestCallback = std::function<bool(const glm::vec2&)>;
+		using BatchGroups = std::unordered_map<std::string, std::vector<std::weak_ptr<Node>>>;
 
 	public:
 		Scene();
@@ -37,8 +38,12 @@ namespace Scene
 		void recursiveNodeUpdateTransform(std::shared_ptr<Node> node);
 		void recursiveNodeUpdate(std::shared_ptr<Node> node);
 		void recursiveNodeDraw(std::shared_ptr<Node> node);
+		void drawBatchGroup(const std::string& name);
 		bool interactTest(const glm::vec2& pos);
 
+	public:
+		static void MakeBatchLists(BatchGroups& batchGroups, std::shared_ptr<Node> node);
+	
 	private:
 		std::list<std::shared_ptr<Node>> getTouchableNodes(std::shared_ptr<Node> node, const glm::vec2& pos);
 		std::list<std::shared_ptr<Node>> getTouchableNodes(const glm::vec2& pos);
@@ -57,12 +62,17 @@ namespace Scene
 
 		void setInteractTestCallback(InteractTestCallback value) { mInteractTestCallback = value; }
 
+		bool isBatchGroupsEnabled() const { return mBatchGroupsEnabled; }
+		void setBatchGroupsEnabled(bool value) { mBatchGroupsEnabled = value; }
+
 	private:
 		std::shared_ptr<RootNode> mRoot = std::make_shared<RootNode>();
 		std::list<std::weak_ptr<Node>> mTouchedNodes;
 		std::shared_ptr<Renderer::RenderTarget> mRenderTarget = nullptr;
 		Renderer::Viewport mViewport;
 		InteractTestCallback mInteractTestCallback = nullptr;
+		BatchGroups mBatchGroups;
+		bool mBatchGroupsEnabled = true;
 	};
 
 	class Scene::RootNode : public Node

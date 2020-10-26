@@ -45,12 +45,36 @@ void Scene::Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
 		return;
 
 	node->enterDraw();
-	node->draw();
+
+	if (node->hasBatchGroup() && mBatchGroupsEnabled)
+	{
+		drawBatchGroup(node->getBatchGroup());
+	}
+	else
+	{
+		node->draw();
+	}
 
 	for (auto _node : node->getNodes())
 		recursiveNodeDraw(_node);
 
 	node->leaveDraw();
+}
+
+void Scene::Scene::drawBatchGroup(const std::string& name)
+{
+	if (mBatchGroups.count(name) == 0)
+		return;
+
+	for (auto node : mBatchGroups.at(name))
+	{
+		if (node.expired())
+			continue;
+
+		node.lock()->draw();
+	}
+	
+	mBatchGroups.erase(name);
 }
 
 bool Scene::Scene::interactTest(const glm::vec2& pos)
@@ -59,6 +83,24 @@ bool Scene::Scene::interactTest(const glm::vec2& pos)
 		return true;
 
 	return mInteractTestCallback(pos);
+}
+
+void Scene::Scene::MakeBatchLists(BatchGroups& batchGroups, std::shared_ptr<Node> node)
+{
+	if (!node->isEnabled())
+		return;
+
+	if (!node->isVisible())
+		return;
+
+	if (!node->isTransformReady())
+		return;
+
+	if (node->hasBatchGroup())
+		batchGroups[node->getBatchGroup()].push_back(node);
+
+	for (auto _node : node->getNodes())
+		MakeBatchLists(batchGroups, _node);
 }
 
 std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(std::shared_ptr<Node> node, const glm::vec2& pos)
@@ -147,6 +189,12 @@ void Scene::Scene::frame()
 
 	recursiveNodeUpdate(mRoot);
 	recursiveNodeUpdateTransform(mRoot);
+
+	if (mBatchGroupsEnabled)
+	{
+		mBatchGroups.clear();
+		MakeBatchLists(mBatchGroups, mRoot);
+	}
 
 	GRAPHICS->begin();
 	GRAPHICS->pushRenderTarget(mRenderTarget);

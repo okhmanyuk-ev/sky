@@ -26,11 +26,23 @@ void SceneEditor::frame()
 		return;
 
 	ImGui::Begin("Scene", &mEnabled);
+	if (ImGui::Button("Batch Groups")) 
+	{
+		mBatchGroupsEnabled = true;
+	}
+	ImGui::Separator();
 	showRecursiveNodeTree(mScene.getRoot());
 	ImGui::End();
 
-	highlightNodeUnderCursor();
-	highlightHoveredNode();
+	if (mBatchGroupsEnabled)
+	{
+		showBatchGroupsMenu();
+	}
+	else
+	{
+		highlightNodeUnderCursor();
+		highlightHoveredNode();
+	}
 }
 
 void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
@@ -239,7 +251,7 @@ void SceneEditor::highlightHoveredNode()
 	highlightNode(mHoveredNode);
 }
 
-void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node)
+void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color)
 {
 	if (node == nullptr)
 		return;
@@ -265,8 +277,8 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node)
 
 	GRAPHICS->begin();
 	GRAPHICS->pushOrthoMatrix();
-	GRAPHICS->drawRectangle(model, { Graphics::Color::White, 0.25f });
-	GRAPHICS->drawLineRectangle(model, { Graphics::Color::White, 1.0f });
+	GRAPHICS->drawRectangle(model, { color, 0.25f });
+	GRAPHICS->drawLineRectangle(model, { color, 1.0f });
 	GRAPHICS->pop();
 	GRAPHICS->end();
 }
@@ -309,4 +321,55 @@ void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture)
 		ImGui::Image((ImTextureID)&texture, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
 		ImGui::EndTooltip();
 	}
+}
+
+void SceneEditor::showBatchGroupsMenu()
+{
+	mBatchGroups.clear();
+	Scene::Scene::MakeBatchLists(mBatchGroups, mScene.getRoot());
+
+	ImGui::Begin("BatchGroups", &mBatchGroupsEnabled);
+	
+	bool enabled = mScene.isBatchGroupsEnabled();
+
+	ImGui::Checkbox("Enabled", &enabled);
+	ImGui::Separator();
+
+	mScene.setBatchGroupsEnabled(enabled);
+
+	for (const auto& [name, nodes] : mBatchGroups)
+	{
+		ImGui::Selectable(name.c_str());
+
+		if (ImGui::IsItemHovered())
+		{
+			for (auto node : nodes)
+			{
+				if (node.expired())
+					continue;
+
+				highlightNode(node.lock());
+			}
+		}
+
+		if (ImGui::BeginPopupContextItem())
+		{
+			for (auto _node : nodes)
+			{
+				if (_node.expired())
+					continue;
+
+				auto node = _node.lock();
+
+				auto _name = typeid(node).name();
+				ImGui::Selectable(_name);
+				if (ImGui::IsItemHovered())
+				{
+					highlightNode(node, Graphics::Color::Yellow);
+				}
+			}
+			ImGui::EndPopup();
+		}
+	}
+	ImGui::End();
 }
