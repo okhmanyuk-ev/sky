@@ -43,7 +43,11 @@ namespace Scene
 		auto getRounding() const { return mRounding; }
 		void setRounding(float value) { mRounding = value; }
 
+		auto isAbsoluteRounding() const { return mAbsoluteRounding; }
+		void setAbsoluteRounding(bool value) { mAbsoluteRounding = value; }
+
 	private:
 		float mRounding = 0.0f;
+		bool mAbsoluteRounding = false;
 	};
 }

@@ -13,29 +13,19 @@ void Rectangle::draw()
 	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
 	auto color = getColor();
 
-	std::vector<Renderer::Vertex::PositionColor> vertices = {
-		{ { 0.0f, 0.0f, 0.0f }, { mCornerColors.at(Corner::TopLeft) * color } },
-		{ { 0.0f, 1.0f, 0.0f }, { mCornerColors.at(Corner::BottomLeft) * color } },
-		{ { 1.0f, 1.0f, 0.0f }, { mCornerColors.at(Corner::BottomRight) * color } },
-		{ { 1.0f, 0.0f, 0.0f }, { mCornerColors.at(Corner::TopRight) * color } }
-	};
-
-	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
+	auto top_left_color = mCornerColors.at(Corner::TopLeft) * color;
+	auto top_right_color = mCornerColors.at(Corner::TopRight) * color;
+	auto bottom_left_color = mCornerColors.at(Corner::BottomLeft) * color;
+	auto bottom_right_color = mCornerColors.at(Corner::BottomRight) * color;
 	
 	if (mRounding > 0.0f)
 	{
-        static auto shader = std::make_shared<Renderer::Shaders::Rounded>(Renderer::Vertex::PositionColor::Layout);
-
-		auto size = getSize();
-
-		shader->setSize(size);
-		shader->setRadius((mRounding * glm::min(size.x, size.y)) / 2.0f);
-
-		GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model, shader);
+		GRAPHICS->drawRoundedRectangle(model, top_left_color, top_right_color, bottom_left_color, 
+			bottom_right_color, getSize(), mRounding, mAbsoluteRounding);
 	}
 	else
 	{
-		GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model);
+		GRAPHICS->drawRectangle(model, top_left_color, top_right_color, bottom_left_color, bottom_right_color);
 	}
 }
 
