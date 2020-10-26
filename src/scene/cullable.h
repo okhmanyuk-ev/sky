@@ -19,6 +19,9 @@ namespace Scene
 			auto bounds = T::getGlobalBounds();			
 			auto viewport = T::getScene()->getViewport();
 
+			viewport.size *= PLATFORM->getScale();
+			viewport.position *= PLATFORM->getScale();
+
 			auto b_top = bounds.y;
 			auto b_bottom = bounds.w;
 			auto b_left = bounds.x;
