@@ -1,5 +1,4 @@
 #include "cache_system.h"
-#include "graphics_helpers.h"
 #include <console/device.h>
 
 using namespace Shared;
@@ -101,7 +100,7 @@ void CacheSystem::loadAnimation(const std::string& path, const std::string& name
 	if (mAnimations.count(name) > 0)
 		return;
 
-	auto animation = std::make_shared<Graphics::Animation>(Shared::GraphicsHelpers::OpenAnimationFromFile(path));
+	auto animation = std::make_shared<Graphics::Animation>(Graphics::Animation::OpenFromFile(path));
 
 	loadAnimation(animation, name);
 }

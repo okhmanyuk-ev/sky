@@ -1,7 +1,54 @@
 #include "atlas.h"
 #include <rectpack2D/finders_interface.h>
+#include <nlohmann/json.hpp>
+#include <stb_image_write.h>
 
 using namespace Graphics;
+
+struct SaveImageContext
+{
+	std::string path;
+	Platform::Asset::Path pathType;
+};
+
+void Atlas::SaveToFile(const std::string& path, const Atlas& atlas, Platform::Asset::Path pathType)
+{
+	auto writeFunc = [](void* context, void* memory, int size) {
+		auto saveImageContext = static_cast<SaveImageContext*>(context);
+		Platform::Asset::Write(saveImageContext->path + ".png", memory, size, saveImageContext->pathType);
+	};
+	const auto& image = atlas.getImage();
+
+	SaveImageContext context;
+	context.path = path;
+	context.pathType = pathType;
+
+	stbi_write_png_to_func(writeFunc, &context, image.getWidth(), image.getHeight(),
+		image.getChannels(), image.getMemory(), image.getWidth() * image.getChannels());
+
+	auto json = nlohmann::json();
+	for (const auto& [name, region] : atlas.getTexRegions())
+	{
+		json[name] = { (int)region.pos.x, (int)region.pos.y, (int)region.size.x, (int)region.size.y };
+	}
+	auto json_dump = json.dump(4);
+
+	Platform::Asset::Write(path + "_atlas.json", json_dump.data(), json_dump.size(), pathType);
+}
+
+Atlas Atlas::OpenFromFile(const std::string& image_path, const std::string& atlas_path, Platform::Asset::Path path_type)
+{
+	auto image_file = Platform::Asset(image_path, path_type);
+	auto json_file = Platform::Asset(atlas_path, path_type);
+	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
+	auto json = nlohmann::json::parse(json_string);
+	auto regions = TexRegionMap();
+	for (const auto& [key, value] : json.items())
+	{
+		regions.insert({ key, { { value[0], value[1] }, { value[2], value[3] } } });
+	}
+	return Atlas(image_file, regions);
+}
 
 Atlas::Atlas(const std::map<std::string, Graphics::Image>& images)
 {

@@ -11,6 +11,15 @@ namespace Graphics
 		using StatesMap = std::map<std::string, Frames>;
 
 	public:
+		static void SaveToFile(const std::string& path, const Animation& animation, Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
+
+		static Animation OpenFromFile(const std::string& image_path, const std::string& atlas_path,
+			const std::string& animation_path, Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
+
+		static Animation OpenFromFile(const std::string& smart_path,
+			Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
+
+	public:
 		Animation(const Atlas& atlas, const StatesMap& states);
 
 	public:

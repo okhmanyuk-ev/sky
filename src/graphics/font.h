@@ -32,7 +32,7 @@ namespace Graphics
 		Font(const Platform::Asset& asset);
 		~Font();
 
-		const auto getTexture() const { return mTexture; }
+		auto getTexture() const { return mTexture; }
 		const Glyph& getGlyph(utf8_string::value_type symbol) const;
 
 		static float getScaleFactorForSize(float size);
@@ -50,7 +50,7 @@ namespace Graphics
 		void setCustomVerticalOffset(float value) { mCustomVerticalOffset = value; }
 
 	private:
-		std::shared_ptr<Renderer::Texture> mTexture;
+		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
 		std::unordered_map<utf8_string::value_type, Glyph> mGlyphs;
 		std::unordered_map<utf8_string::value_type, std::unordered_map<utf8_string::value_type, float>> mKernings;
 		float mAscent = 0.0f;
