@@ -11,13 +11,12 @@ struct SaveImageContext
 	Platform::Asset::Path pathType;
 };
 
-void Atlas::SaveToFile(const std::string& path, const Atlas& atlas, Platform::Asset::Path pathType)
+void Atlas::SaveToFile(const std::string& path, const Image& image, const Regions& regions, Platform::Asset::Path pathType)
 {
 	auto writeFunc = [](void* context, void* memory, int size) {
 		auto saveImageContext = static_cast<SaveImageContext*>(context);
 		Platform::Asset::Write(saveImageContext->path + ".png", memory, size, saveImageContext->pathType);
 	};
-	const auto& image = atlas.getImage();
 
 	SaveImageContext context;
 	context.path = path;
@@ -27,7 +26,7 @@ void Atlas::SaveToFile(const std::string& path, const Atlas& atlas, Platform::As
 		image.getChannels(), image.getMemory(), image.getWidth() * image.getChannels());
 
 	auto json = nlohmann::json();
-	for (const auto& [name, region] : atlas.getTexRegions())
+	for (const auto& [name, region] : regions)
 	{
 		json[name] = { (int)region.pos.x, (int)region.pos.y, (int)region.size.x, (int)region.size.y };
 	}
@@ -42,7 +41,7 @@ Atlas Atlas::OpenFromFile(const std::string& image_path, const std::string& atla
 	auto json_file = Platform::Asset(atlas_path, path_type);
 	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
 	auto json = nlohmann::json::parse(json_string);
-	auto regions = TexRegionMap();
+	auto regions = Regions();
 	for (const auto& [key, value] : json.items())
 	{
 		regions.insert({ key, { { value[0], value[1] }, { value[2], value[3] } } });
@@ -50,7 +49,7 @@ Atlas Atlas::OpenFromFile(const std::string& image_path, const std::string& atla
 	return Atlas(image_file, regions);
 }
 
-Atlas::Atlas(const std::map<std::string, Graphics::Image>& images)
+std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)
 {
 	using namespace rectpack2D;
 	constexpr bool allow_flip = false;
@@ -90,7 +89,9 @@ Atlas::Atlas(const std::map<std::string, Graphics::Image>& images)
 	const auto dst_width = result_size.w;
 	const auto dst_height = result_size.h;
 	const int channels = 4;
-	mImage = Graphics::Image(dst_width, dst_height, channels);
+	
+	auto result_image = Image(dst_width, dst_height, channels);
+	auto result_regions = Regions();
 
 	for (int i = 0; i < (int)images.size(); i++)
 	{
@@ -98,7 +99,7 @@ Atlas::Atlas(const std::map<std::string, Graphics::Image>& images)
 		const auto& image = std::next(images.begin(), i)->second;
 		const auto& name = std::next(images.begin(), i)->first;
 
-		auto& region = mTexRegions[name];
+		auto& region = result_regions[name];
 		region.pos = { static_cast<float>(rect.x), static_cast<float>(rect.y) };
 		region.size = { static_cast<float>(rect.w), static_cast<float>(rect.h) };
 
@@ -106,7 +107,7 @@ Atlas::Atlas(const std::map<std::string, Graphics::Image>& images)
 		auto src_height = image.getHeight();
 
 		auto src_mem = image.getMemory();
-		auto dst_mem = mImage->getMemory();
+		auto dst_mem = result_image.getMemory();
 
 		for (int y = 0; y < src_height; y++)
 		{
@@ -118,10 +119,12 @@ Atlas::Atlas(const std::map<std::string, Graphics::Image>& images)
 			}
 		}
 	}
+
+	return { result_image, result_regions };
 }
 
-Atlas::Atlas(const Graphics::Image& image, const TexRegionMap& tex_regions)
+Atlas::Atlas(const Graphics::Image& image, const Regions& tex_regions)
 {
-	mImage = image;
-	mTexRegions = tex_regions;
+	mTexture = std::make_shared<Renderer::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory());
+	mRegions = tex_regions;
 }

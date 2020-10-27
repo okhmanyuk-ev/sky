@@ -1,34 +1,38 @@
 #pragma once
 
+#include <renderer/texture.h>
 #include <graphics/image.h>
 #include <graphics/tex_region.h>
 #include <map>
-#include <optional>
+#include <memory>
+#include <tuple>
 
 namespace Graphics
 {
 	class Atlas
 	{
 	public:
-		static void SaveToFile(const std::string& path, const Atlas& atlas, 
+		using Images = std::map<std::string, Image>;
+		using Regions = std::map<std::string, TexRegion>;
+
+	public:
+		static void SaveToFile(const std::string& path, const Image& image, const Regions& regions, 
 			Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
 		
 		static Atlas OpenFromFile(const std::string& image_path, const std::string& atlas_path, 
 			Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
 
-	public:
-		using TexRegionMap = std::map<std::string, TexRegion>;
+		static std::tuple<Image, Regions> MakeFromImages(const Images& images);
 
 	public:
-		Atlas(const std::map<std::string, Graphics::Image>& images);
-		Atlas(const Graphics::Image& image, const TexRegionMap& tex_regions);
+		Atlas(const Image& image, const Regions& tex_regions);
 
 	public:
-		const auto& getImage() const { return mImage.value(); }
-		const auto& getTexRegions() const { return mTexRegions; }
+		auto getTexture() const { return mTexture; }
+		const auto& getRegions() const { return mRegions; }
 
 	private:
-		std::optional<Graphics::Image> mImage;
-		TexRegionMap mTexRegions;
+		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
+		Regions mRegions;
 	};
 }

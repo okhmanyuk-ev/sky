@@ -30,7 +30,6 @@ namespace Scene
 		void setProgress(size_t value) { mProgress = value; }
 
 		auto getAnimation() const { return mAnimation; }
-		void setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Animation> animation);
 		void setAnimation(std::shared_ptr<Graphics::Animation> value);
 
 		bool isPlaying() const { return mPlaying; }

@@ -8,10 +8,11 @@ namespace Graphics
 	{
 	public:
 		using Frames = std::vector<std::string>;
-		using StatesMap = std::map<std::string, Frames>;
+		using States = std::map<std::string, Frames>;
 
 	public:
-		static void SaveToFile(const std::string& path, const Animation& animation, Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
+		static void SaveToFile(const std::string& path, const Image& image, const Atlas::Regions& regions,
+			const States& states, Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
 
 		static Animation OpenFromFile(const std::string& image_path, const std::string& atlas_path,
 			const std::string& animation_path, Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
@@ -19,8 +20,13 @@ namespace Graphics
 		static Animation OpenFromFile(const std::string& smart_path,
 			Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
 
+		// TODO: to enable crossplatform, make with Platform::Asset, not <filesystem>
+#if defined(PLATFORM_WINDOWS)
+		static std::tuple<States, Image, Atlas::Regions> MakeFromFolder(const std::string& path);
+#endif
+
 	public:
-		Animation(const Atlas& atlas, const StatesMap& states);
+		Animation(const Atlas& atlas, const States& states);
 
 	public:
 		const auto& getAtlas() const { return mAtlas; }
@@ -28,6 +34,6 @@ namespace Graphics
 
 	private:
 		Atlas mAtlas;
-		StatesMap mStates;
+		States mStates;
 	};
 }
