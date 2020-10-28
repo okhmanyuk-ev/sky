@@ -1,30 +1,11 @@
 #include "atlas.h"
 #include <rectpack2D/finders_interface.h>
 #include <nlohmann/json.hpp>
-#include <stb_image_write.h>
 
 using namespace Graphics;
 
-struct SaveImageContext
+void Atlas::SaveToFile(const std::string& path, const Regions& regions, Platform::Asset::Path pathType)
 {
-	std::string path;
-	Platform::Asset::Path pathType;
-};
-
-void Atlas::SaveToFile(const std::string& path, const Image& image, const Regions& regions, Platform::Asset::Path pathType)
-{
-	auto writeFunc = [](void* context, void* memory, int size) {
-		auto saveImageContext = static_cast<SaveImageContext*>(context);
-		Platform::Asset::Write(saveImageContext->path + ".png", memory, size, saveImageContext->pathType);
-	};
-
-	SaveImageContext context;
-	context.path = path;
-	context.pathType = pathType;
-
-	stbi_write_png_to_func(writeFunc, &context, image.getWidth(), image.getHeight(),
-		image.getChannels(), image.getMemory(), image.getWidth() * image.getChannels());
-
 	auto json = nlohmann::json();
 	for (const auto& [name, region] : regions)
 	{
@@ -32,7 +13,7 @@ void Atlas::SaveToFile(const std::string& path, const Image& image, const Region
 	}
 	auto json_dump = json.dump(4);
 
-	Platform::Asset::Write(path + "_atlas.json", json_dump.data(), json_dump.size(), pathType);
+	Platform::Asset::Write(path + ".json", json_dump.data(), json_dump.size(), pathType);
 }
 
 std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)

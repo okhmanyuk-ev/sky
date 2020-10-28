@@ -16,7 +16,7 @@ namespace Graphics
 		using Regions = std::map<std::string, TexRegion>;
 
 	public:
-		static void SaveToFile(const std::string& path, const Image& image, const Regions& regions, 
+		static void SaveToFile(const std::string& path, const Regions& regions, 
 			Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
 		
 		static std::tuple<Image, Regions> MakeFromImages(const Images& images);

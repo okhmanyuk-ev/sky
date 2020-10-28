@@ -1,8 +1,29 @@
 #include "image.h"
-
+#include <stb_image_write.h>
 #include <stb_image.h>
 
 using namespace Graphics;
+
+struct SaveImageContext
+{
+	std::string path;
+	Platform::Asset::Path pathType;
+};
+
+void Image::SaveToFile(const std::string& path, const Image& image, Platform::Asset::Path pathType)
+{
+	auto writeFunc = [](void* context, void* memory, int size) {
+		auto saveImageContext = static_cast<SaveImageContext*>(context);
+		Platform::Asset::Write(saveImageContext->path + ".png", memory, size, saveImageContext->pathType);
+	};
+
+	SaveImageContext context;
+	context.path = path;
+	context.pathType = pathType;
+
+	stbi_write_png_to_func(writeFunc, &context, image.getWidth(), image.getHeight(),
+		image.getChannels(), image.getMemory(), image.getWidth() * image.getChannels());
+}
 
 Image::Image(int width, int height, int channels) : mWidth(width), mHeight(height), mChannels(channels)
 {

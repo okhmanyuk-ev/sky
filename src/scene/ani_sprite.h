@@ -29,6 +29,9 @@ namespace Scene
 		auto getProgress() const { return mProgress; }
 		void setProgress(size_t value) { mProgress = value; }
 
+		auto getAnimation() const { return mAnimation; }
+		auto getAtlas() const { return mAtlas; }
+
 		void setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas,
 			std::shared_ptr<Graphics::Animation> animation);
 

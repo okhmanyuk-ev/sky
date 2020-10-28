@@ -3,7 +3,7 @@
 
 using namespace Graphics;
 
-void Animation::SaveToFile(const std::string& path, const Image& image, const States& states, Platform::Asset::Path pathType)
+void Animation::SaveToFile(const std::string& path, const States& states, Platform::Asset::Path pathType)
 {
 	auto json = nlohmann::json();
 	for (const auto& [name, regions] : states)
@@ -14,7 +14,7 @@ void Animation::SaveToFile(const std::string& path, const Image& image, const St
 		}
 	}
 	auto json_dump = json.dump(4);
-	Platform::Asset::Write(path + "_animation.json", json_dump.data(), json_dump.size(), pathType);
+	Platform::Asset::Write(path + ".json", json_dump.data(), json_dump.size(), pathType);
 }
 
 Animation::Animation(const States& states) : 

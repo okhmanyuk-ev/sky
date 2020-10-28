@@ -7,6 +7,10 @@ namespace Graphics
 	class Image
 	{
 	public:
+		static void SaveToFile(const std::string& path, const Image& image, 
+			Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
+
+	public:
 		Image(int width, int height, int channels);
 		Image(void* data, size_t size);
 		Image(const Platform::Asset& asset);
