@@ -107,6 +107,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 		if (texture != nullptr)
 		{
+			ImGui::Text("%dx%d", texture->getWidth(), texture->getHeight());
 			mEditorFontTexture = texture;
 			drawImage(mEditorFontTexture);
 			ImGui::Separator();
@@ -119,8 +120,9 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 		if (texture != nullptr)
 		{
+			ImGui::Text("%dx%d", texture->getWidth(), texture->getHeight());
 			mEditorSpriteTexture = texture;
-			drawImage(mEditorSpriteTexture);
+			drawImage(mEditorSpriteTexture, sprite->getTexRegion());
 			ImGui::Separator();
 		}
 	}
@@ -215,17 +217,8 @@ void SceneEditor::showTooltip(std::shared_ptr<Scene::Node> node)
 
 		mSpriteTexture = texture;
 
-		glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
-
-		const float MaxSize = 256.0f;
-
-		auto max = glm::max(size.x, size.y);
-
-		if (max > MaxSize)
-			size *= (MaxSize / max);
-
 		ImGui::BeginTooltip();
-		ImGui::Image((ImTextureID)&mSpriteTexture, ImVec2(size.x, size.y));
+		drawImage(mSpriteTexture, sprite->getTexRegion());
 		ImGui::EndTooltip();
 	}
 	else if (auto label = std::dynamic_pointer_cast<Scene::Label>(node); label != nullptr)
@@ -293,21 +286,45 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::ve
 	GRAPHICS->end();
 }
 
-void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture)
+void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture, const Graphics::TexRegion& region)
 {
 	glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
 
 	const float MaxSize = 256.0f;
 
 	auto max = glm::max(size.x, size.y);
+	float scale = 1.0f;
 
 	if (max > MaxSize)
-		size *= (MaxSize / max);
+		scale = MaxSize / max;
+		
+	size *= scale;
 
 	auto pos = ImGui::GetCursorScreenPos();
-	
-	ImGui::Text("%dx%d", texture->getWidth(), texture->getHeight());
+
+	auto prev_cursor_pos = ImGui::GetCursorPos();
+
 	ImGui::Image((ImTextureID)&texture, ImVec2(size.x, size.y));
+	
+	if (region.size.x > 0.0f && region.size.y > 0.0f)
+	{
+		auto new_cursor_pos = ImGui::GetCursorPos();
+
+		ImGui::SetCursorPos(prev_cursor_pos);
+
+		auto drawList = ImGui::GetWindowDrawList();
+
+		auto region_pos = region.pos * scale;
+		auto region_size = region.size * scale;
+
+		auto p = ImGui::GetCursorScreenPos();
+		auto p1 = ImVec2(p.x + region_pos.x, p.y + region_pos.y);
+		auto p2 = ImVec2(p1.x + region_size.x, p1.y + region_size.y);
+		auto color = ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		drawList->AddRect(p1, p2, color);
+
+		ImGui::SetCursorPos(new_cursor_pos);
+	}
 
 	if (ImGui::IsItemHovered())
 	{

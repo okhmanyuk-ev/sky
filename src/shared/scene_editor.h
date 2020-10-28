@@ -24,7 +24,7 @@ namespace Shared
 		void highlightNodeUnderCursor();
 		void highlightHoveredNode();
 		void highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color = Graphics::Color::White);
-		void drawImage(const std::shared_ptr<Renderer::Texture>& texture);
+		void drawImage(const std::shared_ptr<Renderer::Texture>& texture, const Graphics::TexRegion& region = {});
 		void showBatchGroupsMenu();
 		
 	public:
