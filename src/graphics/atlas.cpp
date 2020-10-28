@@ -109,13 +109,26 @@ std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)
 	return { result_image, result_regions };
 }
 
-Atlas::Atlas(std::shared_ptr<Renderer::Texture> texture, const Platform::Asset& regions_file) :
-	mTexture(texture)
+Atlas::Atlas(std::shared_ptr<Renderer::Texture> texture, const Regions& regions) :
+	mTexture(texture), mRegions(regions)
 {
-	auto json_string = std::string((char*)regions_file.getMemory(), regions_file.getSize());
+	//
+}
+
+Atlas::Atlas(std::shared_ptr<Renderer::Texture> texture, const Platform::Asset& regions_file) : 
+	Atlas(texture, ParseRegionsFromFile(regions_file))
+{
+	//
+}
+
+Atlas::Regions Atlas::ParseRegionsFromFile(const Platform::Asset& file)
+{
+	auto json_string = std::string((char*)file.getMemory(), file.getSize());
 	auto json = nlohmann::json::parse(json_string);
+	auto regions = Regions();
 	for (const auto& [key, value] : json.items())
 	{
-		mRegions.insert({ key, { { value[0], value[1] }, { value[2], value[3] } } });
+		regions.insert({ key, { { value[0], value[1] }, { value[2], value[3] } } });
 	}
+	return regions;
 }

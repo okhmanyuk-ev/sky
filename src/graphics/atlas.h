@@ -22,7 +22,11 @@ namespace Graphics
 		static std::tuple<Image, Regions> MakeFromImages(const Images& images);
 
 	public:
+		Atlas(std::shared_ptr<Renderer::Texture> texture, const Regions& regions);
 		Atlas(std::shared_ptr<Renderer::Texture> texture, const Platform::Asset& regions_file);
+
+	private:
+		static Regions ParseRegionsFromFile(const Platform::Asset& file);
 
 	public:
 		auto getTexture() const { return mTexture; }
