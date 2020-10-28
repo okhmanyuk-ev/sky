@@ -109,14 +109,14 @@ std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)
 	return { result_image, result_regions };
 }
 
-Atlas::Atlas(std::shared_ptr<Renderer::Texture> texture, const Regions& regions) :
-	mTexture(texture), mRegions(regions)
+Atlas::Atlas(const Regions& regions) :
+	mRegions(regions)
 {
 	//
 }
 
-Atlas::Atlas(std::shared_ptr<Renderer::Texture> texture, const Platform::Asset& regions_file) : 
-	Atlas(texture, ParseRegionsFromFile(regions_file))
+Atlas::Atlas(const Platform::Asset& regions_file) : 
+	Atlas(ParseRegionsFromFile(regions_file))
 {
 	//
 }

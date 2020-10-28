@@ -29,8 +29,8 @@ namespace Scene
 		auto getProgress() const { return mProgress; }
 		void setProgress(size_t value) { mProgress = value; }
 
-		auto getAnimation() const { return mAnimation; }
-		void setAnimation(std::shared_ptr<Graphics::Animation> value);
+		void setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas,
+			std::shared_ptr<Graphics::Animation> animation);
 
 		bool isPlaying() const { return mPlaying; }
 		void setPlaying(bool value) { mPlaying = value; }
@@ -41,6 +41,7 @@ namespace Scene
 		std::string mState = "idle";
 		Clock::Duration mAccumulator = Clock::Duration::zero();
 		std::shared_ptr<Graphics::Animation> mAnimation;
+		std::shared_ptr<Graphics::Atlas> mAtlas;
 		size_t mProgress = 0;
 		bool mPlaying = true;
 		glm::vec2 mMaxRegionSize = { 0.0f, 0.0f };

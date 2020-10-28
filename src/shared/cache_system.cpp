@@ -19,24 +19,6 @@ std::shared_ptr<Graphics::Font> CacheSystem::getFont(const std::string& name)
 	return mFonts.at(name);
 }
 
-std::shared_ptr<Graphics::Atlas> CacheSystem::getAtlas(const std::string& name, AtlasLoadFunction atlasLoadFunction)
-{
-	if (mAtlases.count(name) == 0)
-	{
-		mAtlases[name] = atlasLoadFunction();
-	}
-	return mAtlases.at(name);
-}
-
-std::shared_ptr<Graphics::Animation> CacheSystem::getAnimation(const std::string& name, AnimationLoadFunction animationLoadFunction)
-{
-	if (mAnimations.count(name) == 0)
-	{
-		mAnimations[name] = animationLoadFunction();
-	}
-	return mAnimations.at(name);
-}
-
 std::shared_ptr<Audio::Sound> CacheSystem::getSound(const std::string& name)
 {
 	loadSound(name);
@@ -45,6 +27,18 @@ std::shared_ptr<Audio::Sound> CacheSystem::getSound(const std::string& name)
 		return nullptr;
 
 	return mSounds.at(name);
+}
+
+std::shared_ptr<Graphics::Atlas> CacheSystem::getAtlas(const std::string& name)
+{
+	loadAtlas(name);
+	return mAtlases.at(name);
+}
+
+std::shared_ptr<Graphics::Animation> CacheSystem::getAnimation(const std::string& name)
+{
+	loadAnimation(name);
+	return mAnimations.at(name);
 }
 
 void CacheSystem::loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name)
@@ -126,4 +120,30 @@ void CacheSystem::loadSound(const std::string& path, const std::string& name)
 void CacheSystem::loadSound(const std::string& path)
 {
 	loadSound(path, path);
+}
+
+void CacheSystem::loadAtlas(const std::string& path, const std::string& name)
+{
+	if (mAtlases.count(name) > 0)
+		return;
+
+	mAtlases[name] = std::make_shared<Graphics::Atlas>(path);
+}
+
+void CacheSystem::loadAtlas(const std::string& path)
+{
+	loadAtlas(path, path);
+}
+
+void CacheSystem::loadAnimation(const std::string& path, const std::string& name)
+{
+	if (mAnimations.count(name) > 0)
+		return;
+
+	mAnimations[name] = std::make_shared<Graphics::Animation>(path);
+}
+
+void CacheSystem::loadAnimation(const std::string& path)
+{
+	loadAnimation(path, path);
 }

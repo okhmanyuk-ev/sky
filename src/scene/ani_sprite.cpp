@@ -44,7 +44,7 @@ void AniSprite::update()
 		mProgress -= frames.size();
 
 	const auto& frame = frames.at(mProgress);
-	const auto& regions = mAnimation->getAtlas()->getRegions();
+	const auto& regions = mAtlas->getRegions();
 	const auto& region = regions.at(frame);
 
 	mSprite->setTexRegion(region);
@@ -73,12 +73,13 @@ void AniSprite::randomizeProgress()
 	mProgress = glm::linearRand<size_t>(0, frames.size() - 1);
 }
 
-void AniSprite::setAnimation(std::shared_ptr<Graphics::Animation> value)
+void AniSprite::setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas, std::shared_ptr<Graphics::Animation> animation)
 { 
-	mAnimation = value;
-	mSprite->setTexture(value->getAtlas()->getTexture());
+	mSprite->setTexture(texture);
+	mAnimation = animation;;
+	mAtlas = atlas;
 
-	const auto& regions = mAnimation->getAtlas()->getRegions();
+	const auto& regions = atlas->getRegions();
 
 	mMaxRegionSize = { 0.0f, 0.0f };
 

@@ -20,25 +20,21 @@
 
 #define TEXTURE(NAME) CACHE->getTexture(NAME)
 #define FONT(NAME) CACHE->getFont(NAME)
-#define ATLAS(NAME, LOAD_FUNC) CACHE->getAtlas(NAME, LOAD_FUNC)
-#define ANIMATION(NAME, LOAD_FUNC) CACHE->getAnimation(NAME, LOAD_FUNC)
 #define SOUND(NAME) CACHE->getSound(NAME)
+#define ATLAS(NAME) CACHE->getAtlas(NAME)
+#define ANIMATION(NAME) CACHE->getAnimation(NAME)
 
 namespace Shared 
 {
 	class CacheSystem
 	{
 	public:
-		using AtlasLoadFunction = std::function<std::shared_ptr<Graphics::Atlas>()>;
-		using AnimationLoadFunction = std::function<std::shared_ptr<Graphics::Animation>()>;
-
-	public:
 		std::shared_ptr<Renderer::Texture> getTexture(const std::string& name);
 		std::shared_ptr<Graphics::Font> getFont(const std::string& name);
-		std::shared_ptr<Graphics::Atlas> getAtlas(const std::string& name, AtlasLoadFunction atlasLoadFunction);
-		std::shared_ptr<Graphics::Animation> getAnimation(const std::string& name, AnimationLoadFunction animationLoadFunction);
 		std::shared_ptr<Audio::Sound> getSound(const std::string& name);
-		
+		std::shared_ptr<Graphics::Atlas> getAtlas(const std::string& name);
+		std::shared_ptr<Graphics::Animation> getAnimation(const std::string& name);
+
 		void loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name);
 		void loadTexture(std::shared_ptr<Graphics::Image> image, const std::string& name);
 		void loadTexture(const std::string& path, const std::string& name);
@@ -50,6 +46,12 @@ namespace Shared
 		void loadSound(std::shared_ptr<Audio::Sound> sound, const std::string& name);
 		void loadSound(const std::string& path, const std::string& name);
 		void loadSound(const std::string& path);
+
+		void loadAtlas(const std::string& path, const std::string& name);
+		void loadAtlas(const std::string& path);
+
+		void loadAnimation(const std::string& path, const std::string& name);
+		void loadAnimation(const std::string& path);
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Renderer::Texture>> mTextures;

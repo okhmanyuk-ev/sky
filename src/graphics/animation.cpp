@@ -3,10 +3,8 @@
 
 using namespace Graphics;
 
-void Animation::SaveToFile(const std::string& path, const Image& image, const Atlas::Regions& regions, 
-	const States& states, Platform::Asset::Path pathType)
+void Animation::SaveToFile(const std::string& path, const Image& image, const States& states, Platform::Asset::Path pathType)
 {
-	Atlas::SaveToFile(path, image, regions, pathType);
 	auto json = nlohmann::json();
 	for (const auto& [name, regions] : states)
 	{
@@ -19,14 +17,14 @@ void Animation::SaveToFile(const std::string& path, const Image& image, const At
 	Platform::Asset::Write(path + "_animation.json", json_dump.data(), json_dump.size(), pathType);
 }
 
-Animation::Animation(std::shared_ptr<Atlas> atlas, const States& states) : 
-	mAtlas(atlas), mStates(states)
+Animation::Animation(const States& states) : 
+	mStates(states)
 {
 	//
 }
 
-Animation::Animation(std::shared_ptr<Atlas> atlas, const Platform::Asset& states_file) : 
-	Animation(atlas, ParseStatesFromFile(states_file))
+Animation::Animation(const Platform::Asset& states_file) : 
+	Animation(ParseStatesFromFile(states_file))
 {
 	//
 }
