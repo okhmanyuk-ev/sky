@@ -83,6 +83,11 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 	ImGui::Separator();
 
+	auto batch_group = node->getBatchGroup();
+	ImGui::InputTextWithHint("Batch Group", "No batch group", batch_group.data(), batch_group.size(), ImGuiInputTextFlags_ReadOnly);
+
+	ImGui::Separator();
+
 	if (auto colored = std::dynamic_pointer_cast<Scene::Color>(node); colored != nullptr)
 	{
 		auto color = colored->getColor();
@@ -122,10 +127,15 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 	if (auto rectangle = std::dynamic_pointer_cast<Scene::Rectangle>(node); rectangle != nullptr)
 	{
+		auto absolute_rounding = rectangle->isAbsoluteRounding();
 		auto rounding = rectangle->getRounding();
-		ImGui::SliderFloat("Rounding", &rounding, 0.0f, 1.0f);
-		rectangle->setRounding(rounding);
+
+		ImGui::Checkbox("Absolute Rounding", &absolute_rounding);
+		ImGui::SliderFloat("Rounding", &rounding, 0.0f, absolute_rounding ? 128.0f : 1.0f);
 		ImGui::Separator();
+		
+		rectangle->setAbsoluteRounding(absolute_rounding);
+		rectangle->setRounding(rounding);		
 	}
 
 	if (auto circle = std::dynamic_pointer_cast<Scene::Circle>(node); circle != nullptr)
