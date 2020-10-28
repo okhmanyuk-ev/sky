@@ -35,20 +35,6 @@ void Atlas::SaveToFile(const std::string& path, const Image& image, const Region
 	Platform::Asset::Write(path + "_atlas.json", json_dump.data(), json_dump.size(), pathType);
 }
 
-Atlas Atlas::OpenFromFile(const std::string& image_path, const std::string& atlas_path, Platform::Asset::Path path_type)
-{
-	auto image_file = Platform::Asset(image_path, path_type);
-	auto json_file = Platform::Asset(atlas_path, path_type);
-	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
-	auto json = nlohmann::json::parse(json_string);
-	auto regions = Regions();
-	for (const auto& [key, value] : json.items())
-	{
-		regions.insert({ key, { { value[0], value[1] }, { value[2], value[3] } } });
-	}
-	return Atlas(image_file, regions);
-}
-
 std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)
 {
 	using namespace rectpack2D;
@@ -123,8 +109,13 @@ std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)
 	return { result_image, result_regions };
 }
 
-Atlas::Atlas(const Graphics::Image& image, const Regions& tex_regions)
+Atlas::Atlas(std::shared_ptr<Renderer::Texture> texture, const Platform::Asset& regions_file) :
+	mTexture(texture)
 {
-	mTexture = std::make_shared<Renderer::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory());
-	mRegions = tex_regions;
+	auto json_string = std::string((char*)regions_file.getMemory(), regions_file.getSize());
+	auto json = nlohmann::json::parse(json_string);
+	for (const auto& [key, value] : json.items())
+	{
+		mRegions.insert({ key, { { value[0], value[1] }, { value[2], value[3] } } });
+	}
 }

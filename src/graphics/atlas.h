@@ -19,13 +19,10 @@ namespace Graphics
 		static void SaveToFile(const std::string& path, const Image& image, const Regions& regions, 
 			Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
 		
-		static Atlas OpenFromFile(const std::string& image_path, const std::string& atlas_path, 
-			Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
-
 		static std::tuple<Image, Regions> MakeFromImages(const Images& images);
 
 	public:
-		Atlas(const Image& image, const Regions& tex_regions);
+		Atlas(std::shared_ptr<Renderer::Texture> texture, const Platform::Asset& regions_file);
 
 	public:
 		auto getTexture() const { return mTexture; }

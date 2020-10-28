@@ -14,26 +14,20 @@ namespace Graphics
 		static void SaveToFile(const std::string& path, const Image& image, const Atlas::Regions& regions,
 			const States& states, Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
 
-		static Animation OpenFromFile(const std::string& image_path, const std::string& atlas_path,
-			const std::string& animation_path, Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
-
-		static Animation OpenFromFile(const std::string& smart_path,
-			Platform::Asset::Path path_type = Platform::Asset::Path::Relative);
-
 		// TODO: to enable crossplatform, make with Platform::Asset, not <filesystem>
 #if defined(PLATFORM_WINDOWS)
 		static std::tuple<States, Image, Atlas::Regions> MakeFromFolder(const std::string& path);
 #endif
 
 	public:
-		Animation(const Atlas& atlas, const States& states);
+		Animation(std::shared_ptr<Atlas> atlas, const Platform::Asset& anim_file);
 
 	public:
-		const auto& getAtlas() const { return mAtlas; }
+		auto getAtlas() const { return mAtlas; }
 		const auto& getStates() const { return mStates; }
 
 	private:
-		Atlas mAtlas;
+		std::shared_ptr<Atlas> mAtlas;
 		States mStates;
 	};
 }

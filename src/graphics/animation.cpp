@@ -20,32 +20,6 @@ void Animation::SaveToFile(const std::string& path, const Image& image, const At
 	Platform::Asset::Write(path + "_animation.json", json_dump.data(), json_dump.size(), pathType);
 }
 
-Animation Animation::OpenFromFile(const std::string& image_path, const std::string& atlas_path,
-	const std::string& animation_path, Platform::Asset::Path path_type)
-{
-	auto atlas = Atlas::OpenFromFile(image_path, atlas_path, path_type);
-	auto json_file = Platform::Asset(animation_path, path_type);
-	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
-	auto json = nlohmann::json::parse(json_string);
-	auto states = Animation::States();
-	for (const auto& [name, regions] : json.items())
-	{
-		for (const auto& region : regions)
-		{
-			states[name].push_back(region.get<std::string>());
-		}
-	}
-	return Animation(atlas, states);
-}
-
-Animation Animation::OpenFromFile(const std::string& smart_path, Platform::Asset::Path path_type)
-{
-	auto image_path = smart_path + ".png";
-	auto atlas_path = smart_path + "_atlas.json";
-	auto animation_path = smart_path + "_animation.json";
-	return OpenFromFile(image_path, atlas_path, animation_path, path_type);
-}
-
 #if defined(PLATFORM_WINDOWS)
 std::tuple<Animation::States, Image, Atlas::Regions> Animation::MakeFromFolder(const std::string& _path)
 {
@@ -87,7 +61,15 @@ std::tuple<Animation::States, Image, Atlas::Regions> Animation::MakeFromFolder(c
 }
 #endif
 
-Animation::Animation(const Atlas& atlas, const States& states) : mAtlas(atlas), mStates(states)
+Animation::Animation(std::shared_ptr<Atlas> atlas, const Platform::Asset& anim_file) : mAtlas(atlas)
 {
-	//
+	auto json_string = std::string((char*)anim_file.getMemory(), anim_file.getSize());
+	auto json = nlohmann::json::parse(json_string);
+	for (const auto& [name, regions] : json.items())
+	{
+		for (const auto& region : regions)
+		{
+			mStates[name].push_back(region.get<std::string>());
+		}
+	}
 }
