@@ -330,7 +330,7 @@ void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture, c
 	{
 		const auto& io = ImGui::GetIO();
 
-		float region_sz = 96.0f;
+		float region_sz = 64.0f;
 
 		region_sz = glm::min(region_sz, size.x, size.y);
 
