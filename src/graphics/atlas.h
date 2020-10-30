@@ -19,7 +19,8 @@ namespace Graphics
 		static void SaveToFile(const std::string& path, const Regions& regions, 
 			Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
 		
-		static std::tuple<Image, Regions> MakeFromImages(const Images& images);
+		static std::tuple<Image, Regions> MakeFromImages(const Images& images, bool anti_bleeding = true);
+		static Image MakeAntibleedImage(const Image& image);
 
 	public:
 		Atlas(const Regions& regions);

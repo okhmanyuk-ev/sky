@@ -16,8 +16,22 @@ void Atlas::SaveToFile(const std::string& path, const Regions& regions, Platform
 	Platform::Asset::Write(path + ".json", json_dump.data(), json_dump.size(), pathType);
 }
 
-std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)
+std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& _images, bool anti_bleeding)
 {
+	Images images;
+
+	if (anti_bleeding)
+	{
+		for (const auto& [name, _img] : _images)
+		{
+			images.insert({ name, MakeAntibleedImage(_img) });
+		}
+	}
+	else
+	{
+		images = _images;
+	}
+
 	using namespace rectpack2D;
 	constexpr bool allow_flip = false;
 	const auto runtime_flipping_mode = flipping_option::DISABLED;
@@ -49,37 +63,107 @@ std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)
 	const auto dst_height = result_size.h;
 	const int channels = 4;
 	
-	auto result_image = Image(dst_width, dst_height, channels);
-	auto result_regions = Regions();
+	auto dst_image = Image(dst_width, dst_height, channels);
+	auto dst_regions = Regions();
 
 	for (int i = 0; i < (int)images.size(); i++)
 	{
 		const auto& rect = rectangles.at(i);
-		const auto& image = std::next(images.begin(), i)->second;
+		const auto& src_image = std::next(images.begin(), i)->second;
 		const auto& name = std::next(images.begin(), i)->first;
 
-		auto& region = result_regions[name];
+		auto& region = dst_regions[name];
 		region.pos = { static_cast<float>(rect.x), static_cast<float>(rect.y) };
 		region.size = { static_cast<float>(rect.w), static_cast<float>(rect.h) };
 
-		auto src_width = image.getWidth();
-		auto src_height = image.getHeight();
-
-		auto src_mem = image.getMemory();
-		auto dst_mem = result_image.getMemory();
-
-		for (int y = 0; y < src_height; y++)
+		if (anti_bleeding)
 		{
-			for (int x = 0; x < src_width; x++)
+			region.pos.x += 1;
+			region.pos.y += 1;
+
+			region.size.x -= 1;
+			region.size.y -= 1;
+		}
+
+		for (int x = 0; x < src_image.getWidth(); x++)
+		{
+			 for (int y = 0; y < src_image.getHeight(); y++)
 			{
-				auto src = (uint8_t*)((size_t)src_mem + (y * src_width * channels) + (x * channels));
-				auto dst = (uint8_t*)((size_t)dst_mem + (rect.y * dst_width * channels) + (y * dst_width * channels) + (rect.x * channels) + (x * channels));
-				memcpy(dst, src, channels);
+				auto src_pixel = src_image.getPixel(x, y);
+				auto dst_pixel = dst_image.getPixel(rect.x + x, rect.y + y);
+				memcpy(dst_pixel, src_pixel, channels);
 			}
 		}
 	}
 
-	return { result_image, result_regions };
+	return { dst_image, dst_regions };
+}
+
+Image Atlas::MakeAntibleedImage(const Image& image)
+{
+	auto w = image.getWidth() + 2;
+	auto h = image.getHeight() + 2;
+	auto channels = image.getChannels();
+
+	auto result = Image(w, h, channels);
+
+	auto src_mem = image.getMemory();
+
+	for (int x = 0; x < w; x++)
+	{
+		for (int y = 0; y < h; y++)
+		{
+			auto pixel = result.getPixel(x, y);
+			pixel[0] = 0;
+			pixel[1] = 0;
+			pixel[2] = 0;
+			pixel[3] = 0;
+		}
+	}
+
+	for (int x = 1; x < w - 1; x++)
+	{
+		for (int y = 1; y < h - 1; y++)
+		{
+			auto src_pixel = image.getPixel(x - 1, y - 1);
+			auto dst_pixel = result.getPixel(x, y);
+			memcpy(dst_pixel, src_pixel, channels);
+		}
+	}
+
+	// vertical
+
+	for (int y = 1; y < h - 1; y++)
+	{
+		{
+			auto src_pixel = image.getPixel(0, y - 1);
+			auto dst_pixel = result.getPixel(0, y);
+			memcpy(dst_pixel, src_pixel, channels);
+		}
+		{
+			auto src_pixel = image.getPixel(image.getWidth() - 1, y - 1);
+			auto dst_pixel = result.getPixel(result.getWidth() - 1, y);
+			memcpy(dst_pixel, src_pixel, channels);
+		}
+	}
+
+	// horizontal
+
+	for (int x = 1; x < w - 1; x++)
+	{
+		{
+			auto src_pixel = image.getPixel(x - 1, 0);
+			auto dst_pixel = result.getPixel(x, 0);
+			memcpy(dst_pixel, src_pixel, channels);
+		}
+		{
+			auto src_pixel = image.getPixel(x - 1, image.getHeight() - 1);
+			auto dst_pixel = result.getPixel(x, result.getHeight() - 1);
+			memcpy(dst_pixel, src_pixel, channels);
+		}
+	}
+
+	return result;
 }
 
 Atlas::Atlas(const Regions& regions) :
