@@ -42,16 +42,8 @@ std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& images)
 	const auto max_side = 1 << 12;
 	const auto discard_step = 1;
 
-	auto my_custom_order_1 = [](const auto a, const auto b) {
-		return a->get_wh().pathological_mult() > b->get_wh().pathological_mult();
-	};
-
-	auto my_custom_order_2 = [](const auto a, const auto b) {
-		return a->get_wh().pathological_mult() < b->get_wh().pathological_mult();
-	};
-
-	const auto result_size = find_best_packing<spaces_type>(rectangles,
-		make_finder_input(max_side, discard_step, report_successful, report_unsuccessful, runtime_flipping_mode), my_custom_order_1, my_custom_order_2);
+	const auto finder_input = make_finder_input(max_side, discard_step, report_successful, report_unsuccessful, runtime_flipping_mode);
+	const auto result_size = find_best_packing<spaces_type>(rectangles, finder_input);
 
 	const auto dst_width = result_size.w;
 	const auto dst_height = result_size.h;
