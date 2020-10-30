@@ -29,6 +29,7 @@
 #include <renderer/all.h>
 #include <scene/all.h>
 #include <imscene/all.h>
+#include <graphics/all.h>
 
 #include <shared/stats_system.h>
 #include <shared/cache_system.h>
@@ -46,8 +47,5 @@
 #include <shared/scene_stylebook.h>
 #include <shared/helpers.h>
 #include <shared/profile.h>
-
-#include <graphics/font.h>
-#include <graphics/legacy_renderer.h>
 
 #include <network/system.h>

@@ -4,7 +4,7 @@
 #include <scene/color.h>
 #include <scene/blend.h>
 #include <scene/sampler.h>
-#include <graphics/tex_region.h>
+#include <graphics/all.h>
 
 namespace Scene
 {
@@ -27,6 +27,7 @@ namespace Scene
 	public:
 		auto getTexture() const { return mTexture; }
 		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexture = value; }
+		void setTexture(const Graphics::TexCell& value);
 
 		auto getTexRegion() const { return mTexRegion; }
 		void setTexRegion(const Graphics::TexRegion& value) { mTexRegion = value; }

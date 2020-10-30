@@ -3,14 +3,17 @@
 
 using namespace Shared;
 
-std::shared_ptr<Renderer::Texture> CacheSystem::getTexture(const std::string& name)
+Graphics::TexCell CacheSystem::getTexture(const std::string& name)
 {
 	loadTexture(name);
 	
+	if (mTexCells.count(name) > 0)
+		return mTexCells.at(name);
+
 	if (mTextures.count(name) == 0)
-		return nullptr;
+		return { nullptr, Graphics::TexRegion() };
 	
-	return mTextures.at(name);
+	return { mTextures.at(name), Graphics::TexRegion() };
 }
 
 std::shared_ptr<Graphics::Font> CacheSystem::getFont(const std::string& name)
@@ -146,4 +149,26 @@ void CacheSystem::loadAnimation(const std::string& path, const std::string& name
 void CacheSystem::loadAnimation(const std::string& path)
 {
 	loadAnimation(path, path);
+}
+
+void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>& paths)
+{
+	Graphics::Atlas::Images images = {};
+
+	for (const auto& path : paths)
+	{
+		images.insert({ path, Graphics::Image({ path }) });
+	}
+
+	auto [image, regions] = Graphics::Atlas::MakeFromImages(images);
+	auto image_ptr = std::make_shared<Graphics::Image>(image);
+
+	loadTexture(image_ptr, name);
+
+	auto texture = getTexture(name).getTexture();
+
+	for (const auto& [name, tex_region] : regions)
+	{
+		mTexCells.insert({ name, Graphics::TexCell(texture, tex_region) });
+	}
 }

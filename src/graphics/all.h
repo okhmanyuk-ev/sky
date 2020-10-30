@@ -1,0 +1,13 @@
+#pragma once
+
+#include <graphics/animation.h>
+#include <graphics/atlas.h>
+#include <graphics/camera.h>
+#include <graphics/color.h>
+#include <graphics/font.h>
+#include <graphics/image.h>
+#include <graphics/legacy_renderer.h>
+#include <graphics/system.h>
+#include <graphics/tex_cell.h>
+#include <graphics/tex_region.h>
+#include <graphics/text_mesh.h>
