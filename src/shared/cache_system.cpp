@@ -1,15 +1,16 @@
 #include "cache_system.h"
 #include <console/device.h>
+#include <nlohmann/json.hpp>
 
 using namespace Shared;
 
 Graphics::TexCell CacheSystem::getTexture(const std::string& name)
 {
-	loadTexture(name);
-	
 	if (mTexCells.count(name) > 0)
 		return mTexCells.at(name);
 
+	loadTexture(name);
+	
 	if (mTextures.count(name) == 0)
 		return { nullptr, Graphics::TexRegion() };
 	
@@ -153,7 +154,7 @@ void CacheSystem::loadAnimation(const std::string& path)
 
 void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>& paths)
 {
-	Graphics::Atlas::Images images = {};
+	Graphics::Atlas::Images images;
 
 	for (const auto& path : paths)
 	{
@@ -161,14 +162,27 @@ void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>
 	}
 
 	auto [image, regions] = Graphics::Atlas::MakeFromImages(images);
-	auto image_ptr = std::make_shared<Graphics::Image>(image);
 
-	loadTexture(image_ptr, name);
+	loadTexture(std::make_shared<Graphics::Image>(image), name);
 
-	auto texture = getTexture(name).getTexture();
+	auto texture = getTexture(name);
 
 	for (const auto& [name, tex_region] : regions)
 	{
 		mTexCells.insert({ name, Graphics::TexCell(texture, tex_region) });
+	}
+}
+
+void CacheSystem::makeAtlases()
+{
+	auto json_file = Platform::Asset("atlases.json");
+	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
+	auto json = nlohmann::json::parse(json_string);
+
+	for (auto field : json.items())
+	{
+		auto name = field.key();
+		auto paths = field.value();
+		makeAtlas(name, paths);
 	}
 }

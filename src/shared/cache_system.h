@@ -55,6 +55,7 @@ namespace Shared
 
 	public:
 		void makeAtlas(const std::string& name, const std::set<std::string>& paths);
+		void makeAtlases();
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Renderer::Texture>> mTextures;

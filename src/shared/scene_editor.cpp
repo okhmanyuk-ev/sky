@@ -393,6 +393,7 @@ void SceneEditor::showBatchGroupsMenu()
 				if (ImGui::IsItemHovered())
 				{
 					highlightNode(node, Graphics::Color::Yellow);
+					showTooltip(node);
 				}
 			}
 			ImGui::EndPopup();
