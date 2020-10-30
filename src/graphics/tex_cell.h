@@ -21,6 +21,22 @@ namespace Graphics
 		auto getTexture() const { return mTexture; }
 		const auto& getRegion() const { return mRegion; }
 
+		float getWidth() const 
+		{ 
+			if (mRegion.size.x > 0.0f)
+				return mRegion.size.x;
+
+			return (float)mTexture->getWidth();
+		}
+
+		float getHeight() const
+		{
+			if (mRegion.size.y > 0.0f)
+				return mRegion.size.y;
+
+			return (float)mTexture->getHeight();
+		}
+
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
 		TexRegion mRegion = {};
