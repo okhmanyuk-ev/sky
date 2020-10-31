@@ -81,12 +81,12 @@ Font::Font(void* data, size_t size)
 		auto& _glyph = mGlyphs[i];
 		const auto& rect = rectangles.at(g_index);
 		const auto& g = glyphs.at(g_index);
-		_glyph.x = rect.x;
-		_glyph.y = rect.y;
-		_glyph.w = rect.w;
-		_glyph.h = rect.h;
-		_glyph.xoff = static_cast<float>(g.xoff);
-		_glyph.yoff = static_cast<float>(g.yoff);
+		_glyph.pos.x = static_cast<float>(rect.x);
+		_glyph.pos.y = static_cast<float>(rect.y);
+		_glyph.size.x = static_cast<float>(rect.w);
+		_glyph.size.y = static_cast<float>(rect.h);
+		_glyph.offset.x = static_cast<float>(g.xoff);
+		_glyph.offset.y = static_cast<float>(g.yoff);
 		_glyph.xadvance = static_cast<float>(xadvance) * scale;
 	}
 

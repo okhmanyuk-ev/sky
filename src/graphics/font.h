@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <memory>
 #include <tinyutf8.hpp>
+#include <glm/glm.hpp>
 
 namespace Graphics
 {
@@ -18,12 +19,9 @@ namespace Graphics
 	public:
 		struct Glyph
 		{
-			int x; // source coords
-			int y;
-			int w; 
-			int h; 
-			float xoff;
-			float yoff;
+			glm::vec2 pos;
+			glm::vec2 size;
+			glm::vec2 offset;
 			float xadvance;
 		};
 

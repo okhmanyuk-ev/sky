@@ -11,16 +11,14 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 
 	const auto texture = font.getTexture();
 
-	float tex_w = static_cast<float>(texture->getWidth());
-	float tex_h = static_cast<float>(texture->getHeight());
+	glm::vec2 tex_size = { static_cast<float>(texture->getWidth()), static_cast<float>(texture->getHeight()) };
 	
 	auto length = std::distance(begin, end);
 
 	mesh.vertices.resize(length * 4);
 	mesh.indices.resize(length * 6);
 
-	float pos_x = 0.0f;
-	float pos_y = 0.0f;
+	glm::vec2 pos = { 0.0f, 0.0f };
 
 	int i = 0;
 
@@ -28,39 +26,32 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 	{
 		const auto& glyph = font.getGlyph(*it);
 
-		float glyph_w = static_cast<float>(glyph.w);
-		float glyph_h = static_cast<float>(glyph.h);
-		float glyph_x = static_cast<float>(glyph.x);
-		float glyph_y = static_cast<float>(glyph.y);
-
 		auto vtx = &mesh.vertices[i * 4];
 		auto idx = &mesh.indices[i * 6];
 
-		pos_x += glyph.xoff;
-		pos_y = font.getAscent() + glyph.yoff;
+		pos.x += glyph.offset.x;
+		pos.y = font.getAscent() + glyph.offset.y;
 
-		float x1 = pos_x;
-		float x2 = pos_x + glyph_w;
-		float y1 = pos_y;
-		float y2 = pos_y + glyph_h;
+		auto p1 = pos;
+		auto p2 = pos + glyph.size;
 
-		pos_x -= glyph.xoff;
-		pos_x += glyph.xadvance;
+		pos.x -= glyph.offset.x;
+		pos.x += glyph.xadvance;
 
 		if (it != end - 1)
 		{
-			pos_x += font.getKerning(*it, *(it + 1));
+			pos.x += font.getKerning(*it, *(it + 1));
 		}
 
-		float u1 = glyph_x / tex_w;
-		float v1 = glyph_y / tex_h;
-		float u2 = (glyph_x + glyph_w) / tex_w;
-		float v2 = (glyph_y + glyph_h) / tex_h;
+		auto uv1 = glyph.pos / tex_size;
+		auto uv2 = (glyph.pos + glyph.size) / tex_size;
 
-		vtx[0] = { { x1, y1, 0.0f }, { Color::White, 1.0f }, { u1, v1 } };
-		vtx[1] = { { x1, y2, 0.0f }, { Color::White, 1.0f }, { u1, v2 } };
-		vtx[2] = { { x2, y2, 0.0f }, { Color::White, 1.0f }, { u2, v2 } };
-		vtx[3] = { { x2, y1, 0.0f }, { Color::White, 1.0f }, { u2, v1 } };
+		glm::vec4 color = { Color::White, 1.0f };
+
+		vtx[0] = { { p1.x, p1.y, 0.0f }, color, { uv1.x, uv1.y } };
+		vtx[1] = { { p1.x, p2.y, 0.0f }, color, { uv1.x, uv2.y } };
+		vtx[2] = { { p2.x, p2.y, 0.0f }, color, { uv2.x, uv2.y } };
+		vtx[3] = { { p2.x, p1.y, 0.0f }, color, { uv2.x, uv1.y } };
 
 		auto base_vtx = i * 4;
 
