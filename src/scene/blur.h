@@ -15,5 +15,6 @@ namespace Scene
 		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
 		int mTargetWidth = 0;
 		int mTargetHeight = 0;
+		int mRadius = 8;
 	};
 }

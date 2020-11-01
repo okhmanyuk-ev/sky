@@ -1,4 +1,5 @@
 #include "blur.h"
+#include <imgui.h>
 
 using namespace Scene;
 
@@ -21,7 +22,7 @@ void Blur::draw()
 	}
 
 	RENDERER->readPixels(pos, size, mImage->getMemory());
-	mImage->blur();
+	mImage->blur(mRadius);
 	mTexture->writePixels(mImage->getWidth(), mImage->getHeight(), mImage->getChannels(), mImage->getMemory());
 
 	if (mTexture == nullptr)
@@ -29,4 +30,8 @@ void Blur::draw()
 
 	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
 	GRAPHICS->drawSprite(mTexture, model);
+
+	ImGui::Begin("sefes");
+	ImGui::SliderInt("Radius", &mRadius, 2, 64);
+	ImGui::End();
 }
