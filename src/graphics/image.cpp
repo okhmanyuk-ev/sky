@@ -62,3 +62,17 @@ uint8_t* Image::getPixel(int x, int y) const
 {
 	return &((uint8_t*)mMemory)[((y * mWidth) + x) * mChannels];
 }
+
+void Image::blur()
+{
+	for (int x = 0; x < mWidth; x++)
+	{
+		for (int y = 0; y < mHeight; y++)
+		{
+			auto pixel = getPixel(x, y); // TODO: implement
+			pixel[0] = 255 - pixel[0];
+			pixel[1] = 255 - pixel[1];
+			pixel[2] = 255 - pixel[2];
+		}
+	}
+}

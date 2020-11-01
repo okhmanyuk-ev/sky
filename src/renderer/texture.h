@@ -9,11 +9,14 @@ namespace Renderer
 		friend class SystemD3D11;
 		friend class SystemGL;
 	public:
-		Texture(int width, int height, int channels, void* data);
+		Texture(int width, int height, int channels, void* data = nullptr);
 		~Texture();
 
 	protected:
 		Texture(int width, int height, bool renderTarget = false);
+
+	public:
+		void writePixels(int width, int height, int channels, void* data);
 
 	public:
 		auto getWidth() const { return mWidth; }

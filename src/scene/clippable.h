@@ -58,7 +58,19 @@ namespace Scene
 
 			GRAPHICS->pushStencilMode(stencil);
 
+			if (mDrawOnlyStencil)
+			{
+				auto blend = GRAPHICS->getCurrentState().blendMode;
+				blend.colorMask = { false, false, false, false };
+				GRAPHICS->pushBlendMode(blend);
+			}
+
 			T::draw();
+
+			if (mDrawOnlyStencil)
+			{
+				GRAPHICS->pop();
+			}
 
 			GRAPHICS->pop();
 		}
@@ -71,6 +83,14 @@ namespace Scene
 
 			T::leaveDraw();
 		}
+
+
+	public:
+		bool isDrawOnlyStencil() const { return mDrawOnlyStencil; }
+		void setDrawOnlyStencil(bool value) { mDrawOnlyStencil = value; }
+
+	private:
+		bool mDrawOnlyStencil = false;
 	};
 
 	template <typename T> class ClippableScissor : public T
