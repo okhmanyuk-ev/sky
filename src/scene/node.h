@@ -41,7 +41,9 @@ namespace Scene
 	public:
 		glm::vec2 project(const glm::vec2& value) const;
 		glm::vec2 unproject(const glm::vec2& value) const;
-		glm::vec4 getGlobalBounds() const;
+		
+		// returning [pos, size]
+		std::tuple<glm::vec2, glm::vec2> getGlobalBounds() const; 
 
 		virtual Scene* getScene() const;
 		virtual bool hitTest(const glm::vec2& value) const;

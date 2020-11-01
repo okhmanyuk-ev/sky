@@ -88,13 +88,11 @@ namespace Scene
 		{
 			T::enterDraw();
 			
-			auto bounds = T::getGlobalBounds();
+			auto [pos, size] = T::getGlobalBounds();
 
 			auto scissor = Renderer::Scissor();
-			scissor.position.x = bounds.x;
-			scissor.position.y = bounds.y;
-			scissor.size.x = bounds.z - bounds.x;
-			scissor.size.y = bounds.w - bounds.y;
+			scissor.position = pos;
+			scissor.size = size;
 
 			GRAPHICS->pushScissor(scissor);
 		}

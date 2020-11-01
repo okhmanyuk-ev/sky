@@ -16,16 +16,16 @@ namespace Scene
 			if (!T::isTransformReady())
 				return;
 
-			auto bounds = T::getGlobalBounds();			
+			auto [pos, size] = T::getGlobalBounds();			
 			auto viewport = T::getScene()->getViewport();
 
 			viewport.size *= PLATFORM->getScale();
 			viewport.position *= PLATFORM->getScale();
 
-			auto b_top = bounds.y;
-			auto b_bottom = bounds.w;
-			auto b_left = bounds.x;
-			auto b_right = bounds.z;
+			auto b_top = pos.y;
+			auto b_bottom = pos.y + size.y;
+			auto b_left = pos.x;
+			auto b_right = pos.x + size.x;
 
 			auto v_top = viewport.position.y;
 			auto v_bottom = viewport.position.y + viewport.size.y;
