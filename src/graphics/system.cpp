@@ -134,6 +134,12 @@ void System::clear(const glm::vec4& color)
 	RENDERER->clear(color);
 }
 
+void System::clearStencil()
+{
+	applyState();
+	RENDERER->clearStencil();
+}
+
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 	const glm::mat4& model)
 {

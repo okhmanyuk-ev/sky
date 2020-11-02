@@ -404,6 +404,12 @@ void SystemGL::clear(const glm::vec4& color)
 		glDisable(GL_SCISSOR_TEST);
 }
 
+void SystemGL::clearStencil()
+{
+	glClearStencil(0);
+	glClear(GL_STENCIL_BUFFER_BIT);
+}
+
 void SystemGL::draw(size_t vertexCount, size_t vertexOffset)
 {
 	prepareForDrawing();

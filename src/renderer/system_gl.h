@@ -40,6 +40,7 @@ namespace Renderer
 		void setTextureAddressMode(const TextureAddress& value) override;
 
 		void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 1.0f }) override;
+		void clearStencil() override;
 
 		void draw(size_t vertexCount, size_t vertexOffset = 0) override;
 		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0) override;

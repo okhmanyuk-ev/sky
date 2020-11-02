@@ -29,6 +29,11 @@ namespace Scene
 		{
 			T::enterDraw();
 
+			if (ClipLayer == 0)
+			{
+				GRAPHICS->clearStencil();
+			}
+
 			ClipLayer += 1;
 
 			Renderer::StencilMode stencil;

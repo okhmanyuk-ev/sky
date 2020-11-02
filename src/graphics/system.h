@@ -35,11 +35,10 @@ namespace Graphics
 		void begin();
 		void end();
 
-	private:
 		void flush();
 
-	public:
 		void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f });
+		void clearStencil();
 
 		// draw colored vertices
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
