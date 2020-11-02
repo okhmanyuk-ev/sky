@@ -217,7 +217,9 @@ void Image::blur(int radius)
 			sum.a += sum_in.a;
 
 			++sp;
-			if (sp >= div) sp = 0;
+			if (sp >= div) 
+				sp = 0;
+			
 			stack_ptr = &stack[sp * 4];
 
 			sum_out.r += stack_ptr[0];
@@ -328,7 +330,10 @@ void Image::blur(int radius)
 			sum.a += sum_in.a;
 
 			++sp;
-			if (sp >= div) sp = 0;
+
+			if (sp >= div) 
+				sp = 0;
+
 			stack_ptr = &stack[sp * 4];
 
 			sum_out.r += stack_ptr[0];

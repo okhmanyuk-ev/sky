@@ -3,35 +3,32 @@
 
 using namespace Scene;
 
+Blur::Blur()
+{
+	mSprite = std::make_shared<Sprite>();
+	mSprite->setStretch(1.0f);
+	mSprite->setSampler(Renderer::Sampler::Linear);
+	attach(mSprite);
+}
+
 void Blur::draw()
 {
 	Node::draw();
-	
-	auto [pos, size] = getGlobalBounds();
 
-	auto w = (int)glm::floor(size.x);
-	auto h = (int)glm::floor(size.y);
+	glm::ivec2 pos;
+	glm::ivec2 size;
 
-	if (mTargetWidth != w || mTargetHeight != h)
+	std::tie(pos, size) = getGlobalBounds();
+
+	if (size != mPrevSize)
 	{
-		mTargetWidth = w;
-		mTargetHeight = h;
-
-		mImage = std::make_shared<Graphics::Image>(w, h, 4);
-		mTexture = std::make_shared<Renderer::Texture>(w, h, 4);
+		mImage = std::make_shared<Graphics::Image>(size.x, size.y, 4);
+		mSprite->setTexture(std::make_shared<Renderer::Texture>(size.x, size.y, 4));
+		mPrevSize = size;
 	}
 
+	GRAPHICS->flush();
 	RENDERER->readPixels(pos, size, mImage->getMemory());
 	mImage->blur(mRadius);
-	mTexture->writePixels(mImage->getWidth(), mImage->getHeight(), mImage->getChannels(), mImage->getMemory());
-
-	if (mTexture == nullptr)
-		return;
-
-	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
-	GRAPHICS->drawSprite(mTexture, model);
-
-	ImGui::Begin("sefes");
-	ImGui::SliderInt("Radius", &mRadius, 2, 64);
-	ImGui::End();
+	mSprite->getTexture()->writePixels(mImage->getWidth(), mImage->getHeight(), mImage->getChannels(), mImage->getMemory());
 }

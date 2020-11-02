@@ -140,6 +140,16 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		rectangle->setRounding(rounding);		
 	}
 
+	if (auto blur = std::dynamic_pointer_cast<Scene::Blur>(node); blur != nullptr)
+	{
+		auto radius = blur->getRadius();
+
+		ImGui::SliderInt("Radius", &radius, 0, 64);
+		ImGui::Separator();
+
+		blur->setRadius(radius);
+	}
+
 	if (auto circle = std::dynamic_pointer_cast<Scene::Circle>(node); circle != nullptr)
 	{
 		auto radius = circle->getRadius();
