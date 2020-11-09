@@ -67,7 +67,7 @@ namespace Shared::SceneHelpers
 	template <class T> class Emitter : public Scene::Actionable<Scene::Node>
 	{
 	public:
-		Emitter(std::weak_ptr<Scene::Node> holder) : mHolder(holder)
+		Emitter()
 		{
 			runAction(Shared::ActionHelpers::RepeatInfinite([this]()->Shared::ActionHelpers::Action {
 				if (!mRunning)
@@ -86,6 +86,7 @@ namespace Shared::SceneHelpers
 	public:
 		void emit(int count = 1)
 		{
+			assert(!mHolder.expired());
 			assert(count > 0);
 
 			for (int i = 0; i < count - 1; i++)
@@ -99,8 +100,8 @@ namespace Shared::SceneHelpers
 			particle->setColor(mBeginColor);
 			particle->setAlpha(0.0f);
 			particle->setPosition(holder->unproject(project(getSize() * glm::linearRand(glm::vec2(0.0f), glm::vec2(1.0f)))));
-			particle->setSize(mBeginSize);
-			particle->setPivot({ 0.5f, 0.5f });
+			particle->setScale(mBeginScale);
+			particle->setPivot(0.5f);
 			particle->setRotation(glm::radians(glm::linearRand(0.0f, 360.0f)));
 
 			auto duration = glm::linearRand(mMinDuration, mMaxDuration);
@@ -109,7 +110,7 @@ namespace Shared::SceneHelpers
 			particle->runAction(Shared::ActionHelpers::MakeSequence(
 				Shared::ActionHelpers::MakeParallel(
 					Shared::ActionHelpers::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Common::Easing::CubicOut),
-					Shared::ActionHelpers::ChangeSize(particle, mEndSize, duration),
+					Shared::ActionHelpers::ChangeScale(particle, mEndScale, duration),
 					Shared::ActionHelpers::ChangeColor(particle, mBeginColor, mEndColor, duration),
 					Shared::ActionHelpers::ChangeAlpha(particle, mBeginColor.a, mEndColor.a, duration)
 				),
@@ -122,10 +123,9 @@ namespace Shared::SceneHelpers
 	protected:
 		virtual std::shared_ptr<Scene::Actionable<T>> createParticle() const = 0;
 
-	private:
-		std::weak_ptr<Scene::Node> mHolder;
-
 	public:
+		void setHolder(std::weak_ptr<Scene::Node> value) { mHolder = value; }
+
 		bool isRunning() const { return mRunning; }
 		void setRunning(bool value) { mRunning = value; }
 
@@ -137,11 +137,11 @@ namespace Shared::SceneHelpers
 
 		void setDelay(float value) { setMinDelay(value); setMaxDelay(value); }
 
-		auto getBeginSize() const { return mBeginSize; }
-		void setBeginSize(const glm::vec2& value) { mBeginSize = value; }
+		auto getBeginScale() const { return mBeginScale; }
+		void setBeginScale(const glm::vec2& value) { mBeginScale = value; }
 
-		auto getEndSize() const { return mEndSize; }
-		void setEndSize(const glm::vec2& value) { mEndSize = value; }
+		auto getEndScale() const { return mEndScale; }
+		void setEndScale(const glm::vec2& value) { mEndScale = value; }
 
 		auto getDistance() const { return mDistance; }
 		void setDistance(float value) { mDistance = value; }
@@ -169,11 +169,12 @@ namespace Shared::SceneHelpers
 		void setDirection(const glm::vec2& value) { setMinDirection(value); setMaxDirection(value); }
 
 	private:
+		std::weak_ptr<Scene::Node> mHolder;
 		bool mRunning = true;
 		float mMinDelay = 0.5f;
 		float mMaxDelay = 0.5f;
-		glm::vec2 mBeginSize = { 8.0f, 8.0f };
-		glm::vec2 mEndSize = { 0.0f, 0.0f };
+		glm::vec2 mBeginScale = { 1.0f, 1.0f };
+		glm::vec2 mEndScale = { 0.0f, 0.0f };
 		float mDistance = 32.0f;
 		float mMinDuration = 1.0f;
 		float mMaxDuration = 1.0f;
@@ -185,9 +186,6 @@ namespace Shared::SceneHelpers
 
 	class SpriteEmitter : public Emitter<Scene::Sprite>, public Scene::Blend, public Scene::Sampler
 	{
-	public:
-		SpriteEmitter(std::weak_ptr<Scene::Node> holder) : Emitter(holder) { }
-
 	protected:
 		std::shared_ptr<Scene::Actionable<Scene::Sprite>> createParticle() const override
 		{
@@ -208,9 +206,6 @@ namespace Shared::SceneHelpers
 
 	class RectangleEmitter : public Emitter<Scene::Rectangle>
 	{
-	public:
-		RectangleEmitter(std::weak_ptr<Scene::Node> holder) : Emitter(holder) { }
-	
 	protected:
 		std::shared_ptr<Scene::Actionable<Scene::Rectangle>> createParticle() const override
 		{
