@@ -2,13 +2,7 @@
 
 #include <common/frame_system.h>
 #include <platform/system.h>
-#include <renderer/system.h>
-#include <renderer/topology.h>
-#include <renderer/vertex.h>
-#include <renderer/shaders/default.h>
-#include <renderer/shaders/sdf.h>
-#include <renderer/shaders/circle.h>
-#include <renderer/shaders/rounded.h>
+#include <renderer/all.h>
 
 #include <graphics/color.h>
 #include <graphics/font.h>

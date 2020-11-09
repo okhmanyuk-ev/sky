@@ -1,7 +1,6 @@
 #pragma once
 
 #include <scene/node.h>
-#include <graphics/all.h>
 #include <scene/sprite.h>
 
 namespace Scene
