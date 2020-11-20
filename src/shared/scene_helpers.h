@@ -211,6 +211,7 @@ namespace Shared::SceneHelpers
 		{
 			auto particle = std::make_shared<Scene::Actionable<Scene::Rectangle>>();
 			particle->setRounding(mRounding);
+			particle->setSize(mBeginSize);
 			return particle;
 		}
 
@@ -218,8 +219,12 @@ namespace Shared::SceneHelpers
 		auto getRounding() const { return mRounding; }
 		void setRounding(float value) { mRounding = value; }
 
+		auto getBeginSize() const { return mBeginSize; }
+		void setBeginSize(const glm::vec2& value) { mBeginSize = value; }
+
 	private:
 		float mRounding = 0.0f;
+		glm::vec2 mBeginSize = { 8.0f, 8.0f };
 	};
 
 	// TODO: can be moved to 'scene'
