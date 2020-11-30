@@ -158,7 +158,7 @@ void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>
 
 	for (const auto& path : paths)
 	{
-		images.insert({ path, Graphics::Image({ path }) });
+		images.insert({ path, Graphics::Image(Platform::Asset(path)) });
 	}
 
 	auto [image, regions] = Graphics::Atlas::MakeFromImages(images);
