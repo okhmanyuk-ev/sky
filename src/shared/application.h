@@ -53,10 +53,11 @@ namespace Shared
 	private:
 		Flags mFlags;
 
-	protected: // Scene
-		std::shared_ptr<Scene::Scene> mScene;
-	
+	protected:
+		auto getScene() const { return mScene; }
+
 	private: // Scene
+		std::shared_ptr<Scene::Scene> mScene;
 		std::shared_ptr<SceneEditor> mSceneEditor;
 
 	private:
