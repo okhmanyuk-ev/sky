@@ -39,6 +39,8 @@ namespace Scene
 		void recursiveNodeUpdate(std::shared_ptr<Node> node);
 		void recursiveNodeDraw(std::shared_ptr<Node> node);
 		void drawBatchGroup(const std::string& name);
+
+	public:
 		bool interactTest(const glm::vec2& pos);
 
 	public:

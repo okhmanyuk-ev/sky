@@ -61,7 +61,8 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	{
 		mScene = std::make_shared<Scene::Scene>();
 		mScene->setInteractTestCallback([](const auto& pos) {
-			return !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup);
+			return !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup) 
+				&& !ImGui::IsAnyItemActive();
 		});
 		mSceneEditor = std::make_shared<SceneEditor>(*mScene);
 
