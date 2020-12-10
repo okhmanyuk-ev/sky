@@ -238,8 +238,7 @@ void ConsoleDevice::showCandidates(float height, float top)
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
 	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, IMGUI_SYSTEM->getLogicalHeight() - height - top - 10));
-	ImGui::SetNextWindowFocus();
-
+	
 	ImGui::Begin("ConsoleCandidates", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel & ~ImGuiWindowFlags_NoBringToFrontOnFocus);
 	ImGui::SetWindowPos(ImVec2(8, 4 + top + height));
 
