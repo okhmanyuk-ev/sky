@@ -338,6 +338,18 @@ void SystemD3D11::clear(const glm::vec4& color)
 	}
 }
 
+void SystemD3D11::clearStencil()
+{
+	if (currentRenderTarget == nullptr)
+	{
+		Context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_STENCIL, 1.0f, 0);
+	}
+	else
+	{
+		currentRenderTarget->clearRenderTargetStencil();
+	}
+}
+
 void SystemD3D11::draw(size_t vertexCount, size_t vertexOffset)
 {
 	prepareForDrawing();

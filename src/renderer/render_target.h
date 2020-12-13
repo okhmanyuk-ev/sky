@@ -17,6 +17,7 @@ namespace Renderer
 	private:
 		void bindRenderTarget() const;
 		void clearRenderTarget(const glm::vec4& color) const;
+		void clearRenderTargetStencil() const;
 
 #if defined(RENDERER_D3D11)
 	private:

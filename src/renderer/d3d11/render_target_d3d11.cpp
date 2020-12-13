@@ -63,4 +63,10 @@ void RenderTarget::clearRenderTarget(const glm::vec4& color) const
 	SystemD3D11::Context->ClearRenderTargetView(render_target_view, (float*)&color);
 	SystemD3D11::Context->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
+
+void RenderTarget::clearRenderTargetStencil() const
+{
+	SystemD3D11::Context->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
 #endif

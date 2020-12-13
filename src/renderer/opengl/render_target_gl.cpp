@@ -43,6 +43,12 @@ void RenderTarget::bindRenderTarget() const
 
 void RenderTarget::clearRenderTarget(const glm::vec4& color) const
 {
-
+	//
 }
+
+void RenderTarget::clearRenderTargetStencil() const
+{
+	//
+}
+
 #endif
