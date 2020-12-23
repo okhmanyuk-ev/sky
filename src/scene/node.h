@@ -90,6 +90,10 @@ namespace Scene
 		const auto& getBatchGroup() const { return mBatchGroup; }
 		void setBatchGroup(const std::string& value) { mBatchGroup = value; }
 
+		auto getAbsoluteSize() const { return mAbsoluteSize; }
+		auto getAbsoluteWidth() const { return mAbsoluteSize.x; }
+		auto getAbsoluteHeight() const { return mAbsoluteSize.y; }
+
 	private:
 		Node* mParent = nullptr;
 		std::list<std::shared_ptr<Node>> mNodes;
@@ -102,5 +106,6 @@ namespace Scene
 		bool mTouching = false;
 		bool mTransformReady = false;
 		std::string mBatchGroup = "";
+		glm::vec2 mAbsoluteSize = { 0.0f, 0.0f };
 	};
 }

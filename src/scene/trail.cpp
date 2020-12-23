@@ -17,7 +17,7 @@ void Trail::updateTransform()
 		mSegments.pop_front();
 
 	auto holder = mHolder.lock();
-	auto pos = holder->unproject(project(getSize() * 0.5f));
+	auto pos = holder->unproject(project(getAbsoluteSize() * 0.5f));
 
 	if (!mSegments.empty() && glm::distance(mSegments.rbegin()->pos, pos) < 0.5f)
 		return;
@@ -47,7 +47,7 @@ void Trail::draw()
 		auto perp = glm::normalize(p1 - p2);
 		perp = { -perp.y, perp.x };
 
-		float thickness = (getSize().x + getSize().y) / 4.0f; // TODO: bad size effect when parent node was scaled
+		float thickness = (getAbsoluteSize().x + getAbsoluteSize().y) / 4.0f; // TODO: bad size effect when parent node was scaled
 
 		perp *= thickness;
 		

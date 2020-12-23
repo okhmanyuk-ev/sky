@@ -11,7 +11,7 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	label->setFont(FONT("default"));
 	label->setFontSize(text_size);
 	label->setText(text);
-	label->setPosition(holder->unproject(target->project({ target->getSize() / 2.0f })));
+	label->setPosition(holder->unproject(target->project({ target->getAbsoluteSize() / 2.0f })));
 	label->setPivot(0.5f);
 	label->setAlpha(0.0f);
 	label->runAction(ActionHelpers::MakeSequence(

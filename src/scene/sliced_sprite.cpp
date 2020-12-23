@@ -12,11 +12,11 @@ void SlicedSprite::draw()
 	if (getAlpha() <= 0.0f)
 		return;
 
-	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
+	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
 	
 	GRAPHICS->pushSampler(getSampler());
 	GRAPHICS->pushBlendMode(getBlendMode());
-	GRAPHICS->drawSlicedSprite(mTexture, model, mCenterRegion, getSize(), getColor());
+	GRAPHICS->drawSlicedSprite(mTexture, model, mCenterRegion, getAbsoluteSize(), getColor());
 	GRAPHICS->pop(2);
 }
 

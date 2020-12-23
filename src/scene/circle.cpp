@@ -25,7 +25,7 @@ void Circle::draw()
 	if (getAlpha() <= 0.0f)
 		return;
 
-	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
+	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
 	auto color = getColor();
 	auto inner_color = mInnerColor * color;
 	auto outer_color = mOuterColor * color;
@@ -41,7 +41,7 @@ void SegmentedCircle::draw()
 	if (getAlpha() <= 0.0f)
 		return;
 
-	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
+	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
 	auto color = getColor();
 	auto inner_color = mInnerColor * color;
 	auto outer_color = mOuterColor * color;

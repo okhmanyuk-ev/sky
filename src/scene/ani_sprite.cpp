@@ -14,10 +14,10 @@ void AniSprite::update()
 {
 	Node::update();
 
-	if (getWidth() <= 0.0f)
+	if (getAbsoluteWidth() <= 0.0f)
 		setWidth(mSprite->getTexRegion().size.x);
 
-	if (getHeight() <= 0.0f)
+	if (getAbsoluteHeight() <= 0.0f)
 		setHeight(mSprite->getTexRegion().size.y);
 
 	const auto& states = mAnimation->getStates();

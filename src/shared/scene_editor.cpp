@@ -179,6 +179,11 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Separator();
 	}
 
+
+	auto absolute_size = node->getAbsoluteSize();
+	ImGui::InputFloat2("Absolute Size", (float*)&absolute_size, "%.3f", ImGuiInputTextFlags_ReadOnly);
+	ImGui::Separator();
+
 	auto position = node->getPosition();
 	auto size = node->getSize();
 	auto stretch = node->getStretch();

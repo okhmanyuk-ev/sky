@@ -102,9 +102,9 @@ glm::vec2 Node::unproject(const glm::vec2& value) const
 std::tuple<glm::vec2, glm::vec2> Node::getGlobalBounds() const
 {
 	auto tl = project({ 0.0f, 0.0f });
-	auto tr = project({ getWidth(), 0.0f });
-	auto bl = project({ 0.0f, getHeight() });
-	auto br = project({ getWidth(), getHeight() });
+	auto tr = project({ getAbsoluteWidth(), 0.0f });
+	auto bl = project({ 0.0f, getAbsoluteHeight() });
+	auto br = project({ getAbsoluteWidth(), getAbsoluteHeight() });
 
 	auto min = glm::min(glm::min(tl, tr), glm::min(bl, br));
 	auto max = glm::max(glm::max(tl, tr), glm::max(bl, br));
@@ -125,8 +125,8 @@ bool Node::hitTest(const glm::vec2& value) const
 	return
 		value.x >= 0.0f &&
 		value.y >= 0.0f &&
-		value.x <= getWidth() &&
-		value.y <= getHeight();
+		value.x <= getAbsoluteWidth() &&
+		value.y <= getAbsoluteHeight();
 }
 
 bool Node::interactTest(const glm::vec2& value) const
@@ -136,7 +136,7 @@ bool Node::interactTest(const glm::vec2& value) const
 
 void Node::updateTransform()
 {
-	auto parent_size = hasParent() ? getParent()->getSize() : (getScene()->getViewport().size / PLATFORM->getScale());
+	auto parent_size = hasParent() ? getParent()->getAbsoluteSize() : (getScene()->getViewport().size / PLATFORM->getScale());
 
 	mTransform = hasParent() ? getParent()->getTransform() : glm::mat4(1.0f);
 	mTransform = glm::translate(mTransform, { getAnchor() * parent_size, 0.0f });
@@ -145,7 +145,7 @@ void Node::updateTransform()
 	mTransform = glm::rotate(mTransform, getRadialAnchor() * glm::pi<float>() * 2.0f, { 0.0f, 0.0f, 1.0f });
 	mTransform = glm::rotate(mTransform, -getRadialPivot() * glm::pi<float>() * 2.0f, { 0.0f, 0.0f, 1.0f });
 	mTransform = glm::scale(mTransform, { getScale(), 1.0f });
-	mTransform = glm::translate(mTransform, { -getPivot() * getSize(), 0.0f });
+	mTransform = glm::translate(mTransform, { -getPivot() * getAbsoluteSize(), 0.0f });
 	mTransform = glm::translate(mTransform, { -getOrigin(), 0.0f });
 
 	mTransformReady = true;
@@ -164,15 +164,11 @@ void Node::leaveDraw()
 void Node::update()
 {
 	auto stretch = getStretch() / getScale();
-	auto margin = getMargin();
-	
-	auto parent_size = hasParent() ? getParent()->getSize() : getScene()->getViewport().size;
+	auto parent_size = hasParent() ? getParent()->getAbsoluteSize() : getScene()->getViewport().size;
 
-	if (stretch.x >= 0.0f)
-		setWidth((parent_size.x * stretch.x) - margin.x);
-
-	if (stretch.y >= 0.0f)
-		setHeight((parent_size.y * stretch.y) - margin.y);
+	mAbsoluteSize = getSize();
+	mAbsoluteSize -= getMargin();
+	mAbsoluteSize += stretch * parent_size;
 }
 
 void Node::draw()

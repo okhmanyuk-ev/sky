@@ -42,7 +42,7 @@ namespace Scene
 
 	private:
 		glm::vec2 mSize = { 0.0f, 0.0f };
-		glm::vec2 mStretch = { -1.0f, -1.0f };
+		glm::vec2 mStretch = { 0.0f, 0.0f };
 		glm::vec2 mPosition = { 0.0f, 0.0f };
 		glm::vec2 mOrigin = { 0.0f, 0.0f };
 		glm::vec2 mMargin = { 0.0f, 0.0f };

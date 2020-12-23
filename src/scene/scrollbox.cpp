@@ -52,15 +52,15 @@ void Scrollbox::physics(float dTime)
 	else
 		mSpeed = { 0.0f, 0.0f };
 
-	if (mContent->getX() + mContent->getWidth() < mBounding->getWidth())
+	if (mContent->getX() + mContent->getAbsoluteWidth() < mBounding->getAbsoluteWidth())
 	{
-		mContent->setX(mBounding->getWidth() - mContent->getWidth());
+		mContent->setX(mBounding->getAbsoluteWidth() - mContent->getAbsoluteWidth());
 		mSpeed.x = 0.0f;
 	}
 
-	if (mContent->getY() + mContent->getHeight() < mBounding->getHeight())
+	if (mContent->getY() + mContent->getAbsoluteHeight() < mBounding->getAbsoluteHeight())
 	{
-		mContent->setY(mBounding->getHeight() - mContent->getHeight());
+		mContent->setY(mBounding->getAbsoluteHeight() - mContent->getAbsoluteHeight());
 		mSpeed.y = 0.0f;
 	}
 

@@ -12,7 +12,7 @@ void Sprite::draw()
 	if (getAlpha() <= 0.0f)
 		return;
 	
-	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
+	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
 	
 	GRAPHICS->pushSampler(getSampler());
 	GRAPHICS->pushBlendMode(getBlendMode());
@@ -28,10 +28,10 @@ void Sprite::update()
 	if (mTexture == nullptr) 
 		return;
 
-	if (getWidth() <= 0.0f)
+	if (getAbsoluteWidth() <= 0.0f)
 		applyTextureWidth();
 
-	if (getHeight() <= 0.0f)
+	if (getAbsoluteHeight() <= 0.0f)
 		applyTextureHeight();
 }
 

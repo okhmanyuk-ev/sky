@@ -10,7 +10,7 @@ void Rectangle::draw()
 	if (getAlpha() <= 0.0f)
 		return;
 
-	auto model = glm::scale(getTransform(), { getSize(), 1.0f });
+	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
 	auto color = getColor();
 
 	auto top_left_color = mCornerColors.at(Corner::TopLeft) * color;
@@ -21,7 +21,7 @@ void Rectangle::draw()
 	if (mRounding > 0.0f)
 	{
 		GRAPHICS->drawRoundedRectangle(model, top_left_color, top_right_color, bottom_left_color, 
-			bottom_right_color, getSize(), mRounding, mAbsoluteRounding);
+			bottom_right_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
 	}
 	else
 	{

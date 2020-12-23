@@ -99,7 +99,7 @@ namespace Shared::SceneHelpers
 			auto particle = createParticle();			
 			particle->setColor(mBeginColor);
 			particle->setAlpha(0.0f);
-			particle->setPosition(holder->unproject(project(getSize() * glm::linearRand(glm::vec2(0.0f), glm::vec2(1.0f)))));
+			particle->setPosition(holder->unproject(project(getAbsoluteSize() * glm::linearRand(glm::vec2(0.0f), glm::vec2(1.0f)))));
 			particle->setScale(mBeginScale);
 			particle->setPivot(0.5f);
 			particle->setRotation(glm::radians(glm::linearRand(0.0f, 360.0f)));
@@ -248,7 +248,7 @@ namespace Shared::SceneHelpers
 			if (mAdaptSize.y <= 0.0f)
 				return;
 
-			auto scale = mAdaptSize / T::getSize();
+			auto scale = mAdaptSize / T::getAbsoluteSize();
 
 			T::setScale(glm::min(scale.x, scale.y));
 		}
@@ -291,7 +291,7 @@ namespace Shared::SceneHelpers
 		{
 			T::leaveDraw();
 
-			auto model = glm::scale(T::getTransform(), { T::getSize(), 1.0f });
+			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
 
 			GRAPHICS->drawLineRectangle(model, { 1.0f, 1.0f, 1.0f, 1.0 });
 		}
