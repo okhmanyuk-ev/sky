@@ -71,8 +71,8 @@ namespace Shared
 		virtual void onWindowDisappearing() { }
 
 	public:
-		virtual std::unique_ptr<Common::Actions::Action> createEnterAction() = 0;
-		virtual std::unique_ptr<Common::Actions::Action> createLeaveAction() = 0;
+		virtual std::unique_ptr<Actions::Action> createEnterAction() = 0;
+		virtual std::unique_ptr<Actions::Action> createLeaveAction() = 0;
 	};
 
 	class SceneManager::Window : public Scene::Node
@@ -101,7 +101,7 @@ namespace Shared
 		virtual void onCloseEnd() { }
 
 	public:
-		virtual std::unique_ptr<Common::Actions::Action> createOpenAction() = 0;
-		virtual std::unique_ptr<Common::Actions::Action> createCloseAction() = 0;
+		virtual std::unique_ptr<Actions::Action> createOpenAction() = 0;
+		virtual std::unique_ptr<Actions::Action> createCloseAction() = 0;
 	};
 }

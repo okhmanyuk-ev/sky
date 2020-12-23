@@ -19,7 +19,7 @@ namespace Scene
 		}
 
 	public:
-		void runAction(std::unique_ptr<Common::Actions::Action> action) { mActions.add(std::move(action)); }
+		void runAction(std::unique_ptr<Actions::Action> action) { mActions.add(std::move(action)); }
 		void clearActions() { mActions.clear(); }
 		bool hasActions() const { return mActions.hasActions(); }
 
@@ -28,7 +28,7 @@ namespace Scene
 		void setActionsEnabled(bool value) { mActionsEnabled = value; }
 
 	private:
-		Common::Actions::GenericActionsPlayer<Common::Actions::Parallel> mActions;
+		Actions::GenericActionsPlayer<Actions::Parallel> mActions;
 		bool mActionsEnabled = true;
 	};
 }

@@ -5,8 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-using namespace Common;
-using namespace Common::Actions;
+using namespace Actions;
 
 // parallel action
 
@@ -173,7 +172,7 @@ Action::Status Interpolate::frame()
 
 // instant player
 
-void Common::Actions::Run(std::unique_ptr<Action> action)
+void Actions::Run(std::unique_ptr<Action> action)
 {
 	//	FRAME->add([action = std::move(action)] {
 	//		return action->frame() == Status::Continue ? FrameSystem::Status::Continue : FrameSystem::Status::Finished;
@@ -185,8 +184,8 @@ void Common::Actions::Run(std::unique_ptr<Action> action)
 		player->update();
 
 		if (player->hasActions())
-			return FrameSystem::Status::Continue;
+			return Common::FrameSystem::Status::Continue;
 
-		return FrameSystem::Status::Finished;
+		return Common::FrameSystem::Status::Finished;
 	});
 }

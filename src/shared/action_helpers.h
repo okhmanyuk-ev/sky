@@ -8,8 +8,8 @@
 
 namespace Shared::ActionHelpers
 {
-	using EasingFunction = Common::Actions::Interpolate::EasingFunction;
-    using Action = std::unique_ptr<Common::Actions::Action>;
+	using EasingFunction = Actions::Interpolate::EasingFunction;
+    using Action = std::unique_ptr<Actions::Action>;
 	using SceneTransform = std::shared_ptr<Scene::Transform>;
 	using SceneColor = std::shared_ptr<Scene::Color>;
 	using SceneNode = std::shared_ptr<Scene::Node>;
@@ -133,22 +133,22 @@ namespace Shared::ActionHelpers
 
 namespace Shared::ActionHelpers
 {
-	template<class...Args> std::unique_ptr<Common::Actions::Sequence> MakeSequence(Args&&...args)
+	template<class...Args> std::unique_ptr<Actions::Sequence> MakeSequence(Args&&...args)
 	{
-		auto seq = std::make_unique<Common::Actions::Sequence>();
+		auto seq = std::make_unique<Actions::Sequence>();
 		(seq->add(std::forward<Args>(args)), ...);
 		return seq;
 	}
 
-	template<class...Args> std::unique_ptr<Common::Actions::Parallel> MakeParallel(Common::Actions::Parallel::Awaiting awaitingType, Args&&...args)
+	template<class...Args> std::unique_ptr<Actions::Parallel> MakeParallel(Actions::Parallel::Awaiting awaitingType, Args&&...args)
 	{
-		auto parallel = std::make_unique<Common::Actions::Parallel>(awaitingType);
+		auto parallel = std::make_unique<Actions::Parallel>(awaitingType);
 		(parallel->add(std::forward<Args>(args)), ...);
 		return parallel;
 	}
 
-	template<class...Args> std::unique_ptr<Common::Actions::Parallel> MakeParallel(Args&&...args)
+	template<class...Args> std::unique_ptr<Actions::Parallel> MakeParallel(Args&&...args)
 	{
-		return MakeParallel(Common::Actions::Parallel::Awaiting::All, std::forward<Args>(args)...);
+		return MakeParallel(Actions::Parallel::Awaiting::All, std::forward<Args>(args)...);
 	}
 }

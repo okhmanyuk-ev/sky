@@ -6,7 +6,7 @@
 #include <optional>
 #include <functional>
 
-namespace Common::Actions
+namespace Actions
 {
 	class Action
 	{
@@ -77,7 +77,7 @@ namespace Common::Actions
 		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value, 
 			"T must be derived from Sequence or Parallel");
 	private:
-		FrameSystem::Framer mFramer = FrameSystem::Framer([this] { T::frame(); });
+		Common::FrameSystem::Framer mFramer = Common::FrameSystem::Framer([this] { T::frame(); });
 	};
 
 	using SequentialActionsPlayer = ActionsPlayer<Sequence>;

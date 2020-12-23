@@ -8,15 +8,15 @@ using namespace Shared;
 
 ActionHelpers::Action ActionHelpers::Insert(std::function<Action()> action)
 {
-	return std::make_unique<Common::Actions::Repeat>([action]() -> Common::Actions::Repeat::Result {
-		return { Common::Actions::Action::Status::Finished, action() };
+	return std::make_unique<Actions::Repeat>([action]() -> Actions::Repeat::Result {
+		return { Actions::Action::Status::Finished, action() };
 	});
 }
 
 ActionHelpers::Action ActionHelpers::RepeatInfinite(std::function<Action()> action)
 {
-	return std::make_unique<Common::Actions::Repeat>([action]() -> Common::Actions::Repeat::Result {
-		return { Common::Actions::Action::Status::Continue, action() };
+	return std::make_unique<Actions::Repeat>([action]() -> Actions::Repeat::Result {
+		return { Actions::Action::Status::Continue, action() };
 	});
 }
 
@@ -47,11 +47,11 @@ ActionHelpers::Action ActionHelpers::Wait(float duration)
 
 ActionHelpers::Action ActionHelpers::Wait(std::function<bool()> while_callback)
 {
-	return std::make_unique<Common::Actions::Generic>([while_callback] {
+	return std::make_unique<Actions::Generic>([while_callback] {
 		if (while_callback())
-			return Common::Actions::Action::Status::Continue;
+			return Actions::Action::Status::Continue;
 
-		return Common::Actions::Action::Status::Finished;
+		return Actions::Action::Status::Finished;
 	});
 }
 
@@ -82,7 +82,7 @@ ActionHelpers::Action ActionHelpers::Delayed(std::function<bool()> while_callbac
 
 ActionHelpers::Action ActionHelpers::Breakable(float duration, Action action)
 {
-	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
+	return MakeParallel(Actions::Parallel::Awaiting::Any,
 		Wait(duration),
 		std::move(action)
 	);
@@ -90,7 +90,7 @@ ActionHelpers::Action ActionHelpers::Breakable(float duration, Action action)
 
 ActionHelpers::Action ActionHelpers::Breakable(std::function<bool()> while_callback, Action action)
 {
-	return MakeParallel(Common::Actions::Parallel::Awaiting::Any,
+	return MakeParallel(Actions::Parallel::Awaiting::Any,
 		Wait(while_callback),
 		std::move(action)
 	);
@@ -100,19 +100,19 @@ ActionHelpers::Action ActionHelpers::Breakable(std::function<bool()> while_callb
 
 ActionHelpers::Action ActionHelpers::Pausable(std::function<bool()> run_callback, ActionHelpers::Action action)
 {
-	auto player = std::make_shared<Common::Actions::GenericActionsPlayer<Common::Actions::Parallel>>();
+	auto player = std::make_shared<Actions::GenericActionsPlayer<Actions::Parallel>>();
 	player->add(std::move(action));
 
-	return std::make_unique<Common::Actions::Generic>([run_callback, player]() {
+	return std::make_unique<Actions::Generic>([run_callback, player]() {
 		if (!run_callback())
-			return Common::Actions::Action::Status::Continue;
+			return Actions::Action::Status::Continue;
 
 		player->update();
 
 		if (player->hasActions())
-			return Common::Actions::Action::Status::Continue;
+			return Actions::Action::Status::Continue;
 
-		return Common::Actions::Action::Status::Finished;
+		return Actions::Action::Status::Finished;
 	});
 }
 
@@ -120,12 +120,12 @@ ActionHelpers::Action ActionHelpers::Pausable(std::function<bool()> run_callback
 
 ActionHelpers::Action ActionHelpers::Execute(std::function<void()> callback)
 {
-	return std::make_unique<Common::Actions::Generic>(Common::Actions::Generic::Type::One, callback);
+	return std::make_unique<Actions::Generic>(Actions::Generic::Type::One, callback);
 }
 
 ActionHelpers::Action ActionHelpers::ExecuteInfinite(std::function<void()> callback)
 {
-	return std::make_unique<Common::Actions::Generic>(Common::Actions::Generic::Type::Infinity, callback);
+	return std::make_unique<Actions::Generic>(Actions::Generic::Type::Infinity, callback);
 }
 
 // log
@@ -141,7 +141,7 @@ ActionHelpers::Action ActionHelpers::Log(const std::string& text)
 
 ActionHelpers::Action ActionHelpers::Interpolate(float start, float dest, float duration, EasingFunction easingFunction, std::function<void(float)> callback)
 {
-	return std::make_unique<Common::Actions::Interpolate>(start, dest, Clock::FromSeconds(duration), easingFunction, callback);
+	return std::make_unique<Actions::Interpolate>(start, dest, Clock::FromSeconds(duration), easingFunction, callback);
 }
 
 ActionHelpers::Action ActionHelpers::Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback)
