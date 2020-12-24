@@ -222,7 +222,7 @@ size_t Scene::Scene::getNodesCount(std::shared_ptr<Node> node) const
 
 void Scene::Scene::onEvent(const Platform::Input::Mouse::Event& e)
 {
-	if (e.type == Platform::Input::Mouse::Event::Type::ButtonDown)
+	if (e.type == Platform::Input::Mouse::Event::Type::ButtonDown && e.button == Platform::Input::Mouse::Button::Left)
 	{
 		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Begin, e.x, e.y }));
 	}
@@ -230,7 +230,7 @@ void Scene::Scene::onEvent(const Platform::Input::Mouse::Event& e)
 	{
 		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Continue, e.x, e.y }));
 	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp)
+	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp && e.button == Platform::Input::Mouse::Button::Left)
 	{
 		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::End, e.x, e.y }));
 	}
