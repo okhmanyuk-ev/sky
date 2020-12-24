@@ -51,7 +51,7 @@ void Trail::draw()
 
 		perp *= thickness;
 		
-		auto interp = Common::Easing::Linear((float)i / (float)mSegments.size());
+		auto interp = Easing::Linear((float)i / (float)mSegments.size());
 
 		if (mNarrowing)
 			perp *= interp;

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Common::Easing
+namespace Easing
 {
 	float Linear(float p);
 

@@ -204,11 +204,11 @@ namespace Actions
 		UAction Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback);
 		UAction Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback);
 
-		UAction Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
-		UAction Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
+		UAction Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction = Easing::Linear);
+		UAction Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction = Easing::Linear);
 
-		UAction Interpolate(const glm::vec3& startValue, const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction = Common::Easing::Linear);
-		UAction Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction = Common::Easing::Linear);
+		UAction Interpolate(const glm::vec3& startValue, const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction = Easing::Linear);
+		UAction Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction = Easing::Linear);
 
 		UAction Log(const std::string& text);
 

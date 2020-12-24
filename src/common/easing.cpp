@@ -4,7 +4,7 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/easing.hpp>
 
-namespace Common::Easing
+namespace Easing
 {
 	float Linear(float p) { return glm::linearInterpolation(p); }
 

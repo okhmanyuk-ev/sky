@@ -619,7 +619,7 @@ void ConsoleDevice::close()
 	mInterpolator.setStartValue(0.0f);
 	mInterpolator.setDestinationValue(1.0f);
 	mInterpolator.setPassed(mInterpolator.getDuration() - mInterpolator.getPassed());
-	mInterpolator.setEasingFunction(Common::Easing::ExponentialIn);
+	mInterpolator.setEasingFunction(Easing::ExponentialIn);
 	mInterpolator.setFinishCallback([&] { mState = State::Closed; });
 }
 
@@ -632,6 +632,6 @@ void ConsoleDevice::open()
 	mInterpolator.setStartValue(1.0f);
 	mInterpolator.setDestinationValue(0.0f);
 	mInterpolator.setPassed(mInterpolator.getDuration() - mInterpolator.getPassed());
-	mInterpolator.setEasingFunction(Common::Easing::ExponentialOut);
+	mInterpolator.setEasingFunction(Easing::ExponentialOut);
 	mInterpolator.setFinishCallback([&] { mState = State::Opened; });
 }

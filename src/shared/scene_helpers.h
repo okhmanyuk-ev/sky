@@ -108,7 +108,7 @@ namespace Shared::SceneHelpers
 
 			particle->runAction(Actions::Factory::MakeSequence(
 				Actions::Factory::MakeParallel(
-					Actions::Factory::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Common::Easing::CubicOut),
+					Actions::Factory::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
 					Actions::Factory::ChangeScale(particle, mEndScale, duration),
 					Actions::Factory::ChangeColor(particle, mBeginColor, mEndColor, duration),
 					Actions::Factory::ChangeAlpha(particle, mBeginColor.a, mEndColor.a, duration)
