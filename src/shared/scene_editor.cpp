@@ -18,6 +18,21 @@ SceneEditor::~SceneEditor()
 void SceneEditor::onEvent(const Platform::Input::Mouse::Event& e)
 {
 	mMousePos = { e.x, e.y };
+
+	if (mNodeSelectingMode)
+	{
+		if (e.type == Platform::Input::Mouse::Event::Type::Wheel)
+		{
+			if (e.wheelY < 0.0f)
+				mSelectedNode += 1;
+			else
+				mSelectedNode -= 1;
+		}
+		if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp && e.button == Platform::Input::Mouse::Button::Right)
+		{
+			mWantOpenNodeEditor = true;
+		}
+	}
 }
 
 void SceneEditor::frame()
@@ -25,14 +40,9 @@ void SceneEditor::frame()
 	if (!mEnabled)
 		return;
 
-	ImGui::Begin("Scene", &mEnabled);
-	if (ImGui::Button("Batch Groups")) 
-	{
-		mBatchGroupsEnabled = true;
-	}
-	ImGui::Separator();
-	showRecursiveNodeTree(mScene.getRoot());
-	ImGui::End();
+	mNodeSelectingMode = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::Ctrl) && !ImGui::IsPopupOpen("NodeEditor");
+
+	showNodeTreeWindow();
 
 	if (mBatchGroupsEnabled)
 	{
@@ -40,9 +50,37 @@ void SceneEditor::frame()
 	}
 	else
 	{
-		highlightNodeUnderCursor();
-		highlightHoveredNode();
+		if (mNodeSelectingMode)
+		{
+			highlightNodeUnderCursor();
+		}
+		else
+		{
+			highlightHoveredNode();
+		}
 	}
+}
+
+void SceneEditor::showNodeTreeWindow()
+{
+	ImGui::Begin("Scene", &mEnabled);
+	if (ImGui::Button("Batch Groups"))
+	{
+		mBatchGroupsEnabled = true;
+	}
+	ImGui::Separator();
+	showRecursiveNodeTree(mScene.getRoot());
+	if (mWantOpenNodeEditor)
+	{
+		ImGui::OpenPopup("NodeEditor");
+	}
+	mWantOpenNodeEditor = false;
+	if (ImGui::BeginPopup("NodeEditor"))
+	{
+		showNodeEditor(mHoveredNode);
+		ImGui::EndPopup();
+	}
+	ImGui::End();
 }
 
 void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
@@ -52,13 +90,15 @@ void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
 	if (node->getNodes().size() == 0)
 		flags |= ImGuiTreeNodeFlags_Leaf;
 
+	if (node == mHoveredNode)
+		flags |= ImGuiTreeNodeFlags_Selected;
+
 	auto name = typeid(*node).name();
 	bool opened = ImGui::TreeNodeEx((void*)&*node, flags, name);
 
-	if (ImGui::BeginPopupContextItem())
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 	{
-		showNodeEditor(node);
-		ImGui::EndPopup();
+		mWantOpenNodeEditor = true;
 	}
 	else if (ImGui::IsItemHovered())
 	{
@@ -101,11 +141,13 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		auto fontSize = label->getFontSize();
 		ImGui::SliderFloat("Font Size", &fontSize, 0.0f, 96.0f);
 		label->setFontSize(fontSize);
+
+		auto text = label->getText();
+		ImGui::InputText("Text", text.data(), text.size(), ImGuiInputTextFlags_ReadOnly);
+
 		ImGui::Separator();
 
-		auto texture = label->getFont()->getTexture();
-
-		if (texture != nullptr)
+		if (auto texture = label->getFont()->getTexture(); texture != nullptr)
 		{
 			ImGui::Text("%dx%d", texture->getWidth(), texture->getHeight());
 			mEditorFontTexture = texture;
@@ -179,7 +221,6 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Separator();
 	}
 
-
 	auto absolute_size = node->getAbsoluteSize();
 	ImGui::InputFloat2("Absolute Size", (float*)&absolute_size, "%.3f", ImGuiInputTextFlags_ReadOnly);
 	ImGui::Separator();
@@ -247,18 +288,35 @@ void SceneEditor::showTooltip(std::shared_ptr<Scene::Node> node)
 
 void SceneEditor::highlightNodeUnderCursor()
 {
-	/*auto nodes = mScene.getNodes(mMousePos);
+	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup) || ImGui::IsAnyItemActive())
+		return;
+
+	auto nodes = mScene.getNodes(mMousePos);
 
 	if (nodes.empty())
 		return;
 
+	mSelectedNode = glm::clamp(mSelectedNode, 0, (int)nodes.size() - 1);
+
 	ImGui::BeginTooltip();
-	for (auto node : nodes)
+	for (int i = 0; i < nodes.size(); i++)
 	{
+		auto node = *std::next(nodes.begin(), i);
 		auto name = typeid(node).name();
-		ImGui::Text(name);
+		auto selected = i == mSelectedNode;
+		ImGui::Selectable(name, selected);
+		if (selected)
+		{
+			highlightNode(node, Graphics::Color::Yellow, true);
+			mHoveredNode = node;
+		}
+		else
+		{
+			highlightNode(node, Graphics::Color::White, false);
+		}
 	}
-	ImGui::EndTooltip();*/
+
+	ImGui::EndTooltip();
 }
 
 void SceneEditor::highlightHoveredNode()
@@ -269,7 +327,7 @@ void SceneEditor::highlightHoveredNode()
 	highlightNode(mHoveredNode);
 }
 
-void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color)
+void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color, bool filled)
 {
 	if (node == nullptr)
 		return;
@@ -291,7 +349,10 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::ve
 
 	GRAPHICS->begin();
 	GRAPHICS->pushOrthoMatrix();
-	GRAPHICS->drawRectangle(model, { color, 0.25f });
+	if (filled)
+	{
+		GRAPHICS->drawRectangle(model, { color, 0.25f });
+	}
 	GRAPHICS->drawLineRectangle(model, { color, 1.0f });
 	GRAPHICS->pop();
 	GRAPHICS->end();

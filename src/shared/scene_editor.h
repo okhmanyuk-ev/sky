@@ -18,12 +18,13 @@ namespace Shared
 		void frame() override;
 
 	private:
+		void showNodeTreeWindow();
 		void showRecursiveNodeTree(std::shared_ptr<Scene::Node> node);
 		void showNodeEditor(std::shared_ptr<Scene::Node> node);
 		void showTooltip(std::shared_ptr<Scene::Node> node);
 		void highlightNodeUnderCursor();
 		void highlightHoveredNode();
-		void highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color = Graphics::Color::White);
+		void highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color = Graphics::Color::White, bool filled = true);
 		void drawImage(const std::shared_ptr<Renderer::Texture>& texture, const Graphics::TexRegion& region = {});
 		void showBatchGroupsMenu();
 		
@@ -41,5 +42,8 @@ namespace Shared
 		std::shared_ptr<Renderer::Texture> mEditorSpriteTexture = nullptr;
 		std::shared_ptr<Renderer::Texture> mEditorFontTexture = nullptr;
 		std::shared_ptr<Scene::Node> mHoveredNode = nullptr;
+		int mSelectedNode = 0;
+		bool mNodeSelectingMode = false;
+		bool mWantOpenNodeEditor = false;
 	};
 }
