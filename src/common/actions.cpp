@@ -129,26 +129,26 @@ Action::Status Repeat::frame()
 
 Factory::UAction Factory::Insert(std::function<UAction()> action)
 {
-	return std::make_unique<Actions::Repeat>([action]() -> Actions::Repeat::Result {
-		return { Actions::Action::Status::Finished, action() };
+	return std::make_unique<Repeat>([action]() -> Repeat::Result {
+		return { Action::Status::Finished, action() };
 	});
 }
 
 Factory::UAction Factory::RepeatInfinite(std::function<UAction()> action)
 {
-	return std::make_unique<Actions::Repeat>([action]() -> Actions::Repeat::Result {
-		return { Actions::Action::Status::Continue, action() };
+	return std::make_unique<Repeat>([action]() -> Repeat::Result {
+		return { Action::Status::Continue, action() };
 	});
 }
 
 Factory::UAction Factory::Execute(std::function<void()> callback)
 {
-	return std::make_unique<Actions::Generic>(Actions::Generic::Type::One, callback);
+	return std::make_unique<Generic>(Generic::Type::One, callback);
 }
 
 Factory::UAction Factory::ExecuteInfinite(std::function<void()> callback)
 {
-	return std::make_unique<Actions::Generic>(Actions::Generic::Type::Infinity, callback);
+	return std::make_unique<Generic>(Generic::Type::Infinity, callback);
 }
 
 Factory::UAction Factory::Wait(float duration)
@@ -161,11 +161,11 @@ Factory::UAction Factory::Wait(float duration)
 
 Factory::UAction Factory::Wait(std::function<bool()> while_callback)
 {
-	return std::make_unique<Actions::Generic>([while_callback] {
+	return std::make_unique<Generic>([while_callback] {
 		if (while_callback())
-			return Actions::Action::Status::Continue;
+			return Action::Status::Continue;
 
-		return Actions::Action::Status::Finished;
+		return Action::Status::Finished;
 	});
 }
 
@@ -194,7 +194,7 @@ Factory::UAction Factory::Delayed(std::function<bool()> while_callback, UAction 
 
 Factory::UAction Factory::Breakable(float duration, UAction action)
 {
-	return MakeParallel(Actions::Parallel::Awaiting::Any,
+	return MakeParallel(Parallel::Awaiting::Any,
 		Wait(duration),
 		std::move(action)
 	);
@@ -202,7 +202,7 @@ Factory::UAction Factory::Breakable(float duration, UAction action)
 
 Factory::UAction Factory::Breakable(std::function<bool()> while_callback, UAction action)
 {
-	return MakeParallel(Actions::Parallel::Awaiting::Any,
+	return MakeParallel(Parallel::Awaiting::Any,
 		Wait(while_callback),
 		std::move(action)
 	);
@@ -210,33 +210,33 @@ Factory::UAction Factory::Breakable(std::function<bool()> while_callback, UActio
 
 Factory::UAction Factory::Pausable(std::function<bool()> run_callback, UAction action)
 {
-	auto player = std::make_shared<Actions::GenericActionsPlayer<Actions::Parallel>>();
+	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
 	player->add(std::move(action));
 
-	return std::make_unique<Actions::Generic>([run_callback, player]() {
+	return std::make_unique<Generic>([run_callback, player]() {
 		if (!run_callback())
-			return Actions::Action::Status::Continue;
+			return Action::Status::Continue;
 
 		player->update();
 
 		if (player->hasActions())
-			return Actions::Action::Status::Continue;
+			return Action::Status::Continue;
 
-		return Actions::Action::Status::Finished;
+		return Action::Status::Finished;
 	});
 }
 
 Factory::UAction Factory::Interpolate(float start, float dest, float duration, EasingFunction easing, std::function<void(float)> callback)
 {
-	return std::make_unique<Actions::Generic>([start, dest, duration, easing, callback, passed = 0.0f]() mutable {
+	return std::make_unique<Generic>([start, dest, duration, easing, callback, passed = 0.0f]() mutable {
 		passed += Clock::ToSeconds(FRAME->getTimeDelta());
 		if (passed >= duration)
 		{
 			callback(dest);
-			return Actions::Action::Status::Finished;
+			return Action::Status::Finished;
 		}
 		callback(glm::lerp(start, dest, easing(passed / duration)));
-		return Actions::Action::Status::Continue;
+		return Action::Status::Continue;
 	});
 }
 

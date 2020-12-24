@@ -140,7 +140,7 @@ namespace Actions
 
 	namespace Factory
 	{
-		using UAction = std::unique_ptr<Actions::Action>;
+		using UAction = std::unique_ptr<Action>;
 
 		UAction Insert(std::function<UAction()> action);
 		UAction RepeatInfinite(std::function<UAction()> action);
@@ -175,23 +175,23 @@ namespace Actions
 
 		UAction Log(const std::string& text);
 
-		template<class...Args> std::unique_ptr<Actions::Sequence> MakeSequence(Args&&...args)
+		template<class...Args> std::unique_ptr<Sequence> MakeSequence(Args&&...args)
 		{
-			auto seq = std::make_unique<Actions::Sequence>();
+			auto seq = std::make_unique<Sequence>();
 			(seq->add(std::forward<Args>(args)), ...);
 			return seq;
 		}
 
-		template<class...Args> std::unique_ptr<Actions::Parallel> MakeParallel(Actions::Parallel::Awaiting awaitingType, Args&&...args)
+		template<class...Args> std::unique_ptr<Parallel> MakeParallel(Parallel::Awaiting awaitingType, Args&&...args)
 		{
-			auto parallel = std::make_unique<Actions::Parallel>(awaitingType);
+			auto parallel = std::make_unique<Parallel>(awaitingType);
 			(parallel->add(std::forward<Args>(args)), ...);
 			return parallel;
 		}
 
-		template<class...Args> std::unique_ptr<Actions::Parallel> MakeParallel(Args&&...args)
+		template<class...Args> std::unique_ptr<Parallel> MakeParallel(Args&&...args)
 		{
-			return MakeParallel(Actions::Parallel::Awaiting::All, std::forward<Args>(args)...);
+			return MakeParallel(Parallel::Awaiting::All, std::forward<Args>(args)...);
 		}
 	}
 
