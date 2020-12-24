@@ -83,7 +83,5 @@ namespace Common
 
 	private:
 		std::function<void()> mQuitCallback = nullptr;
-
-		Actions::ParallelActionsPlayer mActions;
 	};
 }

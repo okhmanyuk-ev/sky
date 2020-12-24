@@ -97,19 +97,6 @@ Action::Status Generic::frame()
 	return mCallback();
 }
 
-// wait action
-
-Wait::Wait(Clock::Duration duration) : mDuration(duration)
-{
-	//
-}
-
-Action::Status Wait::frame()
-{
-	mPassed += FRAME->getTimeDelta();
-	return mPassed >= mDuration ? Status::Finished : Status::Continue;
-}
-
 // repeat action
 
 Repeat::Repeat(Callback callback) : mCallback(std::move(callback))
@@ -135,37 +122,6 @@ Action::Status Repeat::frame()
 		
 	mStatus.reset();
 
-	return Status::Continue;
-}
-
-// interpolate action
-
-Interpolate::Interpolate(float startValue, float destValue, Clock::Duration duration,
-	EasingFunction easingFunction, ProcessCallback processCallback) :
-	mStartValue(startValue),
-	mDestinationValue(destValue),
-	mDuration(duration),
-	mEasingFunction(easingFunction),
-	mProcessCallback(processCallback)
-{
-	//
-}
-
-Action::Status Interpolate::frame()
-{
-	mPassed += FRAME->getTimeDelta();
-
-	if (mPassed >= mDuration)
-	{
-		mProcessCallback(mDestinationValue);
-		return Status::Finished;
-	}
-
-	float p = Clock::ToSeconds(mPassed);
-	float d = Clock::ToSeconds(mDuration);
-	
-	mProcessCallback(glm::lerp(mStartValue, mDestinationValue, mEasingFunction(p / d)));
-	
 	return Status::Continue;
 }
 
@@ -270,9 +226,18 @@ Factory::UAction Factory::Pausable(std::function<bool()> run_callback, UAction a
 	});
 }
 
-Factory::UAction Factory::Interpolate(float start, float dest, float duration, EasingFunction easingFunction, std::function<void(float)> callback)
+Factory::UAction Factory::Interpolate(float start, float dest, float duration, EasingFunction easing, std::function<void(float)> callback)
 {
-	return std::make_unique<Actions::Interpolate>(start, dest, Clock::FromSeconds(duration), easingFunction, callback);
+	return std::make_unique<Actions::Generic>([start, dest, duration, easing, callback, passed = 0.0f]() mutable {
+		passed += Clock::ToSeconds(FRAME->getTimeDelta());
+		if (passed >= duration)
+		{
+			callback(dest);
+			return Actions::Action::Status::Finished;
+		}
+		callback(glm::lerp(start, dest, easing(passed / duration)));
+		return Actions::Action::Status::Continue;
+	});
 }
 
 Factory::UAction Factory::Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback)

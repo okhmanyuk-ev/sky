@@ -119,12 +119,11 @@ void ConsoleCommands::onDelay(CON_ARGS)
 		return;
 	}
 
-	auto seq = std::make_unique<Actions::Sequence>();
-	seq->add(std::make_unique<Actions::Wait>(Clock::FromSeconds(seconds)));
-	seq->add(std::make_unique<Actions::Generic>(Actions::Generic::Type::One, [this, command = CON_ARG(1)] {
-		CONSOLE->execute(command);
-	}));
-	mActions.add(std::move(seq));
+	Actions::Run(Actions::Factory::Delayed(seconds, 
+		Actions::Factory::Execute([this, command = CON_ARG(1)] {
+			CONSOLE->execute(command);
+		})
+	));
 }
 	
 void ConsoleCommands::onExec(CON_ARGS)

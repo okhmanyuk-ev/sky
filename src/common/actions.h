@@ -120,19 +120,6 @@ namespace Actions
 		StatusCallback mCallback = nullptr;
 	};
 
-	class Wait : public Action
-	{
-	public:
-		Wait(Clock::Duration duration);
-
-	private:
-		Status frame() override;
-	
-	private:
-		Clock::Duration mDuration = Clock::Duration::zero();
-		Clock::Duration mPassed = Clock::Duration::zero();
-	};
-
 	class Repeat : public Action
 	{
 	public:
@@ -149,30 +136,6 @@ namespace Actions
 		Callback mCallback;
 		std::optional<Action::Status> mStatus;
 		std::unique_ptr<Action> mAction = nullptr;
-	};
-
-	class Interpolate : public Action
-	{
-	public:
-		using ProcessCallback = std::function<void(float)>;
-		using EasingFunction = std::function<float(float p)>;
-
-	public:
-		Interpolate(float startValue, float destValue, Clock::Duration duration,
-			EasingFunction easingFunction, ProcessCallback processCallback);
-
-	private:
-		Status frame() override;
-	
-	private:
-		Clock::Duration mDuration = Clock::Duration::zero();
-		Clock::Duration mPassed = Clock::Duration::zero();
-
-		float mStartValue = 0.0f;
-		float mDestinationValue = 0.0f;
-
-		EasingFunction mEasingFunction = nullptr;
-		ProcessCallback mProcessCallback = nullptr;
 	};
 
 	namespace Factory
@@ -197,7 +160,7 @@ namespace Actions
 
 		UAction Pausable(std::function<bool()> run_callback, UAction action);
 
-		using EasingFunction = Actions::Interpolate::EasingFunction;
+		using EasingFunction = std::function<float(float)>;
 
 		UAction Interpolate(float start, float dest, float duration, EasingFunction easingFunction, std::function<void(float)> callback);
 		UAction Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback);

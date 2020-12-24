@@ -267,15 +267,14 @@ void SystemWindows::initializeBilling(const ProductsMap& products)
 
 void SystemWindows::purchase(const std::string& product)
 {
-	auto seq = std::make_unique<Actions::Sequence>();
-	seq->add(std::make_unique<Actions::Wait>(Clock::FromSeconds(3.0f)));
-	seq->add(std::make_unique<Actions::Generic>(Actions::Generic::Type::One, [this, product] {
-		if (mProducts.count(product) == 0)
-			return;
+	Actions::Run(Actions::Factory::Delayed(3.0f,
+		Actions::Factory::Execute([this, product] {
+			if (mProducts.count(product) == 0)
+				return;
 
-		mProducts.at(product)();
-	}));
-	Actions::Run(std::move(seq));
+			mProducts.at(product)();
+		})
+	));
 }
 
 void SystemWindows::makeWindow()
