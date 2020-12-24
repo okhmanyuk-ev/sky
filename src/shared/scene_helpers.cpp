@@ -1,5 +1,4 @@
 #include "scene_helpers.h"
-#include <shared/action_helpers.h>
 #include <shared/cache_system.h>
 
 using namespace Shared;
@@ -14,11 +13,11 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	label->setPosition(holder->unproject(target->project({ target->getAbsoluteSize() / 2.0f })));
 	label->setPivot(0.5f);
 	label->setAlpha(0.0f);
-	label->runAction(ActionHelpers::MakeSequence(
-		ActionHelpers::Show(label, 0.5f),
-		ActionHelpers::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
-		ActionHelpers::Hide(label, 0.5f),
-		ActionHelpers::Kill(label)
+	label->runAction(Actions::Factory::MakeSequence(
+		Actions::Factory::Show(label, 0.5f),
+		Actions::Factory::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
+		Actions::Factory::Hide(label, 0.5f),
+		Actions::Factory::Kill(label)
 	));
 	holder->attach(label);
 	return label;
@@ -37,7 +36,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	outer_rect->setPivot({ 0.0f, 0.5f });
 	holder->attach(outer_rect);
 
-	outer_rect->runAction(ActionHelpers::ExecuteInfinite([outer_rect] {
+	outer_rect->runAction(Actions::Factory::ExecuteInfinite([outer_rect] {
 		outer_rect->setWidth(outer_rect->getHeight());
 	}));
 

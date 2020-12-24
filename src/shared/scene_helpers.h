@@ -2,7 +2,6 @@
 
 #include <tinyutf8.hpp>
 #include <scene/all.h>
-#include <shared/action_helpers.h>
 
 namespace Shared::SceneHelpers
 {
@@ -69,12 +68,12 @@ namespace Shared::SceneHelpers
 	public:
 		Emitter()
 		{
-			runAction(Shared::ActionHelpers::RepeatInfinite([this]()->Shared::ActionHelpers::Action {
+			runAction(Actions::Factory::RepeatInfinite([this]()->Actions::Factory::UAction {
 				if (!mRunning)
 					return nullptr;
 
 				auto delay = glm::linearRand(mMinDelay, mMaxDelay);
-				return Shared::ActionHelpers::Delayed(delay, Shared::ActionHelpers::Execute([this] {
+				return Actions::Factory::Delayed(delay, Actions::Factory::Execute([this] {
 					if (!mRunning)
 						return;
 
@@ -107,14 +106,14 @@ namespace Shared::SceneHelpers
 			auto duration = glm::linearRand(mMinDuration, mMaxDuration);
 			auto direction = glm::linearRand(mMinDirection, mMaxDirection);
 
-			particle->runAction(Shared::ActionHelpers::MakeSequence(
-				Shared::ActionHelpers::MakeParallel(
-					Shared::ActionHelpers::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Common::Easing::CubicOut),
-					Shared::ActionHelpers::ChangeScale(particle, mEndScale, duration),
-					Shared::ActionHelpers::ChangeColor(particle, mBeginColor, mEndColor, duration),
-					Shared::ActionHelpers::ChangeAlpha(particle, mBeginColor.a, mEndColor.a, duration)
+			particle->runAction(Actions::Factory::MakeSequence(
+				Actions::Factory::MakeParallel(
+					Actions::Factory::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Common::Easing::CubicOut),
+					Actions::Factory::ChangeScale(particle, mEndScale, duration),
+					Actions::Factory::ChangeColor(particle, mBeginColor, mEndColor, duration),
+					Actions::Factory::ChangeAlpha(particle, mBeginColor.a, mEndColor.a, duration)
 				),
-				Shared::ActionHelpers::Kill(particle)
+				Actions::Factory::Kill(particle)
 			));
 
 			holder->attach(particle);

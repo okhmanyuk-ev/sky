@@ -5,6 +5,10 @@
 #include <list>
 #include <optional>
 #include <functional>
+#include <common/easing.h>
+
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 namespace Actions
 {
@@ -170,6 +174,63 @@ namespace Actions
 		EasingFunction mEasingFunction = nullptr;
 		ProcessCallback mProcessCallback = nullptr;
 	};
+
+	namespace Factory
+	{
+		using UAction = std::unique_ptr<Actions::Action>;
+
+		UAction Insert(std::function<UAction()> action);
+		UAction RepeatInfinite(std::function<UAction()> action);
+
+		UAction Execute(std::function<void()> callback);
+		UAction ExecuteInfinite(std::function<void()> callback);
+
+		UAction Wait(float duration);
+		UAction Wait(std::function<bool()> while_callback);
+		UAction WaitOneFrame();
+
+		UAction Delayed(float duration, UAction action);
+		UAction Delayed(std::function<bool()> while_callback, UAction action);
+
+		UAction Breakable(float duration, UAction action);
+		UAction Breakable(std::function<bool()> while_callback, UAction action);
+
+		UAction Pausable(std::function<bool()> run_callback, UAction action);
+
+		using EasingFunction = Actions::Interpolate::EasingFunction;
+
+		UAction Interpolate(float start, float dest, float duration, EasingFunction easingFunction, std::function<void(float)> callback);
+		UAction Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback);
+		UAction Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback);
+		UAction Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback);
+
+		UAction Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
+		UAction Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction = Common::Easing::Linear);
+
+		UAction Interpolate(const glm::vec3& startValue, const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction = Common::Easing::Linear);
+		UAction Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction = Common::Easing::Linear);
+
+		UAction Log(const std::string& text);
+
+		template<class...Args> std::unique_ptr<Actions::Sequence> MakeSequence(Args&&...args)
+		{
+			auto seq = std::make_unique<Actions::Sequence>();
+			(seq->add(std::forward<Args>(args)), ...);
+			return seq;
+		}
+
+		template<class...Args> std::unique_ptr<Actions::Parallel> MakeParallel(Actions::Parallel::Awaiting awaitingType, Args&&...args)
+		{
+			auto parallel = std::make_unique<Actions::Parallel>(awaitingType);
+			(parallel->add(std::forward<Args>(args)), ...);
+			return parallel;
+		}
+
+		template<class...Args> std::unique_ptr<Actions::Parallel> MakeParallel(Args&&...args)
+		{
+			return MakeParallel(Actions::Parallel::Awaiting::All, std::forward<Args>(args)...);
+		}
+	}
 
 	// an instant action player whithout states,
 	// will be removed as soon as action completed
