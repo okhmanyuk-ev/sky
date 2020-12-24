@@ -143,8 +143,8 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		label->setFontSize(fontSize);
 
 		auto text = label->getText();
-		ImGui::InputText("Text", text.data(), text.size(), ImGuiInputTextFlags_ReadOnly);
-
+		ImGui::InputTextWithHint("Text", "No text", text.data(), text.size(), ImGuiInputTextFlags_ReadOnly);
+		
 		ImGui::Separator();
 
 		if (auto texture = label->getFont()->getTexture(); texture != nullptr)
@@ -162,7 +162,12 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 		if (texture != nullptr)
 		{
-			ImGui::Text("%dx%d", texture->getWidth(), texture->getHeight());
+			glm::i32vec2 texture_size = { texture->getWidth(), texture->getHeight() };
+			ImGui::InputInt2("Resolution", (int*)&texture_size, ImGuiInputTextFlags_ReadOnly);
+
+			auto tex_region = sprite->getTexRegion();
+			ImGui::InputFloat4("Region", (float*)&tex_region, "%.0f", ImGuiInputTextFlags_ReadOnly);
+
 			mEditorSpriteTexture = texture;
 			drawImage(mEditorSpriteTexture, sprite->getTexRegion());
 			ImGui::Separator();
