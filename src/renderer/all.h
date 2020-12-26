@@ -25,6 +25,7 @@
 #include "shaders/bright_filter.h"
 #include "shaders/circle.h"
 #include "shaders/default.h"
+#include "shaders/grayscale.h"
 #include "shaders/light.h"
 #include "shaders/rounded.h"
 #include "shaders/sdf.h"

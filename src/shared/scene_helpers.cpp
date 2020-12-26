@@ -254,3 +254,23 @@ void SceneHelpers::Hud::update()
 	setVerticalMargin(top + bottom);
 	setHorizontalMargin(left + right);
 }
+
+SceneHelpers::GrayscaleSprite::GrayscaleSprite()
+{
+	if (!Shader)
+		Shader = std::make_shared<Renderer::Shaders::Grayscale>(Renderer::Vertex::PositionColorTexture::Layout);
+
+	setShader(Shader);
+}
+
+void SceneHelpers::GrayscaleSprite::draw()
+{
+	Shader->setIntensity(mIntensity);
+	Sprite::draw();
+}
+
+void SceneHelpers::InactiveSprite::update()
+{
+	GrayscaleSprite::update();
+	setIntensity(mActive ? 0.0f : 1.0f);
+}

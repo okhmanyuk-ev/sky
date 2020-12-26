@@ -35,9 +35,13 @@ namespace Scene
 		auto getTextureAddress() const { return mTextureAddress; }
 		void setTextureAddress(Renderer::TextureAddress value) { mTextureAddress = value; }
 
+		auto getShader() const { return mShader; }
+		void setShader(std::shared_ptr<Renderer::ShaderMatrices> value) { mShader = value; }
+
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
 		Graphics::TexRegion mTexRegion = {};
 		Renderer::TextureAddress mTextureAddress = DefaultTextureAddress;
+		std::shared_ptr<Renderer::ShaderMatrices> mShader = nullptr;
 	};
 }
