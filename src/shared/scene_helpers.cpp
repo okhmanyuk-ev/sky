@@ -99,7 +99,7 @@ std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std
 }
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(float height, 
-	const std::vector<std::pair<float/*width*/, std::shared_ptr<Scene::Node>>> items)
+	const std::vector<std::pair<float/*width*/, std::shared_ptr<Scene::Node>>>& items)
 {
 	auto holder = std::make_shared<Scene::Node>();
 	holder->setHeight(height);
@@ -125,7 +125,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(float height,
 }
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const glm::vec2& cell_size, 
-	const std::vector<std::shared_ptr<Scene::Node>> items)
+	const std::vector<std::shared_ptr<Scene::Node>>& items)
 {
 	auto items_width = std::vector<std::pair<float, std::shared_ptr<Scene::Node>>>();
 
@@ -138,7 +138,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const glm::vec2& c
 }
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(float width,
-	const std::vector<std::pair<float/*height*/, std::shared_ptr<Scene::Node>>> items)
+	const std::vector<std::pair<float/*height*/, std::shared_ptr<Scene::Node>>>& items)
 {
 	auto holder = std::make_shared<Scene::Node>();
 	holder->setWidth(width);
@@ -164,7 +164,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(float width,
 }
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const glm::vec2& cell_size,
-	const std::vector<std::shared_ptr<Scene::Node>> items)
+	const std::vector<std::shared_ptr<Scene::Node>>& items)
 {
 	auto items_height = std::vector<std::pair<float, std::shared_ptr<Scene::Node>>>();
 

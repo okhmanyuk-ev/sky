@@ -15,16 +15,16 @@ namespace Shared::SceneHelpers
 		float title_size, int choosed, std::function<void(int)> changeCallback = nullptr);
 
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(float height, const std::vector<std::pair<float/*width*/,
-		std::shared_ptr<Scene::Node>>> items);
+		std::shared_ptr<Scene::Node>>>& items);
 
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const glm::vec2& cell_size,
-		const std::vector<std::shared_ptr<Scene::Node>> items); // TODO: std::span<..>
+		const std::vector<std::shared_ptr<Scene::Node>>& items); 
 
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(float width, const std::vector<std::pair<float/*height*/,
-		std::shared_ptr<Scene::Node>>> items);
+		std::shared_ptr<Scene::Node>>>& items);
 
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(const glm::vec2& cell_size,
-		const std::vector<std::shared_ptr<Scene::Node>> items); // TODO: std::span<..>
+		const std::vector<std::shared_ptr<Scene::Node>>& items); 
 
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 
