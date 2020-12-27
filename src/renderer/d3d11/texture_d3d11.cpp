@@ -31,15 +31,42 @@ Texture::Texture(int width, int height, bool renderTarget) : mWidth(width), mHei
 
 Texture::Texture(int width, int height, int channels, void* data) : Texture(width, height)
 {
-	auto memPitch = width * channels;
-	auto memSlicePitch = width * height * channels;
-	SystemD3D11::Context->UpdateSubresource(texture2d, 0, nullptr, data, memPitch, memSlicePitch);
+	writePixels(width, height, channels, data);
 }
 
 Texture::~Texture()
 {
 	shader_resource_view->Release();
 	texture2d->Release();
+}
+
+void Texture::writePixels(int width, int height, int channels, void* data)
+{
+	if (!data)
+		return;
+
+	auto memPitch = width * channels;
+	auto memSlicePitch = width * height * channels;
+	SystemD3D11::Context->UpdateSubresource(texture2d, 0, nullptr, data, memPitch, memSlicePitch);
+
+	/*GLint last_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// TODO: this method is bad because it changes texture width and height
+	mWidth = width;
+	mHeight = height;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	// TODO: read abound pixel buffer objects (PBO)
+	// https://www.roxlu.com/2014/048/fast-pixel-transfers-with-pixel-buffer-objects
+
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+	//glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	glBindTexture(GL_TEXTURE_2D, last_texture);*/
 }
 
 void Texture::bindTexture() const
