@@ -64,7 +64,9 @@ namespace Scene
 		auto hasScene() const { return getScene() != nullptr; }
 		const auto& getNodes() const { return mNodes; }
 		auto hasNodes() const { return !mNodes.empty(); }
+
 		const auto& getTransform() const { return mTransform; }
+		void setTransform(const glm::mat4& value) { mTransform = value; }
 
 		bool isEnabled() const { return mEnabled; }
 		void setEnabled(bool value) { mEnabled = value; }
