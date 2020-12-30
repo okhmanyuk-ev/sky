@@ -222,18 +222,17 @@ SceneHelpers::FastButton::FastButton()
 
 	mLabel = std::make_shared<Scene::Label>();
 	mLabel->setFont(FONT("default"));
-	mLabel->setAnchor({ 0.5f, 0.5f });
-	mLabel->setPivot({ 0.5f, 0.5f });
+	mLabel->setAnchor(0.5f);
+	mLabel->setPivot(0.5f);
 	attach(mLabel);
 
-	setButtonActive(true);
+	refresh();
 }
 
-void SceneHelpers::FastButton::setButtonActive(bool value)
+void SceneHelpers::FastButton::refresh()
 {
-	setAlpha(value ? 0.33f : 0.125f);
-	setClickEnabled(value);
-	mButtonActive = value;
+	setAlpha(isActive() ? 0.33f : 0.125f);
+	setClickEnabled(isActive());
 }
 
 SceneHelpers::Progressbar::Progressbar()

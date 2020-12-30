@@ -73,18 +73,18 @@ namespace Shared::SceneHelpers
 		void refresh() override;
 	};
 
-	class FastButton : public Scene::Clickable<Scene::Rectangle>
+	class FastButton : public Button<Scene::Rectangle>
 	{
 	public:
 		FastButton();
 
 	public:
-		void setButtonActive(bool value);
+		void refresh() override;
 
+	public:
 		auto getLabel() { return mLabel; }
 
 	private:
-		bool mButtonActive = true;
 		std::shared_ptr<Scene::Label> mLabel;
 	};
 
