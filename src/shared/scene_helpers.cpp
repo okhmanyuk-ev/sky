@@ -30,20 +30,20 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 
 	auto outer_rect = std::make_shared<Scene::Actionable<Scene::Rectangle>>();
 	outer_rect->setAlpha(0.33f);
-	outer_rect->setVerticalStretch(1.0f);
-	outer_rect->setMargin({ 8.0f, 8.0f });
+	outer_rect->setStretch({ 0.0f, 1.0f });
+	outer_rect->setMargin(8.0f);
 	outer_rect->setAnchor({ 0.0f, 0.5f });
 	outer_rect->setPivot({ 0.0f, 0.5f });
 	holder->attach(outer_rect);
 
 	outer_rect->runAction(Actions::Factory::ExecuteInfinite([outer_rect] {
-		outer_rect->setWidth(outer_rect->getHeight());
+		outer_rect->setWidth(outer_rect->getAbsoluteHeight() + outer_rect->getVerticalMargin());
 	}));
 
 	auto inner_rect = std::make_shared<Scene::Rectangle>();
-	inner_rect->setAnchor({ 0.5f, 0.5f });
-	inner_rect->setPivot({ 0.5f, 0.5f });
-	inner_rect->setStretch({ 0.66f, 0.66f });
+	inner_rect->setAnchor(0.5f);
+	inner_rect->setPivot(0.5f);
+	inner_rect->setStretch(0.66f);
 	inner_rect->setAlpha(0.66f);
 	inner_rect->setEnabled(checked);
 	outer_rect->attach(inner_rect);
