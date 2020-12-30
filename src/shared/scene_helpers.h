@@ -97,12 +97,10 @@ namespace Shared::SceneHelpers
 		void setProgress(float value);
 		float getProgress() const;
 
-		auto getProgressColor() const { return mProgress->getColor(); }
-		void setProgressColor(const glm::vec4& value) { mProgress->setColor(value); }
-		void setProgressColor(const glm::vec3& value) { mProgress->setColor(value); }
+		auto getProgressContent() const { return mProgressContent; }
 
 	private:
-		std::shared_ptr<Scene::Rectangle> mProgress;
+		std::shared_ptr<Scene::Rectangle> mProgressContent;
 	};
 
 	// TODO: this can be moved to 'scene' namespace

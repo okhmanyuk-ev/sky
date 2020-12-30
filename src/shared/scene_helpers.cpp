@@ -239,22 +239,22 @@ SceneHelpers::Progressbar::Progressbar()
 {
 	setAlpha(0.33f);
 	
-	mProgress = std::make_shared<Scene::Rectangle>();
-	mProgress->setAnchor({ 0.0f, 0.5f });
-	mProgress->setPivot({ 0.0f, 0.5f });
-	mProgress->setVerticalStretch(1.0f);
-	mProgress->setAlpha(0.66f);
-	attach(mProgress);
+	mProgressContent = std::make_shared<Scene::Rectangle>();
+	mProgressContent->setAnchor({ 0.0f, 0.5f });
+	mProgressContent->setPivot({ 0.0f, 0.5f });
+	mProgressContent->setVerticalStretch(1.0f);
+	mProgressContent->setAlpha(0.66f);
+	attach(mProgressContent);
 }
 
 void SceneHelpers::Progressbar::setProgress(float value)
 {
-	mProgress->setHorizontalStretch(value);
+	mProgressContent->setHorizontalStretch(value);
 }
 
 float SceneHelpers::Progressbar::getProgress() const
 {
-	return mProgress->getHorizontalStretch();
+	return mProgressContent->getHorizontalStretch();
 }
 
 SceneHelpers::Hud::Hud()
