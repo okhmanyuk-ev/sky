@@ -28,6 +28,51 @@ namespace Shared::SceneHelpers
 
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 
+	class GrayscaleSprite : public Scene::Sprite
+	{
+	public:
+		GrayscaleSprite();
+
+	protected:
+		void draw();
+
+	private:
+		static inline std::shared_ptr<Renderer::Shaders::Grayscale> Shader = nullptr;
+
+	public:
+		auto getGrayIntensity() const { return mGrayIntensity; }
+		void setGrayIntensity(float value) { mGrayIntensity = value; }
+
+	private:
+		float mGrayIntensity = 1.0f;
+	};
+
+	template <class T> class Button : public Scene::Clickable<T>
+	{
+	public:
+		virtual void refresh() = 0;
+
+	public:
+		auto isActive() const { return mActive; }
+		void setActive(bool value) 
+		{ 
+			mActive = value; 
+			refresh();
+		}
+
+	private:
+		bool mActive = true;
+	};
+
+	class GrayscaleSpriteButton : public Button<GrayscaleSprite>
+	{
+	public:
+		GrayscaleSpriteButton();
+
+	public:
+		void refresh() override;
+	};
+
 	class FastButton : public Scene::Clickable<Scene::Rectangle>
 	{
 	public:
@@ -305,37 +350,5 @@ namespace Shared::SceneHelpers
 
 	protected:
 		void update() override;
-	};
-
-	class GrayscaleSprite : public Scene::Sprite
-	{
-	public:
-		GrayscaleSprite();
-
-	protected:
-		void draw();
-
-	private:
-		static inline std::shared_ptr<Renderer::Shaders::Grayscale> Shader = nullptr;
-
-	public:
-		auto getIntensity() const { return mIntensity; }
-		void setIntensity(float value) { mIntensity = value; }
-
-	private:
-		float mIntensity = false;
-	};
-
-	class InactiveSprite : public GrayscaleSprite
-	{
-	protected:
-		void update();
-
-	public:
-		auto isActive() const { return mActive; }
-		void setActive(bool value) { mActive = value; }
-
-	private:
-		bool mActive = false;
 	};
 }

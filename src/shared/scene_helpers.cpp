@@ -191,6 +191,30 @@ void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const gl
 	color_node->setColor(color);
 }
 
+SceneHelpers::GrayscaleSprite::GrayscaleSprite()
+{
+	if (!Shader)
+		Shader = std::make_shared<Renderer::Shaders::Grayscale>(Renderer::Vertex::PositionColorTexture::Layout);
+
+	setShader(Shader);
+}
+
+void SceneHelpers::GrayscaleSprite::draw()
+{
+	Shader->setIntensity(mGrayIntensity);
+	Sprite::draw();
+}
+
+SceneHelpers::GrayscaleSpriteButton::GrayscaleSpriteButton()
+{
+	refresh();
+}
+
+void SceneHelpers::GrayscaleSpriteButton::refresh()
+{
+	setGrayIntensity(isActive() ? 0.0f : 1.0f);
+}
+
 SceneHelpers::FastButton::FastButton()
 {
 	setChooseBeginCallback([this] { setAlpha(0.66f); });
@@ -253,24 +277,4 @@ void SceneHelpers::Hud::update()
 	setHorizontalPosition(left);
 	setVerticalMargin(top + bottom);
 	setHorizontalMargin(left + right);
-}
-
-SceneHelpers::GrayscaleSprite::GrayscaleSprite()
-{
-	if (!Shader)
-		Shader = std::make_shared<Renderer::Shaders::Grayscale>(Renderer::Vertex::PositionColorTexture::Layout);
-
-	setShader(Shader);
-}
-
-void SceneHelpers::GrayscaleSprite::draw()
-{
-	Shader->setIntensity(mIntensity);
-	Sprite::draw();
-}
-
-void SceneHelpers::InactiveSprite::update()
-{
-	GrayscaleSprite::update();
-	setIntensity(mActive ? 0.0f : 1.0f);
 }
