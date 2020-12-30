@@ -149,11 +149,21 @@ namespace Actions
 		UAction ExecuteInfinite(std::function<void()> callback);
 
 		UAction Wait(float duration);
-		UAction Wait(std::function<bool()> while_callback);
+
+		// will wait while returning true
+		UAction Wait(std::function<bool()> while_callback); 
+		
+		// will wait while flag is true
+		UAction Wait(bool& while_flag);
 		UAction WaitOneFrame();
 
 		UAction Delayed(float duration, UAction action);
+		
+		// will wait while returning true
 		UAction Delayed(std::function<bool()> while_callback, UAction action);
+
+		// will wait while flag is true
+		UAction Delayed(bool& while_flag, UAction action);
 
 		UAction Breakable(float duration, UAction action);
 		UAction Breakable(std::function<bool()> while_callback, UAction action);

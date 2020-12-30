@@ -169,6 +169,13 @@ Factory::UAction Factory::Wait(std::function<bool()> while_callback)
 	});
 }
 
+Factory::UAction Factory::Wait(bool& while_flag)
+{
+	return Wait([&while_flag] {
+		return while_flag;
+	});
+}
+
 Factory::UAction Factory::WaitOneFrame()
 {
 	return Execute(nullptr);
@@ -186,6 +193,14 @@ Factory::UAction Factory::Delayed(std::function<bool()> while_callback, UAction 
 {
 	return MakeSequence(
 		Wait(while_callback),
+		std::move(action)
+	);
+}
+
+Factory::UAction Factory::Delayed(bool& while_flag, UAction action)
+{
+	return MakeSequence(
+		Wait(while_flag),
 		std::move(action)
 	);
 }
