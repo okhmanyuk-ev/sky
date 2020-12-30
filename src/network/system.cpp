@@ -161,7 +161,7 @@ void System::sendPacket(SocketHandle handle, const Packet& packet)
 
 #if defined(PLATFORM_WINDOWS)
 	sendto(socket_data->socket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
-		(SOCKADDR*)&adr, sizeof(adr));
+		(SOCKADDR*)&adr, (int)sizeof(adr));
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	sendto(socket_data->socket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
 		(sockaddr*)&adr, sizeof(adr));
