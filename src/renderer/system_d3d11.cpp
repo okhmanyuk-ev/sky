@@ -377,11 +377,6 @@ void SystemD3D11::drawIndexed(size_t indexCount, size_t indexOffset, size_t vert
 	Context->DrawIndexed((UINT)indexCount, (UINT)indexOffset, (INT)vertexOffset);
 }
 
-void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory)
-{
-	//Context->ResolveSubresource()
-}
-
 void SystemD3D11::present()
 {
 	mSwapChain->Present(mVsync ? 1 : 0, 0);

@@ -45,8 +45,6 @@ namespace Renderer
 		void draw(size_t vertexCount, size_t vertexOffset = 0) override;
 		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0) override;
 
-		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) override;
-
 		void present() override;
 
 		bool isVsync() const override;
