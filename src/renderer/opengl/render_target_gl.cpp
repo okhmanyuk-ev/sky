@@ -5,7 +5,7 @@
 
 using namespace Renderer;
 
-RenderTarget::RenderTarget(int width, int height) : Texture(width, height, true)
+RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
 {
 	GLint last_fbo;
 	GLint last_rbo;
@@ -34,21 +34,6 @@ RenderTarget::~RenderTarget()
 {
 	glDeleteFramebuffers(1, &framebuffer);
 	glDeleteRenderbuffers(1, &depth_stencil_renderbuffer);
-}
-
-void RenderTarget::bindRenderTarget() const
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-}
-
-void RenderTarget::clearRenderTarget(const glm::vec4& color) const
-{
-	//
-}
-
-void RenderTarget::clearRenderTargetStencil() const
-{
-	//
 }
 
 #endif

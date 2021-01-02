@@ -6,7 +6,7 @@
 
 using namespace Renderer;
 
-RenderTarget::RenderTarget(int width, int height) : Texture(width, height, true)
+RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
 {
 	D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc = { };
 	render_target_view_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -39,34 +39,6 @@ RenderTarget::~RenderTarget()
 	render_target_view->Release();
 	depth_stencil_texture->Release();
 	depth_stencil_view->Release();
-}
-
-void RenderTarget::bindRenderTarget() const
-{
-	ID3D11ShaderResourceView* prev_shader_resource_view;
-	SystemD3D11::Context->PSGetShaderResources(0, 1, &prev_shader_resource_view);
-
-	if (prev_shader_resource_view == shader_resource_view)
-	{
-		ID3D11ShaderResourceView* null[] = { nullptr };
-		SystemD3D11::Context->PSSetShaderResources(0, 1, null); // remove old shader view
-	}
-	
-	if (prev_shader_resource_view)
-		prev_shader_resource_view->Release(); // avoid memory leak
-
-	SystemD3D11::Context->OMSetRenderTargets(1, &render_target_view, depth_stencil_view);
-}
-
-void RenderTarget::clearRenderTarget(const glm::vec4& color) const
-{
-	SystemD3D11::Context->ClearRenderTargetView(render_target_view, (float*)&color);
-	SystemD3D11::Context->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-}
-
-void RenderTarget::clearRenderTargetStencil() const
-{
-	SystemD3D11::Context->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 #endif

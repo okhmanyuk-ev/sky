@@ -274,7 +274,7 @@ void SystemGL::setIndexBuffer(const Buffer& value)
 
 void SystemGL::setTexture(std::shared_ptr<Texture> value)
 {
-	value->bindTexture();
+	glBindTexture(GL_TEXTURE_2D, value->texture);
 	mTextureBound = true;
 	updateGLSampler();
 }
@@ -293,7 +293,7 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 	else
 	{
 		mRenderTargetBound = true;
-		value->bindRenderTarget();
+		glBindFramebuffer(GL_FRAMEBUFFER, value->framebuffer);
 	}
 
 	mCullModeDirty = true;  // when render target is active, we using reversed culling,

@@ -9,11 +9,9 @@ namespace Renderer
 		friend class SystemD3D11;
 		friend class SystemGL;
 	public:
-		Texture(int width, int height, int channels, void* data = nullptr);
+		Texture(int width, int height);
+		Texture(int width, int height, int channels, void* data);
 		~Texture();
-
-	protected:
-		Texture(int width, int height, bool renderTarget = false);
 
 	public:
 		void writePixels(int width, int height, int channels, void* data);
@@ -25,9 +23,6 @@ namespace Renderer
 	private:
 		int mWidth;
 		int mHeight;
-
-	private:
-		void bindTexture() const;
 
 #if defined(RENDERER_D3D11)
 	protected:

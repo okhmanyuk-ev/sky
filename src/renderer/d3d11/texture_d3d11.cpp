@@ -5,7 +5,7 @@
 
 using namespace Renderer;
 
-Texture::Texture(int width, int height, bool renderTarget) : mWidth(width), mHeight(height)
+Texture::Texture(int width, int height) : mWidth(width), mHeight(height)
 {
 	D3D11_TEXTURE2D_DESC texture2d_desc = { };
 	texture2d_desc.Width = mWidth;
@@ -16,7 +16,7 @@ Texture::Texture(int width, int height, bool renderTarget) : mWidth(width), mHei
 	texture2d_desc.SampleDesc.Count = 1;
 	texture2d_desc.SampleDesc.Quality = 0;
 	texture2d_desc.Usage = D3D11_USAGE_DEFAULT;
-	texture2d_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | (renderTarget ? D3D11_BIND_RENDER_TARGET : 0);
+	texture2d_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	texture2d_desc.CPUAccessFlags = 0;
 	texture2d_desc.MiscFlags = 0;	
 	SystemD3D11::Device->CreateTexture2D(&texture2d_desc, nullptr, &texture2d);
@@ -67,10 +67,5 @@ void Texture::writePixels(int width, int height, int channels, void* data)
 	//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 	glBindTexture(GL_TEXTURE_2D, last_texture);*/
-}
-
-void Texture::bindTexture() const
-{
-	SystemD3D11::Context->PSSetShaderResources(0, 1, &shader_resource_view);
 }
 #endif

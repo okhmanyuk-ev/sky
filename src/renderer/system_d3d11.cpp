@@ -213,7 +213,7 @@ void SystemD3D11::setIndexBuffer(const Buffer& value)
 
 void SystemD3D11::setTexture(std::shared_ptr<Texture> value)
 {
-	value->bindTexture();
+	Context->PSSetShaderResources(0, 1, &value->shader_resource_view);
 }
 
 void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)
@@ -225,7 +225,20 @@ void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)
 	}
 	else
 	{
-		value->bindRenderTarget();
+		ID3D11ShaderResourceView* prev_shader_resource_view;
+		Context->PSGetShaderResources(0, 1, &prev_shader_resource_view);
+
+		if (prev_shader_resource_view == value->shader_resource_view)
+		{
+			ID3D11ShaderResourceView* null[] = { nullptr };
+			Context->PSSetShaderResources(0, 1, null); // remove old shader view
+		}
+
+		if (prev_shader_resource_view)
+			prev_shader_resource_view->Release(); // avoid memory leak
+
+		Context->OMSetRenderTargets(1, &value->render_target_view, value->depth_stencil_view);
+
 		currentRenderTarget = value;
 	}
 }
@@ -327,27 +340,29 @@ void SystemD3D11::setTextureAddressMode(const TextureAddress& value)
 
 void SystemD3D11::clear(const glm::vec4& color) 
 {
-	if (currentRenderTarget == nullptr) 
+	auto rtv = renderTargetView;
+	auto dsv = depthStencilView;
+
+	if (currentRenderTarget != nullptr)
 	{
-		Context->ClearRenderTargetView(renderTargetView, (float*)&color);
-		Context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		rtv = currentRenderTarget->render_target_view;
+		dsv = currentRenderTarget->depth_stencil_view;
 	}
-	else
-	{
-		currentRenderTarget->clearRenderTarget(color);
-	}
+
+	Context->ClearRenderTargetView(rtv, (float*)&color);
+	Context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void SystemD3D11::clearStencil()
 {
-	if (currentRenderTarget == nullptr)
+	auto dsv = depthStencilView;
+	
+	if (currentRenderTarget != nullptr)
 	{
-		Context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_STENCIL, 1.0f, 0);
+		dsv = currentRenderTarget->depth_stencil_view;
 	}
-	else
-	{
-		currentRenderTarget->clearRenderTargetStencil();
-	}
+
+	Context->ClearDepthStencilView(dsv, D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void SystemD3D11::draw(size_t vertexCount, size_t vertexOffset)

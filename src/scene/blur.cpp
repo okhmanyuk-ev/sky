@@ -23,7 +23,7 @@ void Blur::draw()
 	if (size != mPrevSize)
 	{
 		mImage = std::make_shared<Graphics::Image>(size.x, size.y, 4);
-		mSprite->setTexture(std::make_shared<Renderer::Texture>(size.x, size.y, 4));
+		mSprite->setTexture(std::make_shared<Renderer::Texture>(size.x, size.y));
 		mPrevSize = size;
 	}
 

@@ -5,7 +5,7 @@
 
 using namespace Renderer;
 
-Texture::Texture(int width, int height, bool renderTarget) : mWidth(width), mHeight(height)
+Texture::Texture(int width, int height) : mWidth(width), mHeight(height)
 {
 	GLint last_texture;
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
@@ -48,19 +48,5 @@ void Texture::writePixels(int width, int height, int channels, void* data)
 
 	glBindTexture(GL_TEXTURE_2D, last_texture);
 }
-
-void Texture::bindTexture() const
-{
-	glBindTexture(GL_TEXTURE_2D, texture);
-}
-
-/*void Texture::writeFromBackbuffer()
-{
-	GLint last_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, PLATFORM->getWidth(), PLATFORM->getHeight(), 0);
-	glBindTexture(GL_TEXTURE_2D, last_texture);
-}*/
 
 #endif
