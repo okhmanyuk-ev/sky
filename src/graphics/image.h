@@ -21,9 +21,6 @@ namespace Graphics
 		uint8_t* getPixel(int x, int y) const;
 
 	public:
-		void blur(int radius);
-
-	public:
 		auto getMemory() const { return mMemory; }
 		auto getWidth() const { return mWidth; }
 		auto getHeight() const { return mHeight; }
