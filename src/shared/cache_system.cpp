@@ -175,7 +175,15 @@ void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>
 
 void CacheSystem::makeAtlases()
 {
-	auto json_file = Platform::Asset("atlases.json");
+	auto path = "atlases.json";
+
+	if (!Platform::Asset::Exists(path))
+	{
+		CONSOLE_DEVICE->writeLine("cannot find atlases.json");
+		return;
+	}
+
+	auto json_file = Platform::Asset(path);
 	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
 	auto json = nlohmann::json::parse(json_string);
 
