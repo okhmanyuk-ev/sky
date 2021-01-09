@@ -64,6 +64,7 @@ namespace Shared
 		TimeoutCallback mTimeoutCallback = nullptr;
 
 		Clock::TimePoint mTransmitTime = Clock::Now();
+		Clock::TimePoint mLazyTransmitTime = Clock::Now();
 		Clock::TimePoint mIncomingTime = Clock::Now();
 
 		uint32_t mOutgoingSequence = 0;

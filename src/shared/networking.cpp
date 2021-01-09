@@ -50,7 +50,7 @@ void Channel::frame()
 {
 	auto now = Clock::Now();
 
-	if (now - mIncomingTime >= Clock::FromSeconds(5))
+	if (now - mIncomingTime >= Clock::FromSeconds(30))
 	{
 		mTimeoutCallback();
 		return;
@@ -69,6 +69,13 @@ void Channel::transmit()
 	auto buf = Common::BitBuffer();
 
 	bool reliable = !mReliableMessages.empty() && mIncomingAcknowledgement >= mReliableSequence;
+
+	auto now = Clock::Now();
+
+	if (!reliable && mMessageWriters.empty() && now - mLazyTransmitTime < Clock::FromSeconds(5))
+		return; // nothing to send
+
+	mLazyTransmitTime = now;
 
 	if (reliable)
 	{
