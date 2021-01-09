@@ -36,11 +36,10 @@ System::~System()
 
 void System::frame()
 {
+	sockaddr_in adr;
 #if defined(PLATFORM_WINDOWS)
-	SOCKADDR_IN adr;
 	int adr_size = sizeof(adr);
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	sockaddr_in adr;
 	socklen_t adr_size = sizeof(adr);
 #endif
 
@@ -48,11 +47,8 @@ void System::frame()
 	{
 		while (true)
 		{
-#if defined(PLATFORM_WINDOWS)
-			int size = recvfrom(socket->socket, mBuffer, 8192, 0, (SOCKADDR*)&adr, &adr_size);
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 			int size = recvfrom(socket->socket, mBuffer, 8192, 0, (sockaddr*)&adr, &adr_size);
-#endif
+
 			if (size == -1)
 				break;
 
@@ -62,6 +58,7 @@ void System::frame()
 			packet.adr.port = ntohs(adr.sin_port);
 
 			packet.buf.write(mBuffer, size);
+			packet.buf.toStart();
 
 			if (socket->readCallback)
 				socket->readCallback(packet);
@@ -85,11 +82,10 @@ System::SocketHandle System::createSocket(uint16_t port)
 		//	throw std::runtime_error("error while creating socket");
 	}
 
+	sockaddr_in adr;
 #if defined(PLATFORM_WINDOWS)
-	SOCKADDR_IN adr;
 	int adr_size = sizeof(adr);
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	sockaddr_in adr;
 	socklen_t adr_size = sizeof(adr);
 #endif
 	adr.sin_family = AF_INET;
