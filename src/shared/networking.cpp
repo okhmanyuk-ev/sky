@@ -20,10 +20,7 @@ void Networking::readPacket(Network::Packet& packet)
 	auto msg = packet.buf.readBitsVar();
 
 	if (mMessages.count(msg) == 0)
-	{
-		LOG("unknown message type " + std::to_string((int)msg) + " from " + packet.adr.toString());
-		return;
-	}
+		throw std::exception(("unknown message type " + std::to_string((int)msg) + " from " + packet.adr.toString()).c_str());
 
 	mMessages.at(msg)(packet);
 }
@@ -59,7 +56,7 @@ void Channel::frame()
 		return;
 	}
 
-	if (now - mTransmitTime < Clock::FromMilliseconds(1000))
+	if (now - mTransmitTime < Clock::FromMilliseconds(10))
 		return;
 
 	mTransmitTime = now;
@@ -88,8 +85,20 @@ void Channel::transmit()
 
 	if (reliable)
 	{
-		Common::BufferHelpers::WriteToBuffer(*mReliableMessages.front(), buf);
+		auto [msg, _buf] = mReliableMessages.front();
+		buf.writeBit(true);
+		buf.writeBitsVar(msg);
+		Common::BufferHelpers::WriteToBuffer(*_buf, buf);
 	}
+
+	for (auto& [msg, callback] : mMessageWriters)
+	{
+		buf.writeBit(true);
+		buf.writeBitsVar(msg);
+		callback(buf);
+	}
+
+	buf.writeBit(false);
 
 	mSendCallback(buf);
 }
@@ -116,12 +125,37 @@ void Channel::read(Common::BitBuffer& buf)
 		mIncomingReliableAcknowledgement = rel_ack;
 	}
 
+	while (buf.readBit())
+	{
+		auto msg = buf.readBitsVar();
+
+		if (mMessageReaders.count(msg) == 0)
+			throw std::exception(("unknown message type in channel: " + std::to_string((int)msg)).c_str());
+
+		mMessageReaders.at(msg)(buf);
+	}
+
+	//LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + 
+	//	", rel_seq: " + std::to_string(rel_seq) + ", rel_ack: " + std::to_string(rel_ack));
+
 	mIncomingTime = Clock::Now();
 }
 
-void Channel::sendReliable(Common::BitBuffer& buf)
+void Channel::sendReliable(uint32_t msg, Common::BitBuffer& buf)
 {
-	mReliableMessages.push_back(std::make_shared<Common::BitBuffer>(buf));
+	mReliableMessages.push_back({ msg, std::make_shared<Common::BitBuffer>(buf) });
+}
+
+void Channel::addMessageReader(uint32_t msg, ReadCallback callback)
+{
+	assert(mMessageReaders.count(msg) == 0);
+	mMessageReaders.insert({ msg, callback });
+}
+
+void Channel::addMessageWriter(uint32_t msg, WriteCallback callback)
+{
+	assert(mMessageWriters.count(msg) == 0);
+	mMessageWriters.insert({ msg, callback });
 }
 
 // server
@@ -145,6 +179,17 @@ Server::Server(uint16_t port) : Networking(port)
 			LOG(adr.toString() + " timed out");
 			mChannels.erase(adr);
 		});
+		channel->addMessageReader((uint32_t)Client::Message::Event, [this](auto& buf) {
+			auto name = Common::BufferHelpers::ReadString(buf);
+			auto params = std::map<std::string, std::string>();
+			while (buf.readBit())
+			{
+				auto key = Common::BufferHelpers::ReadString(buf);
+				auto value = Common::BufferHelpers::ReadString(buf);
+				params.insert({ key, value });
+			}
+			onEvent(name, params);
+		});
 		mChannels[adr] = channel;
 	});
 	addMessage((uint32_t)Message::Regular, [this](auto& packet) {
@@ -160,26 +205,46 @@ Server::Server(uint16_t port) : Networking(port)
 Client::Client(const Network::Address& server_address) :
 	mServerAddress(server_address)
 {
-	addMessage((uint32_t)Message::Connect, [this](auto& packet) {
+	addMessage((uint32_t)Networking::Message::Connect, [this](auto& packet) {
 		LOG("connected");
 
 		assert(!mChannel);
 		mChannel = std::make_shared<Channel>();
 		mChannel->setSendCallback([this](auto& buf) {
-			sendMessage((uint32_t)Message::Regular, mServerAddress, buf);
+			sendMessage((uint32_t)Networking::Message::Regular, mServerAddress, buf);
 		});
 		mChannel->setTimeoutCallback([this] {
 			mChannel = nullptr;
 			LOG("server timed out");
 		});
 	});
-	addMessage((uint32_t)Message::Regular, [this](auto& packet) {
+	addMessage((uint32_t)Networking::Message::Regular, [this](auto& packet) {
+		if (!mChannel)
+			return;
+
 		if (packet.adr != mServerAddress)
 			return;
 
 		mChannel->read(packet.buf);
 	});
 
-	sendMessage((uint32_t)Message::Connect, mServerAddress);
+	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress);
 	LOG("connecting to " + mServerAddress.toString());
+}
+
+void Client::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
+{
+	auto buf = Common::BitBuffer();
+	Common::BufferHelpers::WriteString(buf, name);
+
+	for (auto& [key, value] : params)
+	{
+		buf.writeBit(true);
+		Common::BufferHelpers::WriteString(buf, key);
+		Common::BufferHelpers::WriteString(buf, value);
+	}
+
+	buf.writeBit(false);
+
+	mChannel->sendReliable((uint32_t)Message::Event, buf);
 }
