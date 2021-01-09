@@ -71,6 +71,9 @@ void BitBuffer::ensureCapacity(size_t value)
 
 uint32_t BitBuffer::readBits(int size)
 {
+	if (!hasRemaining())
+		throw std::exception("readBits: no remaining space");
+
 	assert(size >= 0);
 	assert(size <= 32);
 
