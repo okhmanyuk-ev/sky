@@ -5,10 +5,22 @@
 
 using namespace Common;
 
+BitBuffer::BitBuffer()
+{
+	//
+}
+
+BitBuffer::BitBuffer(BitBuffer& bitbuffer) : BitBuffer()
+{
+	write(bitbuffer.getMemory(), bitbuffer.getSize());
+	setPosition(bitbuffer.getPosition());
+	setBitPosition(bitbuffer.getBitPosition());
+}
+
 BitBuffer::~BitBuffer()
 {
 	if (mMemory != nullptr)
-        free(mMemory);
+		free(mMemory);
 }
 
 void BitBuffer::clear()
@@ -34,17 +46,17 @@ void BitBuffer::fill(uint8_t value)
 
 void BitBuffer::ensureSpace(size_t value)
 {
-    value += mPosition;
-    
-    if (mSize >= value)
-        return;
-    
-    setSize(value);
+	value += mPosition;
+
+	if (mSize >= value)
+		return;
+
+	setSize(value);
 }
 
 void BitBuffer::setSize(size_t value)
 {
-    ensureCapacity(value + 4);
+	ensureCapacity(value + 4);
 	mSize = value;
 }
 
@@ -52,8 +64,8 @@ void BitBuffer::ensureCapacity(size_t value)
 {
 	if (mCapacity >= value)
 		return;
-    
-    mCapacity = value * 2;
+
+	mCapacity = value * 2;
 	mMemory = realloc(mMemory, mCapacity);
 }
 
@@ -113,8 +125,8 @@ void BitBuffer::writeBits(uint32_t value, int size)
 
 	auto& src_value = *(uint32_t*)((size_t)mMemory + mPosition);
 	auto row = (1U << mBitPosition) - 1;
-    
-    src_value = (src_value & row) | (value << mBitPosition);
+
+	src_value = (src_value & row) | (value << mBitPosition);
 
 	if (bit_count > 0)
 		mBitPosition = bit_count;

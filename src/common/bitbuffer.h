@@ -16,6 +16,8 @@ namespace Common
 		};
 
 	public:
+		BitBuffer();
+		BitBuffer(BitBuffer& bitbuffer);
 		~BitBuffer();
 
 	public:
@@ -25,7 +27,7 @@ namespace Common
 
 		void fill(uint8_t value);
 		void ensureSpace(size_t value);
-        void ensureCapacity(size_t value);
+		void ensureCapacity(size_t value);
 
 		uint32_t readBits(int size);
 		void writeBits(uint32_t value, int size);
