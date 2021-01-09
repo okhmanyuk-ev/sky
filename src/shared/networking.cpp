@@ -6,39 +6,6 @@
 
 using namespace Shared;
 
-// networking
-
-Networking::Networking(uint16_t port) : mSocket(port)
-{
-	mSocket.setReadCallback([this](auto& packet) {
-		readPacket(packet);
-	});
-}
-
-void Networking::readPacket(Network::Packet& packet)
-{
-	auto msg = packet.buf.readBitsVar();
-
-	if (mMessages.count(msg) == 0)
-		throw std::exception(("unknown message type " + std::to_string((int)msg) + " from " + packet.adr.toString()).c_str());
-
-	mMessages.at(msg)(packet);
-}
-
-void Networking::addMessage(uint32_t msg, ReadCallback callback)
-{
-	assert(mMessages.count(msg) == 0);
-	mMessages.insert({ msg, callback });
-}
-
-void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const Common::BitBuffer& _buf)
-{
-	auto buf = Common::BitBuffer();
-	buf.writeBitsVar(msg);
-	buf.write(_buf.getMemory(), _buf.getSize());
-	mSocket.sendPacket({ adr, buf });
-}
-
 // channel
 
 Channel::Channel()
@@ -56,7 +23,7 @@ void Channel::frame()
 		return;
 	}
 
-	if (now - mTransmitTime < Clock::FromMilliseconds(10))
+	if (now - mTransmitTime < Clock::FromMilliseconds(10)) // TODO: make dynamic pps
 		return;
 
 	mTransmitTime = now;
@@ -66,16 +33,11 @@ void Channel::frame()
 
 void Channel::transmit()
 {
+	mOutgoingSequence += 1;
+
 	auto buf = Common::BitBuffer();
 
 	bool reliable = !mReliableMessages.empty() && mIncomingAcknowledgement >= mReliableSequence;
-
-	auto now = Clock::Now();
-
-	if (!reliable && mMessageWriters.empty() && now - mLazyTransmitTime < Clock::FromSeconds(5))
-		return; // nothing to send
-
-	mLazyTransmitTime = now;
 
 	if (reliable)
 	{
@@ -87,8 +49,6 @@ void Channel::transmit()
 	buf.writeBitsVar(mIncomingSequence);
 	buf.writeBit(mOutgoingReliableSequence);
 	buf.writeBit(mIncomingReliableSequence);
-
-	mOutgoingSequence += 1;
 
 	if (reliable)
 	{
@@ -163,6 +123,39 @@ void Channel::addMessageWriter(uint32_t msg, WriteCallback callback)
 {
 	assert(mMessageWriters.count(msg) == 0);
 	mMessageWriters.insert({ msg, callback });
+}
+
+// networking
+
+Networking::Networking(uint16_t port) : mSocket(port)
+{
+	mSocket.setReadCallback([this](auto& packet) {
+		readPacket(packet);
+	});
+}
+
+void Networking::readPacket(Network::Packet& packet)
+{
+	auto msg = packet.buf.readBitsVar();
+
+	if (mMessages.count(msg) == 0)
+		throw std::exception(("unknown message type " + std::to_string((int)msg) + " from " + packet.adr.toString()).c_str());
+
+	mMessages.at(msg)(packet);
+}
+
+void Networking::addMessage(uint32_t msg, ReadCallback callback)
+{
+	assert(mMessages.count(msg) == 0);
+	mMessages.insert({ msg, callback });
+}
+
+void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const Common::BitBuffer& _buf)
+{
+	auto buf = Common::BitBuffer();
+	buf.writeBitsVar(msg);
+	buf.write(_buf.getMemory(), _buf.getSize());
+	mSocket.sendPacket({ adr, buf });
 }
 
 // server
