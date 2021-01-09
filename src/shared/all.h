@@ -46,5 +46,6 @@
 #include <shared/scene_stylebook.h>
 #include <shared/helpers.h>
 #include <shared/profile.h>
+#include <shared/server.h>
 
 #include <network/system.h>
