@@ -3,14 +3,15 @@
 #include <core/engine.h>
 #include <network/system.h>
 
-#define SERVER ENGINE->getSystem<Shared::Server>()
-#define CLIENT ENGINE->getSystem<Shared::Client>()
-
 namespace Shared
 {
 	class Server
 	{
-		//
+	public:
+		Server(uint16_t port);
+
+	private:
+		Network::Socket mSocket;
 	};
 
 	class Client

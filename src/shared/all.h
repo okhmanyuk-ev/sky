@@ -15,6 +15,8 @@
 #include <common/hash.h>
 #include <common/actions.h>
 #include <common/frame_system.h>
+#include <common/native_console_device.h>
+#include <common/size_converter.h>
 
 #include <audio/system.h>
 #include <audio/sound.h>
