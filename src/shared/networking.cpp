@@ -9,7 +9,7 @@
 
 // #define NET_STATS(KEY, VALUE) STATS_INDICATE_GROUP("net", KEY, VALUE) // TODO: make workable in server app
 
-using namespace Shared;
+using namespace Shared::Networking;
 
 // channel
 
@@ -275,6 +275,23 @@ Server::Channel::Channel()
 	});
 }
 
+void Server::Channel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
+{
+	auto buf = Common::BitBuffer();
+	Common::BufferHelpers::WriteString(buf, name);
+
+	for (auto& [key, value] : params)
+	{
+		buf.writeBit(true);
+		Common::BufferHelpers::WriteString(buf, key);
+		Common::BufferHelpers::WriteString(buf, value);
+	}
+
+	buf.writeBit(false);
+
+	sendReliable((uint32_t)Message::Event, buf);
+}
+
 // client
 
 Client::Client(const Network::Address& server_address) :
@@ -291,6 +308,17 @@ Client::Client(const Network::Address& server_address) :
 		mChannel->setDisconnectCallback([this](const auto& reason) {
 			mChannel = nullptr;
 			LOG("disconnected (" + reason + ")");
+		});
+		mChannel->addMessageReader((uint32_t)Client::Message::Event, [this](auto& buf) {
+			auto name = Common::BufferHelpers::ReadString(buf);
+			auto params = std::map<std::string, std::string>();
+			while (buf.readBit())
+			{
+				auto key = Common::BufferHelpers::ReadString(buf);
+				auto value = Common::BufferHelpers::ReadString(buf);
+				params.insert({ key, value });
+			}
+			onEvent(name, params);
 		});
 	});
 	addMessage((uint32_t)Networking::Message::Regular, [this](auto& packet) {

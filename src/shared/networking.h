@@ -5,7 +5,7 @@
 #include <map>
 #include <common/hash.h>
 
-namespace Shared
+namespace Shared::Networking
 {
 	class Networking
 	{
@@ -51,7 +51,6 @@ namespace Shared
 		void awake();
 		bool awaitingReliableAcknowledgement() const;
 		
-
 	public:
 		void read(Common::BitBuffer& buf);
 		void sendReliable(uint32_t msg, Common::BitBuffer& buf); // TODO: rename to writeReliableMessage
@@ -121,10 +120,19 @@ namespace Shared
 		std::unordered_map<Network::Address, std::shared_ptr<Channel>, AddressHasher> mChannels;
 	};
 
-	class Server::Channel : public Shared::Channel
+	class Server::Channel : public Shared::Networking::Channel
 	{
 	public:
+		enum class Message : uint32_t // Server -> Client
+		{
+			Event = 0
+		};
+
+	public:
 		Channel();
+
+	public:
+		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params);
 
 	protected:
 		virtual void onEvent(const std::string& name, const std::map<std::string, std::string>& params) = 0;
@@ -150,6 +158,9 @@ namespace Shared
 
 	public:
 		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params);
+
+	protected:
+		virtual void onEvent(const std::string& name, const std::map<std::string, std::string>& params) = 0;
 
 	public:
 		bool isConnected() const { return mChannel != nullptr; }
