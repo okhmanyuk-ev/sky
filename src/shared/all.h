@@ -16,7 +16,7 @@
 #include <common/actions.h>
 #include <common/frame_system.h>
 #include <common/native_console_device.h>
-#include <common/size_converter.h>
+#include <common/helpers.h>
 
 #include <audio/system.h>
 #include <audio/sound.h>
@@ -46,7 +46,6 @@
 #include <shared/scene_manager.h>
 #include <shared/scene_editor.h>
 #include <shared/scene_stylebook.h>
-#include <shared/helpers.h>
 #include <shared/profile.h>
 #include <shared/networking.h>
 

@@ -9,6 +9,7 @@ namespace Shared::Helpers
 {
 	std::string SecondsToFmtString(int seconds);
 	bool Chance(float normalized_percent);
+	std::string SizeToNiceString(uint64_t value);
 
 	inline const float RadialLimit = glm::pi<float>() * 2.0f;
 
