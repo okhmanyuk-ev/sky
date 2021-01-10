@@ -17,6 +17,8 @@
 #include <common/frame_system.h>
 #include <common/native_console_device.h>
 #include <common/helpers.h>
+#include <common/bitbuffer.h>
+#include <common/buffer_helpers.h>
 
 #include <audio/system.h>
 #include <audio/sound.h>

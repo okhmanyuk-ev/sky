@@ -263,40 +263,6 @@ Server::Server(uint16_t port) : Networking(port)
 	});
 }
 
-// server channel
-
-Server::Channel::Channel()
-{
-	addMessageReader((uint32_t)Client::Message::Event, [this](auto& buf) {
-		auto name = Common::BufferHelpers::ReadString(buf);
-		auto params = std::map<std::string, std::string>();
-		while (buf.readBit())
-		{
-			auto key = Common::BufferHelpers::ReadString(buf);
-			auto value = Common::BufferHelpers::ReadString(buf);
-			params.insert({ key, value });
-		}
-		onEvent(name, params);
-	});
-}
-
-void Server::Channel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
-{
-	auto buf = Common::BitBuffer();
-	Common::BufferHelpers::WriteString(buf, name);
-
-	for (auto& [key, value] : params)
-	{
-		buf.writeBit(true);
-		Common::BufferHelpers::WriteString(buf, key);
-		Common::BufferHelpers::WriteString(buf, value);
-	}
-
-	buf.writeBit(false);
-
-	sendReliable((uint32_t)Message::Event, buf);
-}
-
 // client
 
 Client::Client(const Network::Address& server_address) :
@@ -306,24 +272,13 @@ Client::Client(const Network::Address& server_address) :
 		LOG("connected");
 
 		assert(!mChannel);
-		mChannel = std::make_shared<Channel>();
+		mChannel = createChannel();
 		mChannel->setSendCallback([this](auto& buf) {
 			sendMessage((uint32_t)Networking::Message::Regular, mServerAddress, buf);
 		});
 		mChannel->setDisconnectCallback([this](const auto& reason) {
 			mChannel = nullptr;
 			LOG("disconnected (" + reason + ")");
-		});
-		mChannel->addMessageReader((uint32_t)Client::Message::Event, [this](auto& buf) {
-			auto name = Common::BufferHelpers::ReadString(buf);
-			auto params = std::map<std::string, std::string>();
-			while (buf.readBit())
-			{
-				auto key = Common::BufferHelpers::ReadString(buf);
-				auto value = Common::BufferHelpers::ReadString(buf);
-				params.insert({ key, value });
-			}
-			onEvent(name, params);
 		});
 	});
 	addMessage((uint32_t)Networking::Message::Regular, [this](auto& packet) {
@@ -366,24 +321,4 @@ void Client::connect()
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
 	// LOG("connecting to " + mServerAddress.toString());
 	mConnectTime = Clock::Now();
-}
-
-void Client::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
-{
-	if (!mChannel)
-		return; // TODO: what we should do in this case ?
-
-	auto buf = Common::BitBuffer();
-	Common::BufferHelpers::WriteString(buf, name);
-
-	for (auto& [key, value] : params)
-	{
-		buf.writeBit(true);
-		Common::BufferHelpers::WriteString(buf, key);
-		Common::BufferHelpers::WriteString(buf, value);
-	}
-
-	buf.writeBit(false);
-
-	mChannel->sendReliable((uint32_t)Message::Event, buf);
 }

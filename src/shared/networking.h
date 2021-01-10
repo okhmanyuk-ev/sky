@@ -97,13 +97,10 @@ namespace Shared::Networking
 	class Server : public Networking
 	{
 	public:
-		class Channel;
-
-	public:
 		Server(uint16_t port);
 
-	public:
-		virtual std::shared_ptr<Server::Channel> createChannel() = 0;
+	protected:
+		virtual std::shared_ptr<Channel> createChannel() = 0;
 
 	public:
 		size_t getClientsCount() const { return mChannels.size(); }
@@ -125,35 +122,14 @@ namespace Shared::Networking
 		std::unordered_map<Network::Address, std::shared_ptr<Channel>, AddressHasher> mChannels;
 	};
 
-	class Server::Channel : public Shared::Networking::Channel
-	{
-	public:
-		enum class Message : uint32_t // Server -> Client
-		{
-			Event = 0
-		};
-
-	public:
-		Channel();
-
-	public:
-		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params);
-
-	protected:
-		virtual void onEvent(const std::string& name, const std::map<std::string, std::string>& params) = 0;
-	};
-
 	class Client : public Networking,
 		public Common::FrameSystem::Frameable
 	{
 	public:
-		enum class Message : uint32_t // Client -> Server
-		{
-			Event = 0
-		};
-
-	public:
 		Client(const Network::Address& server_address);
+
+	protected:
+		virtual std::shared_ptr<Channel> createChannel() = 0;
 
 	public:
 		void frame() override;
@@ -162,13 +138,8 @@ namespace Shared::Networking
 		void connect();
 
 	public:
-		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params);
-
-	protected:
-		virtual void onEvent(const std::string& name, const std::map<std::string, std::string>& params) = 0;
-
-	public:
 		bool isConnected() const { return mChannel != nullptr; }
+		auto getChannel() const { return mChannel; }
 
 	private:
 		Network::Address mServerAddress;
