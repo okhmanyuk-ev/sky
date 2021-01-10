@@ -3,6 +3,11 @@
 #include <common/size_converter.h>
 #include <common/buffer_helpers.h>
 #include <common/actions.h>
+#include <shared/stats_system.h>
+#include <console/system.h>
+#include <common/console_commands.h>
+
+// #define NET_STATS(KEY, VALUE) STATS_INDICATE_GROUP("net", KEY, VALUE) // TODO: make workable in server app
 
 using namespace Shared;
 
@@ -10,20 +15,36 @@ using namespace Shared;
 
 Channel::Channel()
 {
-	//
+	//CONSOLE->registerCommand("asd", [this](CON_ARGS) {
+	//	mIncomingReliableAcknowledgement = !mIncomingReliableAcknowledgement;
+	//});
 }
 
 void Channel::frame()
 {
 	auto now = Clock::Now();
 
-	if (now - mIncomingTime >= Clock::FromSeconds(30))
+	if (now - mIncomingTime >= mTimeoutDuration)
 	{
-		mTimeoutCallback();
+		disconnect("timed out");
 		return;
 	}
 
-	if (now - mTransmitTime < Clock::FromMilliseconds(10)) // TODO: make dynamic pps
+	if (!mMessageWriters.empty()) // we want stream data with loss
+		awake();
+
+	if (!mReliableMessages.empty() && !awaitingReliableAcknowledgement()) // we want send reliable
+		awake();
+
+	auto durationSinceAwake = Clock::ToSeconds(now - mAwakeTime);
+	mTransmitDuration = (durationSinceAwake - 0.25f) / 5.0f;
+	mTransmitDuration = glm::clamp(mTransmitDuration, 0.0f, 1.0f);
+
+	auto min_duration = Clock::ToSeconds(mTransmitDurationMin);
+	auto max_duration = Clock::ToSeconds(mTransmitDurationMax);
+	auto transmit_duration = Clock::FromSeconds(glm::lerp(min_duration, max_duration, mTransmitDuration));
+
+	if (now - mTransmitTime < transmit_duration)
 		return;
 
 	mTransmitTime = now;
@@ -37,7 +58,7 @@ void Channel::transmit()
 
 	auto buf = Common::BitBuffer();
 
-	bool reliable = !mReliableMessages.empty() && mIncomingAcknowledgement >= mReliableSequence;
+	bool reliable = !mReliableMessages.empty() && !awaitingReliableAcknowledgement();
 
 	if (reliable)
 	{
@@ -70,6 +91,16 @@ void Channel::transmit()
 	mSendCallback(buf);
 }
 
+void Channel::awake()
+{
+	mAwakeTime = Clock::Now();
+}
+
+bool Channel::awaitingReliableAcknowledgement() const
+{
+	return mIncomingAcknowledgement < mReliableSequence;
+}
+
 void Channel::read(Common::BitBuffer& buf)
 {
 	auto seq = buf.readBitsVar();
@@ -78,17 +109,29 @@ void Channel::read(Common::BitBuffer& buf)
 	auto rel_ack = buf.readBit();
 
 	if (seq <= mIncomingSequence)
+	{
+		LOG("out of order " + std::to_string(seq - mIncomingSequence) + " packet(s)"); // TODO: del
 		return; // out of order or duplicated packet
+	}
+
+	if (seq - mIncomingSequence > 1)
+		LOG("dropped " + std::to_string(seq - mIncomingSequence) + " packet(s)"); // TODO: del
 
 	mIncomingSequence = seq;
 	mIncomingAcknowledgement = ack;
 
 	if (rel_seq != mIncomingReliableSequence) // reliable received
-		mIncomingReliableSequence = rel_seq;
-
-	if (mIncomingAcknowledgement >= mReliableSequence && rel_ack != mIncomingReliableAcknowledgement) // reliable delivered
 	{
-		mReliableMessages.pop_front();
+		mIncomingReliableSequence = rel_seq;
+		awake(); // we want answer as soon as possible
+	}
+
+	if (!awaitingReliableAcknowledgement() && rel_ack != mIncomingReliableAcknowledgement) // reliable delivered
+	{
+		if (!mReliableMessages.empty())
+		{
+			mReliableMessages.pop_front();
+		}
 		mIncomingReliableAcknowledgement = rel_ack;
 	}
 
@@ -102,8 +145,8 @@ void Channel::read(Common::BitBuffer& buf)
 		mMessageReaders.at(msg)(buf);
 	}
 
-	//LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + 
-	//	", rel_seq: " + std::to_string(rel_seq) + ", rel_ack: " + std::to_string(rel_ack));
+	LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) +
+		", rel_seq: " + std::to_string(rel_seq) + ", rel_ack: " + std::to_string(rel_ack));
 
 	mIncomingTime = Clock::Now();
 }
@@ -123,6 +166,11 @@ void Channel::addMessageWriter(uint32_t msg, WriteCallback callback)
 {
 	assert(mMessageWriters.count(msg) == 0);
 	mMessageWriters.insert({ msg, callback });
+}
+
+void Channel::disconnect(const std::string& reason)
+{
+	mDisconnectCallback(reason);
 }
 
 // networking
@@ -175,8 +223,8 @@ Server::Server(uint16_t port) : Networking(port)
 		channel->setSendCallback([this, adr](auto& buf) {
 			sendMessage((uint32_t)Message::Regular, adr, buf);
 		});
-		channel->setTimeoutCallback([this, adr] {
-			LOG(adr.toString() + " timed out");
+		channel->setDisconnectCallback([this, adr](const auto& reason) {
+			LOG(adr.toString() + " disconnected (" + reason + ")");
 			mChannels.erase(adr);
 		});
 		channel->addMessageReader((uint32_t)Client::Message::Event, [this](auto& buf) {
@@ -196,7 +244,16 @@ Server::Server(uint16_t port) : Networking(port)
 		if (mChannels.count(packet.adr) == 0)
 			return;
 
-		mChannels.at(packet.adr)->read(packet.buf);
+		auto channel = mChannels.at(packet.adr);
+
+		try
+		{
+			channel->read(packet.buf);
+		}
+		catch (std::exception& e)
+		{
+			channel->disconnect(e.what());
+		}
 	});
 }
 
@@ -213,9 +270,9 @@ Client::Client(const Network::Address& server_address) :
 		mChannel->setSendCallback([this](auto& buf) {
 			sendMessage((uint32_t)Networking::Message::Regular, mServerAddress, buf);
 		});
-		mChannel->setTimeoutCallback([this] {
+		mChannel->setDisconnectCallback([this](const auto& reason) {
 			mChannel = nullptr;
-			LOG("server timed out");
+			LOG("disconnected (" + reason + ")");
 		});
 	});
 	addMessage((uint32_t)Networking::Message::Regular, [this](auto& packet) {
@@ -225,7 +282,14 @@ Client::Client(const Network::Address& server_address) :
 		if (packet.adr != mServerAddress)
 			return;
 
-		mChannel->read(packet.buf);
+		try
+		{
+			mChannel->read(packet.buf);
+		}
+		catch (std::exception& e)
+		{
+			mChannel->disconnect(e.what());
+		}
 	});
 
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress);

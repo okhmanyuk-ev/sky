@@ -40,7 +40,7 @@ namespace Shared
 		using ReadCallback = std::function<void(Common::BitBuffer&)>;
 		using WriteCallback = std::function<void(Common::BitBuffer&)>;
 		using SendCallback = std::function<void(Common::BitBuffer&)>;
-		using TimeoutCallback = std::function<void()>;
+		using DisconnectCallback = std::function<void(const std::string& reason)>;
 
 	public:
 		Channel();
@@ -48,20 +48,31 @@ namespace Shared
 	private:
 		void frame() override;
 		void transmit();
+		void awake();
+		bool awaitingReliableAcknowledgement() const;
+		
 
 	public:
 		void read(Common::BitBuffer& buf);
-		void sendReliable(uint32_t msg, Common::BitBuffer& buf);
+		void sendReliable(uint32_t msg, Common::BitBuffer& buf); // TODO: rename to writeReliableMessage
 		void addMessageReader(uint32_t msg, ReadCallback callback);
 		void addMessageWriter(uint32_t msg, WriteCallback callback);
+		void disconnect(const std::string& reason);
+
+	private:
+		Clock::Duration mTimeoutDuration = Clock::FromSeconds(30);
+		Clock::Duration mTransmitDurationMin = Clock::FromMilliseconds(10);
+		Clock::Duration mTransmitDurationMax = Clock::FromMilliseconds(2000);
+		float mTransmitDuration = 0.0f; // min(0.0)..max(1.0)
+		Clock::TimePoint mAwakeTime = Clock::Now();
 
 	public:
 		void setSendCallback(SendCallback value) { mSendCallback = value; }
-		void setTimeoutCallback(TimeoutCallback value) { mTimeoutCallback = value; }
+		void setDisconnectCallback(DisconnectCallback value) { mDisconnectCallback = value; }
 
 	private:
 		SendCallback mSendCallback = nullptr;
-		TimeoutCallback mTimeoutCallback = nullptr;
+		DisconnectCallback mDisconnectCallback = nullptr;
 
 		Clock::TimePoint mTransmitTime = Clock::Now();
 		Clock::TimePoint mIncomingTime = Clock::Now();
