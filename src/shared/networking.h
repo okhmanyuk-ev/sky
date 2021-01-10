@@ -105,6 +105,8 @@ namespace Shared::Networking
 	public:
 		size_t getClientsCount() const { return mChannels.size(); }
 
+		auto getChannels() const { return mChannels; }
+
 	private:
 		struct AddressHasher
 		{
