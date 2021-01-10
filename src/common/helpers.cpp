@@ -1,6 +1,6 @@
 #include "helpers.h"
 
-using namespace Shared;
+using namespace Common;
 
 std::string Helpers::SecondsToFmtString(int seconds)
 {
@@ -16,7 +16,7 @@ bool Helpers::Chance(float normalized_percent)
 	return glm::linearRand(0.0f, 1.0f) <= normalized_percent;
 }
 
-std::string Helpers::SizeToNiceString(uint64_t value) // we need uint128_t here
+std::string Helpers::BytesToNiceString(uint64_t value) // we need uint128_t here
 {
 	int q = 0;
 	std::string l = "b";

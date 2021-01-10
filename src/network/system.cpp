@@ -22,6 +22,19 @@ System::System()
 	WSAData wsa;
 	WSAStartup(MAKEWORD(2, 2), &wsa);
 #endif
+
+	mPacketsPerSecondTimer.setInterval(Clock::FromSeconds(1.0f));
+	mPacketsPerSecondTimer.setCallback([this] {
+		mIncomingPacketsPerSecond = mIncomingPacketsCount - mPrevIncomingPacketsPerSecond;
+		mOutgoingPacketsPerSecond = mOutgoingPacketsCount - mPrevOutgoingPacketsPerSecond;
+		mPrevIncomingPacketsPerSecond = mIncomingPacketsCount;
+		mPrevOutgoingPacketsPerSecond = mOutgoingPacketsCount;
+
+		mIncomingBytesPerSecond = mIncomingBytesCount - mPrevIncomingBytesPerSecond;
+		mOutgoingBytesPerSecond = mOutgoingBytesCount - mPrevOutgoingBytesPerSecond;
+		mPrevIncomingBytesPerSecond = mIncomingBytesCount;
+		mPrevOutgoingBytesPerSecond = mOutgoingBytesCount;
+	});
 }
 
 System::~System()
@@ -62,6 +75,9 @@ void System::frame()
 
 			if (socket->readCallback)
 				socket->readCallback(packet);
+
+			mIncomingPacketsCount += 1;
+			mIncomingBytesCount += size;
 		}
 	}
 }
@@ -162,6 +178,9 @@ void System::sendPacket(SocketHandle handle, const Packet& packet)
 	sendto(socket_data->socket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
 		(sockaddr*)&adr, sizeof(adr));
 #endif
+
+	mOutgoingPacketsCount += 1;
+	mOutgoingBytesCount += packet.buf.getSize();
 }
 
 void System::setReadCallback(SocketHandle handle, ReadCallback value)

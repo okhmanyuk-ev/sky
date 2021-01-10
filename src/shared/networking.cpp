@@ -1,6 +1,6 @@
 #include "networking.h"
 #include <console/device.h>
-#include <common/size_converter.h>
+#include <common/helpers.h>
 #include <common/buffer_helpers.h>
 #include <common/actions.h>
 #include <shared/stats_system.h>
@@ -145,8 +145,8 @@ void Channel::read(Common::BitBuffer& buf)
 		mMessageReaders.at(msg)(buf);
 	}
 
-	LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) +
-		", rel_seq: " + std::to_string(rel_seq) + ", rel_ack: " + std::to_string(rel_ack));
+	//LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) +
+	//	", rel_seq: " + std::to_string(rel_seq) + ", rel_ack: " + std::to_string(rel_ack));
 
 	mIncomingTime = Clock::Now();
 }
@@ -323,7 +323,7 @@ void Client::frame()
 void Client::connect()
 {
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress);
-	LOG("connecting to " + mServerAddress.toString());
+	// LOG("connecting to " + mServerAddress.toString());
 	mConnectTime = Clock::Now();
 }
 

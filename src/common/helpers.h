@@ -5,11 +5,11 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-namespace Shared::Helpers
+namespace Common::Helpers
 {
 	std::string SecondsToFmtString(int seconds);
 	bool Chance(float normalized_percent);
-	std::string SizeToNiceString(uint64_t value);
+	std::string BytesToNiceString(uint64_t value);
 
 	inline const float RadialLimit = glm::pi<float>() * 2.0f;
 
