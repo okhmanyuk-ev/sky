@@ -35,7 +35,7 @@ namespace Common
 		bool readBit();
 		void writeBit(bool value);
 
-		static uint32_t bitsFor(uint32_t value);
+		static uint32_t BitsFor(uint32_t value);
 
 		uint32_t readBitsFor(uint32_t max);
 		void writeBitsFor(uint32_t value, uint32_t max);

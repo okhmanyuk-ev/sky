@@ -152,7 +152,7 @@ void BitBuffer::writeBit(bool value)
 	writeBits(value ? 1 : 0, 1);
 }
 
-uint32_t BitBuffer::bitsFor(uint32_t value)
+uint32_t BitBuffer::BitsFor(uint32_t value)
 {
 	uint32_t result = 0;
 	while (value)
@@ -165,12 +165,12 @@ uint32_t BitBuffer::bitsFor(uint32_t value)
 
 uint32_t BitBuffer::readBitsFor(uint32_t max)
 {
-	return readBits(bitsFor(max));
+	return readBits(BitsFor(max));
 }
 
 void BitBuffer::writeBitsFor(uint32_t value, uint32_t max)
 {
-	writeBits(value, bitsFor(max));
+	writeBits(value, BitsFor(max));
 }
 
 uint32_t BitBuffer::readBitsVar()
@@ -180,7 +180,7 @@ uint32_t BitBuffer::readBitsVar()
 
 void BitBuffer::writeBitsVar(uint32_t value)
 {
-	writeBitsFor(bitsFor(value), 32);
+	writeBitsFor(BitsFor(value), 32);
 	writeBitsFor(value, value);
 }
 
