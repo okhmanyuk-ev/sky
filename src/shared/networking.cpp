@@ -30,9 +30,6 @@ void Channel::frame()
 		return;
 	}
 
-	if (!mMessageWriters.empty())
-		awake(); // we want stream data with loss
-
 	if (!mReliableMessages.empty() && !awaitingReliableAcknowledgement())
 		awake(); // we want send reliable
 
@@ -77,13 +74,6 @@ void Channel::transmit()
 		buf.writeBit(true);
 		buf.writeBitsVar(msg);
 		Common::BufferHelpers::WriteToBuffer(*_buf, buf);
-	}
-
-	for (auto& [msg, callback] : mMessageWriters)
-	{
-		buf.writeBit(true);
-		buf.writeBitsVar(msg);
-		callback(buf);
 	}
 
 	buf.writeBit(false);
@@ -160,12 +150,6 @@ void Channel::addMessageReader(uint32_t msg, ReadCallback callback)
 {
 	assert(mMessageReaders.count(msg) == 0);
 	mMessageReaders.insert({ msg, callback });
-}
-
-void Channel::addMessageWriter(uint32_t msg, WriteCallback callback)
-{
-	assert(mMessageWriters.count(msg) == 0);
-	mMessageWriters.insert({ msg, callback });
 }
 
 void Channel::disconnect(const std::string& reason)

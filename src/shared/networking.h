@@ -58,7 +58,6 @@ namespace Shared::Networking
 		void read(Common::BitBuffer& buf);
 		void sendReliable(uint32_t msg, Common::BitBuffer& buf); // TODO: rename to writeReliableMessage
 		void addMessageReader(uint32_t msg, ReadCallback callback);
-		void addMessageWriter(uint32_t msg, WriteCallback callback);
 		void disconnect(const std::string& reason);
 
 	private:
@@ -91,7 +90,6 @@ namespace Shared::Networking
 
 		std::list<std::pair<uint32_t, std::shared_ptr<Common::BitBuffer>>> mReliableMessages;
 		std::map<uint32_t, ReadCallback> mMessageReaders;
-		std::map<uint32_t, WriteCallback> mMessageWriters; // regular
 	};
 
 	class Server : public Networking
