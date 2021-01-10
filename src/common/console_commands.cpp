@@ -101,8 +101,7 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 
 void ConsoleCommands::onEcho(CON_ARGS)
 {
-	CONSOLE_DEVICE->writeLine(std::accumulate(std::next(CON_ARGS_NAME.begin()), CON_ARGS_NAME.end(), *CON_ARGS_NAME.begin(),
-		[](const auto& a, const auto& b) { return a + " " + b; }));
+	CONSOLE_DEVICE->writeLine(CON_ARGS_ACCUMULATED_STRING);
 }
 
 void ConsoleCommands::onDelay(CON_ARGS)
