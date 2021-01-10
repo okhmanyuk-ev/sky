@@ -140,7 +140,7 @@ void Channel::read(Common::BitBuffer& buf)
 		auto msg = buf.readBitsVar();
 
 		if (mMessageReaders.count(msg) == 0)
-			throw std::exception(("unknown message type in channel: " + std::to_string((int)msg)).c_str());
+			throw std::runtime_error(("unknown message type in channel: " + std::to_string((int)msg)).c_str());
 
 		mMessageReaders.at(msg)(buf);
 	}
@@ -187,7 +187,7 @@ void Networking::readPacket(Network::Packet& packet)
 	auto msg = packet.buf.readBitsVar();
 
 	if (mMessages.count(msg) == 0)
-		throw std::exception(("unknown message type " + std::to_string((int)msg) + " from " + packet.adr.toString()).c_str());
+		throw std::runtime_error(("unknown message type " + std::to_string((int)msg) + " from " + packet.adr.toString()).c_str());
 
 	mMessages.at(msg)(packet);
 }

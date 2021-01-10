@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <string>
+#include <stdexcept>
 
 using namespace Common;
 
@@ -72,7 +73,7 @@ void BitBuffer::ensureCapacity(size_t value)
 uint32_t BitBuffer::readBits(int size)
 {
 	if (!hasRemaining())
-		throw std::exception("readBits: no remaining space");
+		throw std::runtime_error("readBits: no remaining space");
 
 	assert(size >= 0);
 	assert(size <= 32);
