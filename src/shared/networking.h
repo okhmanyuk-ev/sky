@@ -10,6 +10,9 @@ namespace Shared::Networking
 	class Networking
 	{
 	public:
+		static const int inline ProtocolVersion = 1;
+
+	public:
 		enum class Message : uint32_t // Client <-> Server (connectionless)
 		{
 			Regular = 0,
@@ -50,7 +53,7 @@ namespace Shared::Networking
 		void transmit();
 		void awake();
 		bool awaitingReliableAcknowledgement() const;
-		
+
 	public:
 		void read(Common::BitBuffer& buf);
 		void sendReliable(uint32_t msg, Common::BitBuffer& buf); // TODO: rename to writeReliableMessage
@@ -101,7 +104,7 @@ namespace Shared::Networking
 
 	public:
 		virtual std::shared_ptr<Server::Channel> createChannel() = 0;
-		
+
 	public:
 		size_t getClientsCount() const { return mChannels.size(); }
 

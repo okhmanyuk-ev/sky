@@ -213,6 +213,11 @@ Server::Server(uint16_t port) : Networking(port)
 	addMessage((uint32_t)Message::Connect, [this](auto& packet) {
 		auto adr = packet.adr;
 
+		auto protocol = packet.buf.readBitsVar();
+
+		if (protocol != ProtocolVersion)
+			return; // TODO: send something to client to stop him reconnecting
+
 		sendMessage((uint32_t)Message::Connect, adr);
 
 		if (mChannels.count(adr) > 0)
@@ -221,7 +226,7 @@ Server::Server(uint16_t port) : Networking(port)
 
 			// mChannels.at(adr)->disconnect("reconnect");
 			// LOG(adr.toString() + " reconnected");
-			
+
 			return;
 		}
 		else
@@ -356,6 +361,8 @@ void Client::frame()
 
 void Client::connect()
 {
+	auto buf = Common::BitBuffer();
+	buf.writeBitsVar(ProtocolVersion);
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress);
 	// LOG("connecting to " + mServerAddress.toString());
 	mConnectTime = Clock::Now();
@@ -363,7 +370,7 @@ void Client::connect()
 
 void Client::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
 {
-	if (!mChannel) 
+	if (!mChannel)
 		return; // TODO: what we should do in this case ?
 
 	auto buf = Common::BitBuffer();
