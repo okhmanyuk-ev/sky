@@ -363,7 +363,8 @@ void Client::connect()
 
 void Client::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
 {
-	assert(mChannel);
+	if (!mChannel) 
+		return; // TODO: what we should do in this case ?
 
 	auto buf = Common::BitBuffer();
 	Common::BufferHelpers::WriteString(buf, name);
