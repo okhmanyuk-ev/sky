@@ -70,10 +70,10 @@ void Channel::transmit()
 
 	if (reliable)
 	{
-		auto [msg, _buf] = mReliableMessages.front();
+		auto& [name, msg] = mReliableMessages.front();
 		buf.writeBit(true);
-		buf.writeBitsVar(msg);
-		Common::BufferHelpers::WriteToBuffer(*_buf, buf);
+		Common::BufferHelpers::WriteString(buf, name);
+		Common::BufferHelpers::WriteToBuffer(*msg, buf);
 	}
 
 	buf.writeBit(false);
@@ -127,10 +127,10 @@ void Channel::read(Common::BitBuffer& buf)
 
 	while (buf.readBit())
 	{
-		auto msg = buf.readBitsVar();
+		auto msg = Common::BufferHelpers::ReadString(buf);
 
 		if (mMessageReaders.count(msg) == 0)
-			throw std::runtime_error(("unknown message type in channel: " + std::to_string((int)msg)).c_str());
+			throw std::runtime_error(("unknown message type in channel: " + msg).c_str());
 
 		mMessageReaders.at(msg)(buf);
 	}
@@ -141,12 +141,12 @@ void Channel::read(Common::BitBuffer& buf)
 	mIncomingTime = Clock::Now();
 }
 
-void Channel::sendReliable(uint32_t msg, Common::BitBuffer& buf)
+void Channel::sendReliable(const std::string& msg, Common::BitBuffer& buf)
 {
 	mReliableMessages.push_back({ msg, std::make_shared<Common::BitBuffer>(buf) });
 }
 
-void Channel::addMessageReader(uint32_t msg, ReadCallback callback)
+void Channel::addMessageReader(const std::string& msg, ReadCallback callback)
 {
 	assert(mMessageReaders.count(msg) == 0);
 	mMessageReaders.insert({ msg, callback });
