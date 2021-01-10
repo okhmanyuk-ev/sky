@@ -95,11 +95,14 @@ namespace Shared
 	class Server : public Networking
 	{
 	public:
+		class Channel;
+
+	public:
 		Server(uint16_t port);
 
 	public:
-		virtual void onEvent(const std::string& name, const std::map<std::string, std::string>& params) = 0;
-
+		virtual std::shared_ptr<Server::Channel> createChannel() = 0;
+		
 	public:
 		size_t getClientsCount() const { return mChannels.size(); }
 
@@ -116,6 +119,15 @@ namespace Shared
 		};
 
 		std::unordered_map<Network::Address, std::shared_ptr<Channel>, AddressHasher> mChannels;
+	};
+
+	class Server::Channel : public Shared::Channel
+	{
+	public:
+		Channel();
+
+	protected:
+		virtual void onEvent(const std::string& name, const std::map<std::string, std::string>& params) = 0;
 	};
 
 	class Client : public Networking,

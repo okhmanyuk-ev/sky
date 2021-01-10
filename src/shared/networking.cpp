@@ -231,24 +231,13 @@ Server::Server(uint16_t port) : Networking(port)
 
 		assert(mChannels.count(adr) == 0);
 
-		auto channel = std::make_shared<Channel>();
+		auto channel = createChannel();
 		channel->setSendCallback([this, adr](auto& buf) {
 			sendMessage((uint32_t)Message::Regular, adr, buf);
 		});
 		channel->setDisconnectCallback([this, adr](const auto& reason) {
 			LOG(adr.toString() + " disconnected (" + reason + ")");
 			mChannels.erase(adr);
-		});
-		channel->addMessageReader((uint32_t)Client::Message::Event, [this](auto& buf) {
-			auto name = Common::BufferHelpers::ReadString(buf);
-			auto params = std::map<std::string, std::string>();
-			while (buf.readBit())
-			{
-				auto key = Common::BufferHelpers::ReadString(buf);
-				auto value = Common::BufferHelpers::ReadString(buf);
-				params.insert({ key, value });
-			}
-			onEvent(name, params);
 		});
 		mChannels[adr] = channel;
 	});
@@ -266,6 +255,23 @@ Server::Server(uint16_t port) : Networking(port)
 		{
 			channel->disconnect(e.what());
 		}
+	});
+}
+
+// server channel
+
+Server::Channel::Channel()
+{
+	addMessageReader((uint32_t)Client::Message::Event, [this](auto& buf) {
+		auto name = Common::BufferHelpers::ReadString(buf);
+		auto params = std::map<std::string, std::string>();
+		while (buf.readBit())
+		{
+			auto key = Common::BufferHelpers::ReadString(buf);
+			auto value = Common::BufferHelpers::ReadString(buf);
+			params.insert({ key, value });
+		}
+		onEvent(name, params);
 	});
 }
 
