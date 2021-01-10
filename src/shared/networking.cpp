@@ -363,7 +363,7 @@ void Client::connect()
 {
 	auto buf = Common::BitBuffer();
 	buf.writeBitsVar(ProtocolVersion);
-	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress);
+	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
 	// LOG("connecting to " + mServerAddress.toString());
 	mConnectTime = Clock::Now();
 }
