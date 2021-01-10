@@ -118,7 +118,8 @@ namespace Shared
 		std::unordered_map<Network::Address, std::shared_ptr<Channel>, AddressHasher> mChannels;
 	};
 
-	class Client : public Networking
+	class Client : public Networking,
+		public Common::FrameSystem::Frameable
 	{
 	public:
 		enum class Message : uint32_t // Client -> Server
@@ -130,6 +131,12 @@ namespace Shared
 		Client(const Network::Address& server_address);
 
 	public:
+		void frame() override;
+
+	private:
+		void connect();
+
+	public:
 		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params);
 
 	public:
@@ -138,5 +145,7 @@ namespace Shared
 	private:
 		Network::Address mServerAddress;
 		std::shared_ptr<Channel> mChannel = nullptr;
+		Clock::TimePoint mConnectTime = Clock::Now();
+		Clock::Duration mReconnectDelay = Clock::FromSeconds(3);
 	};
 }

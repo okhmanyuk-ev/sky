@@ -30,11 +30,11 @@ void Channel::frame()
 		return;
 	}
 
-	if (!mMessageWriters.empty()) // we want stream data with loss
-		awake();
+	if (!mMessageWriters.empty())
+		awake(); // we want stream data with loss
 
-	if (!mReliableMessages.empty() && !awaitingReliableAcknowledgement()) // we want send reliable
-		awake();
+	if (!mReliableMessages.empty() && !awaitingReliableAcknowledgement())
+		awake(); // we want send reliable
 
 	auto durationSinceAwake = Clock::ToSeconds(now - mAwakeTime);
 	mTransmitDuration = (durationSinceAwake - 0.25f) / 5.0f;
@@ -213,9 +213,21 @@ Server::Server(uint16_t port) : Networking(port)
 	addMessage((uint32_t)Message::Connect, [this](auto& packet) {
 		auto adr = packet.adr;
 
-		LOG(adr.toString() + " connected");
-
 		sendMessage((uint32_t)Message::Connect, adr);
+
+		if (mChannels.count(adr) > 0)
+		{
+			// TODO: test connection overriding and uncomment
+
+			// mChannels.at(adr)->disconnect("reconnect");
+			// LOG(adr.toString() + " reconnected");
+			
+			return;
+		}
+		else
+		{
+			LOG(adr.toString() + " connected");
+		}
 
 		assert(mChannels.count(adr) == 0);
 
@@ -292,8 +304,27 @@ Client::Client(const Network::Address& server_address) :
 		}
 	});
 
+	connect();
+}
+
+void Client::frame()
+{
+	if (isConnected())
+		return;
+
+	auto now = Clock::Now();
+
+	if (now - mConnectTime < mReconnectDelay)
+		return;
+
+	connect();
+}
+
+void Client::connect()
+{
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress);
 	LOG("connecting to " + mServerAddress.toString());
+	mConnectTime = Clock::Now();
 }
 
 void Client::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
