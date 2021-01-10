@@ -29,13 +29,13 @@ namespace Common
 		void ensureSpace(size_t value);
 		void ensureCapacity(size_t value);
 
-		uint32_t readBits(int size);
-		void writeBits(uint32_t value, int size);
+		uint32_t readBits(uint32_t size);
+		void writeBits(uint32_t value, uint32_t size);
 
 		bool readBit();
 		void writeBit(bool value);
 
-		static int bitsFor(uint32_t value);
+		static uint32_t bitsFor(uint32_t value);
 
 		uint32_t readBitsFor(uint32_t max);
 		void writeBitsFor(uint32_t value, uint32_t max);

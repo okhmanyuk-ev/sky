@@ -34,7 +34,7 @@
 #define CON_ARGS const std::vector<std::string>& CON_ARGS_NAME
 #define CON_ARGS_COUNT CON_ARGS_NAME.size()
 #define CON_HAS_ARGS !CON_ARGS_NAME.empty()
-#define CON_ARGS_ACCUMULATED_STRING std::accumulate(std::next(CON_ARGS_NAME.begin()), CON_ARGS_NAME.end(), *CON_ARGS_NAME.begin(), [](const auto& a, const auto& b) { return a + " " + b; })
+#define CON_ARGS_ACCUMULATED_STRING CON_HAS_ARGS ? std::accumulate(std::next(CON_ARGS_NAME.begin()), CON_ARGS_NAME.end(), *CON_ARGS_NAME.begin(), [](const auto& a, const auto& b) { return a + " " + b; }) : ""
 
 #define CON_ARG(N) CON_ARGS_NAME[N]
 #define CON_ARG_INT(N) stoi(CON_ARG(N))

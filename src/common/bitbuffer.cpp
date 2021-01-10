@@ -70,19 +70,19 @@ void BitBuffer::ensureCapacity(size_t value)
 	mMemory = realloc(mMemory, mCapacity);
 }
 
-uint32_t BitBuffer::readBits(int size)
+uint32_t BitBuffer::readBits(uint32_t size)
 {
 	if (!hasRemaining())
 		throw std::runtime_error("readBits: no remaining space");
-
-	assert(size >= 0);
-	assert(size <= 32);
 
 	if (size == 0)
 		return 0;
 
 	if (size == 32)
 		return read<uint32_t>();
+
+	if (size > 32)
+		throw std::runtime_error("readBits: bad size (" + std::to_string(size) + ")");
 
 	auto& src_value = *(uint32_t*)((size_t)mMemory + mPosition);
 	auto max_value = (1U << size) - 1;
@@ -98,11 +98,8 @@ uint32_t BitBuffer::readBits(int size)
 	return result;
 }
 
-void BitBuffer::writeBits(uint32_t value, int size)
+void BitBuffer::writeBits(uint32_t value, uint32_t size)
 {
-	assert(size >= 0);
-	assert(size <= 32);
-
 	if (size == 0)
 		return;
 
@@ -111,6 +108,9 @@ void BitBuffer::writeBits(uint32_t value, int size)
 		write<uint32_t>(value);
 		return;
 	}
+
+	if (size > 32)
+		throw std::runtime_error("writeBits: bad size (" + std::to_string(size) + ")");
 
 	auto max_value = (1U << size) - 1;
 
@@ -152,17 +152,15 @@ void BitBuffer::writeBit(bool value)
 	writeBits(value ? 1 : 0, 1);
 }
 
-int BitBuffer::bitsFor(uint32_t value)
+uint32_t BitBuffer::bitsFor(uint32_t value)
 {
-	for (int i = 1; i < 32; i++)
+	uint32_t result = 0;
+	while (value)
 	{
-		if ((1UL << i) - 1 < value)
-			continue;
-
-		return i;
+		result += 1;
+		value >>= 1;
 	}
-
-	return 0;
+	return result;
 }
 
 uint32_t BitBuffer::readBitsFor(uint32_t max)
@@ -177,12 +175,12 @@ void BitBuffer::writeBitsFor(uint32_t value, uint32_t max)
 
 uint32_t BitBuffer::readBitsVar()
 {
-	return readBits(readBitsFor(31)); // TODO: 31 -> 32 ?
+	return readBits(readBitsFor(32));
 }
 
 void BitBuffer::writeBitsVar(uint32_t value)
 {
-	writeBitsFor(bitsFor(value), 31); // TODO: 31 -> 32 ?
+	writeBitsFor(bitsFor(value), 32);
 	writeBitsFor(value, value);
 }
 
