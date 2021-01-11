@@ -274,9 +274,11 @@ Client::Client(const Network::Address& server_address) :
 	mServerAddress(server_address)
 {
 	addMessage((uint32_t)Networking::Message::Connect, [this](auto& packet) {
+		if (mChannel)
+			return; // already connected
+		
 		LOG("connected");
 
-		assert(!mChannel);
 		mChannel = createChannel();
 		mChannel->setSendCallback([this](auto& buf) {
 			sendMessage((uint32_t)Networking::Message::Regular, mServerAddress, buf);
