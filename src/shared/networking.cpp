@@ -227,12 +227,8 @@ Server::Server(uint16_t port) : Networking(port)
 
 		if (mChannels.count(adr) > 0)
 		{
-			// TODO: test connection overriding and uncomment
-
-			// mChannels.at(adr)->disconnect("reconnect");
-			// LOG(adr.toString() + " reconnected");
-
-			return;
+			mChannels.at(adr)->disconnect("reconnect");
+			LOG(adr.toString() + " reconnected");
 		}
 		else
 		{
