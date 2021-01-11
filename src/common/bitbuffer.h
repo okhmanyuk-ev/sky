@@ -17,7 +17,7 @@ namespace Common
 
 	public:
 		BitBuffer();
-		BitBuffer(BitBuffer& bitbuffer);
+		BitBuffer(const BitBuffer& bitbuffer);
 		~BitBuffer();
 
 	public:
@@ -68,7 +68,7 @@ namespace Common
 
 		auto getCapacity() const { return mCapacity; }
 
-		int getBitPosition() { return mBitPosition; }
+		int getBitPosition() const { return mBitPosition; }
 		void setBitPosition(int value) { mBitPosition = value; }
 
 		int getRemainingBits() { if (!hasRemaining()) return 0; return static_cast<int>(getRemaining()) * 8 - getBitPosition(); }

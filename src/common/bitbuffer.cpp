@@ -11,7 +11,7 @@ BitBuffer::BitBuffer()
 	//
 }
 
-BitBuffer::BitBuffer(BitBuffer& bitbuffer) : BitBuffer()
+BitBuffer::BitBuffer(const BitBuffer& bitbuffer) : BitBuffer()
 {
 	write(bitbuffer.getMemory(), bitbuffer.getSize());
 	setPosition(bitbuffer.getPosition());
