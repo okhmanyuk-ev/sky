@@ -59,6 +59,7 @@ void Channel::transmit()
 	buf.writeBitsVar(mIncomingSequence);
 	buf.writeBit(mOutgoingReliableSequence);
 	buf.writeBit(mIncomingReliableSequence);
+	buf.writeBit(reliable);
 
 	if (reliable)
 	{
@@ -108,6 +109,7 @@ void Channel::read(Common::BitBuffer& buf)
 	auto ack = buf.readBitsVar();
 	auto rel_seq = buf.readBit();
 	auto rel_ack = buf.readBit();
+	auto rel_data = buf.readBit();
 
 	if (Networking::NetLogs == 2 || Networking::NetLogs == 4)
 	{
@@ -132,16 +134,22 @@ void Channel::read(Common::BitBuffer& buf)
 		}
 	}
 
+	if (rel_data)
+		awake();
+
 	mIncomingSequence = seq;
 	mIncomingAcknowledgement = ack;
 	
+	// TODO: else skip reliable data
 	if (rel_seq != mIncomingReliableSequence) // reliable received
 	{
 		if (Networking::NetLogs >= 2)
 			LOG("reliable received");
 
-		awake();
-		readReliableDataFromPacket(buf); // TODO: else skip reliable data
+		if (!rel_data)
+			throw std::runtime_error("rel_seq changed without rel_data");
+
+		readReliableDataFromPacket(buf); 
 		mIncomingReliableSequence = rel_seq;
 	}
 
