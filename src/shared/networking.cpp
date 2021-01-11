@@ -71,6 +71,12 @@ void Channel::transmit()
 
 	buf.writeBit(false);
 
+	if (Networking::NetLogs >= 2)
+	{
+		LOG("[OUT] seq: " + std::to_string(mOutgoingSequence) + ", ack: " + std::to_string(mIncomingSequence) + ", rel_seq: " + std::to_string(mOutgoingReliableSequence) +
+			", rel_ack: " + std::to_string(mIncomingReliableSequence) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
+	}
+
 	mSendCallback(buf);
 }
 
@@ -91,11 +97,17 @@ void Channel::read(Common::BitBuffer& buf)
 	auto rel_seq = buf.readBit();
 	auto rel_ack = buf.readBit();
 
+	if (Networking::NetLogs >= 2)
+	{
+		LOG("[IN ] seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + ", rel_seq: " + std::to_string(rel_seq) +
+			", rel_ack: " + std::to_string(rel_ack) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
+	}
+
 	if (seq <= mIncomingSequence)
 	{
 		if (Networking::NetLogs >= 1)
 		{
-			LOG("out of order " + std::to_string(seq - mIncomingSequence) + " packet(s)"); // TODO: del
+			LOG("out of order " + std::to_string(seq) + " packet");
 		}
 		return; // out of order or duplicated packet
 	}
@@ -104,7 +116,7 @@ void Channel::read(Common::BitBuffer& buf)
 	{
 		if (Networking::NetLogs >= 1)
 		{
-			LOG("dropped " + std::to_string(seq - mIncomingSequence) + " packet(s)"); // TODO: del
+			LOG("dropped " + std::to_string(seq - mIncomingSequence - 1) + " packet(s)");
 		}
 	}
 
@@ -134,12 +146,6 @@ void Channel::read(Common::BitBuffer& buf)
 			throw std::runtime_error(("unknown message type in channel: " + msg).c_str());
 
 		mMessageReaders.at(msg)(buf);
-	}
-
-	if (Networking::NetLogs >= 2)
-	{
-		LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + ", rel_seq: " + std::to_string(rel_seq) +
-			", rel_ack: " + std::to_string(rel_ack) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
 	mIncomingTime = Clock::Now();
