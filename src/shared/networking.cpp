@@ -135,8 +135,8 @@ void Channel::read(Common::BitBuffer& buf)
 		mMessageReaders.at(msg)(buf);
 	}
 
-	//LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) +
-	//	", rel_seq: " + std::to_string(rel_seq) + ", rel_ack: " + std::to_string(rel_ack));
+	//LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + ", rel_seq: " + std::to_string(rel_seq) + 
+	//	", rel_ack: " + std::to_string(rel_ack) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 
 	mIncomingTime = Clock::Now();
 }
