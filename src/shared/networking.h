@@ -19,6 +19,10 @@ namespace Shared::Networking
 		// 5 - loss, reliables
 		static int inline NetLogs = 0;
 
+		static int inline NetTimeout = 15; // sec
+		static int inline NetTransmitDurationMin = 100; // msec
+		static int inline NetTransmitDurationMax = 2000; // msec
+
 	public:
 		enum class Message : uint32_t // Client <-> Server (connectionless)
 		{
@@ -66,9 +70,6 @@ namespace Shared::Networking
 		void disconnect(const std::string& reason);
 
 	private:
-		Clock::Duration mTimeoutDuration = Clock::FromSeconds(30);
-		Clock::Duration mTransmitDurationMin = Clock::FromMilliseconds(10);
-		Clock::Duration mTransmitDurationMax = Clock::FromMilliseconds(2000);
 		float mTransmitDuration = 0.0f; // min(0.0)..max(1.0)
 		Clock::TimePoint mAwakeTime = Clock::Now();
 

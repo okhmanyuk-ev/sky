@@ -17,7 +17,7 @@ void Channel::frame()
 {
 	auto now = Clock::Now();
 
-	if (now - mIncomingTime >= mTimeoutDuration)
+	if (now - mIncomingTime >= Clock::FromSeconds(Networking::NetTimeout))
 	{
 		disconnect("timed out");
 		return;
@@ -35,8 +35,8 @@ void Channel::frame()
 	mTransmitDuration = (durationSinceAwake - 0.25f) / 5.0f;
 	mTransmitDuration = glm::clamp(mTransmitDuration, 0.0f, 1.0f);
 
-	auto min_duration = Clock::ToSeconds(mTransmitDurationMin);
-	auto max_duration = Clock::ToSeconds(mTransmitDurationMax);
+	auto min_duration = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDurationMin));
+	auto max_duration = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDurationMax));
 	auto transmit_duration = Clock::FromSeconds(glm::lerp(min_duration, max_duration, mTransmitDuration));
 
 	if (now - mTransmitTime < transmit_duration)
@@ -53,15 +53,15 @@ void Channel::transmit()
 
 	auto buf = Common::BitBuffer();
 
-	bool reliable = !isReliableAcknowledged();
+	bool rel_data = !isReliableAcknowledged();
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
 	buf.writeBit(mOutgoingReliableSequence);
 	buf.writeBit(mIncomingReliableSequence);
-	buf.writeBit(reliable);
+	buf.writeBit(rel_data);
 
-	if (reliable)
+	if (rel_data)
 	{
 		auto& [name, msg] = mReliableMessages.front();
 		buf.writeBit(true);
@@ -73,8 +73,12 @@ void Channel::transmit()
 
 	if (Networking::NetLogs == 3 || Networking::NetLogs == 4)
 	{
-		LOG("[OUT] seq: " + std::to_string(mOutgoingSequence) + ", ack: " + std::to_string(mIncomingSequence) + ", rel_seq: " + std::to_string(reliable) +
-			", rel_ack: " + std::to_string(mIncomingReliableSequence) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
+		LOG("[OUT] seq: " + std::to_string(mOutgoingSequence) + 
+			", ack: " + std::to_string(mIncomingSequence) + 
+			", rel_seq: " + std::to_string(mOutgoingReliableSequence) +
+			", rel_ack: " + std::to_string(mIncomingReliableSequence) +
+			", rel_data: " + std::to_string(rel_data) + 
+			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
 	mSendCallback(buf);
@@ -113,8 +117,12 @@ void Channel::read(Common::BitBuffer& buf)
 
 	if (Networking::NetLogs == 2 || Networking::NetLogs == 4)
 	{
-		LOG("[IN ] seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + ", rel_seq: " + std::to_string(rel_seq) +
-			", rel_ack: " + std::to_string(rel_ack) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
+		LOG("[IN ] seq: " + std::to_string(seq) + 
+			", ack: " + std::to_string(ack) + 
+			", rel_seq: " + std::to_string(rel_seq) +
+			", rel_ack: " + std::to_string(rel_ack) + 
+			", rel_data: " + std::to_string(rel_data) + 
+			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
 	if (seq <= mIncomingSequence)
@@ -192,7 +200,17 @@ Networking::Networking(uint16_t port) : mSocket(port)
 		readPacket(packet);
 	});
 
-	CONSOLE->registerCVar("net_logs", { "int" }, CVAR_GETTER_INT(Networking::NetLogs), CVAR_SETTER_INT(Networking::NetLogs));
+	CONSOLE->registerCVar("net_logs", { "int" }, 
+		CVAR_GETTER_INT(Networking::NetLogs), CVAR_SETTER_INT(Networking::NetLogs));
+
+	CONSOLE->registerCVar("net_timeout", { "sec" },
+		CVAR_GETTER_INT(Networking::NetTimeout), CVAR_SETTER_INT(Networking::NetTimeout));
+
+	CONSOLE->registerCVar("net_transmit_duration_min", { "msec" },
+		CVAR_GETTER_INT(Networking::NetTransmitDurationMin), CVAR_SETTER_INT(Networking::NetTransmitDurationMin));
+
+	CONSOLE->registerCVar("net_transmit_duration_max", { "msec" },
+		CVAR_GETTER_INT(Networking::NetTransmitDurationMax), CVAR_SETTER_INT(Networking::NetTransmitDurationMax));
 }
 
 void Networking::readPacket(Network::Packet& packet)
