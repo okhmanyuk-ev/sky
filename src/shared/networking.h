@@ -11,6 +11,12 @@ namespace Shared::Networking
 	{
 	public:
 		static const int inline ProtocolVersion = 2;
+		
+		// 1 - loss
+		// 2 - loss, reliables, in msgs
+		// 3 - loss, reliables, out msgs
+		// 4 - loss, reliables, in msgs, out msgs
+		// 5 - loss, reliables
 		static int inline NetLogs = 0;
 
 	public:
@@ -50,6 +56,8 @@ namespace Shared::Networking
 		void frame() override;
 		void transmit();
 		void awake();
+		bool isReliableAcknowledged() const;
+		void readReliableDataFromPacket(Common::BitBuffer& buf);
 
 	public:
 		void read(Common::BitBuffer& buf);
@@ -79,6 +87,7 @@ namespace Shared::Networking
 		uint32_t mIncomingSequence = 0;
 		uint32_t mIncomingAcknowledgement = 0;
 
+		bool mOutgoingReliableSequence = false;
 		bool mIncomingReliableSequence = false;
 		bool mIncomingReliableAcknowledgement = false;
 

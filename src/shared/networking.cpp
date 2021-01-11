@@ -23,8 +23,13 @@ void Channel::frame()
 		return;
 	}
 
-	if (!mReliableMessages.empty() && !mIncomingReliableAcknowledgement)
-		awake(); // we want send reliable
+	if (!mReliableMessages.empty() && isReliableAcknowledged())
+	{
+		mOutgoingReliableSequence = !mOutgoingReliableSequence; // start reliable sending
+	}
+
+	if (!isReliableAcknowledged())
+		awake(); // we want send reliables very fast while they not acknowledged
 
 	auto durationSinceAwake = Clock::ToSeconds(now - mAwakeTime);
 	mTransmitDuration = (durationSinceAwake - 0.25f) / 5.0f;
@@ -48,11 +53,11 @@ void Channel::transmit()
 
 	auto buf = Common::BitBuffer();
 
-	bool reliable = !mReliableMessages.empty() && !mIncomingReliableAcknowledgement;
+	bool reliable = !isReliableAcknowledged();
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
-	buf.writeBit(reliable);
+	buf.writeBit(mOutgoingReliableSequence);
 	buf.writeBit(mIncomingReliableSequence);
 
 	if (reliable)
@@ -65,7 +70,7 @@ void Channel::transmit()
 
 	buf.writeBit(false);
 
-	if (Networking::NetLogs >= 2)
+	if (Networking::NetLogs == 3 || Networking::NetLogs == 4)
 	{
 		LOG("[OUT] seq: " + std::to_string(mOutgoingSequence) + ", ack: " + std::to_string(mIncomingSequence) + ", rel_seq: " + std::to_string(reliable) +
 			", rel_ack: " + std::to_string(mIncomingReliableSequence) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
@@ -79,6 +84,24 @@ void Channel::awake()
 	mAwakeTime = Clock::Now();
 }
 
+bool Channel::isReliableAcknowledged() const
+{
+	return mOutgoingReliableSequence == mIncomingReliableAcknowledgement;
+}
+
+void Channel::readReliableDataFromPacket(Common::BitBuffer& buf)
+{
+	while (buf.readBit())
+	{
+		auto msg = Common::BufferHelpers::ReadString(buf);
+
+		if (mMessageReaders.count(msg) == 0)
+			throw std::runtime_error(("unknown message type in channel: " + msg).c_str());
+
+		mMessageReaders.at(msg)(buf);
+	}
+}
+
 void Channel::read(Common::BitBuffer& buf)
 {
 	auto seq = buf.readBitsVar();
@@ -86,7 +109,7 @@ void Channel::read(Common::BitBuffer& buf)
 	auto rel_seq = buf.readBit();
 	auto rel_ack = buf.readBit();
 
-	if (Networking::NetLogs >= 2)
+	if (Networking::NetLogs == 2 || Networking::NetLogs == 4)
 	{
 		LOG("[IN ] seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + ", rel_seq: " + std::to_string(rel_seq) +
 			", rel_ack: " + std::to_string(rel_ack) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
@@ -98,7 +121,7 @@ void Channel::read(Common::BitBuffer& buf)
 		{
 			LOG("out of order " + std::to_string(seq) + " packet");
 		}
-		return; // out of order or duplicated packet
+		return;
 	}
 
 	if (seq - mIncomingSequence > 1)
@@ -111,41 +134,27 @@ void Channel::read(Common::BitBuffer& buf)
 
 	mIncomingSequence = seq;
 	mIncomingAcknowledgement = ack;
-
-	bool not_duplicated_reliable = !mIncomingReliableSequence && rel_seq;
-	mIncomingReliableSequence = rel_seq;
-
-	if (rel_seq)
-		awake(); // we want reply every reliable packet
-
-	if (!mIncomingReliableAcknowledgement && rel_ack)
+	
+	if (rel_seq != mIncomingReliableSequence) // reliable received
 	{
+		if (Networking::NetLogs >= 2)
+			LOG("reliable received");
+
+		awake();
+		readReliableDataFromPacket(buf); // TODO: else skip reliable data
+		mIncomingReliableSequence = rel_seq;
+	}
+
+	if (rel_ack != mIncomingReliableAcknowledgement) // reliable delivered
+	{
+		if (Networking::NetLogs >= 2)
+			LOG("reliable delivered");
+		
 		if (!mReliableMessages.empty())
 		{
 			mReliableMessages.pop_front();
 		}
-		else if (Networking::NetLogs >= 1)
-		{
-			LOG("unexpected reliable acknowledgement!");
-		}
-		mIncomingReliableAcknowledgement = true;
-	}
-	else if (mIncomingReliableAcknowledgement && !rel_ack)
-	{
-		mIncomingReliableAcknowledgement = false;
-	}
-
-	if (not_duplicated_reliable)
-	{
-		while (buf.readBit())
-		{
-			auto msg = Common::BufferHelpers::ReadString(buf);
-
-			if (mMessageReaders.count(msg) == 0)
-				throw std::runtime_error(("unknown message type in channel: " + msg).c_str());
-
-			mMessageReaders.at(msg)(buf);
-		}
+		mIncomingReliableAcknowledgement = rel_ack;
 	}
 
 	mIncomingTime = Clock::Now();
