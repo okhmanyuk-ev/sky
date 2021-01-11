@@ -32,7 +32,7 @@ void Channel::frame()
 		awake(); // we want send reliables very fast while they not acknowledged
 
 	auto durationSinceAwake = Clock::ToSeconds(now - mAwakeTime);
-	mTransmitDuration = (durationSinceAwake - 0.25f) / 5.0f;
+	mTransmitDuration = (durationSinceAwake - 0.5f) / 5.0f;
 	mTransmitDuration = glm::clamp(mTransmitDuration, 0.0f, 1.0f);
 
 	auto min_duration = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDurationMin));
@@ -200,8 +200,13 @@ Networking::Networking(uint16_t port) : mSocket(port)
 		readPacket(packet);
 	});
 
-	CONSOLE->registerCVar("net_logs", { "int" }, 
+	auto description = "1 - loss, 2 - loss rel in, 3 - loss rel out, 4 - loss rel in out, 5 - loss rel";
+	
+	CONSOLE->registerCVar("net_logs", description, { "int" },
 		CVAR_GETTER_INT(Networking::NetLogs), CVAR_SETTER_INT(Networking::NetLogs));
+
+	CONSOLE->registerCVar("net_reconnect_delay", { "sec" },
+		CVAR_GETTER_INT(Networking::NetReconnectDelay), CVAR_SETTER_INT(Networking::NetReconnectDelay));
 
 	CONSOLE->registerCVar("net_timeout", { "sec" },
 		CVAR_GETTER_INT(Networking::NetTimeout), CVAR_SETTER_INT(Networking::NetTimeout));
@@ -337,7 +342,7 @@ void Client::frame()
 
 	auto now = Clock::Now();
 
-	if (now - mConnectTime < mReconnectDelay)
+	if (now - mConnectTime < Clock::FromSeconds(Networking::NetReconnectDelay))
 		return;
 
 	connect();

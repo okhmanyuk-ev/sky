@@ -12,13 +12,8 @@ namespace Shared::Networking
 	public:
 		static const int inline ProtocolVersion = 2;
 		
-		// 1 - loss
-		// 2 - loss, reliables, in msgs
-		// 3 - loss, reliables, out msgs
-		// 4 - loss, reliables, in msgs, out msgs
-		// 5 - loss, reliables
 		static int inline NetLogs = 0;
-
+		static int inline NetReconnectDelay = 2; // sec
 		static int inline NetTimeout = 15; // sec
 		static int inline NetTransmitDurationMin = 100; // msec
 		static int inline NetTransmitDurationMax = 2000; // msec
@@ -147,6 +142,5 @@ namespace Shared::Networking
 		Network::Address mServerAddress;
 		std::shared_ptr<Channel> mChannel = nullptr;
 		Clock::TimePoint mConnectTime = Clock::Now();
-		Clock::Duration mReconnectDelay = Clock::FromSeconds(3);
 	};
 }
