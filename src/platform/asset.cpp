@@ -11,21 +11,11 @@
 
 using namespace Platform;
 
-Asset::Asset(const std::string& path, Path pathType)
+Asset::Asset(const std::string& path, Storage storage)
 {
-	assert(Exists(path, pathType));
+	assert(Exists(path, storage));
 #if defined(PLATFORM_ANDROID)
-	if (pathType == Path::Absolute)
-	{
-		std::ifstream file(path, std::ios::in | std::ios::binary);
-		file.seekg(0, file.end);
-		mSize = static_cast<size_t>(file.tellg());
-		mMemory = malloc(mSize);
-		file.seekg(0, file.beg);
-		file.read((char*)mMemory, mSize);
-		file.close();
-	}
-	else
+	if (storage == Storage::Assets)
 	{
 		auto asset = AAssetManager_open(SystemAndroid::Instance->activity->assetManager, path.c_str(), AASSET_MODE_UNKNOWN);
 		mSize = AAsset_getLength(asset);
@@ -33,12 +23,19 @@ Asset::Asset(const std::string& path, Path pathType)
 		AAsset_read(asset, mMemory, mSize);
 		AAsset_close(asset);
 	}
-#elif defined(PLATFORM_WINDOWS)
-	auto p = path;
-
-	if (pathType == Path::Relative)
-		p = "assets/" + p;
-
+	else
+	{
+		auto p = StoragePathToAbsolute(path, storage);
+		std::ifstream file(p, std::ios::in | std::ios::binary);
+		file.seekg(0, file.end);
+		mSize = static_cast<size_t>(file.tellg());
+		mMemory = malloc(mSize);
+		file.seekg(0, file.beg);
+		file.read((char*)mMemory, mSize);
+		file.close();
+	}
+#elif defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS)
+	auto p = StoragePathToAbsolute(path, storage);
 	std::ifstream file(p, std::ios::in | std::ios::binary);
 	file.seekg(0, file.end);
 	mSize = static_cast<size_t>(file.tellg());
@@ -46,22 +43,6 @@ Asset::Asset(const std::string& path, Path pathType)
 	file.seekg(0, file.beg);
 	file.read((char*)mMemory, mSize);
 	file.close();
-#elif defined(PLATFORM_IOS)
-    auto p = path;
-    
-    if (pathType == Path::Relative)
-    {
-        auto ios_path = std::string([[[NSBundle mainBundle] bundlePath] UTF8String]);
-        p = ios_path + "/assets/" + p;
-    }
-
-    std::ifstream file(p, std::ios::in | std::ios::binary);
-    file.seekg(0, file.end);
-    mSize = static_cast<size_t>(file.tellg());
-    mMemory = malloc(mSize);
-    file.seekg(0, file.beg);
-    file.read((char*)mMemory, mSize);
-    file.close();
 #endif
 }
 
@@ -77,59 +58,41 @@ Asset::~Asset()
 	free(mMemory);
 }
 
-void Asset::Write(const std::string& path, void* memory, size_t size, Path pathType)
+void Asset::Write(const std::string& path, void* memory, size_t size, Storage storage)
 {
 #if defined(PLATFORM_WINDOWS)
-	auto p = path;
-
-	if (pathType == Path::Relative)
-		p = "assets/" + p;
-	
+	auto p = StoragePathToAbsolute(path, storage);
 	std::filesystem::create_directories(std::filesystem::path(p).remove_filename().string());
-
 	std::ofstream file(p, std::ios::out | std::ios::binary);
 	file.write((char*)memory, size);
 	file.close();
 #elif defined(PLATFORM_ANDROID)
-	if (pathType == Path::Absolute)
+	assert(storage != Storage::Assets);
+	if (storage != Storage::Assets)
 	{
 	//	std::experimental::filesystem::create_directories(std::experimental::filesystem::path(path).remove_filename().string());
 		std::ofstream file(path, std::ios::out | std::ios::binary);
 		file.write((char*)memory, size);
 		file.close();
 	}
-	else
-	{
-		assert(false);
-	}
 #elif defined(PLATFORM_IOS)
-    assert(pathType == Path::Absolute);
-    
-    auto p = path;
-
-    std::ofstream file(p, std::ios::out | std::ios::binary);
-    file.write((char*)memory, size);
-    file.close();
+    assert(storage != Storage::Assets);
+	if (storage != Storage::Assets)
+	{
+		auto p = StoragePathToAbsolute(path, storage);
+		std::ofstream file(p, std::ios::out | std::ios::binary);
+		file.write((char*)memory, size);
+		file.close();
+	}
 #endif
 }
 
-bool Asset::Exists(const std::string& path, Path pathType)
+bool Asset::Exists(const std::string& path, Storage storage)
 {
 #if defined(PLATFORM_WINDOWS)
-	auto p = path;
-
-	if (pathType == Path::Relative)
-		p = "assets/" + p;
-	
-	return std::filesystem::exists(p);
+	return std::filesystem::exists(StoragePathToAbsolute(path, storage));
 #elif defined(PLATFORM_ANDROID)
-	if (pathType == Path::Absolute)
-	{
-		auto file = std::ifstream(path.c_str());
-		return file.good();
-	//	return std::experimental::filesystem::exists(path);
-	}
-	else
+	if (storage == Storage::Assets)
 	{
 		auto asset = AAssetManager_open(SystemAndroid::Instance->activity->assetManager, path.c_str(), AASSET_MODE_UNKNOWN);
 		if (asset == nullptr)
@@ -137,16 +100,44 @@ bool Asset::Exists(const std::string& path, Path pathType)
 		AAsset_close(asset);
 		return true;
 	}
+	else
+	{
+		auto p = StoragePathToAbsolute(path, storage);
+		auto file = std::ifstream(p.c_str());
+		return file.good(); // TODO: std::filesystem::exists() ?
+	}
 #elif defined(PLATFORM_IOS)
-    auto p = path;
-    
-    if (pathType == Path::Relative)
-    {
-        auto ios_path = std::string([[[NSBundle mainBundle] bundlePath] UTF8String]);
-        p = ios_path + "/assets/" + p;
-    }
-    
+    auto p = StoragePathToAbsolute(path, storage);
     auto file = std::ifstream(p.c_str());
-    return file.good();
+    return file.good(); // TODO: std::filesystem::exists() ?
 #endif
+}
+
+std::string Asset::StoragePathToAbsolute(const std::string& path, Storage storage)
+{
+	if (storage == Storage::Assets)
+	{
+#if defined(PLATFORM_WINDOWS)
+		return "assets/" + path;
+#elif defined(PLATFORM_IOS)
+		return std::string([[[NSBundle mainBundle]bundlePath] UTF8String]) + "/assets/" + path;
+#elif defined(PLATFORM_ANDROID)
+		return path;
+#endif
+	}
+	else if (storage == Storage::Bundle)
+	{
+#if defined(PLATFORM_WINDOWS)
+		char* p;
+		size_t len;
+		errno_t err = _dupenv_s(&p, &len, "APPDATA");
+		return p + ("\\" + PLATFORM->getAppName()) + "\\" + path;
+#elif defined(PLATFORM_IOS)
+		return std::string([NSHomeDirectory() UTF8String]) + "/Documents/" + path;
+#elif defined(PLATFORM_IOS)
+		return std::string(SystemAndroid::Instance->activity->internalDataPath) + "/" + path;
+#endif
+	}
+
+	return path; // absolute
 }

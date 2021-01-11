@@ -532,11 +532,6 @@ std::string SystemAndroid::getAppName() const
 	return mAppName;
 }
 
-std::string SystemAndroid::getAppFolder() const
-{
-	return std::string(Instance->activity->internalDataPath) + "/";
-}
-
 void SystemAndroid::showVirtualKeyboard()
 {
     auto env = BeginEnv();

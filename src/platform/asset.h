@@ -8,21 +8,22 @@ namespace Platform
 	class Asset 
 	{
 	public:
-		enum class Path // Storage
+		enum class Storage
 		{
-			//Assets
-			Relative,
+			Assets,
+			Bundle,
 			Absolute
 		};
 
 	public:
-		Asset(const std::string& path, Path pathType = Path::Relative);
+		Asset(const std::string& path, Storage storage = Storage::Assets);
 		Asset(const Asset& asset);
 		~Asset();
 
 	public:
-		static void Write(const std::string& path, void* memory, size_t size, Path pathType = Path::Relative);
-		static bool Exists(const std::string& path, Path pathType = Path::Relative);
+		static void Write(const std::string& path, void* memory, size_t size, Storage storage = Storage::Assets);
+		static bool Exists(const std::string& path, Storage storage = Storage::Assets);
+		static std::string StoragePathToAbsolute(const std::string& path, Storage storage);
 
 	public:
 		auto getMemory() const { return mMemory; }

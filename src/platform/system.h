@@ -59,7 +59,6 @@ namespace Platform
 		virtual void setCursorPos(int x, int y) = 0;
 
 		virtual std::string getAppName() const = 0;
-		virtual std::string getAppFolder() const = 0;
 
 		virtual void showVirtualKeyboard() = 0;
 		virtual void hideVirtualKeyboard() = 0;

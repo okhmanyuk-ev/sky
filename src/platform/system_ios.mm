@@ -196,11 +196,6 @@ void SystemIos::refreshDimensions()
     }
 }
 
-std::string SystemIos::getAppFolder() const
-{
-    return std::string([NSHomeDirectory() UTF8String]) + "/Documents/";
-}
-
 void SystemIos::initializeBilling(const ProductsMap& _products)
 {
     products = _products;

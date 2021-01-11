@@ -9,15 +9,15 @@ using namespace Shared;
 
 void Profile::load()
 {
-	auto path = PLATFORM->getAppFolder() + "save.bson";
+	auto path = "save.bson";
 
-	if (!Platform::Asset::Exists(path, Platform::Asset::Path::Absolute))
+	if (!Platform::Asset::Exists(path, Platform::Asset::Storage::Bundle))
 	{
 		makeDefault();
 		return;
 	}
 
-	auto json_file = Platform::Asset(path, Platform::Asset::Path::Absolute);
+	auto json_file = Platform::Asset(path, Platform::Asset::Storage::Bundle);
 	nlohmann::json json;
 	
 	try
@@ -40,7 +40,7 @@ void Profile::save()
 	auto json = nlohmann::json();
 	write(json);
 	auto bson = nlohmann::json::to_bson(json);
-	Platform::Asset::Write(PLATFORM->getAppFolder() + "save.bson", bson.data(), bson.size(), Platform::Asset::Path::Absolute);
+	Platform::Asset::Write("save.bson", bson.data(), bson.size(), Platform::Asset::Storage::Bundle);
 	mSaveMutex.unlock();
 }
 

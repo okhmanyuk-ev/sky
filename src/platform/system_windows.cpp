@@ -108,15 +108,6 @@ std::string SystemWindows::getAppName() const
 	return mAppName;
 }
 
-std::string SystemWindows::getAppFolder() const
-{
-	char* path;
-	size_t len;
-	errno_t err = _dupenv_s(&path, &len, "APPDATA");
-
-	return path + ("\\" + mAppName) + "\\";
-}
-
 LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	auto thiz = (SystemWindows*)GetWindowLongPtr(hWnd, GWLP_USERDATA);

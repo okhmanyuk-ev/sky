@@ -8,19 +8,19 @@ using namespace Graphics;
 struct SaveImageContext
 {
 	std::string path;
-	Platform::Asset::Path pathType;
+	Platform::Asset::Storage storage;
 };
 
-void Image::SaveToFile(const std::string& path, const Image& image, Platform::Asset::Path pathType)
+void Image::SaveToFile(const std::string& path, const Image& image, Platform::Asset::Storage storage)
 {
 	auto writeFunc = [](void* context, void* memory, int size) {
 		auto saveImageContext = static_cast<SaveImageContext*>(context);
-		Platform::Asset::Write(saveImageContext->path + ".png", memory, size, saveImageContext->pathType);
+		Platform::Asset::Write(saveImageContext->path + ".png", memory, size, saveImageContext->storage);
 	};
 
 	SaveImageContext context;
 	context.path = path;
-	context.pathType = pathType;
+	context.storage = storage;
 
 	stbi_write_png_to_func(writeFunc, &context, image.getWidth(), image.getHeight(),
 		image.getChannels(), image.getMemory(), image.getWidth() * image.getChannels());

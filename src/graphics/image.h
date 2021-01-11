@@ -8,7 +8,7 @@ namespace Graphics
 	{
 	public:
 		static void SaveToFile(const std::string& path, const Image& image, 
-			Platform::Asset::Path pathType = Platform::Asset::Path::Relative);
+			Platform::Asset::Storage storage = Platform::Asset::Storage::Assets);
 
 	public:
 		Image(int width, int height, int channels);
