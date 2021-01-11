@@ -13,13 +13,6 @@ using namespace Shared::Networking;
 
 // channel
 
-Channel::Channel()
-{
-	//CONSOLE->registerCommand("asd", [this](CON_ARGS) {
-	//	mIncomingReliableAcknowledgement = !mIncomingReliableAcknowledgement;
-	//});
-}
-
 void Channel::frame()
 {
 	auto now = Clock::Now();
@@ -100,12 +93,20 @@ void Channel::read(Common::BitBuffer& buf)
 
 	if (seq <= mIncomingSequence)
 	{
-		LOG("out of order " + std::to_string(seq - mIncomingSequence) + " packet(s)"); // TODO: del
+		if (Networking::NetLogs >= 1)
+		{
+			LOG("out of order " + std::to_string(seq - mIncomingSequence) + " packet(s)"); // TODO: del
+		}
 		return; // out of order or duplicated packet
 	}
 
 	if (seq - mIncomingSequence > 1)
-		LOG("dropped " + std::to_string(seq - mIncomingSequence) + " packet(s)"); // TODO: del
+	{
+		if (Networking::NetLogs >= 1)
+		{
+			LOG("dropped " + std::to_string(seq - mIncomingSequence) + " packet(s)"); // TODO: del
+		}
+	}
 
 	mIncomingSequence = seq;
 	mIncomingAcknowledgement = ack;
@@ -135,8 +136,11 @@ void Channel::read(Common::BitBuffer& buf)
 		mMessageReaders.at(msg)(buf);
 	}
 
-	//LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + ", rel_seq: " + std::to_string(rel_seq) + 
-	//	", rel_ack: " + std::to_string(rel_ack) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
+	if (Networking::NetLogs >= 2)
+	{
+		LOG("seq: " + std::to_string(seq) + ", ack: " + std::to_string(ack) + ", rel_seq: " + std::to_string(rel_seq) +
+			", rel_ack: " + std::to_string(rel_ack) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
+	}
 
 	mIncomingTime = Clock::Now();
 }
@@ -164,6 +168,8 @@ Networking::Networking(uint16_t port) : mSocket(port)
 	mSocket.setReadCallback([this](auto& packet) {
 		readPacket(packet);
 	});
+
+	CONSOLE->registerCVar("net_logs", { "int" }, CVAR_GETTER_INT(Networking::NetLogs), CVAR_SETTER_INT(Networking::NetLogs));
 }
 
 void Networking::readPacket(Network::Packet& packet)
@@ -303,6 +309,9 @@ void Client::connect()
 	auto buf = Common::BitBuffer();
 	buf.writeBitsVar(ProtocolVersion);
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
-	// LOG("connecting to " + mServerAddress.toString());
+	if (Networking::NetLogs >= 1)
+	{
+		LOG("connecting to " + mServerAddress.toString());
+	}
 	mConnectTime = Clock::Now();
 }

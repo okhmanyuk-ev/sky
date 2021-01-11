@@ -11,6 +11,7 @@ namespace Shared::Networking
 	{
 	public:
 		static const int inline ProtocolVersion = 1;
+		static int inline NetLogs = 0;
 
 	public:
 		enum class Message : uint32_t // Client <-> Server (connectionless)
@@ -44,9 +45,6 @@ namespace Shared::Networking
 		using WriteCallback = std::function<void(Common::BitBuffer&)>;
 		using SendCallback = std::function<void(Common::BitBuffer&)>;
 		using DisconnectCallback = std::function<void(const std::string& reason)>;
-
-	public:
-		Channel();
 
 	private:
 		void frame() override;
