@@ -23,7 +23,7 @@ void Channel::frame()
 		return;
 	}
 
-	if (!mReliableMessages.empty() && !awaitingReliableAcknowledgement())
+	if (!mReliableMessages.empty() && !mIncomingReliableAcknowledgement)
 		awake(); // we want send reliable
 
 	auto durationSinceAwake = Clock::ToSeconds(now - mAwakeTime);
@@ -48,17 +48,11 @@ void Channel::transmit()
 
 	auto buf = Common::BitBuffer();
 
-	bool reliable = !mReliableMessages.empty() && !awaitingReliableAcknowledgement();
-
-	if (reliable)
-	{
-		mOutgoingReliableSequence = !mIncomingReliableAcknowledgement;
-		mReliableSequence = mOutgoingSequence;
-	}
+	bool reliable = !mReliableMessages.empty() && !mIncomingReliableAcknowledgement;
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
-	buf.writeBit(mOutgoingReliableSequence);
+	buf.writeBit(reliable);
 	buf.writeBit(mIncomingReliableSequence);
 
 	if (reliable)
@@ -73,7 +67,7 @@ void Channel::transmit()
 
 	if (Networking::NetLogs >= 2)
 	{
-		LOG("[OUT] seq: " + std::to_string(mOutgoingSequence) + ", ack: " + std::to_string(mIncomingSequence) + ", rel_seq: " + std::to_string(mOutgoingReliableSequence) +
+		LOG("[OUT] seq: " + std::to_string(mOutgoingSequence) + ", ack: " + std::to_string(mIncomingSequence) + ", rel_seq: " + std::to_string(reliable) +
 			", rel_ack: " + std::to_string(mIncomingReliableSequence) + ", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
@@ -83,11 +77,6 @@ void Channel::transmit()
 void Channel::awake()
 {
 	mAwakeTime = Clock::Now();
-}
-
-bool Channel::awaitingReliableAcknowledgement() const
-{
-	return mIncomingAcknowledgement < mReliableSequence;
 }
 
 void Channel::read(Common::BitBuffer& buf)
@@ -123,29 +112,40 @@ void Channel::read(Common::BitBuffer& buf)
 	mIncomingSequence = seq;
 	mIncomingAcknowledgement = ack;
 
-	if (rel_seq != mIncomingReliableSequence) // reliable received
-	{
-		mIncomingReliableSequence = rel_seq;
-		awake(); // we want answer as soon as possible
-	}
+	bool not_duplicated_reliable = !mIncomingReliableSequence && rel_seq;
+	mIncomingReliableSequence = rel_seq;
 
-	if (!awaitingReliableAcknowledgement() && rel_ack != mIncomingReliableAcknowledgement) // reliable delivered
+	if (rel_seq)
+		awake(); // we want reply every reliable packet
+
+	if (!mIncomingReliableAcknowledgement && rel_ack)
 	{
 		if (!mReliableMessages.empty())
 		{
 			mReliableMessages.pop_front();
 		}
-		mIncomingReliableAcknowledgement = rel_ack;
+		else if (Networking::NetLogs >= 1)
+		{
+			LOG("unexpected reliable acknowledgement!");
+		}
+		mIncomingReliableAcknowledgement = true;
+	}
+	else if (mIncomingReliableAcknowledgement && !rel_ack)
+	{
+		mIncomingReliableAcknowledgement = false;
 	}
 
-	while (buf.readBit())
+	if (not_duplicated_reliable)
 	{
-		auto msg = Common::BufferHelpers::ReadString(buf);
+		while (buf.readBit())
+		{
+			auto msg = Common::BufferHelpers::ReadString(buf);
 
-		if (mMessageReaders.count(msg) == 0)
-			throw std::runtime_error(("unknown message type in channel: " + msg).c_str());
+			if (mMessageReaders.count(msg) == 0)
+				throw std::runtime_error(("unknown message type in channel: " + msg).c_str());
 
-		mMessageReaders.at(msg)(buf);
+			mMessageReaders.at(msg)(buf);
+		}
 	}
 
 	mIncomingTime = Clock::Now();

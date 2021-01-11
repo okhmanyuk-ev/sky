@@ -10,7 +10,7 @@ namespace Shared::Networking
 	class Networking
 	{
 	public:
-		static const int inline ProtocolVersion = 1;
+		static const int inline ProtocolVersion = 2;
 		static int inline NetLogs = 0;
 
 	public:
@@ -50,7 +50,6 @@ namespace Shared::Networking
 		void frame() override;
 		void transmit();
 		void awake();
-		bool awaitingReliableAcknowledgement() const;
 
 	public:
 		void read(Common::BitBuffer& buf);
@@ -80,11 +79,8 @@ namespace Shared::Networking
 		uint32_t mIncomingSequence = 0;
 		uint32_t mIncomingAcknowledgement = 0;
 
-		bool mOutgoingReliableSequence = false;
 		bool mIncomingReliableSequence = false;
 		bool mIncomingReliableAcknowledgement = false;
-
-		uint32_t mReliableSequence = 0;
 
 		std::list<std::pair<std::string, std::shared_ptr<Common::BitBuffer>>> mReliableMessages;
 		std::map<std::string, ReadCallback> mMessageReaders;
