@@ -55,12 +55,12 @@ void System::frame()
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	socklen_t adr_size = sizeof(adr);
 #endif
-
+	
 	for (auto socket : mSockets)
 	{
 		while (true)
 		{
-			int size = recvfrom(socket->socket, mBuffer, 8192, 0, (sockaddr*)&adr, &adr_size);
+			int size = recvfrom(socket->socket, mBuffer, BufferSize, 0, (sockaddr*)&adr, &adr_size);
 
 			if (size == -1)
 				break;
@@ -171,13 +171,8 @@ void System::sendPacket(SocketHandle handle, const Packet& packet)
 	adr.sin_addr.s_addr = packet.adr.ip.l;
 	adr.sin_port = htons(packet.adr.port);
 
-#if defined(PLATFORM_WINDOWS)
-	sendto(socket_data->socket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
-		(SOCKADDR*)&adr, (int)sizeof(adr));
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	sendto(socket_data->socket, (const char*)packet.buf.getMemory(), packet.buf.getSize(), 0,
 		(sockaddr*)&adr, sizeof(adr));
-#endif
 
 	mOutgoingPacketsCount += 1;
 	mOutgoingBytesCount += packet.buf.getSize();

@@ -56,7 +56,9 @@ namespace Network
 
 	private:
 		std::unordered_set<SocketData*> mSockets;
-		char mBuffer[8192];
+
+		static const size_t inline BufferSize = 1024 * 64; // 64kb
+		char mBuffer[BufferSize];
 
 	public:
 		auto getIncomingPacketsCount() const { return mIncomingPacketsCount; }
