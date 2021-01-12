@@ -33,32 +33,26 @@ namespace Network
 		void throwLastError();
 
 	public:
-		using SocketHandle = void*;
+		using UdpSocketHandle = void*;
 		using ReadCallback = std::function<void(Packet&)>;
 
 	public:
-		SocketHandle createSocket(uint16_t port = 0);
-		void destroySocket(SocketHandle handle);
-
-		void sendPacket(SocketHandle handle, const Packet& packet);
-
-		void setReadCallback(SocketHandle handle, ReadCallback value);
-		uint64_t getPort(SocketHandle handle) const;
+		UdpSocketHandle createUdpSocket(uint16_t port = 0);
+		void destroyUdpSocket(UdpSocketHandle handle);
+		void sendUdpPacket(UdpSocketHandle handle, const Packet& packet);
+		void setUdpReadCallback(UdpSocketHandle handle, ReadCallback value);
+		uint64_t getUdpSocketPort(UdpSocketHandle handle) const;
 
 	private:
-		struct SocketData
+		struct UdpSocketData
 		{
 			uint64_t port;
 			ReadCallback readCallback = nullptr;
-#if defined(PLATFORM_WINDOWS)
-			SOCKET socket;
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 			int socket;
-#endif
 		};
 
 	private:
-		std::unordered_set<SocketData*> mSockets;
+		std::unordered_set<UdpSocketData*> mUdpSockets;
 
 		static const size_t inline BufferSize = 1024 * 64; // 64kb
 		char mBuffer[BufferSize];
@@ -100,11 +94,11 @@ namespace Network
 		Common::Timer mPacketsPerSecondTimer;
 	};
 
-	class Socket
+	class UdpSocket
 	{
 	public:
-		Socket(uint16_t port = 0);
-		~Socket();
+		UdpSocket(uint16_t port = 0);
+		~UdpSocket();
 
 	public:
 		void sendPacket(const Packet& packet);
@@ -114,7 +108,7 @@ namespace Network
 		auto getPort() const;
 
 	private:
-		System::SocketHandle mHandle = 0;
+		System::UdpSocketHandle mHandle = 0;
 	};
 
 }

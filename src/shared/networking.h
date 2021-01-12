@@ -39,7 +39,7 @@ namespace Shared::Networking
 		void readPacket(Network::Packet& packet);
 
 	private:
-		Network::Socket mSocket;
+		Network::UdpSocket mSocket;
 		std::map<uint32_t, ReadCallback> mMessages;
 	};
 

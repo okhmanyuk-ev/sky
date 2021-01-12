@@ -54,8 +54,8 @@ System::System()
 
 System::~System()
 {
-	while (!mSockets.empty())
-		destroySocket(static_cast<SocketHandle>(*mSockets.begin()));
+	while (!mUdpSockets.empty())
+		destroyUdpSocket(static_cast<UdpSocketHandle>(*mUdpSockets.begin()));
 
 #if defined(PLATFORM_WINDOWS)
 	WSACleanup();
@@ -67,7 +67,7 @@ void System::frame()
 	sockaddr_in adr;
 	socklen_t adr_size = sizeof(adr);
 	
-	for (auto socket : mSockets)
+	for (auto socket : mUdpSockets)
 	{
 		while (true)
 		{
@@ -102,9 +102,9 @@ void System::throwLastError()
 	throw std::runtime_error("socket error: " + std::to_string(err));
 }
 
-System::SocketHandle System::createSocket(uint16_t port)
+System::UdpSocketHandle System::createUdpSocket(uint16_t port)
 {
-	auto socket_data = new SocketData;
+	auto socket_data = new UdpSocketData;
 
 	socket_data->socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -134,21 +134,21 @@ System::SocketHandle System::createSocket(uint16_t port)
 		throwLastError();
 #endif
 
-	mSockets.insert(socket_data);
+	mUdpSockets.insert(socket_data);
 	return socket_data;
 }
 
-void System::destroySocket(SocketHandle handle)
+void System::destroyUdpSocket(UdpSocketHandle handle)
 {
-	auto socket_data = static_cast<SocketData*>(handle);
+	auto socket_data = static_cast<UdpSocketData*>(handle);
 	close(socket_data->socket);
-	mSockets.erase(socket_data);
+	mUdpSockets.erase(socket_data);
 	delete socket_data;
 }
 
-void System::sendPacket(SocketHandle handle, const Packet& packet)
+void System::sendUdpPacket(UdpSocketHandle handle, const Packet& packet)
 {
-	auto socket_data = static_cast<SocketData*>(handle);
+	auto socket_data = static_cast<UdpSocketData*>(handle);
 
 	sockaddr_in adr;
 	adr.sin_family = AF_INET;
@@ -162,39 +162,39 @@ void System::sendPacket(SocketHandle handle, const Packet& packet)
 	mOutgoingBytesCount += packet.buf.getSize();
 }
 
-void System::setReadCallback(SocketHandle handle, ReadCallback value)
+void System::setUdpReadCallback(UdpSocketHandle handle, ReadCallback value)
 {
-	auto socket_data = static_cast<SocketData*>(handle);
+	auto socket_data = static_cast<UdpSocketData*>(handle);
 	socket_data->readCallback = value;
 }
 
-uint64_t System::getPort(SocketHandle handle) const
+uint64_t System::getUdpSocketPort(UdpSocketHandle handle) const
 {
-	auto socket_data = static_cast<SocketData*>(handle);
+	auto socket_data = static_cast<UdpSocketData*>(handle);
 	return socket_data->port;
 }
 
-Socket::Socket(uint16_t port)
+UdpSocket::UdpSocket(uint16_t port)
 {
-	mHandle = NETWORK->createSocket(port);
+	mHandle = NETWORK->createUdpSocket(port);
 }
 
-Socket::~Socket()
+UdpSocket::~UdpSocket()
 {
-	NETWORK->destroySocket(mHandle);
+	NETWORK->destroyUdpSocket(mHandle);
 }
 
-void Socket::sendPacket(const Packet& packet)
+void UdpSocket::sendPacket(const Packet& packet)
 {
-	NETWORK->sendPacket(mHandle, packet);
+	NETWORK->sendUdpPacket(mHandle, packet);
 }
 
-void Socket::setReadCallback(System::ReadCallback value)
+void UdpSocket::setReadCallback(System::ReadCallback value)
 {
-	NETWORK->setReadCallback(mHandle, value);
+	NETWORK->setUdpReadCallback(mHandle, value);
 }
 
-auto Socket::getPort() const
+auto UdpSocket::getPort() const
 {
-	return NETWORK->getPort(mHandle);
+	return NETWORK->getUdpSocketPort(mHandle);
 }
