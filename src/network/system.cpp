@@ -17,12 +17,17 @@
 
 using namespace Network;
 
+#if defined(PLATFORM_WINDOWS)
 #define close closesocket
 #define socklen_t int
+#endif
 
 #if defined(PLATFORM_ANDROID) | defined(PLATFORM_IOS)
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
+#endif
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR -1
 #endif
 #endif
 
@@ -90,7 +95,11 @@ void System::frame()
 
 void System::throwLastError()
 {
-	throw std::runtime_error("socket error: " + std::to_string(GetLastError()));
+	auto err = errno;
+#if defined(PLATFORM_WINDOWS)
+	err = GetLastError();
+#endif
+	throw std::runtime_error("socket error: " + std::to_string(err));
 }
 
 System::SocketHandle System::createSocket(uint16_t port)
@@ -100,39 +109,30 @@ System::SocketHandle System::createSocket(uint16_t port)
 	socket_data->socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	if (socket_data->socket == INVALID_SOCKET)
-	{
 		throwLastError();
-	}
-
+	
 	sockaddr_in adr;
 	socklen_t adr_size = sizeof(adr);
 	adr.sin_family = AF_INET;
 	adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	adr.sin_port = htons(port);
 
-
 	if (bind(socket_data->socket, (sockaddr*)&adr, adr_size) == SOCKET_ERROR)
-	{
 		throwLastError();
-	}
-
+	
 	if (getsockname(socket_data->socket, (sockaddr*)&adr, &adr_size) == SOCKET_ERROR)
-	{
 		throwLastError();
-	}
-
+	
 	socket_data->port = ntohs(adr.sin_port);
 
-	u_long tr = 1;
-	
 #if defined(PLATFORM_WINDOWS)
+	u_long tr = 1;
 	if (ioctlsocket(socket_data->socket, FIONBIO, &tr) == SOCKET_ERROR)
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	if (fcntl(socket_data->socket, F_SETFL, fcntl(socket_data->socket, F_GETFL) | O_NONBLOCK) == -1)
-#endif
-	{
 		throwLastError();
-	}
+#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+	if (fcntl(socket_data->socket, F_SETFL, fcntl(socket_data->socket, F_GETFL) | O_NONBLOCK) == SOCKET_ERROR)
+		throwLastError();
+#endif
 
 	mSockets.insert(socket_data);
 	return socket_data;
