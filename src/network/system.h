@@ -29,6 +29,9 @@ namespace Network
 	private:
 		void frame() override;
 	
+	private:
+		void throwLastError();
+
 	public:
 		using SocketHandle = void*;
 		using ReadCallback = std::function<void(Packet&)>;

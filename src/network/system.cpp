@@ -1,4 +1,5 @@
 #include "system.h"
+#include <stdexcept>
 
 #if defined(PLATFORM_WINDOWS)
 #pragma comment(lib,"ws2_32.lib")
@@ -15,6 +16,15 @@
 #endif
 
 using namespace Network;
+
+#define close closesocket
+#define socklen_t int
+
+#if defined(PLATFORM_ANDROID) | defined(PLATFORM_IOS)
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET -1
+#endif
+#endif
 
 System::System()
 {
@@ -50,11 +60,7 @@ System::~System()
 void System::frame()
 {
 	sockaddr_in adr;
-#if defined(PLATFORM_WINDOWS)
-	int adr_size = sizeof(adr);
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	socklen_t adr_size = sizeof(adr);
-#endif
 	
 	for (auto socket : mSockets)
 	{
@@ -82,62 +88,50 @@ void System::frame()
 	}
 }
 
+void System::throwLastError()
+{
+	throw std::runtime_error("socket error: " + std::to_string(GetLastError()));
+}
+
 System::SocketHandle System::createSocket(uint16_t port)
 {
 	auto socket_data = new SocketData;
 
 	socket_data->socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-#if defined(PLATFORM_WINDOWS)
 	if (socket_data->socket == INVALID_SOCKET)
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	if (socket_data->socket == -1)
-#endif
 	{
-		//	auto a = errno;
-		//	throw std::runtime_error("error while creating socket");
+		throwLastError();
 	}
 
 	sockaddr_in adr;
-#if defined(PLATFORM_WINDOWS)
-	int adr_size = sizeof(adr);
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	socklen_t adr_size = sizeof(adr);
-#endif
 	adr.sin_family = AF_INET;
 	adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	adr.sin_port = htons(port);
 
 
-#if defined(PLATFORM_WINDOWS)
-	if (bind(socket_data->socket, (SOCKADDR*)&adr, adr_size) == SOCKET_ERROR)
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	if (bind(socket_data->socket, (sockaddr*)&adr, adr_size) == -1)
-#endif
+	if (bind(socket_data->socket, (sockaddr*)&adr, adr_size) == SOCKET_ERROR)
 	{
-		//	throw std::runtime_error("error while binding socket");
+		throwLastError();
 	}
 
-#if defined(PLATFORM_WINDOWS)
-	if (getsockname(socket_data->socket, (SOCKADDR*)&adr, &adr_size) == SOCKET_ERROR)
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-	if (getsockname(socket_data->socket, (sockaddr*)&adr, &adr_size) == -1)
-#endif
+	if (getsockname(socket_data->socket, (sockaddr*)&adr, &adr_size) == SOCKET_ERROR)
 	{
-		//	throw std::runtime_error("error while getting sock port");
+		throwLastError();
 	}
 
 	socket_data->port = ntohs(adr.sin_port);
 
 	u_long tr = 1;
-
+	
 #if defined(PLATFORM_WINDOWS)
 	if (ioctlsocket(socket_data->socket, FIONBIO, &tr) == SOCKET_ERROR)
 #elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	if (fcntl(socket_data->socket, F_SETFL, fcntl(socket_data->socket, F_GETFL) | O_NONBLOCK) == -1)
 #endif
 	{
-		//	throw std::runtime_error("cannot set socket blocking state");
+		throwLastError();
 	}
 
 	mSockets.insert(socket_data);
@@ -147,13 +141,7 @@ System::SocketHandle System::createSocket(uint16_t port)
 void System::destroySocket(SocketHandle handle)
 {
 	auto socket_data = static_cast<SocketData*>(handle);
-
-#if defined(PLATFORM_WINDOWS)
-	closesocket(socket_data->socket);
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	close(socket_data->socket);
-#endif
-
 	mSockets.erase(socket_data);
 	delete socket_data;
 }
@@ -162,11 +150,7 @@ void System::sendPacket(SocketHandle handle, const Packet& packet)
 {
 	auto socket_data = static_cast<SocketData*>(handle);
 
-#if defined(PLATFORM_WINDOWS)
-	SOCKADDR_IN adr;
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	sockaddr_in adr;
-#endif
 	adr.sin_family = AF_INET;
 	adr.sin_addr.s_addr = packet.adr.ip.l;
 	adr.sin_port = htons(packet.adr.port);
