@@ -325,6 +325,8 @@ endif()
 
 # websocketpp
 
+target_compile_definitions(${PROJECT_NAME} PUBLIC -DASIO_STANDALONE)
+
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_FUNCTIONAL_)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_SYSTEM_ERROR_)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_RANDOM_DEVICE_)
