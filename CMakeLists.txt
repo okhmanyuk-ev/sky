@@ -312,3 +312,13 @@ endif()
 # tinyobjloader
 
 target_include_directories(${PROJECT_NAME} PUBLIC lib/tinyobjloader)
+
+# asio
+
+add_library(asio INTERFACE)
+target_include_directories(asio INTERFACE lib/asio/include)
+target_link_libraries(${PROJECT_NAME} asio)
+
+if(WIN32)
+target_compile_definitions(${PROJECT_NAME} PUBLIC -DWIN32_LEAN_AND_MEAN)
+endif()

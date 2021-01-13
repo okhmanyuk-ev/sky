@@ -1,16 +1,16 @@
 #pragma once
 
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0601
+#endif
+
 #include <core/engine.h>
 
 #include "packet.h"
 #include <functional>
 
 #include <platform/defines.h>
-
-#if defined(PLATFORM_WINDOWS)
-#include <Windows.h>
-#include <winsock.h>
-#endif
+#include <asio.hpp>
 
 #include <common/frame_system.h>
 #include <unordered_set>
@@ -29,9 +29,6 @@ namespace Network
 	private:
 		void frame() override;
 	
-	private:
-		void throwLastError();
-
 	public:
 		using UdpSocketHandle = void*;
 		using ReadCallback = std::function<void(Packet&)>;
@@ -46,16 +43,15 @@ namespace Network
 	private:
 		struct UdpSocketData
 		{
+			UdpSocketData(asio::io_service& service, const asio::ip::udp::endpoint& endpoint) : socket(service, endpoint) {}
 			uint64_t port;
 			ReadCallback readCallback = nullptr;
-			int socket;
+			asio::ip::udp::socket socket;
 		};
 
 	private:
 		std::unordered_set<UdpSocketData*> mUdpSockets;
-
-		static const size_t inline BufferSize = 1024 * 64; // 64kb
-		char mBuffer[BufferSize];
+		asio::io_service mService;
 
 	public:
 		auto getIncomingPacketsCount() const { return mIncomingPacketsCount; }
@@ -110,5 +106,4 @@ namespace Network
 	private:
 		System::UdpSocketHandle mHandle = 0;
 	};
-
 }
