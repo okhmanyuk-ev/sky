@@ -322,3 +322,15 @@ target_link_libraries(${PROJECT_NAME} asio)
 if(WIN32)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DWIN32_LEAN_AND_MEAN)
 endif()
+
+# websocketpp
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_FUNCTIONAL_)
+target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_SYSTEM_ERROR_)
+target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_RANDOM_DEVICE_)
+target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_MEMORY_)
+target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_STL_)
+
+add_library(websocketpp INTERFACE)
+target_include_directories(websocketpp INTERFACE lib/websocketpp)
+target_link_libraries(${PROJECT_NAME} websocketpp)
