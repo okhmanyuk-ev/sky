@@ -50,5 +50,6 @@
 #include <shared/scene_stylebook.h>
 #include <shared/profile.h>
 #include <shared/networking_ws.h>
+#include <shared/networking_udp.h>
 
 #include <network/system.h>
