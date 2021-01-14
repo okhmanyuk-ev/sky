@@ -141,18 +141,18 @@ void Channel::read(Common::BitBuffer& buf)
 		// (when unreliable data code will be added)
 		// now we just abort reading
 
-		if (!rel)
-			throw std::runtime_error("rel_seq changed without rel_data");
-
-		auto rel_idx = buf.readBitsVar();
-
-		if (rel_idx > mIncomingReliableIndex) // reliable 100% received, index was increased
+		if (rel)
 		{
-			if (Networking::NetLogs >= 2)
-				LOG("reliable received");
+			auto rel_idx = buf.readBitsVar();
 
-			readReliableDataFromPacket(buf);
-			mIncomingReliableIndex = rel_idx;
+			if (rel_idx > mIncomingReliableIndex) // reliable 100% received, index was increased
+			{
+				if (Networking::NetLogs >= 2)
+					LOG("reliable received");
+
+				readReliableDataFromPacket(buf);
+				mIncomingReliableIndex = rel_idx;
+			}
 		}
 
 		mIncomingReliableSequence = rel_seq;
