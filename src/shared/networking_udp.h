@@ -9,7 +9,7 @@ namespace Shared::NetworkingUDP
 	class Networking
 	{
 	public:
-		static const int inline ProtocolVersion = 2;
+		static const int inline ProtocolVersion = 3;
 
 		static int inline NetLogs = 0;
 		static int inline NetReconnectDelay = 2; // sec
@@ -85,6 +85,11 @@ namespace Shared::NetworkingUDP
 		bool mOutgoingReliableSequence = false;
 		bool mIncomingReliableSequence = false;
 		bool mIncomingReliableAcknowledgement = false;
+
+		uint32_t mIncomingReliableIndex = 0;
+		uint32_t mOutgoingReliableIndex = 0;
+
+		uint32_t mReliableSentSequence = 0;
 
 		std::list<std::pair<std::string, std::shared_ptr<Common::BitBuffer>>> mReliableMessages;
 		std::map<std::string, ReadCallback> mMessageReaders;

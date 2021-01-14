@@ -48,20 +48,24 @@ void Channel::transmit()
 
 	auto buf = Common::BitBuffer();
 
-	bool rel_data = !isReliableAcknowledged();
+	bool rel = isReliableAcknowledged();
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
 	buf.writeBit(mOutgoingReliableSequence);
 	buf.writeBit(mIncomingReliableSequence);
-	buf.writeBit(rel_data);
+	buf.writeBit(rel);
 
-	if (rel_data)
+	if (rel)
 	{
+		buf.writeBitsVar(mOutgoingReliableIndex);
+
 		auto& [name, msg] = mReliableMessages.front();
 		buf.writeBit(true);
 		Common::BufferHelpers::WriteString(buf, name);
 		Common::BufferHelpers::WriteToBuffer(*msg, buf);
+
+		mReliableSentSequence = mOutgoingSequence;
 	}
 
 	buf.writeBit(false);
@@ -72,7 +76,7 @@ void Channel::transmit()
 			", ack: " + std::to_string(mIncomingSequence) +
 			", rel_seq: " + std::to_string(mOutgoingReliableSequence) +
 			", rel_ack: " + std::to_string(mIncomingReliableSequence) +
-			", rel_data: " + std::to_string(rel_data) +
+			", rel: " + std::to_string(rel) +
 			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
@@ -108,17 +112,7 @@ void Channel::read(Common::BitBuffer& buf)
 	auto ack = buf.readBitsVar();
 	auto rel_seq = buf.readBit();
 	auto rel_ack = buf.readBit();
-	auto rel_data = buf.readBit();
-
-	if (Networking::NetLogs == 2 || Networking::NetLogs == 4)
-	{
-		LOG("[IN ] seq: " + std::to_string(seq) +
-			", ack: " + std::to_string(ack) +
-			", rel_seq: " + std::to_string(rel_seq) +
-			", rel_ack: " + std::to_string(rel_ack) +
-			", rel_data: " + std::to_string(rel_data) +
-			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
-	}
+	auto rel = buf.readBit();
 
 	if (seq <= mIncomingSequence)
 	{
@@ -137,35 +131,60 @@ void Channel::read(Common::BitBuffer& buf)
 		}
 	}
 
-	if (rel_data)
+	if (rel)
 		awake();
 
 	mIncomingSequence = seq;
 	mIncomingAcknowledgement = ack;
 
-	// TODO: else skip reliable data
-	if (rel_seq != mIncomingReliableSequence) // reliable received
+	if (rel_seq != mIncomingReliableSequence) // reliable maybe received, flag was changed
 	{
-		if (Networking::NetLogs >= 2)
-			LOG("reliable received");
+		// TODO: else skip reliable data 
+		// (when unreliable data code will be added)
+		// now we just abort reading
 
-		if (!rel_data)
+		if (!rel)
 			throw std::runtime_error("rel_seq changed without rel_data");
 
-		readReliableDataFromPacket(buf);
+		auto rel_idx = buf.readBitsVar();
+
+		if (rel_idx > mIncomingReliableIndex) // reliable 100% received, index was increased
+		{
+			if (Networking::NetLogs >= 2)
+				LOG("reliable received");
+
+			readReliableDataFromPacket(buf);
+			mIncomingReliableIndex = rel_idx;
+		}
+
 		mIncomingReliableSequence = rel_seq;
 	}
 
-	if (rel_ack != mIncomingReliableAcknowledgement) // reliable delivered
+	if (rel_ack != mIncomingReliableAcknowledgement) // reliable maybe delivered
 	{
-		if (Networking::NetLogs >= 2)
-			LOG("reliable delivered");
-
-		if (!mReliableMessages.empty())
+		if (ack == mReliableSentSequence) // reliable delivered 100%, acked for mReliableSentSequence
 		{
-			mReliableMessages.pop_front();
+			if (Networking::NetLogs >= 2)
+				LOG("reliable delivered");
+
+			if (!mReliableMessages.empty())
+			{
+				mReliableMessages.pop_front();
+			}
+			mOutgoingReliableIndex += 1;
 		}
+
 		mIncomingReliableAcknowledgement = rel_ack;
+	}
+
+	if (Networking::NetLogs == 2 || Networking::NetLogs == 4)
+	{
+		LOG("[IN ] seq: " + std::to_string(seq) +
+			", ack: " + std::to_string(ack) +
+			", rel_seq: " + std::to_string(rel_seq) +
+			", rel_ack: " + std::to_string(rel_ack) +
+			", rel: " + std::to_string(rel) +
+			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
 	mIncomingTime = Clock::Now();
