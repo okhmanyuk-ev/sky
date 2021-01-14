@@ -123,7 +123,7 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
     [mTextField setSmartInsertDeleteType:UITextSmartInsertDeleteTypeYes];
     [mTextField addTarget:rootViewController action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
     [rootView addSubview:mTextField];
-    
+        
     refreshDimensions(); // we need mWidth & mHeight to be initialized here, but ResizeEvent may be a mistake here
 }
 
@@ -166,6 +166,11 @@ void SystemIos::setVirtualKeyboardText(const std::string& text)
 {
     [mTextField setText:[NSString stringWithUTF8String:text.c_str()]];
     EVENT->emit(System::VirtualKeyboardTextChanged({ text }));
+}
+
+std::string SystemIos::getDeviceId() const
+{
+    return UIDevice.currentDevice.identifierForVendor.UUIDString.UTF8String;
 }
 
 void SystemIos::refreshDimensions()
