@@ -52,6 +52,9 @@ void System::frame()
 			packet.adr.ip.b[3] = ip[3];
 			packet.adr.port = endpoint.port();
 
+			mIncomingPacketsCount += 1;
+			mIncomingBytesCount += packet.buf.getSize();
+
 			if (socket->readCallback)
 				socket->readCallback(packet);
 		}
