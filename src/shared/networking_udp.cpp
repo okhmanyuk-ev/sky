@@ -75,6 +75,7 @@ void Channel::transmit()
 			", rel_seq: " + std::to_string(mOutgoingReliableSequence) +
 			", rel_ack: " + std::to_string(mIncomingReliableSequence) +
 			", rel: " + std::to_string(rel) +
+			", rel_idx: " + std::to_string(mOutgoingReliableIndex) +
 			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
@@ -182,6 +183,7 @@ void Channel::read(Common::BitBuffer& buf)
 			", rel_seq: " + std::to_string(rel_seq) +
 			", rel_ack: " + std::to_string(rel_ack) +
 			", rel: " + std::to_string(rel) +
+			", rel_idx: " + std::to_string(mIncomingReliableIndex) +
 			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 

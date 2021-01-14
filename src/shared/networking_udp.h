@@ -87,7 +87,7 @@ namespace Shared::NetworkingUDP
 		bool mIncomingReliableAcknowledgement = false;
 
 		uint32_t mIncomingReliableIndex = 0;
-		uint32_t mOutgoingReliableIndex = 0;
+		uint32_t mOutgoingReliableIndex = 1;
 
 		uint32_t mReliableSentSequence = 0;
 
