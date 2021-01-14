@@ -158,9 +158,9 @@ void Channel::read(Common::BitBuffer& buf)
 		mIncomingReliableSequence = rel_seq;
 	}
 
-	if (rel_ack != mIncomingReliableAcknowledgement) // reliable maybe delivered
+	if (rel_ack == mIncomingReliableAcknowledgement) // reliable maybe delivered
 	{
-		if (ack == mReliableSentSequence) // reliable delivered 100%, acked for mReliableSentSequence
+		if (ack == mReliableSentSequence && rel_ack == mOutgoingReliableSequence) // reliable delivered 100%, acked for mReliableSentSequence
 		{
 			if (Networking::NetLogs >= 2)
 				LOG("reliable delivered");
