@@ -1,7 +1,7 @@
-#include "networking.h"
+#include "networking_ws.h"
 #include <console/device.h>
 
-namespace Shared::Networking
+namespace Shared::NetworkingWS
 {
 	Client::Client()
 	{

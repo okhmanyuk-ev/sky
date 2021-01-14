@@ -49,6 +49,6 @@
 #include <shared/scene_editor.h>
 #include <shared/scene_stylebook.h>
 #include <shared/profile.h>
-#include <shared/networking.h>
+#include <shared/networking_ws.h>
 
 #include <network/system.h>
