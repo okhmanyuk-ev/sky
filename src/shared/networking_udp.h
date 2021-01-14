@@ -54,7 +54,7 @@ namespace Shared::NetworkingUDP
 		void frame() override;
 		void transmit();
 		void awake();
-		bool isReliableAcknowledged() const;
+		bool wantSendReliable() const;
 		void readReliableDataFromPacket(Common::BitBuffer& buf);
 
 	public:

@@ -18,13 +18,8 @@ void Channel::frame()
 		return;
 	}
 
-	if (!mReliableMessages.empty() && isReliableAcknowledged())
-	{
-		mOutgoingReliableSequence = !mOutgoingReliableSequence; // start reliable sending
-	}
-
-	if (!isReliableAcknowledged())
-		awake(); // we want send reliables very fast while they not acknowledged
+	if (wantSendReliable())
+		awake();
 
 	auto durationSinceAwake = Clock::ToSeconds(now - mAwakeTime);
 	mTransmitDuration = (durationSinceAwake - 0.5f) / 5.0f;
@@ -48,7 +43,10 @@ void Channel::transmit()
 
 	auto buf = Common::BitBuffer();
 
-	bool rel = isReliableAcknowledged();
+	bool rel = wantSendReliable();
+
+	if (rel)
+		mOutgoingReliableSequence = !mOutgoingReliableSequence;
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
@@ -88,9 +86,9 @@ void Channel::awake()
 	mAwakeTime = Clock::Now();
 }
 
-bool Channel::isReliableAcknowledged() const
+bool Channel::wantSendReliable() const
 {
-	return mOutgoingReliableSequence == mIncomingReliableAcknowledgement;
+	return mOutgoingReliableSequence == mIncomingReliableAcknowledgement && !mReliableMessages.empty();
 }
 
 void Channel::readReliableDataFromPacket(Common::BitBuffer& buf)
