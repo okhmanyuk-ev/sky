@@ -574,6 +574,20 @@ void SystemAndroid::setVirtualKeyboardText(const std::string& text)
 	EndEnv();
 }
 
+std::string SystemAndroid::getUDID() const
+{
+	auto env = BeginEnv();
+	auto clazz = env->GetObjectClass(gSkyActivity);
+	auto method = env->GetMethodID(clazz, "getUDID", "()Ljava/lang/String;");
+	auto _result = (jstring)env->CallObjectMethod(gSkyActivity, method);
+	auto __result = env->GetStringUTFChars(_result, 0);
+	auto result = std::string(__result);
+	env->ReleaseStringUTFChars(_result, __result);
+	env->DeleteLocalRef(clazz);
+	EndEnv();
+	return result;
+}
+
 void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallback>& products)
 {
     gProductsMap = products;

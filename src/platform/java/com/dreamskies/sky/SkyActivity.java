@@ -19,6 +19,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.provider.Settings.Secure;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class SkyActivity extends NativeActivity {
     static {
@@ -214,6 +216,10 @@ public class SkyActivity extends NativeActivity {
     }
 
     // ------------
+
+    public String getUDID() {
+        return Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+    }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {

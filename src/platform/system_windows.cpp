@@ -108,6 +108,12 @@ std::string SystemWindows::getAppName() const
 	return mAppName;
 }
 
+
+std::string SystemWindows::getUDID() const
+{
+	return "TODO";
+}
+
 LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	auto thiz = (SystemWindows*)GetWindowLongPtr(hWnd, GWLP_USERDATA);

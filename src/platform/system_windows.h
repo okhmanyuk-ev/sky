@@ -56,6 +56,8 @@ namespace Platform
 		std::string getVirtualKeyboardText() const override { return ""; };
 		void setVirtualKeyboardText(const std::string& text) override { /*nothing*/ };
 
+		std::string getUDID() const override;
+
 		void initializeBilling(const ProductsMap& products) override;
 		void purchase(const std::string& product) override;
 

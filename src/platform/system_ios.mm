@@ -168,9 +168,10 @@ void SystemIos::setVirtualKeyboardText(const std::string& text)
     EVENT->emit(System::VirtualKeyboardTextChanged({ text }));
 }
 
-std::string SystemIos::getDeviceId() const
+std::string SystemIos::getUDID() const
 {
-    return UIDevice.currentDevice.identifierForVendor.UUIDString.UTF8String;
+    // return UIDevice.currentDevice.identifierForVendor.UUIDString.UTF8String;
+    return "need UDID, not UUID";
 }
 
 void SystemIos::refreshDimensions()
