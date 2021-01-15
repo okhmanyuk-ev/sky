@@ -217,7 +217,7 @@ public class SkyActivity extends NativeActivity {
 
     // ------------
 
-    public String getUDID() {
+    public String getUUID() {
         return Secure.getString(getContentResolver(), Secure.ANDROID_ID);
     }
 

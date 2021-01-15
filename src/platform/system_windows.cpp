@@ -1,6 +1,9 @@
 #include "system_windows.h"
 #ifdef PLATFORM_WINDOWS
 
+#pragma comment(lib, "rpcrt4.lib") 
+#include <rpc.h>
+
 using namespace Platform;
 
 int main(int argc, char* argv[])
@@ -109,9 +112,16 @@ std::string SystemWindows::getAppName() const
 }
 
 
-std::string SystemWindows::getUDID() const
+std::string SystemWindows::getUUID() const
 {
-	return "TODO";
+	UUID uuid;
+	UuidCreateSequential(&uuid);
+	uuid.Data1 = 0;
+	char* str;
+	UuidToStringA(&uuid, (RPC_CSTR*)&str);
+	auto result = std::string(str);
+	RpcStringFreeA((RPC_CSTR*)&str);
+	return result;
 }
 
 LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
