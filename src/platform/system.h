@@ -67,7 +67,7 @@ namespace Platform
 		virtual std::string getVirtualKeyboardText() const = 0;
 		virtual void setVirtualKeyboardText(const std::string& text) = 0;
         
-        virtual std::string getUDID() const = 0;
+        virtual std::string getDeviceId() const = 0;
 
 	public:        
 		float getLogicalWidth() const;
