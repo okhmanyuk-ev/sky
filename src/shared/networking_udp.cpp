@@ -373,3 +373,52 @@ void Client::connect()
 	}
 	mConnectTime = Clock::Now();
 }
+
+// simplechannel
+
+SimpleChannel::SimpleChannel()
+{
+	addMessageReader("event", [this](auto& buf) { onEventMessage(buf); });
+}
+
+void SimpleChannel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
+{
+	auto buf = Common::BitBuffer();
+	Common::BufferHelpers::WriteString(buf, name);
+	for (auto& [key, value] : params)
+	{
+		buf.writeBit(true);
+		Common::BufferHelpers::WriteString(buf, key);
+		Common::BufferHelpers::WriteString(buf, value);
+	}
+	buf.writeBit(false);
+	sendReliable("event", buf);
+}
+
+void SimpleChannel::onEventMessage(Common::BitBuffer& buf)
+{
+	auto name = Common::BufferHelpers::ReadString(buf);
+	auto params = std::map<std::string, std::string>();
+	while (buf.readBit())
+	{
+		auto key = Common::BufferHelpers::ReadString(buf);
+		auto value = Common::BufferHelpers::ReadString(buf);
+		params.insert({ key, value });
+	}
+	if (mEvents.count(name) > 0)
+	{
+		mEvents.at(name)(params);
+		return;
+	}
+	LOG("event: \"" + name + "\"");
+	for (const auto& [key, value] : params)
+	{
+		LOG(" - " + key + " : " + value);
+	}
+}
+
+void SimpleChannel::addEventCallback(const std::string& name, EventCallback callback)
+{
+	assert(mEvents.count(name) == 0);
+	mEvents[name] = callback;
+}

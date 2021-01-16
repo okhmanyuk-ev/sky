@@ -147,4 +147,25 @@ namespace Shared::NetworkingUDP
 		std::shared_ptr<Channel> mChannel = nullptr;
 		Clock::TimePoint mConnectTime = Clock::Now();
 	};
+
+	class SimpleChannel : public Channel
+	{
+	public:
+		using EventCallback = std::function<void(std::map<std::string, std::string>)>;
+		
+	public:
+		SimpleChannel();
+
+	public:
+		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params);
+
+	private:
+		void onEventMessage(Common::BitBuffer& buf);
+
+	public:
+		void addEventCallback(const std::string& name, EventCallback callback);
+
+	private:
+		std::map<std::string, EventCallback> mEvents;
+	};
 }
