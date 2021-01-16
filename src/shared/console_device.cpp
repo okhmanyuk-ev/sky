@@ -461,12 +461,18 @@ void ConsoleDevice::onEvent(const TouchEmulator::Event& e)
 
 void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardTextChanged& e)
 {
+	if (!isOpened())
+		return;
+
 	strcpy(mInputText, e.text.c_str());
 	mInputState = InputState::Text;
 }
 
 void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardEnterPressed& e)
 {
+	if (!isOpened())
+		return;
+
 	enterInput();
 }
 
