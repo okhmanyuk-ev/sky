@@ -4,6 +4,7 @@
 #include <console/device.h>
 #include <common/task_system.h>
 #include <common/event_system.h>
+#include <common/frame_system.h>
 
 using namespace Shared;
 
@@ -42,6 +43,9 @@ void Profile::save()
 	auto bson = nlohmann::json::to_bson(json);
 	Platform::Asset::Write("save.bson", bson.data(), bson.size(), Platform::Asset::Storage::Bundle);
 	mSaveMutex.unlock();
+	FRAME->addOneThreadsafe([] {
+		EVENT->emit(ProfileSavedEvent());
+	});
 }
 
 void Profile::clear()

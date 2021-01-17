@@ -8,11 +8,14 @@ namespace Shared
 	class Profile
 	{
 	public:
+		struct ProfileSavedEvent { };
 		struct ProfileClearedEvent { };
 
-	protected:
+	public:
 		virtual void read(const nlohmann::json& json) = 0;
 		virtual void write(nlohmann::json& json) = 0;
+	
+	protected:
 		virtual void makeDefault() = 0;
 
 	public:
