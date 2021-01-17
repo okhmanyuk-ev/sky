@@ -157,7 +157,7 @@ namespace Shared::NetworkingUDP
 		SimpleChannel();
 
 	public:
-		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params);
+		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params = {});
 
 	private:
 		void onEventMessage(Common::BitBuffer& buf);
