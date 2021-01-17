@@ -117,6 +117,7 @@ std::string SystemWindows::getUUID() const
 	UUID uuid;
 	UuidCreateSequential(&uuid);
 	uuid.Data1 = 0;
+	uuid.Data2 = 0;
 	char* str;
 	UuidToStringA(&uuid, (RPC_CSTR*)&str);
 	auto result = std::string(str);
