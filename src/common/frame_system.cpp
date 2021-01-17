@@ -25,6 +25,13 @@ void FrameSystem::addOne(Callback callback)
 	});
 }
 
+void FrameSystem::addOneThreadsafe(Callback callback)
+{
+	mMutex.lock();
+	mThreadsafeCallbacks.push_back(callback);
+	mMutex.unlock();
+}
+
 void FrameSystem::frame()
 {
 	if (mFramerateLimit > 0)
@@ -55,6 +62,14 @@ void FrameSystem::frame()
 		else
 			it = mFramers.erase(it);
 	}
+
+	mMutex.lock();
+	for (auto callback : mThreadsafeCallbacks)
+	{
+		callback();
+	}
+	mThreadsafeCallbacks.clear();
+	mMutex.unlock();
 }
 
 FrameSystem::Frameable::Frameable()

@@ -4,6 +4,7 @@
 #include <core/clock.h>
 #include <list>
 #include <functional>
+#include <mutex>
 
 #define FRAME ENGINE->getSystem<Common::FrameSystem>()
 
@@ -33,6 +34,7 @@ namespace Common
 		void add(StatusCallback callback);
 		void addInfinity(Callback callback);
 		void addOne(Callback callback);
+		void addOneThreadsafe(Callback callback);
 
 	public:
 		auto getFramerateLimit() const { return mFramerateLimit; }
@@ -53,12 +55,14 @@ namespace Common
 
 	private:
 		std::list<StatusCallback> mFramers;
+		std::list<Callback> mThreadsafeCallbacks;
 		int mFramerateLimit = 0;
 		bool mSleepAllowed = true;
 		double mTimeScale = 1.0;
 		Clock::TimePoint mLastTime = Clock::Now();
 		Clock::Duration mTimeDelta = Clock::Duration::zero();
 		Clock::Duration mUptime = Clock::Duration::zero();
+		std::mutex mMutex;
 	};
 
 	class FrameSystem::Frameable
