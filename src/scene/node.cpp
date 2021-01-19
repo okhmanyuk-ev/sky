@@ -65,12 +65,6 @@ glm::vec2 Node::project(const glm::vec2& value) const
 	glm::mat4 projection = glm::orthoLH(0.0f, scaled_size.x, scaled_size.y, 0.0f, -1.0f, 1.0f);
 	glm::vec4 viewport = { 0.0f, vp.size.y, vp.size.x, -vp.size.y };
 	glm::vec3 result = glm::project(original, getTransform(), projection, viewport);
-
-	if (glm::isnan(result.x))
-		result.x = 0.0f;
-
-	if (glm::isnan(result.y))
-		result.y = 0.0f;
 	
 	return { result.x, result.y };
 }
@@ -89,12 +83,6 @@ glm::vec2 Node::unproject(const glm::vec2& value) const
 	glm::mat4 projection = glm::orthoLH(0.0f, scaled_size.x, scaled_size.y, 0.0f, -1.0f, 1.0f);
 	glm::vec4 viewport = { 0.0f, vp.size.y, vp.size.x, -vp.size.y };
 	glm::vec3 result = glm::unProject(original, getTransform(), projection, viewport);
-
-	if (glm::isnan(result.x))
-		result.x = 0.0f;
-
-	if (glm::isnan(result.y))
-		result.y = 0.0f;
 
 	return { result.x, result.y };
 }
