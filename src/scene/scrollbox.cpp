@@ -45,34 +45,27 @@ void Scrollbox::physics(float dTime)
 	if (!isTouching())
 		speed *= delta;
 
-	mContent->setPosition(mContent->getPosition() + speed);
+	auto scroll_bound_size = getScrollBoundSize();
+
+	mScrollPosition += -speed / scroll_bound_size;
+
+	if (glm::isnan(mScrollPosition.x))
+		mScrollPosition.x = 0.0f;
+
+	if (glm::isnan(mScrollPosition.y))
+		mScrollPosition.y = 0.0f;
 
 	if (mInertiaEnabled && !isTouching())
 		mSpeed *= 1.0f - (mInertiaFriction * delta);
 	else
 		mSpeed = { 0.0f, 0.0f };
 
-	if (mContent->getX() + mContent->getAbsoluteWidth() < mBounding->getAbsoluteWidth())
-	{
-		mContent->setX(mBounding->getAbsoluteWidth() - mContent->getAbsoluteWidth());
-		mSpeed.x = 0.0f;
-	}
+	mScrollPosition = glm::clamp(mScrollPosition);
 
-	if (mContent->getY() + mContent->getAbsoluteHeight() < mBounding->getAbsoluteHeight())
-	{
-		mContent->setY(mBounding->getAbsoluteHeight() - mContent->getAbsoluteHeight());
-		mSpeed.y = 0.0f;
-	}
+	mContent->setPosition(-mScrollPosition * scroll_bound_size);
+}
 
-	if (mContent->getX() > 0.0f)
-	{
-		mContent->setX(0.0f);
-		mSpeed.x = 0.0f;
-	}
-
-	if (mContent->getY() > 0.0f)
-	{
-		mContent->setY(0.0f);
-		mSpeed.y = 0.0f;
-	}
+glm::vec2 Scrollbox::getScrollBoundSize() const
+{
+	return mContent->getAbsoluteSize() - mBounding->getAbsoluteSize();
 }

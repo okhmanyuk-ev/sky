@@ -36,11 +36,25 @@ namespace Scene
 		auto isInertiaEnabled() const { return mInertiaEnabled; }
 		void setInertiaEnabled(bool value) { mInertiaEnabled = value; }
 
+		auto getScrollPosition() const { return mScrollPosition; }
+		void setScrollPosition(const glm::vec2& value) { mScrollPosition = value; }
+
+		auto getHorizontalScrollPosition() const { return mScrollPosition.x; }
+		void setHorizontalScrollPosition(float value) { mScrollPosition.x = value; }
+
+		auto getVerticalScrollPosition() const { return mScrollPosition.y; }
+		void setVerticalScrollPosition(float value) { mScrollPosition.y = value; }
+
+		glm::vec2 getScrollBoundSize() const;
+		auto getHorizontalScrollBoundSize() const { return getScrollBoundSize().x; }
+		auto getVerticalScrollBoundSize() const { return getScrollBoundSize().y; }
+
 	private:
 		std::shared_ptr<Node> mBounding;
 		std::shared_ptr<Node> mContent;
 		glm::vec2 mSensitivity = { 1.0f, 1.0f };
 		glm::vec2 mSpeed = { 0.0f, 0.0f };
+		glm::vec2 mScrollPosition = { 0.0f, 0.0f };
 		float mInertiaFriction = 0.03f;
 		bool mInertiaEnabled = true;
 		Common::TimestepFixer mTimestepFixer;
