@@ -421,3 +421,47 @@ Factory::UAction Factory::ChangeCirclePie(std::shared_ptr<Scene::Circle> circle,
 		return ChangeCirclePie(circle, circle->getPie(), dest, duration, easingFunction);
 	});
 }
+
+Factory::UAction Factory::ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [scrollbox](float value) {
+		scrollbox->setHorizontalScrollPosition(value);
+	});
+}
+
+Factory::UAction Factory::ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([scrollbox, dest, duration, easingFunction] {
+		return ChangeHorizontalScrollPosition(scrollbox, scrollbox->getHorizontalScrollPosition(), dest, duration, easingFunction);
+	});
+}
+
+Factory::UAction Factory::ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [scrollbox](float value) {
+		scrollbox->setVerticalScrollPosition(value);
+	});
+}
+
+Factory::UAction Factory::ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([scrollbox, dest, duration, easingFunction] {
+		return ChangeVerticalScrollPosition(scrollbox, scrollbox->getVerticalScrollPosition(), dest, duration, easingFunction);
+	});
+}
+
+Factory::UAction Factory::ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction)
+{
+	return MakeParallel(
+		ChangeHorizontalScrollPosition(scrollbox, start.x, dest.x, duration, easingFunction),
+		ChangeVerticalScrollPosition(scrollbox, start.y, dest.y, duration, easingFunction)
+	);
+}
+
+Factory::UAction Factory::ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([scrollbox, dest, duration, easingFunction] {
+		return ChangeScrollPosition(scrollbox, scrollbox->getScrollPosition(), dest, duration, easingFunction);
+	});
+}
+

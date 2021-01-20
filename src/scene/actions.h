@@ -3,6 +3,7 @@
 #include <scene/node.h>
 #include <scene/color.h>
 #include <scene/circle.h>
+#include <scene/scrollbox.h>
 #include <common/actions.h>
 #include <common/easing.h>
 
@@ -96,4 +97,13 @@ namespace Actions::Factory
 
 	UAction ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
+	UAction ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
+	UAction ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
+	UAction ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
 }
