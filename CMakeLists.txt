@@ -158,6 +158,10 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
+if(MSVC)
+target_compile_definitions(${PROJECT_NAME} INTERFACE -D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 # glm
 
 set(GLM_QUIET ON)
@@ -186,7 +190,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC lib/rectpack2D/include)
 add_subdirectory(lib/tinyutf8)
 target_include_directories(${PROJECT_NAME} PUBLIC lib/tinyutf8)
 target_link_libraries(${PROJECT_NAME} tinyutf8)
-target_compile_options(tinyutf8 PRIVATE /wd4267)
+if(MSVC)
+	target_compile_options(tinyutf8 PRIVATE /wd4267)
+endif()
 set_property(TARGET tinyutf8 PROPERTY FOLDER ${LIBS_FOLDER})
 
 # fmod
@@ -333,6 +339,8 @@ target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_SYSTEM_ERR
 target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_RANDOM_DEVICE_)
 target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_MEMORY_)
 target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_STL_)
-target_compile_options(websocketpp INTERFACE /wd4267)
+if(MSVC)
+	target_compile_options(websocketpp INTERFACE /wd4267)
+endif()
 target_include_directories(websocketpp INTERFACE lib/websocketpp)
 target_link_libraries(${PROJECT_NAME} websocketpp)
