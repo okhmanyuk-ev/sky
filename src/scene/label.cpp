@@ -47,24 +47,27 @@ void Label::update()
 		mMeshDirty = true;
 	}
 
-	if (mMeshDirty)
+	if (!mMeshDirty)
+		return;
+
+	mMeshDirty = false;
+
+	if (!mMultiline)
 	{
-		if (!mMultiline)
-		{
-			mMeshWidth = mFont->getStringWidth(mText, mFontSize);
-			mMeshHeight = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
-			mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText, -mFont->getDescent() + mFont->getCustomVerticalOffset());
-		}
-		else if (width > 0.0f)
-		{
-			mMeshWidth = width;
-			std::tie(mMeshHeight, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, mText, width, mFontSize, mMultilineAlign);
-		}
-		mMeshDirty = false;
+		mMeshWidth = mFont->getStringWidth(mText, mFontSize);
+		mMeshHeight = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
+		mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText, -mFont->getDescent() + mFont->getCustomVerticalOffset());
+	}
+	else if (width > 0.0f)
+	{
+		mMeshWidth = width;
+		std::tie(mMeshHeight, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, mText, width, mFontSize, mMultilineAlign);
 	}
 
 	setWidth(mMeshWidth * (1.0f - getHorizontalStretch()));
 	setHeight(mMeshHeight * (1.0f - getVerticalStretch()));
+
+	Node::update();
 }
 
 void Label::draw()
