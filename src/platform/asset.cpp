@@ -71,7 +71,8 @@ void Asset::Write(const std::string& path, void* memory, size_t size, Storage st
 	if (storage != Storage::Assets)
 	{
 	//	std::experimental::filesystem::create_directories(std::experimental::filesystem::path(path).remove_filename().string());
-		std::ofstream file(path, std::ios::out | std::ios::binary);
+		auto p = StoragePathToAbsolute(path, storage);
+		std::ofstream file(p, std::ios::out | std::ios::binary);
 		file.write((char*)memory, size);
 		file.close();
 	}
@@ -134,7 +135,7 @@ std::string Asset::StoragePathToAbsolute(const std::string& path, Storage storag
 		return p + ("\\" + PLATFORM->getAppName()) + "\\" + path;
 #elif defined(PLATFORM_IOS)
 		return std::string([NSHomeDirectory() UTF8String]) + "/Documents/" + path;
-#elif defined(PLATFORM_IOS)
+#elif defined(PLATFORM_ANDROID)
 		return std::string(SystemAndroid::Instance->activity->internalDataPath) + "/" + path;
 #endif
 	}
