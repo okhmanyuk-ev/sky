@@ -32,22 +32,26 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 	auto local_pos = unproject(pos);
 
 	if (type != Touch::Begin)
-		mSpeed += local_pos - mPrevPosition;
+		mSpeed -= local_pos - mPrevPosition;
 
 	mPrevPosition = local_pos;
 }
 
 void Scrollbox::physics(float dTime)
 {
-	auto speed = mSpeed * mSensitivity;
+	auto speed = mSpeed * mSensitivity / getScrollBoundSize();
 	auto delta = dTime * 100.0f;
 
 	if (!isTouching())
 		speed *= delta;
 
-	auto scroll_bound_size = getScrollBoundSize();
+	mScrollPosition += speed;
 
-	mScrollPosition += -speed / scroll_bound_size;
+	if (getContent()->getAbsoluteWidth() < getBounding()->getAbsoluteWidth())
+		mScrollPosition.x = 0.0f;
+
+	if (getContent()->getAbsoluteHeight() < getBounding()->getAbsoluteHeight())
+		mScrollPosition.y = 0.0f;
 
 	if (glm::isnan(mScrollPosition.x))
 		mScrollPosition.x = 0.0f;
@@ -62,7 +66,7 @@ void Scrollbox::physics(float dTime)
 
 	mScrollPosition = glm::clamp(mScrollPosition);
 
-	mContent->setPosition(-mScrollPosition * scroll_bound_size);
+	mContent->setPosition(-mScrollPosition * getScrollBoundSize());
 }
 
 glm::vec2 Scrollbox::getScrollBoundSize() const

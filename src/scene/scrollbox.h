@@ -22,7 +22,7 @@ namespace Scene
 		
 	public:
 		auto getContent() { return mContent; }
-		auto getBounding() { return std::static_pointer_cast<Transform>(mBounding); }
+		auto getBounding() { return mBounding; }
 
 		auto getSensitivity() const { return mSensitivity; }
 		void setSensitivity(const glm::vec2& value) { mSensitivity = value; }
