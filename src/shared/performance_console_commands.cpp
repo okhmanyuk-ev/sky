@@ -6,6 +6,8 @@
 #include <shared/imgui_user.h>
 #include <renderer/defines.h>
 #include <shared/stats_system.h>
+#include <network/system.h>
+#include <common/helpers.h>
 
 using namespace Shared;
 
@@ -23,15 +25,11 @@ PerformanceConsoleCommands::PerformanceConsoleCommands()
 		CVAR_GETTER_INT(mWantShowTasks),
 		CVAR_SETTER_INT(mWantShowTasks));
 
-	return;
+	CONSOLE->registerCVar("hud_show_net_speed", "show net speed", { "bool" },
+		CVAR_GETTER_BOOL(mWantShowNetSpeed), CVAR_SETTER_BOOL(mWantShowNetSpeed));
 
-	CONSOLE->registerCVar("hud_show_framegraph", "show frame graph on screen", { "int" },
-		CVAR_GETTER_INT(mWantShowFrameGraph),
-		CVAR_SETTER_INT(mWantShowFrameGraph));
-
-	CONSOLE->registerCVar("hud_framegraph_capacity", "delta graph capacity", { "int" },
-		CVAR_GETTER_INT(mFrameGraphCapacity),
-		CVAR_SETTER_INT(mFrameGraphCapacity));
+	CONSOLE->registerCVar("hud_show_net_pps", "show net packets per second", { "bool" },
+		CVAR_GETTER_BOOL(mWantShowNetPps), CVAR_SETTER_BOOL(mWantShowNetPps));
 }
 
 PerformanceConsoleCommands::~PerformanceConsoleCommands()
@@ -54,35 +52,9 @@ void PerformanceConsoleCommands::frame()
 	else if (mWantShowTasks > 0)
 		ENGINE_STATS("tasks", TASK->getTasksCount());
 
-	return;
+	if (mWantShowNetSpeed)
+		STATS_INDICATE_GROUP("net", "net speed", Common::Helpers::BytesToNiceString(NETWORK->getBytesPerSecond()) + "/s");
 
-	if (mWantShowFrameGraph)
-	{
-		mDeltaTimes.push_front(Clock::ToSeconds(FRAME->getTimeDelta()));
-
-		while (mDeltaTimes.size() > static_cast<size_t>(mFrameGraphCapacity))
-			mDeltaTimes.pop_back();
-
-		auto getter = [](auto data, auto idx) {
-			return ((std::deque<float>*)data)->at(idx);
-		};
-
-		if (mWantShowFrameGraph > 1)
-		{
-			float min = 1000.0;
-			float max = 0.0;
-			for (float delta : mDeltaTimes)
-			{
-				min = glm::min(delta, min);
-				max = glm::max(delta, max);
-			}
-
-			auto s = "min: " + std::to_string(min) + ", max: " + std::to_string(max);
-			ImGui::PlotLines("Delta", getter, &mDeltaTimes, (int)mDeltaTimes.size(), 0, s.c_str(), FLT_MAX, FLT_MAX, ImVec2(0, 64));
-		}
-		else
-		{
-			ImGui::PlotLines("Delta", getter, &mDeltaTimes, (int)mDeltaTimes.size());
-		}
-	}
+	if (mWantShowNetPps)
+		STATS_INDICATE_GROUP("net", "net pps", std::to_string(NETWORK->getPacketsPerSecond()));
 }

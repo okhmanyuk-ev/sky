@@ -73,6 +73,15 @@ namespace Shared::NetworkingUDP
 		void setSendCallback(SendCallback value) { mSendCallback = value; }
 		void setDisconnectCallback(DisconnectCallback value) { mDisconnectCallback = value; }
 
+	public:
+		auto getIncomingSequence() const { return mIncomingSequence; }
+		auto getOutgoingSequence() const { return mOutgoingSequence; }
+		
+		auto getIncomingReliableIndex() const { return mIncomingReliableIndex; }
+		auto getOutgoingReliableIndex() const { return mOutgoingReliableIndex; }
+
+		auto getOutgoingReliableQueueSize() const { return mReliableMessages.size(); }
+
 	private:
 		SendCallback mSendCallback = nullptr;
 		DisconnectCallback mDisconnectCallback = nullptr;

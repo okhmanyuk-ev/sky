@@ -30,9 +30,9 @@ namespace Shared
 		int mWantShowFps = 0;
 		int mWantShowDrawcalls = 0;
 		int mWantShowTasks = 0;
-		int mWantShowFrameGraph = 0;
-		int mFrameGraphCapacity = 240;
-
+		bool mWantShowNetSpeed = false;
+		bool mWantShowNetPps = false;
+		
 	private:
 		std::deque<float> mDeltaTimes;
 	};
