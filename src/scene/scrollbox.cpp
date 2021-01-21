@@ -40,6 +40,13 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 void Scrollbox::physics(float dTime)
 {
 	auto speed = mSpeed * mSensitivity / getScrollBoundSize();
+
+	if (glm::isnan(speed.x))
+		speed.x = 0.0f;
+
+	if (glm::isnan(speed.y))
+		speed.y = 0.0f;
+
 	auto delta = dTime * 100.0f;
 
 	if (!isTouching())
@@ -51,12 +58,6 @@ void Scrollbox::physics(float dTime)
 		mScrollPosition.x = 0.0f;
 
 	if (getContent()->getAbsoluteHeight() < getBounding()->getAbsoluteHeight())
-		mScrollPosition.y = 0.0f;
-
-	if (glm::isnan(mScrollPosition.x))
-		mScrollPosition.x = 0.0f;
-
-	if (glm::isnan(mScrollPosition.y))
 		mScrollPosition.y = 0.0f;
 
 	if (mInertiaEnabled && !isTouching())
