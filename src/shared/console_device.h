@@ -96,7 +96,8 @@ namespace Shared
 	
 	private:
 		State mState = State::Closed;
-		char mInputText[128] = {};
+		static const int inline InputTextSize = 128;
+		char mInputText[InputTextSize] = {};
 		std::vector<std::string> mInputHistory;
 		int mInputHistoryPos = 0;
 		std::deque<Text> mBuffer;

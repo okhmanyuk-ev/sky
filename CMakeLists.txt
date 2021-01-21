@@ -186,6 +186,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC lib/rectpack2D/include)
 add_subdirectory(lib/tinyutf8)
 target_include_directories(${PROJECT_NAME} PUBLIC lib/tinyutf8)
 target_link_libraries(${PROJECT_NAME} tinyutf8)
+target_compile_options(tinyutf8 PRIVATE /wd4267)
 set_property(TARGET tinyutf8 PROPERTY FOLDER ${LIBS_FOLDER})
 
 # fmod
@@ -325,14 +326,13 @@ endif()
 
 # websocketpp
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DASIO_STANDALONE)
-
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_FUNCTIONAL_)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_SYSTEM_ERROR_)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_RANDOM_DEVICE_)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_MEMORY_)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WEBSOCKETPP_CPP11_STL_)
-
 add_library(websocketpp INTERFACE)
+target_compile_definitions(websocketpp INTERFACE -DASIO_STANDALONE)
+target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_FUNCTIONAL_)
+target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_SYSTEM_ERROR_)
+target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_RANDOM_DEVICE_)
+target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_MEMORY_)
+target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_STL_)
+target_compile_options(websocketpp INTERFACE /wd4267)
 target_include_directories(websocketpp INTERFACE lib/websocketpp)
 target_link_libraries(${PROJECT_NAME} websocketpp)

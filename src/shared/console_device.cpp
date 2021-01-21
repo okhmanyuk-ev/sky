@@ -464,7 +464,7 @@ void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardTextChanged& 
 	if (!isOpened())
 		return;
 
-	strcpy(mInputText, e.text.c_str());
+	strcpy_s(mInputText, InputTextSize, e.text.c_str());
 	mInputState = InputState::Text;
 }
 
@@ -483,7 +483,7 @@ void ConsoleDevice::handleInputCompletion(ImGuiTextEditCallbackData* data)
 
 	auto s = mCandidates[mSelectedCandidate].name;
 
-	strcpy(data->Buf, s.c_str());
+	strcpy_s(data->Buf, data->BufSize, s.c_str());
 	data->CursorPos = data->SelectionStart = data->SelectionEnd = data->BufTextLen = static_cast<int>(s.size());
 	data->BufDirty = true;
 	mInputState = InputState::Completion;
