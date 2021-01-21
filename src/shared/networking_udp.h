@@ -17,6 +17,8 @@ namespace Shared::NetworkingUDP
 		static int inline NetTransmitDurationMin = 100; // msec
 		static int inline NetTransmitDurationMax = 2000; // msec
 
+		static void Log(const std::string& text, int level);
+
 	public:
 		enum class Message : uint32_t // Client <-> Server (connectionless)
 		{

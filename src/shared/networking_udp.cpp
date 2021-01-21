@@ -115,19 +115,13 @@ void Channel::read(Common::BitBuffer& buf)
 
 	if (seq <= mIncomingSequence)
 	{
-		if (Networking::NetLogs >= 1)
-		{
-			LOG("out of order " + std::to_string(seq) + " packet");
-		}
+		Networking::Log("out of order " + std::to_string(seq) + " packet", 1);
 		return;
 	}
 
 	if (seq - mIncomingSequence > 1)
 	{
-		if (Networking::NetLogs >= 1)
-		{
-			LOG("dropped " + std::to_string(seq - mIncomingSequence - 1) + " packet(s)");
-		}
+		Networking::Log("dropped " + std::to_string(seq - mIncomingSequence - 1) + " packet(s)", 1);
 	}
 
 	if (rel)
@@ -148,8 +142,7 @@ void Channel::read(Common::BitBuffer& buf)
 
 			if (rel_idx > mIncomingReliableIndex) // reliable 100% received, index was increased
 			{
-				if (Networking::NetLogs >= 2)
-					LOG("reliable received");
+				Networking::Log("reliable received", 2);
 
 				readReliableDataFromPacket(buf);
 				mIncomingReliableIndex = rel_idx;
@@ -163,8 +156,7 @@ void Channel::read(Common::BitBuffer& buf)
 	{
 		if (ack == mReliableSentSequence && rel_ack == mOutgoingReliableSequence) // reliable delivered 100%, acked for mReliableSentSequence
 		{
-			if (Networking::NetLogs >= 2)
-				LOG("reliable delivered");
+			Networking::Log("reliable delivered", 2);
 
 			if (!mReliableMessages.empty())
 			{
@@ -207,6 +199,12 @@ void Channel::disconnect(const std::string& reason)
 }
 
 // networking
+
+void Networking::Log(const std::string& text, int level)
+{
+	if (NetLogs >= level)
+		LOG(text);
+}
 
 Networking::Networking(uint16_t port) : mSocket(port)
 {
@@ -273,11 +271,11 @@ Server::Server(uint16_t port) : Networking(port)
 		if (mChannels.count(adr) > 0)
 		{
 			mChannels.at(adr)->disconnect("reconnect");
-			LOG(adr.toString() + " reconnected");
+			Log(adr.toString() + " reconnected", 1);
 		}
 		else
 		{
-			LOG(adr.toString() + " connected");
+			Log(adr.toString() + " connected", 1);
 		}
 
 		assert(mChannels.count(adr) == 0);
@@ -287,7 +285,7 @@ Server::Server(uint16_t port) : Networking(port)
 			sendMessage((uint32_t)Message::Regular, adr, buf);
 		});
 		channel->setDisconnectCallback([this, adr](const auto& reason) {
-			LOG(adr.toString() + " disconnected (" + reason + ")");
+			Log(adr.toString() + " disconnected (" + reason + ")", 1);
 			mChannels.erase(adr);
 		});
 		mChannels[adr] = channel;
@@ -318,7 +316,7 @@ Client::Client(const Network::Address& server_address) :
 		if (mChannel)
 			return; // already connected
 
-		LOG("connected");
+		Log("connected", 1);
 
 		mChannel = createChannel();
 		mChannel->setSendCallback([this](auto& buf) {
@@ -326,7 +324,7 @@ Client::Client(const Network::Address& server_address) :
 		});
 		mChannel->setDisconnectCallback([this](const auto& reason) {
 			mChannel = nullptr;
-			LOG("disconnected (" + reason + ")");
+			Log("disconnected (" + reason + ")", 1);
 		});
 	});
 	addMessage((uint32_t)Networking::Message::Regular, [this](auto& packet) {
@@ -367,10 +365,7 @@ void Client::connect()
 	auto buf = Common::BitBuffer();
 	buf.writeBitsVar(ProtocolVersion);
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
-	if (Networking::NetLogs >= 1)
-	{
-		LOG("connecting to " + mServerAddress.toString());
-	}
+	Log("connecting to " + mServerAddress.toString(), 1);
 	mConnectTime = Clock::Now();
 }
 
