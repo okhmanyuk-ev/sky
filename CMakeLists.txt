@@ -159,7 +159,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 if(MSVC)
-target_compile_definitions(${PROJECT_NAME} INTERFACE -D_CRT_SECURE_NO_WARNINGS)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 # glm
