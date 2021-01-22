@@ -215,11 +215,8 @@ void SceneHelpers::GrayscaleSpriteButton::refresh()
 	setGrayIntensity(isActive() ? 0.0f : 1.0f);
 }
 
-SceneHelpers::FastButton::FastButton()
+SceneHelpers::RectangleButton::RectangleButton()
 {
-	setChooseBeginCallback([this] { setAlpha(0.66f); });
-	setChooseEndCallback([this] { setAlpha(0.33f); });
-
 	mLabel = std::make_shared<Scene::Label>();
 	mLabel->setFont(FONT("default"));
 	mLabel->setAnchor(0.5f);
@@ -229,10 +226,30 @@ SceneHelpers::FastButton::FastButton()
 	refresh();
 }
 
-void SceneHelpers::FastButton::refresh()
+void SceneHelpers::RectangleButton::refresh()
 {
 	setAlpha(isActive() ? 0.33f : 0.125f);
 	setClickEnabled(isActive());
+}
+
+void SceneHelpers::RectangleButton::onChooseBegin()
+{
+	Button<Scene::Rectangle>::onChooseBegin();
+
+	if (!mHighlightEnabled)
+		return;
+
+	setAlpha(0.66f);
+}
+
+void SceneHelpers::RectangleButton::onChooseEnd()
+{
+	Button<Scene::Rectangle>::onChooseEnd();
+
+	if (!mHighlightEnabled)
+		return;
+
+	setAlpha(0.33f);
 }
 
 SceneHelpers::Progressbar::Progressbar()

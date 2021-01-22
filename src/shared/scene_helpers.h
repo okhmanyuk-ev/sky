@@ -167,19 +167,27 @@ namespace Shared::SceneHelpers
 		void refresh() override;
 	};
 
-	class FastButton : public Button<Scene::Rectangle>
+	class RectangleButton : public Button<Scene::Rectangle>
 	{
 	public:
-		FastButton();
+		RectangleButton();
 
 	public:
 		void refresh() override;
 
 	public:
+		void onChooseBegin() override;
+		void onChooseEnd() override;
+
+	public:
 		auto getLabel() { return mLabel; }
+
+		auto isHighlightEnabled() const { return mHighlightEnabled;  }
+		void setHighlightEnabled(bool value) { mHighlightEnabled = value; }
 
 	private:
 		std::shared_ptr<Scene::Label> mLabel;
+		bool mHighlightEnabled = true;
 	};
 
 	class Progressbar : public Scene::Rectangle
