@@ -2,6 +2,7 @@
 
 #include <tinyutf8.hpp>
 #include <scene/all.h>
+#include <audio/system.h>
 
 namespace Shared::SceneHelpers
 {
@@ -50,18 +51,48 @@ namespace Shared::SceneHelpers
 	template <class T> class Button : public Scene::Clickable<T>
 	{
 	public:
+		using Callback = std::function<void()>;
+
+	public:
 		virtual void refresh() = 0;
+
+	protected:
+		void onClick() override
+		{
+			Scene::Clickable<T>::onClick();
+
+			auto executeCallback = [](auto callback) { if (callback) callback(); };
+			if (isActive())
+			{
+				executeCallback(mActiveCallback);
+				AUDIO->play(mActiveSound);
+			}
+			else
+			{
+				executeCallback(mInactiveCallback);
+				AUDIO->play(mInactiveSound);
+			}
+		}
 
 	public:
 		auto isActive() const { return mActive; }
-		void setActive(bool value) 
-		{ 
-			mActive = value; 
-			refresh();
-		}
+		void setActive(bool value) { mActive = value; refresh(); }
+
+		auto getActiveCallback() const { return mActiveCallback; }
+		void setActiveCallback(Callback value) { mActiveCallback = value; }
+
+		auto getInactiveCallback() const { return mInactiveCallback; }
+		void setInactiveCallback(Callback value) { mInactiveCallback = value; }
+
+		void setActiveSound(std::shared_ptr<Audio::Sound> value) { mActiveSound = value; }
+		void setInactiveSound(std::shared_ptr<Audio::Sound> value) { mInactiveSound = value; }
 
 	private:
 		bool mActive = true;
+		Callback mActiveCallback = nullptr;
+		Callback mInactiveCallback = nullptr;
+		std::shared_ptr<Audio::Sound> mActiveSound = nullptr;
+		std::shared_ptr<Audio::Sound> mInactiveSound = nullptr;
 	};
 
 	class GrayscaleSpriteButton : public Button<GrayscaleSprite>
