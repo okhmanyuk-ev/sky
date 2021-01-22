@@ -151,6 +151,8 @@ void Node::leaveDraw()
 
 void Node::update()
 {
+	mActions.update();
+
 	auto stretch = getStretch() / getScale();
 	auto parent_size = hasParent() ? getParent()->getAbsoluteSize() : getScene()->getViewport().size;
 

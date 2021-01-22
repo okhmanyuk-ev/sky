@@ -137,7 +137,7 @@ namespace Shared::SceneHelpers
 	// TODO: this can be moved to 'scene' namespace
 	// but we should solve the problem with actions in 'shared'.
 	// 'scene' does not know anything about 'shared'
-	template <class T> class Emitter : public Scene::Actionable<Scene::Node>
+	template <class T> class Emitter : public Scene::Node
 	{
 	public:
 		Emitter()
@@ -194,7 +194,7 @@ namespace Shared::SceneHelpers
 		}
 
 	protected:
-		virtual std::shared_ptr<Scene::Actionable<T>> createParticle() const = 0;
+		virtual std::shared_ptr<T> createParticle() const = 0;
 
 	public:
 		void setHolder(std::weak_ptr<Scene::Node> value) { mHolder = value; }
@@ -260,9 +260,9 @@ namespace Shared::SceneHelpers
 	class SpriteEmitter : public Emitter<Scene::Sprite>, public Scene::Blend, public Scene::Sampler
 	{
 	protected:
-		std::shared_ptr<Scene::Actionable<Scene::Sprite>> createParticle() const override
+		std::shared_ptr<Scene::Sprite> createParticle() const override
 		{
-			auto particle = std::make_shared<Scene::Actionable<Scene::Sprite>>();
+			auto particle = std::make_shared<Scene::Sprite>();
 			particle->setTexture(mTexture);
 			particle->setSampler(getSampler());
 			particle->setBlendMode(getBlendMode());
@@ -280,9 +280,9 @@ namespace Shared::SceneHelpers
 	class RectangleEmitter : public Emitter<Scene::Rectangle>
 	{
 	protected:
-		std::shared_ptr<Scene::Actionable<Scene::Rectangle>> createParticle() const override
+		std::shared_ptr<Scene::Rectangle> createParticle() const override
 		{
-			auto particle = std::make_shared<Scene::Actionable<Scene::Rectangle>>();
+			auto particle = std::make_shared<Scene::Rectangle>();
 			particle->setRounding(mRounding);
 			particle->setSize(mBeginSize);
 			return particle;

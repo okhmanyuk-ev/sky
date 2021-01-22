@@ -6,7 +6,7 @@ using namespace Shared;
 std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder,
 	std::shared_ptr<Scene::Node> target, const utf8_string& text, float text_size, float move_duration)
 {
-	auto label = std::make_shared<Scene::Actionable<Scene::Label>>();
+	auto label = std::make_shared<Scene::Label>();
 	label->setFont(FONT("default"));
 	label->setFontSize(text_size);
 	label->setText(text);
@@ -28,7 +28,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 {
 	auto holder = std::make_shared<Scene::Clickable<Scene::Node>>();
 
-	auto outer_rect = std::make_shared<Scene::Actionable<Scene::Rectangle>>();
+	auto outer_rect = std::make_shared<Scene::Rectangle>();
 	outer_rect->setAlpha(0.33f);
 	outer_rect->setStretch({ 0.0f, 1.0f });
 	outer_rect->setMargin(8.0f);

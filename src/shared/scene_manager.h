@@ -7,7 +7,7 @@
 
 namespace Shared
 {
-	class SceneManager : public Scene::Actionable<Scene::Node>
+	class SceneManager : public Scene::Node
 	{
 	public:
 		class Screen;

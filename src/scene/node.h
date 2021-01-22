@@ -5,6 +5,7 @@
 #include <scene/transform.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <common/actions.h>
 
 namespace Scene
 {
@@ -109,5 +110,13 @@ namespace Scene
 		bool mTransformReady = false;
 		std::string mBatchGroup = "";
 		glm::vec2 mAbsoluteSize = { 0.0f, 0.0f };
+
+	public:
+		void runAction(std::unique_ptr<Actions::Action> action) { mActions.add(std::move(action)); }
+		void clearActions() { mActions.clear(); }
+		bool hasActions() const { return mActions.hasActions(); }
+
+	private:
+		Actions::GenericActionsPlayer<Actions::Parallel> mActions;
 	};
 }
