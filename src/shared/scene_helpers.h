@@ -95,6 +95,69 @@ namespace Shared::SceneHelpers
 		std::shared_ptr<Audio::Sound> mInactiveSound = nullptr;
 	};
 
+	template <class T> class BouncingButtonBehavior : public T
+	{
+	public:
+		void updateTransform() override
+		{
+			T::updateTransform();
+
+			auto transform = getTransform();
+			transform = glm::translate(transform, { 0.5f * getAbsoluteSize(), 0.0f });
+			transform = glm::scale(transform, { mRelativeScale, mRelativeScale, 1.0f });
+			transform = glm::translate(transform, { 0.5f * -getAbsoluteSize(), 0.0f });
+			setTransform(transform);
+		}
+
+	public:
+		void onChooseBegin() override
+		{	
+			T::onChooseBegin();
+			
+			if (mChooseAnimationProcessing)
+				return;
+
+			mChooseAnimationStarted = true;
+			runAction(Actions::Factory::MakeSequence(
+				Actions::Factory::Execute([this] { 
+					mChooseAnimationProcessing = true; 
+				}),
+				Actions::Factory::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
+				Actions::Factory::Execute([this] {
+					mChooseAnimationProcessing = false;
+				})
+			));
+		}
+
+		void onChooseEnd() override
+		{
+			T::onChooseEnd();
+
+			if (!mChooseAnimationStarted)
+				return;
+
+			const float Duration = 0.125f / 1.5f;
+
+			mChooseAnimationStarted = false;
+			runAction(Actions::Factory::MakeSequence(
+				Actions::Factory::Wait(mChooseAnimationProcessing),
+				Actions::Factory::Execute([this] { 
+					mChooseAnimationProcessing = true; 
+				}),
+				Actions::Factory::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
+				Actions::Factory::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
+				Actions::Factory::Execute([this] {
+					mChooseAnimationProcessing = false;
+				})
+			));
+		}
+
+	private:
+		float mRelativeScale = 1.0f;
+		bool mChooseAnimationProcessing = false;
+		bool mChooseAnimationStarted = false;
+	};
+
 	class GrayscaleSpriteButton : public Button<GrayscaleSprite>
 	{
 	public:
