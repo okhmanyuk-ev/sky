@@ -294,3 +294,62 @@ void SceneHelpers::Hud::update()
 	setVerticalMargin(top + bottom);
 	setHorizontalMargin(left + right);
 }
+
+// pages manager
+
+size_t SceneHelpers::PagesManager::addPage(std::shared_ptr<Page> page)
+{
+	mPages.push_back(page);
+	return mPages.size() - 1;
+}
+
+void SceneHelpers::PagesManager::showPage(size_t index)
+{
+	assert(index < mPages.size());
+
+	if (mCurrentPage.has_value() && mCurrentPage.value() == index)
+		return;
+
+	if (mCurrentPage.has_value())
+		mPages.at(mCurrentPage.value())->onHide(mCurrentPage.value(), index);
+
+	auto prev_index = mCurrentPage;
+
+	mCurrentPage = index;
+	mPages.at(index)->onShow(prev_index, index);
+
+	if (mPageChangedCallback)
+		mPageChangedCallback(prev_index, index);
+}
+
+void SceneHelpers::PagesManager::showPrevPage()
+{
+	assert(mCurrentPage.has_value());
+	auto index = mCurrentPage.value();
+	
+	if (index <= 0)
+	{
+		if (mCarousel)
+			showPage(mPages.size() - 1);
+
+		return;
+	}
+
+	showPage(index - 1);
+}
+
+void SceneHelpers::PagesManager::showNextPage()
+{
+	assert(mCurrentPage.has_value());
+	auto index = mCurrentPage.value();
+
+	if (index >= mPages.size() - 1)
+	{
+		if (mCarousel)
+			showPage(0);
+		
+		return;
+	}
+
+	showPage(index + 1);
+}
