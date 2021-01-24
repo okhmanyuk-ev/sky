@@ -21,6 +21,9 @@ namespace Scene
 		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
 		
 	public:
+		glm::vec2 screenToScrollPosition(const glm::vec2& projected_screen_pos);
+
+	public:
 		auto getContent() { return mContent; }
 		auto getBounding() { return mBounding; }
 
@@ -45,9 +48,9 @@ namespace Scene
 		auto getVerticalScrollPosition() const { return mScrollPosition.y; }
 		void setVerticalScrollPosition(float value) { mScrollPosition.y = value; }
 
-		glm::vec2 getScrollBoundSize() const;
-		auto getHorizontalScrollBoundSize() const { return getScrollBoundSize().x; }
-		auto getVerticalScrollBoundSize() const { return getScrollBoundSize().y; }
+		glm::vec2 getScrollSpaceSize() const;
+		auto getHorizontalScrollSpaceSize() const { return getScrollSpaceSize().x; }
+		auto getVerticalScrollSpaceSize() const { return getScrollSpaceSize().y; }
 
 	private:
 		std::shared_ptr<Node> mBounding;

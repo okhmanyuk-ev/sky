@@ -39,7 +39,7 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 
 void Scrollbox::physics(float dTime)
 {
-	auto speed = mSpeed * mSensitivity / getScrollBoundSize();
+	auto speed = mSpeed * mSensitivity / getScrollSpaceSize();
 
 	if (glm::isnan(speed.x))
 		speed.x = 0.0f;
@@ -67,10 +67,17 @@ void Scrollbox::physics(float dTime)
 
 	mScrollPosition = glm::clamp(mScrollPosition);
 
-	mContent->setPosition(-mScrollPosition * getScrollBoundSize());
+	mContent->setAnchor(mScrollPosition);
+	mContent->setPivot(mScrollPosition);
 }
 
-glm::vec2 Scrollbox::getScrollBoundSize() const
+glm::vec2 Scrollbox::screenToScrollPosition(const glm::vec2& projected_screen_pos)
+{
+	auto unproject_pos = mContent->unproject(projected_screen_pos);
+	return unproject_pos / getScrollSpaceSize();
+}
+
+glm::vec2 Scrollbox::getScrollSpaceSize() const
 {
 	return mContent->getAbsoluteSize() - mBounding->getAbsoluteSize();
 }
