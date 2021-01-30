@@ -8,6 +8,7 @@
 #include "gtest-extra.h"
 
 #include <gtest/gtest-spi.h>
+
 #include <algorithm>
 #include <cstring>
 #include <memory>
@@ -20,14 +21,6 @@
 #include "util.h"
 
 namespace {
-
-// This is used to suppress coverity warnings about untrusted values.
-std::string sanitize(const std::string& s) {
-  std::string result;
-  for (std::string::const_iterator i = s.begin(), end = s.end(); i != end; ++i)
-    result.push_back(static_cast<char>(*i & 0xff));
-  return result;
-}
 
 // Tests that assertion macros evaluate their arguments exactly once.
 class SingleEvaluationTest : public ::testing::Test {
@@ -167,22 +160,24 @@ TEST_F(SingleEvaluationTest, FailedEXPECT_WRITE) {
 // Tests that assertion arguments are evaluated exactly once.
 TEST_F(SingleEvaluationTest, WriteTests) {
   // successful EXPECT_WRITE
-  EXPECT_WRITE(stdout,
-               {  // NOLINT
-                 a_++;
-                 std::printf("test");
-               },
-               (b_++, "test"));
+  EXPECT_WRITE(
+      stdout,
+      {  // NOLINT
+        a_++;
+        std::printf("test");
+      },
+      (b_++, "test"));
   EXPECT_EQ(1, a_);
   EXPECT_EQ(1, b_);
 
   // failed EXPECT_WRITE
-  EXPECT_NONFATAL_FAILURE(EXPECT_WRITE(stdout,
-                                       {  // NOLINT
-                                         a_++;
-                                         std::printf("test");
-                                       },
-                                       (b_++, "other")),
+  EXPECT_NONFATAL_FAILURE(EXPECT_WRITE(
+                              stdout,
+                              {  // NOLINT
+                                a_++;
+                                std::printf("test");
+                              },
+                              (b_++, "other")),
                           "Actual: test");
   EXPECT_EQ(2, a_);
   EXPECT_EQ(2, b_);
@@ -385,8 +380,8 @@ TEST(OutputRedirectTest, RestoreAndRead) {
   std::fprintf(file.get(), "[[[");
   OutputRedirect redir(file.get());
   std::fprintf(file.get(), "censored");
-  EXPECT_EQ("censored", sanitize(redir.restore_and_read()));
-  EXPECT_EQ("", sanitize(redir.restore_and_read()));
+  EXPECT_EQ("censored", redir.restore_and_read());
+  EXPECT_EQ("", redir.restore_and_read());
   std::fprintf(file.get(), "]]]");
   file = buffered_file();
   EXPECT_READ(read_end, "[[[]]]");
@@ -417,16 +412,17 @@ TEST(OutputRedirectTest, ErrorInDtor) {
   std::unique_ptr<OutputRedirect> redir(new OutputRedirect(f.get()));
   // Put a character in a file buffer.
   EXPECT_EQ('x', fputc('x', f.get()));
-  EXPECT_WRITE(stderr,
-               {
-                 // The close function must be called inside EXPECT_WRITE,
-                 // otherwise the system may recycle closed file descriptor when
-                 // redirecting the output in EXPECT_STDERR and the second close
-                 // will break output redirection.
-                 FMT_POSIX(close(write_fd));
-                 SUPPRESS_ASSERT(redir.reset(nullptr));
-               },
-               format_system_error(EBADF, "cannot flush stream"));
+  EXPECT_WRITE(
+      stderr,
+      {
+        // The close function must be called inside EXPECT_WRITE,
+        // otherwise the system may recycle closed file descriptor when
+        // redirecting the output in EXPECT_STDERR and the second close
+        // will break output redirection.
+        FMT_POSIX(close(write_fd));
+        SUPPRESS_ASSERT(redir.reset(nullptr));
+      },
+      format_system_error(EBADF, "cannot flush stream"));
   write_copy.dup2(write_fd);  // "undo" close or dtor of buffered_file will fail
 }
 
