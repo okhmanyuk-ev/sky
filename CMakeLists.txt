@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.19)
 project(sky)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -198,12 +198,20 @@ set_property(TARGET tinyutf8 PROPERTY FOLDER ${LIBS_FOLDER})
 # fmod
 
 target_include_directories(${PROJECT_NAME} PUBLIC lib/fmod/include)
-	
+
 if(WIN32)
 	add_library(fmod SHARED IMPORTED)
 	add_library(fmodstudio SHARED IMPORTED)
 	target_link_libraries(${PROJECT_NAME} fmod)
 	target_link_libraries(${PROJECT_NAME} fmodstudio)
+	set_target_properties(fmod PROPERTIES
+		MAP_IMPORTED_CONFIG_MINSIZEREL Release
+		MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release
+	)
+	set_target_properties(fmodstudio PROPERTIES
+		MAP_IMPORTED_CONFIG_MINSIZEREL Release
+		MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release
+	)
 	if(X64)
 		set_target_properties(fmod PROPERTIES
 			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x64/fmodL_vc.lib
@@ -212,12 +220,19 @@ if(WIN32)
 			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x64/fmodstudioL_vc.lib
 			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x64/fmodstudio_vc.lib)
 	else()
-		set_target_properties(fmod PROPERTIES
-			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodL_vc.lib
-			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmod_vc.lib)
-		set_target_properties(fmodstudio PROPERTIES
-			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudioL_vc.lib
-			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudio_vc.lib)
+		if(MINGW)
+			set_target_properties(fmod PROPERTIES
+				IMPORTED_IMPLIB ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmod_vc.lib)
+			set_target_properties(fmodstudio PROPERTIES
+				IMPORTED_IMPLIB ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudio_vc.lib)
+		else()
+			set_target_properties(fmod PROPERTIES
+				IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodL_vc.lib
+				IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmod_vc.lib)
+			set_target_properties(fmodstudio PROPERTIES
+				IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudioL_vc.lib
+				IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudio_vc.lib)
+		endif()
 	endif()
 elseif(ANDROID)
 	add_library(fmod SHARED IMPORTED)
