@@ -102,11 +102,11 @@ namespace Shared::SceneHelpers
 		{
 			T::updateTransform();
 
-			auto transform = getTransform();
-			transform = glm::translate(transform, { 0.5f * getAbsoluteSize(), 0.0f });
+			auto transform = T::getTransform();
+			transform = glm::translate(transform, { 0.5f * T::getAbsoluteSize(), 0.0f });
 			transform = glm::scale(transform, { mRelativeScale, mRelativeScale, 1.0f });
-			transform = glm::translate(transform, { 0.5f * -getAbsoluteSize(), 0.0f });
-			setTransform(transform);
+			transform = glm::translate(transform, { 0.5f * -T::getAbsoluteSize(), 0.0f });
+            T::setTransform(transform);
 		}
 
 	public:
@@ -118,7 +118,7 @@ namespace Shared::SceneHelpers
 				return;
 
 			mChooseAnimationStarted = true;
-			runAction(Actions::Factory::MakeSequence(
+            T::runAction(Actions::Factory::MakeSequence(
 				Actions::Factory::Execute([this] { 
 					mChooseAnimationProcessing = true; 
 				}),
@@ -139,7 +139,7 @@ namespace Shared::SceneHelpers
 			const float Duration = 0.125f / 1.5f;
 
 			mChooseAnimationStarted = false;
-			runAction(Actions::Factory::MakeSequence(
+            T::runAction(Actions::Factory::MakeSequence(
 				Actions::Factory::Wait(mChooseAnimationProcessing),
 				Actions::Factory::Execute([this] { 
 					mChooseAnimationProcessing = true; 
