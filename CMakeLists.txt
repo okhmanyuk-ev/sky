@@ -218,19 +218,12 @@ if(WIN32)
 			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x64/fmodstudioL_vc.lib
 			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x64/fmodstudio_vc.lib)
 	else()
-		if(MINGW)
-			set_target_properties(fmod PROPERTIES
-				IMPORTED_IMPLIB ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmod_vc.lib)
-			set_target_properties(fmodstudio PROPERTIES
-				IMPORTED_IMPLIB ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudio_vc.lib)
-		else()
-			set_target_properties(fmod PROPERTIES
-				IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodL_vc.lib
-				IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmod_vc.lib)
-			set_target_properties(fmodstudio PROPERTIES
-				IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudioL_vc.lib
-				IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudio_vc.lib)
-		endif()
+		set_target_properties(fmod PROPERTIES
+			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodL_vc.lib
+			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmod_vc.lib)
+		set_target_properties(fmodstudio PROPERTIES
+			IMPORTED_IMPLIB_DEBUG ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudioL_vc.lib
+			IMPORTED_IMPLIB_RELEASE ${PROJECT_SOURCE_DIR}/lib/fmod/x86/fmodstudio_vc.lib)
 	endif()
 elseif(ANDROID)
 	add_library(fmod SHARED IMPORTED)
