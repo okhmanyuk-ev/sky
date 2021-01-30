@@ -1,7 +1,7 @@
 #include "system_d3d11.h"
 
 #if defined(RENDERER_D3D11)
-#include <Platform/system_windows.h>
+#include <platform/system_windows.h>
 
 using namespace Renderer;
 

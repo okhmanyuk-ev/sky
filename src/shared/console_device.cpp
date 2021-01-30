@@ -122,13 +122,13 @@ void ConsoleDevice::frame()
 	auto savedCursor = ImGui::GetCursorPos();
 	
 	ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(engineName.c_str()).x - margin);
-	ImGui::TextDisabled(engineName.c_str());
+	ImGui::TextDisabled("%s", engineName.c_str());
 
 	ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(apiName.c_str()).x - margin);
-	ImGui::TextDisabled(apiName.c_str());
+	ImGui::TextDisabled("%s", apiName.c_str());
 	
 	ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(buildName.c_str()).x - margin);
-	ImGui::TextDisabled(buildName.c_str());
+	ImGui::TextDisabled("%s", buildName.c_str());
 
 	ImGui::SetCursorPos(savedCursor);
 
@@ -277,13 +277,13 @@ void ConsoleDevice::showCandidates(float height, float top)
 		if (auto args = candidate.args; !args.empty())
 		{
 			ImGui::SameLine();
-			ImGui::TextDisabled(args.c_str());
+			ImGui::TextDisabled("%s", args.c_str());
 		}
 
 		if (auto description = candidate.description; !description.empty())
 		{
 			ImGui::SameLine();
-			ImGui::TextDisabled(("- " + description).c_str());
+			ImGui::TextDisabled("%s", ("- " + description).c_str());
 		}
 	}
 
@@ -405,13 +405,15 @@ void ConsoleDevice::drawText(const Text& text, glm::vec4 colorMultiplier)
 	case Console::Color::White:
 		color = Graphics::Color::White;
 		break;
+	case Console::Color::Default:
+		break;
 	}
 
 	auto color4 = glm::vec4(color, 1.0f);
 
 	color4 *= colorMultiplier;
 
-	ImGui::TextColored(ImVec4(color4.r, color4.g, color4.b, color4.a), text.text.c_str());
+	ImGui::TextColored(ImVec4(color4.r, color4.g, color4.b, color4.a), "%s", text.text.c_str());
 
 	if (!text.linebreak)
 		ImGui::SameLine();

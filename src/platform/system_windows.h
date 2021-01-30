@@ -25,7 +25,7 @@ namespace Platform
 		void process() override;
 		void quit() override;
 
-		bool isFinished() const { return mFinished; };
+		bool isFinished() const override { return mFinished; };
 
 		int getWidth() const override { return mWidth; }
 		int getHeight() const override { return mHeight; }

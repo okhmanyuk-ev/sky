@@ -3,10 +3,10 @@
 #include <renderer/system.h>
 
 #if defined(RENDERER_D3D11)
-#include <Platform/system.h>
-#include <Common/event_system.h>
-#include <Common/hash.h>
-#include <Renderer/low_level_api.h>
+#include <platform/system.h>
+#include <common/event_system.h>
+#include <common/hash.h>
+#include <renderer/low_level_api.h>
 #include <map>
 
 namespace Renderer

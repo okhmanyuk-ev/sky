@@ -50,12 +50,12 @@ void ConsoleHelperCommands::frame()
 
 		for (auto& [name, cvar] : CONSOLE->getCVars())
 		{
-			ImGui::Text(name.c_str());
+			ImGui::Text("%s", name.c_str());
 
 			if (ImGui::IsItemHovered())
 			{
 				ImGui::BeginTooltip();
-				ImGui::Text(cvar.getDescription().c_str());
+				ImGui::Text("%s", cvar.getDescription().c_str());
 				ImGui::EndTooltip();
 			}
 

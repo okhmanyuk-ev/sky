@@ -62,10 +62,12 @@ void System::applyState()
 	}
 
 	if (scissorChanged)
+	{
 		if (state.scissor.has_value())
 			RENDERER->setScissor(state.scissor.value());
 		else
 			RENDERER->setScissor(nullptr);
+	}
 	
 	if (renderTargetChanged)
 		RENDERER->setRenderTarget(state.renderTarget);

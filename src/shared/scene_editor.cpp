@@ -93,8 +93,9 @@ void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
 	if (node == mHoveredNode)
 		flags |= ImGuiTreeNodeFlags_Selected;
 
-	auto name = typeid(*node).name();
-	bool opened = ImGui::TreeNodeEx((void*)&*node, flags, name);
+	auto& n = *node.get();
+	auto name = typeid(n).name();
+	bool opened = ImGui::TreeNodeEx((void*)&*node, flags, "%s", name);
 
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 	{
@@ -399,7 +400,7 @@ void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture, c
 
 		float region_sz = 64.0f;
 
-		region_sz = glm::min(region_sz, size.x, size.y);
+		region_sz = glm::min(region_sz, glm::min(size.x, size.y));
 
 		float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
 		float region_y = io.MousePos.y - pos.y - region_sz * 0.5f;

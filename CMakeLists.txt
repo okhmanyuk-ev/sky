@@ -157,10 +157,7 @@ elseif(ANDROID)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)
-
-if(MSVC)
-	target_compile_definitions(${PROJECT_NAME} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
-endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 
 # glm
 
@@ -171,6 +168,7 @@ add_subdirectory(lib/glm)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DGLM_ENABLE_EXPERIMENTAL)
 target_link_libraries(${PROJECT_NAME} glm)
 target_include_directories(${PROJECT_NAME} PUBLIC lib/glm)
+target_compile_definitions(glm INTERFACE -D_CRT_SECURE_NO_WARNINGS) # for clang
 
 # stb
 

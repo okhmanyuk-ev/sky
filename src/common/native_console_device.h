@@ -1,9 +1,9 @@
 #ifdef _WIN32
 #pragma once
 
-#include <Console/device.h>
-#include <Common/event_system.h>
-#include <Common/frame_system.h>
+#include <console/device.h>
+#include <common/event_system.h>
+#include <common/frame_system.h>
 
 #include <thread>
 #include <Windows.h>

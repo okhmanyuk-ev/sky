@@ -91,9 +91,9 @@ void StatsSystem::frame()
 
 			key_width = glm::max(key_width, ImGui::CalcTextSize(key.c_str()).x);
 			value_width = glm::max(value_width, ImGui::CalcTextSize(value.text.c_str()).x);
-			ImGui::TextColored(c, key.c_str());
+			ImGui::TextColored(c, "%s", key.c_str());
 			ImGui::NextColumn();
-			ImGui::TextColored(c, value.text.c_str());
+			ImGui::TextColored(c, "%s", value.text.c_str());
 			ImGui::NextColumn();
 		}
 	}
