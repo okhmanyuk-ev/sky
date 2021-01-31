@@ -345,6 +345,7 @@ target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_SYSTEM_ERR
 target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_RANDOM_DEVICE_)
 target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_MEMORY_)
 target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_STL_)
+target_compile_definitions(websocketpp INTERFACE -D_WEBSOCKETPP_CPP11_THREAD_)
 if(MSVC)
 	target_compile_options(websocketpp INTERFACE /wd4267)
 endif()
