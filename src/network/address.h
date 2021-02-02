@@ -9,7 +9,7 @@ namespace Network
 	{
 	public:
 		Address();
-		Address(std::string adr);
+		Address(const std::string& adr);
 
 	public:	
 		std::string toString() const;

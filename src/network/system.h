@@ -54,6 +54,9 @@ namespace Network
 		asio::io_service mService;
 
 	public:
+		auto& getIoService() { return mService; }
+
+	public:
 		auto getIncomingPacketsCount() const { return mIncomingPacketsCount; }
 		auto getOutgoingPacketsCount() const { return mOutgoingPacketsCount; }
 		auto getPacketsCount() const { return getIncomingPacketsCount() + getOutgoingPacketsCount(); }
