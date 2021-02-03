@@ -55,10 +55,10 @@ void Scrollbox::physics(float dTime)
 	mScrollPosition += speed;
 
 	if (getContent()->getAbsoluteWidth() < getBounding()->getAbsoluteWidth())
-		mScrollPosition.x = 0.0f;
+		mScrollPosition.x = mScrollOrigin.x;
 
 	if (getContent()->getAbsoluteHeight() < getBounding()->getAbsoluteHeight())
-		mScrollPosition.y = 0.0f;
+		mScrollPosition.y = mScrollOrigin.y;
 
 	if (mInertiaEnabled && !isTouching())
 		mSpeed *= 1.0f - (mInertiaFriction * delta);

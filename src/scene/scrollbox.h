@@ -48,6 +48,10 @@ namespace Scene
 		auto getVerticalScrollPosition() const { return mScrollPosition.y; }
 		void setVerticalScrollPosition(float value) { mScrollPosition.y = value; }
 
+		auto getScrollOrigin() const { return mScrollOrigin; }
+		void setScrollOrigin(const glm::vec2& value) { mScrollOrigin = value; }
+		void setScrollOrigin(float value) { setScrollOrigin({ value, value }); }
+
 		glm::vec2 getScrollSpaceSize() const;
 		auto getHorizontalScrollSpaceSize() const { return getScrollSpaceSize().x; }
 		auto getVerticalScrollSpaceSize() const { return getScrollSpaceSize().y; }
@@ -58,6 +62,7 @@ namespace Scene
 		glm::vec2 mSensitivity = { 1.0f, 1.0f };
 		glm::vec2 mSpeed = { 0.0f, 0.0f };
 		glm::vec2 mScrollPosition = { 0.0f, 0.0f };
+		glm::vec2 mScrollOrigin = { 0.0f, 0.0f };
 		float mInertiaFriction = 0.03f;
 		bool mInertiaEnabled = true;
 		Common::TimestepFixer mTimestepFixer;
