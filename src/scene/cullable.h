@@ -16,29 +16,54 @@ namespace Scene
 			if (!T::isTransformReady())
 				return;
 
-			auto [pos, size] = T::getGlobalBounds();			
-			auto viewport = T::getScene()->getViewport();
+			auto [left_pos, left_size] = T::getGlobalBounds();	
 
-			viewport.size *= PLATFORM->getScale();
-			viewport.position *= PLATFORM->getScale();
+			bool visible = false;
 
-			auto b_top = pos.y;
-			auto b_bottom = pos.y + size.y;
-			auto b_left = pos.x;
-			auto b_right = pos.x + size.x;
+			if (!mCullTarget.expired())
+			{
+				auto [right_pos, right_size] = mCullTarget.lock()->getGlobalBounds();
 
-			auto v_top = viewport.position.y;
-			auto v_bottom = viewport.position.y + viewport.size.y;
-			auto v_left = viewport.position.x;
-			auto v_right = viewport.position.x + viewport.size.x;
+				visible = isIntersect(left_pos, left_size, right_pos, right_size);
+			}
+			else
+			{
+				auto viewport = T::getScene()->getViewport();
 
-			auto visible =
-				b_right > v_left &&
-				b_left < v_right &&
-				b_bottom > v_top &&
-				b_top < v_bottom;
+				viewport.size *= PLATFORM->getScale();
+				viewport.position *= PLATFORM->getScale();
+
+				visible = isIntersect(left_pos, left_size, viewport.position, viewport.size);
+			}
 
 			T::setVisible(visible);
 		}
+
+	private:
+		bool isIntersect(const glm::vec2& left_pos, const glm::vec2& left_size, 
+			const glm::vec2& right_pos, const glm::vec2& right_size)
+		{
+			auto left_top = left_pos.y;
+			auto left_bottom = left_pos.y + left_size.y;
+			auto left_left = left_pos.x;
+			auto left_right = left_pos.x + left_size.x;
+
+			auto right_top = right_pos.y;
+			auto right_bottom = right_pos.y + right_size.y;
+			auto right_left = right_pos.x;
+			auto right_right = right_pos.x + right_size.x;
+
+			return
+				left_right > right_left &&
+				left_left < right_right &&
+				left_bottom > right_top &&
+				left_top < right_bottom;
+		}
+
+	public:
+		void setCullTarget(std::weak_ptr<Node> value) { mCullTarget = value; }
+
+	private:
+		std::weak_ptr<Node> mCullTarget;
 	};
 }
