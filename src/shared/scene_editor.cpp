@@ -119,13 +119,15 @@ void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
 void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 {
 	auto enabled = node->isEnabled();
-	ImGui::Checkbox("Enabled", &enabled);
-	node->setEnabled(enabled);
-
-	ImGui::Separator();
-
+	auto visible = node->isVisible();
 	auto batch_group = node->getBatchGroup();
+
+	ImGui::Checkbox("Enabled", &enabled);
+	ImGui::Checkbox("Visible", &visible);
 	ImGui::InputTextWithHint("Batch Group", "No batch group", batch_group.data(), batch_group.size(), ImGuiInputTextFlags_ReadOnly);
+
+	node->setEnabled(enabled);
+	node->setVisible(visible);
 
 	ImGui::Separator();
 
