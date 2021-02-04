@@ -294,3 +294,91 @@ void SceneHelpers::Hud::update()
 	setVerticalMargin(top + bottom);
 	setHorizontalMargin(left + right);
 }
+
+SceneHelpers::VerticalScrollbar::VerticalScrollbar()
+{
+	setStretch({ 0.0f, 1.0f });
+	setMargin({ 0.0f, 8.0f });
+	setAnchor({ 1.0f, 0.5f });
+	setPivot({ 1.0f, 0.5f });
+	setPosition({ -8.0f, 0.0f });
+	setSize({ 4.0f, 0.0f });
+	setAlpha(BarAlpha);
+	setRounding(1.0f);
+
+	mIndicator = std::make_shared<Scene::Rectangle>();
+	mIndicator->setSize({ 0.0f, 32.0f });
+	mIndicator->setStretch({ 1.0f, 0.0f });
+	mIndicator->setAnchor({ 0.5f, 0.0f });
+	mIndicator->setPivot({ 0.5f, 0.0f });
+	mIndicator->setRounding(1.0f);
+	mIndicator->setAlpha(IndicatorAlpha);
+	attach(mIndicator);
+}
+
+void SceneHelpers::VerticalScrollbar::update()
+{
+	Scene::Rectangle::update();
+
+	if (mScrollbox.expired())
+	{
+		setVisible(false);
+		return;
+	}
+
+	setVisible(true);
+
+	auto scrollbox = mScrollbox.lock();
+	auto v_scroll_pos = scrollbox->getVerticalScrollPosition();
+
+	mIndicator->setVerticalAnchor(v_scroll_pos);
+	mIndicator->setVerticalPivot(v_scroll_pos);
+
+	auto now = Clock::Now();
+
+	if (mPrevScrollPosition != v_scroll_pos)
+		mScrollMoveTime = now;
+
+	mPrevScrollPosition = v_scroll_pos;
+
+	if (mAlphaAnimating)
+		return;
+
+	const float Timeout = 0.5f;
+	const float AnimDuration = 0.25f;
+
+	if (now - mScrollMoveTime >= Clock::FromSeconds(Timeout))
+	{
+		if (mHidden)
+			return;
+		
+		mAlphaAnimating = true;
+		runAction(Actions::Factory::MakeSequence(
+			Actions::Factory::MakeParallel(
+				Actions::Factory::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
+				Actions::Factory::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
+			),
+			Actions::Factory::Execute([this] {
+				mHidden = true;
+				mAlphaAnimating = false;
+			})
+		));
+	}
+	else
+	{
+		if (!mHidden)
+			return;
+
+		mAlphaAnimating = true;
+		runAction(Actions::Factory::MakeSequence(
+			Actions::Factory::MakeParallel(
+				Actions::Factory::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
+				Actions::Factory::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
+			),
+			Actions::Factory::Execute([this] {
+				mHidden = false;
+				mAlphaAnimating = false;
+			})
+		));
+	}
+}

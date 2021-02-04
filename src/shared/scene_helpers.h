@@ -452,4 +452,31 @@ namespace Shared::SceneHelpers
 	protected:
 		void update() override;
 	};
+
+	// scrollbar
+
+	class VerticalScrollbar : public Scene::Rectangle,
+		public std::enable_shared_from_this<VerticalScrollbar>
+	{
+	private:
+		const float BarAlpha = 0.125f;
+		const float IndicatorAlpha = 0.5f;
+
+	public:
+		VerticalScrollbar();
+
+	public:
+		void update() override;
+
+	public:
+		void setScrollbox(std::weak_ptr<Scene::Scrollbox> value) { mScrollbox = value; }
+
+	private:
+		std::weak_ptr<Scene::Scrollbox> mScrollbox;
+		std::shared_ptr<Scene::Rectangle> mIndicator;
+		float mPrevScrollPosition = 0.0f;
+		Clock::TimePoint mScrollMoveTime = Clock::Now();
+		bool mAlphaAnimating = false;
+		bool mHidden = false;
+	};
 }
