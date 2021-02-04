@@ -217,6 +217,20 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Separator();
 	}
 
+	if (auto scrollbox = std::dynamic_pointer_cast<Scene::Scrollbox>(node); scrollbox != nullptr)
+	{
+		auto scroll_position = scrollbox->getScrollPosition();
+		auto scroll_origin = scrollbox->getScrollOrigin();
+
+		ImGui::DragFloat2("Scroll Position", (float*)&scroll_position, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat2("Scroll Origin", (float*)&scroll_origin, 0.01f, 0.0f, 1.0f);
+
+		scrollbox->setScrollPosition(scroll_position);
+		scrollbox->setScrollOrigin(scroll_origin);
+
+		ImGui::Separator();
+	}
+
 	auto absolute_size = node->getAbsoluteSize();
 	ImGui::InputFloat2("Absolute Size", (float*)&absolute_size, "%.3f", ImGuiInputTextFlags_ReadOnly);
 	ImGui::Separator();
