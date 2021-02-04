@@ -9,12 +9,9 @@ namespace Scene
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 
 	protected:
-		void update() override
+		void updateTransform() override
 		{
-			T::update();
-
-			if (!T::isTransformReady())
-				return;
+			T::updateTransform();
 
 			auto [left_pos, left_size] = T::getGlobalBounds();	
 
