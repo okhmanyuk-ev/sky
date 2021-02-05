@@ -347,24 +347,9 @@ void SceneHelpers::VerticalScrollbar::update()
 	const float Timeout = 0.5f;
 	const float AnimDuration = 0.25f;
 
-	if (now - mScrollMoveTime >= Clock::FromSeconds(Timeout))
-	{
-		if (mHidden)
-			return;
-		
-		mAlphaAnimating = true;
-		runAction(Actions::Factory::MakeSequence(
-			Actions::Factory::MakeParallel(
-				Actions::Factory::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
-				Actions::Factory::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
-			),
-			Actions::Factory::Execute([this] {
-				mHidden = true;
-				mAlphaAnimating = false;
-			})
-		));
-	}
-	else
+	bool visible = now - mScrollMoveTime < Clock::FromSeconds(Timeout) || scrollbox->isTouching();
+
+	if(visible)
 	{
 		if (!mHidden)
 			return;
@@ -377,6 +362,23 @@ void SceneHelpers::VerticalScrollbar::update()
 			),
 			Actions::Factory::Execute([this] {
 				mHidden = false;
+				mAlphaAnimating = false;
+			})
+		));
+	} 
+	else 
+	{
+		if (mHidden)
+			return;
+		
+		mAlphaAnimating = true;
+		runAction(Actions::Factory::MakeSequence(
+			Actions::Factory::MakeParallel(
+				Actions::Factory::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
+				Actions::Factory::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
+			),
+			Actions::Factory::Execute([this] {
+				mHidden = true;
 				mAlphaAnimating = false;
 			})
 		));
