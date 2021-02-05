@@ -306,13 +306,19 @@ void ConsoleDevice::showFastLogs()
 
 	auto now = Clock::Now();
 
-	for (auto& item : mBuffer)
+	for (int i = 0; i < mBuffer.size(); i++)
 	{
+		auto item = mBuffer.at(i);
+
 		const float MaxLifetime = 5.0f;
-		
+		const int MaxRowsOnScreen = 16;
+
 		auto lifetime = Clock::ToSeconds(now - item.time);
 
 		if (lifetime >= MaxLifetime)
+			continue;
+
+		if (mBuffer.size() - i > MaxRowsOnScreen)
 			continue;
 
 		auto alpha = 1.0f - glm::smoothstep(0.0f, MaxLifetime, lifetime);
