@@ -154,7 +154,7 @@ void Channel::read(Common::BitBuffer& buf)
 
 	if (rel_ack != mIncomingReliableAcknowledgement) // reliable maybe delivered
 	{
-		if (ack == mReliableSentSequence && rel_ack == mOutgoingReliableSequence) // reliable delivered 100%, acked for mReliableSentSequence
+		if (ack >= mReliableSentSequence && rel_ack == mOutgoingReliableSequence) // reliable delivered 100%, acked for mReliableSentSequence
 		{
 			Networking::Log("reliable delivered", 2);
 
@@ -400,15 +400,17 @@ void SimpleChannel::onEventMessage(Common::BitBuffer& buf)
 		auto value = Common::BufferHelpers::ReadString(buf);
 		params.insert({ key, value });
 	}
+	if (mShowEventLogs || mEvents.count(name) == 0)
+	{
+		LOG("event: \"" + name + "\"");
+		for (const auto& [key, value] : params)
+		{
+			LOG(" - " + key + " : " + value);
+		}
+	}
 	if (mEvents.count(name) > 0)
 	{
 		mEvents.at(name)(params);
-		return;
-	}
-	LOG("event: \"" + name + "\"");
-	for (const auto& [key, value] : params)
-	{
-		LOG(" - " + key + " : " + value);
 	}
 }
 

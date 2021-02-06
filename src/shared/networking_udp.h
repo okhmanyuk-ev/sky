@@ -178,5 +178,12 @@ namespace Shared::NetworkingUDP
 
 	private:
 		std::map<std::string, EventCallback> mEvents;
+		
+	public:
+		auto isShowEventLogs() const { return mShowEventLogs; }
+		void setShowEventLogs(bool value) { mShowEventLogs = value; }
+
+	private:
+		bool mShowEventLogs = false;
 	};
 }
