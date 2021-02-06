@@ -39,7 +39,7 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 
 void Scrollbox::physics(float dTime)
 {
-	auto speed = mSpeed * mSensitivity / getScrollSpaceSize();
+	auto speed = mSpeed * mSensitivity / getScrollSpace();
 
 	if (glm::isnan(speed.x))
 		speed.x = 0.0f;
@@ -74,10 +74,10 @@ void Scrollbox::physics(float dTime)
 glm::vec2 Scrollbox::screenToScrollPosition(const glm::vec2& projected_screen_pos)
 {
 	auto unproject_pos = mContent->unproject(projected_screen_pos);
-	return unproject_pos / getScrollSpaceSize();
+	return unproject_pos / getScrollSpace();
 }
 
-glm::vec2 Scrollbox::getScrollSpaceSize() const
+glm::vec2 Scrollbox::getScrollSpace() const
 {
 	return mContent->getAbsoluteSize() - mBounding->getAbsoluteSize();
 }

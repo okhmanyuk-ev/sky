@@ -52,9 +52,9 @@ namespace Scene
 		void setScrollOrigin(const glm::vec2& value) { mScrollOrigin = value; }
 		void setScrollOrigin(float value) { setScrollOrigin({ value, value }); }
 
-		glm::vec2 getScrollSpaceSize() const;
-		auto getHorizontalScrollSpaceSize() const { return getScrollSpaceSize().x; }
-		auto getVerticalScrollSpaceSize() const { return getScrollSpaceSize().y; }
+		glm::vec2 getScrollSpace() const;
+		auto getHorizontalScrollSpace() const { return getScrollSpace().x; }
+		auto getVerticalScrollSpace() const { return getScrollSpace().y; }
 
 	private:
 		std::shared_ptr<Node> mBounding;
