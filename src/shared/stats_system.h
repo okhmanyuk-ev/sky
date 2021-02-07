@@ -39,6 +39,7 @@ namespace Shared
 		void indicate(const std::string& key, int value, const std::string& group = "");
 		void indicate(const std::string& key, float value, const std::string& group = "");
 		void indicate(const std::string& key, size_t value, const std::string& group = "");
+		void indicate(const std::string& key, uint32_t value, const std::string& group = "");
 
 	public:
 		auto isEnabled() const { return mEnabled; }

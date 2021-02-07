@@ -157,3 +157,8 @@ void StatsSystem::indicate(const std::string& key, size_t value, const std::stri
 {
 	indicate(key, std::to_string(value), group);
 }
+
+void StatsSystem::indicate(const std::string& key, uint32_t value, const std::string& group)
+{
+	indicate(key, std::to_string(value), group);
+}
