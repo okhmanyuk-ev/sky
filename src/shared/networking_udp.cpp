@@ -78,7 +78,7 @@ void Channel::transmit()
 		mOutgoingReliableMessages.erase(index);
 
 		if (Networking::NetLogRel)
-			LOGF("send reliable {}", index);
+			LOGF("write reliable {}", index);
 	}
 
 	buf.writeBit(false);
@@ -218,6 +218,9 @@ void Channel::sendReliable(const std::string& msg, Common::BitBuffer& buf)
 {
 	mOutgoingReliableIndex += 1;
 	mOutgoingReliableMessages.insert({ mOutgoingReliableIndex, { msg, std::make_shared<Common::BitBuffer>(buf) } });
+	
+	if (Networking::NetLogRel)
+		LOGF("send reliable {}", mOutgoingReliableIndex);
 }
 
 void Channel::addMessageReader(const std::string& msg, ReadCallback callback)
