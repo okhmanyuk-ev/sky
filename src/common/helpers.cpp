@@ -1,5 +1,8 @@
 #include "helpers.h"
 
+#include <cstddef>
+#include <cstdint>
+
 using namespace Common;
 
 std::string Helpers::SecondsToFmtString(int seconds)
@@ -61,4 +64,46 @@ std::string Helpers::BytesToNiceString(uint64_t value) // we need uint128_t here
 		return std::to_string(value) + " " + l;
 
 	return std::to_string(value / (1ULL << q)) + "." + std::to_string(value % (1ULL << q) / ((1ULL << q) / 10 + 1)) + " " + l;
+}
+
+/*uint32_t Helpers::crc32c(const uint8_t* mem, size_t size, uint32_t crc)
+{
+	int k;
+
+	// CRC-32C (iSCSI) polynomial in reversed bit order. 
+	const auto POLY = 0x82f63b78;
+
+	crc = ~crc;
+	while (size--) {
+		crc ^= *mem++;
+		for (k = 0; k < 8; k++)
+			crc = crc & 1 ? (crc >> 1) ^ POLY : crc >> 1;
+	}
+	return ~crc;
+}*/
+
+uint32_t crc32_for_byte(uint32_t r) 
+{
+	for (int j = 0; j < 8; ++j)
+		r = (r & 1 ? 0 : (uint32_t)0xEDB88320L) ^ r >> 1;
+
+	return r ^ (uint32_t)0xFF000000L;
+}
+
+uint32_t Helpers::crc32(void* data, size_t size, uint32_t initial) 
+{
+	static uint32_t table[0x100];
+
+	if (!*table)
+	{
+		for (size_t i = 0; i < 0x100; ++i)
+			table[i] = crc32_for_byte(i);
+	}
+
+	uint32_t crc = initial;
+		
+	for (size_t i = 0; i < size; ++i)
+		crc = table[(uint8_t)crc ^ ((uint8_t*)data)[i]] ^ crc >> 8;
+
+	return crc;
 }

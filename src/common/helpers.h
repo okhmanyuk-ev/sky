@@ -27,4 +27,7 @@ namespace Common::Helpers
 	{
 		return RadialToGlobal(radius, RadialLimit);
 	}
+
+	uint32_t crc32(void* data, size_t size, uint32_t initial = 0);
+
 }
