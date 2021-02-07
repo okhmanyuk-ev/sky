@@ -18,16 +18,19 @@ void Channel::frame()
 		return;
 	}
 
-	if (wantSendReliable())
+	if (!mOutgoingReliableMessages.empty())
+		awake();
+
+	if (!mReliableAcknowledgements.empty())
 		awake();
 
 	auto durationSinceAwake = Clock::ToSeconds(now - mAwakeTime);
-	mTransmitDuration = (durationSinceAwake - 0.5f) / 5.0f;
-	mTransmitDuration = glm::clamp(mTransmitDuration, 0.0f, 1.0f);
+	mHibernation = (durationSinceAwake - 0.5f) / 10.0f;
+	mHibernation = glm::clamp(mHibernation, 0.0f, 1.0f);
 
 	auto min_duration = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDurationMin));
 	auto max_duration = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDurationMax));
-	auto transmit_duration = Clock::FromSeconds(glm::lerp(min_duration, max_duration, mTransmitDuration));
+	auto transmit_duration = Clock::FromSeconds(glm::lerp(min_duration, max_duration, mHibernation));
 
 	if (now - mTransmitTime < transmit_duration)
 		return;
@@ -40,42 +43,47 @@ void Channel::frame()
 void Channel::transmit()
 {
 	mOutgoingSequence += 1;
-
+	
 	auto buf = Common::BitBuffer();
-
-	bool rel = wantSendReliable();
-
-	if (rel)
-		mOutgoingReliableSequence = !mOutgoingReliableSequence;
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
-	buf.writeBit(mOutgoingReliableSequence);
-	buf.writeBit(mIncomingReliableSequence);
-	buf.writeBit(rel);
-
-	if (rel)
+	
+	for (auto index : mReliableAcknowledgements)
 	{
-		buf.writeBitsVar(mOutgoingReliableIndex);
-
-		auto& [name, msg] = mReliableMessages.front();
 		buf.writeBit(true);
-		Common::BufferHelpers::WriteString(buf, name);
-		Common::BufferHelpers::WriteToBuffer(*msg, buf);
-
-		mReliableSentSequence = mOutgoingSequence;
+		buf.writeBitsVar(index);
 	}
 
 	buf.writeBit(false);
 
-	if (Networking::NetLogs == 3 || Networking::NetLogs == 4)
+	mReliableAcknowledgements.clear();
+	
+	while (!mOutgoingReliableMessages.empty())
+	{
+		auto [index, rel_msg] = *mOutgoingReliableMessages.begin();
+
+		if (buf.getSize() + rel_msg.buf->getSize() > Networking::NetMaxPacketSize)
+			break;
+
+		buf.writeBit(true);
+		buf.writeBitsVar(index);
+		Common::BufferHelpers::WriteString(buf, rel_msg.name);
+
+		auto size = rel_msg.buf->getSize(); // TODO: use bit corrected size
+		buf.writeBitsVar(size);
+		buf.write(rel_msg.buf->getMemory(), size);
+
+		mPendingOutgoingReliableMessages.insert({ index, { mOutgoingSequence, rel_msg } });
+		mOutgoingReliableMessages.erase(index);
+	}
+
+	buf.writeBit(false);
+
+	if (Networking::NetLogs)
 	{
 		LOG("[OUT] seq: " + std::to_string(mOutgoingSequence) +
 			", ack: " + std::to_string(mIncomingSequence) +
-			", rel_seq: " + std::to_string(mOutgoingReliableSequence) +
-			", rel_ack: " + std::to_string(mIncomingReliableSequence) +
-			", rel: " + std::to_string(rel) +
-			", rel_idx: " + std::to_string(mOutgoingReliableIndex) +
 			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
@@ -87,21 +95,34 @@ void Channel::awake()
 	mAwakeTime = Clock::Now();
 }
 
-bool Channel::wantSendReliable() const
+void Channel::readReliableMessages()
 {
-	return mOutgoingReliableSequence == mIncomingReliableAcknowledgement && !mReliableMessages.empty();
+	while (mIncomingReliableMessages.count(mIncomingReliableIndex + 1))
+	{
+		mIncomingReliableIndex += 1;
+
+		auto [name, rel_buf] = mIncomingReliableMessages.at(mIncomingReliableIndex);
+
+		if (mMessageReaders.count(name) == 0)
+			throw std::runtime_error(("unknown message type in channel: " + name).c_str());
+
+		mMessageReaders.at(name)(*rel_buf);
+		mIncomingReliableMessages.erase(mIncomingReliableIndex);
+	}
 }
 
-void Channel::readReliableDataFromPacket(Common::BitBuffer& buf)
+void Channel::resendReliableMessages(uint32_t ack)
 {
-	while (buf.readBit())
+	for (auto [index, pending] : mPendingOutgoingReliableMessages)
 	{
-		auto msg = Common::BufferHelpers::ReadString(buf);
+		if (ack < pending.sequence)
+			continue;
 
-		if (mMessageReaders.count(msg) == 0)
-			throw std::runtime_error(("unknown message type in channel: " + msg).c_str());
+		mOutgoingReliableMessages.insert({ index, pending.rel_msg });
+		mPendingOutgoingReliableMessages.erase(index);
 
-		mMessageReaders.at(msg)(buf);
+		resendReliableMessages(ack);
+		return;
 	}
 }
 
@@ -109,73 +130,59 @@ void Channel::read(Common::BitBuffer& buf)
 {
 	auto seq = buf.readBitsVar();
 	auto ack = buf.readBitsVar();
-	auto rel_seq = buf.readBit();
-	auto rel_ack = buf.readBit();
-	auto rel = buf.readBit();
 
 	if (seq <= mIncomingSequence)
 	{
-		Networking::Log("out of order " + std::to_string(seq) + " packet", 1);
+		LOG("out of order " + std::to_string(seq) + " packet");
 		return;
 	}
 
 	if (seq - mIncomingSequence > 1)
 	{
-		Networking::Log("dropped " + std::to_string(seq - mIncomingSequence - 1) + " packet(s)", 1);
+		LOG("dropped " + std::to_string(seq - mIncomingSequence - 1) + " packet(s)");
 	}
-
-	if (rel)
-		awake();
 
 	mIncomingSequence = seq;
-	mIncomingAcknowledgement = ack;
 
-	if (rel_seq != mIncomingReliableSequence) // reliable maybe received, flag was changed
+	while (buf.readBit())
 	{
-		// TODO: else skip reliable data 
-		// (when unreliable data code will be added)
-		// now we just abort reading
-
-		if (rel)
-		{
-			auto rel_idx = buf.readBitsVar();
-
-			if (rel_idx > mIncomingReliableIndex) // reliable 100% received, index was increased
-			{
-				Networking::Log("reliable received", 2);
-
-				readReliableDataFromPacket(buf);
-				mIncomingReliableIndex = rel_idx;
-			}
-		}
-
-		mIncomingReliableSequence = rel_seq;
+		auto index = buf.readBitsVar();
+		mPendingOutgoingReliableMessages.erase(index);
 	}
 
-	if (rel_ack != mIncomingReliableAcknowledgement) // reliable maybe delivered
+	while (buf.readBit())
 	{
-		if (ack >= mReliableSentSequence && rel_ack == mOutgoingReliableSequence) // reliable delivered 100%, acked for mReliableSentSequence
-		{
-			Networking::Log("reliable delivered", 2);
+		auto index = buf.readBitsVar();
 
-			if (!mReliableMessages.empty())
-			{
-				mReliableMessages.pop_front();
-			}
-			mOutgoingReliableIndex += 1;
-		}
+		mReliableAcknowledgements.insert(index);
 
-		mIncomingReliableAcknowledgement = rel_ack;
+		auto msg = ReliableMessage();
+		msg.name = Common::BufferHelpers::ReadString(buf);
+		msg.buf = std::make_shared<Common::BitBuffer>();
+
+		auto size = buf.readBitsVar(); // TODO: use bit corrected size
+
+		for (uint32_t i = 0; i < size; i++)
+			msg.buf->write(buf.read<uint8_t>());
+
+		msg.buf->toStart();
+
+		if (mIncomingReliableIndex >= index) 
+			continue; // this index was already received and readed
+
+		if (mIncomingReliableMessages.count(index) > 0)
+			continue; // this index was already received but not yet readed
+
+		mIncomingReliableMessages.insert({ index, msg });
 	}
 
-	if (Networking::NetLogs == 2 || Networking::NetLogs == 4)
+	readReliableMessages();
+	resendReliableMessages(ack);
+
+	if (Networking::NetLogs)
 	{
 		LOG("[IN ] seq: " + std::to_string(seq) +
 			", ack: " + std::to_string(ack) +
-			", rel_seq: " + std::to_string(rel_seq) +
-			", rel_ack: " + std::to_string(rel_ack) +
-			", rel: " + std::to_string(rel) +
-			", rel_idx: " + std::to_string(mIncomingReliableIndex) +
 			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
@@ -184,7 +191,8 @@ void Channel::read(Common::BitBuffer& buf)
 
 void Channel::sendReliable(const std::string& msg, Common::BitBuffer& buf)
 {
-	mReliableMessages.push_back({ msg, std::make_shared<Common::BitBuffer>(buf) });
+	mOutgoingReliableIndex += 1;
+	mOutgoingReliableMessages.insert({ mOutgoingReliableIndex, { msg, std::make_shared<Common::BitBuffer>(buf) } });
 }
 
 void Channel::addMessageReader(const std::string& msg, ReadCallback callback)
@@ -200,22 +208,14 @@ void Channel::disconnect(const std::string& reason)
 
 // networking
 
-void Networking::Log(const std::string& text, int level)
-{
-	if (NetLogs >= level)
-		LOG(text);
-}
-
 Networking::Networking(uint16_t port) : mSocket(port)
 {
 	mSocket.setReadCallback([this](auto& packet) {
 		readPacket(packet);
 	});
 
-	auto description = "1 - loss, 2 - loss rel in, 3 - loss rel out, 4 - loss rel in out, 5 - loss rel";
-
-	CONSOLE->registerCVar("net_logs", description, { "int" },
-		CVAR_GETTER_INT(Networking::NetLogs), CVAR_SETTER_INT(Networking::NetLogs));
+	CONSOLE->registerCVar("net_logs", { "bool" },
+		CVAR_GETTER_BOOL(Networking::NetLogs), CVAR_SETTER_BOOL(Networking::NetLogs));
 
 	CONSOLE->registerCVar("net_reconnect_delay", { "sec" },
 		CVAR_GETTER_INT(Networking::NetReconnectDelay), CVAR_SETTER_INT(Networking::NetReconnectDelay));
@@ -228,6 +228,9 @@ Networking::Networking(uint16_t port) : mSocket(port)
 
 	CONSOLE->registerCVar("net_transmit_duration_max", { "msec" },
 		CVAR_GETTER_INT(Networking::NetTransmitDurationMax), CVAR_SETTER_INT(Networking::NetTransmitDurationMax));
+
+	CONSOLE->registerCVar("net_max_packet_size", { "bytes" },
+		CVAR_GETTER_INT(Networking::NetMaxPacketSize), CVAR_SETTER_INT(Networking::NetMaxPacketSize));
 }
 
 void Networking::readPacket(Network::Packet& packet)
@@ -271,11 +274,11 @@ Server::Server(uint16_t port) : Networking(port)
 		if (mChannels.count(adr) > 0)
 		{
 			mChannels.at(adr)->disconnect("reconnect");
-			Log(adr.toString() + " reconnected", 1);
+			LOG(adr.toString() + " reconnected");
 		}
 		else
 		{
-			Log(adr.toString() + " connected", 1);
+			LOG(adr.toString() + " connected");
 		}
 
 		assert(mChannels.count(adr) == 0);
@@ -285,7 +288,7 @@ Server::Server(uint16_t port) : Networking(port)
 			sendMessage((uint32_t)Message::Regular, adr, buf);
 		});
 		channel->setDisconnectCallback([this, adr](const auto& reason) {
-			Log(adr.toString() + " disconnected (" + reason + ")", 1);
+			LOG(adr.toString() + " disconnected (" + reason + ")");
 			mChannels.erase(adr);
 		});
 		mChannels[adr] = channel;
@@ -316,7 +319,7 @@ Client::Client(const Network::Address& server_address) :
 		if (mChannel)
 			return; // already connected
 
-		Log("connected", 1);
+		LOG("connected");
 
 		mChannel = createChannel();
 		mChannel->setSendCallback([this](auto& buf) {
@@ -324,7 +327,7 @@ Client::Client(const Network::Address& server_address) :
 		});
 		mChannel->setDisconnectCallback([this](const auto& reason) {
 			mChannel = nullptr;
-			Log("disconnected (" + reason + ")", 1);
+			LOG("disconnected (" + reason + ")");
 		});
 	});
 	addMessage((uint32_t)Networking::Message::Regular, [this](auto& packet) {
@@ -365,7 +368,7 @@ void Client::connect()
 	auto buf = Common::BitBuffer();
 	buf.writeBitsVar(ProtocolVersion);
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
-	Log("connecting to " + mServerAddress.toString(), 1);
+	LOG("connecting to " + mServerAddress.toString());
 	mConnectTime = Clock::Now();
 }
 

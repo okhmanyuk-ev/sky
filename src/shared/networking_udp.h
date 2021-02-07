@@ -2,6 +2,7 @@
 
 #include <network/system.h>
 #include <map>
+#include <set>
 #include <common/hash.h>
 
 namespace Shared::NetworkingUDP
@@ -11,13 +12,12 @@ namespace Shared::NetworkingUDP
 	public:
 		static const int inline ProtocolVersion = 3;
 
-		static int inline NetLogs = 0;
 		static int inline NetReconnectDelay = 2; // sec
 		static int inline NetTimeout = 15; // sec
-		static int inline NetTransmitDurationMin = 100; // msec
+		static int inline NetTransmitDurationMin = 10; // msec
 		static int inline NetTransmitDurationMax = 2000; // msec
-
-		static void Log(const std::string& text, int level);
+		static int inline NetMaxPacketSize = 1100;
+		static bool inline NetLogs = false;
 
 	public:
 		enum class Message : uint32_t // Client <-> Server (connectionless)
@@ -56,8 +56,8 @@ namespace Shared::NetworkingUDP
 		void frame() override;
 		void transmit();
 		void awake();
-		bool wantSendReliable() const;
-		void readReliableDataFromPacket(Common::BitBuffer& buf);
+		void readReliableMessages();
+		void resendReliableMessages(uint32_t ack);
 
 	public:
 		void read(Common::BitBuffer& buf);
@@ -65,44 +65,52 @@ namespace Shared::NetworkingUDP
 		void addMessageReader(const std::string& msg, ReadCallback callback);
 		void disconnect(const std::string& reason);
 
-	private:
-		float mTransmitDuration = 0.0f; // min(0.0)..max(1.0)
-		Clock::TimePoint mAwakeTime = Clock::Now();
-
 	public:
 		void setSendCallback(SendCallback value) { mSendCallback = value; }
 		void setDisconnectCallback(DisconnectCallback value) { mDisconnectCallback = value; }
 
 	public:
+		auto getHibernation() const { return mHibernation; }
+
 		auto getIncomingSequence() const { return mIncomingSequence; }
 		auto getOutgoingSequence() const { return mOutgoingSequence; }
-		
+
 		auto getIncomingReliableIndex() const { return mIncomingReliableIndex; }
 		auto getOutgoingReliableIndex() const { return mOutgoingReliableIndex; }
-
-		auto getOutgoingReliableQueueSize() const { return mReliableMessages.size(); }
-
+		
 	private:
 		SendCallback mSendCallback = nullptr;
 		DisconnectCallback mDisconnectCallback = nullptr;
+
+		float mHibernation = 0.0f; // 0.0f..1.0f
+		Clock::TimePoint mAwakeTime = Clock::Now();
 
 		Clock::TimePoint mTransmitTime = Clock::Now();
 		Clock::TimePoint mIncomingTime = Clock::Now();
 
 		uint32_t mOutgoingSequence = 0;
 		uint32_t mIncomingSequence = 0;
-		uint32_t mIncomingAcknowledgement = 0;
 
-		bool mOutgoingReliableSequence = false;
-		bool mIncomingReliableSequence = false;
-		bool mIncomingReliableAcknowledgement = false;
-
+		uint32_t mOutgoingReliableIndex = 0;
 		uint32_t mIncomingReliableIndex = 0;
-		uint32_t mOutgoingReliableIndex = 1;
 
-		uint32_t mReliableSentSequence = 0;
+		struct ReliableMessage
+		{
+			std::string name;
+			std::shared_ptr<Common::BitBuffer> buf;
+		};
 
-		std::list<std::pair<std::string, std::shared_ptr<Common::BitBuffer>>> mReliableMessages;
+		struct PendingReliableMessage
+		{
+			uint32_t sequence;
+			ReliableMessage rel_msg;
+		};
+
+		std::map</*index*/uint32_t, ReliableMessage> mOutgoingReliableMessages;
+		std::map</*index*/uint32_t, PendingReliableMessage> mPendingOutgoingReliableMessages;
+		std::set</*index*/uint32_t> mReliableAcknowledgements;
+		std::map</*index*/uint32_t, ReliableMessage> mIncomingReliableMessages;
+
 		std::map<std::string, ReadCallback> mMessageReaders;
 	};
 
