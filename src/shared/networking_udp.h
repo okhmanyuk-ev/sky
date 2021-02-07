@@ -1,8 +1,9 @@
 #pragma once
 
-#include <network/system.h>
 #include <map>
 #include <set>
+#include <optional>
+#include <network/system.h>
 #include <common/hash.h>
 
 namespace Shared::NetworkingUDP
@@ -26,6 +27,7 @@ namespace Shared::NetworkingUDP
 		{
 			Regular = 0,
 			Connect = 1,
+			Disconnect = 2
 		};
 
 	public:
@@ -114,6 +116,8 @@ namespace Shared::NetworkingUDP
 		std::map</*index*/uint32_t, ReliableMessage> mIncomingReliableMessages;
 
 		std::map<std::string, ReadCallback> mMessageReaders;
+
+		std::optional</*reason*/std::string> mDisconnect;
 	};
 
 	class Server : public Networking

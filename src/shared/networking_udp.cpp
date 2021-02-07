@@ -10,6 +10,12 @@ using namespace Shared::NetworkingUDP;
 
 void Channel::frame()
 {
+	if (mDisconnect.has_value())
+	{
+		mDisconnectCallback(mDisconnect.value());
+		return;
+	}
+
 	auto now = Clock::Now();
 
 	if (now - mIncomingTime >= Clock::FromSeconds(Networking::NetTimeout))
@@ -231,7 +237,10 @@ void Channel::addMessageReader(const std::string& msg, ReadCallback callback)
 
 void Channel::disconnect(const std::string& reason)
 {
-	mDisconnectCallback(reason);
+	if (mDisconnect.has_value())
+		return;
+
+	mDisconnect = reason;
 }
 
 // networking
@@ -322,7 +331,11 @@ Server::Server(uint16_t port) : Networking(port)
 			sendMessage((uint32_t)Message::Regular, adr, buf);
 		});
 		channel->setDisconnectCallback([this, adr](const auto& reason) {
-			LOG(adr.toString() + " disconnected (" + reason + ")");
+			auto buf = Common::BitBuffer();
+			Common::BufferHelpers::WriteString(buf, reason);
+			sendMessage((uint32_t)Message::Disconnect, adr, buf);
+
+			LOGF("{} disconnected ({})", adr.toString(), reason);
 			mChannels.erase(adr);
 		});
 		mChannels[adr] = channel;
@@ -342,6 +355,15 @@ Server::Server(uint16_t port) : Networking(port)
 			channel->disconnect(e.what());
 		}
 	});
+	addMessage((uint32_t)Message::Disconnect, [this](auto& packet) {
+		if (mChannels.count(packet.adr) == 0)
+			return;
+
+		auto reason = Common::BufferHelpers::ReadString(packet.buf);
+		
+		LOGF("{} disconnected ({})", packet.adr.toString(), reason);
+		mChannels.erase(packet.adr);
+	});
 }
 
 // client
@@ -360,8 +382,12 @@ Client::Client(const Network::Address& server_address) :
 			sendMessage((uint32_t)Networking::Message::Regular, mServerAddress, buf);
 		});
 		mChannel->setDisconnectCallback([this](const auto& reason) {
-			mChannel = nullptr;
+			auto buf = Common::BitBuffer();
+			Common::BufferHelpers::WriteString(buf, reason);
+			sendMessage((uint32_t)Message::Disconnect, mServerAddress, buf);
+
 			LOGF("disconnected ({})", reason);
+			mChannel = nullptr;
 		});
 	});
 	addMessage((uint32_t)Networking::Message::Regular, [this](auto& packet) {
@@ -379,6 +405,18 @@ Client::Client(const Network::Address& server_address) :
 		{
 			mChannel->disconnect(e.what());
 		}
+	});
+	addMessage((uint32_t)Message::Disconnect, [this](auto& packet) {
+		if (packet.adr != mServerAddress)
+			return;
+
+		if (!mChannel)
+			return;
+
+		auto reason = Common::BufferHelpers::ReadString(packet.buf);
+		
+		mChannel = nullptr;
+		LOGF("disconnected ({})", reason);
 	});
 
 	connect();
