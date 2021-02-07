@@ -28,11 +28,11 @@ void Channel::frame()
 	mHibernation = (durationSinceAwake - 0.5f) / 10.0f;
 	mHibernation = glm::clamp(mHibernation, 0.0f, 1.0f);
 
-	auto min_duration = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDurationMin));
-	auto max_duration = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDurationMax));
-	auto transmit_duration = Clock::FromSeconds(glm::lerp(min_duration, max_duration, mHibernation));
+	auto min_delay = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDelayMin));
+	auto max_delay = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDelayMax));
+	auto transmit_delay = Clock::FromSeconds(glm::lerp(min_delay, max_delay, mHibernation));
 
-	if (now - mTransmitTime < transmit_duration)
+	if (now - mTransmitTime < transmit_delay)
 		return;
 
 	mTransmitTime = now;
@@ -76,15 +76,17 @@ void Channel::transmit()
 
 		mPendingOutgoingReliableMessages.insert({ index, { mOutgoingSequence, rel_msg } });
 		mOutgoingReliableMessages.erase(index);
+
+		if (Networking::NetLogRel)
+			LOGF("send reliable {}", index);
 	}
 
 	buf.writeBit(false);
 
-	if (Networking::NetLogs)
+	if (Networking::NetLogPackets)
 	{
-		LOG("[OUT] seq: " + std::to_string(mOutgoingSequence) +
-			", ack: " + std::to_string(mIncomingSequence) +
-			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
+		LOGF("[OUT] seq: {}, ack: {}, size: {}", mOutgoingSequence, mIncomingSequence, 
+			Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
 	mSendCallback(buf);
@@ -102,6 +104,9 @@ void Channel::readReliableMessages()
 		mIncomingReliableIndex += 1;
 
 		auto [name, rel_buf] = mIncomingReliableMessages.at(mIncomingReliableIndex);
+
+		if (Networking::NetLogRel)
+			LOGF("read reliable {}", mIncomingReliableIndex);
 
 		if (mMessageReaders.count(name) == 0)
 			throw std::runtime_error(("unknown message type in channel: " + name).c_str());
@@ -121,6 +126,9 @@ void Channel::resendReliableMessages(uint32_t ack)
 		mOutgoingReliableMessages.insert({ index, pending.rel_msg });
 		mPendingOutgoingReliableMessages.erase(index);
 
+		if (Networking::NetLogRel)
+			LOGF("resend reliable {}", index);
+		
 		resendReliableMessages(ack);
 		return;
 	}
@@ -133,13 +141,16 @@ void Channel::read(Common::BitBuffer& buf)
 
 	if (seq <= mIncomingSequence)
 	{
-		LOG("out of order " + std::to_string(seq) + " packet");
+		if (Networking::NetLogDrops)
+			LOGF("out of order {} packet", seq);
+		
 		return;
 	}
 
 	if (seq - mIncomingSequence > 1)
 	{
-		LOG("dropped " + std::to_string(seq - mIncomingSequence - 1) + " packet(s)");
+		if (Networking::NetLogDrops)
+			LOGF("dropped {} packet(s)", seq - mIncomingSequence - 1);
 	}
 
 	mIncomingSequence = seq;
@@ -148,6 +159,9 @@ void Channel::read(Common::BitBuffer& buf)
 	{
 		auto index = buf.readBitsVar();
 		mPendingOutgoingReliableMessages.erase(index);
+		
+		if (Networking::NetLogRel)
+			LOGF("reliable {} delivered", index);
 	}
 
 	while (buf.readBit())
@@ -167,23 +181,34 @@ void Channel::read(Common::BitBuffer& buf)
 
 		msg.buf->toStart();
 
-		if (mIncomingReliableIndex >= index) 
-			continue; // this index was already received and readed
+		if (mIncomingReliableIndex >= index)
+		{
+			if (Networking::NetLogRel)
+				LOGF("reliable {} was already received and readed", index);
+
+			continue;
+		}
 
 		if (mIncomingReliableMessages.count(index) > 0)
-			continue; // this index was already received but not yet readed
+		{
+			if (Networking::NetLogRel)
+				LOGF("reliable {} was already received but not yet readed", index);
 
+			continue;
+		}
 		mIncomingReliableMessages.insert({ index, msg });
+
+		if (Networking::NetLogRel)
+			LOGF("reliable {} received", index);
 	}
 
 	readReliableMessages();
 	resendReliableMessages(ack);
 
-	if (Networking::NetLogs)
+	if (Networking::NetLogPackets)
 	{
-		LOG("[IN ] seq: " + std::to_string(seq) +
-			", ack: " + std::to_string(ack) +
-			", size: " + Common::Helpers::BytesToNiceString(buf.getSize()));
+		LOGF("[IN ] seq: {}, ack: {}, size: {}", seq, ack,
+			Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
 	mIncomingTime = Clock::Now();
@@ -214,8 +239,14 @@ Networking::Networking(uint16_t port) : mSocket(port)
 		readPacket(packet);
 	});
 
-	CONSOLE->registerCVar("net_logs", { "bool" },
-		CVAR_GETTER_BOOL(Networking::NetLogs), CVAR_SETTER_BOOL(Networking::NetLogs));
+	CONSOLE->registerCVar("net_log_packets", { "bool" },
+		CVAR_GETTER_BOOL(Networking::NetLogPackets), CVAR_SETTER_BOOL(Networking::NetLogPackets));
+
+	CONSOLE->registerCVar("net_log_drops", { "bool" },
+		CVAR_GETTER_BOOL(Networking::NetLogDrops), CVAR_SETTER_BOOL(Networking::NetLogDrops));
+
+	CONSOLE->registerCVar("net_log_rel", { "bool" },
+		CVAR_GETTER_BOOL(Networking::NetLogRel), CVAR_SETTER_BOOL(Networking::NetLogRel));
 
 	CONSOLE->registerCVar("net_reconnect_delay", { "sec" },
 		CVAR_GETTER_INT(Networking::NetReconnectDelay), CVAR_SETTER_INT(Networking::NetReconnectDelay));
@@ -223,11 +254,11 @@ Networking::Networking(uint16_t port) : mSocket(port)
 	CONSOLE->registerCVar("net_timeout", { "sec" },
 		CVAR_GETTER_INT(Networking::NetTimeout), CVAR_SETTER_INT(Networking::NetTimeout));
 
-	CONSOLE->registerCVar("net_transmit_duration_min", { "msec" },
-		CVAR_GETTER_INT(Networking::NetTransmitDurationMin), CVAR_SETTER_INT(Networking::NetTransmitDurationMin));
+	CONSOLE->registerCVar("net_transmit_delay_min", { "msec" },
+		CVAR_GETTER_INT(Networking::NetTransmitDelayMin), CVAR_SETTER_INT(Networking::NetTransmitDelayMin));
 
-	CONSOLE->registerCVar("net_transmit_duration_max", { "msec" },
-		CVAR_GETTER_INT(Networking::NetTransmitDurationMax), CVAR_SETTER_INT(Networking::NetTransmitDurationMax));
+	CONSOLE->registerCVar("net_transmit_delay_max", { "msec" },
+		CVAR_GETTER_INT(Networking::NetTransmitDelayMax), CVAR_SETTER_INT(Networking::NetTransmitDelayMax));
 
 	CONSOLE->registerCVar("net_max_packet_size", { "bytes" },
 		CVAR_GETTER_INT(Networking::NetMaxPacketSize), CVAR_SETTER_INT(Networking::NetMaxPacketSize));
@@ -327,7 +358,7 @@ Client::Client(const Network::Address& server_address) :
 		});
 		mChannel->setDisconnectCallback([this](const auto& reason) {
 			mChannel = nullptr;
-			LOG("disconnected (" + reason + ")");
+			LOGF("disconnected ({})", reason);
 		});
 	});
 	addMessage((uint32_t)Networking::Message::Regular, [this](auto& packet) {
@@ -408,7 +439,7 @@ void SimpleChannel::onEventMessage(Common::BitBuffer& buf)
 		LOG("event: \"" + name + "\"");
 		for (const auto& [key, value] : params)
 		{
-			LOG(" - " + key + " : " + value);
+			LOGF(" - {} : {}", key, value);
 		}
 	}
 	if (mEvents.count(name) > 0)

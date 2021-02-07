@@ -14,10 +14,12 @@ namespace Shared::NetworkingUDP
 
 		static int inline NetReconnectDelay = 2; // sec
 		static int inline NetTimeout = 15; // sec
-		static int inline NetTransmitDurationMin = 10; // msec
-		static int inline NetTransmitDurationMax = 2000; // msec
+		static int inline NetTransmitDelayMin = 10; // msec
+		static int inline NetTransmitDelayMax = 2000; // msec
 		static int inline NetMaxPacketSize = 1100;
-		static bool inline NetLogs = false;
+		static bool inline NetLogPackets = false;
+		static bool inline NetLogDrops = false;
+		static bool inline NetLogRel = false;
 
 	public:
 		enum class Message : uint32_t // Client <-> Server (connectionless)

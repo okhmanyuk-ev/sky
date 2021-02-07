@@ -1,12 +1,14 @@
 #pragma once
 
-#include <core/engine.h>
-
 #include <string>
 #include <functional>
+#include <core/engine.h>
+#include <fmt/format.h>
 
 #define LOG(S) CONSOLE_DEVICE->writeLine(S)
+#define LOGF(S, ...) LOG(fmt::format(S, __VA_ARGS__))
 #define LOGC(S, C) CONSOLE_DEVICE->writeLine(S, C)
+#define LOGCF(S, C, ...) LOGC(fmt::format(S, __VA_ARGS__), C)
 
 #define CONSOLE_DEVICE ENGINE->getSystem<Console::Device>()
 
