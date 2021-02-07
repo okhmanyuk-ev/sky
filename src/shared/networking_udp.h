@@ -18,7 +18,7 @@ namespace Shared::NetworkingUDP
 		static int inline NetTransmitDelayMax = 2000; // msec
 		static int inline NetMaxPacketSize = 1100;
 		static bool inline NetLogPackets = false;
-		static bool inline NetLogDrops = false;
+		static bool inline NetLogLoss = false;
 		static bool inline NetLogRel = false;
 
 	public:

@@ -141,7 +141,7 @@ void Channel::read(Common::BitBuffer& buf)
 
 	if (seq <= mIncomingSequence)
 	{
-		if (Networking::NetLogDrops)
+		if (Networking::NetLogLoss)
 			LOGF("out of order {} packet", seq);
 		
 		return;
@@ -149,7 +149,7 @@ void Channel::read(Common::BitBuffer& buf)
 
 	if (seq - mIncomingSequence > 1)
 	{
-		if (Networking::NetLogDrops)
+		if (Networking::NetLogLoss)
 			LOGF("dropped {} packet(s)", seq - mIncomingSequence - 1);
 	}
 
@@ -245,8 +245,8 @@ Networking::Networking(uint16_t port) : mSocket(port)
 	CONSOLE->registerCVar("net_log_packets", { "bool" },
 		CVAR_GETTER_BOOL(Networking::NetLogPackets), CVAR_SETTER_BOOL(Networking::NetLogPackets));
 
-	CONSOLE->registerCVar("net_log_drops", { "bool" },
-		CVAR_GETTER_BOOL(Networking::NetLogDrops), CVAR_SETTER_BOOL(Networking::NetLogDrops));
+	CONSOLE->registerCVar("net_log_loss", { "bool" },
+		CVAR_GETTER_BOOL(Networking::NetLogLoss), CVAR_SETTER_BOOL(Networking::NetLogLoss));
 
 	CONSOLE->registerCVar("net_log_rel", { "bool" },
 		CVAR_GETTER_BOOL(Networking::NetLogRel), CVAR_SETTER_BOOL(Networking::NetLogRel));
