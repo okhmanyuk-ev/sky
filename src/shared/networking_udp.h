@@ -46,6 +46,9 @@ namespace Shared::NetworkingUDP
 	private:
 		void readPacket(Network::Packet& packet);
 
+	public:
+		const auto& getSocket() const { return mSocket; }
+
 	private:
 		Network::UdpSocket mSocket;
 		std::map<uint32_t, ReadCallback> mMessages;

@@ -44,7 +44,6 @@ namespace Network
 		struct UdpSocketData
 		{
 			UdpSocketData(asio::io_service& service, const asio::ip::udp::endpoint& endpoint) : socket(service, endpoint) {}
-			uint64_t port;
 			ReadCallback readCallback = nullptr;
 			asio::ip::udp::socket socket;
 		};
@@ -104,7 +103,7 @@ namespace Network
 
 	public:
 		void setReadCallback(System::ReadCallback value);
-		auto getPort() const;
+		uint16_t getPort() const;
 
 	private:
 		System::UdpSocketHandle mHandle = 0;
