@@ -70,7 +70,10 @@ void Channel::transmit()
 		auto [index, rel_msg] = *mOutgoingReliableMessages.begin();
 
 		if (buf.getSize() + rel_msg.buf->getSize() > Networking::NetMaxPacketSize)
+		{
+			// TODO: if rel_msg size is too much it will deadlock here (we should make fragmented channel)
 			break;
+		}
 
 		buf.writeBit(true);
 		buf.writeBitsVar(index);
@@ -88,6 +91,8 @@ void Channel::transmit()
 	}
 
 	buf.writeBit(false);
+
+	// TODO: send unreliable data here
 
 	if (Networking::NetLogPackets)
 	{
