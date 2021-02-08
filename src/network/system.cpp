@@ -103,7 +103,7 @@ void System::setUdpReadCallback(UdpSocketHandle handle, ReadCallback value)
 uint64_t System::getUdpSocketPort(UdpSocketHandle handle) const
 {
 	auto socket_data = static_cast<UdpSocketData*>(handle);
-	return socket_data->port;
+	return socket_data->socket.local_endpoint().port();
 }
 
 UdpSocket::UdpSocket(uint16_t port)
@@ -126,7 +126,7 @@ void UdpSocket::setReadCallback(System::ReadCallback value)
 	NETWORK->setUdpReadCallback(mHandle, value);
 }
 
-auto UdpSocket::getPort() const
+uint16_t UdpSocket::getPort() const
 {
 	return NETWORK->getUdpSocketPort(mHandle);
 }
