@@ -27,7 +27,8 @@ namespace Shared::NetworkingUDP
 		{
 			Regular = 0,
 			Connect = 1,
-			Disconnect = 2
+			Disconnect = 2,
+			Redirect = 3
 		};
 
 	public:
@@ -39,6 +40,8 @@ namespace Shared::NetworkingUDP
 	protected:
 		void addMessage(uint32_t msg, ReadCallback callback);
 		void sendMessage(uint32_t msg, const Network::Address& adr, const Common::BitBuffer& buf = {});
+		void sendDisconnect(const Network::Address& address, const std::string& reason);
+		void sendRedirect(const Network::Address& address, const std::string& redirect_address);
 
 	private:
 		void readPacket(Network::Packet& packet);

@@ -300,6 +300,20 @@ void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const Co
 	mSocket.sendPacket({ adr, buf });
 }
 
+void Networking::sendDisconnect(const Network::Address& address, const std::string& reason)
+{
+	auto buf = Common::BitBuffer();
+	Common::BufferHelpers::WriteString(buf, reason);
+	sendMessage((uint32_t)Message::Disconnect, address, buf);
+}
+
+void Networking::sendRedirect(const Network::Address& address, const std::string& redirect_address)
+{
+	auto buf = Common::BitBuffer();
+	Common::BufferHelpers::WriteString(buf, redirect_address);
+	sendMessage((uint32_t)Message::Redirect, address, buf);
+}
+
 // server
 
 Server::Server(uint16_t port) : Networking(port)
@@ -331,10 +345,7 @@ Server::Server(uint16_t port) : Networking(port)
 			sendMessage((uint32_t)Message::Regular, adr, buf);
 		});
 		channel->setDisconnectCallback([this, adr](const auto& reason) {
-			auto buf = Common::BitBuffer();
-			Common::BufferHelpers::WriteString(buf, reason);
-			sendMessage((uint32_t)Message::Disconnect, adr, buf);
-
+			sendDisconnect(adr, reason);
 			LOGF("{} disconnected ({})", adr.toString(), reason);
 			mChannels.erase(adr);
 		});
@@ -382,10 +393,7 @@ Client::Client(const Network::Address& server_address) :
 			sendMessage((uint32_t)Networking::Message::Regular, mServerAddress, buf);
 		});
 		mChannel->setDisconnectCallback([this](const auto& reason) {
-			auto buf = Common::BitBuffer();
-			Common::BufferHelpers::WriteString(buf, reason);
-			sendMessage((uint32_t)Message::Disconnect, mServerAddress, buf);
-
+			sendDisconnect(mServerAddress, reason);
 			LOGF("disconnected ({})", reason);
 			mChannel = nullptr;
 		});
@@ -417,6 +425,16 @@ Client::Client(const Network::Address& server_address) :
 		
 		mChannel = nullptr;
 		LOGF("disconnected ({})", reason);
+	});
+	addMessage((uint32_t)Message::Redirect, [this](auto& packet) {
+		if (packet.adr != mServerAddress)
+			return; 
+		
+		auto redirect_address = Common::BufferHelpers::ReadString(packet.buf);
+		
+		LOGF("redirected to {}", redirect_address);
+		mServerAddress = redirect_address;
+		connect();
 	});
 
 	connect();
