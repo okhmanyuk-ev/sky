@@ -38,7 +38,7 @@ namespace Network
 		void destroyUdpSocket(UdpSocketHandle handle);
 		void sendUdpPacket(UdpSocketHandle handle, const Packet& packet);
 		void setUdpReadCallback(UdpSocketHandle handle, ReadCallback value);
-		uint64_t getUdpSocketPort(UdpSocketHandle handle) const;
+		uint16_t getUdpSocketPort(UdpSocketHandle handle) const;
 
 	private:
 		struct UdpSocketData

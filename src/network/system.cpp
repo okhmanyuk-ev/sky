@@ -100,7 +100,7 @@ void System::setUdpReadCallback(UdpSocketHandle handle, ReadCallback value)
 	socket_data->readCallback = value;
 }
 
-uint64_t System::getUdpSocketPort(UdpSocketHandle handle) const
+uint16_t System::getUdpSocketPort(UdpSocketHandle handle) const
 {
 	auto socket_data = static_cast<UdpSocketData*>(handle);
 	return socket_data->socket.local_endpoint().port();
