@@ -9,6 +9,15 @@ Server::Server(uint16_t port)
 {
 	mWSServer.set_access_channels(websocketpp::log::alevel::all);
 	mWSServer.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+	mWSServer.set_open_handler([this](websocketpp::connection_hdl hdl) {
+		mConnections.insert(hdl);
+	});
+
+	mWSServer.set_close_handler([this](websocketpp::connection_hdl hdl) {
+		mConnections.erase(hdl);
+	});
+
 	mWSServer.init_asio();
 	mWSServer.listen(port);
 	mWSServer.start_accept();

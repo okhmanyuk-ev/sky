@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <common/frame_system.h>
 #include <websocketpp/server.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
@@ -19,8 +20,12 @@ namespace Shared::NetworkingWS
 	public:
 		void frame() override;
 
+	public:
+		auto getClientsCount() const { return mConnections.size(); }
+
 	private:
 		WSServer mWSServer;
+		std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>> mConnections;
 	};
 
 	class Client : public Common::FrameSystem::Frameable
