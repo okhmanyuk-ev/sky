@@ -1,6 +1,6 @@
 #pragma once
 
-#include <set>
+#include <map>
 #include <common/frame_system.h>
 #include <websocketpp/server.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
@@ -9,6 +9,32 @@
 
 namespace Shared::NetworkingWS
 {
+	class Channel
+	{
+	public:
+		using SendCallback = std::function<void(const std::string& text)>;
+		using EventCallback = std::function<void(std::map<std::string, std::string>)>;
+
+	public:
+		virtual ~Channel() {};
+
+	public:
+		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params = {});
+		void send(const std::string& text);
+
+	public:
+		void addEventCallback(const std::string& name, EventCallback callback);
+
+	private:
+		std::map<std::string, EventCallback> mEvents;
+
+	public:
+		void setSendCallback(SendCallback value) { mSendCallback = value; }
+
+	private:
+		SendCallback mSendCallback = nullptr;
+	};
+
 	class Server : public Common::FrameSystem::Frameable
 	{
 	private:
@@ -18,14 +44,17 @@ namespace Shared::NetworkingWS
 		Server(uint16_t port);
 
 	public:
+		virtual std::shared_ptr<Channel> createChannel() = 0;
+
+	public:
 		void frame() override;
 
 	public:
-		auto getClientsCount() const { return mConnections.size(); }
+		auto& getChannels() const { return mChannels; }
 
 	private:
 		WSServer mWSServer;
-		std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>> mConnections;
+		std::map<websocketpp::connection_hdl, std::shared_ptr<Channel>, std::owner_less<websocketpp::connection_hdl>> mChannels;
 	};
 
 	class Client : public Common::FrameSystem::Frameable
