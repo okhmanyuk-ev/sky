@@ -9,58 +9,33 @@ using namespace Shared::NetworkingWS;
 void Channel::read(Common::BitBuffer& buf)
 {
 	auto name = Common::BufferHelpers::ReadString(buf);
-	auto params = std::map<std::string, std::string>();
-	while (buf.readBit())
-	{
-		auto key = Common::BufferHelpers::ReadString(buf);
-		auto value = Common::BufferHelpers::ReadString(buf);
-		params.insert({ key, value });
-	}
-	//if (mShowEventLogs || mEvents.count(name) == 0)
-	{
-		LOG("event: \"" + name + "\"");
-		for (const auto& [key, value] : params)
-		{
-			LOGF(" - {} : {}", key, value);
-		}
-	}
-	if (mEvents.count(name) > 0)
-	{
-		mEvents.at(name)(params);
-	}
+	
+	if (mMessageReaders.count(name) == 0)
+		throw std::runtime_error(("unknown message type in channel: " + name).c_str());
+
+	mMessageReaders.at(name)(buf);
 }
 
-void Channel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
+void Channel::sendReliable(const std::string& name, Common::BitBuffer& buf)
 {
-	auto buf = Common::BitBuffer();
-	Common::BufferHelpers::WriteString(buf, name);
-	for (auto& [key, value] : params)
-	{
-		buf.writeBit(true);
-		Common::BufferHelpers::WriteString(buf, key);
-		Common::BufferHelpers::WriteString(buf, value);
-	}
-	buf.writeBit(false);
-	send(buf);
+	auto msg = Common::BitBuffer();
+	Common::BufferHelpers::WriteString(msg, name);
+	msg.write(buf.getMemory(), buf.getSize());
+	mSendCallback(msg);
 }
 
-void Channel::send(const Common::BitBuffer& buf)
+void Channel::addMessageReader(const std::string& name, ReadCallback callback)
 {
-	mSendCallback(buf);
-}
-
-void Channel::addEventCallback(const std::string& name, EventCallback callback)
-{
-	assert(mEvents.count(name) == 0);
-	mEvents[name] = callback;
+	assert(mMessageReaders.count(name) == 0);
+	mMessageReaders.insert({ name, callback });
 }
 
 // server
 
 Server::Server(uint16_t port)
 {
-	mWSServer.set_access_channels(websocketpp::log::alevel::all);
-	mWSServer.clear_access_channels(websocketpp::log::alevel::frame_payload);
+	mWSServer.set_access_channels(websocketpp::log::alevel::none);
+	mWSServer.set_error_channels(websocketpp::log::alevel::none);
 
 	mWSServer.set_open_handler([this](websocketpp::connection_hdl hdl) {
 		auto channel = createChannel();
@@ -99,8 +74,9 @@ void Server::frame()
 
 Client::Client(const std::string& url)
 {
-	mWSClient.set_access_channels(websocketpp::log::alevel::all);
-	mWSClient.clear_access_channels(websocketpp::log::alevel::frame_payload);
+	mWSClient.set_access_channels(websocketpp::log::alevel::none);
+	mWSClient.set_error_channels(websocketpp::log::alevel::none);
+
 	mWSClient.init_asio();
 
 	mWSClient.set_open_handler([this](websocketpp::connection_hdl hdl) {
@@ -137,4 +113,55 @@ Client::Client(const std::string& url)
 void Client::frame()
 {
 	mWSClient.poll();
+}
+
+// simplechannel
+
+SimpleChannel::SimpleChannel()
+{
+	addMessageReader("event", [this](auto& buf) { onEventMessage(buf); });
+}
+
+void SimpleChannel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
+{
+	auto buf = Common::BitBuffer();
+	Common::BufferHelpers::WriteString(buf, name);
+	for (auto& [key, value] : params)
+	{
+		buf.writeBit(true);
+		Common::BufferHelpers::WriteString(buf, key);
+		Common::BufferHelpers::WriteString(buf, value);
+	}
+	buf.writeBit(false);
+	sendReliable("event", buf);
+}
+
+void SimpleChannel::onEventMessage(Common::BitBuffer& buf)
+{
+	auto name = Common::BufferHelpers::ReadString(buf);
+	auto params = std::map<std::string, std::string>();
+	while (buf.readBit())
+	{
+		auto key = Common::BufferHelpers::ReadString(buf);
+		auto value = Common::BufferHelpers::ReadString(buf);
+		params.insert({ key, value });
+	}
+	if (mShowEventLogs || mEvents.count(name) == 0)
+	{
+		LOG("event: \"" + name + "\"");
+		for (const auto& [key, value] : params)
+		{
+			LOGF(" - {} : {}", key, value);
+		}
+	}
+	if (mEvents.count(name) > 0)
+	{
+		mEvents.at(name)(params);
+	}
+}
+
+void SimpleChannel::addEventCallback(const std::string& name, EventCallback callback)
+{
+	assert(mEvents.count(name) == 0);
+	mEvents[name] = callback;
 }

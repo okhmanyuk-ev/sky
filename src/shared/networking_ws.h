@@ -13,30 +13,23 @@ namespace Shared::NetworkingWS
 	class Channel
 	{
 	public:
-		using SendCallback = std::function<void(const Common::BitBuffer&)>;
-		using EventCallback = std::function<void(std::map<std::string, std::string>)>;
+		using ReadCallback = std::function<void(Common::BitBuffer&)>;
+		using SendCallback = std::function<void(Common::BitBuffer&)>;
 
 	public:
-		virtual ~Channel() {};
+		virtual ~Channel() {}
 
 	public:
 		void read(Common::BitBuffer& buf);
-
-	public:
-		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params = {});
-		void send(const Common::BitBuffer& buf);
-
-	public:
-		void addEventCallback(const std::string& name, EventCallback callback);
-
-	private:
-		std::map<std::string, EventCallback> mEvents;
+		void sendReliable(const std::string& name, Common::BitBuffer& buf);
+		void addMessageReader(const std::string& name, ReadCallback callback);
 
 	public:
 		void setSendCallback(SendCallback value) { mSendCallback = value; }
 
 	private:
 		SendCallback mSendCallback = nullptr;
+		std::map<std::string, ReadCallback> mMessageReaders;
 	};
 
 	class Server : public Common::FrameSystem::Frameable
@@ -83,5 +76,33 @@ namespace Shared::NetworkingWS
 		WSClient mWSClient;
 		websocketpp::connection_hdl mHdl;
 		std::shared_ptr<Channel> mChannel = nullptr;
+	};
+
+	class SimpleChannel : public Channel
+	{
+	public:
+		using EventCallback = std::function<void(std::map<std::string, std::string>)>;
+
+	public:
+		SimpleChannel();
+
+	public:
+		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params = {});
+
+	private:
+		void onEventMessage(Common::BitBuffer& buf);
+
+	public:
+		void addEventCallback(const std::string& name, EventCallback callback);
+
+	private:
+		std::map<std::string, EventCallback> mEvents;
+
+	public:
+		auto isShowEventLogs() const { return mShowEventLogs; }
+		void setShowEventLogs(bool value) { mShowEventLogs = value; }
+
+	private:
+		bool mShowEventLogs = false;
 	};
 }

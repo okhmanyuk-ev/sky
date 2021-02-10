@@ -58,7 +58,6 @@ namespace Shared::NetworkingUDP
 	{
 	public:
 		using ReadCallback = std::function<void(Common::BitBuffer&)>;
-		using WriteCallback = std::function<void(Common::BitBuffer&)>;
 		using SendCallback = std::function<void(Common::BitBuffer&)>;
 		using DisconnectCallback = std::function<void(const std::string& reason)>;
 
