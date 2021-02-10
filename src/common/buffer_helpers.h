@@ -12,20 +12,6 @@ namespace Common::BufferHelpers
 
 	void WriteToBuffer(BitBuffer& from, BitBuffer& to);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	int32_t ReadSBits(Common::BitBuffer& msg, int size);
 	void WriteSBits(Common::BitBuffer& msg, int32_t value, int size);
 
