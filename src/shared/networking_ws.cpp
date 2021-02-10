@@ -38,6 +38,9 @@ Server::Server(uint16_t port)
 	mWSServer.set_error_channels(websocketpp::log::alevel::none);
 
 	mWSServer.set_open_handler([this](websocketpp::connection_hdl hdl) {
+		auto connection = mWSServer.get_con_from_hdl(hdl);
+		LOGF("{} connected", connection->get_remote_endpoint());
+
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
 			mWSServer.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
@@ -46,6 +49,9 @@ Server::Server(uint16_t port)
 	});
 
 	mWSServer.set_close_handler([this](websocketpp::connection_hdl hdl) {
+		auto connection = mWSServer.get_con_from_hdl(hdl);
+		LOGF("{} disconnected", connection->get_remote_endpoint());
+
 		mChannels.erase(hdl);
 	});
 
@@ -80,6 +86,7 @@ Client::Client(const std::string& url)
 	mWSClient.init_asio();
 
 	mWSClient.set_open_handler([this](websocketpp::connection_hdl hdl) {
+		LOG("connected");
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
 			mWSClient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
@@ -88,6 +95,7 @@ Client::Client(const std::string& url)
 		mChannel = channel;
 	});
 	mWSClient.set_close_handler([this](websocketpp::connection_hdl hdl) {
+		LOG("disconnected");
 		mHdl.reset();
 		mChannel = nullptr;
 	});
@@ -108,6 +116,7 @@ Client::Client(const std::string& url)
 	}
 
 	mWSClient.connect(con);
+	LOG("connecting");
 }
 
 void Client::onFrame()
