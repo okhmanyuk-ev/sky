@@ -99,6 +99,10 @@ Client::Client(const std::string& url)
 		mHdl.reset();
 		mChannel = nullptr;
 	});
+	mWSClient.set_fail_handler([this, url](websocketpp::connection_hdl hdl) {
+		LOG("failed");
+		connect(url);
+	});
 
 	mWSClient.set_message_handler([this](websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg) {
 		auto& payload = msg->get_raw_payload();
@@ -108,6 +112,11 @@ Client::Client(const std::string& url)
 		mChannel->read(buf);
 	});
 
+	connect(url);
+}
+
+void Client::connect(const std::string& url)
+{
 	websocketpp::lib::error_code ec;
 	auto con = mWSClient.get_connection(url, ec);
 	if (ec) {

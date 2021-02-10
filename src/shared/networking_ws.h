@@ -62,6 +62,9 @@ namespace Shared::NetworkingWS
 	public:
 		Client(const std::string& url);
 
+	private:
+		void connect(const std::string& url);
+
 	public:
 		virtual std::shared_ptr<Channel> createChannel() = 0;
 
