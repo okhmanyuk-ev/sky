@@ -69,10 +69,10 @@ namespace Common
 	{
 	public:
 		Frameable();
-		virtual ~Frameable();
+		~Frameable();
 
 	public:
-		virtual void frame() = 0;
+		virtual void onFrame() = 0;
 
 	private:
 		std::shared_ptr<bool> mFinished = std::make_shared<bool>(false);
@@ -84,7 +84,7 @@ namespace Common
 		Framer(Callback callback = nullptr);
 
 	private:
-		void frame() override;
+		void onFrame() override;
 
 	public:
 		void setCallback(Callback value) { mCallback = value; }

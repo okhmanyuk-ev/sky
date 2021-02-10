@@ -2,7 +2,7 @@
 
 using namespace Common;
 
-void Timer::frame()
+void Timer::onFrame()
 {
 	mPassed += FRAME->getTimeDelta();
 

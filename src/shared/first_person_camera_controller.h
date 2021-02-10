@@ -20,7 +20,7 @@ namespace Shared
 		~FirstPersonCameraController();
 
 	private:
-		void frame() override;
+		void onFrame() override;
 
 	private:
 		void onEvent(const Platform::Input::Keyboard::Event& e) override;

@@ -2,7 +2,7 @@
 
 using namespace Shared;
 
-void DrawCallCounter::frame()
+void DrawCallCounter::onFrame()
 {
 	mDrawCalls = mDrawCallsInternal;
 	mDrawCallsInternal = 0;

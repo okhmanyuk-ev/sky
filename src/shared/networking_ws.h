@@ -44,7 +44,7 @@ namespace Shared::NetworkingWS
 		virtual std::shared_ptr<Channel> createChannel() = 0;
 
 	public:
-		void frame() override;
+		void onFrame() override;
 
 	public:
 		auto& getChannels() const { return mChannels; }
@@ -66,7 +66,7 @@ namespace Shared::NetworkingWS
 		virtual std::shared_ptr<Channel> createChannel() = 0;
 
 	public:
-		void frame() override;
+		void onFrame() override;
 
 	public:
 		auto getChannel() const { return mChannel; }

@@ -79,7 +79,7 @@ namespace Shared
 		void setHiddenButtonEnabled(bool value) { mHiddenButtonEnabled = value; }
 
 	private:
-		void frame() override;
+		void onFrame() override;
 		void showCandidates(float height, float top);
 		void showFastLogs();
 		void showCloseButton(float pos_y);

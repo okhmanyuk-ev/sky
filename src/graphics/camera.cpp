@@ -34,7 +34,7 @@ Camera3D::Camera3D(float fieldOfView, glm::vec3 worldUp, float nearPlane, float 
 	//
 }
 
-void Camera3D::frame()
+void Camera3D::onFrame()
 {
 	float sinYaw = glm::sin(mYaw);
 	float sinPitch = glm::sin(mPitch);

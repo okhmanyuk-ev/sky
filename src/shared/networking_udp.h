@@ -62,7 +62,7 @@ namespace Shared::NetworkingUDP
 		using DisconnectCallback = std::function<void(const std::string& reason)>;
 
 	private:
-		void frame() override;
+		void onFrame() override;
 		void transmit();
 		void awake();
 		void readReliableMessages();
@@ -163,7 +163,7 @@ namespace Shared::NetworkingUDP
 		virtual std::shared_ptr<Channel> createChannel() = 0;
 
 	public:
-		void frame() override;
+		void onFrame() override;
 
 	private:
 		void connect();

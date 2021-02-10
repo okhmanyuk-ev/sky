@@ -78,7 +78,7 @@ FrameSystem::Frameable::Frameable()
 		if (*finished) 
 			return Status::Finished;
 		
-		frame();
+		onFrame();
 		return Status::Continue;
 	});
 }
@@ -94,7 +94,7 @@ FrameSystem::Framer::Framer(Callback callback) : Frameable(),
 	//
 }
 
-void FrameSystem::Framer::frame()
+void FrameSystem::Framer::onFrame()
 {
 	if (mCallback == nullptr)
 		return;

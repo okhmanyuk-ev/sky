@@ -13,7 +13,7 @@ namespace Common
 		~FramerateCounter();
 
 	private:
-		void frame() override;
+		void onFrame() override;
 
 	public:
 		auto getFrameCount() const { return mFrameCount; }

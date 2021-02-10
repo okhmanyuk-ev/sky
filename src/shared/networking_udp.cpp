@@ -8,7 +8,7 @@ using namespace Shared::NetworkingUDP;
 
 // channel
 
-void Channel::frame()
+void Channel::onFrame()
 {
 	if (mDisconnect.has_value())
 	{
@@ -445,7 +445,7 @@ Client::Client(const Network::Address& server_address) :
 	connect();
 }
 
-void Client::frame()
+void Client::onFrame()
 {
 	if (isConnected())
 		return;

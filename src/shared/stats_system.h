@@ -32,7 +32,7 @@ namespace Shared
 		~StatsSystem();
 
 	private:
-		void frame() override;
+		void onFrame() override;
 
 	public:
 		void indicate(const std::string& key, const std::string& value, const std::string& group = "");

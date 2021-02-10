@@ -25,7 +25,7 @@ System::~System()
 		destroyUdpSocket(static_cast<UdpSocketHandle>(*mUdpSockets.begin()));
 }
 
-void System::frame()
+void System::onFrame()
 {
 	for (auto socket : mUdpSockets)
 	{

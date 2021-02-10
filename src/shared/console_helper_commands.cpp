@@ -36,7 +36,7 @@ ConsoleHelperCommands::~ConsoleHelperCommands()
 	//
 }
 
-void ConsoleHelperCommands::frame()
+void ConsoleHelperCommands::onFrame()
 {
 	if (mShowImguiDemo)
 	{

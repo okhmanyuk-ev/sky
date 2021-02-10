@@ -13,7 +13,7 @@ namespace Common
 		using EasingFunction = std::function<float(float p)>;
 
 	private:
-		void frame() override;
+		void onFrame() override;
 
 	public:
 		float getValue() const { return mValue; }

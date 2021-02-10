@@ -19,7 +19,7 @@ StatsSystem::~StatsSystem()
 	CONSOLE->removeCVar("g_stats");
 }
 
-void StatsSystem::frame()
+void StatsSystem::onFrame()
 {
 	if (!mEnabled)
 		return;

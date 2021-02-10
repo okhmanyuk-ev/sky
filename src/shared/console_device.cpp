@@ -56,7 +56,7 @@ void ConsoleDevice::clear()
 	mBuffer.clear();
 }
 
-void ConsoleDevice::frame()
+void ConsoleDevice::onFrame()
 {
 	if (!mEnabled)
 		return;

@@ -20,7 +20,7 @@ namespace Shared
 		~PerformanceConsoleCommands();
 
 	private:
-		void frame() override;
+		void onFrame() override;
 
 	private:
 		Common::FramerateCounter mFramerateCounter;

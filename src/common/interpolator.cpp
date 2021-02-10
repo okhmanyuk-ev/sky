@@ -5,7 +5,7 @@
 
 using namespace Common;
 
-void Interpolator::frame()
+void Interpolator::onFrame()
 {
 	mPassed += FRAME->getTimeDelta();
 

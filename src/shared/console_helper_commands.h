@@ -17,7 +17,7 @@ namespace Shared
 		~ConsoleHelperCommands();
 
 	private:
-		void frame() override;
+		void onFrame() override;
 
 	private:
 		bool mShowCVars = false;

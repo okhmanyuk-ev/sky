@@ -12,7 +12,7 @@ namespace Shared
 		public Common::Event::Listenable<Shared::RendererDebugDrawCallEvent>
 	{
 	private:
-		void frame() override;
+		void onFrame() override;
 		void onEvent(const Shared::RendererDebugDrawCallEvent& e) override;
 
 	public:

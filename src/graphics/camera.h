@@ -34,7 +34,7 @@ namespace Graphics
 		Camera3D(float fieldOfView, glm::vec3 worldUp, float nearPlane = 1.0f, float farPlane = 8192.0f);
 
 	public:
-		void frame() override;
+		void onFrame() override;
 
 	public:
 		void frontMove(float offset);

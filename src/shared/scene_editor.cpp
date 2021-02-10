@@ -35,7 +35,7 @@ void SceneEditor::onEvent(const Platform::Input::Mouse::Event& e)
 	}
 }
 
-void SceneEditor::frame()
+void SceneEditor::onFrame()
 {
 	if (!mEnabled)
 		return;

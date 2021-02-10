@@ -27,7 +27,7 @@ namespace Network
 		~System();
 
 	private:
-		void frame() override;
+		void onFrame() override;
 	
 	public:
 		using UdpSocketHandle = void*;

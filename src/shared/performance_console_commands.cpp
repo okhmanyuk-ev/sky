@@ -37,7 +37,7 @@ PerformanceConsoleCommands::~PerformanceConsoleCommands()
 	//
 }
 
-void PerformanceConsoleCommands::frame()
+void PerformanceConsoleCommands::onFrame()
 {
 	if (mWantShowFps > 1)
 		ENGINE_STATS("fps", std::to_string(mFramerateCounter.getFramerate()) + " (" + std::to_string(mFramerateCounter.getAverageFramerate()) + " avg)");

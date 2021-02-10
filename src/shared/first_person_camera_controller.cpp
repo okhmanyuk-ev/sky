@@ -10,7 +10,7 @@ FirstPersonCameraController::FirstPersonCameraController(Graphics::Camera3D& cam
 	//
 }
 
-void FirstPersonCameraController::frame()
+void FirstPersonCameraController::onFrame()
 {
 	if (ImGui::IsAnyItemActive())
 		return;

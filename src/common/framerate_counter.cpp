@@ -17,7 +17,7 @@ FramerateCounter::~FramerateCounter()
 	//
 }
 
-void FramerateCounter::frame()
+void FramerateCounter::onFrame()
 {
 	mFramerateInternal++;
 	mFrameCount++;

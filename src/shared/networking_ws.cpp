@@ -65,7 +65,7 @@ Server::Server(uint16_t port)
 	mWSServer.start_accept();
 }
 
-void Server::frame()
+void Server::onFrame()
 {
 	mWSServer.poll();
 }
@@ -110,7 +110,7 @@ Client::Client(const std::string& url)
 	mWSClient.connect(con);
 }
 
-void Client::frame()
+void Client::onFrame()
 {
 	mWSClient.poll();
 }

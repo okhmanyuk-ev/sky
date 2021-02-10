@@ -10,7 +10,7 @@ namespace Common
 		using Callback = std::function<void()>;
 	
 	private:
-		void frame() override;
+		void onFrame() override;
 	
 	public:
 		auto getInterval() const { return mInterval; }

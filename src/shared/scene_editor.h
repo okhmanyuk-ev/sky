@@ -15,7 +15,7 @@ namespace Shared
 		void onEvent(const Platform::Input::Mouse::Event& e) override;
 
 	private:
-		void frame() override;
+		void onFrame() override;
 
 	private:
 		void showNodeTreeWindow();
