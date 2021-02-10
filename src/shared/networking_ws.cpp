@@ -92,7 +92,7 @@ Server::Server(uint16_t port)
 
 void Server::frame()
 {
-	mWSServer.poll_one();
+	mWSServer.poll();
 }
 
 // client
@@ -136,5 +136,5 @@ Client::Client(const std::string& url)
 
 void Client::frame()
 {
-	mWSClient.poll_one();
+	mWSClient.poll();
 }
