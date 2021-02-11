@@ -302,7 +302,7 @@ SceneHelpers::VerticalScrollbar::VerticalScrollbar()
 	setAnchor({ 1.0f, 0.5f });
 	setPivot({ 1.0f, 0.5f });
 	setPosition({ -8.0f, 0.0f });
-	setSize({ 4.0f, 0.0f });
+	setSize({ 2.0f, 0.0f });
 	setAlpha(BarAlpha);
 	setRounding(1.0f);
 
