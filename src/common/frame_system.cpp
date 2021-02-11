@@ -34,6 +34,8 @@ void FrameSystem::addOneThreadsafe(Callback callback)
 
 void FrameSystem::frame()
 {
+	mFrameCount += 1;
+
 	if (mFramerateLimit > 0)
 	{
 		auto frameTime = Clock::FromSeconds(1.0 / mFramerateLimit);

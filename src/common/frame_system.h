@@ -52,6 +52,7 @@ namespace Common
 		auto getFramerCount() const { return mFramers.size(); }
 
 		auto getUptime() const { return mUptime; }
+		auto getFrameCount() { return mFrameCount; }
 
 	private:
 		std::list<StatusCallback> mFramers;
@@ -62,6 +63,7 @@ namespace Common
 		Clock::TimePoint mLastTime = Clock::Now();
 		Clock::Duration mTimeDelta = Clock::Duration::zero();
 		Clock::Duration mUptime = Clock::Duration::zero();
+		uint64_t mFrameCount = 0;
 		std::mutex mMutex;
 	};
 
