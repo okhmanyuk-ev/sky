@@ -13,6 +13,9 @@ namespace Scene
 		void update() override;
 
 	public:
+		void updateTextMesh();
+
+	public:
 		auto getFont() const { return mFont; }
 		void setFont(const std::shared_ptr<Graphics::Font>& value) { mFont = value; }
 

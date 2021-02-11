@@ -139,6 +139,16 @@ void Node::updateTransform()
 	mTransformReady = true;
 }
 
+void Node::updateAbsoluteSize()
+{
+	auto stretch = getStretch() / getScale();
+	auto parent_size = hasParent() ? getParent()->getAbsoluteSize() : getScene()->getViewport().size;
+
+	mAbsoluteSize = getSize();
+	mAbsoluteSize -= getMargin();
+	mAbsoluteSize += stretch * parent_size;
+}
+
 void Node::enterDraw()
 {
 	//
@@ -151,14 +161,16 @@ void Node::leaveDraw()
 
 void Node::update()
 {
+	auto frame_count = FRAME->getFrameCount();
+	
+	if (mPrevFrameCount.has_value())
+		assert(mPrevFrameCount.value() != frame_count); // do not update twice in one frame
+	
+	mPrevFrameCount = frame_count;
+
 	mActions.update();
 
-	auto stretch = getStretch() / getScale();
-	auto parent_size = hasParent() ? getParent()->getAbsoluteSize() : getScene()->getViewport().size;
-
-	mAbsoluteSize = getSize();
-	mAbsoluteSize -= getMargin();
-	mAbsoluteSize += stretch * parent_size;
+	updateAbsoluteSize();
 }
 
 void Node::draw()

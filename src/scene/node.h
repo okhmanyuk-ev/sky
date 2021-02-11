@@ -51,6 +51,9 @@ namespace Scene
 		virtual bool interactTest(const glm::vec2& value) const;
 
 		virtual void updateTransform();
+	
+	public:
+		void updateAbsoluteSize();
 
 	protected:
 		virtual void enterDraw();
@@ -110,6 +113,7 @@ namespace Scene
 		bool mTransformReady = false;
 		std::string mBatchGroup = "";
 		glm::vec2 mAbsoluteSize = { 0.0f, 0.0f };
+		std::optional<uint64_t> mPrevFrameCount;
 
 	public:
 		void runAction(std::unique_ptr<Actions::Action> action) { mActions.add(std::move(action)); }
