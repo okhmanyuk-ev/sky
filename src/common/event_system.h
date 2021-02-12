@@ -61,6 +61,19 @@ namespace Common::Event
 			}
 		}
 
+	public:
+		auto getListenersCount() const 
+		{ 
+			size_t result = 0;
+
+			for (const auto& [type, listeners] : mListeners)
+			{
+				result += listeners.size();
+			}
+
+			return result; 
+		}
+
 	private:
 		std::unordered_map<size_t, std::unordered_set<void*>> mListeners;
 		size_t mTypeCount = 0;
