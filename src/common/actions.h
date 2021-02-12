@@ -1,14 +1,15 @@
 #pragma once
 
-#include <common/frame_system.h>
-
 #include <list>
 #include <optional>
 #include <functional>
-#include <common/easing.h>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+
+#include <common/frame_system.h>
+#include <common/event_system.h>
+#include <common/easing.h>
 
 namespace Actions
 {
@@ -202,6 +203,28 @@ namespace Actions
 		template<class...Args> std::unique_ptr<Parallel> MakeParallel(Args&&...args)
 		{
 			return MakeParallel(Parallel::Awaiting::All, std::forward<Args>(args)...);
+		}
+
+		// will wait forever
+		template<class T> UAction WaitEvent(Common::Event::System::ListenerCallback<T> onEvent)
+		{
+			auto event_holder = std::make_shared<std::optional<T>>();
+
+			auto listener = std::make_shared<Common::Event::Listener<T>>();
+			listener->setCallback([event_holder](const auto& e) {
+				if (event_holder->has_value())
+					return;
+
+				*event_holder = e;
+			});
+
+			return std::make_unique<Actions::Generic>([event_holder, listener, onEvent] {
+				if (!event_holder->has_value())
+					return Actions::Action::Status::Continue;
+
+				onEvent(event_holder->value());
+				return Actions::Action::Status::Finished;
+			});
 		}
 	}
 
