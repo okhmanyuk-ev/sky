@@ -141,12 +141,11 @@ void Node::updateTransform()
 
 void Node::updateAbsoluteSize()
 {
-	auto stretch = getStretch() / getScale();
 	auto parent_size = hasParent() ? getParent()->getAbsoluteSize() : getScene()->getViewport().size;
 
 	mAbsoluteSize = getSize();
 	mAbsoluteSize -= getMargin();
-	mAbsoluteSize += stretch * parent_size;
+	mAbsoluteSize += getStretch() * parent_size;
 }
 
 void Node::enterDraw()
