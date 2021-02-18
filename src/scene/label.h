@@ -13,7 +13,7 @@ namespace Scene
 		void update() override;
 
 	public:
-		void updateTextMesh();
+		void refresh();
 
 	public:
 		auto getFont() const { return mFont; }
@@ -41,6 +41,9 @@ namespace Scene
 		auto getMultilineAlign() const { return mMultilineAlign; }
 		void setMultilineAlign(Graphics::TextMesh::Align value) { mMultilineAlign = value; }
 
+		auto isAutoRefreshing() const { return mAutoRefreshing; }
+		void setAutoRefreshing(bool value) { mAutoRefreshing = value; }
+
 	private:
 		std::shared_ptr<Graphics::Font> mFont;
 		float mFontSize = 24.0f;
@@ -59,5 +62,6 @@ namespace Scene
 		float mOutlineThickness = 0.0f;
 		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
 		Graphics::TextMesh::Align mPrevMultilineAlign = Graphics::TextMesh::Align::Left;
+		bool mAutoRefreshing = true;
 	};
 }

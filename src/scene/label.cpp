@@ -23,10 +23,12 @@ void Label::draw()
 void Label::update()
 {
 	Node::update();
-	updateTextMesh();
+
+	if (mAutoRefreshing)
+		refresh();
 }
 
-void Label::updateTextMesh()
+void Label::refresh()
 {
 	if (mFont == nullptr || mFontSize <= 0.0f)
 		return;
