@@ -94,10 +94,11 @@ Client::Client(const std::string& url)
 		mHdl = hdl;
 		mChannel = channel;
 	});
-	mWSClient.set_close_handler([this](websocketpp::connection_hdl hdl) {
+	mWSClient.set_close_handler([this, url](websocketpp::connection_hdl hdl) {
 		LOG("disconnected");
 		mHdl.reset();
 		mChannel = nullptr;
+		connect(url);
 	});
 	mWSClient.set_fail_handler([this, url](websocketpp::connection_hdl hdl) {
 		LOG("failed");
