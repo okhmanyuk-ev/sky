@@ -106,4 +106,7 @@ namespace Actions::Factory
 
 	UAction ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
+	UAction ChangeRadialAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeRadialAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 }

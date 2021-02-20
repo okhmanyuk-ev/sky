@@ -465,3 +465,16 @@ Factory::UAction Factory::ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox>
 	});
 }
 
+Factory::UAction Factory::ChangeRadialAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setRadialAnchor(value);
+	});
+}
+
+Factory::UAction Factory::ChangeRadialAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([node, dest, duration, easingFunction] {
+		return ChangeRadialAnchor(node, node->getRadialAnchor(), dest, duration, easingFunction);
+	});
+}
