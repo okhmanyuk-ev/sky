@@ -33,10 +33,12 @@ void Label::refresh()
 	if (mFont == nullptr || mFontSize <= 0.0f)
 		return;
 
+	auto mesh_dirty = false;
+
 	if (mPrevText != mText)
 	{
 		mPrevText = mText;
-		mMeshDirty = true;
+		mesh_dirty = true;
 	}
 
 	auto width = getAbsoluteWidth();
@@ -44,37 +46,35 @@ void Label::refresh()
 	if (mMultiline && mPrevWidth != width)
 	{
 		mPrevWidth = width;
-		mMeshDirty = true;
+		mesh_dirty = true;
 	}
 
 	if (mPrevFontSize != mFontSize)
 	{
 		mPrevFontSize = mFontSize;
-		mMeshDirty = true;
+		mesh_dirty = true;
 	}
 
 	if (mPrevFont != mFont)
 	{
 		mPrevFont = mFont;
-		mMeshDirty = true;
+		mesh_dirty = true;
 	}
 
 	if (mPrevMultiline != mMultiline)
 	{
 		mPrevMultiline = mMultiline;
-		mMeshDirty = true;
+		mesh_dirty = true;
 	}
 
 	if (mPrevMultilineAlign != mMultilineAlign)
 	{
 		mPrevMultilineAlign = mMultilineAlign;
-		mMeshDirty = true;
+		mesh_dirty = true;
 	}
 
-	if (!mMeshDirty)
+	if (!mesh_dirty)
 		return;
-
-	mMeshDirty = false;
 
 	if (!mMultiline)
 	{
@@ -92,4 +92,29 @@ void Label::refresh()
 	setHeight(mMeshHeight * (1.0f - getVerticalStretch()));
 
 	Node::updateAbsoluteSize();
+}
+
+std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
+{
+	assert(!mText.empty());
+	assert(index >= 0);
+	assert(index < mText.length());
+
+	auto scale = mFont->getScaleFactorForSize(mFontSize);
+	
+	auto pos = mMesh.symbol_positions.at(index) * scale;
+	auto size = mMesh.symbol_sizes.at(index) * scale;
+
+	return { pos, size };
+}
+
+float Label::getSymbolLineY(int index)
+{
+	assert(!mText.empty());
+	assert(index >= 0);
+	assert(index < mText.length());
+
+	auto scale = mFont->getScaleFactorForSize(mFontSize);
+
+	return mMesh.symbol_line_y.at(index) * scale;
 }

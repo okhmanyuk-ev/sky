@@ -44,6 +44,10 @@ namespace Scene
 		auto isAutoRefreshing() const { return mAutoRefreshing; }
 		void setAutoRefreshing(bool value) { mAutoRefreshing = value; }
 
+		// returning [pos, size]
+		std::tuple<glm::vec2, glm::vec2> getSymbolBounds(int index);
+		float getSymbolLineY(int index);
+
 	private:
 		std::shared_ptr<Graphics::Font> mFont;
 		float mFontSize = 24.0f;
@@ -53,7 +57,6 @@ namespace Scene
 		Graphics::TextMesh mMesh;
 		float mMeshWidth = 0.0f;
 		float mMeshHeight = 0.0f;
-		bool mMeshDirty = true;
 		utf8_string mPrevText;
 		float mPrevWidth = 0.0f;
 		float mPrevFontSize = 0.0f;

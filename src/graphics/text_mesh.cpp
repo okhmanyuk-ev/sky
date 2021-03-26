@@ -17,6 +17,9 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 
 	mesh.vertices.resize(length * 4);
 	mesh.indices.resize(length * 6);
+	mesh.symbol_positions.resize(length);
+	mesh.symbol_sizes.resize(length);
+	mesh.symbol_line_y.resize(length);
 
 	glm::vec2 pos = { 0.0f, 0.0f };
 
@@ -61,6 +64,10 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 		idx[3] = base_vtx + 0;
 		idx[4] = base_vtx + 2;
 		idx[5] = base_vtx + 3;
+
+		mesh.symbol_positions[i] = p1;
+		mesh.symbol_sizes[i] = glyph.size;
+		mesh.symbol_line_y[i] = 0.0f;
 	}
 
 	return mesh;
@@ -106,6 +113,29 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 			vertex.pos.y += height;
 			result.vertices.push_back(vertex);
 		}
+
+		for (auto symbol_position : mesh.symbol_positions)
+		{
+			if (align == Align::Right)
+				symbol_position.x += scaledMaxWidth - str_w;
+			else if (align == Align::Center)
+				symbol_position.x += (scaledMaxWidth - str_w) / 2.0f;
+
+			symbol_position.y += height;
+			result.symbol_positions.push_back(symbol_position);
+		}
+
+		for (auto symbol_size : mesh.symbol_sizes)
+		{
+			result.symbol_sizes.push_back(symbol_size);
+		}
+
+		for (auto symbol_line_y : mesh.symbol_line_y)
+		{
+			symbol_line_y += height;
+			result.symbol_line_y.push_back(symbol_line_y);
+		}
+
 		height += font.getAscent() - font.getDescent() + font.getLinegap();
 	};
 
