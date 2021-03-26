@@ -118,8 +118,8 @@ void ConsoleCommands::onDelay(CON_ARGS)
 		return;
 	}
 
-	Actions::Run(Actions::Factory::Delayed(seconds, 
-		Actions::Factory::Execute([this, command = CON_ARG(1)] {
+	Actions::Run(Actions::Collection::Delayed(seconds,
+		Actions::Collection::Execute([this, command = CON_ARG(1)] {
 			CONSOLE->execute(command);
 		})
 	));

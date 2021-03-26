@@ -118,12 +118,12 @@ namespace Shared::SceneHelpers
 				return;
 
 			mChooseAnimationStarted = true;
-            T::runAction(Actions::Factory::MakeSequence(
-				Actions::Factory::Execute([this] { 
+			T::runAction(Actions::Collection::MakeSequence(
+				Actions::Collection::Execute([this] {
 					mChooseAnimationProcessing = true; 
 				}),
-				Actions::Factory::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
-				Actions::Factory::Execute([this] {
+				Actions::Collection::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
+				Actions::Collection::Execute([this] {
 					mChooseAnimationProcessing = false;
 				})
 			));
@@ -139,14 +139,14 @@ namespace Shared::SceneHelpers
 			const float Duration = 0.125f / 1.5f;
 
 			mChooseAnimationStarted = false;
-            T::runAction(Actions::Factory::MakeSequence(
-				Actions::Factory::Wait(mChooseAnimationProcessing),
-				Actions::Factory::Execute([this] { 
+			T::runAction(Actions::Collection::MakeSequence(
+				Actions::Collection::Wait(mChooseAnimationProcessing),
+				Actions::Collection::Execute([this] {
 					mChooseAnimationProcessing = true; 
 				}),
-				Actions::Factory::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
-				Actions::Factory::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
-				Actions::Factory::Execute([this] {
+				Actions::Collection::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
+				Actions::Collection::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
+				Actions::Collection::Execute([this] {
 					mChooseAnimationProcessing = false;
 				})
 			));
@@ -213,12 +213,12 @@ namespace Shared::SceneHelpers
 	public:
 		Emitter()
 		{
-			runAction(Actions::Factory::RepeatInfinite([this]()->Actions::Factory::UAction {
+			runAction(Actions::Collection::RepeatInfinite([this]()->Actions::Collection::UAction {
 				if (!mRunning)
 					return nullptr;
 
 				auto delay = glm::linearRand(mMinDelay, mMaxDelay);
-				return Actions::Factory::Delayed(delay, Actions::Factory::Execute([this] {
+				return Actions::Collection::Delayed(delay, Actions::Collection::Execute([this] {
 					if (!mRunning)
 						return;
 
@@ -251,14 +251,14 @@ namespace Shared::SceneHelpers
 			auto duration = glm::linearRand(mMinDuration, mMaxDuration);
 			auto direction = glm::linearRand(mMinDirection, mMaxDirection);
 
-			particle->runAction(Actions::Factory::MakeSequence(
-				Actions::Factory::MakeParallel(
-					Actions::Factory::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
-					Actions::Factory::ChangeScale(particle, mEndScale, duration),
-					Actions::Factory::ChangeColor(particle, mBeginColor, mEndColor, duration),
-					Actions::Factory::ChangeAlpha(particle, mBeginColor.a, mEndColor.a, duration)
+			particle->runAction(Actions::Collection::MakeSequence(
+				Actions::Collection::MakeParallel(
+					Actions::Collection::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
+					Actions::Collection::ChangeScale(particle, mEndScale, duration),
+					Actions::Collection::ChangeColor(particle, mBeginColor, mEndColor, duration),
+					Actions::Collection::ChangeAlpha(particle, mBeginColor.a, mEndColor.a, duration)
 				),
-				Actions::Factory::Kill(particle)
+				Actions::Collection::Kill(particle)
 			));
 
 			holder->attach(particle);

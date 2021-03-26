@@ -13,11 +13,11 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	label->setPosition(holder->unproject(target->project({ target->getAbsoluteSize() / 2.0f })));
 	label->setPivot(0.5f);
 	label->setAlpha(0.0f);
-	label->runAction(Actions::Factory::MakeSequence(
-		Actions::Factory::Show(label, 0.5f),
-		Actions::Factory::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
-		Actions::Factory::Hide(label, 0.5f),
-		Actions::Factory::Kill(label)
+	label->runAction(Actions::Collection::MakeSequence(
+		Actions::Collection::Show(label, 0.5f),
+		Actions::Collection::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
+		Actions::Collection::Hide(label, 0.5f),
+		Actions::Collection::Kill(label)
 	));
 	holder->attach(label);
 	return label;
@@ -36,7 +36,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	outer_rect->setPivot({ 0.0f, 0.5f });
 	holder->attach(outer_rect);
 
-	outer_rect->runAction(Actions::Factory::ExecuteInfinite([outer_rect] {
+	outer_rect->runAction(Actions::Collection::ExecuteInfinite([outer_rect] {
 		outer_rect->setWidth(outer_rect->getAbsoluteHeight() + outer_rect->getVerticalMargin());
 	}));
 
@@ -355,12 +355,12 @@ void SceneHelpers::VerticalScrollbar::update()
 			return;
 
 		mAlphaAnimating = true;
-		runAction(Actions::Factory::MakeSequence(
-			Actions::Factory::MakeParallel(
-				Actions::Factory::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
-				Actions::Factory::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
+		runAction(Actions::Collection::MakeSequence(
+			Actions::Collection::MakeParallel(
+				Actions::Collection::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
+				Actions::Collection::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
 			),
-			Actions::Factory::Execute([this] {
+			Actions::Collection::Execute([this] {
 				mHidden = false;
 				mAlphaAnimating = false;
 			})
@@ -372,12 +372,12 @@ void SceneHelpers::VerticalScrollbar::update()
 			return;
 		
 		mAlphaAnimating = true;
-		runAction(Actions::Factory::MakeSequence(
-			Actions::Factory::MakeParallel(
-				Actions::Factory::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
-				Actions::Factory::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
+		runAction(Actions::Collection::MakeSequence(
+			Actions::Collection::MakeParallel(
+				Actions::Collection::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
+				Actions::Collection::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
 			),
-			Actions::Factory::Execute([this] {
+			Actions::Collection::Execute([this] {
 				mHidden = true;
 				mAlphaAnimating = false;
 			})

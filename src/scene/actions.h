@@ -7,7 +7,7 @@
 #include <common/actions.h>
 #include <common/easing.h>
 
-namespace Actions::Factory
+namespace Actions::Collection
 {
     using SceneTransform = std::shared_ptr<Scene::Transform>;
 	using SceneColor = std::shared_ptr<Scene::Color>;

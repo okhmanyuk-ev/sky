@@ -139,7 +139,7 @@ namespace Actions
 		std::unique_ptr<Action> mAction = nullptr;
 	};
 
-	namespace Factory
+	namespace Collection
 	{
 		using UAction = std::unique_ptr<Action>;
 

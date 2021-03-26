@@ -125,33 +125,33 @@ Action::Status Repeat::frame()
 	return Status::Continue;
 }
 
-// factory
+// collection
 
-Factory::UAction Factory::Insert(std::function<UAction()> action)
+Collection::UAction Collection::Insert(std::function<UAction()> action)
 {
 	return std::make_unique<Repeat>([action]() -> Repeat::Result {
 		return { Action::Status::Finished, action() };
 	});
 }
 
-Factory::UAction Factory::RepeatInfinite(std::function<UAction()> action)
+Collection::UAction Collection::RepeatInfinite(std::function<UAction()> action)
 {
 	return std::make_unique<Repeat>([action]() -> Repeat::Result {
 		return { Action::Status::Continue, action() };
 	});
 }
 
-Factory::UAction Factory::Execute(std::function<void()> callback)
+Collection::UAction Collection::Execute(std::function<void()> callback)
 {
 	return std::make_unique<Generic>(Generic::Type::One, callback);
 }
 
-Factory::UAction Factory::ExecuteInfinite(std::function<void()> callback)
+Collection::UAction Collection::ExecuteInfinite(std::function<void()> callback)
 {
 	return std::make_unique<Generic>(Generic::Type::Infinity, callback);
 }
 
-Factory::UAction Factory::Wait(float duration)
+Collection::UAction Collection::Wait(float duration)
 {
 	return Wait([duration]() mutable {
 		duration -= Clock::ToSeconds(FRAME->getTimeDelta());
@@ -159,7 +159,7 @@ Factory::UAction Factory::Wait(float duration)
 	});
 }
 
-Factory::UAction Factory::Wait(std::function<bool()> while_callback)
+Collection::UAction Collection::Wait(std::function<bool()> while_callback)
 {
 	return std::make_unique<Generic>([while_callback] {
 		if (while_callback())
@@ -169,19 +169,19 @@ Factory::UAction Factory::Wait(std::function<bool()> while_callback)
 	});
 }
 
-Factory::UAction Factory::Wait(bool& while_flag)
+Collection::UAction Collection::Wait(bool& while_flag)
 {
 	return Wait([&while_flag] {
 		return while_flag;
 	});
 }
 
-Factory::UAction Factory::WaitOneFrame()
+Collection::UAction Collection::WaitOneFrame()
 {
 	return Execute(nullptr);
 }
 
-Factory::UAction Factory::Delayed(float duration, UAction action)
+Collection::UAction Collection::Delayed(float duration, UAction action)
 {
 	return MakeSequence(
 		Wait(duration),
@@ -189,7 +189,7 @@ Factory::UAction Factory::Delayed(float duration, UAction action)
 	);
 }
 
-Factory::UAction Factory::Delayed(std::function<bool()> while_callback, UAction action)
+Collection::UAction Collection::Delayed(std::function<bool()> while_callback, UAction action)
 {
 	return MakeSequence(
 		Wait(while_callback),
@@ -197,7 +197,7 @@ Factory::UAction Factory::Delayed(std::function<bool()> while_callback, UAction 
 	);
 }
 
-Factory::UAction Factory::Delayed(bool& while_flag, UAction action)
+Collection::UAction Collection::Delayed(bool& while_flag, UAction action)
 {
 	return MakeSequence(
 		Wait(while_flag),
@@ -207,7 +207,7 @@ Factory::UAction Factory::Delayed(bool& while_flag, UAction action)
 
 // breakable
 
-Factory::UAction Factory::Breakable(float duration, UAction action)
+Collection::UAction Collection::Breakable(float duration, UAction action)
 {
 	return MakeParallel(Parallel::Awaiting::Any,
 		Wait(duration),
@@ -215,7 +215,7 @@ Factory::UAction Factory::Breakable(float duration, UAction action)
 	);
 }
 
-Factory::UAction Factory::Breakable(std::function<bool()> while_callback, UAction action)
+Collection::UAction Collection::Breakable(std::function<bool()> while_callback, UAction action)
 {
 	return MakeParallel(Parallel::Awaiting::Any,
 		Wait(while_callback),
@@ -223,7 +223,7 @@ Factory::UAction Factory::Breakable(std::function<bool()> while_callback, UActio
 	);
 }
 
-Factory::UAction Factory::Pausable(std::function<bool()> run_callback, UAction action)
+Collection::UAction Collection::Pausable(std::function<bool()> run_callback, UAction action)
 {
 	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
 	player->add(std::move(action));
@@ -241,7 +241,7 @@ Factory::UAction Factory::Pausable(std::function<bool()> run_callback, UAction a
 	});
 }
 
-Factory::UAction Factory::Interpolate(float start, float dest, float duration, EasingFunction easing, std::function<void(float)> callback)
+Collection::UAction Collection::Interpolate(float start, float dest, float duration, EasingFunction easing, std::function<void(float)> callback)
 {
 	return std::make_unique<Generic>([start, dest, duration, easing, callback, passed = 0.0f]() mutable {
 		passed += Clock::ToSeconds(FRAME->getTimeDelta());
@@ -255,56 +255,56 @@ Factory::UAction Factory::Interpolate(float start, float dest, float duration, E
 	});
 }
 
-Factory::UAction Factory::Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback)
+Collection::UAction Collection::Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback)
 {
-	return Factory::Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
+	return Collection::Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
 		callback(glm::lerp(start, dest, value));
 	});
 }
 
-Factory::UAction Factory::Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback)
-{
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
-		callback(glm::lerp(start, dest, value));
-	});
-}
-
-Factory::UAction Factory::Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback)
+Collection::UAction Collection::Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback)
 {
 	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
 		callback(glm::lerp(start, dest, value));
 	});
 }
 
-Factory::UAction Factory::Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction)
+Collection::UAction Collection::Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback)
+{
+	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
+		callback(glm::lerp(start, dest, value));
+	});
+}
+
+Collection::UAction Collection::Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction)
 {
 	return Interpolate(startValue, destValue, duration, easingFunction, [&value](float _value) {
 		value = _value;
 	});
 }
 
-Factory::UAction Factory::Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction)
+Collection::UAction Collection::Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction)
 {
 	return Insert([destValue, duration, &value, easingFunction] {
-		return Factory::Interpolate(value, destValue, duration, value, easingFunction);
+		return Collection::Interpolate(value, destValue, duration, value, easingFunction);
 	});
 }
 
-Factory::UAction Factory::Interpolate(const glm::vec3& startValue, const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction)
+Collection::UAction Collection::Interpolate(const glm::vec3& startValue, const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction)
 {
 	return Interpolate(startValue, destValue, duration, easingFunction, [&value](const glm::vec3& _value) {
 		value = _value;
 	});
 }
 
-Factory::UAction Factory::Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction)
+Collection::UAction Collection::Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction)
 {
 	return Insert([destValue, duration, &value, easingFunction] {
 		return Interpolate(value, destValue, duration, value, easingFunction);
 	});
 }
 
-Factory::UAction Factory::Log(const std::string& text)
+Collection::UAction Collection::Log(const std::string& text)
 {
 	return Execute([text] {
 		LOG(text);

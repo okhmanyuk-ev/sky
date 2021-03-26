@@ -275,8 +275,8 @@ void SystemWindows::initializeBilling(const ProductsMap& products)
 
 void SystemWindows::purchase(const std::string& product)
 {
-	Actions::Run(Actions::Factory::Delayed(3.0f,
-		Actions::Factory::Execute([this, product] {
+	Actions::Run(Actions::Collection::Delayed(3.0f,
+		Actions::Collection::Execute([this, product] {
 			if (mProducts.count(product) == 0)
 				return;
 
