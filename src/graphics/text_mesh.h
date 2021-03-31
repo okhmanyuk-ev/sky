@@ -17,7 +17,7 @@ namespace Graphics
 			Right
 		};
 
-		Renderer::Topology topology;
+		Renderer::Topology topology = Renderer::Topology::TriangleList;
 		std::vector<Renderer::Vertex::PositionColorTexture> vertices;
 		std::vector<uint32_t> indices;
 
