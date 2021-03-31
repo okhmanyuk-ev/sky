@@ -62,7 +62,12 @@ void Asset::Write(const std::string& path, void* memory, size_t size, Storage st
 {
 #if defined(PLATFORM_WINDOWS)
 	auto p = StoragePathToAbsolute(path, storage);
-	std::filesystem::create_directories(std::filesystem::path(p).remove_filename().string());
+	
+	auto dirs = std::filesystem::path(p).remove_filename().string();
+	
+	if (!dirs.empty())
+		std::filesystem::create_directories(dirs);
+	
 	std::ofstream file(p, std::ios::out | std::ios::binary);
 	file.write((char*)memory, size);
 	file.close();
