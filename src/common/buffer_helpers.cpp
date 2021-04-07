@@ -6,7 +6,7 @@
 
 using namespace Common;
 
-void BufferHelpers::WriteString(Common::BitBuffer& msg, std::string_view value)
+void BufferHelpers::WriteString(BitBuffer& msg, std::string_view value)
 {
 	for (auto it = value.begin(); it != value.end(); ++it)
 	{
@@ -16,7 +16,7 @@ void BufferHelpers::WriteString(Common::BitBuffer& msg, std::string_view value)
 	msg.write<uint8_t>(0);
 }
 
-std::string BufferHelpers::ReadString(Common::BitBuffer& msg)
+std::string BufferHelpers::ReadString(BitBuffer& msg)
 {
 	std::string result;
 
@@ -51,7 +51,7 @@ void BufferHelpers::WriteToBuffer(BitBuffer& from, BitBuffer& to)
 	to.writeBits(from.readBits(bitCount), bitCount);
 }
 
-int32_t BufferHelpers::ReadSBits(Common::BitBuffer& msg, int size)
+int32_t BufferHelpers::ReadSBits(BitBuffer& msg, int size)
 {
 	bool b = msg.readBit();
 
@@ -63,13 +63,13 @@ int32_t BufferHelpers::ReadSBits(Common::BitBuffer& msg, int size)
 	return result;
 }
 
-void BufferHelpers::WriteSBits(Common::BitBuffer& msg, int32_t value, int size)
+void BufferHelpers::WriteSBits(BitBuffer& msg, int32_t value, int size)
 {
 	msg.writeBit(value < 0);
 	msg.writeBits(std::abs(value), size - 1);
 }
 
-float BufferHelpers::ReadBitAngle(Common::BitBuffer& msg, int size)
+float BufferHelpers::ReadBitAngle(BitBuffer& msg, int size)
 {
 	uint32_t x = 1UL << size;
 
@@ -82,38 +82,38 @@ float BufferHelpers::ReadBitAngle(Common::BitBuffer& msg, int size)
 	}
 }
 
-void BufferHelpers::WriteBitAngle(Common::BitBuffer& msg, float angle, int size)
+void BufferHelpers::WriteBitAngle(BitBuffer& msg, float angle, int size)
 {
 	uint32_t b = 1UL << size;
 	msg.writeBits((b - 1) & (int)(std::trunc(b * angle) / 360), size);
 }
 
-float BufferHelpers::ReadAngle(Common::BitBuffer& msg)
+float BufferHelpers::ReadAngle(BitBuffer& msg)
 {
 	return msg.read<int8_t>() * (360.0f / 65536);
 }
 
-void BufferHelpers::WriteAngle(Common::BitBuffer& msg, float angle)
+void BufferHelpers::WriteAngle(BitBuffer& msg, float angle)
 {
 	msg.write<uint8_t>((int64_t)(fmod((double)angle, 360.0) * 256.0 / 360.0) & 0xFF);
 }
 
-float BufferHelpers::ReadHiResAngle(Common::BitBuffer& msg)
+float BufferHelpers::ReadHiResAngle(BitBuffer& msg)
 {
 	return msg.read<int16_t>() * (360.0f / 65536);
 }
 
-void BufferHelpers::WriteHiResAngle(Common::BitBuffer& msg, float angle)
+void BufferHelpers::WriteHiResAngle(BitBuffer& msg, float angle)
 {
 	msg.write<int16_t>((int64_t)(fmod((double)angle, 360.0) * 65536.0 / 360.0) & 0xFFFF);
 }
 
-float BufferHelpers::ReadCoord(Common::BitBuffer& msg)
+float BufferHelpers::ReadCoord(BitBuffer& msg)
 {
 	return msg.read<int16_t>() / 8.0f;
 }
 
-float BufferHelpers::ReadBitCoord(Common::BitBuffer& msg)
+float BufferHelpers::ReadBitCoord(BitBuffer& msg)
 {
 	int intData = msg.readBits(1);
 	int fracData = msg.readBits(1);
@@ -139,7 +139,7 @@ float BufferHelpers::ReadBitCoord(Common::BitBuffer& msg)
 		return 0.0;
 }
 
-void BufferHelpers::ReadBitVec3(Common::BitBuffer& msg, float (&dst)[3])
+void BufferHelpers::ReadBitVec3(BitBuffer& msg, float (&dst)[3])
 {
 	bool x = msg.readBit();
 	bool y = msg.readBit();

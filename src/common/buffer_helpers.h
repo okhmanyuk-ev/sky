@@ -7,26 +7,26 @@
 
 namespace Common::BufferHelpers
 {
-	void WriteString(Common::BitBuffer& msg, std::string_view value);
-	std::string ReadString(Common::BitBuffer& msg);
+	void WriteString(BitBuffer& msg, std::string_view value);
+	std::string ReadString(BitBuffer& msg);
 
 	void WriteToBuffer(BitBuffer& from, BitBuffer& to);
 
-	int32_t ReadSBits(Common::BitBuffer& msg, int size);
-	void WriteSBits(Common::BitBuffer& msg, int32_t value, int size);
+	int32_t ReadSBits(BitBuffer& msg, int size);
+	void WriteSBits(BitBuffer& msg, int32_t value, int size);
 
-	float ReadBitAngle(Common::BitBuffer& msg, int size);
-	void WriteBitAngle(Common::BitBuffer& msg, float angle, int size);
+	float ReadBitAngle(BitBuffer& msg, int size);
+	void WriteBitAngle(BitBuffer& msg, float angle, int size);
 
-	float ReadAngle(Common::BitBuffer& msg);
-	void WriteAngle(Common::BitBuffer& msg, float angle);
+	float ReadAngle(BitBuffer& msg);
+	void WriteAngle(BitBuffer& msg, float angle);
 
-	float ReadHiResAngle(Common::BitBuffer& msg);
-	void WriteHiResAngle(Common::BitBuffer& msg, float angle);
+	float ReadHiResAngle(BitBuffer& msg);
+	void WriteHiResAngle(BitBuffer& msg, float angle);
 
-	float ReadCoord(Common::BitBuffer& msg);
+	float ReadCoord(BitBuffer& msg);
 
-	float ReadBitCoord(Common::BitBuffer& msg);
+	float ReadBitCoord(BitBuffer& msg);
 
-	void ReadBitVec3(Common::BitBuffer& msg, float (&dst)[3]);
+	void ReadBitVec3(BitBuffer& msg, float (&dst)[3]);
 }

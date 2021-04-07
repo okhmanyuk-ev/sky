@@ -50,7 +50,7 @@ void Channel::transmit()
 {
 	mOutgoingSequence += 1;
 	
-	auto buf = Common::BitBuffer();
+	auto buf = BitBuffer();
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
@@ -145,7 +145,7 @@ void Channel::resendReliableMessages(uint32_t ack)
 	}
 }
 
-void Channel::read(Common::BitBuffer& buf)
+void Channel::read(BitBuffer& buf)
 {
 	auto seq = buf.readBitsVar();
 	auto ack = buf.readBitsVar();
@@ -183,7 +183,7 @@ void Channel::read(Common::BitBuffer& buf)
 
 		auto msg = ReliableMessage();
 		msg.name = Common::BufferHelpers::ReadString(buf);
-		msg.buf = std::make_shared<Common::BitBuffer>();
+		msg.buf = std::make_shared<BitBuffer>();
 
 		auto size = buf.readBitsVar(); // TODO: use bit corrected size
 
@@ -225,10 +225,10 @@ void Channel::read(Common::BitBuffer& buf)
 	mIncomingTime = Clock::Now();
 }
 
-void Channel::sendReliable(const std::string& msg, Common::BitBuffer& buf)
+void Channel::sendReliable(const std::string& msg, BitBuffer& buf)
 {
 	mOutgoingReliableIndex += 1;
-	mOutgoingReliableMessages.insert({ mOutgoingReliableIndex, { msg, std::make_shared<Common::BitBuffer>(buf) } });
+	mOutgoingReliableMessages.insert({ mOutgoingReliableIndex, { msg, std::make_shared<BitBuffer>(buf) } });
 	
 	if (Networking::NetLogRel)
 		LOGF("send reliable {}", mOutgoingReliableIndex);
@@ -297,9 +297,9 @@ void Networking::addMessage(uint32_t msg, ReadCallback callback)
 	mMessages.insert({ msg, callback });
 }
 
-void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const Common::BitBuffer& _buf)
+void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const BitBuffer& _buf)
 {
-	auto buf = Common::BitBuffer();
+	auto buf = BitBuffer();
 	buf.writeBitsVar(msg);
 	buf.write(_buf.getMemory(), _buf.getSize());
 	mSocket.sendPacket({ adr, buf });
@@ -307,14 +307,14 @@ void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const Co
 
 void Networking::sendDisconnect(const Network::Address& address, const std::string& reason)
 {
-	auto buf = Common::BitBuffer();
+	auto buf = BitBuffer();
 	Common::BufferHelpers::WriteString(buf, reason);
 	sendMessage((uint32_t)Message::Disconnect, address, buf);
 }
 
 void Networking::sendRedirect(const Network::Address& address, const std::string& redirect_address)
 {
-	auto buf = Common::BitBuffer();
+	auto buf = BitBuffer();
 	Common::BufferHelpers::WriteString(buf, redirect_address);
 	sendMessage((uint32_t)Message::Redirect, address, buf);
 }
@@ -460,7 +460,7 @@ void Client::onFrame()
 
 void Client::connect()
 {
-	auto buf = Common::BitBuffer();
+	auto buf = BitBuffer();
 	buf.writeBitsVar(ProtocolVersion);
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
 	LOG("connecting to " + mServerAddress.toString());
@@ -476,7 +476,7 @@ SimpleChannel::SimpleChannel()
 
 void SimpleChannel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
 {
-	auto buf = Common::BitBuffer();
+	auto buf = BitBuffer();
 	Common::BufferHelpers::WriteString(buf, name);
 	for (auto& [key, value] : params)
 	{
@@ -488,7 +488,7 @@ void SimpleChannel::sendEvent(const std::string& name, const std::map<std::strin
 	sendReliable("event", buf);
 }
 
-void SimpleChannel::onEventMessage(Common::BitBuffer& buf)
+void SimpleChannel::onEventMessage(BitBuffer& buf)
 {
 	auto name = Common::BufferHelpers::ReadString(buf);
 	auto params = std::map<std::string, std::string>();

@@ -8,6 +8,6 @@ namespace Network
 	struct Packet
 	{
 		Address adr;
-		Common::BitBuffer buf;
+		BitBuffer buf;
 	};
 }

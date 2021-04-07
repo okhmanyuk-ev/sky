@@ -39,7 +39,7 @@ namespace Shared::NetworkingUDP
 
 	protected:
 		void addMessage(uint32_t msg, ReadCallback callback);
-		void sendMessage(uint32_t msg, const Network::Address& adr, const Common::BitBuffer& buf = {});
+		void sendMessage(uint32_t msg, const Network::Address& adr, const BitBuffer& buf = {});
 		void sendDisconnect(const Network::Address& address, const std::string& reason);
 		void sendRedirect(const Network::Address& address, const std::string& redirect_address);
 
@@ -57,8 +57,8 @@ namespace Shared::NetworkingUDP
 	class Channel : public Common::FrameSystem::Frameable
 	{
 	public:
-		using ReadCallback = std::function<void(Common::BitBuffer&)>;
-		using SendCallback = std::function<void(Common::BitBuffer&)>;
+		using ReadCallback = std::function<void(BitBuffer&)>;
+		using SendCallback = std::function<void(BitBuffer&)>;
 		using DisconnectCallback = std::function<void(const std::string& reason)>;
 
 	private:
@@ -69,8 +69,8 @@ namespace Shared::NetworkingUDP
 		void resendReliableMessages(uint32_t ack);
 
 	public:
-		void read(Common::BitBuffer& buf);
-		void sendReliable(const std::string& msg, Common::BitBuffer& buf);
+		void read(BitBuffer& buf);
+		void sendReliable(const std::string& msg, BitBuffer& buf);
 		void addMessageReader(const std::string& msg, ReadCallback callback);
 		void disconnect(const std::string& reason);
 
@@ -106,7 +106,7 @@ namespace Shared::NetworkingUDP
 		struct ReliableMessage
 		{
 			std::string name;
-			std::shared_ptr<Common::BitBuffer> buf;
+			std::shared_ptr<BitBuffer> buf;
 		};
 
 		struct PendingReliableMessage
@@ -190,7 +190,7 @@ namespace Shared::NetworkingUDP
 		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params = {});
 
 	private:
-		void onEventMessage(Common::BitBuffer& buf);
+		void onEventMessage(BitBuffer& buf);
 
 	public:
 		void addEventCallback(const std::string& name, EventCallback callback);

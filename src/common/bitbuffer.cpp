@@ -4,8 +4,6 @@
 #include <string>
 #include <stdexcept>
 
-using namespace Common;
-
 BitBuffer::BitBuffer()
 {
 	//

@@ -6,7 +6,7 @@ using namespace Shared::NetworkingWS;
 
 // channel
 
-void Channel::read(Common::BitBuffer& buf)
+void Channel::read(BitBuffer& buf)
 {
 	auto name = Common::BufferHelpers::ReadString(buf);
 	
@@ -16,9 +16,9 @@ void Channel::read(Common::BitBuffer& buf)
 	mMessageReaders.at(name)(buf);
 }
 
-void Channel::sendReliable(const std::string& name, Common::BitBuffer& buf)
+void Channel::sendReliable(const std::string& name, BitBuffer& buf)
 {
-	auto msg = Common::BitBuffer();
+	auto msg = BitBuffer();
 	Common::BufferHelpers::WriteString(msg, name);
 	msg.write(buf.getMemory(), buf.getSize());
 	mSendCallback(msg);
@@ -60,7 +60,7 @@ Server::Server(uint16_t port)
 			return;
 
 		auto& payload = msg->get_raw_payload();
-		auto buf = Common::BitBuffer();
+		auto buf = BitBuffer();
 		buf.write(payload.data(), payload.size());
 		buf.toStart();
 		mChannels.at(hdl)->read(buf);
@@ -107,7 +107,7 @@ Client::Client(const std::string& url)
 
 	mWSClient.set_message_handler([this](websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg) {
 		auto& payload = msg->get_raw_payload();
-		auto buf = Common::BitBuffer();
+		auto buf = BitBuffer();
 		buf.write(payload.data(), payload.size());
 		buf.toStart();
 		mChannel->read(buf);
@@ -143,7 +143,7 @@ SimpleChannel::SimpleChannel()
 
 void SimpleChannel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
 {
-	auto buf = Common::BitBuffer();
+	auto buf = BitBuffer();
 	Common::BufferHelpers::WriteString(buf, name);
 	for (auto& [key, value] : params)
 	{
@@ -155,7 +155,7 @@ void SimpleChannel::sendEvent(const std::string& name, const std::map<std::strin
 	sendReliable("event", buf);
 }
 
-void SimpleChannel::onEventMessage(Common::BitBuffer& buf)
+void SimpleChannel::onEventMessage(BitBuffer& buf)
 {
 	auto name = Common::BufferHelpers::ReadString(buf);
 	auto params = std::map<std::string, std::string>();

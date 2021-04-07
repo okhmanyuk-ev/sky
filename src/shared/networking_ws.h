@@ -13,15 +13,15 @@ namespace Shared::NetworkingWS
 	class Channel
 	{
 	public:
-		using ReadCallback = std::function<void(Common::BitBuffer&)>;
-		using SendCallback = std::function<void(Common::BitBuffer&)>;
+		using ReadCallback = std::function<void(BitBuffer&)>;
+		using SendCallback = std::function<void(BitBuffer&)>;
 
 	public:
 		virtual ~Channel() {}
 
 	public:
-		void read(Common::BitBuffer& buf);
-		void sendReliable(const std::string& name, Common::BitBuffer& buf);
+		void read(BitBuffer& buf);
+		void sendReliable(const std::string& name, BitBuffer& buf);
 		void addMessageReader(const std::string& name, ReadCallback callback);
 
 	public:
@@ -93,7 +93,7 @@ namespace Shared::NetworkingWS
 		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params = {});
 
 	private:
-		void onEventMessage(Common::BitBuffer& buf);
+		void onEventMessage(BitBuffer& buf);
 
 	public:
 		void addEventCallback(const std::string& name, EventCallback callback);
