@@ -34,7 +34,7 @@ Address::Address(const std::string& adr)
 		ip.b[2] = bytes[2];
 		ip.b[3] = bytes[3];
 	}
-	catch (std::exception& e)
+	catch (...)
 	{
 		auto resolver = asio::ip::udp::resolver(NETWORK->getIoService());
 		auto query = asio::ip::udp::resolver::query(ip_s, "");
