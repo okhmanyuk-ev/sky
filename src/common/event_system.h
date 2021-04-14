@@ -4,6 +4,7 @@
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
+#include <typeindex>
 
 #define EVENT ENGINE->getSystem<Common::Event::System>()
 
@@ -21,40 +22,33 @@ namespace Common::Event
 			ListenerCallback<T> callback;
 		};
 
-	private:
-		template <typename T> auto getTypeIndex()
-		{
-			static auto type = mTypeCount++;
-			return type;
-		}
-
 	public:
 		template <typename T> ListenerHandle createListener(ListenerCallback<T> callback)
 		{
 			auto listener = new ListenerData<T>;
 			listener->callback = callback;
-			auto type_index = getTypeIndex<T>();
-			mListeners[type_index].insert(listener);
+			auto index = std::type_index(typeid(T));
+			mListeners[index].insert(listener);
 			return listener;
 		}
 
 		template <typename T> void destroyListener(ListenerHandle handle)
 		{
 			auto listener = static_cast<ListenerData<T>*>(handle);
-			auto type_index = getTypeIndex<T>();
-			mListeners[type_index].erase(listener);
+			auto index = std::type_index(typeid(T));
+			mListeners[index].erase(listener);
 			delete listener;
 		}
 
 	public:
 		template <typename T> void emit(const T& e)
 		{
-			auto type = getTypeIndex<T>();
-		
-			if (mListeners.count(type) == 0)
+			auto index = std::type_index(typeid(T));
+
+			if (mListeners.count(index) == 0)
 				return;
 
-			for (auto handle : mListeners.at(type))
+			for (auto handle : mListeners.at(index))
 			{
 				auto listener = static_cast<ListenerData<T>*>(handle);
 				listener->callback(e);
@@ -75,8 +69,7 @@ namespace Common::Event
 		}
 
 	private:
-		std::unordered_map<size_t, std::unordered_set<void*>> mListeners;
-		size_t mTypeCount = 0;
+		std::unordered_map<std::type_index, std::unordered_set<void*>> mListeners;
 	};
 
 	template <typename T> class Listenable
