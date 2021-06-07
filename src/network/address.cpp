@@ -11,7 +11,7 @@ Address::Address()
 
 Address::Address(const std::string& adr)
 {
-	std::string ip_s = "";
+	auto ip_s = adr;
 	
 	auto p = adr.find(":");
 
