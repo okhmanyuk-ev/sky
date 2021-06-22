@@ -41,6 +41,7 @@ namespace Scene
 
 		auto getScrollPosition() const { return mScrollPosition; }
 		void setScrollPosition(const glm::vec2& value) { mScrollPosition = value; }
+		void setScrollPosition(float value) { setScrollPosition({ value, value }); }
 
 		auto getHorizontalScrollPosition() const { return mScrollPosition.x; }
 		void setHorizontalScrollPosition(float value) { mScrollPosition.x = value; }
