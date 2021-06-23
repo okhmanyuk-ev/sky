@@ -9,9 +9,6 @@ namespace Scene
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 
 	public:
-		using Callback = std::function<void()>;
-
-	public:
 		Tappable()
 		{
 			T::setTouchable(true);
@@ -28,30 +25,31 @@ namespace Scene
 			if (type != Node::Touch::Begin)
 				return;
 
-			tap();
+			tap(pos);
 		}
 
 	protected:
-		virtual void onTap()
+		virtual void onTap(const glm::vec2& pos)
 		{
 			if (mTapCallback)
-				mTapCallback();
+				mTapCallback(pos);
 		}
 
 	public:
-		void tap()
+		void tap(const glm::vec2& pos = { 0.0f, 0.0f })
 		{
-			onTap();
+			onTap(pos);
 		}
 
 	public:
-		void setTapCallback(Callback value) { mTapCallback = value; }
+		void setTapCallback(std::function<void(const glm::vec2&)> value) { mTapCallback = value; }
+		void setTapCallback(std::function<void()> value) { setTapCallback([value](auto) { value(); }); }
 
 		bool isTapEnabled() const { return mTapEnabled; }
 		void setTapEnabled(bool value) { mTapEnabled = value; }
 
 	private:
-		Callback mTapCallback = nullptr;
+		std::function<void(const glm::vec2&)> mTapCallback = nullptr;
 		bool mTapEnabled = true;
 	};
 }
