@@ -422,6 +422,34 @@ Collection::UAction Collection::ChangeCirclePie(std::shared_ptr<Scene::Circle> c
 	});
 }
 
+Collection::UAction Collection::ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [circle](float value) {
+		circle->setRadius(value);
+	});
+}
+
+Collection::UAction Collection::ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([circle, dest, duration, easingFunction] {
+		return ChangeCircleRadius(circle, circle->getRadius(), dest, duration, easingFunction);
+	});
+}
+
+Collection::UAction Collection::ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [circle](float value) {
+		circle->setFill(value);
+	});
+}
+
+Collection::UAction Collection::ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([circle, dest, duration, easingFunction] {
+		return ChangeCircleFill(circle, circle->getFill(), dest, duration, easingFunction);
+	});
+}
+
 Collection::UAction Collection::ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start, float dest, float duration, EasingFunction easingFunction)
 {
 	return Interpolate(start, dest, duration, easingFunction, [scrollbox](float value) {

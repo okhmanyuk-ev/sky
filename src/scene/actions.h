@@ -98,6 +98,12 @@ namespace Actions::Collection
 	UAction ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 
+	UAction ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
+	UAction ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
 	UAction ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 
