@@ -141,41 +141,32 @@ SimpleChannel::SimpleChannel()
 	addMessageReader("event", [this](auto& buf) { onEventMessage(buf); });
 }
 
-void SimpleChannel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
+void SimpleChannel::sendEvent(const std::string& name, const nlohmann::json& json)
 {
 	auto buf = BitBuffer();
 	Common::BufferHelpers::WriteString(buf, name);
-	for (auto& [key, value] : params)
-	{
-		buf.writeBit(true);
-		Common::BufferHelpers::WriteString(buf, key);
-		Common::BufferHelpers::WriteString(buf, value);
-	}
-	buf.writeBit(false);
+	
+	auto dump = json.dump(); // TODO: use bson + bitbuffer
+	Common::BufferHelpers::WriteString(buf, dump);
+	
 	sendReliable("event", buf);
 }
 
 void SimpleChannel::onEventMessage(BitBuffer& buf)
 {
 	auto name = Common::BufferHelpers::ReadString(buf);
-	auto params = std::map<std::string, std::string>();
-	while (buf.readBit())
-	{
-		auto key = Common::BufferHelpers::ReadString(buf);
-		auto value = Common::BufferHelpers::ReadString(buf);
-		params.insert({ key, value });
-	}
+	auto dump = Common::BufferHelpers::ReadString(buf);
+
+	auto json = nlohmann::json::parse(dump);
+
 	if (mShowEventLogs || mEvents.count(name) == 0)
 	{
-		LOG("event: \"" + name + "\"");
-		for (const auto& [key, value] : params)
-		{
-			LOGF(" - {} : {}", key, value);
-		}
+		LOGF("event: \"{}\", dump: \"{}\"", name, dump);
 	}
+
 	if (mEvents.count(name) > 0)
 	{
-		mEvents.at(name)(params);
+		mEvents.at(name)(json);
 	}
 }
 

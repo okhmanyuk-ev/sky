@@ -7,6 +7,7 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
+#include <nlohmann/json.hpp>
 
 namespace Shared::NetworkingWS
 {
@@ -84,13 +85,13 @@ namespace Shared::NetworkingWS
 	class SimpleChannel : public Channel
 	{
 	public:
-		using EventCallback = std::function<void(std::map<std::string, std::string>)>;
+		using EventCallback = std::function<void(const nlohmann::json&)>;
 
 	public:
 		SimpleChannel();
 
 	public:
-		void sendEvent(const std::string& name, const std::map<std::string, std::string>& params = {});
+		void sendEvent(const std::string& name, const nlohmann::json& json = {});
 
 	private:
 		void onEventMessage(BitBuffer& buf);
