@@ -109,6 +109,13 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
     Window = [[UIWindow alloc]initWithFrame:bounds];
     [Window makeKeyAndVisible];
     
+    for (UIGestureRecognizer* recognizer in Window.gestureRecognizers)
+    {
+        recognizer.delaysTouchesBegan = false;
+        recognizer.cancelsTouchesInView = false;
+        recognizer.enabled = false;
+    }
+    
     auto rootViewController = [[ViewController alloc] init];
     [Window setRootViewController: rootViewController];
     
