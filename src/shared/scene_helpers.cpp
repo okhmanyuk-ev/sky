@@ -7,7 +7,6 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 	std::shared_ptr<Scene::Node> target, const utf8_string& text, float text_size, float move_duration)
 {
 	auto label = std::make_shared<Scene::Label>();
-	label->setFont(FONT("default"));
 	label->setFontSize(text_size);
 	label->setText(text);
 	label->setPosition(holder->unproject(target->project({ target->getAbsoluteSize() / 2.0f })));
@@ -49,7 +48,6 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	outer_rect->attach(inner_rect);
 
 	auto label = std::make_shared<Scene::Label>();
-	label->setFont(FONT("default"));
 	label->setFontSize(title_size);
 	label->setText(title);
 	label->setAnchor({ 1.0f, 0.5f });
@@ -218,7 +216,6 @@ void SceneHelpers::GrayscaleSpriteButton::refresh()
 SceneHelpers::RectangleButton::RectangleButton()
 {
 	mLabel = std::make_shared<Scene::Label>();
-	mLabel->setFont(FONT("default"));
 	mLabel->setAnchor(0.5f);
 	mLabel->setPivot(0.5f);
 	attach(mLabel);

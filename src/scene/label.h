@@ -8,6 +8,10 @@ namespace Scene
 {
 	class Label : public Node, public Color
 	{
+	public:
+		inline static std::shared_ptr<Graphics::Font> DefaultFont = nullptr;
+		inline static float DefaultFontSize = 24.0f;
+
 	protected:
 		void draw() override;
 		void update() override;
@@ -49,8 +53,8 @@ namespace Scene
 		float getSymbolLineY(int index);
 
 	private:
-		std::shared_ptr<Graphics::Font> mFont;
-		float mFontSize = 24.0f;
+		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
+		float mFontSize = DefaultFontSize;
 		utf8_string mText = "";
 		bool mMultiline = false;
 		Graphics::TextMesh::Align mMultilineAlign = Graphics::TextMesh::Align::Left;
