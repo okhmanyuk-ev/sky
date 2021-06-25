@@ -6,8 +6,6 @@ void Label::draw()
 {
 	Node::draw();
 
-	assert(mFont);
-
 	if (mFont == nullptr || mFontSize <= 0.0f || (mMultiline && getAbsoluteWidth() <= 0.0f))
 		return;
 

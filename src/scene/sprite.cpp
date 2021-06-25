@@ -6,8 +6,6 @@ void Sprite::draw()
 {
 	Node::draw();
 	
-	assert(mTexture);
-
 	if (mTexture == nullptr)
 		return;
 	
