@@ -381,3 +381,69 @@ void SceneHelpers::VerticalScrollbar::update()
 		));
 	}
 }
+
+// fade screen
+
+SceneHelpers::FadeScreen::FadeScreen()
+{
+	setEnabled(false);
+	setInteractions(false);
+	setStretch(1.0f);
+	setAnchor(0.5f);
+	setPivot(0.5f);
+
+	mContent = std::make_shared<Scene::Node>();
+	mContent->setStretch(1.0f);
+	attach(mContent);
+
+	mFadeRectangle = std::make_shared<Scene::Rectangle>();
+	mFadeRectangle->setStretch(1.0f);
+	mFadeRectangle->setColor(Graphics::Color::Black);
+	attach(mFadeRectangle);
+}
+
+void SceneHelpers::FadeScreen::onEnterBegin()
+{
+	setEnabled(true);
+}
+
+void SceneHelpers::FadeScreen::onEnterEnd()
+{
+	setInteractions(true);
+}
+
+void SceneHelpers::FadeScreen::onLeaveBegin()
+{
+	setInteractions(false);
+}
+
+void SceneHelpers::FadeScreen::onLeaveEnd()
+{
+	setEnabled(false);
+}
+
+void SceneHelpers::FadeScreen::onWindowAppearing()
+{
+	setInteractions(false);
+}
+
+void SceneHelpers::FadeScreen::onWindowDisappearing()
+{
+	setInteractions(true);
+}
+
+std::unique_ptr<Actions::Action> SceneHelpers::FadeScreen::createEnterAction()
+{
+	return Actions::Collection::MakeSequence(
+		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::ChangeAlpha(mFadeRectangle, 0.0f, 0.5f)
+	);
+};
+
+std::unique_ptr<Actions::Action> SceneHelpers::FadeScreen::createLeaveAction()
+{
+	return Actions::Collection::MakeSequence(
+		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::ChangeAlpha(mFadeRectangle, 1.0f, 0.5f)
+	);
+};

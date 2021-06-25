@@ -3,6 +3,7 @@
 #include <tinyutf8.hpp>
 #include <scene/all.h>
 #include <audio/system.h>
+#include "scene_manager.h"
 
 namespace Shared::SceneHelpers
 {
@@ -478,5 +479,30 @@ namespace Shared::SceneHelpers
 		Clock::TimePoint mScrollMoveTime = Clock::Now();
 		bool mAlphaAnimating = false;
 		bool mHidden = false;
+	};
+
+	class FadeScreen : public SceneManager::Screen
+	{
+	public:
+		FadeScreen();
+
+	public:
+		auto getContent() const { return mContent; }
+
+	protected:
+		void onEnterBegin() override;
+		void onEnterEnd() override;
+		void onLeaveBegin() override;
+		void onLeaveEnd() override;
+		void onWindowAppearing() override;
+		void onWindowDisappearing() override;
+
+	protected:
+		std::unique_ptr<Actions::Action> createEnterAction() override;
+		std::unique_ptr<Actions::Action> createLeaveAction() override;
+
+	private:
+		std::shared_ptr<Scene::Node> mContent;
+		std::shared_ptr<Scene::Rectangle> mFadeRectangle;
 	};
 }

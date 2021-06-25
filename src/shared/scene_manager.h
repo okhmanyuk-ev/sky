@@ -1,7 +1,6 @@
 #pragma once
 
-#include <shared/all.h>
-#include "scene_manager.h"
+#include <scene/all.h>
 
 #define SCENE_MANAGER ENGINE->getSystem<Shared::SceneManager>()
 
