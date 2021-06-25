@@ -481,10 +481,10 @@ namespace Shared::SceneHelpers
 		bool mHidden = false;
 	};
 
-	class FadeScreen : public SceneManager::Screen
+	class StandardScreen : public SceneManager::Screen
 	{
 	public:
-		FadeScreen();
+		StandardScreen();
 
 	public:
 		auto getContent() const { return mContent; }
@@ -504,5 +504,29 @@ namespace Shared::SceneHelpers
 	private:
 		std::shared_ptr<Scene::Node> mContent;
 		std::shared_ptr<Scene::Rectangle> mFadeRectangle;
+	};
+
+	class StandardWindow : public Scene::Clickable<Backshaded<Shared::SceneManager::Window>>
+	{
+	public:
+		StandardWindow();
+
+	public:
+		void onOpenEnd() override;
+		void onCloseBegin() override;
+
+	public:
+		std::unique_ptr<Actions::Action> createOpenAction() override;
+		std::unique_ptr<Actions::Action> createCloseAction() override;
+
+	public:
+		auto getContent() { return mContent; }
+
+		auto getCloseOnMissclick() const { return mCloseOnMissclick; }
+		void setCloseOnMissclick(bool value) { mCloseOnMissclick = value; }
+
+	private:
+		std::shared_ptr<Scene::Node> mContent;
+		bool mCloseOnMissclick = true;
 	};
 }

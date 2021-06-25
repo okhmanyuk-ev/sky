@@ -382,9 +382,9 @@ void SceneHelpers::VerticalScrollbar::update()
 	}
 }
 
-// fade screen
+// standard screen
 
-SceneHelpers::FadeScreen::FadeScreen()
+SceneHelpers::StandardScreen::StandardScreen()
 {
 	setEnabled(false);
 	setInteractions(false);
@@ -402,37 +402,37 @@ SceneHelpers::FadeScreen::FadeScreen()
 	attach(mFadeRectangle);
 }
 
-void SceneHelpers::FadeScreen::onEnterBegin()
+void SceneHelpers::StandardScreen::onEnterBegin()
 {
 	setEnabled(true);
 }
 
-void SceneHelpers::FadeScreen::onEnterEnd()
+void SceneHelpers::StandardScreen::onEnterEnd()
 {
 	setInteractions(true);
 }
 
-void SceneHelpers::FadeScreen::onLeaveBegin()
+void SceneHelpers::StandardScreen::onLeaveBegin()
 {
 	setInteractions(false);
 }
 
-void SceneHelpers::FadeScreen::onLeaveEnd()
+void SceneHelpers::StandardScreen::onLeaveEnd()
 {
 	setEnabled(false);
 }
 
-void SceneHelpers::FadeScreen::onWindowAppearing()
+void SceneHelpers::StandardScreen::onWindowAppearing()
 {
 	setInteractions(false);
 }
 
-void SceneHelpers::FadeScreen::onWindowDisappearing()
+void SceneHelpers::StandardScreen::onWindowDisappearing()
 {
 	setInteractions(true);
 }
 
-std::unique_ptr<Actions::Action> SceneHelpers::FadeScreen::createEnterAction()
+std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createEnterAction()
 {
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
@@ -440,10 +440,67 @@ std::unique_ptr<Actions::Action> SceneHelpers::FadeScreen::createEnterAction()
 	);
 };
 
-std::unique_ptr<Actions::Action> SceneHelpers::FadeScreen::createLeaveAction()
+std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction()
 {
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
 		Actions::Collection::ChangeAlpha(mFadeRectangle, 1.0f, 0.5f)
+	);
+};
+
+// standard window
+
+SceneHelpers::StandardWindow::StandardWindow()
+{
+	setStretch(1.0f);
+	setClickCallback([this] {
+		if (!mCloseOnMissclick)
+			return;
+
+		if (getState() != State::Opened)
+			return;
+
+		SCENE_MANAGER->popWindow();
+	});
+
+	getBackshadeColor()->setColor({ Graphics::Color::Black, 0.0f });
+
+	mContent = std::make_shared<Scene::Node>();
+	mContent->setStretch(1.0f);
+	mContent->setAnchor({ 0.5f, -0.5f });
+	mContent->setPivot({ 0.5f, 0.5f });
+	mContent->setInteractions(false);
+	attach(mContent);
+}
+
+void SceneHelpers::StandardWindow::onOpenEnd()
+{
+	mContent->setInteractions(true);
+}
+
+void SceneHelpers::StandardWindow::onCloseBegin()
+{
+	mContent->setInteractions(false);
+}
+
+std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction()
+{
+	return Actions::Collection::MakeSequence(
+		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::MakeParallel(
+			Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, 0.5f, Easing::CubicOut),
+			Actions::Collection::ChangeVerticalAnchor(mContent, 0.5f, 0.5f, Easing::CubicOut)
+		)
+	);
+};
+
+std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction()
+{
+	return Actions::Collection::MakeSequence(
+		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::MakeParallel(
+			Actions::Collection::ChangeVerticalAnchor(mContent, -0.5f, 0.5f, Easing::CubicIn),
+			Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, 0.5f, Easing::CubicIn)
+		)
 	);
 };
