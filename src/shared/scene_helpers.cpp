@@ -271,12 +271,12 @@ float SceneHelpers::Progressbar::getProgress() const
 	return mProgressContent->getHorizontalStretch();
 }
 
-SceneHelpers::Hud::Hud()
+SceneHelpers::SafeArea::SafeArea()
 {
 	setStretch(1.0f);
 }
 
-void SceneHelpers::Hud::update()
+void SceneHelpers::SafeArea::update()
 {
 	Scene::Node::update();
 

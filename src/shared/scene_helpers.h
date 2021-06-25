@@ -444,10 +444,10 @@ namespace Shared::SceneHelpers
 
 	// automatically stretching to full safe area of the screen
 	// should be attached to fullscreen node or scene root
-	class Hud : public Scene::Node
+	class SafeArea : public Scene::Node
 	{
 	public:
-		Hud();
+		SafeArea();
 
 	protected:
 		void update() override;
