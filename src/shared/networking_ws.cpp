@@ -146,22 +146,28 @@ void SimpleChannel::sendEvent(const std::string& name, const nlohmann::json& jso
 	auto buf = BitBuffer();
 	Common::BufferHelpers::WriteString(buf, name);
 	
-	auto dump = json.dump(); // TODO: use bson + bitbuffer
-	Common::BufferHelpers::WriteString(buf, dump);
-	
+	auto bson = nlohmann::json::to_bson(json);
+
+	buf.writeBitsVar(bson.size());
+	buf.write(bson.data(), bson.size());
+
 	sendReliable("event", buf);
 }
 
 void SimpleChannel::onEventMessage(BitBuffer& buf)
 {
 	auto name = Common::BufferHelpers::ReadString(buf);
-	auto dump = Common::BufferHelpers::ReadString(buf);
+	
+	auto bson_size = buf.readBitsVar();
+	std::vector<uint8_t> bson;
+	bson.resize(bson_size);
+	buf.read(bson.data(), bson_size);
 
-	auto json = nlohmann::json::parse(dump);
+	auto json = nlohmann::json::from_bson(bson);
 
 	if (mShowEventLogs || mEvents.count(name) == 0)
 	{
-		LOGF("event: \"{}\", dump: \"{}\"", name, dump);
+		LOGF("event: \"{}\", dump: \"{}\"", name, json.dump());
 	}
 
 	if (mEvents.count(name) > 0)
