@@ -11,6 +11,7 @@ namespace Scene
 	class Sprite : public Node, public Color, public Blend, public Sampler
 	{
 	public:
+		inline static std::shared_ptr<Renderer::Texture> DefaultTexture = nullptr;
 		inline static Renderer::TextureAddress DefaultTextureAddress = Renderer::TextureAddress::Clamp;
 
 	protected:
@@ -39,7 +40,7 @@ namespace Scene
 		void setShader(std::shared_ptr<Renderer::ShaderMatrices> value) { mShader = value; }
 
 	private:
-		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
+		std::shared_ptr<Renderer::Texture> mTexture = DefaultTexture;
 		Graphics::TexRegion mTexRegion = {};
 		Renderer::TextureAddress mTextureAddress = DefaultTextureAddress;
 		std::shared_ptr<Renderer::ShaderMatrices> mShader = nullptr;

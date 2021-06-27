@@ -6,6 +6,8 @@ void Label::draw()
 {
 	Node::draw();
 
+	assert(mFont); // you should setup Label::DefaultFont
+
 	if (mFont == nullptr || mFontSize <= 0.0f || (mMultiline && getAbsoluteWidth() <= 0.0f))
 		return;
 
