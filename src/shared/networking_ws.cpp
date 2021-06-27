@@ -145,11 +145,17 @@ void SimpleChannel::sendEvent(const std::string& name, const nlohmann::json& jso
 {
 	auto buf = BitBuffer();
 	Common::BufferHelpers::WriteString(buf, name);
-	
-	auto bson = nlohmann::json::to_bson(json);
 
-	buf.writeBitsVar(bson.size());
-	buf.write(bson.data(), bson.size());
+	if (!json.empty())
+	{
+		auto bson = nlohmann::json::to_bson(json);
+		buf.writeBitsVar(bson.size());
+		buf.write(bson.data(), bson.size());
+	}
+	else
+	{
+		buf.writeBitsVar(0);
+	}
 
 	sendReliable("event", buf);
 }
@@ -157,13 +163,17 @@ void SimpleChannel::sendEvent(const std::string& name, const nlohmann::json& jso
 void SimpleChannel::onEventMessage(BitBuffer& buf)
 {
 	auto name = Common::BufferHelpers::ReadString(buf);
-	
-	auto bson_size = buf.readBitsVar();
-	std::vector<uint8_t> bson;
-	bson.resize(bson_size);
-	buf.read(bson.data(), bson_size);
 
-	auto json = nlohmann::json::from_bson(bson);
+	nlohmann::json json = {};
+
+	auto bson_size = buf.readBitsVar();
+	if (bson_size > 0)
+	{
+		std::vector<uint8_t> bson;
+		bson.resize(bson_size);
+		buf.read(bson.data(), bson_size);
+		json = nlohmann::json::from_bson(bson);
+	}
 
 	if (mShowEventLogs || mEvents.count(name) == 0)
 	{
