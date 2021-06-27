@@ -70,7 +70,7 @@ void ConsoleDevice::onFrame()
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0001f);
 			ImGui::Begin("ConsoleButton", nullptr, ImGui::User::ImGuiWindowFlags_Overlay & ~ImGuiWindowFlags_NoInputs);
-			ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10, 10));
+			ImGui::SetWindowPos(ImGui::User::TopRightCorner());
 
 			if (ImGui::Button("Console"))
 			{
@@ -101,11 +101,11 @@ void ConsoleDevice::onFrame()
 	style.ScrollbarSize = 2;
 
 	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoDecoration);
-	
+
 #if defined(PLATFORM_MOBILE)
-	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.25f));
+	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.33f));
 #else
-	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.75f));
+	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.66f));
 #endif
 
 	ImGui::SetWindowPos(ImVec2(0, -ImGui::GetWindowHeight() * mInterpolator.getValue()));
@@ -118,16 +118,20 @@ void ConsoleDevice::onFrame()
 	auto buildName = std::string(__DATE__) + " " + std::string(__TIME__);
 	
 	const float margin = 17.0f;
-	
+
+	ImGui::SetCursorPosY(ImGui::GetCursorPos().y + PLATFORM->getSafeAreaTopMargin());
+
 	auto savedCursor = ImGui::GetCursorPos();
 	
-	ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(engineName.c_str()).x - margin);
+	float base_x = ImGui::GetWindowWidth() - margin;
+
+	ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(engineName.c_str()).x);
 	ImGui::TextDisabled("%s", engineName.c_str());
 
-	ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(apiName.c_str()).x - margin);
+	ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(apiName.c_str()).x);
 	ImGui::TextDisabled("%s", apiName.c_str());
 	
-	ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(buildName.c_str()).x - margin);
+	ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(buildName.c_str()).x);
 	ImGui::TextDisabled("%s", buildName.c_str());
 
 	ImGui::SetCursorPos(savedCursor);
@@ -302,8 +306,8 @@ void ConsoleDevice::showFastLogs()
 		ImGuiWindowFlags_NoBackground);
 
 	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), 0));
-	ImGui::SetWindowPos(ImVec2(0, IMGUI_SYSTEM->getLogicalHeight() - ImGui::GetWindowHeight()));
-
+	ImGui::SetWindowPos(ImGui::User::BottomLeftCorner(0.0f));
+	
 	auto now = Clock::Now();
 
 	for (int i = 0; i < mBuffer.size(); i++)
