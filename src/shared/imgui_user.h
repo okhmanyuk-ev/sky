@@ -33,4 +33,9 @@ namespace ImGui::User
 
 	ImVec2 BottomLeftCorner(float margin = 10.0f);
 	ImVec2 BottomRightCorner(float margin = 10.0f);
+
+    float GetSafeAreaTop();
+    float GetSafeAreaBottom();
+    float GetSafeAreaLeft();
+    float GetSafeAreaRight();
 }

@@ -119,7 +119,7 @@ void ConsoleDevice::onFrame()
 	
 	const float margin = 17.0f;
 
-	ImGui::SetCursorPosY(ImGui::GetCursorPos().y + PLATFORM->getSafeAreaTopMargin());
+	ImGui::SetCursorPosY(ImGui::GetCursorPos().y + ImGui::User::GetSafeAreaTop());
 
 	auto savedCursor = ImGui::GetCursorPos();
 	

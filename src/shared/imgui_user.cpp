@@ -117,4 +117,26 @@ namespace ImGui::User
 		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - (PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()),
             IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - (PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()));
 	}
+
+    float GetSafeAreaTop()
+    {
+        return PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
+    }
+
+    float GetSafeAreaBottom()
+    {
+        return PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
+    }
+
+    float GetSafeAreaLeft()
+    {
+        return PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
+    }
+
+    float GetSafeAreaRight()
+    {
+        return PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
+    }
+
+
 }
