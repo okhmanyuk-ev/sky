@@ -114,15 +114,18 @@ namespace Shared::NetworkingWS
 	{
 	public:
 		using UID = int;
+		using Profile = nlohmann::json;
 
 	public:
-		UID auth(const std::string& platform, const std::string& uuid);
+		std::tuple<UID, std::shared_ptr<Profile>> auth(const std::string& platform, const std::string& uuid);
+		void commit(UID uid, std::shared_ptr<Profile> profile);
 
 	public:
 		void load(nlohmann::json& json);
 		void save(nlohmann::json& json);
 
 	private:
+		std::unordered_map<UID, std::shared_ptr<Profile>> mProfiles;
 		std::unordered_map</*uuid*/std::string, UID> mUIDS;
 		int mUsersCount = 0;
 	};

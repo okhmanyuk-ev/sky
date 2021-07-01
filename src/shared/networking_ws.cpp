@@ -194,7 +194,7 @@ void SimpleChannel::addEventCallback(const std::string& name, EventCallback call
 
 // userbaseserver
 
-Userbase::UID Userbase::auth(const std::string& platform, const std::string& uuid)
+std::tuple<Userbase::UID, std::shared_ptr<Userbase::Profile>> Userbase::auth(const std::string& platform, const std::string& uuid)
 {
 	if (mUIDS.count(uuid) == 0)
 	{
@@ -202,15 +202,67 @@ Userbase::UID Userbase::auth(const std::string& platform, const std::string& uui
 		mUIDS.insert({ uuid, mUsersCount });
 	}
 
-	return mUIDS.at(uuid);
+	auto uid = mUIDS.at(uuid);
+
+	if (mProfiles.count(uid) == 0)
+	{
+		mProfiles.insert({ uid, std::make_shared<Profile>() });
+	}
+
+	auto profile = mProfiles.at(uid);
+
+	return { uid, profile };
+}		
+
+void Userbase::commit(UID uid, std::shared_ptr<Profile> profile)
+{
+	mProfiles[uid] = profile;
 }
 
 void Userbase::load(nlohmann::json& json)
 {
-	//
+	auto& userbase = json["userbase"];
+
+	mUsersCount = userbase["users_count"];
+
+	for (auto& user : userbase["users"])
+	{
+		UID uid = user["uid"];
+		std::string uuid = user["uuid"];
+		auto profile_dump = user["profile"];
+		
+		mUIDS.insert({ uuid, uid });
+		
+		if (!profile_dump.is_string())
+			continue;
+		
+		auto profile = nlohmann::json::parse((std::string)profile_dump);
+		
+		mProfiles.insert({ uid, std::make_shared<Profile>(profile) });
+	}
 }
 
 void Userbase::save(nlohmann::json& json)
 {
-	//
+	auto& userbase = json["userbase"];
+
+	userbase["users_count"] = mUsersCount;
+
+	auto& users = userbase["users"];
+
+	for (const auto& [uuid, uid] : mUIDS)
+	{
+		nlohmann::json user = {
+			{ "uuid", uuid },
+			{ "uid", uid }
+		};
+	
+		if (mProfiles.count(uid) > 0)
+		{
+			const auto& profile = mProfiles.at(uid);
+			user["profile"] = profile->dump();
+		}
+
+		users.push_back(user);
+	}
 }

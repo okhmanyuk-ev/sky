@@ -351,3 +351,7 @@ if(MSVC)
 endif()
 target_include_directories(websocketpp INTERFACE lib/websocketpp)
 target_link_libraries(${PROJECT_NAME} websocketpp)
+
+if(WIN32)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+endif()
