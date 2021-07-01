@@ -191,3 +191,26 @@ void SimpleChannel::addEventCallback(const std::string& name, EventCallback call
 	assert(mEvents.count(name) == 0);
 	mEvents[name] = callback;
 }
+
+// userbaseserver
+
+Userbase::UID Userbase::auth(const std::string& platform, const std::string& uuid)
+{
+	if (mUIDS.count(uuid) == 0)
+	{
+		mUsersCount += 1;
+		mUIDS.insert({ uuid, mUsersCount });
+	}
+
+	return mUIDS.at(uuid);
+}
+
+void Userbase::load(nlohmann::json& json)
+{
+	//
+}
+
+void Userbase::save(nlohmann::json& json)
+{
+	//
+}

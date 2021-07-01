@@ -109,4 +109,21 @@ namespace Shared::NetworkingWS
 	private:
 		bool mShowEventLogs = false;
 	};
+
+	class Userbase
+	{
+	public:
+		using UID = int;
+
+	public:
+		UID auth(const std::string& platform, const std::string& uuid);
+
+	public:
+		void load(nlohmann::json& json);
+		void save(nlohmann::json& json);
+
+	private:
+		std::unordered_map</*uuid*/std::string, UID> mUIDS;
+		int mUsersCount = 0;
+	};
 }
