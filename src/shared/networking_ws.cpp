@@ -219,13 +219,13 @@ void Userbase::commit(UID uid, std::shared_ptr<Profile> profile)
 	mProfiles[uid] = profile;
 }
 
-void Userbase::load(nlohmann::json& json)
+void Userbase::load(const nlohmann::json& json)
 {
 	auto& userbase = json["userbase"];
 
 	mUsersCount = userbase["users_count"];
 
-	for (auto& user : userbase["users"])
+	for (const auto& user : userbase["users"])
 	{
 		UID uid = user["uid"];
 		std::string uuid = user["uuid"];

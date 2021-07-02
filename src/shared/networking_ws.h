@@ -121,8 +121,11 @@ namespace Shared::NetworkingWS
 		void commit(UID uid, std::shared_ptr<Profile> profile);
 
 	public:
-		void load(nlohmann::json& json);
+		void load(const nlohmann::json& json);
 		void save(nlohmann::json& json);
+
+	public:
+		const auto& getProfiles() const { return mProfiles; }
 
 	private:
 		std::unordered_map<UID, std::shared_ptr<Profile>> mProfiles;
