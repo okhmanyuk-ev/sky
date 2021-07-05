@@ -107,3 +107,14 @@ uint32_t Helpers::crc32(void* data, size_t size, uint32_t initial)
 
 	return crc;
 }
+
+nlohmann::json Helpers::LoadJsonFromAsset(const Platform::Asset& asset)
+{
+	auto json_string = std::string((char*)asset.getMemory(), asset.getSize());
+	return nlohmann::json::parse(json_string);
+}
+
+nlohmann::json Helpers::LoadBsonFromAsset(const Platform::Asset& asset)
+{
+	return nlohmann::json::from_bson(std::string((char*)asset.getMemory(), asset.getSize()));
+}

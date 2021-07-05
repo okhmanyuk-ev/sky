@@ -5,6 +5,9 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include <nlohmann/json.hpp>
+#include <platform/asset.h>
+
 namespace Common::Helpers
 {
 	std::string SecondsToFmtString(int seconds);
@@ -30,4 +33,6 @@ namespace Common::Helpers
 
 	uint32_t crc32(void* data, size_t size, uint32_t initial = 0);
 
+	nlohmann::json LoadJsonFromAsset(const Platform::Asset& asset);
+	nlohmann::json LoadBsonFromAsset(const Platform::Asset& asset);
 }

@@ -1,6 +1,7 @@
 #include "cache_system.h"
 #include <console/device.h>
 #include <nlohmann/json.hpp>
+#include <common/helpers.h>
 
 using namespace Shared;
 
@@ -183,9 +184,7 @@ void CacheSystem::makeAtlases()
 		return;
 	}
 
-	auto json_file = Platform::Asset(path);
-	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
-	auto json = nlohmann::json::parse(json_string);
+	auto json = Common::Helpers::LoadJsonFromAsset({ path });
 
 	for (auto field : json.items())
 	{

@@ -5,6 +5,7 @@
 #include <common/task_system.h>
 #include <common/event_system.h>
 #include <common/frame_system.h>
+#include <common/helpers.h>
 
 using namespace Shared;
 
@@ -18,12 +19,9 @@ void Profile::load()
 		return;
 	}
 
-	auto json_file = Platform::Asset(path, Platform::Asset::Storage::Bundle);
-	nlohmann::json json;
-	
 	try
 	{
-		json = nlohmann::json::from_bson(std::string((char*)json_file.getMemory(), json_file.getSize()));
+		auto json = Common::Helpers::LoadBsonFromAsset(Platform::Asset(path, Platform::Asset::Storage::Bundle));
 		read(json);
 	}
 	catch (const std::exception& e)
