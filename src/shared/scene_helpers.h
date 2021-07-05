@@ -372,41 +372,6 @@ namespace Shared::SceneHelpers
 		glm::vec2 mBeginSize = { 8.0f, 8.0f };
 	};
 
-	// TODO: can be moved to 'scene'
-	template <typename T> class Adaptive : public T
-	{
-		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-
-	protected:
-		void update() override
-		{
-			adapt();
-			T::update();
-		}
-
-	private:
-		void adapt()
-		{
-			if (mAdaptSize.x <= 0.0f)
-				return;
-
-			if (mAdaptSize.y <= 0.0f)
-				return;
-
-			auto scale = mAdaptSize / T::getAbsoluteSize();
-
-			T::setScale(glm::min(scale.x, scale.y));
-		}
-
-	public:
-		auto getAdaptSize() const { return mAdaptSize; }
-		void setAdaptSize(const glm::vec2& value) { mAdaptSize = value; }
-		void setAdaptSize(float value) { mAdaptSize = { value, value }; }
-
-	private:
-		glm::vec2 mAdaptSize = { 0.0f, 0.0f };
-	};
-
 	template <typename T> class Backshaded : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");

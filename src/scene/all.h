@@ -1,6 +1,7 @@
 #pragma once
 
 #include <scene/actions.h>
+#include <scene/adaptive.h>
 #include <scene/ani_sprite.h>
 #include <scene/blend.h>
 #include <scene/bloom_layer.h>
