@@ -57,6 +57,9 @@ namespace Scene
 		auto getHorizontalScrollSpace() const { return getScrollSpace().x; }
 		auto getVerticalScrollSpace() const { return getScrollSpace().y; }
 
+		auto getInsignificantSpeed() const { return mInsignificantSpeed; }
+		void setInsignificantSpeed(float value) { mInsignificantSpeed = value; }
+
 	private:
 		std::shared_ptr<Node> mBounding;
 		std::shared_ptr<Node> mContent;
@@ -65,6 +68,7 @@ namespace Scene
 		glm::vec2 mScrollPosition = { 0.0f, 0.0f };
 		glm::vec2 mScrollOrigin = { 0.0f, 0.0f };
 		float mInertiaFriction = 0.03f;
+		float mInsignificantSpeed = 0.01f;
 		bool mInertiaEnabled = true;
 		Common::TimestepFixer mTimestepFixer;
 	};

@@ -39,6 +39,12 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 
 void Scrollbox::physics(float dTime)
 {
+	if (glm::abs(mSpeed.y) <= mInsignificantSpeed)
+		mSpeed.y = 0.0f;
+
+	if (glm::abs(mSpeed.x) <= mInsignificantSpeed)
+		mSpeed.x = 0.0f;
+
 	auto speed = mSpeed * mSensitivity / getScrollSpace();
 
 	if (glm::isnan(speed.x))
