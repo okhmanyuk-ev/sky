@@ -55,7 +55,10 @@ namespace Shared::SceneHelpers
 		using Callback = std::function<void()>;
 
 	public:
-		virtual void refresh() = 0;
+		virtual void refresh()
+		{
+			setClickEnabled(isActive());
+		};
 
 	protected:
 		void onClick() override
@@ -186,9 +189,21 @@ namespace Shared::SceneHelpers
 		auto isHighlightEnabled() const { return mHighlightEnabled;  }
 		void setHighlightEnabled(bool value) { mHighlightEnabled = value; }
 
+		auto getActiveColor() const { return mActiveColor; }
+		void setActiveColor(const glm::vec4& value) { mActiveColor = value; }
+
+		auto getInactiveColor() const { return mInactiveColor; }
+		void setInactiveColor(const glm::vec4& value) { mInactiveColor = value; }
+
+		auto getHighlightColor() const { return mHighlightColor; }
+		void setHighlightColor(const glm::vec4& value) { mHighlightColor = value; }
+
 	private:
 		std::shared_ptr<Scene::Label> mLabel;
 		bool mHighlightEnabled = true;
+		glm::vec4 mActiveColor = { 1.0f, 1.0f, 1.0f, 0.33f };
+		glm::vec4 mInactiveColor = { 1.0f, 1.0f, 1.0f, 0.125f };
+		glm::vec4 mHighlightColor = { 1.0f, 1.0f, 1.0f, 0.66f };
 	};
 
 	class Progressbar : public Scene::Rectangle

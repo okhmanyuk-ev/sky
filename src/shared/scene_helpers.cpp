@@ -225,8 +225,12 @@ SceneHelpers::RectangleButton::RectangleButton()
 
 void SceneHelpers::RectangleButton::refresh()
 {
-	setAlpha(isActive() ? 0.33f : 0.125f);
-	setClickEnabled(isActive());
+	Button<Scene::Rectangle>::refresh();
+
+	if (isActive())
+		setColor(mActiveColor);
+	else
+		setColor(mInactiveColor);
 }
 
 void SceneHelpers::RectangleButton::onChooseBegin()
@@ -236,7 +240,7 @@ void SceneHelpers::RectangleButton::onChooseBegin()
 	if (!mHighlightEnabled)
 		return;
 
-	setAlpha(0.66f);
+	setColor(mHighlightColor);
 }
 
 void SceneHelpers::RectangleButton::onChooseEnd()
@@ -246,7 +250,7 @@ void SceneHelpers::RectangleButton::onChooseEnd()
 	if (!mHighlightEnabled)
 		return;
 
-	setAlpha(0.33f);
+	refresh();
 }
 
 SceneHelpers::Progressbar::Progressbar()
