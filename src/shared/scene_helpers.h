@@ -57,7 +57,7 @@ namespace Shared::SceneHelpers
 	public:
 		virtual void refresh()
 		{
-			setClickEnabled(isActive());
+            Scene::Clickable<T>::setClickEnabled(isActive());
 		};
 
 	protected:
