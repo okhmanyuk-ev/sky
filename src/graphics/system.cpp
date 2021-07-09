@@ -5,6 +5,12 @@
 
 using namespace Graphics;
 
+void System::onFrame()
+{
+	mBatchesCountPublic = mBatchesCount;
+	mBatchesCount = 0;
+}
+
 void System::begin()
 {
 	assert(!mWorking);
@@ -161,6 +167,8 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	{
 		if (mBatch.topology != topology || mBatch.mode != BatchMode::Colored)
 			flush();
+		else
+			mBatchesCount += 1;
 
 		mBatch.mode = BatchMode::Colored;
 		mBatch.shader = mBatchColorShader;
@@ -225,6 +233,8 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	{
 		if (mBatch.topology != topology || mBatch.texture != texture || mBatch.mode != BatchMode::Textured)
 			flush();
+		else
+			mBatchesCount += 1;
 
 		mBatch.mode = BatchMode::Textured;
 		mBatch.shader = mTexturedShader;

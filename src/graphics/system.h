@@ -20,10 +20,13 @@
 
 namespace Graphics
 {
-	class System
+	class System : public Common::FrameSystem::Frameable
 	{
 	public:
 		struct State;
+
+	private:
+		void onFrame() override;
 
 	public:
 		void begin();
@@ -170,10 +173,14 @@ namespace Graphics
 		auto getSdfSmoothFactor() const { return mSdfSmoothFactor; }
 		void setSdfSmoothFactor(float value) { mSdfSmoothFactor = value; }
 
+		auto getBatchesCount() const { return mBatchesCountPublic; }
+
 	private:
 		bool mBatching = true;
 		float mSdfSmoothFactor = 1.0f;
-		
+		int mBatchesCount = 0;
+		int mBatchesCountPublic = 0;
+
 	private:
 		std::shared_ptr<Renderer::Shaders::Default> mTexturedShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout);
 		std::shared_ptr<Renderer::Shaders::Default> mColoredShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColor::Layout);

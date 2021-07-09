@@ -29,6 +29,7 @@ namespace Shared
 	private:
 		int mWantShowFps = 0;
 		int mWantShowDrawcalls = 0;
+		int mWantShowBatches = 0;
 		int mWantShowTasks = 0;
 		bool mWantShowNetSpeed = false;
 		bool mWantShowNetPps = false;

@@ -8,6 +8,7 @@
 #include <shared/stats_system.h>
 #include <network/system.h>
 #include <common/helpers.h>
+#include <graphics/system.h>
 
 using namespace Shared;
 
@@ -20,6 +21,10 @@ PerformanceConsoleCommands::PerformanceConsoleCommands()
 	CONSOLE->registerCVar("hud_show_drawcalls", "show drawcalls statistics", { "int" },
 		CVAR_GETTER_INT(mWantShowDrawcalls),
 		CVAR_SETTER_INT(mWantShowDrawcalls));
+
+	CONSOLE->registerCVar("hud_show_batches", "show batches statistics", { "int" },
+		CVAR_GETTER_INT(mWantShowBatches),
+		CVAR_SETTER_INT(mWantShowBatches));
 
 	CONSOLE->registerCVar("hud_show_tasks", "show tasks count on screen", { "int" },
 		CVAR_GETTER_INT(mWantShowTasks),
@@ -45,7 +50,10 @@ void PerformanceConsoleCommands::onFrame()
 		ENGINE_STATS("fps", mFramerateCounter.getFramerate());
 
 	if (mWantShowDrawcalls > 0)
-		ENGINE_STATS("draw", mDrawCallCounter.getDrawCalls());
+		ENGINE_STATS("drawcalls", mDrawCallCounter.getDrawCalls());
+
+	if (mWantShowBatches > 0)
+		ENGINE_STATS("batches", GRAPHICS->getBatchesCount());
 
 	if (mWantShowTasks > 1)
 		ENGINE_STATS("tasks", std::to_string(TASK->getTasksCount()) + " at " + std::to_string(TASK->getThreadsCount()) + " threads");
