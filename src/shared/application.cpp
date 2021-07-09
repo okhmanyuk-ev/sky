@@ -68,6 +68,16 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 		ENGINE->addSystem<Shared::SceneManager>(std::make_shared<Shared::SceneManager>());
 		mScene->getRoot()->attach(SCENE_MANAGER);
+
+		auto getter = [this] { 
+			auto fps = 1.0f / Clock::ToSeconds(mScene->getTimestep());
+			return std::vector<std::string>({ std::to_string(fps) });
+		};
+		auto setter = [this](CON_ARGS) {
+			auto sec = std::stof(CON_ARG(0));
+			mScene->setTimestep(Clock::FromSeconds(1.0f / sec));
+		};
+		CONSOLE->registerCVar("scene_fps", { "float" }, getter, setter);
 	}
 }
 
