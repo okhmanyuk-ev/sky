@@ -58,6 +58,7 @@ namespace Scene
 	protected:
 		virtual void enterDraw();
 		virtual void leaveDraw();
+		virtual void update(Clock::Duration delta);
 		virtual void update();
 		virtual void draw();
 		virtual void touch(Touch type, const glm::vec2& pos);
@@ -113,7 +114,6 @@ namespace Scene
 		bool mTransformReady = false;
 		std::string mBatchGroup = "";
 		glm::vec2 mAbsoluteSize = { 0.0f, 0.0f };
-		std::optional<uint64_t> mPrevFrameCount;
 
 	public:
 		void runAction(std::unique_ptr<Actions::Action> action) { mActions.add(std::move(action)); }

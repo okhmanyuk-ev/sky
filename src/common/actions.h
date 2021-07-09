@@ -24,7 +24,7 @@ namespace Actions
 	
 	public:
 		virtual ~Action() = default;
-		virtual Status frame() = 0;
+		virtual Status frame(Clock::Duration delta) = 0;
 	};
 
 	class Parallel : public Action
@@ -42,7 +42,7 @@ namespace Actions
 		Parallel(Awaiting awaitingType = Awaiting::All);
 
 	protected:
-		Status frame() override;
+		Status frame(Clock::Duration delta) override;
 
 	public:
 		void add(std::unique_ptr<Action> action);
@@ -66,7 +66,7 @@ namespace Actions
 		};
 
 	protected:
-		Status frame() override;
+		Status frame(Clock::Duration delta) override;
 
 	public:
 		void add(std::unique_ptr<Action> action, Origin origin = Origin::End);
@@ -82,7 +82,7 @@ namespace Actions
 		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value, 
 			"T must be derived from Sequence or Parallel");
 	private:
-		Common::FrameSystem::Framer mFramer = Common::FrameSystem::Framer([this] { T::frame(); });
+		Common::FrameSystem::Framer mFramer = Common::FrameSystem::Framer([this] { T::frame(FRAME->getTimeDelta()); });
 	};
 
 	using SequentialActionsPlayer = ActionsPlayer<Sequence>;
@@ -94,15 +94,15 @@ namespace Actions
 			"T must be derived from Sequence or Parallel");
 
 	public:
-		void update() { T::frame(); }
+		void update(Clock::Duration delta) { T::frame(delta); }
 	};
 
 	class Generic : public Action
 	{
 	public:
-		using StatusCallback = std::function<Status()>;
-		using Callback = std::function<void()>;
-	
+		using StatusCallback = std::function<Status(Clock::Duration)>;
+		using Callback = std::function<void(Clock::Duration)>;
+
 	public:
 		enum class Type 
 		{
@@ -115,7 +115,7 @@ namespace Actions
 		Generic(Type type, Callback callback);
 
 	private:
-		Status frame() override;
+		Status frame(Clock::Duration delta) override;
 
 	private:
 		StatusCallback mCallback = nullptr;
@@ -131,7 +131,7 @@ namespace Actions
 		Repeat(Callback callback);
 		
 	private:
-		Status frame() override;
+		Status frame(Clock::Duration delta) override;
 
 	private:
 		Callback mCallback;
@@ -147,12 +147,14 @@ namespace Actions
 		UAction RepeatInfinite(std::function<UAction()> action);
 
 		UAction Execute(std::function<void()> callback);
+		UAction ExecuteInfinite(std::function<void(Clock::Duration delta)> callback);
 		UAction ExecuteInfinite(std::function<void()> callback);
 
 		UAction Wait(float duration);
 
 		// will wait while returning true
-		UAction Wait(std::function<bool()> while_callback); 
+		UAction Wait(std::function<bool(Clock::Duration delta)> while_callback);
+		UAction Wait(std::function<bool()> while_callback);
 		
 		// will wait while flag is true
 		UAction Wait(bool& while_flag);
@@ -218,7 +220,7 @@ namespace Actions
 				*event_holder = e;
 			});
 
-			return std::make_unique<Actions::Generic>([event_holder, listener, onEvent] {
+			return std::make_unique<Actions::Generic>([event_holder, listener, onEvent](auto delta) {
 				if (!event_holder->has_value())
 					return Actions::Action::Status::Continue;
 

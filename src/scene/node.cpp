@@ -158,18 +158,16 @@ void Node::leaveDraw()
 	//
 }
 
+void Node::update(Clock::Duration delta)
+{
+	mActions.update(delta);
+	updateAbsoluteSize();
+	update();
+}
+
 void Node::update()
 {
-	auto frame_count = FRAME->getFrameCount();
-	
-	if (mPrevFrameCount.has_value())
-		assert(mPrevFrameCount.value() != frame_count); // do not update twice in one frame
-	
-	mPrevFrameCount = frame_count;
-
-	mActions.update();
-
-	updateAbsoluteSize();
+	//
 }
 
 void Node::draw()

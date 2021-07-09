@@ -4,6 +4,13 @@ Scene::Scene::Scene()
 {
 	mRoot->setStretch(1.0f);
 	mRoot->setScene(this);
+
+	mFixedRecursiveUpdate.setTimestep(Clock::FromSeconds(1.0f / 120.0f));
+	mFixedRecursiveUpdate.setForceTimeCompletion(false);
+	mFixedRecursiveUpdate.setCallback([this](auto delta) {
+		recursiveNodeUpdate(mRoot, delta);
+		recursiveNodeUpdateTransform(mRoot);
+	});
 }
 
 Scene::Scene::~Scene()
@@ -22,15 +29,15 @@ void Scene::Scene::recursiveNodeUpdateTransform(std::shared_ptr<Node> node)
 		recursiveNodeUpdateTransform(_node);
 }
 
-void Scene::Scene::recursiveNodeUpdate(std::shared_ptr<Node> node)
+void Scene::Scene::recursiveNodeUpdate(std::shared_ptr<Node> node, Clock::Duration delta)
 {
 	if (!node->isEnabled())
 		return;
 
-	node->update();
+	node->update(delta);
 
 	for (auto _node : node->getNodes())
-		recursiveNodeUpdate(_node);
+		recursiveNodeUpdate(_node, delta);
 }
 
 void Scene::Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
@@ -187,8 +194,7 @@ void Scene::Scene::frame()
 		mViewport.size /= PLATFORM->getScale();
 	}
 
-	recursiveNodeUpdate(mRoot);
-	recursiveNodeUpdateTransform(mRoot);
+	mFixedRecursiveUpdate.execute();
 
 	if (mBatchGroupsEnabled)
 	{

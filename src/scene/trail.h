@@ -12,6 +12,7 @@ namespace Scene
 		Trail(std::weak_ptr<Node> holder);
 
 	public:
+		void update(Clock::Duration dTime) override;
 		void updateTransform() override;
 	
 	protected:
@@ -32,6 +33,7 @@ namespace Scene
 	private:
 		float mLifetime = 1.0f;
 		bool mNarrowing = false;
+		Clock::Duration mUptime;
 		std::weak_ptr<Node> mHolder;
 
 		struct Segment

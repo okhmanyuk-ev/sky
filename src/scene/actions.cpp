@@ -7,8 +7,8 @@ using namespace Actions;
 
 Collection::UAction Collection::ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed)
 {
-	return ExecuteInfinite([node, direction, speed] {
-		auto dTime = Clock::ToSeconds(FRAME->getTimeDelta());
+	return ExecuteInfinite([node, direction, speed](auto delta) {
+		auto dTime = Clock::ToSeconds(delta);
 		node->setPosition(node->getPosition() + direction * dTime * speed);
 	});
 }

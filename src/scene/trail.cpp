@@ -7,11 +7,17 @@ Trail::Trail(std::weak_ptr<Node> holder) : mHolder(holder)
 	//
 }
 
+void Trail::update(Clock::Duration dTime)
+{
+	Node::update(dTime);
+	mUptime += dTime;
+}
+
 void Trail::updateTransform()
 {
 	Node::updateTransform();
 
-	auto now = FRAME->getUptime();
+	auto now = mUptime;
 
 	while (!mSegments.empty() && now - mSegments.front().time > Clock::FromSeconds(mLifetime))
 		mSegments.pop_front();
@@ -24,7 +30,7 @@ void Trail::updateTransform()
 
 	auto segment = Segment();
 	segment.pos = pos;
-	segment.time = FRAME->getUptime();
+	segment.time = now;
 	mSegments.push_back(segment);
 }
 

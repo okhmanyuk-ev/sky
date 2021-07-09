@@ -12,7 +12,7 @@ namespace Scene
 		AniSprite();
 
 	protected:
-		void update() override;
+		void update(Clock::Duration delta) override;
 		
 	public:
 		void randomizeProgress();

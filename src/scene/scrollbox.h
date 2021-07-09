@@ -11,11 +11,8 @@ namespace Scene
 		Scrollbox();
 
 	protected:
-		void update() override;
+		void update(Clock::Duration dTime) override;
 		void touch(Touch type, const glm::vec2& pos) override;
-
-	private:
-		void physics(float dTime);
 
 	private:
 		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
@@ -70,6 +67,5 @@ namespace Scene
 		float mInertiaFriction = 0.03f;
 		float mInsignificantSpeed = 0.01f;
 		bool mInertiaEnabled = true;
-		Common::TimestepFixer mTimestepFixer;
 	};
 }

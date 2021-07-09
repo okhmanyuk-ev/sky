@@ -4,7 +4,7 @@
 
 using namespace Common;
 
-void TimestepFixer::execute(float dTime)
+void TimestepFixer::execute(Clock::Duration dTime)
 {
 	mTimeAccumulator += dTime;
 
@@ -16,15 +16,15 @@ void TimestepFixer::execute(float dTime)
 
 	if (mForceTimeCompletion)
 	{
-		if (mTimeAccumulator > 0.0f)
+		if (mTimeAccumulator > Clock::Duration::zero())
 		{
 			mCallback(mTimeAccumulator);
-			mTimeAccumulator = 0.0f;
+			mTimeAccumulator = Clock::Duration::zero();
 		}
 	}
 }
 
 void TimestepFixer::execute()
 {
-	execute(Clock::ToSeconds(FRAME->getTimeDelta()));
+	execute(FRAME->getTimeDelta());
 }

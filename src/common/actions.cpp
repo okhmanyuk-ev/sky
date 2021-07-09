@@ -13,7 +13,7 @@ Parallel::Parallel(Awaiting awaitingType) : mAwaitingType(awaitingType)
 	//
 }
 
-Action::Status Parallel::frame()
+Action::Status Parallel::frame(Clock::Duration delta)
 {
 	auto it = mActions.begin();
 	while (it != mActions.end())
@@ -22,7 +22,7 @@ Action::Status Parallel::frame()
 
 		if (!action)
 			it = mActions.erase(it);
-		else if (action->frame() == Status::Continue)
+		else if (action->frame(delta) == Status::Continue)
 			++it;
 		else if (mAwaitingType == Awaiting::Any)
 			return Status::Finished;
@@ -48,14 +48,14 @@ void Parallel::clear()
 
 // sequence action
 
-Action::Status Sequence::frame()
+Action::Status Sequence::frame(Clock::Duration delta)
 {
 	if (mActions.empty())
 		return Status::Finished;
 
 	auto& action = mActions.front();
 
-	if (!action || action->frame() == Status::Finished)
+	if (!action || action->frame(delta) == Status::Finished)
 		mActions.pop_front();
 
 	return mActions.empty() ? Status::Finished : Status::Continue;
@@ -83,18 +83,18 @@ Generic::Generic(StatusCallback callback) : mCallback(callback)
 
 Generic::Generic(Type type, Callback callback)
 {
-	mCallback = [type, callback] {
+	mCallback = [type, callback](auto delta) {
 		if (callback)
-			callback();
+			callback(delta);
 
 		return type == Type::One ? Status::Finished : Status::Continue;
 	};
 }
 
-Action::Status Generic::frame()
+Action::Status Generic::frame(Clock::Duration delta)
 {
 	assert(mCallback);
-	return mCallback();
+	return mCallback(delta);
 }
 
 // repeat action
@@ -104,7 +104,7 @@ Repeat::Repeat(Callback callback) : mCallback(std::move(callback))
 	//
 }
 
-Action::Status Repeat::frame() 
+Action::Status Repeat::frame(Clock::Duration delta)
 {
 	if (!mStatus.has_value())
 		std::tie(mStatus, mAction) = mCallback();
@@ -112,7 +112,7 @@ Action::Status Repeat::frame()
 	auto status = Status::Finished;
 
 	if (mAction)
-		status = mAction->frame();
+		status = mAction->frame(delta);
 
 	if (status == Status::Continue)
 		return Status::Continue;
@@ -143,29 +143,47 @@ Collection::UAction Collection::RepeatInfinite(std::function<UAction()> action)
 
 Collection::UAction Collection::Execute(std::function<void()> callback)
 {
-	return std::make_unique<Generic>(Generic::Type::One, callback);
+	return std::make_unique<Generic>(Generic::Type::One, [callback](auto delta) {
+		if (callback)
+			callback();
+	});
 }
 
-Collection::UAction Collection::ExecuteInfinite(std::function<void()> callback)
+Collection::UAction Collection::ExecuteInfinite(std::function<void(Clock::Duration delta)> callback)
 {
 	return std::make_unique<Generic>(Generic::Type::Infinity, callback);
 }
 
+Collection::UAction Collection::ExecuteInfinite(std::function<void()> callback)
+{
+	return ExecuteInfinite([callback](auto delta) {
+		if (callback)
+			callback();
+	});
+}
+
 Collection::UAction Collection::Wait(float duration)
 {
-	return Wait([duration]() mutable {
-		duration -= Clock::ToSeconds(FRAME->getTimeDelta());
+	return Wait([duration](auto delta) mutable {
+		duration -= Clock::ToSeconds(delta);
 		return duration > 0.0f;
+	});
+}
+
+Collection::UAction Collection::Wait(std::function<bool(Clock::Duration delta)> while_callback)
+{
+	return std::make_unique<Generic>([while_callback](auto delta) {
+		if (while_callback(delta))
+			return Action::Status::Continue;
+
+		return Action::Status::Finished;
 	});
 }
 
 Collection::UAction Collection::Wait(std::function<bool()> while_callback)
 {
-	return std::make_unique<Generic>([while_callback] {
-		if (while_callback())
-			return Action::Status::Continue;
-
-		return Action::Status::Finished;
+	return Wait([while_callback](auto delta) {
+		return while_callback();
 	});
 }
 
@@ -228,11 +246,11 @@ Collection::UAction Collection::Pausable(std::function<bool()> run_callback, UAc
 	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
 	player->add(std::move(action));
 
-	return std::make_unique<Generic>([run_callback, player]() {
+	return std::make_unique<Generic>([run_callback, player](auto delta) {
 		if (!run_callback())
 			return Action::Status::Continue;
 
-		player->update();
+		player->update(delta);
 
 		if (player->hasActions())
 			return Action::Status::Continue;
@@ -243,8 +261,8 @@ Collection::UAction Collection::Pausable(std::function<bool()> run_callback, UAc
 
 Collection::UAction Collection::Interpolate(float start, float dest, float duration, EasingFunction easing, std::function<void(float)> callback)
 {
-	return std::make_unique<Generic>([start, dest, duration, easing, callback, passed = 0.0f]() mutable {
-		passed += Clock::ToSeconds(FRAME->getTimeDelta());
+	return std::make_unique<Generic>([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
+		passed += Clock::ToSeconds(delta);
 		if (passed >= duration)
 		{
 			callback(dest);
@@ -322,7 +340,7 @@ void Actions::Run(std::unique_ptr<Action> action)
 	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
 	player->add(std::move(action));
 	FRAME->add([player] {
-		player->update();
+		player->update(FRAME->getTimeDelta());
 
 		if (player->hasActions())
 			return Common::FrameSystem::Status::Continue;

@@ -10,9 +10,9 @@ AniSprite::AniSprite()
 	attach(mSprite);
 }
 
-void AniSprite::update()
+void AniSprite::update(Clock::Duration delta)
 {
-	Node::update();
+	Node::update(delta);
 
 	if (getAbsoluteWidth() <= 0.0f)
 		setWidth(mSprite->getTexRegion().size.x);
@@ -27,7 +27,7 @@ void AniSprite::update()
 	
 	if (mPlaying)
 	{
-		mAccumulator += FRAME->getTimeDelta();
+		mAccumulator += delta;
 
 		const auto duration = Clock::FromSeconds(1.0f / mFrequency);
 

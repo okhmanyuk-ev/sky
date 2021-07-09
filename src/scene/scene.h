@@ -5,7 +5,7 @@
 #include <graphics/system.h>
 #include <common/event_system.h>
 #include <scene/node.h>
-
+#include <common/timestep_fixer.h>
 #include <platform/input.h>
 
 namespace Scene
@@ -36,7 +36,7 @@ namespace Scene
 
 	private:
 		void recursiveNodeUpdateTransform(std::shared_ptr<Node> node);
-		void recursiveNodeUpdate(std::shared_ptr<Node> node);
+		void recursiveNodeUpdate(std::shared_ptr<Node> node, Clock::Duration delta);
 		void recursiveNodeDraw(std::shared_ptr<Node> node);
 		void drawBatchGroup(const std::string& name);
 
@@ -67,6 +67,9 @@ namespace Scene
 		bool isBatchGroupsEnabled() const { return mBatchGroupsEnabled; }
 		void setBatchGroupsEnabled(bool value) { mBatchGroupsEnabled = value; }
 
+		auto getTimestep() const { return mFixedRecursiveUpdate.getTimestep(); }
+		void setTimestep(Clock::Duration value) { mFixedRecursiveUpdate.setTimestep(value); }
+
 	private:
 		std::shared_ptr<RootNode> mRoot = std::make_shared<RootNode>();
 		std::list<std::weak_ptr<Node>> mTouchedNodes;
@@ -75,6 +78,7 @@ namespace Scene
 		InteractTestCallback mInteractTestCallback = nullptr;
 		BatchGroups mBatchGroups;
 		bool mBatchGroupsEnabled = true;
+		Common::TimestepFixer mFixedRecursiveUpdate;
 	};
 
 	class Scene::RootNode : public Node
