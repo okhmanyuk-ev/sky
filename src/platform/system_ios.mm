@@ -21,6 +21,31 @@ using namespace Platform;
     return YES;
 }
 
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    //
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    //
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    //
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    //
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+    //
+}
+
 - (void)emitTouchEvent:(NSSet*)touches withType:(Input::Touch::Event::Type)type
 {
     for (UITouch* touch in touches)
@@ -61,6 +86,16 @@ using namespace Platform;
 @end
 
 @implementation ViewController
+
+-(bool)prefersHomeIndicatorAutoHidden
+{
+    return NO;
+}
+
+-(UIRectEdge)preferredScreenEdgesDeferringSystemGestures
+{
+    return UIRectEdgeBottom;
+}
 
 // UITextFieldDelegate
 
