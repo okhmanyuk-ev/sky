@@ -35,10 +35,16 @@ namespace Scene
 				mTapCallback(pos);
 		}
 
+		virtual void onTap()
+		{
+			//
+		}
+
 	public:
 		void tap(const glm::vec2& pos = { 0.0f, 0.0f })
 		{
 			onTap(pos);
+			onTap();
 		}
 
 	public:
