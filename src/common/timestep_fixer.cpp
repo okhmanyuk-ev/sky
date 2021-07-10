@@ -6,6 +6,12 @@ using namespace Common;
 
 void TimestepFixer::execute(Clock::Duration dTime)
 {
+	if (mDeltaLimiterEnabled)
+	{
+		if (dTime > mDeltaLimit)
+			dTime = mDeltaLimit;
+	}
+
 	mTimeAccumulator += dTime;
 
 	while (mTimeAccumulator >= mTimestep)

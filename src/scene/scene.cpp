@@ -7,6 +7,7 @@ Scene::Scene::Scene()
 
 	mFixedRecursiveUpdate.setTimestep(Clock::FromSeconds(1.0f / 120.0f));
 	mFixedRecursiveUpdate.setForceTimeCompletion(false);
+	mFixedRecursiveUpdate.setDeltaLimiterEnabled(true);
 	mFixedRecursiveUpdate.setCallback([this](auto delta) {
 		recursiveNodeUpdate(mRoot, delta);
 		recursiveNodeUpdateTransform(mRoot);
