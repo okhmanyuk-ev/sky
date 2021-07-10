@@ -8,6 +8,9 @@ namespace Scene
 	class Scrollbox : public Node
 	{
 	public:
+		static inline float DefaultInertiaFriction = 0.03f;
+
+	public:
 		Scrollbox();
 
 	protected:
@@ -64,7 +67,7 @@ namespace Scene
 		glm::vec2 mSpeed = { 0.0f, 0.0f };
 		glm::vec2 mScrollPosition = { 0.0f, 0.0f };
 		glm::vec2 mScrollOrigin = { 0.0f, 0.0f };
-		float mInertiaFriction = 0.03f;
+		float mInertiaFriction = DefaultInertiaFriction;
 		float mInsignificantSpeed = 0.01f;
 		bool mInertiaEnabled = true;
 	};
