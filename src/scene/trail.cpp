@@ -43,7 +43,7 @@ void Trail::draw()
 
 	auto vertices = std::vector<Renderer::Vertex::PositionColor>();
 
-	for (int i = 0; i < mSegments.size(); i++)
+	for (int i = mSegments.size() - 1; i >= 0; i--)
 	{
 		bool last = i == mSegments.size() - 1;
 
@@ -62,11 +62,11 @@ void Trail::draw()
 		if (mNarrowing)
 			perp *= interp;
 		
-		auto v1 = glm::vec2(p1.x + perp.x, p1.y + perp.y);
-		auto v2 = glm::vec2(p1.x - perp.x, p1.y - perp.y);
+		auto v1 = p1 + perp;
+		auto v2 = p1 - perp;
 
-		auto color = getColor();
-		color.a = 1.0f * interp * getAlpha();
+		auto color = glm::lerp(mEndColor, mBeginColor, interp);
+		color *= getColor();
 
 		vertices.push_back({ { last ? v2 : v1, 0.0f }, color });
 		vertices.push_back({ { last ? v1 : v2, 0.0f }, color });

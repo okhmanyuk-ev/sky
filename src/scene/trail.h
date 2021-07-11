@@ -30,9 +30,17 @@ namespace Scene
 
 		auto getSegmentsCount() const { return mSegments.size(); }
 
+		auto getBeginColor() const { return mBeginColor; }
+		void setBeginColor(const glm::vec4& value) { mBeginColor = value; }
+
+		auto getEndColor() const { return mEndColor; }
+		void setEndColor(const glm::vec4& value) { mEndColor = value; }
+
 	private:
 		float mLifetime = 1.0f;
 		bool mNarrowing = false;
+		glm::vec4 mBeginColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glm::vec4 mEndColor = { 1.0f, 1.0f, 1.0f, 0.0f };
 		Clock::Duration mUptime;
 		std::weak_ptr<Node> mHolder;
 
