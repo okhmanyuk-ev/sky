@@ -256,6 +256,12 @@ namespace Shared::SceneHelpers
 			
 			auto holder = mHolder.lock();
 
+			if (!holder->isTransformReady())
+				return;
+
+			if (!holder->hasScene())
+				return;
+
 			auto particle = createParticle();			
 			particle->setColor(mBeginColor);
 			particle->setAlpha(0.0f);
