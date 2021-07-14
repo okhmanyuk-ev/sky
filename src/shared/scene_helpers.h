@@ -28,6 +28,10 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(const glm::vec2& cell_size,
 		const std::vector<std::shared_ptr<Scene::Node>>& items); 
 
+	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items);
+	std::shared_ptr<Scene::Node> MakeVerticalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items);
+	std::shared_ptr<Scene::Node> MakeGrid(const std::vector<std::vector<std::shared_ptr<Scene::Node>>>& items);
+
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 
 	class GrayscaleSprite : public Scene::Sprite

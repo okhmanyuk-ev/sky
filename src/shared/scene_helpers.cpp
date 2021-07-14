@@ -174,6 +174,52 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const glm::vec2& cel
 	return MakeVerticalGrid(cell_size.x, items_height);
 }
 
+std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items)
+{
+	auto holder = std::make_shared<Scene::Node>();
+	float stretch_x = 1.0f / (float)items.size();
+	float anchor_x = 0.0f;
+	for (auto item : items)
+	{
+		auto cell = std::make_shared<Scene::Node>();
+		cell->setStretch({ stretch_x, 1.0f });
+		cell->setHorizontalAnchor(anchor_x);
+		holder->attach(cell);
+		cell->attach(item);
+		anchor_x += stretch_x;
+	}
+	return holder;
+}
+
+std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items)
+{
+	auto holder = std::make_shared<Scene::Node>();
+	float stretch_y = 1.0f / (float)items.size();
+	float anchor_y = 0.0f;
+	for (auto item : items)
+	{
+		auto cell = std::make_shared<Scene::Node>();
+		cell->setStretch({ 1.0f, stretch_y });
+		cell->setVerticalAnchor(anchor_y);
+		holder->attach(cell);
+		cell->attach(item);
+		anchor_y += stretch_y;
+	}
+	return holder;
+}
+
+std::shared_ptr<Scene::Node> SceneHelpers::MakeGrid(const std::vector<std::vector<std::shared_ptr<Scene::Node>>>& items)
+{
+	std::vector<std::shared_ptr<Scene::Node>> horz_grids;
+	for (auto item : items)
+	{
+		auto horz_grid = MakeHorizontalGrid(item);
+		horz_grid->setStretch(1.0f);
+		horz_grids.push_back(horz_grid);
+	}
+	return MakeVerticalGrid(horz_grids);
+}
+
 void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color)
 {
 	for (auto child : node->getNodes())
