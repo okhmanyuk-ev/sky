@@ -42,12 +42,19 @@ namespace Renderer
 		virtual void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) = 0;
 		virtual void clearStencil() = 0;
 
-		virtual void draw(size_t vertexCount, size_t vertexOffset = 0) = 0;
-		virtual void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0) = 0;
+		virtual void draw(size_t vertexCount, size_t vertexOffset = 0);
+		virtual void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0);
 
-		virtual void present() = 0;
+		virtual void present();
 
 		virtual bool isVsync() const = 0;
 		virtual void setVsync(bool value) = 0;
+
+	public:
+		int getDrawcalls() const { return mDrawcallsPublic; }
+
+	private:
+		int mDrawcalls = 0;
+		int mDrawcallsPublic = 0;
 	};
 }

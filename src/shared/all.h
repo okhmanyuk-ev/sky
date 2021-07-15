@@ -41,7 +41,6 @@
 #include <shared/localization_system.h>
 #include <shared/first_person_camera_controller.h>
 #include <shared/imgui_user.h>
-#include <shared/renderer_debug.h>
 #include <shared/touch_emulator.h>
 #include <shared/gesture_detector.h>
 #include <shared/scene_helpers.h>

@@ -367,18 +367,21 @@ void SystemD3D11::clearStencil()
 
 void SystemD3D11::draw(size_t vertexCount, size_t vertexOffset)
 {
+	System::draw(vertexCount, vertexOffset);
 	prepareForDrawing();
 	Context->Draw((UINT)vertexCount, (UINT)vertexOffset);
 }
 
 void SystemD3D11::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOffset)
 {
+	System::drawIndexed(indexCount, indexOffset, vertexOffset);
 	prepareForDrawing();
 	Context->DrawIndexed((UINT)indexCount, (UINT)indexOffset, (INT)vertexOffset);
 }
 
 void SystemD3D11::present()
 {
+	System::present();
 	mSwapChain->Present(mVsync ? 1 : 0, 0);
 }
 

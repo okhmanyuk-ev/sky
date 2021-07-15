@@ -50,7 +50,7 @@ void PerformanceConsoleCommands::onFrame()
 		ENGINE_STATS("fps", mFramerateCounter.getFramerate());
 
 	if (mWantShowDrawcalls > 0)
-		ENGINE_STATS("drawcalls", mDrawCallCounter.getDrawCalls());
+		ENGINE_STATS("drawcalls", RENDERER->getDrawcalls());
 
 	if (mWantShowBatches > 0)
 		ENGINE_STATS("batches", GRAPHICS->getBatchesCount());

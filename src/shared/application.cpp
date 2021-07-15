@@ -17,7 +17,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	ENGINE->addSystem<Common::FrameSystem>(std::make_shared<Common::FrameSystem>());
 	ENGINE->addSystem<Common::ProfilerSystem>(std::make_shared<Common::ProfilerSystem>());
 	ENGINE->addSystem<Platform::System>(Platform::System::create(appname));
-	ENGINE->addSystem<Renderer::System>(std::make_shared<RendererDebug<Renderer::SystemCrossplatform>>());
+	ENGINE->addSystem<Renderer::System>(std::make_shared<Renderer::SystemCrossplatform>());
 	ENGINE->addSystem<Console::Device>(std::make_shared<Shared::ConsoleDevice>());
 	ENGINE->addSystem<Console::System>(std::make_shared<Console::System>());
 	ENGINE->addSystem<Graphics::System>(std::make_shared<Graphics::System>());

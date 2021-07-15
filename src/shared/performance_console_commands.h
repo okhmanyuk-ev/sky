@@ -9,7 +9,6 @@
 #include <common/framerate_counter.h>
 #include <common/task_system.h>
 #include <deque>
-#include <shared/drawcall_counter.h>
 
 namespace Shared
 {
@@ -24,7 +23,6 @@ namespace Shared
 
 	private:
 		Common::FramerateCounter mFramerateCounter;
-		Shared::DrawCallCounter mDrawCallCounter;
 
 	private:
 		int mWantShowFps = 0;
