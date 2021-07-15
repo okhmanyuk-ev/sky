@@ -11,7 +11,9 @@ namespace Scene
 	protected:
 		void update() override
 		{
-			adapt();
+			if (mAdaptingEnabled)
+				adapt();
+			
 			T::update();
 		}
 
@@ -34,7 +36,11 @@ namespace Scene
 		void setAdaptSize(const glm::vec2& value) { mAdaptSize = value; }
 		void setAdaptSize(float value) { mAdaptSize = { value, value }; }
 
+		bool isAdaptingEnabled() const { return mAdaptingEnabled; }
+		void setAdaptingEnabled(bool value) { mAdaptingEnabled = value; }
+
 	private:
+		bool mAdaptingEnabled = true;
 		glm::vec2 mAdaptSize = { 0.0f, 0.0f };
 	};
 }
