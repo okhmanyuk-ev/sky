@@ -412,12 +412,14 @@ void SystemGL::clearStencil()
 
 void SystemGL::draw(size_t vertexCount, size_t vertexOffset)
 {
+	System::draw(vertexCount, vertexOffset);
 	prepareForDrawing();
 	glDrawArrays(mGLTopology, (GLint)vertexOffset, (GLsizei)vertexCount);
 }
 
 void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOffset)
 {
+	System::drawIndexed(indexCount, indexOffset, vertexOffset);
 	prepareForDrawing();
 	int indexSize = mGLIndexType == GL_UNSIGNED_INT ? 4 : 2;
 #if defined(PLATFORM_ANDROID) | defined(PLATFORM_IOS)
@@ -429,6 +431,7 @@ void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexO
 
 void SystemGL::present()
 {
+	System::present();
 #if defined(RENDERER_GL44)
 	SwapBuffers(mHDC);
 #elif defined(RENDERER_GLES3)
