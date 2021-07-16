@@ -23,6 +23,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishC
 		return;
 
 	mInTransition = true;
+	mPrevScreen = mCurrentScreen;
 
 	auto createLeaveAction = [this] {
 		return Actions::Collection::MakeSequence(
@@ -93,6 +94,12 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishC
 			));
 		}
 	}
+}
+
+void SceneManager::switchScreenBack(Callback finishCallback)
+{
+	assert(!mPrevScreen.expired());
+	switchScreen(mPrevScreen.lock(), finishCallback);
 }
 
 void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCallback)

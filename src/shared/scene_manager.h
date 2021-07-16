@@ -20,7 +20,8 @@ namespace Shared
 
 	public:
 		void switchScreen(std::shared_ptr<Screen> screen, Callback finishCallback = nullptr);
-		
+		void switchScreenBack(Callback finishCallback = nullptr);
+
 		void pushWindow(std::shared_ptr<Window> window, Callback finishCallback = nullptr);
 		void popWindow(size_t count = 1, Callback finishCallback = nullptr);
 		void popWindow(Callback finishCallback);
@@ -40,6 +41,7 @@ namespace Shared
 		std::shared_ptr<Screen> mCurrentScreen = nullptr;
 		std::stack<std::shared_ptr<Window>> mWindows;
 		bool mInTransition = false;
+		std::weak_ptr<Screen> mPrevScreen;
 	};
 
 	class SceneManager::Screen : public Scene::Node
