@@ -67,8 +67,7 @@ namespace Scene
 		bool isBatchGroupsEnabled() const { return mBatchGroupsEnabled; }
 		void setBatchGroupsEnabled(bool value) { mBatchGroupsEnabled = value; }
 
-		auto getTimestep() const { return mFixedRecursiveUpdate.getTimestep(); }
-		void setTimestep(Clock::Duration value) { mFixedRecursiveUpdate.setTimestep(value); }
+		auto& getTimestepFixer() { return mFixedRecursiveUpdate; }
 
 	private:
 		std::shared_ptr<RootNode> mRoot = std::make_shared<RootNode>();

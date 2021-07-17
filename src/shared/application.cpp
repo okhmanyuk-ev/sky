@@ -70,14 +70,23 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		mScene->getRoot()->attach(SCENE_MANAGER);
 
 		auto getter = [this] { 
-			auto fps = 1.0f / Clock::ToSeconds(mScene->getTimestep());
+			auto fps = 1.0f / Clock::ToSeconds(mScene->getTimestepFixer().getTimestep());
 			return std::vector<std::string>({ std::to_string(fps) });
 		};
 		auto setter = [this](CON_ARGS) {
 			auto sec = std::stof(CON_ARG(0));
-			mScene->setTimestep(Clock::FromSeconds(1.0f / sec));
+			mScene->getTimestepFixer().setTimestep(Clock::FromSeconds(1.0f / sec));
 		};
-		CONSOLE->registerCVar("scene_fps", { "float" }, getter, setter);
+		CONSOLE->registerCVar("scene_timestep_fps", { "float" }, getter, setter);
+
+		CONSOLE->registerCVar("scene_timestep_enabled", { "bool" }, 
+			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().isEnabled), 
+			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setEnabled));
+
+		CONSOLE->registerCVar("scene_timestep_force_time_completion", { "bool" },
+			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().getForceTimeCompletion),
+			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion));
+
 	}
 }
 

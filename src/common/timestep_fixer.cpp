@@ -6,6 +6,12 @@ using namespace Common;
 
 void TimestepFixer::execute(Clock::Duration dTime)
 {
+	if (!mEnabled)
+	{
+		mCallback(dTime);
+		return;
+	}
+
 	if (mDeltaLimiterEnabled)
 	{
 		if (dTime > mDeltaLimit)
