@@ -86,7 +86,6 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		CONSOLE->registerCVar("scene_timestep_force_time_completion", { "bool" },
 			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().getForceTimeCompletion),
 			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion));
-
 	}
 }
 

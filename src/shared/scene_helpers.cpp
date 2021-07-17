@@ -321,6 +321,8 @@ float SceneHelpers::Progressbar::getProgress() const
 	return mProgressContent->getHorizontalStretch();
 }
 
+// safe area
+
 SceneHelpers::SafeArea::SafeArea()
 {
 	setStretch(1.0f);
