@@ -11,8 +11,14 @@
 
 namespace Shared::NetworkingWS
 {
+	class Client;
+	class Server;
+
 	class Channel
 	{
+		friend Client;
+		friend Server;
+
 	public:
 		using ReadCallback = std::function<void(BitBuffer&)>;
 		using SendCallback = std::function<void(BitBuffer&)>;
@@ -27,10 +33,15 @@ namespace Shared::NetworkingWS
 
 	public:
 		void setSendCallback(SendCallback value) { mSendCallback = value; }
+		auto getHdl() const { return mHdl; }
+
+	private:
+		void setHdl(websocketpp::connection_hdl value) { mHdl = value; }
 
 	private:
 		SendCallback mSendCallback = nullptr;
 		std::map<std::string, ReadCallback> mMessageReaders;
+		websocketpp::connection_hdl mHdl;
 	};
 
 	class Server : public Common::FrameSystem::Frameable
@@ -78,7 +89,6 @@ namespace Shared::NetworkingWS
 
 	private:
 		WSClient mWSClient;
-		websocketpp::connection_hdl mHdl;
 		std::shared_ptr<Channel> mChannel = nullptr;
 	};
 

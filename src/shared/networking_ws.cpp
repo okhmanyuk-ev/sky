@@ -45,6 +45,7 @@ Server::Server(uint16_t port)
 		channel->setSendCallback([this, hdl](const auto& buf) {
 			mWSServer.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
 		});
+		channel->setHdl(hdl);
 		mChannels.insert({ hdl, channel });
 	});
 
@@ -91,12 +92,11 @@ Client::Client(const std::string& url)
 		channel->setSendCallback([this, hdl](const auto& buf) {
 			mWSClient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
 		});
-		mHdl = hdl;
+		channel->setHdl(hdl);
 		mChannel = channel;
 	});
 	mWSClient.set_close_handler([this, url](websocketpp::connection_hdl hdl) {
 		LOG("disconnected");
-		mHdl.reset();
 		mChannel = nullptr;
 		connect(url);
 	});
