@@ -67,7 +67,7 @@ namespace Scene
 		bool isBatchGroupsEnabled() const { return mBatchGroupsEnabled; }
 		void setBatchGroupsEnabled(bool value) { mBatchGroupsEnabled = value; }
 
-		auto& getTimestepFixer() { return mFixedRecursiveUpdate; }
+		auto& getTimestepFixer() { return mTimestepFixer; }
 
 	private:
 		std::shared_ptr<RootNode> mRoot = std::make_shared<RootNode>();
@@ -77,7 +77,7 @@ namespace Scene
 		InteractTestCallback mInteractTestCallback = nullptr;
 		BatchGroups mBatchGroups;
 		bool mBatchGroupsEnabled = true;
-		Common::TimestepFixer mFixedRecursiveUpdate;
+		Common::TimestepFixer mTimestepFixer;
 	};
 
 	class Scene::RootNode : public Node

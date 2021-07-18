@@ -4,11 +4,11 @@
 
 using namespace Common;
 
-void TimestepFixer::execute(Clock::Duration dTime)
+void TimestepFixer::execute(Clock::Duration dTime, Callback callback)
 {
 	if (!mEnabled)
 	{
-		mCallback(dTime);
+		callback(dTime);
 		return;
 	}
 
@@ -22,7 +22,7 @@ void TimestepFixer::execute(Clock::Duration dTime)
 
 	while (mTimeAccumulator >= mTimestep)
 	{
-		mCallback(mTimestep);
+		callback(mTimestep);
 		mTimeAccumulator -= mTimestep;
 	}
 
@@ -30,13 +30,13 @@ void TimestepFixer::execute(Clock::Duration dTime)
 	{
 		if (mTimeAccumulator > Clock::Duration::zero())
 		{
-			mCallback(mTimeAccumulator);
+			callback(mTimeAccumulator);
 			mTimeAccumulator = Clock::Duration::zero();
 		}
 	}
 }
 
-void TimestepFixer::execute()
+void TimestepFixer::execute(Callback callback)
 {
-	execute(FRAME->getTimeDelta());
+	execute(FRAME->getTimeDelta(), callback);
 }

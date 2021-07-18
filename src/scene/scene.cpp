@@ -5,13 +5,9 @@ Scene::Scene::Scene()
 	mRoot->setStretch(1.0f);
 	mRoot->setScene(this);
 
-	mFixedRecursiveUpdate.setTimestep(Clock::FromSeconds(1.0f / 120.0f));
-	mFixedRecursiveUpdate.setForceTimeCompletion(false);
-	mFixedRecursiveUpdate.setDeltaLimiterEnabled(true);
-	mFixedRecursiveUpdate.setCallback([this](auto delta) {
-		recursiveNodeUpdate(mRoot, delta);
-		recursiveNodeUpdateTransform(mRoot);
-	});
+	mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / 120.0f));
+	mTimestepFixer.setForceTimeCompletion(false);
+	mTimestepFixer.setDeltaLimiterEnabled(true);
 }
 
 Scene::Scene::~Scene()
@@ -195,7 +191,10 @@ void Scene::Scene::frame()
 		mViewport.size /= PLATFORM->getScale();
 	}
 
-	mFixedRecursiveUpdate.execute();
+	mTimestepFixer.execute([this](auto delta) {
+		recursiveNodeUpdate(mRoot, delta);
+		recursiveNodeUpdateTransform(mRoot);
+	});
 
 	if (mBatchGroupsEnabled)
 	{
