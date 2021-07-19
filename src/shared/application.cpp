@@ -130,11 +130,11 @@ void Application::run()
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
 		IMGUI_SYSTEM->begin();
-		FRAME->frame();
 		if (mFlags.count(Flag::Scene))
 		{
 			mScene->frame();
 		}
+		FRAME->frame();
 		IMGUI_SYSTEM->end();
 		RENDERER->present();
 	}
