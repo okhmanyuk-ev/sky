@@ -355,3 +355,9 @@ target_link_libraries(${PROJECT_NAME} websocketpp)
 if(WIN32)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
+
+# box2d
+
+add_subdirectory(lib/box2d)
+target_link_libraries(${PROJECT_NAME} box2d)
+set_property(TARGET box2d PROPERTY FOLDER ${LIBS_FOLDER})
