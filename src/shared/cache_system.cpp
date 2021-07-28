@@ -46,6 +46,12 @@ std::shared_ptr<Graphics::Animation> CacheSystem::getAnimation(const std::string
 	return mAnimations.at(name);
 }
 
+const nlohmann::json& CacheSystem::getJson(const std::string& name)
+{
+	loadJson(name);
+	return mJsons.at(name);
+}
+
 void CacheSystem::loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
@@ -153,6 +159,22 @@ void CacheSystem::loadAnimation(const std::string& path)
 	loadAnimation(path, path);
 }
 
+void CacheSystem::loadJson(const std::string& path, const std::string& name)
+{
+	if (mJsons.count(name) > 0)
+		return;
+
+	if (!Platform::Asset::Exists(path))
+		return;
+
+	mJsons[name] = Common::Helpers::LoadJsonFromAsset({ path });
+}
+
+void CacheSystem::loadJson(const std::string& path)
+{
+	loadJson(path, path);
+}
+
 void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>& paths)
 {
 	Graphics::Atlas::Images images;
@@ -176,15 +198,7 @@ void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>
 
 void CacheSystem::makeAtlases()
 {
-	auto path = "atlases.json";
-
-	if (!Platform::Asset::Exists(path))
-	{
-		CONSOLE_DEVICE->writeLine("cannot find atlases.json");
-		return;
-	}
-
-	auto json = Common::Helpers::LoadJsonFromAsset({ path });
+	auto json = JSON("atlases.json");
 
 	for (auto field : json.items())
 	{

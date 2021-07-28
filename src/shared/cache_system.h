@@ -8,6 +8,7 @@
 #include <memory>
 #include <set>
 #include <audio/sound.h>
+#include <nlohmann/json.hpp>
 
 #define CACHE ENGINE->getSystem<Shared::CacheSystem>()
 
@@ -22,6 +23,7 @@
 #define SOUND(NAME) CACHE->getSound(NAME)
 #define ATLAS(NAME) CACHE->getAtlas(NAME)
 #define ANIMATION(NAME) CACHE->getAnimation(NAME)
+#define JSON(NAME) CACHE->getJson(NAME)
 
 namespace Shared 
 {
@@ -33,6 +35,7 @@ namespace Shared
 		std::shared_ptr<Audio::Sound> getSound(const std::string& name);
 		std::shared_ptr<Graphics::Atlas> getAtlas(const std::string& name);
 		std::shared_ptr<Graphics::Animation> getAnimation(const std::string& name);
+		const nlohmann::json& getJson(const std::string& name);
 
 	public:
 		void loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name);
@@ -53,6 +56,9 @@ namespace Shared
 		void loadAnimation(const std::string& path, const std::string& name);
 		void loadAnimation(const std::string& path);
 
+		void loadJson(const std::string& path, const std::string& name);
+		void loadJson(const std::string& path);
+
 	public:
 		void makeAtlas(const std::string& name, const std::set<std::string>& paths);
 		void makeAtlases();
@@ -63,6 +69,7 @@ namespace Shared
 		std::unordered_map<std::string, std::shared_ptr<Graphics::Atlas>> mAtlases;
 		std::unordered_map<std::string, std::shared_ptr<Graphics::Animation>> mAnimations;
 		std::unordered_map<std::string, std::shared_ptr<Audio::Sound>> mSounds;
+		std::unordered_map<std::string, nlohmann::json> mJsons;
 
 	private:
 		std::unordered_map<std::string, Graphics::TexCell> mTexCells;
