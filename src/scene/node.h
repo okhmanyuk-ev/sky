@@ -58,8 +58,7 @@ namespace Scene
 	protected:
 		virtual void enterDraw();
 		virtual void leaveDraw();
-		virtual void update(Clock::Duration delta);
-		virtual void update();
+		virtual void update(Clock::Duration dTime);
 		virtual void draw();
 		virtual void touch(Touch type, const glm::vec2& pos);
 

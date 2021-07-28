@@ -2,9 +2,9 @@
 
 using namespace Scene;
 
-void Circle::update()
+void Circle::update(Clock::Duration dTime)
 {
-	Node::update();
+	Node::update(dTime);
 
 	if (mPiePivot >= 0.0f)
 		setRadialPivot(mPie * mPiePivot);

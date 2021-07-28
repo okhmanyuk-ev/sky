@@ -269,7 +269,7 @@ namespace Shared::SceneHelpers
 		SafeArea();
 
 	protected:
-		void update() override;
+		void update(Clock::Duration dTime) override;
 	};
 
 	class VerticalScrollbar : public Scene::Rectangle,
@@ -283,7 +283,7 @@ namespace Shared::SceneHelpers
 		VerticalScrollbar();
 
 	public:
-		void update() override;
+		void update(Clock::Duration dTime) override;
 
 	public:
 		void setScrollbox(std::weak_ptr<Scene::Scrollbox> value) { mScrollbox = value; }

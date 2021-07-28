@@ -23,9 +23,9 @@ void Sprite::draw()
 	GRAPHICS->pop(3);
 }
 
-void Sprite::update()
+void Sprite::update(Clock::Duration dTime)
 {
-	Node::update();
+	Node::update(dTime);
 
 	if (mTexture == nullptr) 
 		return;

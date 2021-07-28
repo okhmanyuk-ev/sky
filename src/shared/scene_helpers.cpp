@@ -328,9 +328,9 @@ SceneHelpers::SafeArea::SafeArea()
 	setStretch(1.0f);
 }
 
-void SceneHelpers::SafeArea::update()
+void SceneHelpers::SafeArea::update(Clock::Duration dTime)
 {
-	Scene::Node::update();
+	Scene::Node::update(dTime);
 
 	auto scale = PLATFORM->getScale();
 	auto left = PLATFORM->getSafeAreaLeftMargin() / scale;
@@ -365,9 +365,9 @@ SceneHelpers::VerticalScrollbar::VerticalScrollbar()
 	attach(mIndicator);
 }
 
-void SceneHelpers::VerticalScrollbar::update()
+void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 {
-	Scene::Rectangle::update();
+	Scene::Rectangle::update(dTime);
 
 	if (mScrollbox.expired())
 	{

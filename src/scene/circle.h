@@ -9,7 +9,7 @@ namespace Scene
 	class Circle : public Node, public Color, public Blend
 	{
 	protected:
-		void update() override;
+		void update(Clock::Duration dTime) override;
 		void draw() override;
 
 	public:

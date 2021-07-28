@@ -18,11 +18,10 @@ namespace Scene
 		}
 
 	protected:
-		void update() override
+		void update(Clock::Duration dTime) override
 		{
 			assert(ClipLayer == 0);
-
-			T::update();
+			T::update(dTime);
 		}
 
 		void enterDraw() override

@@ -22,9 +22,9 @@ void Label::draw()
 	GRAPHICS->pop();
 }
 
-void Label::update()
+void Label::update(Clock::Duration dTime)
 {
-	Node::update();
+	Node::update(dTime);
 
 	if (mAutoRefreshing)
 		refresh();

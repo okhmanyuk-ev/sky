@@ -11,7 +11,7 @@ namespace Scene
 	class SlicedSprite : public Node, public Color, public Blend, public Sampler
 	{
 	protected:
-		void update() override;
+		void update(Clock::Duration dTime) override;
 		void draw() override;
 
 	public:

@@ -20,9 +20,9 @@ void SlicedSprite::draw()
 	GRAPHICS->pop(2);
 }
 
-void SlicedSprite::update()
+void SlicedSprite::update(Clock::Duration dTime)
 {
-	Node::update();
+	Node::update(dTime);
 
 	if (mTexture == nullptr)
 		return;

@@ -158,16 +158,10 @@ void Node::leaveDraw()
 	//
 }
 
-void Node::update(Clock::Duration delta)
+void Node::update(Clock::Duration dTime)
 {
-	mActions.update(delta);
+	mActions.update(dTime);
 	updateAbsoluteSize();
-	update();
-}
-
-void Node::update()
-{
-	//
 }
 
 void Node::draw()

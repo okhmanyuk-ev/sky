@@ -15,7 +15,7 @@ namespace Scene
 		inline static Renderer::TextureAddress DefaultTextureAddress = Renderer::TextureAddress::Clamp;
 
 	protected:
-		void update() override;
+		void update(Clock::Duration dTime) override;
 		void draw() override;
 
 	private:

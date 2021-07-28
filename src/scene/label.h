@@ -14,7 +14,7 @@ namespace Scene
 
 	protected:
 		void draw() override;
-		void update() override;
+		void update(Clock::Duration dTime) override;
 
 	public:
 		void refresh();
