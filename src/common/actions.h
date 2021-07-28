@@ -150,6 +150,7 @@ namespace Actions
 		UAction ExecuteInfinite(std::function<void(Clock::Duration delta)> callback);
 		UAction ExecuteInfinite(std::function<void()> callback);
 
+		UAction Wait();
 		UAction Wait(float duration);
 
 		// will wait while returning true

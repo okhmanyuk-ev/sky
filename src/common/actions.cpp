@@ -162,6 +162,11 @@ Collection::UAction Collection::ExecuteInfinite(std::function<void()> callback)
 	});
 }
 
+Collection::UAction Collection::Wait()
+{
+	return Execute(nullptr);
+}
+
 Collection::UAction Collection::Wait(float duration)
 {
 	return Wait([duration](auto delta) mutable {
@@ -196,7 +201,18 @@ Collection::UAction Collection::Wait(bool& while_flag)
 
 Collection::UAction Collection::WaitOneFrame()
 {
-	return Execute(nullptr);
+	auto flag = std::make_shared<bool>(false);
+
+	return MakeSequence(
+		Execute([flag] {
+			FRAME->addOne([flag] {
+				*flag = true;
+			});
+		}),
+		Wait([flag] {
+			return !*flag;
+		})
+	);
 }
 
 Collection::UAction Collection::Delayed(float duration, UAction action)
