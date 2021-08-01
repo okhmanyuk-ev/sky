@@ -54,7 +54,7 @@ std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& _images, b
 	};
 
 	const auto max_side = 1 << 12;
-	const auto discard_step = 1;
+	const auto discard_step = -4;
 
 	const auto finder_input = make_finder_input(max_side, discard_step, report_successful, report_unsuccessful, runtime_flipping_mode);
 	const auto result_size = find_best_packing<spaces_type>(rectangles, finder_input);

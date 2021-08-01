@@ -9,12 +9,12 @@ namespace Scene
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 
 	protected:
-		void update() override
+		void update(Clock::Duration dTime) override
 		{
 			if (mAdaptingEnabled)
 				adapt();
 			
-			T::update();
+			T::update(dTime);
 		}
 
 	private:
