@@ -19,6 +19,13 @@ namespace
 			vec4 iMouse;
 		};
 
+		uniform sampler2D uTexture;
+
+		#define iChannel0 uTexture
+		#define iChannel1 uTexture
+		#define iChannel2 uTexture
+		#define iChannel3 uTexture
+
 		#ifdef VERTEX_SHADER
 		in vec3 aPosition;
 		out vec3 vPosition;
