@@ -12,6 +12,7 @@ namespace Renderer::Shaders
 			glm::vec3 iResolution = { 0.0f, 0.0f, 0.0f };
 			float iTime = 0.0f;
 			glm::vec4 iMouse = { 0.0f, 0.0f, 0.0f, 0.0f };
+			int iFrame = 0;
 		};
 
 	public:

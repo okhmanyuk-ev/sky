@@ -17,6 +17,7 @@ namespace
 			vec3 iResolution;
 			float iTime;
 			vec4 iMouse;
+			int iFrame;
 		};
 
 		uniform sampler2D uTexture;
