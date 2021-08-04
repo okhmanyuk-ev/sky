@@ -8,6 +8,9 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include <imgui.h>
+#include <imgui_stdlib.h>
+
 #include <nlohmann/json.hpp>
 
 #include <common/timer.h>
