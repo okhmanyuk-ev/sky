@@ -1,5 +1,4 @@
 #include "system.h"
-
 #include <vector>
 #include <numeric>
 
@@ -9,6 +8,18 @@ void System::onFrame()
 {
 	mBatchesCountPublic = mBatchesCount;
 	mBatchesCount = 0;
+
+	for (const auto& name : mUnusedRenderTargets)
+	{
+		mRenderTargets.erase(name);
+	}
+
+	mUnusedRenderTargets.clear();
+
+	for (const auto& [name, target] : mRenderTargets)
+	{
+		mUnusedRenderTargets.insert(name);
+	}
 }
 
 void System::begin()
@@ -738,4 +749,32 @@ void System::setBatching(bool value)
 		flush(); 
 	
 	mBatching = value; 
+}
+
+std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::string& name, int width, int height)
+{
+	if (mRenderTargets.contains(name))
+	{
+		auto target = mRenderTargets.at(name);
+
+		if (target->getWidth() != width || target->getHeight() != height)
+		{
+			mRenderTargets.erase(name);
+		}
+	}
+
+	if (!mRenderTargets.contains(name)) 
+	{
+		auto target = std::make_shared<Renderer::RenderTarget>(width, height);
+		mRenderTargets.insert({ name, target });
+	}
+
+	mUnusedRenderTargets.erase(name);
+	
+	return mRenderTargets.at(name);
+}
+
+std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::string& name)
+{
+	return getRenderTarget(name, PLATFORM->getWidth(), PLATFORM->getHeight());
 }

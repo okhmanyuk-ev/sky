@@ -213,6 +213,16 @@ namespace Graphics
 			std::vector<uint32_t> indices;
 			std::vector<Renderer::Vertex::PositionColorTexture> vertices;
 		} mBatch;
+
+	public:
+		std::shared_ptr<Renderer::RenderTarget> getRenderTarget(const std::string& name, int width, int height);
+		std::shared_ptr<Renderer::RenderTarget> getRenderTarget(const std::string& name);
+
+		const auto& getRenderTargets() const { return mRenderTargets; }
+
+	private:
+		std::map<std::string, std::shared_ptr<Renderer::RenderTarget>> mRenderTargets;
+		std::set<std::string> mUnusedRenderTargets;
 	};
 
 	inline bool operator==(const System::State& left, const System::State& right)

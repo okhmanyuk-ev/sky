@@ -8,10 +8,16 @@
 
 namespace Shared
 {
-	class GraphicalConsoleCommands
+	class GraphicalConsoleCommands : public Common::FrameSystem::Frameable
 	{
 	public:
 		GraphicalConsoleCommands();
 		~GraphicalConsoleCommands();
+
+	private:
+		void onFrame() override;
+
+	private:
+		bool mShowTargets = false;
 	};
 }
