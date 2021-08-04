@@ -1,5 +1,6 @@
 #include <renderer/shader_custom.h>
 #include <string>
+#include <stdexcept>
 
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 #include <renderer/system_gl.h>
@@ -61,7 +62,7 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 		std::string errorLog;
 		errorLog.resize(maxLength);
 		glGetShaderInfoLog(vertexShader, maxLength, &maxLength, &errorLog[0]);
-		assert(false);
+		throw std::runtime_error(errorLog);
 	}
 
 	auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -78,7 +79,7 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 		std::string errorLog;
 		errorLog.resize(maxLength);
 		glGetShaderInfoLog(fragmentShader, maxLength, &maxLength, &errorLog[0]);
-		assert(false);
+		throw std::runtime_error(errorLog);
 	}
 
 	mImpl->program = glCreateProgram();
