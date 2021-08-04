@@ -29,3 +29,4 @@
 #include "shaders/light.h"
 #include "shaders/rounded.h"
 #include "shaders/sdf.h"
+#include "shaders/shadertoy.h"
