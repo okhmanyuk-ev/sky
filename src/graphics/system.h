@@ -66,6 +66,10 @@ namespace Graphics
 		void drawRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f },
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
+		void drawRectangle(const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader);
+
+		void drawRectangle(std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+
 		// rounded rectangle
 		void drawRoundedRectangle(const glm::mat4& model, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding);

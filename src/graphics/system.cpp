@@ -303,6 +303,16 @@ void System::drawRectangle(const glm::mat4& model, const glm::vec4& color,
 	drawRectangle(model, color, color, color, color, shader);
 }
 
+void System::drawRectangle(const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
+{
+	drawRectangle(model, { Color::White, 1.0f }, shader);
+}
+
+void System::drawRectangle(std::shared_ptr<Renderer::ShaderMatrices> shader)
+{
+	drawRectangle(glm::mat4(1.0f), shader);
+}
+
 void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding)
 {
