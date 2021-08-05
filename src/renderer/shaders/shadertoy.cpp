@@ -6,7 +6,7 @@ using namespace Renderer::Shaders;
 namespace
 {
 	const char* shaderSource =
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
+//#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 		R"(
 		layout (std140) uniform ConstantBuffer
 		{
@@ -51,7 +51,7 @@ namespace
 		}
 		#endif
 		)";
-#endif
+//#endif
 }
 
 Shadertoy::Shadertoy(const Vertex::Layout& layout, const std::string& src) :
