@@ -73,6 +73,11 @@ file(GLOB SCENE_SRC
     src/scene/*.h
 )
 
+file(GLOB SCENE3D_SRC
+    src/scene3d/*.cpp
+    src/scene3d/*.h
+)
+
 file(GLOB IMSCENE_SRC
     src/imscene/*.cpp
     src/imscene/*.h
@@ -99,6 +104,7 @@ source_group("renderer\\opengl" FILES ${RENDERER_OPENGL_SRC})
 source_group("renderer\\shaders" FILES ${RENDERER_SHADERS_SRC})
 source_group("audio" FILES ${AUDIO_SRC})
 source_group("scene" FILES ${SCENE_SRC})
+source_group("scene3d" FILES ${SCENE3D_SRC})
 source_group("imscene" FILES ${IMSCENE_SRC})
 source_group("shared" FILES ${SHARED_SRC})
 source_group("network" FILES ${NETWORK_SRC})
@@ -115,6 +121,7 @@ add_library(${PROJECT_NAME} STATIC
 	${RENDERER_OPENGL_SRC}
 	${AUDIO_SRC}
 	${SCENE_SRC}
+	${SCENE3D_SRC}
 	${IMSCENE_SRC}
 	${SHARED_SRC}
 	${NETWORK_SRC}

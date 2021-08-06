@@ -35,6 +35,7 @@
 
 #include <renderer/all.h>
 #include <scene/all.h>
+#include <scene3d/all.h>
 #include <imscene/all.h>
 #include <graphics/all.h>
 
