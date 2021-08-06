@@ -16,7 +16,7 @@ namespace Shared
 		public Common::Event::Listenable<Platform::Input::Touch::Event>
 	{
 	public:
-		FirstPersonCameraController(Graphics::Camera3D& camera);
+		FirstPersonCameraController(std::shared_ptr<Graphics::Camera3D> camera);
 		~FirstPersonCameraController();
 
 	private:
@@ -47,7 +47,7 @@ namespace Shared
 		bool mKeyCtrl = false;
 
 	private:
-		Graphics::Camera3D& mCamera;
+		std::shared_ptr<Graphics::Camera3D> mCamera; // TODO: maybe weak_ptr
 
 	public:
 		auto getSensivity() const { return mSensivity; }

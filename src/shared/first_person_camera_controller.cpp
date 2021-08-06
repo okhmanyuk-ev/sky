@@ -4,7 +4,7 @@
 
 using namespace Shared;
 
-FirstPersonCameraController::FirstPersonCameraController(Graphics::Camera3D& camera) :
+FirstPersonCameraController::FirstPersonCameraController(std::shared_ptr<Graphics::Camera3D> camera) :
 	mCamera(camera)
 {
 	//
@@ -23,8 +23,8 @@ void FirstPersonCameraController::onFrame()
 		{
 			diff *= mSensivity / 10.0f;
 
-			mCamera.setYaw(mCamera.getYaw() - glm::radians(diff.x));
-			mCamera.setPitch(mCamera.getPitch() + glm::radians(diff.y));
+			mCamera->setYaw(mCamera->getYaw() - glm::radians(diff.x));
+			mCamera->setPitch(mCamera->getPitch() + glm::radians(diff.y));
 
 			mPrevAngles = mCurrentAngles;
 		}
@@ -36,29 +36,29 @@ void FirstPersonCameraController::onFrame()
 		auto offset = mSensivity * Clock::ToSeconds(FRAME->getTimeDelta()) * 1.5f;
 
 		if (mLeftArrow)
-			mCamera.setYaw(mCamera.getYaw() + offset);
+			mCamera->setYaw(mCamera->getYaw() + offset);
 
 		if (mRightArrow)
-			mCamera.setYaw(mCamera.getYaw() - offset);
+			mCamera->setYaw(mCamera->getYaw() - offset);
 
 		if (mUpArrow)
-			mCamera.setPitch(mCamera.getPitch() - offset);
+			mCamera->setPitch(mCamera->getPitch() - offset);
 
 		if (mDownArrow)
-			mCamera.setPitch(mCamera.getPitch() + offset);
+			mCamera->setPitch(mCamera->getPitch() + offset);
 
 		float limit = glm::pi<float>() / 2.0f - 0.01f;
 
-		mCamera.setPitch(fmaxf(-limit, mCamera.getPitch()));
-		mCamera.setPitch(fminf(+limit, mCamera.getPitch()));
+		mCamera->setPitch(fmaxf(-limit, mCamera->getPitch()));
+		mCamera->setPitch(fminf(+limit, mCamera->getPitch()));
 
 		auto pi = glm::pi<float>();
 
-		while (mCamera.getYaw() > pi)
-			mCamera.setYaw(mCamera.getYaw() - (pi * 2.0f));
+		while (mCamera->getYaw() > pi)
+			mCamera->setYaw(mCamera->getYaw() - (pi * 2.0f));
 
-		while (mCamera.getYaw() < -pi)
-			mCamera.setYaw(mCamera.getYaw() + (pi * 2.0f));
+		while (mCamera->getYaw() < -pi)
+			mCamera->setYaw(mCamera->getYaw() + (pi * 2.0f));
 	}
 	{
 		auto speed = mSpeed * Clock::ToSeconds(FRAME->getTimeDelta()) * 50.0f;
@@ -87,13 +87,13 @@ void FirstPersonCameraController::onFrame()
 		{
 			direction = glm::normalize(direction);
 
-			mCamera.sideMove(direction.x * speed);
-			mCamera.frontMove(direction.y * speed);
+			mCamera->sideMove(direction.x * speed);
+			mCamera->frontMove(direction.y * speed);
 		}
 
-		auto pos = mCamera.getPosition();
+		auto pos = mCamera->getPosition();
 
-		mCamera.setPosition(pos);
+		mCamera->setPosition(pos);
 	}
 }
 
@@ -164,7 +164,7 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::Event& e
 
 	if (e.type == Event::Type::Wheel)
 	{
-		mCamera.setFieldOfView(mCamera.getFieldOfView() - e.wheelY * 0.05f);
+		mCamera->setFieldOfView(mCamera->getFieldOfView() - e.wheelY * 0.05f);
 	}
 }
 
