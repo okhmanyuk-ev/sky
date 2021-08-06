@@ -1,4 +1,5 @@
 #include <renderer/shader_custom.h>
+#include <stdexcept>
 
 #if defined(RENDERER_D3D11)
 #include <renderer/system_d3d11.h>
@@ -43,6 +44,12 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 
 	if (pixel_shader_error != nullptr)
 		pixel_shader_error_string = std::string((char*)pixel_shader_error->GetBufferPointer(), pixel_shader_error->GetBufferSize());
+
+	if (vertexShaderBlob == nullptr)
+		throw std::runtime_error(vertex_shader_error_string);
+
+	if (pixelShaderBlob == nullptr)
+		throw std::runtime_error(pixel_shader_error_string);
 
 	SystemD3D11::Device->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &mImpl->vertexShader);
 	SystemD3D11::Device->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &mImpl->pixelShader);
