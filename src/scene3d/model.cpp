@@ -6,61 +6,122 @@ void Model::draw(Driver& driver)
 {
 	Node::draw(driver);
 	
-	driver.getShader()->setMaterial(mMaterial);
+	static std::shared_ptr<Renderer::Shaders::Light> shader = nullptr;
 
-	GRAPHICS->drawGeneric(mTopology, mVertices, mIndices, getTransform(), driver.getShader());
+	if (!mVertices.has_value())
+	{
+		std::set<Renderer::Shaders::Light::Flag> flags;
+		std::tie(mVertices, flags) = generateVertices();
+
+		if (mShaderFlags != flags)
+		{
+			shader = std::make_shared<Renderer::Shaders::Light>(Vertex::Layout, flags);
+			mShaderFlags = flags;
+		}
+	}
+
+	assert(shader);
+	driver.prepareShader(*shader, mMaterial);
+
+	GRAPHICS->drawGeneric(mTopology, mVertices.value(), mIndices, getTransform(), shader, mTexture);
 }
 
-// cube
-
-Cube::Cube()
+std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>> Model::generateVertices()
 {
-	const glm::vec4 VertexColor = { Graphics::Color::White, 1.0f };
+	std::vector<Vertex> result;
 
-	setVertices({
-		/* front */
-		/* 0  */ { { -1.0f,  1.0f,  1.0f }, VertexColor, { 0.0f, 0.0f, 1.0f } },
-		/* 1  */ { {  1.0f,  1.0f,  1.0f }, VertexColor, { 0.0f, 0.0f, 1.0f } },
-		/* 2  */ { { -1.0f, -1.0f,  1.0f }, VertexColor, { 0.0f, 0.0f, 1.0f } },
-		/* 3  */ { {  1.0f, -1.0f,  1.0f }, VertexColor, { 0.0f, 0.0f, 1.0f } },
+	auto count = mPositionAttribs.size();
 
-		/* top */
-		/* 4  */ { { -1.0f,  1.0f,  1.0f }, VertexColor, { 0.0f, 1.0f, 0.0f } },
-		/* 5  */ { { -1.0f,  1.0f, -1.0f }, VertexColor, { 0.0f, 1.0f, 0.0f } },
-		/* 6  */ { {  1.0f,  1.0f,  1.0f }, VertexColor, { 0.0f, 1.0f, 0.0f } },
-		/* 7  */ { {  1.0f,  1.0f, -1.0f }, VertexColor, { 0.0f, 1.0f, 0.0f } },
+	bool has_col = mColorAttribs.size() == count;
+	bool has_tex = mTexCoordAttribs.size() == count;
+	bool has_normal = mNormalAttribs.size() == count;
 
-		/* left */
-		/* 8  */ { { -1.0f,  1.0f, -1.0f }, VertexColor, { -1.0f, 0.0f, 0.0f } },
-		/* 9  */ { { -1.0f,  1.0f,  1.0f }, VertexColor, { -1.0f, 0.0f, 0.0f } },
-		/* 10 */ { { -1.0f, -1.0f, -1.0f }, VertexColor, { -1.0f, 0.0f, 0.0f } },
-		/* 11 */ { { -1.0f, -1.0f,  1.0f }, VertexColor, { -1.0f, 0.0f, 0.0f } },
+	assert(has_normal); // normals should be
 
-		/* back */
-		/* 12 */ { { -1.0f,  1.0f, -1.0f }, VertexColor, { 0.0f, 0.0f, -1.0f } },
-		/* 13 */ { { -1.0f, -1.0f, -1.0f }, VertexColor, { 0.0f, 0.0f, -1.0f } },
-		/* 14 */ { {  1.0f,  1.0f, -1.0f }, VertexColor, { 0.0f, 0.0f, -1.0f } },
-		/* 15 */ { {  1.0f, -1.0f, -1.0f }, VertexColor, { 0.0f, 0.0f, -1.0f } },
+	for (int i = 0; i < count; i++)
+	{
+		Vertex vertex;
+		vertex.pos = mPositionAttribs.at(i);
 
-		/* bottom */
-		/* 16 */ { { -1.0f, -1.0f,  1.0f }, VertexColor, { 0.0f, -1.0f, 0.0f } },
-		/* 17 */ { {  1.0f, -1.0f,  1.0f }, VertexColor, { 0.0f, -1.0f, 0.0f } },
-		/* 18 */ { { -1.0f, -1.0f, -1.0f }, VertexColor, { 0.0f, -1.0f, 0.0f } },
-		/* 19 */ { {  1.0f, -1.0f, -1.0f }, VertexColor, { 0.0f, -1.0f, 0.0f } },
+		if (has_col)
+			vertex.col = mColorAttribs.at(i);
+		
+		if (has_tex)
+			vertex.tex = mTexCoordAttribs.at(i);
+		
+		if (has_normal)
+			vertex.normal = mNormalAttribs.at(i);
+		
+		result.push_back(vertex);
+	}
 
-		/* right */
-		/* 20 */ { { 1.0f, -1.0f, -1.0f }, VertexColor, { 1.0f, 0.0f, 0.0f } },
-		/* 21 */ { { 1.0f, -1.0f,  1.0f }, VertexColor, { 1.0f, 0.0f, 0.0f } },
-		/* 22 */ { { 1.0f,  1.0f, -1.0f }, VertexColor, { 1.0f, 0.0f, 0.0f } },
-		/* 23 */ { { 1.0f,  1.0f,  1.0f }, VertexColor, { 1.0f, 0.0f, 0.0f } },
-	});
+	std::set<Renderer::Shaders::Light::Flag> flags;
 
-	setIndices({
-		0, 1, 2, 1, 3, 2, // front
-		4, 5, 6, 5, 7, 6, // top
-		8, 9, 10, 9, 11, 10, // left
-		12, 13, 14, 13, 15, 14, // back
-		16, 17, 18, 17, 19, 18, // bottom
-		20, 21, 22, 21, 23, 22, // right
-	});
+	if (has_col)
+		flags.insert(Renderer::Shaders::Light::Flag::Colored);
+
+	if (has_tex)
+		flags.insert(Renderer::Shaders::Light::Flag::Textured);
+
+	return { result, flags };
+}
+
+void Model::setVertices(std::vector<Renderer::Vertex::PositionColorNormal> vertices)
+{
+	mPositionAttribs.clear();
+	mColorAttribs.clear();
+	mNormalAttribs.clear();
+
+	for (const auto& vertex : vertices)
+	{
+		mPositionAttribs.push_back(vertex.pos);
+		mColorAttribs.push_back(vertex.col);
+		mNormalAttribs.push_back(vertex.normal);
+	}
+}
+
+void Model::setVertices(std::vector<Renderer::Vertex::PositionTextureNormal> vertices)
+{
+	mPositionAttribs.clear();
+	mTexCoordAttribs.clear();
+	mNormalAttribs.clear();
+
+	for (const auto& vertex : vertices)
+	{
+		mPositionAttribs.push_back(vertex.pos);
+		mTexCoordAttribs.push_back(vertex.tex);
+		mNormalAttribs.push_back(vertex.normal);
+	}
+}
+
+void Model::setPositionAttribs(const std::vector<PositionAttrib>& value)
+{
+	if (mPositionAttribs != value)
+		mVertices.reset();
+
+	mPositionAttribs = value;
+}
+
+void Model::setColorAttribs(const std::vector<ColorAttrib>& value)
+{
+	if (mColorAttribs != value)
+		mVertices.reset();
+
+	mColorAttribs = value;
+}
+
+void Model::setNormalAttribs(const std::vector<NormalAttrib>& value)
+{
+	if (mNormalAttribs != value)
+		mVertices.reset();
+
+	mNormalAttribs = value;
+}
+
+void Model::setTexCoordAttribs(const std::vector<TexCoordAttrib>& value)
+{
+	if (mTexCoordAttribs != value)
+		mVertices.reset();
+
+	mTexCoordAttribs = value;
 }

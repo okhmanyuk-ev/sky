@@ -26,9 +26,6 @@ namespace Scene3D
 		auto getCamera() const { return mCamera; }
 
 	public:
-		using Vertex = Renderer::Vertex::PositionColorNormal;
-
-	public:
 		auto& getDriver() { return mDriver; }
 
 	private:

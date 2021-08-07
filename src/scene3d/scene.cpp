@@ -6,18 +6,9 @@ Scene::Scene()
 {
 	mRoot = std::make_shared<Node>();
 
-	auto shader = std::make_shared<Renderer::Shaders::Light>(Vertex::Layout);
-
-	mDriver.setShader(shader);
-
 	mCamera = std::make_shared<Graphics::Camera3D>(70.0f, glm::vec3(0.0f, -1.0f, 0.0f));
 	mCamera->setYaw(glm::radians(90.0f));
 	mCamera->setPosition({ 0.0f, 0.0f, -1000.0f });
-
-	auto light = shader->getPointLight();
-	light.position = { 0.0f, 0.0f, -500.0f };
-	shader->setPointLight(light);
-	shader->setMaterial(Renderer::Shaders::Materials::Emerald);
 }
 
 void Scene::frame()
@@ -27,8 +18,7 @@ void Scene::frame()
 	recursiveNodeUpdate(mRoot, FRAME->getTimeDelta());
 	recursiveNodeUpdateTransform(mRoot);
 	
-	auto shader = mDriver.getShader();
-	shader->setEyePosition(mCamera->getPosition());
+	mDriver.setCameraPosition(mCamera->getPosition());
 
 	GRAPHICS->begin();
 	GRAPHICS->pushViewport(Renderer::Viewport());
