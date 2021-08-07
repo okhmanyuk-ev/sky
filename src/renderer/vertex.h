@@ -105,4 +105,14 @@ namespace Renderer::Vertex
 
 		static const Layout Layout;
 	};
+
+	struct PositionColorTextureNormal
+	{
+		glm::vec3 pos;
+		glm::vec4 col;
+		glm::vec2 tex;
+		glm::vec3 normal;
+
+		static const Layout Layout;
+	};
 }
