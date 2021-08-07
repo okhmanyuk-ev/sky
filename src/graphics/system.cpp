@@ -176,7 +176,7 @@ void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& ve
 	RENDERER->setIndexBuffer(indices);
 	RENDERER->setVertexBuffer(vertices);
 	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
-	RENDERER->drawIndexed(indices.size);
+	RENDERER->drawIndexed(indices.size / indices.stride);
 }
 
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
