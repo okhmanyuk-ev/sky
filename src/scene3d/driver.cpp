@@ -6,5 +6,6 @@ void Driver::prepareShader(Renderer::Shaders::Light& shader, Renderer::Shaders::
 {
 	shader.setEyePosition(mCameraPosition);
 	shader.setPointLight(mPointLight);
+	shader.setDirectionalLight(mDirectionalLight);
 	shader.setMaterial(material);
 }

@@ -11,11 +11,15 @@ namespace Scene3D
 
 		void setCameraPosition(const glm::vec3& value) { mCameraPosition = value; }
 
+		auto getDirectionalLight() const { return mDirectionalLight; }
+		void setDirectionalLight(const Renderer::Shaders::Light::DirectionalLight& value) { mDirectionalLight = value; }
+
 		auto getPointLight() const { return mPointLight; }
 		void setPointLight(const Renderer::Shaders::Light::PointLight& value) { mPointLight = value; }
 
 	private:
 		glm::vec3 mCameraPosition;
 		Renderer::Shaders::Light::PointLight mPointLight;
+		Renderer::Shaders::Light::DirectionalLight mDirectionalLight;
 	};
 }

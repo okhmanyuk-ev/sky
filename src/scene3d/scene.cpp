@@ -28,8 +28,9 @@ void Scene::frame()
 	GRAPHICS->pushCullMode(Renderer::CullMode::None);
 	GRAPHICS->pushDepthMode(Renderer::ComparisonFunc::Less);
 	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
+	GRAPHICS->pushTextureAddress(Renderer::TextureAddress::Wrap);
 	recursiveNodeDraw(mRoot);
-	GRAPHICS->pop(7);
+	GRAPHICS->pop(8);
 	GRAPHICS->end();
 }
 
