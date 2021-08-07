@@ -29,8 +29,8 @@ namespace Scene3D
 		using Vertex = Renderer::Vertex::PositionColorNormal;
 
 	private:
-		std::shared_ptr<Renderer::Shaders::Light> mShader;
 		std::shared_ptr<Graphics::Camera3D> mCamera;
+		Driver mDriver;
 
 	private:
 		void recursiveNodeUpdateTransform(std::shared_ptr<Node> node);

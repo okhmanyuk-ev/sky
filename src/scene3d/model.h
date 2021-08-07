@@ -8,11 +8,11 @@ namespace Scene3D
 	class Model : public Node
 	{
 	public:
-		using Indices = std::vector<uint16_t>;
+		using Indices = std::vector<uint32_t>;
 		using Vertices = std::vector<Scene::Vertex>;
 
 	public:
-		void draw() override;
+		void draw(Driver& driver) override;
 
 	public:
 		auto getTopology() const { return mTopology; }

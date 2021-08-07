@@ -38,17 +38,17 @@ void Node::update(Clock::Duration dTime)
 	//
 }
 
-void Node::enterDraw()
+void Node::enterDraw(Driver& driver)
 {
 	//
 }
 
-void Node::leaveDraw()
+void Node::draw(Driver& driver)
 {
 	//
 }
 
-void Node::draw()
+void Node::leaveDraw(Driver& driver)
 {
 	//
 }

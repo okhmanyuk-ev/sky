@@ -6,40 +6,40 @@ Scene::Scene()
 {
 	mRoot = std::make_shared<Node>();
 
-	mShader = std::make_shared<Renderer::Shaders::Light>(Vertex::Layout);
+	auto shader = std::make_shared<Renderer::Shaders::Light>(Vertex::Layout);
+
+	mDriver.setShader(shader);
+
 	mCamera = std::make_shared<Graphics::Camera3D>(70.0f, glm::vec3(0.0f, -1.0f, 0.0f));
 	mCamera->setYaw(glm::radians(90.0f));
 	mCamera->setPosition({ 0.0f, 0.0f, -1000.0f });
 
-	auto light = mShader->getPointLight();
+	auto light = shader->getPointLight();
 	light.position = { 0.0f, 0.0f, -500.0f };
-	mShader->setPointLight(light);
-	mShader->setMaterial(Renderer::Shaders::Materials::Emerald);
+	shader->setPointLight(light);
+	shader->setMaterial(Renderer::Shaders::Materials::Emerald);
 }
 
 void Scene::frame()
 {
 	mCamera->onFrame();
 
-	auto view = mCamera->getViewMatrix();
-	auto projection = mCamera->getProjectionMatrix();
-	auto model = glm::mat4(1.0f);
-
-	mShader->setProjectionMatrix(projection);
-	mShader->setViewMatrix(view);
-	mShader->setModelMatrix(model);
-
-	mShader->setEyePosition(mCamera->getPosition());
-
-	RENDERER->setViewport(Renderer::Viewport());
-	RENDERER->setScissor(nullptr);
-	RENDERER->setCullMode(Renderer::CullMode::None); // TODO: not "None"!
-	RENDERER->setDepthMode(Renderer::DepthMode(Renderer::ComparisonFunc::Less));
-	RENDERER->setShader(mShader);
-
 	recursiveNodeUpdate(mRoot, FRAME->getTimeDelta());
 	recursiveNodeUpdateTransform(mRoot);
+	
+	auto shader = mDriver.getShader();
+	shader->setEyePosition(mCamera->getPosition());
+
+	GRAPHICS->begin();
+	GRAPHICS->pushViewport(Renderer::Viewport());
+	GRAPHICS->pushProjectionMatrix(mCamera->getProjectionMatrix());
+	GRAPHICS->pushViewMatrix(mCamera->getViewMatrix());
+	GRAPHICS->pushScissor(std::nullopt);
+	GRAPHICS->pushCullMode(Renderer::CullMode::None);
+	GRAPHICS->pushDepthMode(Renderer::DepthMode(Renderer::ComparisonFunc::Less));
 	recursiveNodeDraw(mRoot);
+	GRAPHICS->pop(6);
+	GRAPHICS->end();
 }
 
 void Scene::recursiveNodeUpdateTransform(std::shared_ptr<Node> node)
@@ -75,14 +75,11 @@ void Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
 	if (!node->isTransformReady())
 		return;
 
-	node->enterDraw();
-
-	mShader->setModelMatrix(node->getTransform()); // TODO: this bad place for it
-
-	node->draw();
+	node->enterDraw(mDriver);
+	node->draw(mDriver);
 
 	for (auto _node : node->getNodes())
 		recursiveNodeDraw(_node);
 
-	node->leaveDraw();
+	node->leaveDraw(mDriver);
 }

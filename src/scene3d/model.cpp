@@ -2,16 +2,11 @@
 
 using namespace Scene3D;
 
-void Model::draw()
+void Model::draw(Driver& driver)
 {
-	Node::draw();
+	Node::draw(driver);
 
-	RENDERER->setTopology(mTopology);
-	RENDERER->setIndexBuffer(mIndices);
-	RENDERER->setVertexBuffer(mVertices);
-
-	RENDERER->drawIndexed(mIndices.size());
-
+	GRAPHICS->drawGeneric(mTopology, mVertices, mIndices, getTransform(), driver.getShader());
 }
 
 // cube

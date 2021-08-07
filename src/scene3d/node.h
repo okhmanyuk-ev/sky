@@ -3,6 +3,8 @@
 #include <core/engine.h>
 #include <core/clock.h>
 #include <scene3d/transform.h>
+#include <scene3d/driver.h>
+#include <graphics/all.h>
 
 namespace Scene3D
 {
@@ -17,10 +19,10 @@ namespace Scene3D
 		void detach(std::shared_ptr<Node> node);
 
 	public:
-		virtual void enterDraw();
-		virtual void leaveDraw();
 		virtual void update(Clock::Duration dTime);
-		virtual void draw();
+		virtual void enterDraw(Driver& driver);
+		virtual void draw(Driver& driver);
+		virtual void leaveDraw(Driver& driver);
 
 		virtual void updateTransform();
 
