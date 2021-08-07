@@ -28,6 +28,9 @@ namespace Scene3D
 	public:
 		using Vertex = Renderer::Vertex::PositionColorNormal;
 
+	public:
+		auto& getDriver() { return mDriver; }
+
 	private:
 		std::shared_ptr<Graphics::Camera3D> mCamera;
 		Driver mDriver;

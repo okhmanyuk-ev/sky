@@ -5,6 +5,8 @@ using namespace Scene3D;
 void Model::draw(Driver& driver)
 {
 	Node::draw(driver);
+	
+	driver.getShader()->setMaterial(mMaterial);
 
 	GRAPHICS->drawGeneric(mTopology, mVertices, mIndices, getTransform(), driver.getShader());
 }
