@@ -1,4 +1,5 @@
 #include "model.h"
+#include <numeric>
 
 using namespace Scene3D;
 
@@ -6,22 +7,23 @@ void Model::draw(Driver& driver)
 {
 	Node::draw(driver);
 	
-	static std::shared_ptr<Renderer::Shaders::Light> shader = nullptr;
+	static std::map<std::set<Renderer::Shaders::Light::Flag>, std::shared_ptr<Renderer::Shaders::Light>> shaders;
 
 	if (!mVertices.has_value())
-	{
-		std::set<Renderer::Shaders::Light::Flag> flags;
-		std::tie(mVertices, flags) = generateVertices();
+		std::tie(mVertices, mShaderFlags) = generateVertices();
 
-		if (mShaderFlags != flags)
-		{
-			shader = std::make_shared<Renderer::Shaders::Light>(Vertex::Layout, flags);
-			mShaderFlags = flags;
-		}
-	}
+	if (!shaders.contains(mShaderFlags))
+		shaders[mShaderFlags] = std::make_shared<Renderer::Shaders::Light>(Vertex::Layout, mShaderFlags);
+	
+	auto shader = shaders.at(mShaderFlags);
 
-	assert(shader);
 	driver.prepareShader(*shader, mMaterial);
+
+	if (mIndices.empty())
+	{
+		mIndices.resize(mPositionAttribs.size());
+		std::iota(mIndices.begin(), mIndices.end(), 0);
+	}
 
 	GRAPHICS->drawGeneric(mTopology, mVertices.value(), mIndices, getTransform(), shader, mTexture);
 }
@@ -94,7 +96,7 @@ void Model::setVertices(std::vector<Renderer::Vertex::PositionTextureNormal> ver
 	}
 }
 
-void Model::setPositionAttribs(const std::vector<PositionAttrib>& value)
+void Model::setPositionAttribs(const PositionAttribs& value)
 {
 	if (mPositionAttribs != value)
 		mVertices.reset();
@@ -102,7 +104,7 @@ void Model::setPositionAttribs(const std::vector<PositionAttrib>& value)
 	mPositionAttribs = value;
 }
 
-void Model::setColorAttribs(const std::vector<ColorAttrib>& value)
+void Model::setColorAttribs(const ColorAttribs& value)
 {
 	if (mColorAttribs != value)
 		mVertices.reset();
@@ -110,7 +112,7 @@ void Model::setColorAttribs(const std::vector<ColorAttrib>& value)
 	mColorAttribs = value;
 }
 
-void Model::setNormalAttribs(const std::vector<NormalAttrib>& value)
+void Model::setNormalAttribs(const NormalAttribs& value)
 {
 	if (mNormalAttribs != value)
 		mVertices.reset();
@@ -118,7 +120,7 @@ void Model::setNormalAttribs(const std::vector<NormalAttrib>& value)
 	mNormalAttribs = value;
 }
 
-void Model::setTexCoordAttribs(const std::vector<TexCoordAttrib>& value)
+void Model::setTexCoordAttribs(const TexCoordAttribs& value)
 {
 	if (mTexCoordAttribs != value)
 		mVertices.reset();

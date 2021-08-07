@@ -11,10 +11,10 @@ namespace Scene3D
 	public:
 		using Indices = std::vector<uint32_t>;
 		
-		using PositionAttrib = glm::vec3;
-		using ColorAttrib = glm::vec4;
-		using NormalAttrib = glm::vec3;
-		using TexCoordAttrib = glm::vec2;
+		using PositionAttribs = std::vector<glm::vec3>;
+		using ColorAttribs = std::vector<glm::vec4>;
+		using NormalAttribs = std::vector<glm::vec3>;
+		using TexCoordAttribs = std::vector<glm::vec2>;
 
 	public:
 		void draw(Driver& driver) override;
@@ -40,16 +40,16 @@ namespace Scene3D
 		void setMaterial(const Renderer::Shaders::Light::Material& value) { mMaterial = value; }
 
 		const auto& getPositionAttribs() const { return mPositionAttribs; }
-		void setPositionAttribs(const std::vector<PositionAttrib>& value);
+		void setPositionAttribs(const PositionAttribs& value);
 
 		const auto& getColorAttribs() const { return mColorAttribs; }
-		void setColorAttribs(const std::vector<ColorAttrib>& value);
+		void setColorAttribs(const ColorAttribs& value);
 
 		const auto& getNormalAttribs() const { return mNormalAttribs; }
-		void setNormalAttribs(const std::vector<NormalAttrib>& value);
+		void setNormalAttribs(const NormalAttribs& value);
 
 		const auto& getTexCoordAttribs() const { return mTexCoordAttribs; }
-		void setTexCoordAttribs(const std::vector<TexCoordAttrib>& value);
+		void setTexCoordAttribs(const TexCoordAttribs& value);
 
 		auto getTexture() const { return mTexture; }
 		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexture = value; }
@@ -59,10 +59,10 @@ namespace Scene3D
 		Indices mIndices;
 		std::optional<std::vector<Vertex>> mVertices;
 		std::set<Renderer::Shaders::Light::Flag> mShaderFlags;
-		std::vector<PositionAttrib> mPositionAttribs;
-		std::vector<ColorAttrib> mColorAttribs;
-		std::vector<NormalAttrib> mNormalAttribs;
-		std::vector<TexCoordAttrib> mTexCoordAttribs;
+		PositionAttribs mPositionAttribs;
+		ColorAttribs mColorAttribs;
+		NormalAttribs mNormalAttribs;
+		TexCoordAttribs mTexCoordAttribs;
 		Renderer::Shaders::Light::Material mMaterial;
 		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
 	};

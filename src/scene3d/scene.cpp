@@ -6,7 +6,7 @@ Scene::Scene()
 {
 	mRoot = std::make_shared<Node>();
 
-	mCamera = std::make_shared<Graphics::Camera3D>(70.0f, glm::vec3(0.0f, -1.0f, 0.0f));
+	mCamera = std::make_shared<Graphics::Camera3D>();
 	mCamera->setYaw(glm::radians(90.0f));
 	mCamera->setPosition({ 0.0f, 0.0f, -1000.0f });
 }
@@ -26,9 +26,10 @@ void Scene::frame()
 	GRAPHICS->pushViewMatrix(mCamera->getViewMatrix());
 	GRAPHICS->pushScissor(std::nullopt);
 	GRAPHICS->pushCullMode(Renderer::CullMode::None);
-	GRAPHICS->pushDepthMode(Renderer::DepthMode(Renderer::ComparisonFunc::Less));
+	GRAPHICS->pushDepthMode(Renderer::ComparisonFunc::Less);
+	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
 	recursiveNodeDraw(mRoot);
-	GRAPHICS->pop(6);
+	GRAPHICS->pop(7);
 	GRAPHICS->end();
 }
 
