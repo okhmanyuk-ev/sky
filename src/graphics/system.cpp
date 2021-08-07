@@ -131,10 +131,7 @@ void System::flush()
 	shader_matrices->setModelMatrix(glm::mat4(1.0f));
 
 	RENDERER->setShader(mBatch.shader);
-
-	if (mBatch.texture.has_value())
-		RENDERER->setTexture(mBatch.texture.value());
-
+	RENDERER->setTexture(mBatch.texture.value_or(nullptr));
 	RENDERER->setTopology(mBatch.topology.value());
 	RENDERER->setIndexBuffer(mBatch.indices);
 	RENDERER->setVertexBuffer(mBatch.vertices);
@@ -157,6 +154,29 @@ void System::clearStencil()
 {
 	applyState();
 	RENDERER->clearStencil();
+}
+
+void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices, const Renderer::Buffer& indices,
+	const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader,
+	std::optional<std::shared_ptr<Renderer::Texture>> texture)
+{
+	assert(shader);
+
+	applyState();
+	flush();
+
+	const auto& state = mStates.top();
+
+	shader->setProjectionMatrix(state.projectionMatrix);
+	shader->setViewMatrix(state.viewMatrix);
+	shader->setModelMatrix(model);
+
+	RENDERER->setTexture(texture.value_or(nullptr));
+	RENDERER->setTopology(topology);
+	RENDERER->setIndexBuffer(indices);
+	RENDERER->setVertexBuffer(vertices);
+	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
+	RENDERER->drawIndexed(indices.size);
 }
 
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
@@ -203,23 +223,10 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	}
 	else
 	{
-		flush();
-
 		if (!shader)
 			shader = mColoredShader;
 
-		const auto& state = mStates.top();
-
-		shader->setProjectionMatrix(state.projectionMatrix);
-		shader->setViewMatrix(state.viewMatrix);
-		shader->setModelMatrix(model);
-
-		RENDERER->setTopology(topology);
-		RENDERER->setIndexBuffer(indices);
-		RENDERER->setVertexBuffer(vertices);
-		RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
-
-		RENDERER->drawIndexed(indices.size());
+		drawGeneric(topology, vertices, indices, model, shader);
 	}
 }
 
@@ -271,24 +278,10 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	}
 	else
 	{
-		flush();
-
 		if (!shader)
 			shader = mTexturedShader;
 
-		const auto& state = mStates.top();
-
-		shader->setProjectionMatrix(state.projectionMatrix);
-		shader->setViewMatrix(state.viewMatrix);
-		shader->setModelMatrix(model);
-
-		RENDERER->setTexture(texture);
-		RENDERER->setTopology(topology);
-		RENDERER->setIndexBuffer(indices);
-		RENDERER->setVertexBuffer(vertices);
-		RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
-
-		RENDERER->drawIndexed(indices.size());
+		drawGeneric(topology, vertices, indices, model, shader, texture);
 	}
 }
 
@@ -671,6 +664,13 @@ void System::pushDepthMode(Renderer::DepthMode value)
 {
 	auto state = mStates.top();
 	state.depthMode = value;
+	push(state);
+}
+
+void System::pushCullMode(Renderer::CullMode value) 
+{
+	auto state = mStates.top();
+	state.cullMode = value;
 	push(state);
 }
 

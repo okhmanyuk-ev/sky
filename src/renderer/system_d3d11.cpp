@@ -213,6 +213,9 @@ void SystemD3D11::setIndexBuffer(const Buffer& value)
 
 void SystemD3D11::setTexture(std::shared_ptr<Texture> value)
 {
+	if (value == nullptr)
+		return;
+
 	Context->PSSetShaderResources(0, 1, &value->shader_resource_view);
 }
 

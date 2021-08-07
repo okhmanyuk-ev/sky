@@ -37,6 +37,13 @@ namespace Graphics
 		void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f });
 		void clearStencil();
 
+		// generic
+		// TODO: hidden overload conflict when name "draw"
+		void drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices,
+			const Renderer::Buffer& indices, const glm::mat4& model,
+			std::shared_ptr<Renderer::ShaderMatrices> shader,
+			std::optional<std::shared_ptr<Renderer::Texture>> texture = std::nullopt);
+
 		// draw colored vertices
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 			const glm::mat4& model = glm::mat4(1.0f));
@@ -134,6 +141,7 @@ namespace Graphics
 		void pushSampler(Renderer::Sampler value);
 		void pushBlendMode(Renderer::BlendMode value);
 		void pushDepthMode(Renderer::DepthMode value);
+		void pushCullMode(Renderer::CullMode value);
 		void pushViewport(const Renderer::Viewport& value);
 		void pushViewport(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
 		void pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value);

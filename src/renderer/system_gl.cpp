@@ -274,6 +274,9 @@ void SystemGL::setIndexBuffer(const Buffer& value)
 
 void SystemGL::setTexture(std::shared_ptr<Texture> value)
 {
+	if (value == nullptr)
+		return;
+
 	glBindTexture(GL_TEXTURE_2D, value->texture);
 	mTextureBound = true;
 	updateGLSampler();
