@@ -25,22 +25,21 @@ glm::mat4 Camera2D::getProjectionMatrix() const
 
 // camera 3d
 
-Camera3D::Camera3D(float fieldOfView, glm::vec3 worldUp, float nearPlane, float farPlane) :
-	mFieldOfView(fieldOfView),
-	mWorldUp(worldUp),
-	mNearPlane(nearPlane),
-	mFarPlane(farPlane)
+Camera3D::Camera3D()
 {
 	//
 }
 
 void Camera3D::onFrame()
 {
-	float sinYaw = glm::sin(mYaw);
-	float sinPitch = glm::sin(mPitch);
+	auto yaw = mYaw * (mWorldUp.y * -1.0f);
+	auto pitch = mPitch * (mWorldUp.y * -1.0f);
 
-	float cosYaw = glm::cos(mYaw);
-	float cosPitch = glm::cos(mPitch);
+	float sinYaw = glm::sin(yaw);
+	float sinPitch = glm::sin(pitch);
+
+	float cosYaw = glm::cos(yaw);
+	float cosPitch = glm::cos(pitch);
 
 	mFront = glm::normalize(glm::vec3(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch));
 	mRight = glm::normalize(glm::cross(mFront, mWorldUp));

@@ -31,7 +31,7 @@ namespace Graphics
 	class Camera3D : public Camera, public Common::FrameSystem::Frameable
 	{
 	public:
-		Camera3D(float fieldOfView, glm::vec3 worldUp, float nearPlane = 1.0f, float farPlane = 8192.0f);
+		Camera3D();
 
 	public:
 		void onFrame() override;
@@ -61,6 +61,9 @@ namespace Graphics
 		auto getFieldOfView() const { return mFieldOfView; }
 		void setFieldOfView(float value) { mFieldOfView = value; }
 
+		auto getWorldUp() const { return mWorldUp; }
+		void setWorldUp(const glm::vec3& value) { mWorldUp = value; }
+
 		auto getNearPlane() const { return mNearPlane; }
 		void setNearPlane(float value) { mNearPlane = value; }
 
@@ -75,10 +78,10 @@ namespace Graphics
 		glm::vec3 mPosition = { 0.0f, 0.0f, 0.0f };
 		float mYaw = 0.0f;
 		float mPitch = 0.0f;
-		float mFieldOfView;
-		glm::vec3 mWorldUp;
-		float mNearPlane;
-		float mFarPlane;
+		float mFieldOfView = 70.0f;
+		glm::vec3 mWorldUp = { 0.0f, -1.0f, 0.0f };
+		float mNearPlane = 1.0f;
+		float mFarPlane = 8192.0f;
 
 	private:
 		glm::vec3 mFront;
