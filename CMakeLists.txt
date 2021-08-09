@@ -331,7 +331,14 @@ endif()
 
 # tinyobjloader
 
+file(GLOB TINYOBJLOADER_SRC
+	lib/tinyobjloader/*.cc 
+	lib/tinyobjloader/*.h
+)	
 target_include_directories(${PROJECT_NAME} PUBLIC lib/tinyobjloader)
+add_library(tinyobjloader STATIC ${TINYOBJLOADER_SRC})
+target_link_libraries(${PROJECT_NAME} tinyobjloader)
+set_property(TARGET tinyobjloader PROPERTY FOLDER ${LIBS_FOLDER})
 
 # asio
 
