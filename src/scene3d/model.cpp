@@ -68,7 +68,7 @@ std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>>
 	return { result, flags };
 }
 
-void Model::setVertices(std::vector<Renderer::Vertex::PositionColorNormal> vertices)
+void Model::setVertices(const std::vector<Renderer::Vertex::PositionColorNormal>& vertices)
 {
 	mPositionAttribs.clear();
 	mColorAttribs.clear();
@@ -82,7 +82,7 @@ void Model::setVertices(std::vector<Renderer::Vertex::PositionColorNormal> verti
 	}
 }
 
-void Model::setVertices(std::vector<Renderer::Vertex::PositionTextureNormal> vertices)
+void Model::setVertices(const std::vector<Renderer::Vertex::PositionTextureNormal>& vertices)
 {
 	mPositionAttribs.clear();
 	mTexCoordAttribs.clear();

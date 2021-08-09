@@ -13,6 +13,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include <tiny_obj_loader.h>
+
 #include <common/timer.h>
 #include <common/easing.h>
 #include <common/hash.h>

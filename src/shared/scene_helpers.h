@@ -2,6 +2,7 @@
 
 #include <tinyutf8.hpp>
 #include <scene/all.h>
+#include <scene3d/all.h>
 #include <audio/system.h>
 #include "scene_manager.h"
 
@@ -345,4 +346,8 @@ namespace Shared::SceneHelpers
 		std::shared_ptr<Scene::Node> mContent;
 		bool mCloseOnMissclick = true;
 	};
+
+	// 3d
+
+	std::vector<std::shared_ptr<Scene3D::Model>> MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension);
 }

@@ -26,8 +26,8 @@ namespace Scene3D
 		std::tuple<std::vector<Vertex>, std::set<Renderer::Shaders::Light::Flag>> generateVertices();
 
 	public:
-		void setVertices(std::vector<Renderer::Vertex::PositionColorNormal> vertices);
-		void setVertices(std::vector<Renderer::Vertex::PositionTextureNormal> vertices);
+		void setVertices(const std::vector<Renderer::Vertex::PositionColorNormal>& vertices);
+		void setVertices(const std::vector<Renderer::Vertex::PositionTextureNormal>& vertices);
 
 	public:
 		auto getTopology() const { return mTopology; }
