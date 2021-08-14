@@ -1,6 +1,7 @@
 #include "scene_helpers.h"
 #include <shared/cache_system.h>
 #include <tiny_obj_loader.h>
+#include <sstream>
 
 using namespace Shared;
 
