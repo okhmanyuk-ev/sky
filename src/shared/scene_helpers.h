@@ -235,6 +235,9 @@ namespace Shared::SceneHelpers
 		{
 			T::enterDraw();
 
+			if (mBackshadeColor->getAlpha() <= 0.0f)
+				return;
+
 			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
 			GRAPHICS->drawRectangle(glm::mat4(1.0f), mBackshadeColor->getColor());
 			GRAPHICS->pop();
@@ -245,6 +248,30 @@ namespace Shared::SceneHelpers
 
 	private:
 		std::shared_ptr<Scene::Color> mBackshadeColor = std::make_shared<Scene::Color>();
+	};
+
+	template <typename T> class Frontshaded : public T
+	{
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
+
+	protected:
+		void leaveDraw() override
+		{
+			T::leaveDraw();
+
+			if (mFrontshadeColor->getAlpha() <= 0.0f)
+				return;
+
+			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
+			GRAPHICS->drawRectangle(glm::mat4(1.0f), mFrontshadeColor->getColor());
+			GRAPHICS->pop();
+		}
+
+	public:
+		auto getFrontshadeColor() const { return mFrontshadeColor; }
+
+	private:
+		std::shared_ptr<Scene::Color> mFrontshadeColor = std::make_shared<Scene::Color>();
 	};
 
 	template <typename T> class Outlined : public T
@@ -298,14 +325,11 @@ namespace Shared::SceneHelpers
 		bool mHidden = false;
 	};
 
-	class StandardScreen : public SceneManager::Screen
+	class StandardScreen : public Frontshaded<SceneManager::Screen>
 	{
 	public:
 		StandardScreen();
-
-	public:
-		auto getContent() const { return mContent; }
-
+		
 	protected:
 		void onEnterBegin() override;
 		void onEnterEnd() override;
@@ -317,10 +341,6 @@ namespace Shared::SceneHelpers
 	protected:
 		std::unique_ptr<Actions::Action> createEnterAction() override;
 		std::unique_ptr<Actions::Action> createLeaveAction() override;
-
-	private:
-		std::shared_ptr<Scene::Node> mContent;
-		std::shared_ptr<Scene::Rectangle> mFadeRectangle;
 	};
 
 	class StandardWindow : public Scene::Clickable<Backshaded<Shared::SceneManager::Window>>

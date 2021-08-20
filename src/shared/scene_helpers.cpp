@@ -445,15 +445,7 @@ SceneHelpers::StandardScreen::StandardScreen()
 	setStretch(1.0f);
 	setAnchor(0.5f);
 	setPivot(0.5f);
-
-	mContent = std::make_shared<Scene::Node>();
-	mContent->setStretch(1.0f);
-	attach(mContent);
-
-	mFadeRectangle = std::make_shared<Scene::Rectangle>();
-	mFadeRectangle->setStretch(1.0f);
-	mFadeRectangle->setColor(Graphics::Color::Black);
-	attach(mFadeRectangle);
+	getFrontshadeColor()->setColor(Graphics::Color::Black);
 }
 
 void SceneHelpers::StandardScreen::onEnterBegin()
@@ -490,7 +482,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createEnterAction
 {
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
-		Actions::Collection::ChangeAlpha(mFadeRectangle, 0.0f, 0.5f)
+		Actions::Collection::ChangeAlpha(getFrontshadeColor(), 0.0f, 0.5f)
 	);
 };
 
@@ -498,7 +490,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction
 {
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
-		Actions::Collection::ChangeAlpha(mFadeRectangle, 1.0f, 0.5f)
+		Actions::Collection::ChangeAlpha(getFrontshadeColor(), 1.0f, 0.5f)
 	);
 };
 
