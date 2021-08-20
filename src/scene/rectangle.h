@@ -16,27 +16,34 @@ namespace Scene
 			BottomRight
 		};
 
+		enum class Edge
+		{
+			Top,
+			Bottom,
+			Left,
+			Right
+		};
+
 	protected:
 		void draw() override;
 
 	public:
-		void setHorizontalGradient(const glm::vec4& left, const glm::vec4& right);
-		void setHorizontalGradient(const glm::vec3& left, const glm::vec3& right);
-
-		void setVerticalGradient(const glm::vec4& top, const glm::vec4& bottom);
-		void setVerticalGradient(const glm::vec3& top, const glm::vec3& bottom);
-
-	public:
 		auto getCornerColor(Corner corner) const { return mCornerColors.at(corner); }
-		void setCornerColor(Corner corner, const glm::vec4& value) { mCornerColors[corner] = value; }
-		void setCornerColor(Corner corner, const glm::vec3& value) { setCornerColor(corner, { value, 1.0f }); }
+		auto getEdgeColor(Edge edge) const { return mEdgeColors.at(edge); }
 
-	public:
-		std::map<Corner, glm::vec4> mCornerColors = {
-			{ Corner::TopLeft, { Graphics::Color::White, 1.0f } },
-			{ Corner::TopRight, { Graphics::Color::White, 1.0f } },
-			{ Corner::BottomLeft, { Graphics::Color::White, 1.0f } },
-			{ Corner::BottomRight, { Graphics::Color::White, 1.0f } },
+	private:
+		std::map<Edge, std::shared_ptr<Color>> mEdgeColors = {
+			{ Edge::Top, std::make_shared<Color>() },
+			{ Edge::Bottom, std::make_shared<Color>() },
+			{ Edge::Left, std::make_shared<Color>() },
+			{ Edge::Right, std::make_shared<Color>() },
+		};
+
+		std::map<Corner, std::shared_ptr<Color>> mCornerColors = {
+			{ Corner::TopLeft, std::make_shared<Color>() },
+			{ Corner::TopRight, std::make_shared<Color>() },
+			{ Corner::BottomLeft, std::make_shared<Color>() },
+			{ Corner::BottomRight, std::make_shared<Color>() },
 		};
 
 	public:
