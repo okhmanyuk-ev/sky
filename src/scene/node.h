@@ -51,9 +51,7 @@ namespace Scene
 		virtual bool interactTest(const glm::vec2& value) const;
 
 		virtual void updateTransform();
-	
-	public:
-		void updateAbsoluteSize();
+		virtual void updateAbsoluteSize();
 
 	protected:
 		virtual void enterDraw();

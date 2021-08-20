@@ -8,27 +8,35 @@ namespace Scene
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 
-	protected:
-		void update(Clock::Duration dTime) override
+	public:
+		void updateTransform() override
 		{
-			if (mAdaptingEnabled)
-				adapt();
-			
-			T::update(dTime);
-		}
+			T::updateTransform();
 
-	private:
-		void adapt()
-		{
-			if (mAdaptSize.x <= 0.0f)
+			if (!mAdaptingEnabled)
 				return;
 
-			if (mAdaptSize.y <= 0.0f)
-				return;
+			assert(mAdaptSize.x > 0.0f);
+			assert(mAdaptSize.y > 0.0f);
 
 			auto scale = mAdaptSize / T::getAbsoluteSize();
+			mAdaptScale = glm::min(scale.x, scale.y);
 
-			T::setScale(glm::min(scale.x, scale.y));
+			auto pivot = T::getPivot();
+			auto abs_size = T::getAbsoluteSize();
+
+			auto transform = T::getTransform();
+			transform = glm::translate(transform, { pivot * abs_size, 0.0f });
+			transform = glm::scale(transform, { mAdaptScale, mAdaptScale, 1.0f });
+			transform = glm::translate(transform, { pivot * -abs_size, 0.0f });
+			T::setTransform(transform);
+		}
+
+	public:
+		void bakeAdaption()
+		{
+			T::setSize(T::getSize() * mAdaptScale);
+			mAdaptScale = 1.0f;
 		}
 
 	public:
@@ -42,5 +50,6 @@ namespace Scene
 	private:
 		bool mAdaptingEnabled = true;
 		glm::vec2 mAdaptSize = { 0.0f, 0.0f };
+		float mAdaptScale = 1.0f;
 	};
 }
