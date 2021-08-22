@@ -75,13 +75,19 @@ namespace Shared::SceneHelpers
 			{
 				executeCallback(mActiveCallback);
 				AUDIO->play(mActiveSound);
-                PLATFORM->haptic();
+				PLATFORM->haptic(Platform::System::HapticType::Medium);
 			}
 			else
 			{
 				executeCallback(mInactiveCallback);
 				AUDIO->play(mInactiveSound);
 			}
+		}
+
+		void onChooseBegin() override
+		{
+			Scene::Clickable<T>::onChooseBegin();
+			PLATFORM->haptic(Platform::System::HapticType::Low);
 		}
 
 	public:

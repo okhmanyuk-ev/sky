@@ -266,10 +266,23 @@ void SystemIos::purchase(const std::string& product)
     //
 }
 
-void SystemIos::haptic()
+void SystemIos::haptic(HapticType hapticType)
 {
-    auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleMedium];
-    [generator impactOccurred];
+    if (hapticType == HapticType::Low)
+    {
+        auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLow];
+        [generator impactOccurred];
+    }
+    else if (hapticType == HapticType::Medium)
+    {
+        auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleMedium];
+        [generator impactOccurred];
+    }
+    else if (hapticType == HapticType::High)
+    {
+        auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleHigh];
+        [generator impactOccurred];
+    }
 }
 
 #endif

@@ -63,7 +63,7 @@ namespace Platform
 		void initializeBilling(const ProductsMap& products) override;
 		void purchase(const std::string& product) override;
 
-		void haptic() override { /*nothing*/ }
+		void haptic(HapticType hapticType) override { /*nothing*/ }
 
 	public:
 		static JNIEnv* BeginEnv();

@@ -69,7 +69,16 @@ namespace Platform
         
         virtual std::string getUUID() const = 0;
 
-		virtual void haptic() = 0;
+	public:
+		enum class HapticType
+		{
+			Low,
+			Medium,
+			High
+		};
+
+	public:
+		virtual void haptic(HapticType hapticType) = 0;
 
 	public:        
 		float getLogicalWidth() const;
