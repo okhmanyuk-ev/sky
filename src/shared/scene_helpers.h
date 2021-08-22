@@ -75,6 +75,7 @@ namespace Shared::SceneHelpers
 			{
 				executeCallback(mActiveCallback);
 				AUDIO->play(mActiveSound);
+                PLATFORM->haptic();
 			}
 			else
 			{

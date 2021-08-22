@@ -266,4 +266,10 @@ void SystemIos::purchase(const std::string& product)
     //
 }
 
+void SystemIos::haptic()
+{
+    auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleMedium];
+    [generator impactOccurred];
+}
+
 #endif
