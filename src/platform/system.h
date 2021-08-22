@@ -69,6 +69,8 @@ namespace Platform
         
         virtual std::string getUUID() const = 0;
 
+		virtual void haptic() = 0;
+
 	public:        
 		float getLogicalWidth() const;
 		float getLogicalHeight() const;

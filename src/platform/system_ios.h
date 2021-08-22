@@ -56,6 +56,8 @@ namespace Platform
         void initializeBilling(const ProductsMap& products) override;
         void purchase(const std::string& product) override;
 
+        void haptic() override { /*nothing*/ }
+
     public:
         void setSize(int w, int h) { mWidth = w; mHeight = h; }
         
