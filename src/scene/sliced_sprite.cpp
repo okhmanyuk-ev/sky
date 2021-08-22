@@ -5,9 +5,8 @@ using namespace Scene;
 void SlicedSprite::draw()
 {
 	Node::draw();
-	
-	if (mTexture == nullptr)
-		return;
+
+	assert(mTexture != nullptr);
 	
 	if (getAlpha() <= 0.0f)
 		return;
@@ -24,9 +23,8 @@ void SlicedSprite::update(Clock::Duration dTime)
 {
 	Node::update(dTime);
 
-	if (mTexture == nullptr)
-		return;
-	
+	assert(mTexture != nullptr);
+
 	auto width = static_cast<float>(mTexture->getWidth());
 	auto height = static_cast<float>(mTexture->getHeight());
 

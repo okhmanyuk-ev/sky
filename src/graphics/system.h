@@ -88,10 +88,10 @@ namespace Graphics
 		void drawLineRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f });
 
 		// circle
-		void drawCircle(const glm::mat4& model, const glm::vec4& inner_color = { Color::White, 1.0f },
+		void drawCircle(const glm::mat4& model = glm::mat4(1.0f), const glm::vec4& inner_color = { Color::White, 1.0f },
 			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f, float pie = 1.0f);
 
-		void drawSegmentedCircle(const glm::mat4& model, int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
+		void drawSegmentedCircle(const glm::mat4& model = glm::mat4(1.0f), int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
 			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f);
 
 		// sprite

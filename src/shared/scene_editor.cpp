@@ -159,22 +159,28 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		}
 	}
 
+	auto showTexture = [this](auto texture, auto region) {
+		if (texture == nullptr)
+			return;
+
+		ImGui::InputFloat4("Region", (float*)&region, "%.0f", ImGuiInputTextFlags_ReadOnly);
+
+		glm::i32vec2 texture_size = { texture->getWidth(), texture->getHeight() };
+		ImGui::InputInt2("Resolution", (int*)&texture_size, ImGuiInputTextFlags_ReadOnly);
+
+		mEditorSpriteTexture = texture;
+		drawImage(mEditorSpriteTexture, region);
+		ImGui::Separator();
+	};
+
 	if (auto sprite = std::dynamic_pointer_cast<Scene::Sprite>(node); sprite != nullptr)
 	{
-		auto texture = sprite->getTexture();
+		showTexture(sprite->getTexture(), sprite->getTexRegion());
+	}
 
-		if (texture != nullptr)
-		{
-			glm::i32vec2 texture_size = { texture->getWidth(), texture->getHeight() };
-			ImGui::InputInt2("Resolution", (int*)&texture_size, ImGuiInputTextFlags_ReadOnly);
-
-			auto tex_region = sprite->getTexRegion();
-			ImGui::InputFloat4("Region", (float*)&tex_region, "%.0f", ImGuiInputTextFlags_ReadOnly);
-
-			mEditorSpriteTexture = texture;
-			drawImage(mEditorSpriteTexture, sprite->getTexRegion());
-			ImGui::Separator();
-		}
+	if (auto sliced = std::dynamic_pointer_cast<Scene::SlicedSprite>(node); sliced != nullptr)
+	{
+		showTexture(sliced->getTexture(), sliced->getCenterRegion());
 	}
 
 	if (auto rectangle = std::dynamic_pointer_cast<Scene::Rectangle>(node); rectangle != nullptr)
