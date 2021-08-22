@@ -112,10 +112,12 @@ namespace Shared::SceneHelpers
 		{
 			T::updateTransform();
 
+			auto offset = 0.5f * T::getAbsoluteSize();
+
 			auto transform = T::getTransform();
-			transform = glm::translate(transform, { 0.5f * T::getAbsoluteSize(), 0.0f });
+			transform = glm::translate(transform, { offset, 0.0f });
 			transform = glm::scale(transform, { mRelativeScale, mRelativeScale, 1.0f });
-			transform = glm::translate(transform, { 0.5f * -T::getAbsoluteSize(), 0.0f });
+			transform = glm::translate(transform, { -offset, 0.0f });
             T::setTransform(transform);
 		}
 
@@ -168,10 +170,10 @@ namespace Shared::SceneHelpers
 		bool mChooseAnimationStarted = false;
 	};
 
-	class GrayscaleSpriteButton : public Button<GrayscaleSprite>
+	class SpriteButton : public Button<GrayscaleSprite>
 	{
 	public:
-		GrayscaleSpriteButton();
+		SpriteButton();
 
 	public:
 		void refresh() override;

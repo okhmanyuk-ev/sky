@@ -251,12 +251,12 @@ void SceneHelpers::GrayscaleSprite::draw()
 	Sprite::draw();
 }
 
-SceneHelpers::GrayscaleSpriteButton::GrayscaleSpriteButton()
+SceneHelpers::SpriteButton::SpriteButton()
 {
 	refresh();
 }
 
-void SceneHelpers::GrayscaleSpriteButton::refresh()
+void SceneHelpers::SpriteButton::refresh()
 {
 	setGrayIntensity(isActive() ? 0.0f : 1.0f);
 }

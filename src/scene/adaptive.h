@@ -22,13 +22,12 @@ namespace Scene
 			auto scale = mAdaptSize / T::getAbsoluteSize();
 			mAdaptScale = glm::min(scale.x, scale.y);
 
-			auto pivot = T::getPivot();
-			auto abs_size = T::getAbsoluteSize();
-
+			auto offset = T::getPivot() * T::getAbsoluteSize();
+			
 			auto transform = T::getTransform();
-			transform = glm::translate(transform, { pivot * abs_size, 0.0f });
+			transform = glm::translate(transform, { offset, 0.0f });
 			transform = glm::scale(transform, { mAdaptScale, mAdaptScale, 1.0f });
-			transform = glm::translate(transform, { pivot * -abs_size, 0.0f });
+			transform = glm::translate(transform, { -offset, 0.0f });
 			T::setTransform(transform);
 		}
 

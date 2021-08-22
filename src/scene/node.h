@@ -98,6 +98,9 @@ namespace Scene
 		auto getAbsoluteWidth() const { return mAbsoluteSize.x; }
 		auto getAbsoluteHeight() const { return mAbsoluteSize.y; }
 
+	protected:
+		void setAbsoluteSize(const glm::vec2& value) { mAbsoluteSize = value; }
+
 	private:
 		Node* mParent = nullptr;
 		std::list<std::shared_ptr<Node>> mNodes;
