@@ -498,30 +498,21 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_
 }
 
 void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
-	const TexRegion& center_region, const glm::vec2& size, std::optional<float> edgeSize, 
+	const TexRegion& center_region, const glm::vec2& size, std::optional<float> edge_size,
 	const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	float tex_w = static_cast<float>(texture->getWidth());
-	float tex_h = static_cast<float>(texture->getHeight());
+	glm::vec2 tex_size = { static_cast<float>(texture->getWidth()), static_cast<float>(texture->getHeight()) };
+	
+	glm::vec2 s1 = center_region.pos / tex_size;
+	glm::vec2 s2 = (center_region.size / tex_size) + s1;
 
-	float s_x1 = center_region.pos.x / tex_w;
-	float s_y1 = center_region.pos.y / tex_h;
-	float s_x2 = (center_region.size.x / tex_w) + s_x1;
-	float s_y2 = (center_region.size.y / tex_h) + s_y1;
+	glm::vec2 p1 = center_region.pos / size;
+	glm::vec2 p2 = 1.0f - ((tex_size - (center_region.pos + center_region.size)) / size);
 
-	float p_x1 = center_region.pos.x / size.x;
-	float p_y1 = center_region.pos.y / size.y;
-	float p_x2 = 1.0f - ((tex_w - (center_region.pos.x + center_region.size.x)) / size.x);
-	float p_y2 = 1.0f - ((tex_h - (center_region.pos.y + center_region.size.y)) / size.y);
-
-	if (edgeSize.has_value())
+	if (edge_size.has_value())
 	{
-		auto edge_size = edgeSize.value();
-
-		p_x1 = edge_size / size.x;
-		p_y1 = edge_size / size.y;
-		p_x2 = (size.x - edge_size) / size.x;
-		p_y2 = (size.y - edge_size) / size.y;
+		p1 = edge_size.value() / size;
+		p2 = (size - edge_size.value()) / size;
 	}
 
 	static auto vertices = std::vector<Renderer::Vertex::PositionColorTexture>(36);
@@ -529,65 +520,65 @@ void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const 
 	// top left
 
 	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color, { 0.0f, 0.0f } };
-	vertices[1] = { { 0.0f, p_y1, 0.0f }, color, { 0.0f, s_y1 } };
-	vertices[2] = { { p_x1, p_y1, 0.0f }, color, { s_x1, s_y1 } };
-	vertices[3] = { { p_x1, 0.0f, 0.0f }, color, { s_x1, 0.0f } };
+	vertices[1] = { { 0.0f, p1.y, 0.0f }, color, { 0.0f, s1.y } };
+	vertices[2] = { { p1.x, p1.y, 0.0f }, color, { s1.x, s1.y } };
+	vertices[3] = { { p1.x, 0.0f, 0.0f }, color, { s1.x, 0.0f } };
 	
 	// top center
 
-	vertices[4] = { { p_x1, 0.0f, 0.0f }, color, { s_x1, 0.0f } };
-	vertices[5] = { { p_x1, p_y1, 0.0f }, color, { s_x1, s_y1 } };
-	vertices[6] = { { p_x2, p_y1, 0.0f }, color, { s_x2, s_y1 } };
-	vertices[7] = { { p_x2, 0.0f, 0.0f }, color, { s_x2, 0.0f } };
+	vertices[4] = { { p1.x, 0.0f, 0.0f }, color, { s1.x, 0.0f } };
+	vertices[5] = { { p1.x, p1.y, 0.0f }, color, { s1.x, s1.y } };
+	vertices[6] = { { p2.x, p1.y, 0.0f }, color, { s2.x, s1.y } };
+	vertices[7] = { { p2.x, 0.0f, 0.0f }, color, { s2.x, 0.0f } };
 
 	// top right
 
-	vertices[8] = { { p_x2, 0.0f, 0.0f }, color, { s_x2, 0.0f } };
-	vertices[9] = { { p_x2, p_y1, 0.0f }, color, { s_x2, s_y1 } };
-	vertices[10] = { { 1.0f, p_y1, 0.0f }, color, { 1.0f, s_y1 } };
+	vertices[8] = { { p2.x, 0.0f, 0.0f }, color, { s2.x, 0.0f } };
+	vertices[9] = { { p2.x, p1.y, 0.0f }, color, { s2.x, s1.y } };
+	vertices[10] = { { 1.0f, p1.y, 0.0f }, color, { 1.0f, s1.y } };
 	vertices[11] = { { 1.0f, 0.0f, 0.0f }, color, { 1.0f, 0.0f } };
 
 	// center left
 
-	vertices[12] = { { 0.0f, p_y1, 0.0f }, color, { 0.0f, s_y1 } };
-	vertices[13] = { { 0.0f, p_y2, 0.0f }, color, { 0.0f, s_y2 } };
-	vertices[14] = { { p_x1, p_y2, 0.0f }, color, { s_x1, s_y2 } };
-	vertices[15] = { { p_x1, p_y1, 0.0f }, color, { s_x1, s_y1 } };
+	vertices[12] = { { 0.0f, p1.y, 0.0f }, color, { 0.0f, s1.y } };
+	vertices[13] = { { 0.0f, p2.y, 0.0f }, color, { 0.0f, s2.y } };
+	vertices[14] = { { p1.x, p2.y, 0.0f }, color, { s1.x, s2.y } };
+	vertices[15] = { { p1.x, p1.y, 0.0f }, color, { s1.x, s1.y } };
 
 	// center
 
-	vertices[16] = { { p_x1, p_y1, 0.0f }, color, { s_x1, s_y1 } };
-	vertices[17] = { { p_x1, p_y2, 0.0f }, color, { s_x1, s_y2 } };
-	vertices[18] = { { p_x2, p_y2, 0.0f }, color, { s_x2, s_y2 } };
-	vertices[19] = { { p_x2, p_y1, 0.0f }, color, { s_x2, s_y1 } };
+	vertices[16] = { { p1.x, p1.y, 0.0f }, color, { s1.x, s1.y } };
+	vertices[17] = { { p1.x, p2.y, 0.0f }, color, { s1.x, s2.y } };
+	vertices[18] = { { p2.x, p2.y, 0.0f }, color, { s2.x, s2.y } };
+	vertices[19] = { { p2.x, p1.y, 0.0f }, color, { s2.x, s1.y } };
 
 	// center right
 
-	vertices[20] = { { p_x2, p_y1, 0.0f }, color, { s_x2, s_y1 } };
-	vertices[21] = { { p_x2, p_y2, 0.0f }, color, { s_x2, s_y2 } };
-	vertices[22] = { { 1.0f, p_y2, 0.0f }, color, { 1.0f, s_y2 } };
-	vertices[23] = { { 1.0f, p_y1, 0.0f }, color, { 1.0f, s_y1 } };
+	vertices[20] = { { p2.x, p1.y, 0.0f }, color, { s2.x, s1.y } };
+	vertices[21] = { { p2.x, p2.y, 0.0f }, color, { s2.x, s2.y } };
+	vertices[22] = { { 1.0f, p2.y, 0.0f }, color, { 1.0f, s2.y } };
+	vertices[23] = { { 1.0f, p1.y, 0.0f }, color, { 1.0f, s1.y } };
 
 	// bottom left
 
-	vertices[24] = { { 0.0f, p_y2, 0.0f }, color, { 0.0f, s_y2 } };
+	vertices[24] = { { 0.0f, p2.y, 0.0f }, color, { 0.0f, s2.y } };
 	vertices[25] = { { 0.0f, 1.0f, 0.0f }, color, { 0.0f, 1.0f } };
-	vertices[26] = { { p_x1, 1.0f, 0.0f }, color, { s_x1, 1.0f } };
-	vertices[27] = { { p_x1, p_y2, 0.0f }, color, { s_x1, s_y2 } };
+	vertices[26] = { { p1.x, 1.0f, 0.0f }, color, { s1.x, 1.0f } };
+	vertices[27] = { { p1.x, p2.y, 0.0f }, color, { s1.x, s2.y } };
 
 	// bottom center
 
-	vertices[28] = { { p_x1, p_y2, 0.0f }, color, { s_x1, s_y2 } };
-	vertices[29] = { { p_x1, 1.0f, 0.0f }, color, { s_x1, 1.0f } };
-	vertices[30] = { { p_x2, 1.0f, 0.0f }, color, { s_x2, 1.0f } };
-	vertices[31] = { { p_x2, p_y2, 0.0f }, color, { s_x2, s_y2 } };
+	vertices[28] = { { p1.x, p2.y, 0.0f }, color, { s1.x, s2.y } };
+	vertices[29] = { { p1.x, 1.0f, 0.0f }, color, { s1.x, 1.0f } };
+	vertices[30] = { { p2.x, 1.0f, 0.0f }, color, { s2.x, 1.0f } };
+	vertices[31] = { { p2.x, p2.y, 0.0f }, color, { s2.x, s2.y } };
 
 	// bottom right
 
-	vertices[32] = { { p_x2, p_y2, 0.0f }, color, { s_x2, s_y2 } };
-	vertices[33] = { { p_x2, 1.0f, 0.0f }, color, { s_x2, 1.0f } };
+	vertices[32] = { { p2.x, p2.y, 0.0f }, color, { s2.x, s2.y } };
+	vertices[33] = { { p2.x, 1.0f, 0.0f }, color, { s2.x, 1.0f } };
 	vertices[34] = { { 1.0f, 1.0f, 0.0f }, color, { 1.0f, 1.0f } };
-	vertices[35] = { { 1.0f, p_y2, 0.0f }, color, { 1.0f, s_y2 } };
+	vertices[35] = { { 1.0f, p2.y, 0.0f }, color, { 1.0f, s2.y } };
 
 	static const std::vector<uint32_t> indices = { 
 		0, 1, 2, 0, 2, 3,

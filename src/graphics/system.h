@@ -109,7 +109,7 @@ namespace Graphics
 
 		// sliced sprite
 		void drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
-			const TexRegion& center_region, const glm::vec2& size, std::optional<float> edgeSize = std::nullopt,
+			const TexRegion& center_region, const glm::vec2& size, std::optional<float> edge_size = std::nullopt,
 			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// sdf mesh
