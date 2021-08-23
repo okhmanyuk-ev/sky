@@ -194,7 +194,7 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	
 	applyState();
 
-	if (mBatching && vertices.size() <= 4 && !shader)
+	if (mBatching && vertices.size() <= 40 && !shader)
 	{
 		if (mBatch.topology != topology || mBatch.mode != BatchMode::Colored)
 			flush();
@@ -247,7 +247,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 
 	applyState();
 	
-	if (mBatching && vertices.size() <= 4 && !shader)
+	if (mBatching && vertices.size() <= 40 && !shader)
 	{
 		if (mBatch.topology != topology || mBatch.texture != texture || mBatch.mode != BatchMode::Textured)
 			flush();
@@ -337,6 +337,43 @@ void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& color
 	const glm::vec2& size, float rounding, bool absolute_rounding)
 {
 	drawRoundedRectangle(model, color, color, color, color, size, rounding, absolute_rounding);
+}
+
+void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4& color,
+	const glm::vec2& size, float rounding, bool absolute_rounding)
+{
+	static std::shared_ptr<Renderer::RenderTarget> target = nullptr;
+
+	if (target == nullptr)
+	{
+		target = std::make_shared<Renderer::RenderTarget>(513, 513);
+
+		push(State{});
+		pushRenderTarget(target);
+		pushViewport(target);
+		pushSampler(Renderer::Sampler::Linear);
+		pushOrthoMatrix(1.0f, 1.0f);
+		clear({ Graphics::Color::White, 0.0f });
+		drawCircle();
+		pop(5);
+	}
+
+	static Graphics::TexRegion center_region = { { glm::floor(target->getWidth() / 2.0f), glm::floor(target->getHeight() / 2.0f) }, { 1.0f, 1.0f } };
+
+	float edge_size = 0.0f;
+
+	if (absolute_rounding)
+	{
+		edge_size = rounding;
+	}
+	else
+	{
+		edge_size = (glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;
+	}
+
+	pushSampler(Renderer::Sampler::Linear);
+	drawSlicedSprite(target, model, center_region, size, edge_size, color);
+	pop();
 }
 
 void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
@@ -453,7 +490,8 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_
 }
 
 void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
-	const TexRegion& center_region, const glm::vec2& size, const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
+	const TexRegion& center_region, const glm::vec2& size, std::optional<float> edgeSize, 
+	const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	float tex_w = static_cast<float>(texture->getWidth());
 	float tex_h = static_cast<float>(texture->getHeight());
@@ -467,6 +505,16 @@ void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const 
 	float p_y1 = center_region.pos.y / size.y;
 	float p_x2 = 1.0f - ((tex_w - (center_region.pos.x + center_region.size.x)) / size.x);
 	float p_y2 = 1.0f - ((tex_h - (center_region.pos.y + center_region.size.y)) / size.y);
+
+	if (edgeSize.has_value())
+	{
+		auto edge_size = edgeSize.value();
+
+		p_x1 = edge_size / size.x;
+		p_y1 = edge_size / size.y;
+		p_x2 = (size.x - edge_size) / size.x;
+		p_y2 = (size.y - edge_size) / size.y;
+	}
 
 	static auto vertices = std::vector<Renderer::Vertex::PositionColorTexture>(36);
 

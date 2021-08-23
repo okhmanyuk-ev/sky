@@ -15,7 +15,7 @@ void SlicedSprite::draw()
 	
 	GRAPHICS->pushSampler(getSampler());
 	GRAPHICS->pushBlendMode(getBlendMode());
-	GRAPHICS->drawSlicedSprite(mTexture, model, mCenterRegion, getAbsoluteSize(), getColor());
+	GRAPHICS->drawSlicedSprite(mTexture, model, mCenterRegion, getAbsoluteSize(), std::nullopt, getColor());
 	GRAPHICS->pop(2);
 }
 

@@ -43,8 +43,25 @@ void Rectangle::draw()
 
 	if (mRounding > 0.0f)
 	{
-		GRAPHICS->drawRoundedRectangle(model, top_left_color, top_right_color, bottom_left_color, 
-			bottom_right_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
+		static auto colors = std::vector<glm::vec4>(4);
+
+		colors[0] = top_left_color;
+		colors[1] = top_right_color;
+		colors[2] = bottom_left_color;
+		colors[3] = bottom_right_color;
+
+		bool one_color = std::all_of(colors.begin() + 1, colors.end(), 
+			std::bind(std::equal_to<glm::vec4>(), std::placeholders::_1, colors.front()));
+
+		if (one_color && mSlicedSpriteOptimizationEnabled)
+		{
+			GRAPHICS->drawRoundedSlicedRectangle(model, top_left_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
+		}
+		else
+		{
+			GRAPHICS->drawRoundedRectangle(model, top_left_color, top_right_color, bottom_left_color,
+				bottom_right_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
+		}
 	}
 	else
 	{

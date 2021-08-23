@@ -84,6 +84,9 @@ namespace Graphics
 		void drawRoundedRectangle(const glm::mat4& model, const glm::vec4& color,
 			const glm::vec2& size, float rounding, bool absolute_rounding);
 
+		void drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4& color,
+			const glm::vec2& size, float rounding, bool absolute_rounding);
+
 		// colored line rectangle
 		void drawLineRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f });
 
@@ -106,8 +109,8 @@ namespace Graphics
 
 		// sliced sprite
 		void drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
-			const TexRegion& center_region, const glm::vec2& size, const glm::vec4& color = { Color::White, 1.0f },
-			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+			const TexRegion& center_region, const glm::vec2& size, std::optional<float> edgeSize = std::nullopt,
+			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// sdf mesh
 		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,

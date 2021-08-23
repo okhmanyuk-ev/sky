@@ -53,8 +53,12 @@ namespace Scene
 		auto isAbsoluteRounding() const { return mAbsoluteRounding; }
 		void setAbsoluteRounding(bool value) { mAbsoluteRounding = value; }
 
+		auto isSlicedSpriteOptimizationEnabled() const { return mSlicedSpriteOptimizationEnabled; }
+		void setSlicedSpriteOptimizationEnabled(bool value) { mSlicedSpriteOptimizationEnabled = value; }
+
 	private:
 		float mRounding = 0.0f;
 		bool mAbsoluteRounding = false;
+		bool mSlicedSpriteOptimizationEnabled = true;
 	};
 }
