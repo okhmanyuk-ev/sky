@@ -141,6 +141,7 @@ namespace Graphics
 		void push(const State& value);
 		void pop(int count = 1);
 
+		void pushCleanState();
 		void pushSampler(Renderer::Sampler value);
 		void pushBlendMode(Renderer::BlendMode value);
 		void pushDepthMode(Renderer::DepthMode value);

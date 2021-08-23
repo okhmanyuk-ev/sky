@@ -187,13 +187,16 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	{
 		auto absolute_rounding = rectangle->isAbsoluteRounding();
 		auto rounding = rectangle->getRounding();
+		auto sliced = rectangle->isSlicedSpriteOptimizationEnabled();
 
+		ImGui::Checkbox("Sliced", &sliced);
 		ImGui::Checkbox("Absolute Rounding", &absolute_rounding);
 		ImGui::SliderFloat("Rounding", &rounding, 0.0f, absolute_rounding ? 128.0f : 1.0f);
 		ImGui::Separator();
 		
 		rectangle->setAbsoluteRounding(absolute_rounding);
-		rectangle->setRounding(rounding);		
+		rectangle->setRounding(rounding);	
+		rectangle->setSlicedSpriteOptimizationEnabled(sliced);
 	}
 
 	if (auto circle = std::dynamic_pointer_cast<Scene::Circle>(node); circle != nullptr)

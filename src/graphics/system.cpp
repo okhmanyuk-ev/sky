@@ -26,7 +26,7 @@ void System::begin()
 {
 	assert(!mWorking);
 	mWorking = true;
-	mStates.push(State());
+	pushCleanState();
 	mAppliedState = std::nullopt;
 }
 
@@ -34,10 +34,10 @@ void System::end()
 {
 	assert(mWorking);
 	assert(mStates.size() == 1);
-	mWorking = false;
 	applyState();
 	flush();
-	mStates.pop();
+	pop();
+	mWorking = false;
 }
 
 void System::applyState()
@@ -324,7 +324,7 @@ void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& top_l
 	shader->setSize(size);
 	if (absolute_rounding)
 	{
-		shader->setRadius(rounding);
+		shader->setRadius(glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f));
 	}
 	else
 	{
@@ -346,9 +346,9 @@ void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4&
 
 	if (target == nullptr)
 	{
-		target = std::make_shared<Renderer::RenderTarget>(513, 513);
-
-		push(State{});
+		target = std::make_shared<Renderer::RenderTarget>(512, 512);
+		
+		pushCleanState();
 		pushRenderTarget(target);
 		pushViewport(target);
 		pushSampler(Renderer::Sampler::Linear);
@@ -358,13 +358,21 @@ void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4&
 		pop(5);
 	}
 
-	static Graphics::TexRegion center_region = { { glm::floor(target->getWidth() / 2.0f), glm::floor(target->getHeight() / 2.0f) }, { 1.0f, 1.0f } };
+	static Graphics::TexRegion center_region = { 
+		{ 
+			(target->getWidth() / 2.0f) - 1.0f, 
+			(target->getHeight() / 2.0f) - 1.0f
+		}, 
+		{ 
+			2.0f, 2.0f 
+		} 
+	};
 
 	float edge_size = 0.0f;
 
 	if (absolute_rounding)
 	{
-		edge_size = rounding;
+		edge_size = glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f);
 	}
 	else
 	{
@@ -692,6 +700,11 @@ void System::pop(int count)
 	{
 		mStates.pop();
 	}
+}
+
+void System::pushCleanState()
+{
+	push(State{});
 }
 
 void System::pushSampler(Renderer::Sampler value)
