@@ -342,26 +342,12 @@ void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& color
 void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4& color,
 	const glm::vec2& size, float rounding, bool absolute_rounding)
 {
-	static std::shared_ptr<Renderer::RenderTarget> target = nullptr;
-
-	if (target == nullptr)
-	{
-		target = std::make_shared<Renderer::RenderTarget>(512, 512);
-		
-		pushCleanState();
-		pushRenderTarget(target);
-		pushViewport(target);
-		pushSampler(Renderer::Sampler::Linear);
-		pushOrthoMatrix(1.0f, 1.0f);
-		clear({ Graphics::Color::White, 0.0f });
-		drawCircle();
-		pop(5);
-	}
+	auto circle_texture = getCircleTexture();
 
 	static Graphics::TexRegion center_region = { 
 		{ 
-			(target->getWidth() / 2.0f) - 1.0f, 
-			(target->getHeight() / 2.0f) - 1.0f
+			(circle_texture->getWidth() / 2.0f) - 1.0f, 
+			(circle_texture->getHeight() / 2.0f) - 1.0f
 		}, 
 		{ 
 			2.0f, 2.0f 
@@ -380,7 +366,7 @@ void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4&
 	}
 
 	pushSampler(Renderer::Sampler::Linear);
-	drawSlicedSprite(target, model, center_region, size, edge_size, color);
+	drawSlicedSprite(circle_texture, model, center_region, size, edge_size, color);
 	pop();
 }
 
@@ -461,6 +447,13 @@ void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm
 	}
 
 	draw(Renderer::Topology::TriangleList, vertices, model);
+}
+
+void System::drawCircleTexture(const glm::mat4& model, const glm::vec4& color)
+{
+	pushSampler(Renderer::Sampler::Linear);
+	drawSprite(getCircleTexture(), model, {}, color);
+	pop();
 }
 
 void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
@@ -829,4 +822,24 @@ std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::strin
 std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::string& name)
 {
 	return getRenderTarget(name, PLATFORM->getWidth(), PLATFORM->getHeight());
+}
+
+std::shared_ptr<Renderer::Texture> System::getCircleTexture()
+{
+	static std::shared_ptr<Renderer::RenderTarget> target = nullptr;
+
+	if (target == nullptr)
+	{
+		target = std::make_shared<Renderer::RenderTarget>(256, 256);
+
+		pushCleanState();
+		pushRenderTarget(target);
+		pushViewport(target);
+		pushOrthoMatrix(1.0f, 1.0f);
+		clear({ Graphics::Color::White, 0.0f });
+		drawCircle();
+		pop(4);
+	}
+
+	return target;
 }

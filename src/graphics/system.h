@@ -97,6 +97,8 @@ namespace Graphics
 		void drawSegmentedCircle(const glm::mat4& model = glm::mat4(1.0f), int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
 			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f);
 
+		void drawCircleTexture(const glm::mat4& model = glm::mat4(1.0f), const glm::vec4& color = { Color::White, 1.0f });
+
 		// sprite
 		void drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model = glm::mat4(1.0f), 
 			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f }, 
@@ -235,6 +237,9 @@ namespace Graphics
 	private:
 		std::map<std::string, std::shared_ptr<Renderer::RenderTarget>> mRenderTargets;
 		std::set<std::string> mUnusedRenderTargets;
+
+	private:
+		std::shared_ptr<Renderer::Texture> getCircleTexture();
 	};
 
 	inline bool operator==(const System::State& left, const System::State& right)
