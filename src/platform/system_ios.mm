@@ -270,7 +270,7 @@ void SystemIos::haptic(HapticType hapticType)
 {
     if (hapticType == HapticType::Low)
     {
-        auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLow];
+        auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
         [generator impactOccurred];
     }
     else if (hapticType == HapticType::Medium)
@@ -280,7 +280,7 @@ void SystemIos::haptic(HapticType hapticType)
     }
     else if (hapticType == HapticType::High)
     {
-        auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleHigh];
+        auto generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleHeavy];
         [generator impactOccurred];
     }
 }
