@@ -12,10 +12,10 @@ void TimestepFixer::execute(Clock::Duration dTime, Callback callback)
 		return;
 	}
 
-	if (mDeltaLimiterEnabled)
+	if (mSkipLongFrames)
 	{
-		if (dTime > mDeltaLimit)
-			dTime = mDeltaLimit;
+		if (dTime > mLongFrameDuration)
+			dTime = mLongFrameDuration;
 	}
 
 	mTimeAccumulator += dTime;

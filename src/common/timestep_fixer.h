@@ -21,11 +21,11 @@ namespace Common
 		bool getForceTimeCompletion() const { return mForceTimeCompletion; }
 		void setForceTimeCompletion(bool value) { mForceTimeCompletion = value; }
 
-		auto isDeltaLimiterEnabled() const { return mDeltaLimiterEnabled; }
-		void setDeltaLimiterEnabled(bool value) { mDeltaLimiterEnabled = value; }
+		auto isSkipLongFrames() const { return mSkipLongFrames; }
+		void setSkipLongFrames(bool value) { mSkipLongFrames = value; }
 
-		auto getDeltaLimit() const { return mDeltaLimit; }
-		void setDeltaLimit(Clock::Duration value) { mDeltaLimit = value; }
+		auto getLongFrameDuration() const { return mLongFrameDuration; }
+		void setLongFrameDuration(Clock::Duration value) { mLongFrameDuration = value; }
 
 		bool isEnabled() const { return mEnabled; }
 		void setEnabled(bool value) { mEnabled = value; }
@@ -33,8 +33,8 @@ namespace Common
 	private:
 		Clock::Duration mTimestep = Clock::FromSeconds(1.0f / 120.0f);
 		bool mForceTimeCompletion = true;
-		bool mDeltaLimiterEnabled = false; // avoid very long executes
-		Clock::Duration mDeltaLimit = Clock::FromSeconds(1.0f);
+		bool mSkipLongFrames = false;
+		Clock::Duration mLongFrameDuration = Clock::FromSeconds(1.0f);
 		bool mEnabled = true;
 
 	private:

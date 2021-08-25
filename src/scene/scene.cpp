@@ -6,8 +6,8 @@ Scene::Scene::Scene()
 	mRoot->setScene(this);
 
 	mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / 120.0f));
-	mTimestepFixer.setForceTimeCompletion(false);
-	mTimestepFixer.setDeltaLimiterEnabled(true);
+	mTimestepFixer.setForceTimeCompletion(true);
+	mTimestepFixer.setSkipLongFrames(true);
 }
 
 Scene::Scene::~Scene()
