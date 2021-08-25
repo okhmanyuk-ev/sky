@@ -10,13 +10,13 @@ namespace Scene
 	class Emitter : public Node
 	{
 	public:
+		using CreateParticleCallback = std::function<std::shared_ptr<Node>()>;
+
+	public:
 		Emitter();
 
 	public:
 		void emit(int count = 1);
-
-	protected:
-		virtual std::shared_ptr<Node> createParticle() = 0;
 
 	public:
 		void setHolder(std::weak_ptr<Node> value) { mHolder = value; }
@@ -31,6 +31,7 @@ namespace Scene
 		void setMaxDelay(float value) { mMaxDelay = value; }
 
 		void setDelay(float value) { setMinDelay(value); setMaxDelay(value); }
+		void setSpawnrate(float value) { setDelay(1.0f / value); }
 
 		auto getBeginScale() const { return mBeginScale; }
 		void setBeginScale(const glm::vec2& value) { mBeginScale = value; }
@@ -49,9 +50,6 @@ namespace Scene
 
 		void setDuration(float value) { setMinDuration(value); setMaxDuration(value); }
 
-		auto getBeginColor() const { return mBeginColor; }
-		void setBeginColor(const glm::vec4& value) { mBeginColor = value; }
-
 		auto getEndColor() const { return mEndColor; }
 		void setEndColor(const glm::vec4& value) { mEndColor = value; }
 
@@ -63,6 +61,8 @@ namespace Scene
 
 		void setDirection(const glm::vec2& value) { setMinDirection(value); setMaxDirection(value); }
 
+		void setCreateParticleCallback(CreateParticleCallback value) { mCreateParticleCallback = value; }
+
 	private:
 		std::weak_ptr<Node> mHolder;
 		bool mRunning = true;
@@ -73,39 +73,9 @@ namespace Scene
 		float mDistance = 32.0f;
 		float mMinDuration = 1.0f;
 		float mMaxDuration = 1.0f;
-		glm::vec4 mBeginColor = { Graphics::Color::White, 1.0f };
 		glm::vec4 mEndColor = { Graphics::Color::White, 0.0f };
 		glm::vec2 mMinDirection = { -1.0f, -1.0f };
 		glm::vec2 mMaxDirection = { 1.0f, 1.0f };
-	};
-
-	class SpriteEmitter : public Emitter, public Blend, public Sampler
-	{
-	protected:
-		std::shared_ptr<Node> createParticle() override;
-
-	public:
-		auto getTexture() const { return mTexture; }
-		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexture = value; }
-
-	private:
-		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
-	};
-
-	class RectangleEmitter : public Emitter
-	{
-	protected:
-		std::shared_ptr<Node> createParticle() override;
-
-	public:
-		auto getRounding() const { return mRounding; }
-		void setRounding(float value) { mRounding = value; }
-
-		auto getBeginSize() const { return mBeginSize; }
-		void setBeginSize(const glm::vec2& value) { mBeginSize = value; }
-
-	private:
-		float mRounding = 0.0f;
-		glm::vec2 mBeginSize = { 8.0f, 8.0f };
+		CreateParticleCallback mCreateParticleCallback = nullptr;
 	};
 }
