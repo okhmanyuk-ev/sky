@@ -44,12 +44,10 @@ void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_text
 		GRAPHICS->pop(2);
 	}
 	{
-		mDefaultShader->setColor(glm::vec4(mGlowIntensity));
-		
 		GRAPHICS->pushRenderTarget(render_texture);
 		GRAPHICS->pushViewport(render_texture);
 	//	GRAPHICS->clear(); // uncomment to get only blur effect
-		GRAPHICS->drawSprite(target1, mDefaultShader);
+		GRAPHICS->drawSprite(target1, glm::mat4(1.0f), {}, glm::vec4(mGlowIntensity));
 		GRAPHICS->pop(2);
 	}
 
