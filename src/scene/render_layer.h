@@ -9,11 +9,10 @@
 
 namespace Scene
 {
-	template <typename T> class RenderLayer : public T, public Color
+	template <typename T> class RenderLayer : public T
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
-		static_assert(!std::is_base_of<Color, T>::value, "T must NOT be derived from Color");
-
+		
 	protected:
 		void enterDraw() override
 		{
@@ -21,7 +20,6 @@ namespace Scene
 
 			// https://stackoverflow.com/questions/2171085/opengl-blending-with-previous-contents-of-framebuffer
 			// http://www.shawnhargreaves.com/blog/premultiplied-alpha-and-image-composition.html
-
 
 			auto target = GRAPHICS->getRenderTarget(fmt::format("renderlayer_{}", (void*)this));
 
@@ -40,7 +38,7 @@ namespace Scene
 			if (mPostprocessEnabled)
 				postprocess(target);
 
-			auto color = getColor() * glm::vec4({ glm::vec3(getAlpha()), 1.0f });
+			auto color = getRenderLayerColor()->getColor() * glm::vec4({ glm::vec3(getRenderLayerColor()->getAlpha()), 1.0f });
 
 			GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
 			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
@@ -56,7 +54,10 @@ namespace Scene
 		bool isPostprocessEnabled() const { return mPostprocessEnabled; }
 		void setPostprocessEnabled(bool value) { mPostprocessEnabled = value; }
 
+		auto getRenderLayerColor() const { return mRenderLayerColor; }
+
 	private:
 		bool mPostprocessEnabled = true;
+		std::shared_ptr<Color> mRenderLayerColor = std::make_shared<Color>();
 	};
 }
