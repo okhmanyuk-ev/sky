@@ -25,8 +25,11 @@ namespace Shared
 		void highlightNodeUnderCursor();
 		void highlightHoveredNode();
 		void highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color = Graphics::Color::White, bool filled = true);
-		void drawImage(const std::shared_ptr<Renderer::Texture>& texture, const Graphics::TexRegion& region = {});
 		void showBatchGroupsMenu();
+		
+	public:
+		static void drawImage(std::shared_ptr<Renderer::Texture> texture, std::optional<Graphics::TexRegion> region = std::nullopt,
+			float max_size = 256.0f);
 		
 	public:
 		bool isEnabled() const { return mEnabled; }
@@ -38,9 +41,6 @@ namespace Shared
 		Scene::Scene& mScene;
 		Scene::Scene::BatchGroups mBatchGroups;
 		glm::vec2 mMousePos = { 0.0f, 0.0f };
-		std::shared_ptr<Renderer::Texture> mSpriteTexture = nullptr;
-		std::shared_ptr<Renderer::Texture> mEditorSpriteTexture = nullptr;
-		std::shared_ptr<Renderer::Texture> mEditorFontTexture = nullptr;
 		std::shared_ptr<Scene::Node> mHoveredNode = nullptr;
 		int mSelectedNode = 0;
 		bool mNodeSelectingMode = false;

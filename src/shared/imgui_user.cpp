@@ -138,5 +138,8 @@ namespace ImGui::User
         return PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
     }
 
-
+	ImTextureID GetImTextureID(std::shared_ptr<Renderer::Texture> texture)
+	{
+		return (ImTextureID)(new std::shared_ptr<Renderer::Texture>(texture)); // TODO: memory leak here
+	}
 }

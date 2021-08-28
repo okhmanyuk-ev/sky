@@ -68,7 +68,6 @@ namespace Shared
 		void onEvent(const Platform::Input::Touch::Event& e) override;
 
 	private:
-		std::shared_ptr<Renderer::Texture> mTexture;
 		std::set<int> mReleasedKeyboardKeys;
 		std::set<int> mReleasedMouseButtons;
 		glm::vec2 mMousePos;

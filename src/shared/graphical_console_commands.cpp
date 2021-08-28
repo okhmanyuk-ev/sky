@@ -1,6 +1,7 @@
 #include "graphical_console_commands.h"
 #include "platform/system_windows.h"
 #include <shared/imgui_system.h>
+#include <shared/scene_editor.h>
 
 using namespace Shared;
 
@@ -43,6 +44,10 @@ void GraphicalConsoleCommands::onFrame()
 		for (const auto& [name, target] : GRAPHICS->getRenderTargets())
 		{
 			ImGui::Text(name.c_str());
+			ImGui::Text("%dx%d", target->getWidth(), target->getHeight());
+			auto width = ImGui::GetContentRegionAvailWidth();
+			SceneEditor::drawImage(target, std::nullopt, width);
+			ImGui::Separator();
 		}
 		ImGui::End();
 	}

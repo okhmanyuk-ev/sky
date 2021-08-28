@@ -3,6 +3,8 @@
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
 #include <imgui.h>
+#include <renderer/texture.h>
+#include <memory>
 
 namespace ImGui::User
 {
@@ -38,4 +40,5 @@ namespace ImGui::User
     float GetSafeAreaBottom();
     float GetSafeAreaLeft();
     float GetSafeAreaRight();
+	ImTextureID GetImTextureID(std::shared_ptr<Renderer::Texture> texture);
 }

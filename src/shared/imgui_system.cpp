@@ -4,6 +4,7 @@
 #include <platform/system.h>
 #include <graphics/color.h>
 #include <renderer/texture.h>
+#include <shared/imgui_user.h>
 
 using namespace Shared;
 
@@ -126,7 +127,7 @@ void ImguiSystem::end()
 			}
 			else
 			{
-				RENDERER->setTexture(*static_cast<std::shared_ptr<Renderer::Texture>*>(cmd.TextureId));
+				RENDERER->setTexture(*(std::shared_ptr<Renderer::Texture>*)cmd.TextureId);
 				RENDERER->setScissor({ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });
 				RENDERER->drawIndexed(cmd.ElemCount, indexOffset);
 			}
@@ -147,8 +148,7 @@ void ImguiSystem::ensureFont()
 	int32_t height;
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
-	mTexture = std::make_shared<Renderer::Texture>(width, height, 4, data);
-	io.Fonts->TexID = &mTexture;
+	io.Fonts->TexID = ImGui::User::GetImTextureID(std::make_shared<Renderer::Texture>(width, height, 4, data));
 }
 
 void ImguiSystem::onEvent(const Platform::Input::Touch::Event& e)

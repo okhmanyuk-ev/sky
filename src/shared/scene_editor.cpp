@@ -2,6 +2,7 @@
 #include <imgui.h>
 #include <console/system.h>
 #include <common/console_commands.h>
+#include <shared/imgui_user.h>
 
 using namespace Shared;
 
@@ -48,16 +49,13 @@ void SceneEditor::onFrame()
 	{
 		showBatchGroupsMenu();
 	}
+	else if (mNodeSelectingMode)
+	{
+		highlightNodeUnderCursor();
+	}
 	else
 	{
-		if (mNodeSelectingMode)
-		{
-			highlightNodeUnderCursor();
-		}
-		else
-		{
-			highlightHoveredNode();
-		}
+		highlightHoveredNode();
 	}
 }
 
@@ -153,8 +151,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		if (auto texture = label->getFont()->getTexture(); texture != nullptr)
 		{
 			ImGui::Text("%dx%d", texture->getWidth(), texture->getHeight());
-			mEditorFontTexture = texture;
-			drawImage(mEditorFontTexture);
+			drawImage(texture);
 			ImGui::Separator();
 		}
 	}
@@ -167,9 +164,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 		glm::i32vec2 texture_size = { texture->getWidth(), texture->getHeight() };
 		ImGui::InputInt2("Resolution", (int*)&texture_size, ImGuiInputTextFlags_ReadOnly);
-
-		mEditorSpriteTexture = texture;
-		drawImage(mEditorSpriteTexture, region);
+		drawImage(texture, region);
 		ImGui::Separator();
 	};
 
@@ -292,10 +287,8 @@ void SceneEditor::showTooltip(std::shared_ptr<Scene::Node> node)
 		if (texture == nullptr)
 			return;
 
-		mSpriteTexture = texture;
-
 		ImGui::BeginTooltip();
-		drawImage(mSpriteTexture, sprite->getTexRegion());
+		drawImage(texture, sprite->getTexRegion());
 		ImGui::EndTooltip();
 	}
 	else if (auto label = std::dynamic_pointer_cast<Scene::Label>(node); label != nullptr)
@@ -379,17 +372,15 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::ve
 	GRAPHICS->end();
 }
 
-void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture, const Graphics::TexRegion& region)
+void SceneEditor::drawImage(std::shared_ptr<Renderer::Texture> texture, std::optional<Graphics::TexRegion> region, float max_size)
 {
 	glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
-
-	const float MaxSize = 256.0f;
 
 	auto max = glm::max(size.x, size.y);
 	float scale = 1.0f;
 
-	if (max > MaxSize)
-		scale = MaxSize / max;
+	if (max > max_size)
+		scale = max_size / max;
 		
 	size *= scale;
 
@@ -397,9 +388,9 @@ void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture, c
 
 	auto prev_cursor_pos = ImGui::GetCursorPos();
 
-	ImGui::Image((ImTextureID)&texture, ImVec2(size.x, size.y));
+	ImGui::Image(ImGui::User::GetImTextureID(texture), ImVec2(size.x, size.y));
 	
-	if (region.size.x > 0.0f && region.size.y > 0.0f)
+	if (region.has_value() && region.value().size.x > 0.0f && region.value().size.y > 0.0f)
 	{
 		auto new_cursor_pos = ImGui::GetCursorPos();
 
@@ -407,8 +398,8 @@ void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture, c
 
 		auto drawList = ImGui::GetWindowDrawList();
 
-		auto region_pos = region.pos * scale;
-		auto region_size = region.size * scale;
+		auto region_pos = region.value().pos * scale;
+		auto region_size = region.value().size * scale;
 
 		auto p = ImGui::GetCursorScreenPos();
 		auto p1 = ImVec2(p.x + region_pos.x, p.y + region_pos.y);
@@ -438,7 +429,7 @@ void SceneEditor::drawImage(const std::shared_ptr<Renderer::Texture>& texture, c
 		auto uv1 = ImVec2((region_x + region_sz) / size.x, (region_y + region_sz) / size.y);
 
 		ImGui::BeginTooltip();
-		ImGui::Image((ImTextureID)&texture, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
+		ImGui::Image(ImGui::User::GetImTextureID(texture), ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
 		ImGui::EndTooltip();
 	}
 }
