@@ -45,7 +45,6 @@ void Emitter::emit(int count)
 
 	auto particle = mCreateParticleCallback();
 	particle->setPosition(holder->unproject(project(getAbsoluteSize() * glm::linearRand(glm::vec2(0.0f), glm::vec2(1.0f)))));
-	particle->setScale(mBeginScale);
 	particle->setPivot(0.5f);
 	particle->setRotation(glm::radians(glm::linearRand(0.0f, 360.0f)));
 

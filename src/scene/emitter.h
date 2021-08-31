@@ -33,9 +33,6 @@ namespace Scene
 		void setDelay(float value) { setMinDelay(value); setMaxDelay(value); }
 		void setSpawnrate(float value) { setDelay(1.0f / value); }
 
-		auto getBeginScale() const { return mBeginScale; }
-		void setBeginScale(const glm::vec2& value) { mBeginScale = value; }
-
 		auto getEndScale() const { return mEndScale; }
 		void setEndScale(const glm::vec2& value) { mEndScale = value; }
 
@@ -68,7 +65,6 @@ namespace Scene
 		bool mRunning = true;
 		float mMinDelay = 0.5f;
 		float mMaxDelay = 0.5f;
-		glm::vec2 mBeginScale = { 1.0f, 1.0f };
 		glm::vec2 mEndScale = { 0.0f, 0.0f };
 		float mDistance = 32.0f;
 		float mMinDuration = 1.0f;
