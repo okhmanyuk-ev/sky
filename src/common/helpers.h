@@ -37,5 +37,6 @@ namespace Common::Helpers
 	nlohmann::json LoadJsonFromAsset(const Platform::Asset& asset);
 	nlohmann::json LoadBsonFromAsset(const Platform::Asset& asset);
 
-	float SmoothValueAssign(float src, float dst, Clock::Duration dTime);
+	float SmoothValueAssign(float src, float dst, Clock::Duration dTime, float friction = 0.1f);
+	glm::vec2 SmoothValueAssign(const glm::vec2& src, const glm::vec2& dst, Clock::Duration dTime, float friction = 0.1f);
 }

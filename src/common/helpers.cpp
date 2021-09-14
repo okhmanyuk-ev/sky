@@ -119,10 +119,17 @@ nlohmann::json Helpers::LoadBsonFromAsset(const Platform::Asset& asset)
 	return nlohmann::json::from_bson(std::string((char*)asset.getMemory(), asset.getSize()));
 }
 
-float Helpers::SmoothValueAssign(float src, float dst, Clock::Duration dTime)
+float Helpers::SmoothValueAssign(float src, float dst, Clock::Duration dTime, float friction)
 {
-	auto delta = dst - src;
-	auto _dTime = Clock::ToSeconds(dTime);
-	const float speed = 10.0f;
-	return src + (delta * _dTime * speed);
+	auto distance = dst - src;
+	auto delta = Clock::ToSeconds(dTime) * 100.0f;
+	return src + (distance * delta * friction);
+}
+
+glm::vec2 Helpers::SmoothValueAssign(const glm::vec2& src, const glm::vec2& dst, Clock::Duration dTime, float friction)
+{
+	return {
+		SmoothValueAssign(src.x, dst.x, dTime, friction),
+		SmoothValueAssign(src.y, dst.y, dTime, friction)
+	};
 }
