@@ -118,3 +118,11 @@ nlohmann::json Helpers::LoadBsonFromAsset(const Platform::Asset& asset)
 {
 	return nlohmann::json::from_bson(std::string((char*)asset.getMemory(), asset.getSize()));
 }
+
+float Helpers::SmoothValueAssign(float src, float dst, Clock::Duration dTime)
+{
+	auto delta = dst - src;
+	auto _dTime = Clock::ToSeconds(dTime);
+	const float speed = 10.0f;
+	return src + (delta * _dTime * speed);
+}

@@ -7,6 +7,7 @@
 
 #include <nlohmann/json.hpp>
 #include <platform/asset.h>
+#include <core/clock.h>
 
 namespace Common::Helpers
 {
@@ -35,4 +36,6 @@ namespace Common::Helpers
 
 	nlohmann::json LoadJsonFromAsset(const Platform::Asset& asset);
 	nlohmann::json LoadBsonFromAsset(const Platform::Asset& asset);
+
+	float SmoothValueAssign(float src, float dst, Clock::Duration dTime);
 }
