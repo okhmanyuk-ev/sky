@@ -1,5 +1,6 @@
 #include "scrollbox.h"
-#include "console/device.h"
+#include <console/device.h>
+#include <common/helpers.h>
 
 using namespace Scene;
 
@@ -32,10 +33,8 @@ void Scrollbox::update(Clock::Duration dTime)
 	if (glm::isnan(speed.y))
 		speed.y = 0.0f;
 
-	auto delta = Clock::ToSeconds(dTime) * 100.0f;
-
 	if (!isTouching())
-		speed *= delta;
+		speed *= Clock::ToSeconds(dTime) * 100.0f;
 
 	mScrollPosition += speed;
 
@@ -46,7 +45,7 @@ void Scrollbox::update(Clock::Duration dTime)
 		mScrollPosition.y = mScrollOrigin.y;
 
 	if (mInertiaEnabled && !isTouching())
-		mSpeed *= 1.0f - (mInertiaFriction * delta);
+		mSpeed = Common::Helpers::SmoothValueAssign(mSpeed, { 0.0f, 0.0f }, dTime, mInertiaFriction);
 	else
 		mSpeed = { 0.0f, 0.0f };
 
