@@ -281,8 +281,9 @@ void ImScene::Label::draw(Node& node)
 	glm::vec4 outline_color = { Graphics::Color::White, 1.0f };
 
 	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
-	GRAPHICS->drawString(*mFont, mesh, model, mFontSize, color, outline_thickness, outline_color);
-	GRAPHICS->pop();
+	GRAPHICS->pushModelMatrix(model);
+	GRAPHICS->drawString(*mFont, mesh, mFontSize, color, outline_thickness, outline_color);
+	GRAPHICS->pop(2);
 }
 
 // Rectangle
@@ -305,7 +306,9 @@ void ImScene::Rectangle::draw(Node& node)
 	};
 
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
-	GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices, model);
+	GRAPHICS->pushModelMatrix(model);
+	GRAPHICS->draw(Renderer::Topology::TriangleList, vertices, indices);
+	GRAPHICS->pop();
 }
 
 // Sprite
@@ -348,8 +351,9 @@ void ImScene::Sprite::draw(Node& node)
 	//GRAPHICS->pushSampler(getSampler());
 	//GRAPHICS->pushBlendMode(getBlendMode());
 	//GRAPHICS->pushTextureAddress(mTextureAddress);
-	GRAPHICS->drawSprite(mTexture, model, mRegion/*, getColor()*/);
-	//GRAPHICS->pop(3);
+	GRAPHICS->pushModelMatrix(model);
+	GRAPHICS->drawSprite(mTexture, mRegion/*, getColor()*/);
+	GRAPHICS->pop();
 }
 
 // Circle
@@ -382,6 +386,7 @@ void ImScene::Circle::draw(Node& node)
 	auto inner_color = mColor;
 	auto outer_color = mColor;
 	//GRAPHICS->pushBlendMode(getBlendMode());
-	GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mPie);
-	//GRAPHICS->pop();
+	GRAPHICS->pushModelMatrix(model);
+	GRAPHICS->drawCircle(inner_color, outer_color, mFill, mPie);
+	GRAPHICS->pop();
 }

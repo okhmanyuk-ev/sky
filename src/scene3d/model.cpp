@@ -25,7 +25,9 @@ void Model::draw(Driver& driver)
 		std::iota(mIndices.begin(), mIndices.end(), 0);
 	}
 
-	GRAPHICS->drawGeneric(mTopology, mVertices.value(), mIndices, getTransform(), shader, mTexture);
+	GRAPHICS->pushModelMatrix(getTransform());
+	GRAPHICS->drawGeneric(mTopology, mVertices.value(), mIndices, shader, mTexture);
+	GRAPHICS->pop();
 }
 
 std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>> Model::generateVertices()

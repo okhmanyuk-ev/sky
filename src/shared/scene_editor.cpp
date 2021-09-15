@@ -363,12 +363,13 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::ve
 
 	GRAPHICS->begin();
 	GRAPHICS->pushOrthoMatrix();
+	GRAPHICS->pushModelMatrix(model);
 	if (filled)
 	{
-		GRAPHICS->drawRectangle(model, { color, 0.25f });
+		GRAPHICS->drawRectangle({ color, 0.25f });
 	}
-	GRAPHICS->drawLineRectangle(model, { color, 1.0f });
-	GRAPHICS->pop();
+	GRAPHICS->drawLineRectangle({ color, 1.0f });
+	GRAPHICS->pop(2);
 	GRAPHICS->end();
 }
 

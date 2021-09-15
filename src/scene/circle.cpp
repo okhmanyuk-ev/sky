@@ -30,15 +30,16 @@ void Circle::draw()
 	auto inner_color = mInnerColor * color;
 	auto outer_color = mOuterColor * color;
 	GRAPHICS->pushBlendMode(getBlendMode());
+	GRAPHICS->pushModelMatrix(model);
 	if (inner_color == outer_color && mFill == 1.0f && mPie == 1.0f)
 	{
-		GRAPHICS->drawCircleTexture(model, inner_color);
+		GRAPHICS->drawCircleTexture(inner_color);
 	}
 	else
 	{
-		GRAPHICS->drawCircle(model, inner_color, outer_color, mFill, mPie);
+		GRAPHICS->drawCircle(inner_color, outer_color, mFill, mPie);
 	}
-	GRAPHICS->pop();
+	GRAPHICS->pop(2);
 }
 
 void SegmentedCircle::draw()
@@ -53,6 +54,7 @@ void SegmentedCircle::draw()
 	auto inner_color = mInnerColor * color;
 	auto outer_color = mOuterColor * color;
 	GRAPHICS->pushBlendMode(getBlendMode());
-	GRAPHICS->drawSegmentedCircle(model, mSegments, inner_color, outer_color, mFill);
-	GRAPHICS->pop();
+	GRAPHICS->pushModelMatrix(model);
+	GRAPHICS->drawSegmentedCircle(mSegments, inner_color, outer_color, mFill);
+	GRAPHICS->pop(2);
 }

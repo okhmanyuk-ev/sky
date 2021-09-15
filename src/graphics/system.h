@@ -43,102 +43,88 @@ namespace Graphics
 		// generic
 		// TODO: hidden overload conflict when name "draw"
 		void drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices,
-			const Renderer::Buffer& indices, const glm::mat4& model,
-			std::shared_ptr<Renderer::ShaderMatrices> shader,
+			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 			std::optional<std::shared_ptr<Renderer::Texture>> texture = std::nullopt);
 
 		// draw colored vertices
-		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
-			const glm::mat4& model = glm::mat4(1.0f));
+		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices);
 
 		// draw indexed colored vertices
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
-			const std::vector<uint32_t>& indices, const glm::mat4& model = glm::mat4(1.0f),
-			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+			const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw colored and textured vertices
 		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
-			const glm::mat4& model = glm::mat4(1.0f),
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw indexed colored and textured vertices
 		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, 
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
-			const std::vector<uint32_t>& indices, const glm::mat4& model = glm::mat4(1.0f),
-			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+			const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 		
 		// colored rectangle
-		void drawRectangle(const glm::mat4& model, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+		void drawRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color,
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
-		void drawRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f },
+		void drawRectangle(const glm::vec4& color = { Color::White, 1.0f },
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
-
-		void drawRectangle(const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader);
 
 		void drawRectangle(std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// rounded rectangle
-		void drawRoundedRectangle(const glm::mat4& model, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+		void drawRoundedRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding);
 
-		void drawRoundedRectangle(const glm::mat4& model, const glm::vec4& color,
-			const glm::vec2& size, float rounding, bool absolute_rounding);
+		void drawRoundedRectangle(const glm::vec4& color, const glm::vec2& size, float rounding, bool absolute_rounding);
 
-		void drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4& color,
-			const glm::vec2& size, float rounding, bool absolute_rounding);
+		void drawRoundedSlicedRectangle(const glm::vec4& color, const glm::vec2& size, float rounding, bool absolute_rounding);
 
 		// colored line rectangle
-		void drawLineRectangle(const glm::mat4& model, const glm::vec4& color = { Color::White, 1.0f });
+		void drawLineRectangle(const glm::vec4& color = { Color::White, 1.0f });
 
 		// circle
-		void drawCircle(const glm::mat4& model = glm::mat4(1.0f), const glm::vec4& inner_color = { Color::White, 1.0f },
+		void drawCircle(const glm::vec4& inner_color = { Color::White, 1.0f },
 			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f, float pie = 1.0f);
 
-		void drawSegmentedCircle(const glm::mat4& model = glm::mat4(1.0f), int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
+		void drawSegmentedCircle(int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
 			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f);
 
-		void drawCircleTexture(const glm::mat4& model = glm::mat4(1.0f), const glm::vec4& color = { Color::White, 1.0f });
+		void drawCircleTexture(const glm::vec4& color = { Color::White, 1.0f });
 
 		// sprite
-		void drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model = glm::mat4(1.0f), 
+		void drawSprite(std::shared_ptr<Renderer::Texture> texture, 
 			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f }, 
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
-
-		void drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
-			std::shared_ptr<Renderer::ShaderMatrices> shader);
 
 		void drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader);
 
 		// sliced sprite
-		void drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
-			const TexRegion& center_region, const glm::vec2& size, std::optional<float> edge_size = std::nullopt,
+		void drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const TexRegion& center_region, 
+			const glm::vec2& size, std::optional<float> edge_size = std::nullopt,
 			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// sdf mesh
 		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
-			float smoothFactor, const glm::mat4& model,
-			const glm::vec4& color = { Graphics::Color::White, 1.0f });
+			float smoothFactor, const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
 		// text
-		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, 
-			float minValue, float maxValue, float smoothFactor, 
-			const glm::vec4& color = { Graphics::Color::White, 1.0f });
+		void drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 
+			float smoothFactor, const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
-		void drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size, 
+		void drawString(const Font& font, const TextMesh& mesh, float size, 
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
 		
-		void drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
+		void drawString(const Font& font, const utf8_string& text, float size,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
 
 	private:
-		glm::vec3 project(const glm::vec3& pos, const glm::mat4& model);
+		glm::vec3 project(const glm::vec3& pos);
 		void pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size);
 		
 	public:
@@ -157,6 +143,7 @@ namespace Graphics
 		void pushScissor(std::optional<Renderer::Scissor> value);
 		void pushViewMatrix(const glm::mat4& value);
 		void pushProjectionMatrix(const glm::mat4& value);
+		void pushModelMatrix(const glm::mat4& value);
 		void pushTextureAddress(Renderer::TextureAddress value);
 		void pushOrthoMatrix(float width, float height);
 		void pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
@@ -169,6 +156,7 @@ namespace Graphics
 		{
 			glm::mat4 projectionMatrix = glm::mat4(1.0f);
 			glm::mat4 viewMatrix = glm::mat4(1.0f);
+			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			std::shared_ptr<Renderer::RenderTarget> renderTarget = nullptr;
 			std::optional<Renderer::Scissor> scissor = std::nullopt;
 			Renderer::Viewport viewport = Renderer::Viewport();
@@ -253,6 +241,7 @@ namespace Graphics
 		return
 			left.projectionMatrix == right.projectionMatrix &&
 			left.viewMatrix == right.viewMatrix &&
+		//	left.modelMatrix == right.modelMatrix && // we should not compare model matrix for fine batching
 			left.renderTarget == right.renderTarget &&
 			left.scissor == right.scissor &&
 			left.viewport == right.viewport &&

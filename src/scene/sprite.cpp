@@ -19,8 +19,9 @@ void Sprite::draw()
 	GRAPHICS->pushSampler(getSampler());
 	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->pushTextureAddress(mTextureAddress);
-	GRAPHICS->drawSprite(mTexture, model, mTexRegion, getColor(), mShader);
-	GRAPHICS->pop(3);
+	GRAPHICS->pushModelMatrix(model);
+	GRAPHICS->drawSprite(mTexture, mTexRegion, getColor(), mShader);
+	GRAPHICS->pop(4);
 }
 
 void Sprite::update(Clock::Duration dTime)

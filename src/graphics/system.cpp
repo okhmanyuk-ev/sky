@@ -53,11 +53,11 @@ void System::applyState()
 
 	const auto& state = mStates.top();
 
-	if (mAppliedState.has_value() && state == mAppliedState.value())
+	if (mAppliedState.has_value() && mAppliedState.value() == state)
 		return;
-
+	
 	flush();
-
+	
 	bool scissorChanged = true;
 	bool renderTargetChanged = true;
 	bool depthModeChanged = true;
@@ -70,19 +70,21 @@ void System::applyState()
 
 	if (mAppliedState.has_value())
 	{
-		if (mAppliedState->scissor.has_value() && state.scissor.has_value())
-			scissorChanged = mAppliedState->scissor.value() != state.scissor.value();
-		else if (!mAppliedState->scissor.has_value() && !state.scissor.has_value())
+		const auto& applied_state = mAppliedState.value();
+
+		if (applied_state.scissor.has_value() && state.scissor.has_value())
+			scissorChanged = applied_state.scissor.value() != state.scissor.value();
+		else if (!applied_state.scissor.has_value() && !state.scissor.has_value())
 			scissorChanged = false;
 
-		renderTargetChanged = mAppliedState->renderTarget != state.renderTarget;
-		depthModeChanged = mAppliedState->depthMode != state.depthMode;
-		cullModeChanged = mAppliedState->cullMode != state.cullMode;
-		viewportChanged = mAppliedState->viewport != state.viewport;
-		blendModeChanged = mAppliedState->blendMode != state.blendMode;
-		samplerChanged = mAppliedState->sampler != state.sampler;
-		textureAddressChanged = mAppliedState->textureAddress != state.textureAddress;
-		stencilChanged = mAppliedState->stencilMode != state.stencilMode;
+		renderTargetChanged = applied_state.renderTarget != state.renderTarget;
+		viewportChanged = applied_state.viewport != state.viewport;
+		depthModeChanged = applied_state.depthMode != state.depthMode;
+		cullModeChanged = applied_state.cullMode != state.cullMode;
+		blendModeChanged = applied_state.blendMode != state.blendMode;
+		samplerChanged = applied_state.sampler != state.sampler;
+		textureAddressChanged = applied_state.textureAddress != state.textureAddress;
+		stencilChanged = applied_state.stencilMode != state.stencilMode;
 	}
 
 	if (scissorChanged)
@@ -133,9 +135,13 @@ void System::flush()
 	auto shader_matrices = std::dynamic_pointer_cast<Renderer::ShaderMatrices>(mBatch.shader);
 	assert(shader_matrices);
 
-	shader_matrices->setProjectionMatrix(glm::orthoLH(0.0f, state.viewport.size.x / scale, state.viewport.size.y / scale, 0.0f, -1.0f, 1.0f));
-	shader_matrices->setViewMatrix(glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
-	shader_matrices->setModelMatrix(glm::mat4(1.0f));
+	auto view = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	auto projection = glm::orthoLH(0.0f, state.viewport.size.x / scale, state.viewport.size.y / scale, 0.0f, -1.0f, 1.0f);
+	auto model = glm::mat4(1.0f);
+
+	shader_matrices->setProjectionMatrix(projection);
+	shader_matrices->setViewMatrix(view);
+	shader_matrices->setModelMatrix(model);
 
 	RENDERER->setShader(mBatch.shader);
 	RENDERER->setTexture(mBatch.texture.value_or(nullptr));
@@ -163,8 +169,8 @@ void System::clearStencil()
 	RENDERER->clearStencil();
 }
 
-void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices, const Renderer::Buffer& indices,
-	const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader,
+void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices, 
+	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 	std::optional<std::shared_ptr<Renderer::Texture>> texture)
 {
 	assert(shader);
@@ -176,7 +182,7 @@ void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& ve
 
 	shader->setProjectionMatrix(state.projectionMatrix);
 	shader->setViewMatrix(state.viewMatrix);
-	shader->setModelMatrix(model);
+	shader->setModelMatrix(state.modelMatrix);
 
 	RENDERER->setTexture(texture.value_or(nullptr));
 	RENDERER->setTopology(topology);
@@ -186,16 +192,15 @@ void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& ve
 	RENDERER->drawIndexed(indices.size / indices.stride);
 }
 
-void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
-	const glm::mat4& model)
+void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices)
 {
 	auto indices = std::vector<uint32_t>(vertices.size());
 	std::iota(indices.begin(), indices.end(), 0);
-	draw(topology, vertices, indices, model);
+	draw(topology, vertices, indices);
 }
 
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
-	const std::vector<uint32_t>& indices, const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
+	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
 	
@@ -221,7 +226,7 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 		for (const auto& src_vertex : vertices)
 		{
 			auto& dst_vertex = mBatch.vertices.at(start_vertex);
-			dst_vertex.pos = project(src_vertex.pos, model);
+			dst_vertex.pos = project(src_vertex.pos);
 			dst_vertex.col = src_vertex.col;
 			start_vertex += 1;
 		}
@@ -233,21 +238,21 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 		if (!shader)
 			shader = mColoredShader;
 
-		drawGeneric(topology, vertices, indices, model, shader);
+		drawGeneric(topology, vertices, indices, shader);
 	}
 }
 
 void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
-	const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
+	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	auto indices = std::vector<uint32_t>(vertices.size());
 	std::iota(indices.begin(), indices.end(), 0);
-	draw(topology, texture, vertices, indices, model, shader);
+	draw(topology, texture, vertices, indices, shader);
 }
 
 void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
-	const std::vector<uint32_t>& indices, const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
+	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
 	assert(texture);
@@ -275,7 +280,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 		for (const auto& src_vertex : vertices)
 		{
 			auto& dst_vertex = mBatch.vertices.at(start_vertex);
-			dst_vertex.pos = project(src_vertex.pos, model);
+			dst_vertex.pos = project(src_vertex.pos);
 			dst_vertex.col = src_vertex.col;
 			dst_vertex.tex = src_vertex.tex;
 			start_vertex += 1;
@@ -288,11 +293,11 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 		if (!shader)
 			shader = mTexturedShader;
 
-		drawGeneric(topology, vertices, indices, model, shader, texture);
+		drawGeneric(topology, vertices, indices, shader, texture);
 	}
 }
 
-void System::drawRectangle(const glm::mat4& model, const glm::vec4& top_left_color,
+void System::drawRectangle(const glm::vec4& top_left_color,
 	const glm::vec4& top_right_color, const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, 
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
@@ -305,26 +310,21 @@ void System::drawRectangle(const glm::mat4& model, const glm::vec4& top_left_col
 
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 
-	draw(Renderer::Topology::TriangleList, vertices, indices, model, shader);
+	draw(Renderer::Topology::TriangleList, vertices, indices, shader);
 }
 
-void System::drawRectangle(const glm::mat4& model, const glm::vec4& color,
+void System::drawRectangle(const glm::vec4& color,
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	drawRectangle(model, color, color, color, color, shader);
-}
-
-void System::drawRectangle(const glm::mat4& model, std::shared_ptr<Renderer::ShaderMatrices> shader)
-{
-	drawRectangle(model, { Color::White, 1.0f }, shader);
+	drawRectangle(color, color, color, color, shader);
 }
 
 void System::drawRectangle(std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	drawRectangle(glm::mat4(1.0f), shader);
+	drawRectangle({ Color::White, 1.0f }, shader);
 }
 
-void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+void System::drawRoundedRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding)
 {
 	static auto shader = std::make_shared<Renderer::Shaders::Rounded>(Renderer::Vertex::PositionColor::Layout);
@@ -337,16 +337,16 @@ void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& top_l
 	{
 		shader->setRadius((glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f);
 	}
-	drawRectangle(model, top_left_color, top_right_color, bottom_left_color, bottom_right_color, shader);
+	drawRectangle(top_left_color, top_right_color, bottom_left_color, bottom_right_color, shader);
 }
 
-void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& color,
+void System::drawRoundedRectangle(const glm::vec4& color,
 	const glm::vec2& size, float rounding, bool absolute_rounding)
 {
-	drawRoundedRectangle(model, color, color, color, color, size, rounding, absolute_rounding);
+	drawRoundedRectangle(color, color, color, color, size, rounding, absolute_rounding);
 }
 
-void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4& color,
+void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 	const glm::vec2& size, float rounding, bool absolute_rounding)
 {
 	static Graphics::TexRegion center_region = { 
@@ -371,11 +371,11 @@ void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4&
 	}
 
 	pushSampler(Renderer::Sampler::Linear);
-	drawSlicedSprite(mWhiteCircleTexture, model, center_region, size, edge_size, color);
+	drawSlicedSprite(mWhiteCircleTexture, center_region, size, edge_size, color);
 	pop();
 }
 
-void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
+void System::drawLineRectangle(const glm::vec4& color)
 {
 	static auto vertices = std::vector<Renderer::Vertex::PositionColor>(4);
 
@@ -386,10 +386,10 @@ void System::drawLineRectangle(const glm::mat4& model, const glm::vec4& color)
 	
 	static const std::vector<uint32_t> indices = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
-	draw(Renderer::Topology::LineList, vertices, indices, model);
+	draw(Renderer::Topology::LineList, vertices, indices);
 }
 
-void System::drawCircle(const glm::mat4& model, const glm::vec4& inner_color, const glm::vec4& outer_color, 
+void System::drawCircle(const glm::vec4& inner_color, const glm::vec4& outer_color, 
 	float fill, float pie)
 {
 	static auto shader = std::make_shared<Renderer::Shaders::Circle>(Renderer::Vertex::PositionColor::Layout);
@@ -397,10 +397,10 @@ void System::drawCircle(const glm::mat4& model, const glm::vec4& inner_color, co
 	shader->setPie(pie);
 	shader->setInnerColor(inner_color);
 	shader->setOuterColor(outer_color);
-	drawRectangle(model, { Color::White, 1.0f }, shader);
+	drawRectangle(shader);
 }
 
-void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm::vec4& inner_color,
+void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 	const glm::vec4& outer_color, float fill)
 {
 	assert(segments >= 3);
@@ -451,17 +451,17 @@ void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm
 		v1_inner = v2_inner;
 	}
 
-	draw(Renderer::Topology::TriangleList, vertices, model);
+	draw(Renderer::Topology::TriangleList, vertices);
 }
 
-void System::drawCircleTexture(const glm::mat4& model, const glm::vec4& color)
+void System::drawCircleTexture(const glm::vec4& color)
 {
 	pushSampler(Renderer::Sampler::Linear);
-	drawSprite(mWhiteCircleTexture, model, {}, color);
+	drawSprite(mWhiteCircleTexture, {}, color);
 	pop();
 }
 
-void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
+void System::drawSprite(std::shared_ptr<Renderer::Texture> texture,
 	const TexRegion& tex_region, const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	float tex_w = static_cast<float>(texture->getWidth());
@@ -481,21 +481,15 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::m
 	
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 	
-	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model, shader);
-}
-
-void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
-	std::shared_ptr<Renderer::ShaderMatrices> shader)
-{
-	drawSprite(texture, model, { }, { Color::White, 1.0f }, shader);
+	draw(Renderer::Topology::TriangleList, texture, vertices, indices, shader);
 }
 
 void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	drawSprite(texture, glm::mat4(1.0f), shader);
+	drawSprite(texture, { }, { Color::White, 1.0f }, shader);
 }
 
-void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const glm::mat4& model,
+void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, 
 	const TexRegion& center_region, const glm::vec2& size, std::optional<float> edge_size,
 	const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
@@ -590,30 +584,31 @@ void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const 
 		32, 33, 34, 32, 34, 35
 	};
 
-	draw(Renderer::Topology::TriangleList, texture, vertices, indices, model, shader);
+	draw(Renderer::Topology::TriangleList, texture, vertices, indices, shader);
 }
 
 void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
-	float smoothFactor, const glm::mat4& model, const glm::vec4& color)
+	float smoothFactor, const glm::vec4& color)
 {
 	static auto shader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionColorTexture::Layout);
 	shader->setMinValue(minValue);
 	shader->setMaxValue(maxValue);
 	shader->setSmoothFactor(smoothFactor);
 	shader->setColor(color);
-	draw(topology, texture, vertices, indices, model, shader);
+
+	draw(topology, texture, vertices, indices, shader);
 }
 
-void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model,
-	float minValue, float maxValue, float smoothFactor, const glm::vec4& color)
+void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 
+	float smoothFactor, const glm::vec4& color)
 {
 	drawSdf(mesh.topology, font.getTexture(), mesh.vertices, mesh.indices, minValue, 
-		maxValue, smoothFactor, model, color);
+		maxValue, smoothFactor, color);
 }
 
-void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4& model, float size,
+void System::drawString(const Font& font, const TextMesh& mesh, float size,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
 	float fixedOutlineThickness = glm::lerp(0.0f, 0.75f, outlineThickness);
@@ -627,22 +622,22 @@ void System::drawString(const Font& font, const TextMesh& mesh, const glm::mat4&
 	smoothFactor *= mSdfSmoothFactor;
 
 	if (fixedOutlineThickness > 0.0f)
-		drawString(font, mesh, model, outline, mid + (smoothFactor / 2.0f), smoothFactor, outlineColor);
+		drawString(font, mesh, outline, mid + (smoothFactor / 2.0f), smoothFactor, outlineColor);
 
-	drawString(font, mesh, model, mid, max, smoothFactor, color);
+	drawString(font, mesh, mid, max, smoothFactor, color);
 }
 
-void System::drawString(const Font& font, const utf8_string& text, const glm::mat4& model, float size,
+void System::drawString(const Font& font, const utf8_string& text, float size,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(font, TextMesh::createSinglelineTextMesh(font, text), model, size, color, outlineThickness, outlineColor);
+	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, color, outlineThickness, outlineColor);
 }
 
-glm::vec3 System::project(const glm::vec3& pos, const glm::mat4& model)
+glm::vec3 System::project(const glm::vec3& pos)
 {
 	const auto& state = mStates.top();
-	
-	assert(state == mAppliedState);
+	bool eq = state == mAppliedState.value();
+	assert(state == mAppliedState.value());
 	
 	auto scale = PLATFORM->getScale();
 
@@ -653,6 +648,7 @@ glm::vec3 System::project(const glm::vec3& pos, const glm::mat4& model)
 		
 	auto view = state.viewMatrix;
 	auto proj = state.projectionMatrix;
+	auto model = state.modelMatrix;
 
 	return glm::project(pos, view * model, proj, viewport);
 }
@@ -761,6 +757,13 @@ void System::pushProjectionMatrix(const glm::mat4& value)
 {
 	auto state = mStates.top();
 	state.projectionMatrix = value;
+	push(state);
+}
+
+void System::pushModelMatrix(const glm::mat4& value)
+{
+	auto state = mStates.top();
+	state.modelMatrix = value;
 	push(state);
 }
 

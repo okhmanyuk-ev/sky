@@ -41,6 +41,8 @@ void Rectangle::draw()
 	bottom_right_color *= edge_bottom_color;
 	bottom_right_color *= edge_right_color;
 
+	GRAPHICS->pushModelMatrix(model);
+
 	if (mRounding > 0.0f)
 	{
 		static auto colors = std::vector<glm::vec4>(4);
@@ -55,16 +57,18 @@ void Rectangle::draw()
 
 		if (one_color && mSlicedSpriteOptimizationEnabled)
 		{
-			GRAPHICS->drawRoundedSlicedRectangle(model, top_left_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
+			GRAPHICS->drawRoundedSlicedRectangle(top_left_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
 		}
 		else
 		{
-			GRAPHICS->drawRoundedRectangle(model, top_left_color, top_right_color, bottom_left_color,
+			GRAPHICS->drawRoundedRectangle(top_left_color, top_right_color, bottom_left_color,
 				bottom_right_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
 		}
 	}
 	else
 	{
-		GRAPHICS->drawRectangle(model, top_left_color, top_right_color, bottom_left_color, bottom_right_color);
+		GRAPHICS->drawRectangle(top_left_color, top_right_color, bottom_left_color, bottom_right_color);
 	}
+
+	GRAPHICS->pop();
 }

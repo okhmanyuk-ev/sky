@@ -248,7 +248,7 @@ namespace Shared::SceneHelpers
 				return;
 
 			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
-			GRAPHICS->drawRectangle(glm::mat4(1.0f), mBackshadeColor->getColor());
+			GRAPHICS->drawRectangle(mBackshadeColor->getColor());
 			GRAPHICS->pop();
 		}
 
@@ -272,7 +272,7 @@ namespace Shared::SceneHelpers
 				return;
 
 			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
-			GRAPHICS->drawRectangle(glm::mat4(1.0f), mFrontshadeColor->getColor());
+			GRAPHICS->drawRectangle(mFrontshadeColor->getColor());
 			GRAPHICS->pop();
 		}
 

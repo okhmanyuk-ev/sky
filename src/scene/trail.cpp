@@ -144,8 +144,9 @@ void Trail::draw()
 	stencil.passOp = Renderer::StencilOp::Increment;
 
 	GRAPHICS->pushStencilMode(stencil);
-	GRAPHICS->draw(Renderer::Topology::TriangleStrip, vertices, holder->getTransform());
-	GRAPHICS->pop();
+	GRAPHICS->pushModelMatrix(holder->getTransform());
+	GRAPHICS->draw(Renderer::Topology::TriangleStrip, vertices);
+	GRAPHICS->pop(2);
 }
 
 void Trail::clearTrail()

@@ -18,8 +18,9 @@ void Label::draw()
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
 	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
-	GRAPHICS->drawString(*mFont, mMesh, model, mFontSize, getColor(), mOutlineThickness, mOutlineColor);
-	GRAPHICS->pop();
+	GRAPHICS->pushModelMatrix(model);
+	GRAPHICS->drawString(*mFont, mMesh, mFontSize, getColor(), mOutlineThickness, mOutlineColor);
+	GRAPHICS->pop(2);
 }
 
 void Label::update(Clock::Duration dTime)
