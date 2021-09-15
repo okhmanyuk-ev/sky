@@ -4,6 +4,13 @@
 
 using namespace Graphics;
 
+System::System()
+{
+	mWhiteCircleTexture = makeGenericTexture({ 256, 256 }, [this] {
+		drawCircle();
+	});
+}
+
 void System::onFrame()
 {
 	mBatchesCountPublic = mBatchesCount;
@@ -342,12 +349,10 @@ void System::drawRoundedRectangle(const glm::mat4& model, const glm::vec4& color
 void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4& color,
 	const glm::vec2& size, float rounding, bool absolute_rounding)
 {
-	auto circle_texture = getCircleTexture();
-
 	static Graphics::TexRegion center_region = { 
 		{ 
-			(circle_texture->getWidth() / 2.0f) - 1.0f, 
-			(circle_texture->getHeight() / 2.0f) - 1.0f
+			(mWhiteCircleTexture->getWidth() / 2.0f) - 1.0f,
+			(mWhiteCircleTexture->getHeight() / 2.0f) - 1.0f
 		}, 
 		{ 
 			2.0f, 2.0f 
@@ -366,7 +371,7 @@ void System::drawRoundedSlicedRectangle(const glm::mat4& model, const glm::vec4&
 	}
 
 	pushSampler(Renderer::Sampler::Linear);
-	drawSlicedSprite(circle_texture, model, center_region, size, edge_size, color);
+	drawSlicedSprite(mWhiteCircleTexture, model, center_region, size, edge_size, color);
 	pop();
 }
 
@@ -452,7 +457,7 @@ void System::drawSegmentedCircle(const glm::mat4& model, int segments, const glm
 void System::drawCircleTexture(const glm::mat4& model, const glm::vec4& color)
 {
 	pushSampler(Renderer::Sampler::Linear);
-	drawSprite(getCircleTexture(), model, {}, color);
+	drawSprite(mWhiteCircleTexture, model, {}, color);
 	pop();
 }
 
@@ -768,9 +773,7 @@ void System::pushTextureAddress(Renderer::TextureAddress value)
 
 void System::pushOrthoMatrix(float width, float height)
 {
-	auto state = mStates.top();
-	state.projectionMatrix = glm::orthoLH(0.0f, width, height, 0.0f, -1.0f, 1.0f);
-	push(state);
+	pushProjectionMatrix(glm::orthoLH(0.0f, width, height, 0.0f, -1.0f, 1.0f));
 }
 
 void System::pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target)
@@ -824,22 +827,25 @@ std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::strin
 	return getRenderTarget(name, PLATFORM->getWidth(), PLATFORM->getHeight());
 }
 
-std::shared_ptr<Renderer::Texture> System::getCircleTexture()
+std::shared_ptr<Renderer::Texture> System::makeGenericTexture(const glm::ivec2& size, std::function<void()> callback)
 {
-	static std::shared_ptr<Renderer::RenderTarget> target = nullptr;
+	auto result = std::make_shared<Renderer::RenderTarget>(size.x, size.y);
 
-	if (target == nullptr)
-	{
-		target = std::make_shared<Renderer::RenderTarget>(256, 256);
+	auto working = mWorking;
 
-		pushCleanState();
-		pushRenderTarget(target);
-		pushViewport(target);
-		pushOrthoMatrix(1.0f, 1.0f);
-		clear({ Graphics::Color::White, 0.0f });
-		drawCircle();
-		pop(4);
-	}
+	if (!working)
+		begin();
 
-	return target;
+	pushCleanState();
+	pushRenderTarget(result);
+	pushViewport(result);
+	pushOrthoMatrix(1.0f, 1.0f);
+	clear({ Graphics::Color::White, 0.0f });
+	callback();
+	pop(4);
+
+	if (!working)
+		end();
+
+	return result;
 }

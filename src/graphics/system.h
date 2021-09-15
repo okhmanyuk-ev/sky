@@ -25,6 +25,9 @@ namespace Graphics
 	public:
 		struct State;
 
+	public:
+		System();
+
 	private:
 		void onFrame() override;
 
@@ -238,8 +241,11 @@ namespace Graphics
 		std::map<std::string, std::shared_ptr<Renderer::RenderTarget>> mRenderTargets;
 		std::set<std::string> mUnusedRenderTargets;
 
+	public:
+		std::shared_ptr<Renderer::Texture> makeGenericTexture(const glm::ivec2& size, std::function<void()> callback);
+		
 	private:
-		std::shared_ptr<Renderer::Texture> getCircleTexture();
+		std::shared_ptr<Renderer::Texture> mWhiteCircleTexture = nullptr;
 	};
 
 	inline bool operator==(const System::State& left, const System::State& right)
@@ -249,7 +255,9 @@ namespace Graphics
 			left.viewMatrix == right.viewMatrix &&
 			left.renderTarget == right.renderTarget &&
 			left.scissor == right.scissor &&
+			left.viewport == right.viewport &&
 			left.depthMode == right.depthMode &&
+			left.cullMode == right.cullMode &&
 			left.blendMode == right.blendMode &&
 			left.sampler == right.sampler &&
 			left.textureAddress == right.textureAddress &&
