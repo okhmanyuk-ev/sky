@@ -56,5 +56,6 @@
 #include <shared/profile.h>
 #include <shared/networking_ws.h>
 #include <shared/networking_udp.h>
+#include <shared/phys_helpers.h>
 
 #include <network/system.h>
