@@ -302,7 +302,7 @@ namespace Shared::SceneHelpers
 
 	template <typename T> class MovableByHand : public T
 	{
-		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
 
 	public:
 		MovableByHand()
@@ -313,10 +313,14 @@ namespace Shared::SceneHelpers
 	protected:
 		void touch(Scene::Node::Touch type, const glm::vec2& pos) override
 		{
-			if (type != Scene::Node::Touch::Begin)
-				T::setPosition(T::getPosition() + pos - mPrevPosition);
+			T::touch(type, pos);
 
-			mPrevPosition = pos;
+			auto fixed_pos = pos / PLATFORM->getScale();
+			
+			if (type != Scene::Node::Touch::Begin)
+				T::setPosition(T::getPosition() + fixed_pos - mPrevPosition);
+
+			mPrevPosition = fixed_pos;
 		}
 
 	private:

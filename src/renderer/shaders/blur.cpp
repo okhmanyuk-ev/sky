@@ -292,22 +292,22 @@ namespace
 	const char* boxBlurSrc =
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 		R"(
-		#define BOX 20
+		#define Box 10
 
 		void mainImage( out vec4 fragColor, in vec2 fragCoord )
 		{
 			vec2 uv = fragCoord;
 			vec4 col = vec4(0.0);
 	
-			for (int i = -BOX; i <= BOX; i++) 
+			for (int i = -Box; i <= Box; i++) 
 			{
-    			for (int k = -BOX; k <= BOX; k++) 
+    			for (int k = -Box; k <= Box; k++) 
 				{
        				col += texture(iChannel0, uv + vec2(i, k) / iResolution.xy);
 				}
 			}    
 
-			col /= BOX * 2 * BOX * 2;
+			col /= Box * 2 * Box * 2;
 			fragColor = vec4(col.rgb, 1.0);
 		}
 		)";
