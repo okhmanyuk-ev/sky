@@ -31,7 +31,7 @@ void Circle::draw()
 	auto outer_color = mOuterColor * color;
 	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->pushModelMatrix(model);
-	if (inner_color == outer_color && mFill == 1.0f && mPie == 1.0f)
+	if (inner_color == outer_color && mFill == 1.0f && mPie == 1.0f && mDrawTextureWhenAvailable)
 	{
 		GRAPHICS->drawCircleTexture(inner_color);
 	}

@@ -36,6 +36,8 @@ namespace Scene
 		void setOuterColor(const glm::vec4& value) { mOuterColor = value; }
 		void setOuterColor(const glm::vec3& value) { mOuterColor = { value, mOuterColor.a }; }
 
+		void setDrawTextureWhenAvailable(bool value) { mDrawTextureWhenAvailable = value; }
+
 	private:
 		float mRadius = -1.0f;
 		float mThickness = -1.0f; // working only when we have radius
@@ -44,6 +46,7 @@ namespace Scene
 		float mPiePivot = -1.0f;
 		glm::vec4 mInnerColor = { Graphics::Color::White, 1.0f };
 		glm::vec4 mOuterColor = { Graphics::Color::White, 1.0f };
+		bool mDrawTextureWhenAvailable = true;
 	};
 
 	class SegmentedCircle : public Node, public Color, public Blend
