@@ -300,6 +300,29 @@ namespace Shared::SceneHelpers
 		}
 	};
 
+	template <typename T> class MovableByHand : public T
+	{
+		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
+
+	public:
+		MovableByHand()
+		{
+			T::setTouchable(true);
+		}
+
+	protected:
+		void touch(Scene::Node::Touch type, const glm::vec2& pos) override
+		{
+			if (type != Scene::Node::Touch::Begin)
+				T::setPosition(T::getPosition() + pos - mPrevPosition);
+
+			mPrevPosition = pos;
+		}
+
+	private:
+		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
+	};
+
 	// automatically stretching to full safe area of the screen
 	// should be attached to fullscreen node or scene root
 	class SafeArea : public Scene::Node

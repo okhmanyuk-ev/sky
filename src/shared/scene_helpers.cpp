@@ -553,6 +553,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 
 // blur
 
+#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) // TODO: move into Renderer::System
 {
 	auto x = (GLint)pos.x;
@@ -580,6 +581,7 @@ void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) // 
 
 	free(temp);
 }
+#endif
 
 SceneHelpers::Blur::Blur()
 {
@@ -607,7 +609,7 @@ void SceneHelpers::Blur::draw()
 	boxBlur->setCustomBuffer(buf);
 
 	auto texture = std::make_shared<Renderer::Texture>(image->getWidth(), image->getHeight(),
-		image->getChannels(), image->getMemory());
+		image->getChannels(), image->getMemory()); // TODO: every frame we create new texture, this is not good
 
 	auto region = Graphics::TexRegion();
 
