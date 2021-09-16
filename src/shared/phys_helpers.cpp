@@ -56,8 +56,10 @@ void World::update(Clock::Duration delta)
 
 void World::draw()
 {
-	auto model = mNode->getParent()->getTransform();
+	auto model = glm::mat4(1.0f);
 	model = glm::scale(model, { Scale, Scale, 1.0f });
+
+	mCamera.setPosition(-getNode()->getPosition());
 
 	mPhysDraw.begin(mCamera.getProjectionMatrix(), mCamera.getViewMatrix(), model);
 	mB2World.DebugDraw();
