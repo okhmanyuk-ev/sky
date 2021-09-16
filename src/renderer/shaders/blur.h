@@ -1,6 +1,7 @@
 #pragma once
 
 #include <renderer/shader_custom.h>
+#include <renderer/shaders/shadertoy.h>
 
 namespace Renderer::Shaders
 {
@@ -66,4 +67,9 @@ namespace Renderer::Shaders
 		ConstantBuffer mConstantBuffer;
 	};
 
+	class BoxBlur : public Shadertoy
+	{
+	public:
+		BoxBlur(const Vertex::Layout& layout);
+	};
 }

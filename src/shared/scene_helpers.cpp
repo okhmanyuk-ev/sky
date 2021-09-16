@@ -551,6 +551,79 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 	);
 };
 
+// blur
+
+void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) // TODO: move into Renderer::System
+{
+	auto x = (GLint)pos.x;
+	auto y = (GLint)(PLATFORM->getHeight() - pos.y - size.y);
+	auto w = (GLint)size.x;
+	auto h = (GLint)size.y;
+
+	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, memory);
+
+	// fix upside down problem
+
+	size_t row_size = w * 4;
+
+	auto temp = malloc(row_size);
+
+	for (int i = 0; i < h / 2; i++)
+	{
+		auto top_row = (void*)(size_t(memory) + size_t(i) * row_size);
+		auto bottom_row = (void*)(size_t(memory) + size_t(h - 1 - i) * row_size);
+
+		memcpy(temp, top_row, row_size);
+		memcpy(top_row, bottom_row, row_size);
+		memcpy(bottom_row, temp, row_size);
+	}
+
+	free(temp);
+}
+
+SceneHelpers::Blur::Blur()
+{
+	mSprite = std::make_shared<Scene::Sprite>();
+	mSprite->setStretch(1.0f);
+	attach(mSprite);
+}
+
+void SceneHelpers::Blur::draw()
+{
+	Scene::Node::draw();
+
+#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
+	GRAPHICS->flush();
+
+	auto image = std::make_shared<Graphics::Image>(PLATFORM->getWidth(), PLATFORM->getHeight(), 4);
+
+	readPixels({ 0, 0 }, { image->getWidth(), image->getHeight() }, image->getMemory());
+
+	static auto boxBlur = std::make_shared<Renderer::Shaders::BoxBlur>(Renderer::Vertex::PositionColorTexture::Layout);
+	auto buf = boxBlur->getCustomBuffer();
+	auto w = (float)image->getWidth();
+	auto h = (float)image->getHeight();
+	buf.iResolution = { w, h, 0.0f };
+	boxBlur->setCustomBuffer(buf);
+
+	auto texture = std::make_shared<Renderer::Texture>(image->getWidth(), image->getHeight(),
+		image->getChannels(), image->getMemory());
+
+	auto region = Graphics::TexRegion();
+
+	std::tie(region.pos, region.size) = getGlobalBounds();
+
+	mSprite->setTexRegion(region);
+	mSprite->setTexture(texture);
+	mSprite->setShader(boxBlur);
+#else
+	static auto texture = GRAPHICS->makeGenericTexture({ 64, 64 }, [] {
+		GRAPHICS->drawRectangle({ 1.0f, 1.0f, 1.0f, 0.25f });
+	});
+	mSprite->setTexture(texture);
+#endif
+}
+
 std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)
 {
 	std::vector<std::shared_ptr<Scene3D::Model>> result;

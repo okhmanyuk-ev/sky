@@ -286,3 +286,39 @@ Blur2::Blur2(const Vertex::Layout& layout) :
 {
 	setCustomConstantBuffer(&mConstantBuffer);
 }
+
+namespace
+{
+	const char* boxBlurSrc =
+#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
+		R"(
+		#define BOX 20
+
+		void mainImage( out vec4 fragColor, in vec2 fragCoord )
+		{
+			vec2 uv = fragCoord;
+			vec4 col = vec4(0.0);
+	
+			for (int i = -BOX; i <= BOX; i++) 
+			{
+    			for (int k = -BOX; k <= BOX; k++) 
+				{
+       				col += texture(iChannel0, uv + vec2(i, k) / iResolution.xy);
+				}
+			}    
+
+			col /= BOX * 2 * BOX * 2;
+			fragColor = vec4(col.rgb, 1.0);
+		}
+		)";
+#elif defined(RENDERER_D3D11)
+		R"(
+		
+		)";
+#endif
+}
+
+BoxBlur::BoxBlur(const Vertex::Layout& layout) : Shadertoy(layout, boxBlurSrc)
+{
+	//
+}

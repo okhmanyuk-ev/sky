@@ -293,8 +293,10 @@ namespace Shared::SceneHelpers
 			T::leaveDraw();
 
 			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
-
-			GRAPHICS->drawLineRectangle(model, { 1.0f, 1.0f, 1.0f, 1.0 });
+			
+			GRAPHICS->pushModelMatrix(model);
+			GRAPHICS->drawLineRectangle();
+			GRAPHICS->pop();
 		}
 	};
 
@@ -374,6 +376,18 @@ namespace Shared::SceneHelpers
 	private:
 		std::shared_ptr<Scene::Node> mContent;
 		bool mCloseOnMissclick = true;
+	};
+
+	class Blur : public Scene::Node
+	{
+	public:
+		Blur();
+
+	protected:
+		void draw() override;
+
+	private:
+		std::shared_ptr<Scene::Sprite> mSprite;
 	};
 
 	// 3d
