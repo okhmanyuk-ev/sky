@@ -553,9 +553,9 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 
 // blur
 
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) // TODO: move into Renderer::System
 {
+#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 	auto x = (GLint)pos.x;
 	auto y = (GLint)(PLATFORM->getHeight() - pos.y - size.y);
 	auto w = (GLint)size.x;
@@ -580,8 +580,10 @@ void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) // 
 	}
 
 	free(temp);
-}
+#elif defined(RENDERER_D3D11)
+
 #endif
+}
 
 SceneHelpers::Blur::Blur()
 {
@@ -597,25 +599,25 @@ void SceneHelpers::Blur::draw()
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 	GRAPHICS->flush();
 
-	auto image = std::make_shared<Graphics::Image>(PLATFORM->getWidth(), PLATFORM->getHeight(), 4);
+	auto [pos, size] = getGlobalBounds();
 
-	readPixels({ 0, 0 }, { image->getWidth(), image->getHeight() }, image->getMemory());
+	auto x = (int)glm::round(pos.x);
+	auto y = (int)glm::round(pos.y);
+	auto w = (int)glm::round(size.x);
+	auto h = (int)glm::round(size.y);
+
+	auto image = std::make_shared<Graphics::Image>(w, h, 4);
+
+	readPixels({ x, y }, { w, h }, image->getMemory());
 
 	static auto boxBlur = std::make_shared<Renderer::Shaders::BoxBlur>(Renderer::Vertex::PositionColorTexture::Layout);
 	auto buf = boxBlur->getCustomBuffer();
-	auto w = (float)image->getWidth();
-	auto h = (float)image->getHeight();
-	buf.iResolution = { w, h, 0.0f };
+	buf.iResolution = { glm::round(size), 0.0f };
 	boxBlur->setCustomBuffer(buf);
 
-	auto texture = std::make_shared<Renderer::Texture>(image->getWidth(), image->getHeight(),
-		image->getChannels(), image->getMemory()); // TODO: every frame we create new texture, this is not good
+	auto texture = std::make_shared<Renderer::Texture>(w, h, image->getChannels(), 
+		image->getMemory()); // TODO: every frame we create new texture, this is not good
 
-	auto region = Graphics::TexRegion();
-
-	std::tie(region.pos, region.size) = getGlobalBounds();
-
-	mSprite->setTexRegion(region);
 	mSprite->setTexture(texture);
 	mSprite->setShader(boxBlur);
 #else
