@@ -599,11 +599,13 @@ void SystemD3D11::setD3D11SamplerState(const SamplerState& value)
 		const static std::unordered_map<Sampler, D3D11_FILTER> SamplerMap = {
 			{ Sampler::Linear, D3D11_FILTER_MIN_MAG_MIP_LINEAR  },
 			{ Sampler::Nearest, D3D11_FILTER_MIN_MAG_MIP_POINT },
+			{ Sampler::LinearMipmapLinear, D3D11_FILTER_MIN_MAG_MIP_LINEAR }
 		};
 
 		const static std::unordered_map<TextureAddress, D3D11_TEXTURE_ADDRESS_MODE> TextureAddressMap = {
 			{ TextureAddress::Clamp, D3D11_TEXTURE_ADDRESS_CLAMP },
 			{ TextureAddress::Wrap, D3D11_TEXTURE_ADDRESS_WRAP },
+			{ TextureAddress::MirrorWrap, D3D11_TEXTURE_ADDRESS_MIRROR }
 		};
 
 		D3D11_SAMPLER_DESC desc = {};
