@@ -442,7 +442,7 @@ SceneHelpers::Blur::Blur()
 {
 	mSprite = std::make_shared<Scene::Sprite>();
 	mSprite->setStretch(1.0f);
-	mSprite->setSampler(Renderer::Sampler::Linear);
+	mSprite->setSampler(Renderer::Sampler::LinearMipmapLinear);
 	attach(mSprite);
 }
 
@@ -471,17 +471,18 @@ void SceneHelpers::Blur::draw()
 	if (size != mPrevSize)
 	{
 		mImage = std::make_shared<Graphics::Image>(w, h, 4);
-		mSprite->setTexture(std::make_shared<Renderer::Texture>(w, h));
+		mSprite->setTexture(std::make_shared<Renderer::Texture>(w, h, true));
 		mPrevSize = size;
 	}
 
 	GRAPHICS->flush();
 	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
 
-	mSprite->getTexture()->writePixels(w, h, mImage->getChannels(), mImage->getMemory());
+	auto texture = mSprite->getTexture();
+	texture->writePixels(w, h, mImage->getChannels(), mImage->getMemory());
 
-	static auto blur_shader = std::make_shared<Renderer::Shaders::BoxBlur>(Renderer::Vertex::PositionColorTexture::Layout);
-	blur_shader->setResolution(glm::round(size));
+	static auto blur_shader = std::make_shared<Renderer::Shaders::BiasMipmapBlur>(Renderer::Vertex::PositionColorTexture::Layout);
+	//blur_shader->setResolution(glm::round(size));
 	blur_shader->setIntensity(mIntensity);
 
 	mSprite->setShader(blur_shader);

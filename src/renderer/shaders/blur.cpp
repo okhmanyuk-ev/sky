@@ -289,7 +289,7 @@ Blur2::Blur2(const Vertex::Layout& layout) :
 
 namespace
 {
-	const char* boxBlurSrc =
+	const char* biasMipmapBlurSrc =
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 		R"(
 		layout (std140) uniform ConstantBuffer
@@ -298,7 +298,6 @@ namespace
 			mat4 uProjectionMatrix;
 			mat4 uModelMatrix;
 
-			vec2 uResolution;
 			float uIntensity;
 		};
 
@@ -322,21 +321,10 @@ namespace
 
 		out vec4 fragColor;
 
-		#define Box 10
-
 		void main()
 		{
-			vec4 col = vec4(0.0);
-	
-			for (int i = -Box; i <= Box; i++) 
-			{
-    			for (int j = -Box; j <= Box; j++) 
-				{
-       				col += texture(uTexture, vTexCoord + vec2(i, j) / uResolution * uIntensity);
-				}
-			}    
-
-			col /= float(Box) * 2.0 * float(Box) * 2.0;
+			float bias = uIntensity * 4.0;
+			vec4 col = texture(uTexture, vTexCoord, bias);
 			fragColor = vec4(col.rgb, 1.0);
 		}
 		#endif
@@ -349,7 +337,6 @@ namespace
 			float4x4 projectionMatrix;
 			float4x4 modelMatrix;
 
-			float2 resolution;
 			float intensity;
 		};
 
@@ -376,29 +363,18 @@ namespace
 			return result;
 		};
 
-		#define Box 10
-
 		float4 ps_main(PixelInput input) : SV_TARGET
 		{
-			float4 result = 0;
-
-			for (int i = -Box; i <= Box; i++) 
-			{
-    			for (int j = -Box; j <= Box; j++) 
-				{
-					result += texture0.Sample(sampler0, input.uv + float2(i, j) / resolution * intensity);
-				}
-			}    
-
-			result /= Box * 2.0 * Box * 2.0;
+			float bias = intensity * 4.0;
+			float4 result = texture0.SampleBias(sampler0, input.uv, bias);
 			result.a = 1.0;
 			return result;
 		})";
 #endif
 }
 
-BoxBlur::BoxBlur(const Vertex::Layout& layout) :
-	ShaderCustom(layout, { Vertex::Attribute::Type::Position, Vertex::Attribute::Type::TexCoord }, sizeof(ConstantBuffer), boxBlurSrc)
+BiasMipmapBlur::BiasMipmapBlur(const Vertex::Layout& layout) :
+	ShaderCustom(layout, { Vertex::Attribute::Type::Position, Vertex::Attribute::Type::TexCoord }, sizeof(ConstantBuffer), biasMipmapBlurSrc)
 {
 	setCustomConstantBuffer(&mConstantBuffer);
 }
