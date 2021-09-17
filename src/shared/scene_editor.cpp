@@ -3,6 +3,7 @@
 #include <console/system.h>
 #include <common/console_commands.h>
 #include <shared/imgui_user.h>
+#include <shared/scene_helpers.h>
 
 using namespace Shared;
 
@@ -220,6 +221,17 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		circle->setInnerColor(inner_color);
 		circle->setOuterColor(outer_color);
 	
+		ImGui::Separator();
+	}
+
+	if (auto blur = std::dynamic_pointer_cast<SceneHelpers::Blur>(node); blur != nullptr)
+	{
+		auto intensity = blur->getIntensity();
+
+		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 1.0f);
+
+		blur->setIntensity(intensity);
+
 		ImGui::Separator();
 	}
 

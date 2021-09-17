@@ -382,6 +382,76 @@ void SystemD3D11::drawIndexed(size_t indexCount, size_t indexOffset, size_t vert
 	Context->DrawIndexed((UINT)indexCount, (UINT)indexOffset, (INT)vertexOffset);
 }
 
+void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory)
+{
+	ID3D11Resource* resource = NULL;
+	Renderer::SystemD3D11::renderTargetView->GetResource(&resource);
+
+	ID3D11Texture2D* texture = NULL;
+	resource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&texture);
+
+	D3D11_TEXTURE2D_DESC desc = { 0 };
+	texture->GetDesc(&desc);
+	desc.Usage = D3D11_USAGE_STAGING;
+	desc.BindFlags = 0;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+	desc.MiscFlags = 0;
+	desc.Width = size.x;
+	desc.Height = size.y;
+
+	ID3D11Texture2D* staging_texture = NULL;
+	Renderer::SystemD3D11::Device->CreateTexture2D(&desc, NULL, &staging_texture);
+
+	auto src_x = (UINT)pos.x;
+	auto src_y = (UINT)pos.y;
+	auto src_w = (UINT)size.x;
+	auto src_h = (UINT)size.y;
+
+	UINT dst_x = 0;
+	UINT dst_y = 0;
+
+	if (pos.x < 0)
+	{
+		src_x = 0;
+		if (-pos.x > src_w)
+			src_w = 0;
+		else
+			src_w += pos.x;
+
+		dst_x = -pos.x;
+	}
+
+	if (pos.y < 0)
+	{
+		src_y = 0;
+		if (-pos.y > src_h)
+			src_h = 0;
+		else
+			src_h += pos.y;
+
+		dst_y = -pos.y;
+	}
+
+	D3D11_BOX box;
+	box.left = src_x;
+	box.right = src_x + src_w;
+	box.top = src_y;
+	box.bottom = src_y + src_h;
+	box.front = 0;
+	box.back = 1;
+
+	Renderer::SystemD3D11::Context->CopySubresourceRegion(staging_texture, 0, dst_x, dst_y, 0, resource, 0, &box);
+
+	D3D11_MAPPED_SUBRESOURCE mapped = { 0 };
+	Renderer::SystemD3D11::Context->Map(staging_texture, 0, D3D11_MAP_READ, 0, &mapped);
+	memcpy(memory, mapped.pData, size.x * size.y * 4);
+	Renderer::SystemD3D11::Context->Unmap(staging_texture, 0);
+
+	staging_texture->Release();
+	resource->Release();
+	texture->Release();
+}
+
 void SystemD3D11::present()
 {
 	System::present();

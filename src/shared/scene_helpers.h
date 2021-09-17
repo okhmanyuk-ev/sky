@@ -415,6 +415,15 @@ namespace Shared::SceneHelpers
 
 	private:
 		std::shared_ptr<Scene::Sprite> mSprite;
+		std::shared_ptr<Graphics::Image> mImage = nullptr;
+		glm::vec2 mPrevSize = { 0.0f, 0.0f };
+
+	public:
+		auto getIntensity() const { return mIntensity; }
+		void setIntensity(float value) { mIntensity = value; }
+
+	private:
+		float mIntensity = 1.0f;
 	};
 
 	// 3d

@@ -292,33 +292,113 @@ namespace
 	const char* boxBlurSrc =
 #if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 		R"(
-		#define Box 10
+		layout (std140) uniform ConstantBuffer
+		{			
+			mat4 uViewMatrix;
+			mat4 uProjectionMatrix;
+			mat4 uModelMatrix;
 
-		void mainImage( out vec4 fragColor, in vec2 fragCoord )
+			vec2 uResolution;
+			float uIntensity;
+		};
+
+		uniform sampler2D uTexture;
+
+		#ifdef VERTEX_SHADER
+		in vec3 aPosition;
+		in vec2 aTexCoord;
+
+		out vec2 vTexCoord;
+		
+		void main()
 		{
-			vec2 uv = fragCoord;
+			gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
+			vTexCoord = aTexCoord;
+		}
+		#endif
+
+		#ifdef FRAGMENT_SHADER
+		in vec2 vTexCoord;
+
+		out vec4 fragColor;
+
+		#define Box 20
+
+		void main()
+		{
 			vec4 col = vec4(0.0);
 	
 			for (int i = -Box; i <= Box; i++) 
 			{
-    			for (int k = -Box; k <= Box; k++) 
+    			for (int j = -Box; j <= Box; j++) 
 				{
-       				col += texture(iChannel0, uv + vec2(i, k) / iResolution.xy);
+       				col += texture(uTexture, vTexCoord + vec2(i, j) / uResolution * uIntensity);
 				}
 			}    
 
 			col /= Box * 2 * Box * 2;
 			fragColor = vec4(col.rgb, 1.0);
 		}
+		#endif
 		)";
 #elif defined(RENDERER_D3D11)
 		R"(
-		
-		)";
+		cbuffer ConstantBuffer : register(b0)
+		{			
+			float4x4 viewMatrix;
+			float4x4 projectionMatrix;
+			float4x4 modelMatrix;
+
+			float2 resolution;
+			float intensity;
+		};
+
+		struct VertexInput
+		{
+			float3 pos : POSITION0;
+			float2 uv : TEXCOORD0;
+		};
+
+		struct PixelInput
+		{
+			float4 pixelPosition : SV_POSITION;
+			float2 uv : TEXCOORD0;
+		};
+
+		sampler sampler0;
+		Texture2D texture0;
+
+		PixelInput vs_main(VertexInput input)
+		{
+			PixelInput result;
+			result.pixelPosition = mul(projectionMatrix, mul(viewMatrix, mul(modelMatrix, float4(input.pos, 1.0))));
+			result.uv = input.uv;
+			return result;
+		};
+
+		#define Box 20
+
+		float4 ps_main(PixelInput input) : SV_TARGET
+		{
+			float4 result = 0;
+
+			for (int i = -Box; i <= Box; i++) 
+			{
+    			for (int j = -Box; j <= Box; j++) 
+				{
+					result += texture0.Sample(sampler0, input.uv + float2(i, j) / resolution * intensity);
+				}
+			}    
+
+			result /= Box * 2.0 * Box * 2.0;
+			result.a = 1.0;
+			return result;
+		})";
 #endif
 }
 
-BoxBlur::BoxBlur(const Vertex::Layout& layout) : Shadertoy(layout, boxBlurSrc)
+BoxBlur::BoxBlur(const Vertex::Layout& layout) :
+	ShaderCustom(layout, { Vertex::Attribute::Type::Position, Vertex::Attribute::Type::TexCoord }, sizeof(ConstantBuffer), boxBlurSrc)
 {
-	//
+	setCustomConstantBuffer(&mConstantBuffer);
 }

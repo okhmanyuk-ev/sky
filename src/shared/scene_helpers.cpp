@@ -553,42 +553,11 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 
 // blur
 
-void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) // TODO: move into Renderer::System
-{
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
-	auto x = (GLint)pos.x;
-	auto y = (GLint)(PLATFORM->getHeight() - pos.y - size.y);
-	auto w = (GLint)size.x;
-	auto h = (GLint)size.y;
-
-	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, memory);
-
-	// fix upside down problem
-
-	size_t row_size = w * 4;
-
-	auto temp = malloc(row_size);
-
-	for (int i = 0; i < h / 2; i++)
-	{
-		auto top_row = (void*)(size_t(memory) + size_t(i) * row_size);
-		auto bottom_row = (void*)(size_t(memory) + size_t(h - 1 - i) * row_size);
-
-		memcpy(temp, top_row, row_size);
-		memcpy(top_row, bottom_row, row_size);
-		memcpy(bottom_row, temp, row_size);
-	}
-
-	free(temp);
-#elif defined(RENDERER_D3D11)
-
-#endif
-}
-
 SceneHelpers::Blur::Blur()
 {
 	mSprite = std::make_shared<Scene::Sprite>();
 	mSprite->setStretch(1.0f);
+	mSprite->setSampler(Renderer::Sampler::Linear);
 	attach(mSprite);
 }
 
@@ -596,7 +565,6 @@ void SceneHelpers::Blur::draw()
 {
 	Scene::Node::draw();
 
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
 	GRAPHICS->flush();
 
 	auto [pos, size] = getGlobalBounds();
@@ -606,26 +574,24 @@ void SceneHelpers::Blur::draw()
 	auto w = (int)glm::round(size.x);
 	auto h = (int)glm::round(size.y);
 
-	auto image = std::make_shared<Graphics::Image>(w, h, 4);
+	if (size != mPrevSize)
+	{
+		mImage = std::make_shared<Graphics::Image>(w, h, 4);
+		mPrevSize = size;
+	}
 
-	readPixels({ x, y }, { w, h }, image->getMemory());
+	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
+	
+	// TODO: every frame we create new texture, this is not good
 
-	static auto boxBlur = std::make_shared<Renderer::Shaders::BoxBlur>(Renderer::Vertex::PositionColorTexture::Layout);
-	auto buf = boxBlur->getCustomBuffer();
-	buf.iResolution = { glm::round(size), 0.0f };
-	boxBlur->setCustomBuffer(buf);
-
-	auto texture = std::make_shared<Renderer::Texture>(w, h, image->getChannels(), 
-		image->getMemory()); // TODO: every frame we create new texture, this is not good
-
+	auto texture = std::make_shared<Renderer::Texture>(w, h, mImage->getChannels(), mImage->getMemory());
 	mSprite->setTexture(texture);
-	mSprite->setShader(boxBlur);
-#else
-	static auto texture = GRAPHICS->makeGenericTexture({ 64, 64 }, [] {
-		GRAPHICS->drawRectangle({ 1.0f, 1.0f, 1.0f, 0.25f });
-	});
-	mSprite->setTexture(texture);
-#endif
+
+	static auto blur_shader = std::make_shared<Renderer::Shaders::BoxBlur>(Renderer::Vertex::PositionColorTexture::Layout);
+	blur_shader->setResolution(glm::round(size));
+	blur_shader->setIntensity(mIntensity);
+
+	mSprite->setShader(blur_shader);
 }
 
 std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)

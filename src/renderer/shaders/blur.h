@@ -1,7 +1,6 @@
 #pragma once
 
 #include <renderer/shader_custom.h>
-#include <renderer/shaders/shadertoy.h>
 
 namespace Renderer::Shaders
 {
@@ -67,9 +66,25 @@ namespace Renderer::Shaders
 		ConstantBuffer mConstantBuffer;
 	};
 
-	class BoxBlur : public Shadertoy
+	class BoxBlur : public ShaderCustom
 	{
+	private:
+		struct alignas(16) ConstantBuffer
+		{
+			glm::vec2 resolution = { 0.0f, 0.0f };
+			float intensity = 1.0f;
+		};
+
 	public:
 		BoxBlur(const Vertex::Layout& layout);
+
+	public:
+		void setResolution(const glm::vec2& value) { mConstantBuffer.resolution = value; }
+
+		auto getIntensity() const { return mConstantBuffer.intensity; }
+		void setIntensity(float value) { mConstantBuffer.intensity = value; }
+
+	private:
+		ConstantBuffer mConstantBuffer;
 	};
 }

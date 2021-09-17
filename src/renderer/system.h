@@ -45,6 +45,8 @@ namespace Renderer
 		virtual void draw(size_t vertexCount, size_t vertexOffset = 0);
 		virtual void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0);
 
+		virtual void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) = 0;
+
 		virtual void present();
 
 		virtual bool isVsync() const = 0;
