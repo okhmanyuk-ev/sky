@@ -322,7 +322,7 @@ namespace
 
 		out vec4 fragColor;
 
-		#define Box 20
+		#define Box 10
 
 		void main()
 		{
@@ -336,7 +336,7 @@ namespace
 				}
 			}    
 
-			col /= Box * 2 * Box * 2;
+			col /= float(Box) * 2.0 * float(Box) * 2.0;
 			fragColor = vec4(col.rgb, 1.0);
 		}
 		#endif
@@ -376,7 +376,7 @@ namespace
 			return result;
 		};
 
-		#define Box 20
+		#define Box 10
 
 		float4 ps_main(PixelInput input) : SV_TARGET
 		{
