@@ -471,16 +471,14 @@ void SceneHelpers::Blur::draw()
 	if (size != mPrevSize)
 	{
 		mImage = std::make_shared<Graphics::Image>(w, h, 4);
+		mSprite->setTexture(std::make_shared<Renderer::Texture>(w, h));
 		mPrevSize = size;
 	}
 
 	GRAPHICS->flush();
 	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
 
-	// TODO: every frame we create new texture, this is not good
-
-	auto texture = std::make_shared<Renderer::Texture>(w, h, mImage->getChannels(), mImage->getMemory());
-	mSprite->setTexture(texture);
+	mSprite->getTexture()->writePixels(w, h, mImage->getChannels(), mImage->getMemory());
 
 	static auto blur_shader = std::make_shared<Renderer::Shaders::BoxBlur>(Renderer::Vertex::PositionColorTexture::Layout);
 	blur_shader->setResolution(glm::round(size));
