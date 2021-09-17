@@ -31,10 +31,7 @@ Texture::Texture(int width, int height) : mWidth(width), mHeight(height)
 
 Texture::Texture(int width, int height, int channels, void* data) : Texture(width, height)
 {
-	assert(data);
-	auto memPitch = width * channels;
-	auto memSlicePitch = width * height * channels;
-	SystemD3D11::Context->UpdateSubresource(texture2d, 0, nullptr, data, memPitch, memSlicePitch);
+	writePixels(width, height, channels, data);
 }
 
 Texture::~Texture()
@@ -42,4 +39,19 @@ Texture::~Texture()
 	shader_resource_view->Release();
 	texture2d->Release();
 }
+
+void Texture::writePixels(int width, int height, int channels, void* data)
+{
+	assert(width == mWidth);
+	assert(height == mHeight);
+	assert(data);
+
+	if (!data)
+		return;
+
+	auto memPitch = width * channels;
+	auto memSlicePitch = width * height * channels;
+	SystemD3D11::Context->UpdateSubresource(texture2d, 0, nullptr, data, memPitch, memSlicePitch);
+}
+
 #endif

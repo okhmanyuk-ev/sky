@@ -14,6 +14,9 @@ namespace Renderer
 		~Texture();
 
 	public:
+		void writePixels(int width, int height, int channels, void* data);
+
+	public:
 		auto getWidth() const { return mWidth; }
 		auto getHeight() const { return mHeight; }
 		
