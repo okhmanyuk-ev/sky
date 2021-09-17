@@ -434,6 +434,9 @@ void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexO
 
 void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory)
 {
+	if (size.x <= 0 || size.y <= 0)
+		return;
+
 	auto x = (GLint)pos.x;
 	auto y = (GLint)(PLATFORM->getHeight() - pos.y - size.y);
 	auto w = (GLint)size.x;

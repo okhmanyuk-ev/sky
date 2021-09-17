@@ -565,9 +565,10 @@ void SceneHelpers::Blur::draw()
 {
 	Scene::Node::draw();
 
-	GRAPHICS->flush();
-
 	auto [pos, size] = getGlobalBounds();
+
+	if (size.x <= 0 || size.y <= 0)
+		return;
 
 	auto x = (int)glm::round(pos.x);
 	auto y = (int)glm::round(pos.y);
@@ -580,6 +581,7 @@ void SceneHelpers::Blur::draw()
 		mPrevSize = size;
 	}
 
+	GRAPHICS->flush();
 	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
 	
 	// TODO: every frame we create new texture, this is not good

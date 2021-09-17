@@ -62,13 +62,8 @@ namespace Renderer
 
 	private:
 		IDXGISwapChain* mSwapChain;
-
 		ID3D11Texture2D* depthStencilTexture;
-	
-	public: // TODO: make this private and non static
-		static inline ID3D11RenderTargetView* renderTargetView;
-	
-	private:
+		ID3D11RenderTargetView* renderTargetView;
 		ID3D11DepthStencilView* depthStencilView;
 
 		void createRenderTarget();

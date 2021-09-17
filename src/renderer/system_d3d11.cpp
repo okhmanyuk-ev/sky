@@ -384,9 +384,12 @@ void SystemD3D11::drawIndexed(size_t indexCount, size_t indexOffset, size_t vert
 
 void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory)
 {
-	ID3D11Resource* resource = NULL;
-	Renderer::SystemD3D11::renderTargetView->GetResource(&resource);
+	if (size.x <= 0 || size.y <= 0)
+		return;
 
+	ID3D11Resource* resource = NULL;
+	renderTargetView->GetResource(&resource);
+	
 	ID3D11Texture2D* texture = NULL;
 	resource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&texture);
 
@@ -396,11 +399,15 @@ void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void
 	desc.BindFlags = 0;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 	desc.MiscFlags = 0;
+
+	auto back_w = desc.Width;
+	auto back_h = desc.Height;
+
 	desc.Width = size.x;
 	desc.Height = size.y;
 
 	ID3D11Texture2D* staging_texture = NULL;
-	Renderer::SystemD3D11::Device->CreateTexture2D(&desc, NULL, &staging_texture);
+	Device->CreateTexture2D(&desc, NULL, &staging_texture);
 
 	auto src_x = (UINT)pos.x;
 	auto src_y = (UINT)pos.y;
@@ -413,7 +420,7 @@ void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void
 	if (pos.x < 0)
 	{
 		src_x = 0;
-		if (-pos.x > src_w)
+		if (-pos.x > size.x)
 			src_w = 0;
 		else
 			src_w += pos.x;
@@ -424,7 +431,7 @@ void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void
 	if (pos.y < 0)
 	{
 		src_y = 0;
-		if (-pos.y > src_h)
+		if (-pos.y > size.y)
 			src_h = 0;
 		else
 			src_h += pos.y;
@@ -440,12 +447,30 @@ void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void
 	box.front = 0;
 	box.back = 1;
 
-	Renderer::SystemD3D11::Context->CopySubresourceRegion(staging_texture, 0, dst_x, dst_y, 0, resource, 0, &box);
+	if (pos.y < (int)back_h && pos.x < (int)back_w)
+	{
+		Context->CopySubresourceRegion(staging_texture, 0, dst_x, dst_y, 0, resource, 0, &box);
 
-	D3D11_MAPPED_SUBRESOURCE mapped = { 0 };
-	Renderer::SystemD3D11::Context->Map(staging_texture, 0, D3D11_MAP_READ, 0, &mapped);
-	memcpy(memory, mapped.pData, size.x * size.y * 4);
-	Renderer::SystemD3D11::Context->Unmap(staging_texture, 0);
+		D3D11_MAPPED_SUBRESOURCE mapped = { 0 };
+		Context->Map(staging_texture, 0, D3D11_MAP_READ, 0, &mapped);
+		
+		auto dst_row_size = size.x * 4;
+
+		if (mapped.RowPitch == dst_row_size)
+		{
+			memcpy(memory, mapped.pData, size.x * size.y * 4);
+		}
+		else
+		{
+			for (int i = 0; i < size.y; i++)
+			{
+				auto src_row = (void*)(size_t(mapped.pData) + size_t(i) * mapped.RowPitch);
+				auto dst_row = (void*)(size_t(memory) + size_t(i) * dst_row_size);			
+				memcpy(dst_row, src_row, dst_row_size);
+			}
+		}
+		Context->Unmap(staging_texture, 0);
+	}
 
 	staging_texture->Release();
 	resource->Release();
