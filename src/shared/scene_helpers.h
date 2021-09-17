@@ -315,10 +315,10 @@ namespace Shared::SceneHelpers
 		{
 			T::touch(type, pos);
 
-			auto fixed_pos = pos / PLATFORM->getScale();
+			auto fixed_pos = pos;
 			
 			if (type != Scene::Node::Touch::Begin)
-				T::setPosition(T::getPosition() + fixed_pos - mPrevPosition);
+				T::setPosition(T::getPosition() + T::unproject(fixed_pos) - T::unproject(mPrevPosition));
 
 			mPrevPosition = fixed_pos;
 		}
