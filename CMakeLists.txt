@@ -127,6 +127,10 @@ add_library(${PROJECT_NAME} STATIC
 	${NETWORK_SRC}
 )
 
+if(MSVC)
+	target_compile_options(${PROJECT_NAME} PUBLIC /MP) # multicore compile
+endif()
+
 if(APPLE)
 	set(OBJC_SOURCES
 		src/renderer/system_gl.cpp
