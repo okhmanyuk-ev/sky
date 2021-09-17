@@ -400,7 +400,7 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 
 	bool visible = now - mScrollMoveTime < Clock::FromSeconds(Timeout) || scrollbox->isTouching();
 
-	if(visible)
+	if (visible)
 	{
 		if (!mHidden)
 			return;

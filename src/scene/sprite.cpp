@@ -31,10 +31,10 @@ void Sprite::update(Clock::Duration dTime)
 	if (mTexture == nullptr) 
 		return;
 
-	if (getAbsoluteWidth() <= 0.0f)
+	if (getAbsoluteWidth() <= 0.0f && getHorizontalStretch() <= 0.0f)
 		applyTextureWidth();
 
-	if (getAbsoluteHeight() <= 0.0f)
+	if (getAbsoluteHeight() <= 0.0f && getVerticalStretch() <= 0.0f)
 		applyTextureHeight();
 }
 
