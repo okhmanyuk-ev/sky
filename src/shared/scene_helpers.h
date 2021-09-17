@@ -363,48 +363,6 @@ namespace Shared::SceneHelpers
 		bool mHidden = false;
 	};
 
-	class StandardScreen : public Frontshaded<SceneManager::Screen>
-	{
-	public:
-		StandardScreen();
-		
-	protected:
-		void onEnterBegin() override;
-		void onEnterEnd() override;
-		void onLeaveBegin() override;
-		void onLeaveEnd() override;
-		void onWindowAppearing() override;
-		void onWindowDisappearing() override;
-
-	protected:
-		std::unique_ptr<Actions::Action> createEnterAction() override;
-		std::unique_ptr<Actions::Action> createLeaveAction() override;
-	};
-
-	class StandardWindow : public Scene::Clickable<Backshaded<Shared::SceneManager::Window>>
-	{
-	public:
-		StandardWindow();
-
-	public:
-		void onOpenEnd() override;
-		void onCloseBegin() override;
-
-	public:
-		std::unique_ptr<Actions::Action> createOpenAction() override;
-		std::unique_ptr<Actions::Action> createCloseAction() override;
-
-	public:
-		auto getContent() { return mContent; }
-
-		auto getCloseOnMissclick() const { return mCloseOnMissclick; }
-		void setCloseOnMissclick(bool value) { mCloseOnMissclick = value; }
-
-	private:
-		std::shared_ptr<Scene::Node> mContent;
-		bool mCloseOnMissclick = true;
-	};
-
 	class Blur : public Scene::Node
 	{
 	public:
@@ -424,6 +382,75 @@ namespace Shared::SceneHelpers
 
 	private:
 		float mIntensity = 1.0f;
+	};
+
+	class StandardScreen : public Frontshaded<SceneManager::Screen>
+	{
+	public:
+		StandardScreen();
+		
+	protected:
+		void onEnterBegin() override;
+		void onEnterEnd() override;
+		void onLeaveBegin() override;
+		void onLeaveEnd() override;
+		void onWindowAppearing() override;
+		void onWindowDisappearing() override;
+
+	protected:
+		std::unique_ptr<Actions::Action> createEnterAction() override;
+		std::unique_ptr<Actions::Action> createLeaveAction() override;
+	};
+
+	class StandardWindow : public Scene::Clickable<Shared::SceneManager::Window>
+	{
+	public:
+		StandardWindow();
+
+	public:
+		void onOpenEnd() override;
+		void onCloseBegin() override;
+
+	public:
+		std::unique_ptr<Actions::Action> createOpenAction() override;
+		std::unique_ptr<Actions::Action> createCloseAction() override;
+
+	protected:
+		virtual std::unique_ptr<Actions::Action> createOpenAction(float duration) = 0;
+		virtual std::unique_ptr<Actions::Action> createCloseAction(float duration) = 0;
+
+	public:
+		auto getContent() { return mContent; }
+
+		auto getCloseOnMissclick() const { return mCloseOnMissclick; }
+		void setCloseOnMissclick(bool value) { mCloseOnMissclick = value; }
+
+	private:
+		std::shared_ptr<Scene::Node> mContent;
+		bool mCloseOnMissclick = true;
+	};
+
+	class BackshadedStandardWindow : public Backshaded<StandardWindow>
+	{
+	public:
+		BackshadedStandardWindow();
+
+	public:
+		std::unique_ptr<Actions::Action> createOpenAction(float duration) override;
+		std::unique_ptr<Actions::Action> createCloseAction(float duration) override;
+	};
+
+	class BackblurredStandardWindow : public StandardWindow
+	{
+	public:
+		BackblurredStandardWindow();
+
+	public:
+		std::unique_ptr<Actions::Action> createOpenAction(float duration) override;
+		std::unique_ptr<Actions::Action> createCloseAction(float duration) override;
+
+	private:
+		std::shared_ptr<Blur> mBlur;
 	};
 
 	// 3d

@@ -436,6 +436,59 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 	}
 }
 
+// blur
+
+SceneHelpers::Blur::Blur()
+{
+	mSprite = std::make_shared<Scene::Sprite>();
+	mSprite->setStretch(1.0f);
+	mSprite->setSampler(Renderer::Sampler::Linear);
+	attach(mSprite);
+}
+
+void SceneHelpers::Blur::draw()
+{
+	Scene::Node::draw();
+
+	if (mIntensity <= 0.0f)
+	{
+		mSprite->setVisible(false);
+		return;
+	}
+
+	mSprite->setVisible(true);
+
+	auto [pos, size] = getGlobalBounds();
+
+	if (size.x <= 0 || size.y <= 0)
+		return;
+
+	auto x = (int)glm::round(pos.x);
+	auto y = (int)glm::round(pos.y);
+	auto w = (int)glm::round(size.x);
+	auto h = (int)glm::round(size.y);
+
+	if (size != mPrevSize)
+	{
+		mImage = std::make_shared<Graphics::Image>(w, h, 4);
+		mPrevSize = size;
+	}
+
+	GRAPHICS->flush();
+	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
+
+	// TODO: every frame we create new texture, this is not good
+
+	auto texture = std::make_shared<Renderer::Texture>(w, h, mImage->getChannels(), mImage->getMemory());
+	mSprite->setTexture(texture);
+
+	static auto blur_shader = std::make_shared<Renderer::Shaders::BoxBlur>(Renderer::Vertex::PositionColorTexture::Layout);
+	blur_shader->setResolution(glm::round(size));
+	blur_shader->setIntensity(mIntensity);
+
+	mSprite->setShader(blur_shader);
+}
+
 // standard screen
 
 SceneHelpers::StandardScreen::StandardScreen()
@@ -509,8 +562,6 @@ SceneHelpers::StandardWindow::StandardWindow()
 		SCENE_MANAGER->popWindow();
 	});
 
-	getBackshadeColor()->setColor({ Graphics::Color::Black, 0.0f });
-
 	mContent = std::make_shared<Scene::Node>();
 	mContent->setStretch(1.0f);
 	mContent->setAnchor({ 0.5f, -0.5f });
@@ -534,8 +585,8 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction(
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
 		Actions::Collection::MakeParallel(
-			Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, 0.5f, Easing::CubicOut),
-			Actions::Collection::ChangeVerticalAnchor(mContent, 0.5f, 0.5f, Easing::CubicOut)
+			Actions::Collection::ChangeVerticalAnchor(mContent, 0.5f, 0.5f, Easing::CubicOut),
+			createOpenAction(0.5f)
 		)
 	);
 };
@@ -546,55 +597,53 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 		Actions::Collection::WaitOneFrame(),
 		Actions::Collection::MakeParallel(
 			Actions::Collection::ChangeVerticalAnchor(mContent, -0.5f, 0.5f, Easing::CubicIn),
-			Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, 0.5f, Easing::CubicIn)
+			createCloseAction(0.5f)
 		)
 	);
 };
 
-// blur
+// backshaded standard window
 
-SceneHelpers::Blur::Blur()
+SceneHelpers::BackshadedStandardWindow::BackshadedStandardWindow()
 {
-	mSprite = std::make_shared<Scene::Sprite>();
-	mSprite->setStretch(1.0f);
-	mSprite->setSampler(Renderer::Sampler::Linear);
-	attach(mSprite);
+	getBackshadeColor()->setColor({ Graphics::Color::Black, 0.0f });
 }
 
-void SceneHelpers::Blur::draw()
+std::unique_ptr<Actions::Action> SceneHelpers::BackshadedStandardWindow::createOpenAction(float duration)
 {
-	Scene::Node::draw();
+	return Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, duration, Easing::CubicOut);
+};
 
-	auto [pos, size] = getGlobalBounds();
+std::unique_ptr<Actions::Action> SceneHelpers::BackshadedStandardWindow::createCloseAction(float duration)
+{
+	return Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, duration, Easing::CubicIn);
+};
 
-	if (size.x <= 0 || size.y <= 0)
-		return;
+// backblurred standard window
 
-	auto x = (int)glm::round(pos.x);
-	auto y = (int)glm::round(pos.y);
-	auto w = (int)glm::round(size.x);
-	auto h = (int)glm::round(size.y);
-
-	if (size != mPrevSize)
-	{
-		mImage = std::make_shared<Graphics::Image>(w, h, 4);
-		mPrevSize = size;
-	}
-
-	GRAPHICS->flush();
-	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
-	
-	// TODO: every frame we create new texture, this is not good
-
-	auto texture = std::make_shared<Renderer::Texture>(w, h, mImage->getChannels(), mImage->getMemory());
-	mSprite->setTexture(texture);
-
-	static auto blur_shader = std::make_shared<Renderer::Shaders::BoxBlur>(Renderer::Vertex::PositionColorTexture::Layout);
-	blur_shader->setResolution(glm::round(size));
-	blur_shader->setIntensity(mIntensity);
-
-	mSprite->setShader(blur_shader);
+SceneHelpers::BackblurredStandardWindow::BackblurredStandardWindow()
+{
+	mBlur = std::make_shared<Blur>();
+	mBlur->setStretch(1.0f);
+	mBlur->setIntensity(0.0f);
+	attach(mBlur, Scene::Node::AttachDirection::Front);
 }
+
+std::unique_ptr<Actions::Action> SceneHelpers::BackblurredStandardWindow::createOpenAction(float duration)
+{
+	return Actions::Collection::Interpolate(mBlur->getIntensity(), 1.0f, duration, Easing::CubicOut, [this](float value) {
+		mBlur->setIntensity(value);
+	});
+};
+
+std::unique_ptr<Actions::Action> SceneHelpers::BackblurredStandardWindow::createCloseAction(float duration)
+{
+	return Actions::Collection::Interpolate(mBlur->getIntensity(), 0.0f, duration, Easing::CubicIn, [this](float value) {
+		mBlur->setIntensity(value);
+	});
+};
+
+// 3d
 
 std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)
 {
