@@ -441,6 +441,7 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 SceneHelpers::Blur::Blur()
 {
 	setSampler(Renderer::Sampler::LinearMipmapLinear);
+	setBlendMode(Renderer::BlendStates::Opaque);
 }
 
 void SceneHelpers::Blur::draw()
@@ -469,12 +470,7 @@ void SceneHelpers::Blur::draw()
 	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
 
 	getTexture()->writePixels(w, h, mImage->getChannels(), mImage->getMemory());
-
-	static auto blur_shader = std::make_shared<Renderer::Shaders::BiasMipmapBlur>(Renderer::Vertex::PositionColorTexture::Layout);
-	//blur_shader->setResolution(glm::round(size));
-	blur_shader->setIntensity(mBlurIntensity);
-
-	setShader(blur_shader);
+	setMipmapBias(mBlurIntensity * 6.0f);
 
 	Scene::Sprite::draw();
 }

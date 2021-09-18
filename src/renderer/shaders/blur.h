@@ -65,23 +65,4 @@ namespace Renderer::Shaders
 	private:
 		ConstantBuffer mConstantBuffer;
 	};
-
-	class BiasMipmapBlur : public ShaderCustom
-	{
-	private:
-		struct alignas(16) ConstantBuffer
-		{
-			float intensity = 1.0f;
-		};
-
-	public:
-		BiasMipmapBlur(const Vertex::Layout& layout);
-
-	public:
-		auto getIntensity() const { return mConstantBuffer.intensity; }
-		void setIntensity(float value) { mConstantBuffer.intensity = value; }
-
-	private:
-		ConstantBuffer mConstantBuffer;
-	};
 }
