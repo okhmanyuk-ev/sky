@@ -381,10 +381,17 @@ namespace Shared::SceneHelpers
 		std::unique_ptr<Actions::Action> createLeaveAction() override;
 	};
 
-	class StandardWindow : public Scene::Clickable<Shared::SceneManager::Window>
+	class StandardWindow : public Scene::Clickable<Backshaded<Shared::SceneManager::Window>>
 	{
 	public:
-		StandardWindow();
+		enum class Flag
+		{
+			Blur,
+			Fade
+		};
+
+	public:
+		StandardWindow(const std::set<Flag> flags);
 
 	public:
 		void onOpenEnd() override;
@@ -394,10 +401,6 @@ namespace Shared::SceneHelpers
 		std::unique_ptr<Actions::Action> createOpenAction() override;
 		std::unique_ptr<Actions::Action> createCloseAction() override;
 
-	protected:
-		virtual std::unique_ptr<Actions::Action> createOpenAction(float duration) = 0;
-		virtual std::unique_ptr<Actions::Action> createCloseAction(float duration) = 0;
-
 	public:
 		auto getContent() { return mContent; }
 
@@ -406,30 +409,9 @@ namespace Shared::SceneHelpers
 
 	private:
 		std::shared_ptr<Scene::Node> mContent;
-		bool mCloseOnMissclick = true;
-	};
-
-	class BackshadedStandardWindow : public Backshaded<StandardWindow>
-	{
-	public:
-		BackshadedStandardWindow();
-
-	public:
-		std::unique_ptr<Actions::Action> createOpenAction(float duration) override;
-		std::unique_ptr<Actions::Action> createCloseAction(float duration) override;
-	};
-
-	class BackblurredStandardWindow : public StandardWindow
-	{
-	public:
-		BackblurredStandardWindow();
-
-	public:
-		std::unique_ptr<Actions::Action> createOpenAction(float duration) override;
-		std::unique_ptr<Actions::Action> createCloseAction(float duration) override;
-
-	private:
 		std::shared_ptr<Scene::Blur> mBlur;
+		bool mCloseOnMissclick = true;
+		std::set<Flag> mFlags;
 	};
 
 	// 3d

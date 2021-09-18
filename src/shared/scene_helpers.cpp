@@ -496,7 +496,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction
 
 // standard window
 
-SceneHelpers::StandardWindow::StandardWindow()
+SceneHelpers::StandardWindow::StandardWindow(const std::set<Flag> flags) : mFlags(flags)
 {
 	setStretch(1.0f);
 	setClickCallback([this] {
@@ -515,6 +515,16 @@ SceneHelpers::StandardWindow::StandardWindow()
 	mContent->setPivot({ 0.5f, 0.5f });
 	mContent->setInteractions(false);
 	attach(mContent);
+
+	getBackshadeColor()->setColor({ Graphics::Color::Black, 0.0f });
+
+	if (flags.contains(Flag::Blur))
+	{
+		mBlur = std::make_shared<Scene::Blur>();
+		mBlur->setStretch(1.0f);
+		mBlur->setBlurIntensity(0.0f);
+		attach(mBlur, Scene::Node::AttachDirection::Front);
+	}
 }
 
 void SceneHelpers::StandardWindow::onOpenEnd()
@@ -529,61 +539,54 @@ void SceneHelpers::StandardWindow::onCloseBegin()
 
 std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction()
 {
+	const float Duration = 0.5f;
+
+	auto features = Actions::Collection::MakeParallel();
+
+	if (mFlags.contains(Flag::Fade))
+	{
+		features->add(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, Duration, Easing::CubicOut));
+	}
+
+	if (mFlags.contains(Flag::Blur))
+	{
+		features->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
+		features->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
+	}
+
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
 		Actions::Collection::MakeParallel(
 			Actions::Collection::ChangeVerticalAnchor(mContent, 0.5f, 0.5f, Easing::CubicOut),
-			createOpenAction(0.5f)
+			std::move(features)
 		)
 	);
 };
 
 std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction()
 {
+	const float Duration = 0.5f;
+
+	auto features = Actions::Collection::MakeParallel();
+
+	if (mFlags.contains(Flag::Fade))
+	{
+		features->add(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, Duration, Easing::CubicIn));
+	}
+
+	if (mFlags.contains(Flag::Blur))
+	{
+		features->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
+		features->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
+	}
+
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
 		Actions::Collection::MakeParallel(
 			Actions::Collection::ChangeVerticalAnchor(mContent, -0.5f, 0.5f, Easing::CubicIn),
-			createCloseAction(0.5f)
+			std::move(features)
 		)
 	);
-};
-
-// backshaded standard window
-
-SceneHelpers::BackshadedStandardWindow::BackshadedStandardWindow()
-{
-	getBackshadeColor()->setColor({ Graphics::Color::Black, 0.0f });
-}
-
-std::unique_ptr<Actions::Action> SceneHelpers::BackshadedStandardWindow::createOpenAction(float duration)
-{
-	return Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, duration, Easing::CubicOut);
-};
-
-std::unique_ptr<Actions::Action> SceneHelpers::BackshadedStandardWindow::createCloseAction(float duration)
-{
-	return Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, duration, Easing::CubicIn);
-};
-
-// backblurred standard window
-
-SceneHelpers::BackblurredStandardWindow::BackblurredStandardWindow()
-{
-	mBlur = std::make_shared<Scene::Blur>();
-	mBlur->setStretch(1.0f);
-	mBlur->setBlurIntensity(0.0f);
-	attach(mBlur, Scene::Node::AttachDirection::Front);
-}
-
-std::unique_ptr<Actions::Action> SceneHelpers::BackblurredStandardWindow::createOpenAction(float duration)
-{
-	return Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, duration, Easing::CubicOut);
-};
-
-std::unique_ptr<Actions::Action> SceneHelpers::BackblurredStandardWindow::createCloseAction(float duration)
-{
-	return Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, duration, Easing::CubicIn);
 };
 
 // 3d
