@@ -440,23 +440,13 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 
 SceneHelpers::Blur::Blur()
 {
-	mSprite = std::make_shared<Scene::Sprite>();
-	mSprite->setStretch(1.0f);
-	mSprite->setSampler(Renderer::Sampler::LinearMipmapLinear);
-	attach(mSprite);
+	setSampler(Renderer::Sampler::LinearMipmapLinear);
 }
 
 void SceneHelpers::Blur::draw()
 {
-	Scene::Node::draw();
-
-	if (mIntensity <= 0.0f)
-	{
-		mSprite->setVisible(false);
+	if (mBlurIntensity <= 0.0f)
 		return;
-	}
-
-	mSprite->setVisible(true);
 
 	auto [pos, size] = getGlobalBounds();
 
@@ -471,21 +461,22 @@ void SceneHelpers::Blur::draw()
 	if (size != mPrevSize)
 	{
 		mImage = std::make_shared<Graphics::Image>(w, h, 4);
-		mSprite->setTexture(std::make_shared<Renderer::Texture>(w, h, true));
+		setTexture(std::make_shared<Renderer::Texture>(w, h, true));
 		mPrevSize = size;
 	}
 
 	GRAPHICS->flush();
 	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
 
-	auto texture = mSprite->getTexture();
-	texture->writePixels(w, h, mImage->getChannels(), mImage->getMemory());
+	getTexture()->writePixels(w, h, mImage->getChannels(), mImage->getMemory());
 
 	static auto blur_shader = std::make_shared<Renderer::Shaders::BiasMipmapBlur>(Renderer::Vertex::PositionColorTexture::Layout);
 	//blur_shader->setResolution(glm::round(size));
-	blur_shader->setIntensity(mIntensity);
+	blur_shader->setIntensity(mBlurIntensity);
 
-	mSprite->setShader(blur_shader);
+	setShader(blur_shader);
+
+	Scene::Sprite::draw();
 }
 
 // standard screen
@@ -624,21 +615,21 @@ SceneHelpers::BackblurredStandardWindow::BackblurredStandardWindow()
 {
 	mBlur = std::make_shared<Blur>();
 	mBlur->setStretch(1.0f);
-	mBlur->setIntensity(0.0f);
+	mBlur->setBlurIntensity(0.0f);
 	attach(mBlur, Scene::Node::AttachDirection::Front);
 }
 
 std::unique_ptr<Actions::Action> SceneHelpers::BackblurredStandardWindow::createOpenAction(float duration)
 {
-	return Actions::Collection::Interpolate(mBlur->getIntensity(), 1.0f, duration, Easing::CubicOut, [this](float value) {
-		mBlur->setIntensity(value);
+	return Actions::Collection::Interpolate(mBlur->getBlurIntensity(), 1.0f, duration, Easing::CubicOut, [this](float value) {
+		mBlur->setBlurIntensity(value);
 	});
 };
 
 std::unique_ptr<Actions::Action> SceneHelpers::BackblurredStandardWindow::createCloseAction(float duration)
 {
-	return Actions::Collection::Interpolate(mBlur->getIntensity(), 0.0f, duration, Easing::CubicIn, [this](float value) {
-		mBlur->setIntensity(value);
+	return Actions::Collection::Interpolate(mBlur->getBlurIntensity(), 0.0f, duration, Easing::CubicIn, [this](float value) {
+		mBlur->setBlurIntensity(value);
 	});
 };
 
