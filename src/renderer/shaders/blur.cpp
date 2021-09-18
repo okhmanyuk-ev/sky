@@ -323,7 +323,7 @@ namespace
 
 		void main()
 		{
-			float bias = uIntensity * 4.0;
+			float bias = uIntensity * 5.0;
 			vec4 col = texture(uTexture, vTexCoord, bias);
 			fragColor = vec4(col.rgb, 1.0);
 		}
@@ -365,7 +365,7 @@ namespace
 
 		float4 ps_main(PixelInput input) : SV_TARGET
 		{
-			float bias = intensity * 4.0;
+			float bias = intensity * 5.0;
 			float4 result = texture0.SampleBias(sampler0, input.uv, bias);
 			result.a = 1.0;
 			return result;
