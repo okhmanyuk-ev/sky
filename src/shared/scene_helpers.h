@@ -363,26 +363,6 @@ namespace Shared::SceneHelpers
 		bool mHidden = false;
 	};
 
-	class Blur : public Scene::Sprite
-	{
-	public:
-		Blur();
-
-	protected:
-		void draw() override;
-
-	private:
-		std::shared_ptr<Graphics::Image> mImage = nullptr;
-		glm::vec2 mPrevSize = { 0.0f, 0.0f };
-
-	public:
-		auto getBlurIntensity() const { return mBlurIntensity; }
-		void setBlurIntensity(float value) { mBlurIntensity = value; }
-
-	private:
-		float mBlurIntensity = 1.0f;
-	};
-
 	class StandardScreen : public Frontshaded<SceneManager::Screen>
 	{
 	public:
@@ -449,7 +429,7 @@ namespace Shared::SceneHelpers
 		std::unique_ptr<Actions::Action> createCloseAction(float duration) override;
 
 	private:
-		std::shared_ptr<Blur> mBlur;
+		std::shared_ptr<Scene::Blur> mBlur;
 	};
 
 	// 3d

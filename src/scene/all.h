@@ -5,6 +5,7 @@
 #include <scene/ani_sprite.h>
 #include <scene/blend.h>
 #include <scene/bloom_layer.h>
+#include <scene/blur.h>
 #include <scene/circle.h>
 #include <scene/clickable.h>
 #include <scene/clippable.h>

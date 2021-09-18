@@ -4,6 +4,7 @@
 #include <scene/color.h>
 #include <scene/circle.h>
 #include <scene/scrollbox.h>
+#include <scene/blur.h>
 #include <common/actions.h>
 #include <common/easing.h>
 
@@ -115,4 +116,7 @@ namespace Actions::Collection
 
 	UAction ChangeRadialAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeRadialAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
+	UAction ChangeBlurIntensity(std::shared_ptr<Scene::Blur> blur, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeBlurIntensity(std::shared_ptr<Scene::Blur> blur, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 }

@@ -224,7 +224,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Separator();
 	}
 
-	if (auto blur = std::dynamic_pointer_cast<SceneHelpers::Blur>(node); blur != nullptr)
+	if (auto blur = std::dynamic_pointer_cast<Scene::Blur>(node); blur != nullptr)
 	{
 		auto intensity = blur->getBlurIntensity();
 
