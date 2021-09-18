@@ -315,6 +315,12 @@ void SystemGL::setSampler(const Sampler& value)
 	updateGLSampler();
 }
 
+void SystemGL::setMipmapBias(float value)
+{
+	mMipmapBias = value;
+	updateGLSampler();
+}
+
 void SystemGL::setDepthMode(const DepthMode& value)
 {
 	if (value.enabled)
@@ -665,5 +671,6 @@ void SystemGL::updateGLSampler()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	}
 
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, mMipmapBias);
 }
 #endif
