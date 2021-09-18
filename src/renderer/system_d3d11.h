@@ -34,6 +34,7 @@ namespace Renderer
 		void setRenderTarget(std::shared_ptr<RenderTarget> value) override;
 		void setShader(std::shared_ptr<Shader> value) override;
 		void setSampler(const Sampler& value) override;
+		void setMipmapBias(float value) override;
 		void setDepthMode(const DepthMode& value) override;
 		void setStencilMode(const StencilMode& value) override;
 		void setCullMode(const CullMode& value) override;
@@ -179,6 +180,7 @@ namespace Renderer
 		{
 			Sampler sampler = Sampler::Linear;
 			TextureAddress textureAddress = TextureAddress::Clamp;
+			float mipmapBias = 0.0f;
 
 			struct Hasher
 			{
@@ -187,6 +189,7 @@ namespace Renderer
 					size_t seed = 0;
 					Common::Hash::combine(seed, k.sampler);
 					Common::Hash::combine(seed, k.textureAddress);
+					Common::Hash::combine(seed, k.mipmapBias);
 					return seed;
 				}
 			};
@@ -197,7 +200,8 @@ namespace Renderer
 				{
 					return 
 						left.sampler == right.sampler &&
-						left.textureAddress == right.textureAddress;
+						left.textureAddress == right.textureAddress &&
+						left.mipmapBias == right.mipmapBias;
 				}
 			};
 		};

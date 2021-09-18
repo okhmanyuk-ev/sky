@@ -67,6 +67,7 @@ void System::applyState()
 	bool samplerChanged = true;
 	bool textureAddressChanged = true;
 	bool stencilChanged = true;
+	bool mipmapBiasChanged = true;
 
 	if (mAppliedState.has_value())
 	{
@@ -85,6 +86,7 @@ void System::applyState()
 		samplerChanged = applied_state.sampler != state.sampler;
 		textureAddressChanged = applied_state.textureAddress != state.textureAddress;
 		stencilChanged = applied_state.stencilMode != state.stencilMode;
+		mipmapBiasChanged = applied_state.mipmapBias != state.mipmapBias;
 	}
 
 	if (scissorChanged)
@@ -118,6 +120,9 @@ void System::applyState()
 	
 	if (stencilChanged)
 		RENDERER->setStencilMode(state.stencilMode);
+
+	if (mipmapBiasChanged)
+		RENDERER->setMipmapBias(state.mipmapBias);
 
 	mAppliedState = state;
 }
@@ -791,6 +796,13 @@ void System::pushStencilMode(const Renderer::StencilMode& value)
 {
 	auto state = mStates.top();
 	state.stencilMode = value;
+	push(state);
+}
+
+void System::pushMipmapBias(float value)
+{
+	auto state = mStates.top();
+	state.mipmapBias = value;
 	push(state);
 }
 

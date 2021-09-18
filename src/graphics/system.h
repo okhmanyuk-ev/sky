@@ -148,6 +148,7 @@ namespace Graphics
 		void pushOrthoMatrix(float width, float height);
 		void pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
 		void pushStencilMode(const Renderer::StencilMode& value);
+		void pushMipmapBias(float value);
 
 		auto getCurrentState() const { return mStates.top(); }
 		
@@ -166,6 +167,7 @@ namespace Graphics
 			Renderer::Sampler sampler = Renderer::Sampler::Nearest;
 			Renderer::TextureAddress textureAddress = Renderer::TextureAddress::Clamp;
 			Renderer::StencilMode stencilMode = Renderer::StencilMode();
+			float mipmapBias = 0.0f;
 		};
 
 	private:
@@ -250,7 +252,8 @@ namespace Graphics
 			left.blendMode == right.blendMode &&
 			left.sampler == right.sampler &&
 			left.textureAddress == right.textureAddress &&
-			left.stencilMode == right.stencilMode;
+			left.stencilMode == right.stencilMode &&
+			left.mipmapBias == right.mipmapBias;
 	}
 
 	inline bool operator!=(const System::State& left, const System::State& right)
