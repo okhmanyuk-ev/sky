@@ -414,6 +414,13 @@ namespace Shared::SceneHelpers
 		std::set<Flag> mFlags;
 	};
 
+	class BlurDemo : public Scene::Clickable<Shared::SceneHelpers::MovableByHand<Scene::Node>>,
+		public std::enable_shared_from_this<BlurDemo>
+	{
+	public:
+		BlurDemo();
+	};
+
 	// 3d
 
 	std::vector<std::shared_ptr<Scene3D::Model>> MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension);

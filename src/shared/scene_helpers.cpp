@@ -589,6 +589,56 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 	);
 };
 
+// blur demo
+
+SceneHelpers::BlurDemo::BlurDemo()
+{
+	setClickCallback([this] {
+		runAction(Actions::Collection::Kill(shared_from_this()));
+	});
+
+	auto blur = std::make_shared<Shared::SceneHelpers::Outlined<Scene::Blur>>();
+	blur->setStretch(1.0f);
+	attach(blur);
+
+	auto rect = std::make_shared<Scene::Rectangle>();
+	rect->setStretch({ 1.0f, 0.0f });
+	rect->setHeight(8.0f);
+	rect->setAnchor({ 0.5f, 1.0f });
+	rect->setPivot({ 0.5f, 0.0f });
+	rect->setY(4.0f);
+	rect->setAlpha(0.25f);
+	blur->attach(rect);
+
+	auto slider = std::make_shared<Scene::Rectangle>();
+	slider->setPivot(0.5f);
+	slider->setAnchor(0.5f);
+	slider->setStretch({ 0.0f, 1.0f });
+	slider->setWidth(8.0f);
+
+	auto scrollbox = std::make_shared<Scene::Scrollbox>();
+	scrollbox->setInertiaEnabled(false);
+	scrollbox->setStretch(1.0f);
+	scrollbox->getBounding()->setStretch(1.0f);
+	scrollbox->getBounding()->setAnchor(0.5f);
+	scrollbox->getBounding()->setPivot(0.5f);
+	scrollbox->getContent()->setStretch({ 2.0f, 1.0f });
+	scrollbox->getContent()->attach(slider);
+	rect->attach(scrollbox);
+
+	auto label = std::make_shared<Scene::Label>();
+	label->setPosition({ 2.0f, 2.0f });
+	label->setFontSize(12.0f);
+	blur->attach(label);
+
+	runAction(Actions::Collection::ExecuteInfinite([scrollbox, slider, blur, label] {
+		auto h_pos = scrollbox->getHorizontalScrollPosition();
+		blur->setBlurIntensity(1.0f - h_pos);
+		slider->setHorizontalPivot(1.0f - h_pos);
+		label->setText(fmt::format("{:.{}f}", blur->getBlurIntensity(), 2));
+	}));
+}
+
 // 3d
 
 std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)
