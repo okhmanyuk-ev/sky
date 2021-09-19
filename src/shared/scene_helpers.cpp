@@ -657,6 +657,31 @@ SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 	}));
 }
 
+// shockwave
+
+std::shared_ptr<SceneHelpers::Shockwave> SceneHelpers::Shockwave::MakeAnimated(float duration)
+{
+	auto shockwave = std::make_shared<Shockwave>();
+	shockwave->setProgress(0.0f);
+	shockwave->runAction(Actions::Collection::MakeSequence(
+		Actions::Collection::Interpolate(0.0f, 1.0f, duration, Easing::Linear, [shockwave](float value) {
+			shockwave->setProgress(value);
+		}),
+		Actions::Collection::Kill(shockwave)
+	));
+	return shockwave;
+}
+
+void SceneHelpers::Shockwave::draw()
+{
+	static auto shader = std::make_shared<Renderer::Shaders::Shockwave>(Renderer::Vertex::PositionColorTexture::Layout);
+
+	shader->setProgress(mProgress);
+	setShader(shader);
+
+	Glass::draw();
+}
+
 // 3d
 
 std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)

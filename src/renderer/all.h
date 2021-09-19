@@ -30,3 +30,4 @@
 #include "shaders/rounded.h"
 #include "shaders/sdf.h"
 #include "shaders/shadertoy.h"
+#include "shaders/shockwave.h"

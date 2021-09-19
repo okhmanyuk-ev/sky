@@ -423,6 +423,22 @@ namespace Shared::SceneHelpers
 		BlurredGlassDemo();
 	};
 
+	class Shockwave : public Scene::GrayscaledGlass
+	{
+	public:
+		static std::shared_ptr<Shockwave> MakeAnimated(float duration = 1.0f);
+
+	public:
+		void draw() override;
+
+	public:
+		auto getProgress() const { return mProgress; }
+		void setProgress(float value) { mProgress = value; }
+
+	private:
+		float mProgress = 0.5f;
+	};
+
 	// 3d
 
 	std::vector<std::shared_ptr<Scene3D::Model>> MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension);
