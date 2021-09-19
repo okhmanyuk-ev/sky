@@ -68,7 +68,7 @@ namespace
 #endif
 }
 
-Sdf::Sdf(const Vertex::Layout& layout) : Default(layout, { Flag::Colored, Flag::Textured }, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
+Sdf::Sdf(const Vertex::Layout& layout) : Default(layout, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
 {
 	setCustomConstantBuffer(&mCustomConstantBuffer);
 }

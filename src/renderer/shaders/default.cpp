@@ -100,6 +100,7 @@ namespace
 
 		struct PixelInput
 		{
+			float3 pos : POSITION0;
 		#ifdef HAS_COLOR_ATTRIB
 			float4 col : COLOR0;
 		#endif
@@ -117,6 +118,7 @@ namespace
 		PixelInput vs_main(VertexInput input)
 		{
 			PixelInput result;
+			result.pos = input.pos;
 		#ifdef HAS_COLOR_ATTRIB
 			result.col = input.col;
 		#endif
@@ -156,7 +158,7 @@ Default::Default(const Vertex::Layout& layout, const std::set<Flag>& flags, size
 	//
 }
 
-Default::Default(const Vertex::Layout& layout) : Default(layout, MakeFlagsFromLayout(layout))
+Default::Default(const Vertex::Layout& layout, size_t customConstantBufferSize, std::optional<CustomCode> custom_code) : Default(layout, MakeFlagsFromLayout(layout), customConstantBufferSize, custom_code)
 { 
 	//
 };
@@ -199,7 +201,13 @@ std::string Default::MakeDefinesFromFlags(const Vertex::Layout& layout, const st
 		assert(index != std::string::npos);
 		result.replace(index, replace.length(), custom_code->constant_buffer_fields);
 
+#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
+		result += "\n#ifdef FRAGMENT_SHADER\n";
+#endif
 		result += custom_code->fragment_func;
+#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
+		result += "\n#endif\n";
+#endif
 	}
 
 	return result;

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <renderer/shader_custom.h>
+#include <renderer/shaders/default.h>
 
 namespace Renderer::Shaders
 {
-	class Circle : public ShaderCustom
+	class Circle : public Default
 	{
 	private:
 		struct alignas(16) CustomConstantBuffer
@@ -17,18 +17,6 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		enum class Flag
-		{
-			Textured,
-			Colored
-		};
-
-	private:
-		static std::set<Flag> MakeFlagsFromLayout(const Vertex::Layout& layout);
-		static std::string MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags);
-
-	public:
-		Circle(const Vertex::Layout& layout, const std::set<Flag>& flags);
 		Circle(const Vertex::Layout& layout);
 		
 	public:

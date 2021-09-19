@@ -28,6 +28,6 @@ namespace Renderer::Shaders
 
 	public:
 		Default(const Vertex::Layout& layout, const std::set<Flag>& flags, size_t customConstantBufferSize = 0, std::optional<CustomCode> custom_code = std::nullopt);
-		Default(const Vertex::Layout& layout);
+		Default(const Vertex::Layout& layout, size_t customConstantBufferSize = 0, std::optional<CustomCode> custom_code = std::nullopt);
 	};
 }

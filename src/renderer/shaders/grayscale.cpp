@@ -36,7 +36,7 @@ namespace
 #endif
 }
 
-Grayscale::Grayscale(const Vertex::Layout& layout) : Default(layout, { Flag::Colored, Flag::Textured }, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
+Grayscale::Grayscale(const Vertex::Layout& layout) : Default(layout, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
 {
 	setCustomConstantBuffer(&mCustomConstantBuffer);
 };
