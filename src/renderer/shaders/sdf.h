@@ -1,10 +1,10 @@
 #pragma once
 
-#include <renderer/shader_custom.h>
+#include <renderer/shaders/default.h>
 
 namespace Renderer::Shaders
 {
-	class Sdf : public ShaderCustom
+	class Sdf : public Default
 	{
 	private:
 		struct alignas(16) CustomConstantBuffer
