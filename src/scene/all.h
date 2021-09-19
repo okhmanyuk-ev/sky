@@ -12,6 +12,7 @@
 #include <scene/color.h>
 #include <scene/cullable.h>
 #include <scene/emitter.h>
+#include <scene/glass.h>
 #include <scene/label.h>
 #include <scene/node.h>
 #include <scene/rectangle.h>

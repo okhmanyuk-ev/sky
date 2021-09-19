@@ -1,20 +1,16 @@
 #pragma once
 
-#include <scene/sprite.h>
+#include <scene/glass.h>
 
 namespace Scene
 {
-	class Blur : public Sprite
+	class Blur : public Glass
 	{
 	public:
 		Blur();
 
 	protected:
 		void draw() override;
-
-	private:
-		std::shared_ptr<Graphics::Image> mImage = nullptr;
-		glm::vec2 mPrevSize = { 0.0f, 0.0f };
 
 	public:
 		auto getBlurIntensity() const { return mBlurIntensity; }
