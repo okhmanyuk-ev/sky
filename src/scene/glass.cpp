@@ -46,6 +46,18 @@ void BlurredGlass::draw()
 		return;
 
 	setMipmapBias(mBlurIntensity * 6.0f);
+	Glass::draw();
+}
 
+// grayscaled glass
+
+void GrayscaledGlass::draw()
+{
+	if (mGrayscaleIntensity <= 0.0f)
+		return;
+
+	auto static shader = std::make_shared<Renderer::Shaders::Grayscale>(Renderer::Vertex::PositionColorTexture::Layout);
+	shader->setIntensity(mGrayscaleIntensity);
+	setShader(shader);
 	Glass::draw();
 }

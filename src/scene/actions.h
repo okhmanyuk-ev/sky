@@ -117,6 +117,9 @@ namespace Actions::Collection
 	UAction ChangeRadialAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeRadialAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blur, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blur, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
+	UAction ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 }

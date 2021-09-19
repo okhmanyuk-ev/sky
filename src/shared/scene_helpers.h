@@ -41,7 +41,7 @@ namespace Shared::SceneHelpers
 		GrayscaleSprite();
 
 	protected:
-		void draw();
+		void draw() override;
 
 	private:
 		static inline std::shared_ptr<Renderer::Shaders::Grayscale> Shader = nullptr;
@@ -387,7 +387,8 @@ namespace Shared::SceneHelpers
 		enum class Flag
 		{
 			Blur,
-			Fade
+			Fade,
+			Gray
 		};
 
 	public:
@@ -410,6 +411,7 @@ namespace Shared::SceneHelpers
 	private:
 		std::shared_ptr<Scene::Node> mContent;
 		std::shared_ptr<Scene::BlurredGlass> mBlur;
+		std::shared_ptr<Scene::GrayscaledGlass> mGray;
 		bool mCloseOnMissclick = true;
 		std::set<Flag> mFlags;
 	};

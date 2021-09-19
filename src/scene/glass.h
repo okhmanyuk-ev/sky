@@ -36,4 +36,17 @@ namespace Scene
 	private:
 		float mBlurIntensity = 1.0f;
 	};
+
+	class GrayscaledGlass : public Glass
+	{
+	protected:
+		void draw() override;
+
+	public:
+		auto getGrayscaleIntensity() const { return mGrayscaleIntensity; }
+		void setGrayscaleIntensity(float value) { mGrayscaleIntensity = value; }
+
+	private:
+		float mGrayscaleIntensity = 1.0f;
+	};
 }

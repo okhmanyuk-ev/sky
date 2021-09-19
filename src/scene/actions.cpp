@@ -507,16 +507,30 @@ Collection::UAction Collection::ChangeRadialAnchor(SceneTransform node, float de
 	});
 }
 
-Collection::UAction Collection::ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blur, float start, float dest, float duration, EasingFunction easingFunction)
+Collection::UAction Collection::ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float start, float dest, float duration, EasingFunction easingFunction)
 {
-	return Interpolate(start, dest, duration, easingFunction, [blur](float value) {
-		blur->setBlurIntensity(value);
+	return Interpolate(start, dest, duration, easingFunction, [blurred_glass](float value) {
+		blurred_glass->setBlurIntensity(value);
 	});
 }
 
-Collection::UAction Collection::ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blur, float dest, float duration, EasingFunction easingFunction)
+Collection::UAction Collection::ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float dest, float duration, EasingFunction easingFunction)
 {
-	return Insert([blur, dest, duration, easingFunction] {
-		return ChangeBlurIntensity(blur, blur->getBlurIntensity(), dest, duration, easingFunction);
+	return Insert([blurred_glass, dest, duration, easingFunction] {
+		return ChangeBlurIntensity(blurred_glass, blurred_glass->getBlurIntensity(), dest, duration, easingFunction);
+	});
+}
+
+Collection::UAction Collection::ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [grayscaled_glass](float value) {
+		grayscaled_glass->setGrayscaleIntensity(value);
+	});
+}
+
+Collection::UAction Collection::ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([grayscaled_glass, dest, duration, easingFunction] {
+		return ChangeGrayscaleIntensity(grayscaled_glass, grayscaled_glass->getGrayscaleIntensity(), dest, duration, easingFunction);
 	});
 }

@@ -525,6 +525,14 @@ SceneHelpers::StandardWindow::StandardWindow(const std::set<Flag> flags) : mFlag
 		mBlur->setBlurIntensity(0.0f);
 		attach(mBlur, Scene::Node::AttachDirection::Front);
 	}
+
+	if (flags.contains(Flag::Gray))
+	{
+		mGray = std::make_shared<Scene::GrayscaledGlass>();
+		mGray->setStretch(1.0f);
+		mGray->setGrayscaleIntensity(0.0f);
+		attach(mGray, Scene::Node::AttachDirection::Front);
+	}
 }
 
 void SceneHelpers::StandardWindow::onOpenEnd()
@@ -554,6 +562,11 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction(
 		features->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
 	}
 
+	if (mFlags.contains(Flag::Gray))
+	{
+		features->add(Actions::Collection::ChangeGrayscaleIntensity(mGray, 1.0f, Duration, Easing::CubicOut));
+	}
+
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
 		Actions::Collection::MakeParallel(
@@ -578,6 +591,11 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 	{
 		features->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
 		features->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
+	}
+
+	if (mFlags.contains(Flag::Gray))
+	{
+		features->add(Actions::Collection::ChangeGrayscaleIntensity(mGray, 0.0f, Duration, Easing::CubicIn));
 	}
 
 	return Actions::Collection::MakeSequence(
