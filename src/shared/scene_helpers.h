@@ -423,20 +423,31 @@ namespace Shared::SceneHelpers
 		BlurredGlassDemo();
 	};
 
-	class Shockwave : public Scene::GrayscaledGlass
+	class Shockwave : public Scene::Glass
 	{
 	public:
 		static std::shared_ptr<Shockwave> MakeAnimated(float duration = 1.0f);
 
 	public:
+		Shockwave();
+
+	public:
 		void draw() override;
 
 	public:
-		auto getProgress() const { return mProgress; }
-		void setProgress(float value) { mProgress = value; }
+		auto getShockwaveSize() const { return mShockwaveSize; }
+		void setShockwaveSize(float value) { mShockwaveSize = value; }
+
+		auto getShockwaveThickness() const { return mShockwaveThickness; }
+		void setShockwaveThickness(float value) { mShockwaveThickness = value; }
+
+		auto getShockwaveForce() const { return mShockwaveForce; }
+		void setShockwaveForce(float value) { mShockwaveForce = value; }
 
 	private:
-		float mProgress = 0.5f;
+		float mShockwaveSize = 1.0f;
+		float mShockwaveThickness = 1.0f;
+		float mShockwaveForce = 1.0f;
 	};
 
 	// 3d

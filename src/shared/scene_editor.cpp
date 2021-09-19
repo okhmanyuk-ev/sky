@@ -232,6 +232,23 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Separator();
 	}
 
+	if (auto shockwave = std::dynamic_pointer_cast<Shared::SceneHelpers::Shockwave>(node); shockwave != nullptr)
+	{
+		auto size = shockwave->getShockwaveSize();
+		auto thickness = shockwave->getShockwaveThickness();
+		auto force = shockwave->getShockwaveForce();
+
+		ImGui::SliderFloat("Shockwave Size", &size, 0.0f, 1.0f);
+		ImGui::SliderFloat("Shockwave Thickness", &thickness, 0.0f, 1.0f);
+		ImGui::SliderFloat("Shockwave Force", &force, 0.0f, 1.0f);
+
+		shockwave->setShockwaveSize(size);
+		shockwave->setShockwaveThickness(thickness);
+		shockwave->setShockwaveForce(force);
+
+		ImGui::Separator();
+	}
+
 	if (auto scrollbox = std::dynamic_pointer_cast<Scene::Scrollbox>(node); scrollbox != nullptr)
 	{
 		auto scroll_position = scrollbox->getScrollPosition();

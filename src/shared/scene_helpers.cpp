@@ -662,21 +662,35 @@ SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 std::shared_ptr<SceneHelpers::Shockwave> SceneHelpers::Shockwave::MakeAnimated(float duration)
 {
 	auto shockwave = std::make_shared<Shockwave>();
-	shockwave->setProgress(0.0f);
+	shockwave->setShockwaveSize(0.0f);
+	shockwave->setShockwaveThickness(0.5f);
+	shockwave->setShockwaveForce(1.0f);
 	shockwave->runAction(Actions::Collection::MakeSequence(
-		Actions::Collection::Interpolate(0.0f, 1.0f, duration, Easing::Linear, [shockwave](float value) {
-			shockwave->setProgress(value);
-		}),
+		Actions::Collection::MakeParallel(
+			Actions::Collection::Interpolate(shockwave->getShockwaveSize(), 1.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
+				shockwave->setShockwaveSize(value);
+			}),
+			Actions::Collection::Interpolate(shockwave->getShockwaveForce(), 0.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
+				shockwave->setShockwaveForce(value);
+			})
+		),
 		Actions::Collection::Kill(shockwave)
 	));
 	return shockwave;
 }
 
+SceneHelpers::Shockwave::Shockwave()
+{
+	setBlendMode(Renderer::BlendStates::Opaque);
+}
+
 void SceneHelpers::Shockwave::draw()
 {
 	static auto shader = std::make_shared<Renderer::Shaders::Shockwave>(Renderer::Vertex::PositionColorTexture::Layout);
+	shader->setSize(mShockwaveSize);
+	shader->setThickness(mShockwaveThickness);
+	shader->setForce(mShockwaveForce);
 
-	shader->setProgress(mProgress);
 	setShader(shader);
 
 	Glass::draw();

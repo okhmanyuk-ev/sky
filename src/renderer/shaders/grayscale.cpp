@@ -39,4 +39,4 @@ namespace
 Grayscale::Grayscale(const Vertex::Layout& layout) : Default(layout, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
 {
 	setCustomConstantBuffer(&mCustomConstantBuffer);
-};
+}

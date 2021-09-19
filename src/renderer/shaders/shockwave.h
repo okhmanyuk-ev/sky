@@ -1,35 +1,31 @@
 #pragma once
 
-#include <renderer/shader_custom.h>
+#include <renderer/shaders/default.h>
 
 namespace Renderer::Shaders
 {
-	class Shockwave : public ShaderCustom
+	class Shockwave : public Default
 	{
 	private:
 		struct alignas(16) CustomConstantBuffer
 		{
-			float progress = 0.5f;
+			float size = 1.0f;
+			float thickness = 1.0f;
+			float force = 1.0f;
 		};
 
 	public:
-		enum class Flag
-		{
-			Textured,
-			Colored
-		};
-
-	private:
-		static std::set<Flag> MakeFlagsFromLayout(const Vertex::Layout& layout);
-		static std::string MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags);
-
-	public:
-		Shockwave(const Vertex::Layout& layout, const std::set<Flag>& flags);
 		Shockwave(const Vertex::Layout& layout);
 
 	public:
-		auto getProgress() const { return mCustomConstantBuffer.progress; }
-		void setProgress(float value) { mCustomConstantBuffer.progress = value; }
+		auto getSize() const { return mCustomConstantBuffer.size; }
+		void setSize(float value) { mCustomConstantBuffer.size = value; }
+
+		auto getThickness() const { return mCustomConstantBuffer.thickness; }
+		void setThickness(float value) { mCustomConstantBuffer.thickness = value; }
+
+		auto getForce() const { return mCustomConstantBuffer.force; }
+		void setForce(float value) { mCustomConstantBuffer.force = value; }
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;
