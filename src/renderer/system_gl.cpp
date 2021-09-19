@@ -444,13 +444,16 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* m
 		return;
 
 	auto x = (GLint)pos.x;
-	auto y = (GLint)(PLATFORM->getHeight() - pos.y - size.y);
+	auto y = mRenderTargetBound ? (GLint)pos.y : (GLint)(PLATFORM->getHeight() - pos.y - size.y);
 	auto w = (GLint)size.x;
 	auto h = (GLint)size.y;
 
 	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, memory);
 
 	// fix upside down problem
+
+	if (mRenderTargetBound)
+		return;
 
 	size_t row_size = w * 4;
 

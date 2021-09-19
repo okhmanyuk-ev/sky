@@ -394,7 +394,11 @@ void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void
 		return;
 
 	ID3D11Resource* resource = NULL;
-	renderTargetView->GetResource(&resource);
+
+	if (currentRenderTarget)
+		currentRenderTarget->render_target_view->GetResource(&resource);
+	else
+		renderTargetView->GetResource(&resource);
 	
 	ID3D11Texture2D* texture = NULL;
 	resource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&texture);
