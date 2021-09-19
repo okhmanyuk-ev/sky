@@ -2,6 +2,8 @@
 
 using namespace Scene;
 
+// glass
+
 void Glass::draw()
 {
 	auto [pos, size] = getGlobalBounds();
@@ -27,4 +29,23 @@ void Glass::draw()
 	getTexture()->writePixels(w, h, mImage->getChannels(), mImage->getMemory());
 
 	Sprite::draw();
+}
+
+// blurred glass
+
+BlurredGlass::BlurredGlass()
+{
+	setSampler(Renderer::Sampler::LinearMipmapLinear);
+	setBlendMode(Renderer::BlendStates::Opaque);
+	setGenerateMipmaps(true);
+}
+
+void BlurredGlass::draw()
+{
+	if (mBlurIntensity <= 0.0f)
+		return;
+
+	setMipmapBias(mBlurIntensity * 6.0f);
+
+	Glass::draw();
 }

@@ -19,5 +19,21 @@ namespace Scene
 
 	private:
 		bool mGenerateMipmaps = false;
+	};	
+	
+	class BlurredGlass : public Glass
+	{
+	public:
+		BlurredGlass();
+
+	protected:
+		void draw() override;
+
+	public:
+		auto getBlurIntensity() const { return mBlurIntensity; }
+		void setBlurIntensity(float value) { mBlurIntensity = value; }
+
+	private:
+		float mBlurIntensity = 1.0f;
 	};
 }

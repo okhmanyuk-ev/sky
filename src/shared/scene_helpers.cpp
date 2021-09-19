@@ -520,7 +520,7 @@ SceneHelpers::StandardWindow::StandardWindow(const std::set<Flag> flags) : mFlag
 
 	if (flags.contains(Flag::Blur))
 	{
-		mBlur = std::make_shared<Scene::Blur>();
+		mBlur = std::make_shared<Scene::BlurredGlass>();
 		mBlur->setStretch(1.0f);
 		mBlur->setBlurIntensity(0.0f);
 		attach(mBlur, Scene::Node::AttachDirection::Front);
@@ -589,15 +589,15 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 	);
 };
 
-// blur demo
+// blurred glass demo
 
-SceneHelpers::BlurDemo::BlurDemo()
+SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 {
 	setClickCallback([this] {
 		runAction(Actions::Collection::Kill(shared_from_this()));
 	});
 
-	auto blur = std::make_shared<Shared::SceneHelpers::Outlined<Scene::Blur>>();
+	auto blur = std::make_shared<Shared::SceneHelpers::Outlined<Scene::BlurredGlass>>();
 	blur->setStretch(1.0f);
 	attach(blur);
 

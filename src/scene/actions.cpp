@@ -507,14 +507,14 @@ Collection::UAction Collection::ChangeRadialAnchor(SceneTransform node, float de
 	});
 }
 
-Collection::UAction Collection::ChangeBlurIntensity(std::shared_ptr<Scene::Blur> blur, float start, float dest, float duration, EasingFunction easingFunction)
+Collection::UAction Collection::ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blur, float start, float dest, float duration, EasingFunction easingFunction)
 {
 	return Interpolate(start, dest, duration, easingFunction, [blur](float value) {
 		blur->setBlurIntensity(value);
 	});
 }
 
-Collection::UAction Collection::ChangeBlurIntensity(std::shared_ptr<Scene::Blur> blur, float dest, float duration, EasingFunction easingFunction)
+Collection::UAction Collection::ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blur, float dest, float duration, EasingFunction easingFunction)
 {
 	return Insert([blur, dest, duration, easingFunction] {
 		return ChangeBlurIntensity(blur, blur->getBlurIntensity(), dest, duration, easingFunction);

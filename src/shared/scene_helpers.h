@@ -409,16 +409,16 @@ namespace Shared::SceneHelpers
 
 	private:
 		std::shared_ptr<Scene::Node> mContent;
-		std::shared_ptr<Scene::Blur> mBlur;
+		std::shared_ptr<Scene::BlurredGlass> mBlur;
 		bool mCloseOnMissclick = true;
 		std::set<Flag> mFlags;
 	};
 
-	class BlurDemo : public Scene::Clickable<Shared::SceneHelpers::MovableByHand<Scene::Node>>,
-		public std::enable_shared_from_this<BlurDemo>
+	class BlurredGlassDemo : public Scene::Clickable<Shared::SceneHelpers::MovableByHand<Scene::Node>>,
+		public std::enable_shared_from_this<BlurredGlassDemo>
 	{
 	public:
-		BlurDemo();
+		BlurredGlassDemo();
 	};
 
 	// 3d
