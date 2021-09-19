@@ -14,7 +14,7 @@ namespace
 			mat4 uProjectionMatrix;
 			mat4 uModelMatrix;
 
-			vec4 color;
+			//___CUSTOM_FIELDS_HERE
 		};
 
 		uniform sampler2D uTexture;
@@ -56,6 +56,10 @@ namespace
 	
 		out vec4 fragColor;
 
+		#ifdef HAS_FRAGMENT_FUNC
+		vec4 fragment(vec4 result);
+		#endif
+
 		void main()
 		{
 			vec4 result = vec4(1.0, 1.0, 1.0, 1.0);
@@ -65,7 +69,9 @@ namespace
 		#ifdef HAS_TEXCOORD_ATTRIB
 			result *= texture(uTexture, vTexCoord);
 		#endif
-			result *= color;
+		#ifdef HAS_FRAGMENT_FUNC
+			result = fragment(result);
+		#endif
 			fragColor = result;
 		}
 		#endif
@@ -77,8 +83,8 @@ namespace
 			float4x4 viewMatrix;
 			float4x4 projectionMatrix;
 			float4x4 modelMatrix;
-
-			float4 color;
+			
+			//___CUSTOM_FIELDS_HERE
 		};
 
 		struct VertexInput
@@ -121,6 +127,10 @@ namespace
 			return result;
 		};
 
+		#ifdef HAS_FRAGMENT_FUNC
+		float4 fragment(float4 result, PixelInput input);
+		#endif
+
 		float4 ps_main(PixelInput input) : SV_TARGET
 		{
 			float4 result = float4(1.0, 1.0, 1.0, 1.0);
@@ -130,18 +140,20 @@ namespace
 		#ifdef HAS_TEXCOORD_ATTRIB
 			result *= texture0.Sample(sampler0, input.uv);
 		#endif
-			result *= color;
+		#ifdef HAS_FRAGMENT_FUNC
+			result = fragment(result, input);
+		#endif
 			return result;
 		}
 		)";
 #endif
 }
 
-Default::Default(const Vertex::Layout& layout, const std::set<Flag>& flags) :
-	ShaderCustom(layout, { Vertex::Attribute::Type::Position }, sizeof(CustomConstantBuffer), 
-		MakeDefinesFromFlags(layout, shaderSource, flags))
+Default::Default(const Vertex::Layout& layout, const std::set<Flag>& flags, size_t customConstantBufferSize, std::optional<CustomCode> custom_code) :
+	ShaderCustom(layout, { Vertex::Attribute::Type::Position }, customConstantBufferSize,
+		MakeDefinesFromFlags(layout, shaderSource, flags, custom_code))
 {
-	setCustomConstantBuffer(&mCustomConstantBuffer);
+	//
 }
 
 Default::Default(const Vertex::Layout& layout) : Default(layout, MakeFlagsFromLayout(layout))
@@ -162,7 +174,7 @@ std::set<Default::Flag> Default::MakeFlagsFromLayout(const Vertex::Layout& layou
 	return result;
 }
 
-std::string Default::MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags)
+std::string Default::MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags, std::optional<CustomCode> custom_code)
 {
 	auto result = source;
 
@@ -176,6 +188,18 @@ std::string Default::MakeDefinesFromFlags(const Vertex::Layout& layout, const st
 	{
 		assert(layout.hasAttribute(Renderer::Vertex::Attribute::Type::TexCoord));
 		result = "#define HAS_TEXCOORD_ATTRIB\n" + result;
+	}
+
+	if (custom_code.has_value())
+	{
+		result = "#define HAS_FRAGMENT_FUNC\n" + result;
+
+		std::string replace = "//___CUSTOM_FIELDS_HERE";
+		auto index = result.find(replace);
+		assert(index != std::string::npos);
+		result.replace(index, replace.length(), custom_code->constant_buffer_fields);
+
+		result += custom_code->fragment_func;
 	}
 
 	return result;
