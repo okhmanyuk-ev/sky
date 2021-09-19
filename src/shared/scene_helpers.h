@@ -392,7 +392,7 @@ namespace Shared::SceneHelpers
 		};
 
 	public:
-		StandardWindow(const std::set<Flag> flags);
+		StandardWindow(const std::set<Flag> flags = { Flag::Blur });
 
 	public:
 		void onOpenEnd() override;
