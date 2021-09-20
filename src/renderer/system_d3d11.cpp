@@ -258,12 +258,6 @@ void SystemD3D11::setSampler(const Sampler& value)
 	mSamplerStateDirty = true;
 }
 
-void SystemD3D11::setMipmapBias(float value)
-{
-	mSamplerState.mipmapBias = value;
-	mSamplerStateDirty = true;
-}
-
 void SystemD3D11::setDepthMode(const DepthMode& value) 
 {
 	mDepthStencilState.depthMode = value;
@@ -624,7 +618,7 @@ void SystemD3D11::setD3D11SamplerState(const SamplerState& value)
 		desc.AddressV = TextureAddressMap.at(value.textureAddress);
 		desc.AddressW = TextureAddressMap.at(value.textureAddress);
 		desc.MaxAnisotropy = D3D11_MAX_MAXANISOTROPY;
-		desc.MipLODBias = value.mipmapBias;
+		desc.MipLODBias = 0.0f;
 		desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 		desc.MinLOD = 0.0f;
 		desc.MaxLOD = FLT_MAX;

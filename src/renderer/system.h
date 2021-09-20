@@ -33,7 +33,6 @@ namespace Renderer
 		virtual void setRenderTarget(std::shared_ptr<RenderTarget> value) = 0;
 		virtual void setShader(std::shared_ptr<Shader> value) = 0;
 		virtual void setSampler(const Sampler& value) = 0;
-		virtual void setMipmapBias(float value) = 0;
 		virtual void setDepthMode(const DepthMode& value) = 0;
 		virtual void setStencilMode(const StencilMode& value) = 0;
 		virtual void setCullMode(const CullMode& value) = 0;

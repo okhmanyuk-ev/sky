@@ -45,7 +45,10 @@ void BlurredGlass::draw()
 	if (mBlurIntensity <= 0.0f)
 		return;
 
-	setMipmapBias(mBlurIntensity * 6.0f);
+	auto static shader = std::make_shared<Renderer::Shaders::MipmapBias>(Renderer::Vertex::PositionColorTexture::Layout);
+	shader->setBias(mBlurIntensity * 6.0f);
+	setShader(shader);
+
 	Glass::draw();
 }
 

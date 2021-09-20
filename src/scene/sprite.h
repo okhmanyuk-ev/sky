@@ -36,9 +36,6 @@ namespace Scene
 		auto getTextureAddress() const { return mTextureAddress; }
 		void setTextureAddress(Renderer::TextureAddress value) { mTextureAddress = value; }
 
-		auto getMipmapBias() const { return mMipmapBias; }
-		void setMipmapBias(float value) { mMipmapBias = value; }
-
 		auto getShader() const { return mShader; }
 		void setShader(std::shared_ptr<Renderer::ShaderMatrices> value) { mShader = value; }
 
@@ -46,7 +43,6 @@ namespace Scene
 		std::shared_ptr<Renderer::Texture> mTexture = DefaultTexture;
 		Graphics::TexRegion mTexRegion = {};
 		Renderer::TextureAddress mTextureAddress = DefaultTextureAddress;
-		float mMipmapBias = 0.0f;
 		std::shared_ptr<Renderer::ShaderMatrices> mShader = nullptr;
 	};
 }

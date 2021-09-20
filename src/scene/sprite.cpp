@@ -19,10 +19,9 @@ void Sprite::draw()
 	GRAPHICS->pushSampler(getSampler());
 	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->pushTextureAddress(mTextureAddress);
-	GRAPHICS->pushMipmapBias(mMipmapBias);
 	GRAPHICS->pushModelMatrix(model);
 	GRAPHICS->drawSprite(mTexture, mTexRegion, getColor(), mShader);
-	GRAPHICS->pop(5);
+	GRAPHICS->pop(4);
 }
 
 void Sprite::update(Clock::Duration dTime)

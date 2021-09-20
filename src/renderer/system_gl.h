@@ -33,7 +33,6 @@ namespace Renderer
 		void setRenderTarget(std::shared_ptr<RenderTarget> value) override;
 		void setShader(std::shared_ptr<Shader> value) override;
 		void setSampler(const Sampler& value) override;
-		void setMipmapBias(float value) override;
 		void setDepthMode(const DepthMode& value) override;
 		void setStencilMode(const StencilMode& value) override;
 		void setCullMode(const CullMode& value) override;
@@ -126,8 +125,7 @@ namespace Renderer
 		bool mTextureBound = false;
 		Sampler mSampler = Sampler::Nearest;
 		TextureAddress mTextureAddress = TextureAddress::Clamp;
-		float mMipmapBias = 0.0f;
-
+		
 		CullMode mCullMode = CullMode::None;
 		bool mCullModeDirty = true;
 		

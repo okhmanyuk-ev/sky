@@ -27,6 +27,7 @@
 #include "shaders/default.h"
 #include "shaders/grayscale.h"
 #include "shaders/light.h"
+#include "shaders/mipmap_bias.h"
 #include "shaders/rounded.h"
 #include "shaders/sdf.h"
 #include "shaders/shadertoy.h"
