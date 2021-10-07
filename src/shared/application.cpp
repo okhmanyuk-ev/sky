@@ -5,6 +5,7 @@
 #include <imscene/imscene.h>
 #include <audio/system.h>
 #include <shared/scene_manager.h>
+#include <shared/scene_helpers.h>
 
 using namespace Shared;
 
@@ -86,6 +87,37 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		CONSOLE->registerCVar("scene_timestep_force_time_completion", { "bool" },
 			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().getForceTimeCompletion),
 			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion));
+
+		CONSOLE->registerCommand("spawn_blur_glass", [this](CON_ARGS) {
+			auto blur = std::make_shared<SceneHelpers::BlurredGlassDemo>();
+			blur->setSize(192.0f);
+			blur->setAnchor(0.5f);
+			blur->setPivot(0.5f);
+			blur->setBlurIntensity(0.75f);
+			getScene()->getRoot()->attach(blur);
+		});
+
+		CONSOLE->registerCommand("spawn_gray_glass", [this](CON_ARGS) {
+			auto gray = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::GrayscaledGlass>>>>();
+			gray->setSize(192.0f);
+			gray->setAnchor(0.5f);
+			gray->setPivot(0.5f);
+			getScene()->getRoot()->attach(gray);
+		});
+
+		CONSOLE->registerCommand("spawn_shockwave", std::nullopt, {}, { "duration" }, [this](CON_ARGS) {
+			float duration = 1.0f;
+
+			if (CON_ARG_EXIST(0))
+				duration = CON_ARG_FLOAT(0);
+
+			auto shockwave = Shared::SceneHelpers::Shockwave::MakeAnimated(duration);
+			shockwave->setSize(256.0f);
+			shockwave->setAnchor(0.5f);
+			shockwave->setPivot(0.5f);
+			shockwave->setScale(4.0f);
+			getScene()->getRoot()->attach(shockwave);
+		});
 	}
 
 #if defined(BUILD_DEVELOPER)
