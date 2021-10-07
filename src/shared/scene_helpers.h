@@ -327,6 +327,20 @@ namespace Shared::SceneHelpers
 		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
 	};
 
+	template <class T> class KillableByClick : public Scene::Clickable<T>,
+		public std::enable_shared_from_this<KillableByClick<T>>
+	{
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
+
+	public:
+		KillableByClick()
+		{
+			Scene::Clickable<T>::setClickCallback([this] {
+				Scene::Clickable<T>::runAction(Actions::Collection::Kill(KillableByClick<T>::shared_from_this()));
+			});
+		}
+	};
+
 	// automatically stretching to full safe area of the screen
 	// should be attached to fullscreen node or scene root
 	class SafeArea : public Scene::Node
@@ -416,8 +430,7 @@ namespace Shared::SceneHelpers
 		std::set<Flag> mFlags;
 	};
 
-	class BlurredGlassDemo : public Scene::Clickable<Shared::SceneHelpers::MovableByHand<Scene::Node>>,
-		public std::enable_shared_from_this<BlurredGlassDemo>
+	class BlurredGlassDemo : public KillableByClick<MovableByHand<Outlined<Scene::BlurredGlass>>>
 	{
 	public:
 		BlurredGlassDemo();
