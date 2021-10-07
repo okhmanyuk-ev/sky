@@ -13,7 +13,7 @@ void System::execute(const std::string& cmd)
 	}
 }
 
-void System::registerCommand(const std::string& name, const std::string& description,
+void System::registerCommand(const std::string& name, std::optional<std::string> description,
 	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 	Command::Callback callback)
 {
@@ -26,24 +26,24 @@ void System::registerCommand(const std::string& name, const std::string& descrip
 	mCommands[name] = cmd;
 }
 
-void System::registerCommand(const std::string& name, const std::string& description, const std::vector<std::string>& args, Command::Callback callback)
+void System::registerCommand(const std::string& name, std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback)
 {
 	registerCommand(name, description, args, {}, callback);
 }
 
-void System::registerCommand(const std::string& name, const std::string& description, Command::Callback callback)
+void System::registerCommand(const std::string& name, std::optional<std::string> description, Command::Callback callback)
 {
 	registerCommand(name, description, {}, callback);
 }
 
 void System::registerCommand(const std::string& name, const std::vector<std::string>& args, Command::Callback callback)
 {
-	registerCommand(name, {}, args, callback);
+	registerCommand(name, std::nullopt, args, callback);
 }
 
 void System::registerCommand(const std::string& name, Command::Callback callback)
 {
-	registerCommand(name, {}, {}, callback);
+	registerCommand(name, std::nullopt, {}, callback);
 }
 
 void System::removeCommand(const std::string& name)
@@ -51,7 +51,7 @@ void System::removeCommand(const std::string& name)
 	mCommands.erase(name);
 }
 
-void System::registerCVar(const std::string& name, const std::string& description,
+void System::registerCVar(const std::string& name, std::optional<std::string> description,
 	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 	CVar::Getter getter, CVar::Setter setter)
 {
@@ -68,10 +68,10 @@ void System::registerCVar(const std::string& name, const std::string& descriptio
 void System::registerCVar(const std::string& name, const std::vector<std::string>& args,
 	const std::vector<std::string>& optional_args, CVar::Getter getter, CVar::Setter setter)
 {
-	registerCVar(name, "", args, optional_args, getter, setter);
+	registerCVar(name, std::nullopt, args, optional_args, getter, setter);
 }
 
-void System::registerCVar(const std::string& name, const std::string& description,
+void System::registerCVar(const std::string& name, std::optional<std::string> description,
 	const std::vector<std::string>& args, CVar::Getter getter, CVar::Setter setter)
 {
 	registerCVar(name, description, args, {}, getter, setter);
@@ -80,7 +80,7 @@ void System::registerCVar(const std::string& name, const std::string& descriptio
 void System::registerCVar(const std::string& name, const std::vector<std::string>& args, 
 	CVar::Getter getter, CVar::Setter setter)
 {
-	registerCVar(name, "", args, getter, setter);
+	registerCVar(name, std::nullopt, args, getter, setter);
 }
 
 void System::removeCVar(const std::string& name)

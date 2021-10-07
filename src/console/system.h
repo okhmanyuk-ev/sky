@@ -8,6 +8,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <optional>
 
 #define CONSOLE ENGINE->getSystem<Console::System>()
 
@@ -34,7 +35,7 @@ namespace Console
 		auto getSetter() const { return mSetter; }
 
 	private:
-		std::string mDescription;
+		std::optional<std::string> mDescription;
 		std::vector<std::string> mArguments;
 		std::vector<std::string> mOptionalArguments;
 		Getter mGetter;
@@ -53,13 +54,13 @@ namespace Console
 		std::string getArgsAsString() const;
 
 	public:
-		const auto& getDescription() const { return mDescription; }
+		auto getDescription() const { return mDescription; }
 		const auto& getArguments() const { return mArguments; }
 		const auto& getOptionalArguments() const { return mOptionalArguments; }
 		auto getCallback() const { return mCallback; }
 
 	private:
-		std::string mDescription;
+		std::optional<std::string> mDescription;
 		std::vector<std::string> mArguments;
 		std::vector<std::string> mOptionalArguments;
 		Callback mCallback;
@@ -71,31 +72,32 @@ namespace Console
 		void execute(const std::string& cmd);
 
 	public:
-		void registerCommand(const std::string& name, const std::string& description,
+		void registerCommand(const std::string& name, std::optional<std::string> description,
 			const std::vector<std::string>& args, const std::vector<std::string>& optional_args, 
 			Command::Callback callback);
 
-		void registerCommand(const std::string& name, const std::string& description, 
+		void registerCommand(const std::string& name, std::optional<std::string> description,
 			const std::vector<std::string>& args, Command::Callback callback);
 
-		void registerCommand(const std::string& name, const std::string& description, 
+		void registerCommand(const std::string& name, std::optional<std::string> description,
 			Command::Callback callback);
-		
-		void registerCommand(const std::string& name, const std::vector<std::string>& args, 
+
+		void registerCommand(const std::string& name, const std::vector<std::string>& args,
 			Command::Callback callback);
-		
+
 		void registerCommand(const std::string& name, Command::Callback callback);
+
 		void removeCommand(const std::string& name);
 
 	public:
-		void registerCVar(const std::string& name, const std::string& description, 
+		void registerCVar(const std::string& name, std::optional<std::string> description,
 			const std::vector<std::string>& args, const std::vector<std::string>& optional_args, 
 			CVar::Getter getter, CVar::Setter setter = nullptr);
 
 		void registerCVar(const std::string& name, const std::vector<std::string>& args, 
 			const std::vector<std::string>& optional_args, CVar::Getter getter, CVar::Setter setter = nullptr);
 
-		void registerCVar(const std::string& name, const std::string& description,
+		void registerCVar(const std::string& name, std::optional<std::string> description,
 			const std::vector<std::string>& args, CVar::Getter getter, CVar::Setter setter = nullptr);
 
 		void registerCVar(const std::string& name, const std::vector<std::string>& args, 

@@ -55,7 +55,7 @@ void ConsoleHelperCommands::onFrame()
 			if (ImGui::IsItemHovered())
 			{
 				ImGui::BeginTooltip();
-				ImGui::Text("%s", cvar.getDescription().c_str());
+				ImGui::Text("%s", cvar.getDescription().value_or("").c_str());
 				ImGui::EndTooltip();
 			}
 

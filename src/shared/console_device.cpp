@@ -284,10 +284,10 @@ void ConsoleDevice::showCandidates(float height, float top)
 			ImGui::TextDisabled("%s", args.c_str());
 		}
 
-		if (auto description = candidate.description; !description.empty())
+		if (candidate.description.has_value())
 		{
 			ImGui::SameLine();
-			ImGui::TextDisabled("%s", ("- " + description).c_str());
+			ImGui::TextDisabled("%s", ("- " + candidate.description.value()).c_str());
 		}
 	}
 
@@ -594,7 +594,7 @@ std::vector<ConsoleDevice::Candidate> ConsoleDevice::getCandidates(const std::st
 
 		Candidate candidate;
 		candidate.name = name;
-		candidate.description = command.getDescription();		
+		candidate.description = command.getDescription();
 		candidate.type = Candidate::Type::Command;
 		candidate.args = command.getArgsAsString();
 		result.push_back(candidate);

@@ -37,6 +37,7 @@
 #define CON_ARGS_ACCUMULATED_STRING CON_HAS_ARGS ? std::accumulate(std::next(CON_ARGS_NAME.begin()), CON_ARGS_NAME.end(), *CON_ARGS_NAME.begin(), [](const auto& a, const auto& b) { return a + " " + b; }) : ""
 
 #define CON_ARG(N) CON_ARGS_NAME[N]
+#define CON_ARG_EXIST(N) CON_ARGS_COUNT > N
 #define CON_ARG_INT(N) stoi(CON_ARG(N))
 #define CON_ARG_BOOL(N) stoi(CON_ARG(N))
 #define CON_ARG_FLOAT(N) stof(CON_ARG(N))

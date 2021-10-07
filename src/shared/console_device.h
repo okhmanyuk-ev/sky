@@ -118,7 +118,7 @@ namespace Shared
 			Type type;
 
 			std::string name;
-			std::string description;
+			std::optional<std::string> description;
 			std::string args;
 			std::vector<std::string> alias_value;
 		};

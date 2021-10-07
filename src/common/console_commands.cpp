@@ -67,8 +67,8 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 
 		auto s = " - " + name;
 			
-		if (!description.empty())
-			s += " - " + description;
+		if (description.has_value())
+			s += " - " + description.value();
 
 		CONSOLE_DEVICE->writeLine(s);
 	}
@@ -89,8 +89,8 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 
 		auto s = " - " + name + " = " + value;
 
-		if (!description.empty())
-			s += " - " + description;
+		if (description.has_value())
+			s += " - " + description.value();
 
 		if (!hasSetter)
 			s += " (readonly)";
