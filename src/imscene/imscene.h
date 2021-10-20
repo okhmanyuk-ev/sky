@@ -13,6 +13,7 @@
 #include <graphics/tex_region.h>
 #include <graphics/color.h>
 #include <graphics/font.h>
+#include <scene/label.h>
 
 #define IMSCENE ENGINE->getSystem<ImScene::ImScene>()
 
@@ -109,8 +110,8 @@ namespace ImScene
 		void draw(Node& node) override;
 	
 	private:
-		std::shared_ptr<Graphics::Font> mFont = nullptr;
-		float mFontSize = 24.0f;
+		std::shared_ptr<Graphics::Font> mFont = Scene::Label::DefaultFont;
+		float mFontSize = Scene::Label::DefaultFontSize;
 		utf8_string mText;
 	};
 
