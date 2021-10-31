@@ -33,11 +33,6 @@ namespace Scene
 		void setOutlineThickness(float value) { mOutlineThickness = value; }
 
 		auto getOutlineColor() const { return mOutlineColor; }
-		void setOutlineColor(const glm::vec4& value) { mOutlineColor = value; }
-		void setOutlineColor(const glm::vec3& value) { mOutlineColor = { value, mOutlineColor.a }; }
-
-		auto getOutlineAlpha() const { return mOutlineColor.a; }
-		void setOutlineAlpha(float value) { mOutlineColor.a = value; }
 
 		auto getAlign() const { return mAlign; }
 		void setAlign(Graphics::TextMesh::Align value) { mAlign = value; }
@@ -57,7 +52,7 @@ namespace Scene
 		float mPrevFontSize = 0.0f;
 		std::shared_ptr<Graphics::Font> mPrevFont;
 		float mOutlineThickness = 0.0f;
-		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
+		std::shared_ptr<Color> mOutlineColor = std::make_shared<Color>(Graphics::Color::Black);
 		Graphics::TextMesh::Align mPrevAlign = Graphics::TextMesh::Align::Left;
 	};
 }

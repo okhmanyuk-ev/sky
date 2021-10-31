@@ -11,7 +11,7 @@ void Label::draw()
 	if (mFont == nullptr || mFontSize <= 0.0f)
 		return;
 
-	if (getAlpha() <= 0.0f)
+	if (getAlpha() <= 0.0f && (mOutlineColor->getAlpha() <= 0.0f || mOutlineThickness <= 0.0f))
 		return;
 
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
@@ -19,7 +19,7 @@ void Label::draw()
 
 	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
 	GRAPHICS->pushModelMatrix(model);
-	GRAPHICS->drawString(*mFont, mMesh, mFontSize, getColor(), mOutlineThickness, mOutlineColor);
+	GRAPHICS->drawString(*mFont, mMesh, mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor());
 	GRAPHICS->pop(2);
 }
 

@@ -8,6 +8,11 @@ namespace Scene
 	class Color
 	{
 	public:
+		Color();
+		Color(const glm::vec3& color);
+		Color(const glm::vec4& color);
+
+	public:
 		auto getColor() const { return mColor; }
 		void setColor(const glm::vec4& value) { mColor = value; }
 		void setColor(const glm::vec3& value) { mColor = { value, mColor.a }; }
