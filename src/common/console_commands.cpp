@@ -60,7 +60,7 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 
 	for (auto& [name, command] : CONSOLE->getCommands())
 	{
-		if (CON_ARGS_COUNT > 0 && (name.find(CON_ARG(0)) == std::string::npos))
+		if (CON_ARG_EXIST(0) && (name.find(CON_ARG(0)) == std::string::npos))
 			continue;
 
 		auto description = command.getDescription();
@@ -178,7 +178,7 @@ void ConsoleCommands::onAlias(CON_ARGS)
 
 	if (aliases.count(name) > 0)
 	{
-		if (CON_ARGS_COUNT > 1)
+		if (CON_ARG_EXIST(1))
 		{
 			auto value = CON_ARG(1);
 
@@ -209,7 +209,7 @@ void ConsoleCommands::onIf(CON_ARGS)
 	auto condition_value = Console::System::MakeTokensFromString(CON_ARG(1));
 	auto then_cmd = CON_ARG(2);
 	auto else_cmd = std::string();
-	auto has_else_cmd = CON_ARGS_COUNT > 3;
+	auto has_else_cmd = CON_ARG_EXIST(3);
 		
 	if (has_else_cmd)
 		else_cmd = CON_ARG(3);
