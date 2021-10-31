@@ -29,9 +29,6 @@ namespace Scene
 		const auto& getText() const { return mText; }
 		void setText(const utf8_string& value) { mText = value; }
 
-		auto isMultiline() const { return mMultiline; }
-		void setMultiline(bool value) { mMultiline = value; }
-
 		auto getOutlineThickness() const { return mOutlineThickness; }
 		void setOutlineThickness(float value) { mOutlineThickness = value; }
 
@@ -42,11 +39,8 @@ namespace Scene
 		auto getOutlineAlpha() const { return mOutlineColor.a; }
 		void setOutlineAlpha(float value) { mOutlineColor.a = value; }
 
-		auto getMultilineAlign() const { return mMultilineAlign; }
-		void setMultilineAlign(Graphics::TextMesh::Align value) { mMultilineAlign = value; }
-
-		auto isAutoRefreshing() const { return mAutoRefreshing; }
-		void setAutoRefreshing(bool value) { mAutoRefreshing = value; }
+		auto getAlign() const { return mAlign; }
+		void setAlign(Graphics::TextMesh::Align value) { mAlign = value; }
 
 		// returning [pos, size]
 		std::tuple<glm::vec2, glm::vec2> getSymbolBounds(int index);
@@ -56,19 +50,14 @@ namespace Scene
 		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
 		float mFontSize = DefaultFontSize;
 		utf8_string mText = "";
-		bool mMultiline = false;
-		Graphics::TextMesh::Align mMultilineAlign = Graphics::TextMesh::Align::Left;
+		Graphics::TextMesh::Align mAlign = Graphics::TextMesh::Align::Left;
 		Graphics::TextMesh mMesh;
-		float mMeshWidth = 0.0f;
-		float mMeshHeight = 0.0f;
 		utf8_string mPrevText;
 		float mPrevWidth = 0.0f;
 		float mPrevFontSize = 0.0f;
 		std::shared_ptr<Graphics::Font> mPrevFont;
-		bool mPrevMultiline = false;
 		float mOutlineThickness = 0.0f;
 		glm::vec4 mOutlineColor = { Graphics::Color::Black, 1.0f };
-		Graphics::TextMesh::Align mPrevMultilineAlign = Graphics::TextMesh::Align::Left;
-		bool mAutoRefreshing = true;
+		Graphics::TextMesh::Align mPrevAlign = Graphics::TextMesh::Align::Left;
 	};
 }

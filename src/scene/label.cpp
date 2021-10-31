@@ -8,7 +8,7 @@ void Label::draw()
 
 	assert(mFont); // you should setup Label::DefaultFont
 
-	if (mFont == nullptr || mFontSize <= 0.0f || (mMultiline && getAbsoluteWidth() <= 0.0f))
+	if (mFont == nullptr || mFontSize <= 0.0f)
 		return;
 
 	if (getAlpha() <= 0.0f)
@@ -26,15 +26,21 @@ void Label::draw()
 void Label::update(Clock::Duration dTime)
 {
 	Node::update(dTime);
-
-	if (mAutoRefreshing)
-		refresh();
+	refresh();
 }
 
 void Label::refresh()
 {
 	if (mFont == nullptr || mFontSize <= 0.0f)
 		return;
+
+	auto width = getAbsoluteWidth();
+
+	if (width <= 0.0f)
+	{
+		width = mFont->getStringWidth(mText, mFontSize);
+		setWidth(width);
+	}
 
 	auto mesh_dirty = false;
 
@@ -44,9 +50,7 @@ void Label::refresh()
 		mesh_dirty = true;
 	}
 
-	auto width = getAbsoluteWidth();
-
-	if (mMultiline && mPrevWidth != width)
+	if (mPrevWidth != width)
 	{
 		mPrevWidth = width;
 		mesh_dirty = true;
@@ -64,35 +68,32 @@ void Label::refresh()
 		mesh_dirty = true;
 	}
 
-	if (mPrevMultiline != mMultiline)
+	if (mPrevAlign != mAlign)
 	{
-		mPrevMultiline = mMultiline;
-		mesh_dirty = true;
-	}
-
-	if (mPrevMultilineAlign != mMultilineAlign)
-	{
-		mPrevMultilineAlign = mMultilineAlign;
+		mPrevAlign = mAlign;
 		mesh_dirty = true;
 	}
 
 	if (!mesh_dirty)
 		return;
 
-	if (!mMultiline)
+	float height = 0.0f;
+
+	bool singleline_mesh = 
+		mAlign == Graphics::TextMesh::Align::Left &&
+		width >= mFont->getStringWidth(mText, mFontSize);
+
+	if (singleline_mesh)
 	{
-		mMeshWidth = mFont->getStringWidth(mText, mFontSize);
-		mMeshHeight = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
+		height = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
 		mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText, -mFont->getDescent() + mFont->getCustomVerticalOffset());
 	}
-	else if (width > 0.0f)
+	else 
 	{
-		mMeshWidth = width;
-		std::tie(mMeshHeight, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, mText, width, mFontSize, mMultilineAlign);
+		std::tie(height, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, mText, width, mFontSize, mAlign);
 	}
 
-	setWidth(mMeshWidth * (1.0f - getHorizontalStretch()));
-	setHeight(mMeshHeight * (1.0f - getVerticalStretch()));
+	setHeight(height);
 
 	Node::updateAbsoluteSize();
 }
