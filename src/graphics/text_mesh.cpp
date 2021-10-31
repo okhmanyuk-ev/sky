@@ -146,33 +146,38 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 
 	while (it != text.end())
 	{
+		std::advance(it, 1);
+
+		auto length = std::distance(begin, it);
+
+		if (length <= 1)
+			continue;
+
 		auto str_w = font.getStringWidth(begin, it);
 
-		if (str_w >= scaledMaxWidth)
+		if (str_w <= scaledMaxWidth)
+			continue;
+
+		--it;
+
+		auto best_it = it;
+
+		while (best_it != begin)
 		{
-			--it;
-
-			auto best_it = it;
-
-			while (best_it != begin)
+			if (*best_it == ' ')
 			{
-				if (*best_it == ' ')
-				{
-					++best_it;
-					break;
-				}
-
-				--best_it;
+				++best_it;
+				break;
 			}
 
-			if (best_it != begin)
-				it = best_it;
-
-			appendTextMesh(begin, it);
-			begin = it;
+			--best_it;
 		}
 
-		++it;
+		if (best_it != begin)
+			it = best_it;
+
+		appendTextMesh(begin, it);
+		begin = it;
 	}
 
 	if (begin != text.end())
