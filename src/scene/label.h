@@ -37,6 +37,9 @@ namespace Scene
 		auto getAlign() const { return mAlign; }
 		void setAlign(Graphics::TextMesh::Align value) { mAlign = value; }
 
+		auto isMultiline() const { return mMultiline; }
+		void setMultiline(bool value) { mMultiline = value; }
+
 		// returning [pos, size]
 		std::tuple<glm::vec2, glm::vec2> getSymbolBounds(int index);
 		float getSymbolLineY(int index);
@@ -54,5 +57,7 @@ namespace Scene
 		float mOutlineThickness = 0.0f;
 		std::shared_ptr<Color> mOutlineColor = std::make_shared<Color>(Graphics::Color::Black);
 		Graphics::TextMesh::Align mPrevAlign = Graphics::TextMesh::Align::Left;
+		bool mMultiline = false;
+		bool mPrevMultiline = false;
 	};
 }

@@ -34,25 +34,18 @@ void Label::refresh()
 	if (mFont == nullptr || mFontSize <= 0.0f)
 		return;
 
+	auto mesh_dirty = false;
 	auto width = getAbsoluteWidth();
 
-	if (width <= 0.0f)
+	if (mPrevWidth != width && mMultiline)
 	{
-		width = mFont->getStringWidth(mText, mFontSize);
-		setWidth(width);
+		mPrevWidth = width;
+		mesh_dirty = true;
 	}
-
-	auto mesh_dirty = false;
 
 	if (mPrevText != mText)
 	{
 		mPrevText = mText;
-		mesh_dirty = true;
-	}
-
-	if (mPrevWidth != width)
-	{
-		mPrevWidth = width;
 		mesh_dirty = true;
 	}
 
@@ -74,19 +67,22 @@ void Label::refresh()
 		mesh_dirty = true;
 	}
 
+	if (mPrevMultiline != mMultiline) 
+	{
+		mPrevMultiline = mMultiline;
+		mesh_dirty = true;
+	}
+
 	if (!mesh_dirty)
 		return;
 
 	float height = 0.0f;
 
-	bool singleline_mesh = 
-		mAlign == Graphics::TextMesh::Align::Left &&
-		width >= mFont->getStringWidth(mText, mFontSize);
-
-	if (singleline_mesh)
+	if (!mMultiline)
 	{
 		height = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
 		mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText, -mFont->getDescent() + mFont->getCustomVerticalOffset());
+		setWidth(mFont->getStringWidth(mText, mFontSize));
 	}
 	else 
 	{
