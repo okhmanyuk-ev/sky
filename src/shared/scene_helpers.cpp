@@ -522,12 +522,12 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createEnterAction
 
 	if (mEffects.contains(Effect::Blur))
 	{
-		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
+		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::Linear));
 	}
 
 	if (mEffects.contains(Effect::Scale))
 	{
-		parallel->add(Actions::Collection::ChangeScale(mContent, { 1.0f, 1.0f }, Duration, Easing::CubicIn));
+		parallel->add(Actions::Collection::ChangeScale(mContent, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
 	}
 
 	return Actions::Collection::MakeSequence(
@@ -549,7 +549,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction
 
 	if (mEffects.contains(Effect::Blur))
 	{
-		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
+		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::Linear));
 	}
 	
 	if (mEffects.contains(Effect::Scale))
