@@ -398,15 +398,29 @@ namespace Shared::SceneHelpers
 	class StandardWindow : public Scene::Clickable<Backshaded<Shared::SceneManager::Window>>
 	{
 	public:
-		enum class Flag
+		enum class BackgroundEffect
 		{
 			Blur,
 			Fade,
 			Gray
 		};
 
+		enum class ContentEffect 
+		{
+			Anchor,
+			Blur,
+			Alpha,
+			Scale
+		};
+
 	public:
-		StandardWindow(const std::set<Flag> flags = { Flag::Blur });
+		static const glm::vec2 inline StartContentAnchor = { 0.5f, -0.5f };
+		static const glm::vec2 inline StartContentScale = { 0.75f, 0.75f };
+		static const auto inline StartContentBlur = 1.0f;		
+
+	public:
+		StandardWindow(const std::set<BackgroundEffect> background_effect = { BackgroundEffect::Blur }, 
+			const std::set<ContentEffect> content_effect = { ContentEffect::Alpha, ContentEffect::Blur, ContentEffect::Anchor });
 
 	public:
 		void onOpenEnd() override;
@@ -423,11 +437,14 @@ namespace Shared::SceneHelpers
 		void setCloseOnMissclick(bool value) { mCloseOnMissclick = value; }
 
 	private:
+		std::shared_ptr<Scene::RenderLayer<Scene::Node>> mContentHolder;
 		std::shared_ptr<Scene::Node> mContent;
+		std::shared_ptr<Scene::BlurredGlass> mContentBlur;
 		std::shared_ptr<Scene::BlurredGlass> mBlur;
 		std::shared_ptr<Scene::GrayscaledGlass> mGray;
 		bool mCloseOnMissclick = true;
-		std::set<Flag> mFlags;
+		std::set<BackgroundEffect> mBackgroundEffect;
+		std::set<ContentEffect> mContentEffect;
 	};
 
 	class BlurredGlassDemo : public KillableByClick<MovableByHand<Outlined<Scene::BlurredGlass>>>

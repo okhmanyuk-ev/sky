@@ -496,7 +496,8 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction
 
 // standard window
 
-SceneHelpers::StandardWindow::StandardWindow(const std::set<Flag> flags) : mFlags(flags)
+SceneHelpers::StandardWindow::StandardWindow(const std::set<BackgroundEffect> background_effect,
+	const std::set<ContentEffect> content_effect) : mBackgroundEffect(background_effect), mContentEffect(content_effect)
 {
 	setStretch(1.0f);
 	setClickCallback([this] {
@@ -509,16 +510,22 @@ SceneHelpers::StandardWindow::StandardWindow(const std::set<Flag> flags) : mFlag
 		SCENE_MANAGER->popWindow();
 	});
 
+	mContentHolder = std::make_shared<Scene::RenderLayer<Scene::Node>>();
+	mContentHolder->setStretch(1.0f);
+	mContentHolder->setAnchor(0.5f);
+	mContentHolder->setPivot(0.5f);
+	mContentHolder->setInteractions(false);
+	attach(mContentHolder);
+
 	mContent = std::make_shared<Scene::Node>();
 	mContent->setStretch(1.0f);
-	mContent->setAnchor({ 0.5f, -0.5f });
-	mContent->setPivot({ 0.5f, 0.5f });
-	mContent->setInteractions(false);
-	attach(mContent);
+	mContent->setAnchor(0.5f);
+	mContent->setPivot(0.5f);
+	mContentHolder->attach(mContent);
 
 	getBackshadeColor()->setColor({ Graphics::Color::Black, 0.0f });
 
-	if (flags.contains(Flag::Blur))
+	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
 		mBlur = std::make_shared<Scene::BlurredGlass>();
 		mBlur->setStretch(1.0f);
@@ -526,53 +533,95 @@ SceneHelpers::StandardWindow::StandardWindow(const std::set<Flag> flags) : mFlag
 		attach(mBlur, Scene::Node::AttachDirection::Front);
 	}
 
-	if (flags.contains(Flag::Gray))
+	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
 	{
 		mGray = std::make_shared<Scene::GrayscaledGlass>();
 		mGray->setStretch(1.0f);
 		mGray->setGrayscaleIntensity(0.0f);
 		attach(mGray, Scene::Node::AttachDirection::Front);
 	}
+
+	if (mContentEffect.contains(ContentEffect::Blur))
+	{
+		mContentBlur = std::make_shared<Scene::BlurredGlass>();
+		mContentBlur->setStretch(1.0f);
+		mContentBlur->setBlurIntensity(StartContentBlur);
+		mContentHolder->attach(mContentBlur);
+	}
+
+	if (mContentEffect.contains(ContentEffect::Anchor))
+	{
+		mContent->setAnchor(StartContentAnchor);
+	}
+
+	if (mContentEffect.contains(ContentEffect::Alpha))
+	{
+		mContentHolder->getRenderLayerColor()->setAlpha(0.0f);
+	}
+
+	if (mContentEffect.contains(ContentEffect::Scale))
+	{
+		mContentHolder->setScale(StartContentScale);
+	}
 }
 
 void SceneHelpers::StandardWindow::onOpenEnd()
 {
-	mContent->setInteractions(true);
+	mContentHolder->setInteractions(true);
+	mContentHolder->setRenderLayerEnabled(false);
 }
 
 void SceneHelpers::StandardWindow::onCloseBegin()
 {
-	mContent->setInteractions(false);
+	mContentHolder->setInteractions(false);
+	mContentHolder->setRenderLayerEnabled(true);
 }
 
 std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction()
 {
 	const float Duration = 0.5f;
 
-	auto features = Actions::Collection::MakeParallel();
+	auto parallel = Actions::Collection::MakeParallel();
 
-	if (mFlags.contains(Flag::Fade))
+	if (mBackgroundEffect.contains(BackgroundEffect::Fade))
 	{
-		features->add(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, Duration, Easing::CubicOut));
+		parallel->add(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, Duration, Easing::CubicOut));
 	}
 
-	if (mFlags.contains(Flag::Blur))
+	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
-		features->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
-		features->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
+		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
+		parallel->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
 	}
 
-	if (mFlags.contains(Flag::Gray))
+	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
 	{
-		features->add(Actions::Collection::ChangeGrayscaleIntensity(mGray, 1.0f, Duration, Easing::CubicOut));
+		parallel->add(Actions::Collection::ChangeGrayscaleIntensity(mGray, 1.0f, Duration, Easing::CubicOut));
+	}
+
+	if (mContentEffect.contains(ContentEffect::Anchor))
+	{
+		parallel->add(Actions::Collection::ChangeAnchor(mContent, { 0.5f, 0.5f }, Duration, Easing::CubicOut));
+	}
+
+	if (mContentEffect.contains(ContentEffect::Blur))
+	{
+		parallel->add(Actions::Collection::ChangeBlurIntensity(mContentBlur, 0.0f, Duration, Easing::Linear));
+	}
+
+	if (mContentEffect.contains(ContentEffect::Alpha))
+	{
+		parallel->add(Actions::Collection::Show(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicOut));
+	}
+
+	if (mContentEffect.contains(ContentEffect::Scale))
+	{
+		parallel->add(Actions::Collection::ChangeScale(mContentHolder, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
 	}
 
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
-		Actions::Collection::MakeParallel(
-			Actions::Collection::ChangeVerticalAnchor(mContent, 0.5f, 0.5f, Easing::CubicOut),
-			std::move(features)
-		)
+		std::move(parallel)
 	);
 };
 
@@ -580,30 +629,47 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 {
 	const float Duration = 0.5f;
 
-	auto features = Actions::Collection::MakeParallel();
+	auto parallel = Actions::Collection::MakeParallel();
 
-	if (mFlags.contains(Flag::Fade))
+	if (mBackgroundEffect.contains(BackgroundEffect::Fade))
 	{
-		features->add(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, Duration, Easing::CubicIn));
+		parallel->add(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, Duration, Easing::CubicIn));
 	}
 
-	if (mFlags.contains(Flag::Blur))
+	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
-		features->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
-		features->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
+		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
+		parallel->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
 	}
 
-	if (mFlags.contains(Flag::Gray))
+	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
 	{
-		features->add(Actions::Collection::ChangeGrayscaleIntensity(mGray, 0.0f, Duration, Easing::CubicIn));
+		parallel->add(Actions::Collection::ChangeGrayscaleIntensity(mGray, 0.0f, Duration, Easing::CubicIn));
+	}
+
+	if (mContentEffect.contains(ContentEffect::Anchor))
+	{
+		parallel->add(Actions::Collection::ChangeAnchor(mContent, StartContentAnchor, Duration, Easing::CubicIn));
+	}
+
+	if (mContentEffect.contains(ContentEffect::Blur))
+	{
+		parallel->add(Actions::Collection::ChangeBlurIntensity(mContentBlur, StartContentBlur, Duration, Easing::Linear));
+	}
+
+	if (mContentEffect.contains(ContentEffect::Alpha))
+	{
+		parallel->add(Actions::Collection::Hide(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicIn));
+	}
+
+	if (mContentEffect.contains(ContentEffect::Scale))
+	{
+		parallel->add(Actions::Collection::ChangeScale(mContentHolder, StartContentScale, Duration, Easing::CubicIn));
 	}
 
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
-		Actions::Collection::MakeParallel(
-			Actions::Collection::ChangeVerticalAnchor(mContent, -0.5f, 0.5f, Easing::CubicIn),
-			std::move(features)
-		)
+		std::move(parallel)
 	);
 };
 
