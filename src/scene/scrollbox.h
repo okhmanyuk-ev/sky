@@ -60,6 +60,12 @@ namespace Scene
 		auto getInsignificantSpeed() const { return mInsignificantSpeed; }
 		void setInsignificantSpeed(float value) { mInsignificantSpeed = value; }
 
+		bool isOverscrollEnabled() const { return mOverscrollEnabled; }
+		void setOverscrollEnabled(bool value) { mOverscrollEnabled = value; }
+
+		bool isInerting() const { return mInerting; }
+		bool isPullbacking() const { return mPullbacking; }
+
 	private:
 		std::shared_ptr<Node> mBounding;
 		std::shared_ptr<Node> mContent;
@@ -70,5 +76,8 @@ namespace Scene
 		float mInertiaFriction = DefaultInertiaFriction;
 		float mInsignificantSpeed = 0.01f;
 		bool mInertiaEnabled = true;
+		bool mOverscrollEnabled = true;
+		bool mInerting = false;
+		bool mPullbacking = false;
 	};
 }

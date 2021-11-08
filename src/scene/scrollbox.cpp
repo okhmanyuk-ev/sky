@@ -19,18 +19,19 @@ void Scrollbox::update(Clock::Duration dTime)
 {
 	Node::update(dTime);
 
-		if (glm::abs(mSpeed.y) <= mInsignificantSpeed)
+	if (glm::abs(mSpeed.y) <= mInsignificantSpeed)
 		mSpeed.y = 0.0f;
 
 	if (glm::abs(mSpeed.x) <= mInsignificantSpeed)
 		mSpeed.x = 0.0f;
 
-	auto speed = mSpeed * mSensitivity / getScrollSpace();
+	auto scroll_space = getScrollSpace();
+	auto speed = mSpeed * mSensitivity / scroll_space;
 
-	if (glm::isnan(speed.x))
+	if (glm::isnan(speed.x) || glm::isinf(speed.x))
 		speed.x = 0.0f;
 
-	if (glm::isnan(speed.y))
+	if (glm::isnan(speed.y) || glm::isinf(speed.y))
 		speed.y = 0.0f;
 
 	if (!isTouching())
@@ -49,7 +50,16 @@ void Scrollbox::update(Clock::Duration dTime)
 	else
 		mSpeed = { 0.0f, 0.0f };
 
-	mScrollPosition = glm::clamp(mScrollPosition);
+	mInerting = glm::length(mSpeed) != 0.0f && !isTouching();
+
+	auto clamped_pos = glm::clamp(mScrollPosition);
+
+	if (!mOverscrollEnabled)
+		mScrollPosition = clamped_pos;
+	else if (!isTouching())
+		mScrollPosition = Common::Helpers::SmoothValueAssign(mScrollPosition, clamped_pos, dTime);
+
+	mPullbacking = mScrollPosition != clamped_pos && !isTouching();
 
 	mContent->setAnchor(mScrollPosition);
 	mContent->setPivot(mScrollPosition);

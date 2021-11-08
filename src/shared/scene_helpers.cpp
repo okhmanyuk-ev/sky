@@ -627,7 +627,6 @@ SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 	slider->setWidth(8.0f);
 
 	auto scrollbox = std::make_shared<Scene::Scrollbox>();
-	scrollbox->setInertiaEnabled(false);
 	scrollbox->setStretch(1.0f);
 	scrollbox->getBounding()->setStretch(1.0f);
 	scrollbox->getBounding()->setAnchor(0.5f);
@@ -642,7 +641,7 @@ SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 	attach(label);
 
 	runAction(Actions::Collection::ExecuteInfinite([this, scrollbox, slider, label] {
-		if (!scrollbox->isTouching())
+		if (!scrollbox->isTouching() && !scrollbox->isInerting() && !scrollbox->isPullbacking())
 			scrollbox->setHorizontalScrollPosition(1.0f - getBlurIntensity());
 
 		auto h_pos = scrollbox->getHorizontalScrollPosition();
