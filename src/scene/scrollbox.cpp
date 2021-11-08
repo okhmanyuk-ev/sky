@@ -26,8 +26,9 @@ void Scrollbox::update(Clock::Duration dTime)
 		mSpeed.x = 0.0f;
 
 	auto scroll_space = getScrollSpace();
-	auto speed = mSpeed * mSensitivity / scroll_space;
-
+	auto overscroll_factor = 1.0f - (glm::abs(mOverscrollDistance) / getAbsoluteSize());
+	auto speed = mSpeed * mSensitivity / scroll_space * glm::pow3(overscroll_factor);
+	
 	if (glm::isnan(speed.x) || glm::isinf(speed.x))
 		speed.x = 0.0f;
 
@@ -50,8 +51,6 @@ void Scrollbox::update(Clock::Duration dTime)
 	else
 		mSpeed = { 0.0f, 0.0f };
 
-	mInerting = glm::length(mSpeed) != 0.0f && !isTouching();
-
 	auto clamped_pos = glm::clamp(mScrollPosition);
 
 	if (!mOverscrollEnabled)
@@ -59,7 +58,7 @@ void Scrollbox::update(Clock::Duration dTime)
 	else if (!isTouching())
 		mScrollPosition = Common::Helpers::SmoothValueAssign(mScrollPosition, clamped_pos, dTime);
 
-	mPullbacking = mScrollPosition != clamped_pos && !isTouching();
+	mOverscrollDistance = (mScrollPosition - clamped_pos) * scroll_space;
 
 	mContent->setAnchor(mScrollPosition);
 	mContent->setPivot(mScrollPosition);
@@ -86,4 +85,14 @@ glm::vec2 Scrollbox::screenToScrollPosition(const glm::vec2& projected_screen_po
 glm::vec2 Scrollbox::getScrollSpace() const
 {
 	return mContent->getAbsoluteSize() - mBounding->getAbsoluteSize();
+}
+
+bool Scrollbox::isInerting() const
+{
+	return glm::length(mSpeed) != 0.0f && !isTouching();
+}
+
+bool Scrollbox::isPullbacking() const 
+{
+	return glm::length(mOverscrollDistance) != 0.0f && !isTouching();
 }

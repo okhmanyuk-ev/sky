@@ -63,8 +63,9 @@ namespace Scene
 		bool isOverscrollEnabled() const { return mOverscrollEnabled; }
 		void setOverscrollEnabled(bool value) { mOverscrollEnabled = value; }
 
-		bool isInerting() const { return mInerting; }
-		bool isPullbacking() const { return mPullbacking; }
+		bool isInerting() const;
+		bool isPullbacking() const;
+		const auto& getOverscrollDistance() const { return mOverscrollDistance; }
 
 	private:
 		std::shared_ptr<Node> mBounding;
@@ -77,7 +78,6 @@ namespace Scene
 		float mInsignificantSpeed = 0.01f;
 		bool mInertiaEnabled = true;
 		bool mOverscrollEnabled = true;
-		bool mInerting = false;
-		bool mPullbacking = false;
+		glm::vec2 mOverscrollDistance = { 0.0f, 0.0 };
 	};
 }
