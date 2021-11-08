@@ -377,10 +377,21 @@ namespace Shared::SceneHelpers
 		bool mHidden = false;
 	};
 
-	class StandardScreen : public Frontshaded<SceneManager::Screen>
+	class StandardScreen : public Scene::RenderLayer<SceneManager::Screen>
 	{
 	public:
-		StandardScreen();
+		enum class Effect
+		{
+			Alpha,
+			Blur,
+			Scale
+		};
+
+	public:
+		static const glm::vec2 inline StartScale = { 0.95f, 0.95f };
+
+	public:
+		StandardScreen(const std::set<Effect>& effects = { Effect::Alpha, Effect::Blur, Effect::Scale });
 		
 	protected:
 		void onEnterBegin() override;
@@ -393,6 +404,14 @@ namespace Shared::SceneHelpers
 	protected:
 		std::unique_ptr<Actions::Action> createEnterAction() override;
 		std::unique_ptr<Actions::Action> createLeaveAction() override;
+
+	public:
+		auto getContent() const { return mContent; }
+
+	private:
+		std::set<Effect> mEffects;
+		std::shared_ptr<Scene::Node> mContent;
+		std::shared_ptr<Scene::BlurredGlass> mBlur;
 	};
 
 	class StandardWindow : public Scene::Clickable<Backshaded<Shared::SceneManager::Window>>

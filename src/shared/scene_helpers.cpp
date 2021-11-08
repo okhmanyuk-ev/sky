@@ -438,34 +438,65 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 
 // standard screen
 
-SceneHelpers::StandardScreen::StandardScreen()
+SceneHelpers::StandardScreen::StandardScreen(const std::set<Effect>& effects) :
+	mEffects(effects)
 {
 	setEnabled(false);
 	setInteractions(false);
 	setStretch(1.0f);
 	setAnchor(0.5f);
 	setPivot(0.5f);
-	getFrontshadeColor()->setColor(Graphics::Color::Black);
+	
+	mContent = std::make_shared<Scene::Node>();
+	mContent->setStretch(1.0f);
+	mContent->setAnchor(0.5f);
+	mContent->setPivot(0.5f);
+	attach(mContent);
+
+	if (mEffects.contains(Effect::Blur))
+	{
+		mBlur = std::make_shared<Scene::BlurredGlass>();
+		mBlur->setStretch(1.0f);
+		attach(mBlur);
+	}
 }
 
 void SceneHelpers::StandardScreen::onEnterBegin()
 {
 	setEnabled(true);
+	setRenderLayerEnabled(true);
+	if (mEffects.contains(Effect::Blur))
+	{
+		mBlur->setBlurIntensity(1.0f);
+	}
+
+	if (mEffects.contains(Effect::Blur))
+	{
+		mContent->setScale(0.95f);
+	}
+
+	if (mEffects.contains(Effect::Alpha))
+	{
+		getRenderLayerColor()->setAlpha(0.0f);
+	}
 }
 
 void SceneHelpers::StandardScreen::onEnterEnd()
 {
 	setInteractions(true);
+	setRenderLayerEnabled(false);
 }
 
 void SceneHelpers::StandardScreen::onLeaveBegin()
 {
 	setInteractions(false);
+	setRenderLayerEnabled(true);
 }
 
 void SceneHelpers::StandardScreen::onLeaveEnd()
 {
 	setEnabled(false);
+	setRenderLayerEnabled(false);
 }
 
 void SceneHelpers::StandardScreen::onWindowAppearing()
@@ -480,17 +511,55 @@ void SceneHelpers::StandardScreen::onWindowDisappearing()
 
 std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createEnterAction()
 {
+	const float Duration = 0.25f;
+
+	auto parallel = Actions::Collection::MakeParallel();
+
+	if (mEffects.contains(Effect::Alpha))
+	{
+		parallel->add(Actions::Collection::Show(getRenderLayerColor(), Duration));
+	}
+
+	if (mEffects.contains(Effect::Blur))
+	{
+		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
+	}
+
+	if (mEffects.contains(Effect::Scale))
+	{
+		parallel->add(Actions::Collection::ChangeScale(mContent, { 1.0f, 1.0f }, Duration, Easing::CubicIn));
+	}
+
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
-		Actions::Collection::ChangeAlpha(getFrontshadeColor(), 0.0f, 0.5f)
+		std::move(parallel)
 	);
 };
 
 std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction()
 {
+	const float Duration = 0.25f;
+
+	auto parallel = Actions::Collection::MakeParallel();
+
+	if (mEffects.contains(Effect::Alpha))
+	{
+		parallel->add(Actions::Collection::Hide(getRenderLayerColor(), Duration));
+	}
+
+	if (mEffects.contains(Effect::Blur))
+	{
+		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
+	}
+	
+	if (mEffects.contains(Effect::Scale))
+	{
+		parallel->add(Actions::Collection::ChangeScale(mContent, StartScale, Duration, Easing::CubicIn));
+	}
+
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitOneFrame(),
-		Actions::Collection::ChangeAlpha(getFrontshadeColor(), 1.0f, 0.5f)
+		std::move(parallel)
 	);
 };
 
