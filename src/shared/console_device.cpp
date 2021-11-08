@@ -572,11 +572,15 @@ void ConsoleDevice::handleInputHistory(ImGuiTextEditCallbackData* data)
 
 std::vector<ConsoleDevice::Candidate> ConsoleDevice::getCandidates(const std::string& match) const
 {
+	auto lowercase_match = match;
+
+	std::transform(lowercase_match.begin(), lowercase_match.end(), lowercase_match.begin(), tolower);
+
 	std::vector<Candidate> result = {};
 
 	for (auto& [name, cvar] : CONSOLE->getCVars())
 	{
-		if (name.find(match) == std::string::npos)
+		if (name.find(lowercase_match) == std::string::npos)
 			continue;
 
 		Candidate candidate;
@@ -589,7 +593,7 @@ std::vector<ConsoleDevice::Candidate> ConsoleDevice::getCandidates(const std::st
 
 	for (auto& [name, command] : CONSOLE->getCommands())
 	{
-		if (name.find(match) == std::string::npos)
+		if (name.find(lowercase_match) == std::string::npos)
 			continue;
 
 		Candidate candidate;
@@ -602,7 +606,7 @@ std::vector<ConsoleDevice::Candidate> ConsoleDevice::getCandidates(const std::st
 
 	for (auto& [name, value] : CONSOLE->getAliases())
 	{
-		if (name.find(match) == std::string::npos)
+		if (name.find(lowercase_match) == std::string::npos)
 			continue;
 
 		Candidate candidate;
