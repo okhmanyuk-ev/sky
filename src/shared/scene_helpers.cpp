@@ -470,7 +470,7 @@ void SceneHelpers::StandardScreen::onEnterBegin()
 		mBlur->setBlurIntensity(1.0f);
 	}
 
-	if (mEffects.contains(Effect::Blur))
+	if (mEffects.contains(Effect::Scale))
 	{
 		mContent->setScale(0.95f);
 	}
