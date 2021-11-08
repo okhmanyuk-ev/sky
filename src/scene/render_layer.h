@@ -18,6 +18,9 @@ namespace Scene
 		{
 			T::enterDraw();
 
+			if (!mRenderLayerEnabled)
+				return;
+
 			// https://stackoverflow.com/questions/2171085/opengl-blending-with-previous-contents-of-framebuffer
 			// http://www.shawnhargreaves.com/blog/premultiplied-alpha-and-image-composition.html
 
@@ -31,6 +34,12 @@ namespace Scene
 
 		void leaveDraw() override
 		{
+			if (!mRenderLayerEnabled)
+			{
+				T::leaveDraw();
+				return;
+			}
+
 			GRAPHICS->pop(2);
 
 			auto target = GRAPHICS->getRenderTarget(fmt::format("renderlayer_{}", (void*)this));
@@ -51,12 +60,16 @@ namespace Scene
 		virtual void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) { }
 
 	public:
+		bool isRenderLayerEnabled() const { return mRenderLayerEnabled; }
+		void setRenderLayerEnabled(bool value) { mRenderLayerEnabled = value; }
+
 		bool isPostprocessEnabled() const { return mPostprocessEnabled; }
 		void setPostprocessEnabled(bool value) { mPostprocessEnabled = value; }
 
 		auto getRenderLayerColor() const { return mRenderLayerColor; }
 
 	private:
+		bool mRenderLayerEnabled = true;
 		bool mPostprocessEnabled = true;
 		std::shared_ptr<Color> mRenderLayerColor = std::make_shared<Color>();
 	};
