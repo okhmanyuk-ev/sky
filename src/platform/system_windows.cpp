@@ -235,6 +235,14 @@ void SystemWindows::dispatchMouseEvent(UINT msg, WPARAM wParam, LPARAM lParam)
 	evt.x = GET_X_LPARAM(lParam);
 	evt.y = GET_Y_LPARAM(lParam);
 
+	if (evt.type == Input::Mouse::Event::Type::Wheel)
+	{
+		POINT pt = { evt.x, evt.y };
+		ScreenToClient(Window, &pt);
+		evt.x = pt.x;
+		evt.y = pt.y;
+	}
+
 	if (evt.type == Input::Mouse::Event::Type::ButtonDown)
 		mMouseButtons.insert(evt.button);
 	else if (evt.type == Input::Mouse::Event::Type::ButtonUp)

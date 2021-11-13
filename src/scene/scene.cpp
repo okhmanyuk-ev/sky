@@ -240,6 +240,20 @@ void Scene::Scene::onEvent(const Platform::Input::Mouse::Event& e)
 	{
 		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::End, e.x, e.y }));
 	}
+	else if (e.type == Platform::Input::Mouse::Event::Type::Wheel) 
+	{
+		auto pos = glm::vec2(static_cast<float>(e.x), static_cast<float>(e.y));
+
+		if (!interactTest(pos)) 
+			return;
+
+		auto nodes = getTouchableNodes(pos);
+
+		for (auto node : nodes) 
+		{
+			node->scroll(e.wheelX, e.wheelY);
+		}
+	}
 }
 
 void Scene::Scene::onEvent(const Platform::Input::Touch::Event& e)

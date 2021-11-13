@@ -224,11 +224,11 @@ namespace Platform::Input
 			Type type;
 			Button button;
 
-			int x;
-			int y;
+			int x = 0;
+			int y = 0;
 
-			float wheelX;
-			float wheelY;
+			float wheelX = 0.0f;
+			float wheelY = 0.0f;
 		};
 	}
 

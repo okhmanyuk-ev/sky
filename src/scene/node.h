@@ -59,6 +59,7 @@ namespace Scene
 		virtual void update(Clock::Duration dTime);
 		virtual void draw();
 		virtual void touch(Touch type, const glm::vec2& pos);
+		virtual void scroll(float x, float y);
 
 	public:
 		auto getParent() const { return mParent; }

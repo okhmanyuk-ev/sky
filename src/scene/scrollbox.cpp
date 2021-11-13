@@ -76,6 +76,12 @@ void Scrollbox::touch(Touch type, const glm::vec2& pos)
 	mPrevPosition = local_pos;
 }
 
+void Scrollbox::scroll(float x, float y)
+{
+	mSpeed.x -= x * 8.0f;
+	mSpeed.y -= y * 8.0f;
+}
+
 glm::vec2 Scrollbox::screenToScrollPosition(const glm::vec2& projected_screen_pos)
 {
 	auto unproject_pos = mContent->unproject(projected_screen_pos);

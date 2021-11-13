@@ -176,3 +176,8 @@ void Node::touch(Touch type, const glm::vec2& pos)
 	else if (type == Touch::End)
 		mTouching = false;
 }
+
+void Node::scroll(float x, float y)
+{
+	//
+}

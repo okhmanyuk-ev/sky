@@ -16,6 +16,7 @@ namespace Scene
 	protected:
 		void update(Clock::Duration dTime) override;
 		void touch(Touch type, const glm::vec2& pos) override;
+		void scroll(float x, float y) override;
 
 	private:
 		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
