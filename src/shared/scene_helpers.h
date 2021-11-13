@@ -384,22 +384,24 @@ namespace Shared::SceneHelpers
 		{
 			Alpha,
 			Blur,
-			Scale
+			Scale,
+			WindowAppearingScale
 		};
 
 	public:
 		static const glm::vec2 inline StartScale = { 0.95f, 0.95f };
 
 	public:
-		StandardScreen(const std::set<Effect>& effects = { Effect::Alpha, Effect::Blur, Effect::Scale });
+		StandardScreen(const std::set<Effect>& effects = { Effect::Alpha, Effect::Blur, Effect::Scale, Effect::WindowAppearingScale });
 		
 	protected:
 		void onEnterBegin() override;
 		void onEnterEnd() override;
 		void onLeaveBegin() override;
 		void onLeaveEnd() override;
-		void onWindowAppearing() override;
-		void onWindowDisappearing() override;
+		void onWindowAppearingBegin() override;
+		void onWindowDisappearingBegin() override;
+		void onWindowDisappearingEnd() override;
 
 	protected:
 		std::unique_ptr<Actions::Action> createEnterAction() override;

@@ -499,12 +499,24 @@ void SceneHelpers::StandardScreen::onLeaveEnd()
 	setRenderLayerEnabled(false);
 }
 
-void SceneHelpers::StandardScreen::onWindowAppearing()
+void SceneHelpers::StandardScreen::onWindowAppearingBegin()
 {
 	setInteractions(false);
+	if (mEffects.contains(Effect::WindowAppearingScale)) 
+	{
+		runAction(Actions::Collection::ChangeScale(mContent, StartScale, 1.0f, Easing::CubicOut));
+	}
 }
 
-void SceneHelpers::StandardScreen::onWindowDisappearing()
+void SceneHelpers::StandardScreen::onWindowDisappearingBegin()
+{
+	if (mEffects.contains(Effect::WindowAppearingScale))
+	{
+		runAction(Actions::Collection::ChangeScale(mContent, { 1.0f, 1.0f }, 1.0f, Easing::CubicOut));
+	}
+}
+
+void SceneHelpers::StandardScreen::onWindowDisappearingEnd()
 {
 	setInteractions(true);
 }

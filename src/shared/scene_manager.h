@@ -68,8 +68,10 @@ namespace Shared
 		virtual void onLeaveBegin() { }
 		virtual void onLeaveEnd() { }
 
-		virtual void onWindowAppearing() { }
-		virtual void onWindowDisappearing() { }
+		virtual void onWindowAppearingBegin() { }
+		virtual void onWindowAppearingEnd() { }
+		virtual void onWindowDisappearingBegin() { }
+		virtual void onWindowDisappearingEnd() { }
 
 	public:
 		virtual std::unique_ptr<Actions::Action> createEnterAction() = 0;

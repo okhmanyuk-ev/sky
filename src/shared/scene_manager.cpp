@@ -108,7 +108,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 	assert(!isWindowsBusy());
 
 	if (mWindows.empty())
-		mCurrentScreen->onWindowAppearing(); // only on first window in stack
+		mCurrentScreen->onWindowAppearingBegin();
 
 	mWindows.push(window);
 	mWindowHolder->attach(window);
@@ -118,9 +118,13 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 
 	runAction(Actions::Collection::MakeSequence(
 		window->createOpenAction(),
-		Actions::Collection::Execute([window, finishCallback] {
+		Actions::Collection::Execute([this, window, finishCallback] {
 			window->onOpenEnd();
 			window->mState = Window::State::Opened;
+			
+			if (mWindows.size() == 1)
+				mCurrentScreen->onWindowAppearingEnd();
+
 			if (finishCallback)
 			{
 				finishCallback();
@@ -149,15 +153,19 @@ void SceneManager::popWindow(size_t count, Callback finishCallback)
 	window->mState = Window::State::Closing;
 
 	runAction(Actions::Collection::MakeSequence(
+		Actions::Collection::Execute([this, window, count, finishCallback] {
+			if (mWindows.size() == 1)
+				mCurrentScreen->onWindowDisappearingBegin();
+		}),
 		window->createCloseAction(),
 		Actions::Collection::Execute([this, window, count, finishCallback] {
 			window->onCloseEnd();
 			window->mState = Window::State::Closed;
 			mWindowHolder->detach(window);
-			mWindows.pop(); 
+			mWindows.pop();
 			
 			if (mWindows.empty())
-				mCurrentScreen->onWindowDisappearing(); // only on last window in stack
+				mCurrentScreen->onWindowDisappearingEnd();
 
 			popWindow(count - 1, finishCallback);
 		})
