@@ -42,7 +42,7 @@ namespace ImScene
 		void ensureMatrix();
 	};
 
-	class ImScene
+	class ImScene : public Common::FrameSystem::Frameable
 	{
 	public:
 		class Drawable;
@@ -89,6 +89,57 @@ namespace ImScene
 		bool mWorking = false;
 		glm::mat4 mDefaultMatrix = glm::mat4(1.0f);
 		glm::vec2 mDefaultSize = { 0.0f, 0.0f };
+
+
+
+		// 
+
+	public:
+		void onFrame() override
+		{
+			for (auto name : mUnusedImNodes)
+			{
+				auto node = mImNodes.at(name);
+				node->getParent()->detach(node); // maybe parent does not exist if parent was deleted
+				mImNodes.erase(name);
+			}
+
+			mUnusedImNodes.clear();
+
+			for (auto [name, node] : mImNodes)
+			{
+				mUnusedImNodes.insert(name);
+			}
+		}
+
+	public:
+		template<class T>
+		std::shared_ptr<T> pushTemporaryNode(std::shared_ptr<Scene::Node> target, const std::string& unique_name)
+		{
+			std::shared_ptr<T> result = nullptr;
+
+			if (mImNodes.count(unique_name) != 0)
+			{
+				auto node = mImNodes.at(unique_name);
+				result = std::dynamic_pointer_cast<T>(node);
+			}
+
+			if (result == nullptr)
+			{
+				result = std::make_shared<T>();
+				target->attach(result);
+				assert(mImNodes.count(unique_name) == 0);
+				mImNodes.insert({ unique_name, result });
+			}
+
+			mUnusedImNodes.erase(unique_name);
+
+			return result;
+		}
+
+	private:
+		std::map<std::string, std::shared_ptr<Scene::Node>> mImNodes;
+		std::set<std::string> mUnusedImNodes;
 	};
 
 	class ImScene::Drawable
