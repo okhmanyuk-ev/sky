@@ -2,17 +2,17 @@
 
 void ImScene::ImScene::onFrame()
 {
-	for (auto name : mUnusedImNodes)
+	for (auto name : mUnusedNodes)
 	{
-		auto node = mImNodes.at(name);
+		auto node = mNodes.at(name);
 		node->getParent()->detach(node); // maybe parent does not exist if parent was deleted
-		mImNodes.erase(name);
+		mNodes.erase(name);
 	}
 
-	mUnusedImNodes.clear();
+	mUnusedNodes.clear();
 
-	for (auto [name, node] : mImNodes)
+	for (auto [name, node] : mNodes)
 	{
-		mUnusedImNodes.insert(name);
+		mUnusedNodes.insert(name);
 	}
 }

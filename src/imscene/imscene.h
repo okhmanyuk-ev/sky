@@ -25,32 +25,32 @@ namespace ImScene
 		void onFrame() override;
 
 	public:
-		template<class T>
-		std::shared_ptr<T> pushTemporaryNode(std::shared_ptr<Scene::Node> target, const std::string& unique_name)
+		template<class T = Scene::Node>
+		std::shared_ptr<T> attachTemporaryNode(Scene::Node& target, const std::string& unique_name)
 		{
 			std::shared_ptr<T> result = nullptr;
 
-			if (mImNodes.count(unique_name) != 0)
+			if (mNodes.count(unique_name) != 0)
 			{
-				auto node = mImNodes.at(unique_name);
+				auto node = mNodes.at(unique_name);
 				result = std::dynamic_pointer_cast<T>(node);
 			}
 
 			if (result == nullptr)
 			{
 				result = std::make_shared<T>();
-				target->attach(result);
-				assert(mImNodes.count(unique_name) == 0);
-				mImNodes.insert({ unique_name, result });
+				target.attach(result);
+				assert(mNodes.count(unique_name) == 0);
+				mNodes.insert({ unique_name, result });
 			}
 
-			mUnusedImNodes.erase(unique_name);
+			mUnusedNodes.erase(unique_name);
 
 			return result;
 		}
 
 	private:
-		std::map<std::string, std::shared_ptr<Scene::Node>> mImNodes;
-		std::set<std::string> mUnusedImNodes;
+		std::map<std::string, std::shared_ptr<Scene::Node>> mNodes;
+		std::set<std::string> mUnusedNodes;
 	};
 }
