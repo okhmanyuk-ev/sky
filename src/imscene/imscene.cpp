@@ -5,7 +5,10 @@ void ImScene::ImScene::onFrame()
 	for (auto name : mUnusedNodes)
 	{
 		auto node = mNodes.at(name);
-		node->getParent()->detach(node); // maybe parent does not exist if parent was deleted
+		if (node->hasParent())
+		{
+			node->getParent()->detach(node);
+		}
 		mNodes.erase(name);
 	}
 
