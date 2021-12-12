@@ -38,7 +38,6 @@
 #include <renderer/all.h>
 #include <scene/all.h>
 #include <scene3d/all.h>
-#include <imscene/all.h>
 #include <graphics/all.h>
 
 #include <shared/stats_system.h>
@@ -47,6 +46,7 @@
 #include <shared/localization_system.h>
 #include <shared/first_person_camera_controller.h>
 #include <shared/imgui_user.h>
+#include <shared/imscene.h>
 #include <shared/touch_emulator.h>
 #include <shared/gesture_detector.h>
 #include <shared/scene_helpers.h>

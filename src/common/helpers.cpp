@@ -133,3 +133,12 @@ glm::vec2 Helpers::SmoothValueAssign(const glm::vec2& src, const glm::vec2& dst,
 		SmoothValueAssign(src.y, dst.y, dTime, friction)
 	};
 }
+
+glm::vec3 Helpers::SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst, Clock::Duration dTime, float friction)
+{
+	return {
+		SmoothValueAssign(src.x, dst.x, dTime, friction),
+		SmoothValueAssign(src.y, dst.y, dTime, friction),
+		SmoothValueAssign(src.z, dst.z, dTime, friction)
+	};
+}

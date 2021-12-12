@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 #include <shared/imgui_user.h>
-#include <imscene/imscene.h>
+#include <shared/imscene.h>
 #include <audio/system.h>
 #include <shared/scene_manager.h>
 #include <shared/scene_helpers.h>
@@ -31,7 +31,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	ENGINE->addSystem<Shared::CacheSystem>(std::make_shared<Shared::CacheSystem>());
 	ENGINE->addSystem<Shared::ImguiSystem>(std::make_shared<Shared::ImguiSystem>());
 	ENGINE->addSystem<Shared::Stylebook>(std::make_shared<Shared::Stylebook>());
-	ENGINE->addSystem<ImScene::ImScene>(std::make_shared<ImScene::ImScene>());
+	ENGINE->addSystem<Shared::ImScene>(std::make_shared<Shared::ImScene>());
 	if (flags.count(Flag::Audio))
 	{
 		ENGINE->addSystem<Audio::System>(std::make_shared<Audio::System>());
@@ -142,7 +142,7 @@ Application::~Application()
 	{
 		ENGINE->removeSystem<Audio::System>();
 	}
-	ENGINE->removeSystem<ImScene::ImScene>();
+	ENGINE->removeSystem<Shared::ImScene>();
 	ENGINE->removeSystem<Shared::Stylebook>();
 	ENGINE->removeSystem<Shared::ImguiSystem>();
 	ENGINE->removeSystem<Shared::CacheSystem>();

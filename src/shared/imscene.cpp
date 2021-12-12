@@ -1,6 +1,6 @@
 #include "imscene.h"
 
-void ImScene::ImScene::onFrame()
+void Shared::ImScene::onFrame()
 {
 	for (auto name : mUnusedNodes)
 	{
@@ -18,4 +18,6 @@ void ImScene::ImScene::onFrame()
 	{
 		mUnusedNodes.insert(name);
 	}
+
+	mTypesCount.clear();
 }
