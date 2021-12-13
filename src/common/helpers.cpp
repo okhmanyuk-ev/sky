@@ -142,3 +142,20 @@ glm::vec3 Helpers::SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst,
 		SmoothValueAssign(src.z, dst.z, dTime, friction)
 	};
 }
+
+float Helpers::SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction)
+{
+	auto src_deg = glm::degrees(src_radians);
+	auto dst_deg = glm::degrees(dst_radians);
+
+	auto distance = glm::distance(src_deg, dst_deg);
+
+	if (distance > glm::distance(src_deg - 360.0f, dst_deg))
+		src_deg -= 360.0f;
+	else if (distance > glm::distance(src_deg + 360.0f, dst_deg))
+		src_deg += 360.0f;
+
+	src_radians = glm::radians(src_deg);
+
+	return SmoothValueAssign(src_radians, dst_radians, dTime, friction);
+}

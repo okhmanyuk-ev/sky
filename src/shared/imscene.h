@@ -16,7 +16,7 @@ namespace Shared
 
 	public:
 		template<class T = Scene::Node>
-		std::shared_ptr<T> attachTemporaryNode(Scene::Node& target, bool& initialized, std::optional<std::string> key = std::nullopt)
+		std::shared_ptr<T> attachTemporaryNode(Scene::Node& target, std::optional<std::string> key = std::nullopt)
 		{
 			std::shared_ptr<T> result = nullptr;
 
@@ -35,7 +35,7 @@ namespace Shared
 				result = std::dynamic_pointer_cast<T>(node);
 			}
 
-			initialized = false;
+			mNodeWasInitialized = result == nullptr;
 
 			if (result == nullptr)
 			{
@@ -43,7 +43,6 @@ namespace Shared
 				target.attach(result);
 				assert(mNodes.count(final_key) == 0);
 				mNodes.insert({ final_key, result });
-				initialized = true;
 			}
 
 			mUnusedNodes.erase(final_key);
@@ -51,16 +50,12 @@ namespace Shared
 			return result;
 		}
 
-		template<class T = Scene::Node>
-		std::shared_ptr<T> attachTemporaryNode(Scene::Node& target, std::optional<std::string> key = std::nullopt)
-		{
-			bool unused = false;
-			return attachTemporaryNode<T>(target, unused, key);
-		}
+		bool nodeWasInitialized() const { return mNodeWasInitialized; }
 
 	private:
 		std::unordered_map<std::string, int> mTypesCount;
 		std::unordered_map<std::string, std::shared_ptr<Scene::Node>> mNodes;
 		std::set<std::string> mUnusedNodes;
+		bool mNodeWasInitialized = false;
 	};
 }
