@@ -82,7 +82,7 @@ uint32_t BitBuffer::readBits(uint32_t size)
 	if (size > 32)
 		throw std::runtime_error("readBits: bad size (" + std::to_string(size) + ")");
 
-	auto& src_value = *(uint32_t*)((size_t)mMemory + mPosition);
+	auto& src_value = *(uint32_t*)getPositionMemory();
 	auto max_value = (1U << size) - 1;
 
 	auto result = max_value & (src_value >> mBitPosition);
@@ -125,7 +125,7 @@ void BitBuffer::writeBits(uint32_t value, uint32_t size)
 
 	ensureSpace(byte_count + 1);
 
-	auto& src_value = *(uint32_t*)((size_t)mMemory + mPosition);
+	auto& src_value = *(uint32_t*)getPositionMemory();
 	auto row = (1U << mBitPosition) - 1;
 
 	src_value = (src_value & row) | (value << mBitPosition);

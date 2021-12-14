@@ -54,6 +54,7 @@ public:
 
 public:
 	auto getMemory() const { return mMemory; }
+	auto getPositionMemory() const { return (void*)((size_t)mMemory + mPosition); }
 
 	auto getSize() const { return mSize; }
 	void setSize(size_t value);
