@@ -14,6 +14,7 @@ namespace Common::Helpers
 	std::string SecondsToFmtString(int seconds);
 	bool Chance(float normalized_percent);
 	std::string BytesToNiceString(uint64_t value);
+	std::string BytesArrayToNiceString(void* mem, size_t size);
 
 	inline const float RadialLimit = glm::pi<float>() * 2.0f;
 

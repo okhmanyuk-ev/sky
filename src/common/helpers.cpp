@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <common/bitbuffer.h>
 
 using namespace Common;
 
@@ -64,6 +65,24 @@ std::string Helpers::BytesToNiceString(uint64_t value) // we need uint128_t here
 		return std::to_string(value) + " " + l;
 
 	return std::to_string(value / (1ULL << q)) + "." + std::to_string(value % (1ULL << q) / ((1ULL << q) / 10 + 1)) + " " + l;
+}
+
+std::string Helpers::BytesArrayToNiceString(void* mem, size_t size)
+{
+	BitBuffer buf;
+	buf.write(mem, size);
+	buf.toStart();
+	std::string result;
+	while (buf.hasRemaining())
+	{
+		auto b = buf.read<uint8_t>();
+		//if (b > 30)
+		if (std::isprint(b))
+			result += (unsigned char)b;
+		else
+			result += "#" + std::to_string(b);
+	}
+	return result;
 }
 
 /*uint32_t Helpers::crc32c(const uint8_t* mem, size_t size, uint32_t crc)
