@@ -14,6 +14,7 @@
 #include <nlohmann/json.hpp>
 
 #include <tiny_obj_loader.h>
+#include <magic_enum.hpp>
 
 #include <common/timer.h>
 #include <common/easing.h>

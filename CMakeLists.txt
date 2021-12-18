@@ -379,3 +379,7 @@ endif()
 add_subdirectory(lib/box2d)
 target_link_libraries(${PROJECT_NAME} box2d)
 set_property(TARGET box2d PROPERTY FOLDER ${LIBS_FOLDER})
+
+# magic_enum
+
+target_include_directories(${PROJECT_NAME} PUBLIC lib/magic_enum)
