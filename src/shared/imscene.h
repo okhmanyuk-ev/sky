@@ -52,10 +52,15 @@ namespace Shared
 
 		bool nodeWasInitialized() const { return mNodeWasInitialized; }
 
+		void setupPreKillAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction action);
+		void dontKill(std::shared_ptr<Scene::Node> node);
+
 	private:
 		std::unordered_map<std::string, int> mTypesCount;
 		std::unordered_map<std::string, std::shared_ptr<Scene::Node>> mNodes;
 		std::set<std::string> mUnusedNodes;
 		bool mNodeWasInitialized = false;
+		std::map<std::shared_ptr<Scene::Node>, Actions::Collection::UAction> mPreKillActions;
+		std::set<std::shared_ptr<Scene::Node>> mDontKillNodes;
 	};
 }
