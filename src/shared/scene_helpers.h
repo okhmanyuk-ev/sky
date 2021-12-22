@@ -392,7 +392,7 @@ namespace Shared::SceneHelpers
 		static const glm::vec2 inline StartScale = { 0.95f, 0.95f };
 
 	public:
-		StandardScreen(const std::set<Effect>& effects = { Effect::Alpha, Effect::Blur, Effect::Scale, Effect::WindowAppearingScale });
+		StandardScreen(const std::set<Effect>& effects = { Effect::Alpha, Effect::Scale, Effect::WindowAppearingScale });
 		
 	protected:
 		void onEnterBegin() override;
@@ -440,8 +440,8 @@ namespace Shared::SceneHelpers
 		static const auto inline StartContentBlur = 1.0f;		
 
 	public:
-		StandardWindow(const std::set<BackgroundEffect> background_effect = { BackgroundEffect::Blur }, 
-			const std::set<ContentEffect> content_effect = { ContentEffect::Alpha, ContentEffect::Blur, ContentEffect::Anchor });
+		StandardWindow(const std::set<BackgroundEffect> background_effect = { BackgroundEffect::Fade }, 
+			const std::set<ContentEffect> content_effect = { ContentEffect::Alpha, ContentEffect::Anchor });
 
 	public:
 		void onOpenEnd() override;
