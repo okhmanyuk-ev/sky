@@ -33,6 +33,14 @@ std::string BufferHelpers::ReadString(BitBuffer& msg)
 	return result;
 }
 
+std::string BufferHelpers::ReadBytesToString(BitBuffer& msg, size_t size)
+{
+	std::string result;
+	result.resize(size);
+	msg.read(result.data(), size);
+	return result;
+}
+
 void BufferHelpers::WriteToBuffer(BitBuffer& from, BitBuffer& to)
 {
 	int totalBits = static_cast<int>(from.getSize()) * 8;

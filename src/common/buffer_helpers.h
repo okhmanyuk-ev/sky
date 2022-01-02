@@ -9,6 +9,7 @@ namespace Common::BufferHelpers
 {
 	void WriteString(BitBuffer& msg, std::string_view value);
 	std::string ReadString(BitBuffer& msg);
+	std::string ReadBytesToString(BitBuffer& msg, size_t size);
 
 	void WriteToBuffer(BitBuffer& from, BitBuffer& to);
 
