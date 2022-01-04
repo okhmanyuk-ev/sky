@@ -96,7 +96,8 @@ void Asset::Write(const std::string& path, void* memory, size_t size, Storage st
 bool Asset::Exists(const std::string& path, Storage storage)
 {
 #if defined(PLATFORM_WINDOWS)
-	return std::filesystem::exists(StoragePathToAbsolute(path, storage));
+	auto status = std::filesystem::status(StoragePathToAbsolute(path, storage));
+	return status.type() == std::filesystem::file_type::regular;
 #elif defined(PLATFORM_ANDROID)
 	if (storage == Storage::Assets)
 	{
