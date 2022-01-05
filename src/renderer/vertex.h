@@ -50,68 +50,68 @@ namespace Renderer::Vertex
 
 	struct Position
 	{
-		glm::vec3 pos;
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
 
 		static const Layout Layout;
 	};
 
 	struct PositionColor
 	{
-		glm::vec3 pos;
-		glm::vec4 col;
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+		glm::vec4 col = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 		static const Layout Layout;
 	};
 
 	struct PositionTexture 
 	{
-		glm::vec3 pos;
-		glm::vec2 tex;
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+		glm::vec2 tex = { 0.0f, 0.0f };
 	
 		static const Layout Layout;
 	};
 
 	struct PositionNormal
 	{
-		glm::vec3 pos;
-		glm::vec3 normal;
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 normal = { 0.0f, 0.0f, 0.0f };
 
 		static const Layout Layout;
 	};
 
 	struct PositionColorNormal
 	{
-		glm::vec3 pos;
-		glm::vec4 col;
-		glm::vec3 normal;
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+		glm::vec4 col = { 0.0f, 0.0f, 0.0f, 0.0f };
+		glm::vec3 normal = { 0.0f, 0.0f, 0.0f };
 
 		static const Layout Layout;
 	};
 
 	struct PositionColorTexture
 	{
-		glm::vec3 pos;
-		glm::vec4 col;
-		glm::vec2 tex;
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+		glm::vec4 col = { 0.0f, 0.0f, 0.0f, 0.0f };
+		glm::vec2 tex = { 0.0f, 0.0f };
 
 		static const Layout Layout;
 	};
 
 	struct PositionTextureNormal
 	{
-		glm::vec3 pos;
-		glm::vec2 tex;
-		glm::vec3 normal;
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+		glm::vec2 tex = { 0.0f, 0.0f };
+		glm::vec3 normal = { 0.0f, 0.0f, 0.0f };
 
 		static const Layout Layout;
 	};
 
 	struct PositionColorTextureNormal
 	{
-		glm::vec3 pos;
-		glm::vec4 col;
-		glm::vec2 tex;
-		glm::vec3 normal;
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+		glm::vec4 col = { 0.0f, 0.0f, 0.0f, 0.0f };
+		glm::vec2 tex = { 0.0f, 0.0f };
+		glm::vec3 normal = { 0.0f, 0.0f, 0.0f };
 
 		static const Layout Layout;
 	};
