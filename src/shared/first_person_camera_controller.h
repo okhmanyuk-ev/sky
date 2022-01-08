@@ -60,5 +60,6 @@ namespace Shared
 		float mSensivity = 1.0f;
 		float mSpeed = 1.0f;
 		bool mMouseCaptured = false;
+		glm::vec2 mSmoothDirection = { 0.0f, 0.0f };
 	};
 }

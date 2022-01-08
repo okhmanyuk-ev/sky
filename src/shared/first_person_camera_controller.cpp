@@ -1,5 +1,5 @@
 #include "first_person_camera_controller.h"
-
+#include <common/helpers.h>
 #include <imgui.h>
 
 using namespace Shared;
@@ -83,17 +83,19 @@ void FirstPersonCameraController::onFrame()
 		if (mKeyD)
 			direction.x = 1.0f;
 
-		if (mKeyW || mKeyS || mKeyA || mKeyD)
+		if (glm::length(direction) > 0.0f)
 		{
 			direction = glm::normalize(direction);
-
-			mCamera->sideMove(direction.x * speed);
-			mCamera->frontMove(direction.y * speed);
+			direction *= speed;
 		}
 
-		auto pos = mCamera->getPosition();
-
-		mCamera->setPosition(pos);
+		mSmoothDirection = Common::Helpers::SmoothValueAssign(mSmoothDirection, direction, FRAME->getTimeDelta());
+		
+		if (glm::length(mSmoothDirection) > 0.0f)
+		{
+			mCamera->sideMove(mSmoothDirection.x);
+			mCamera->frontMove(mSmoothDirection.y);
+		}
 	}
 }
 

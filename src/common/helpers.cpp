@@ -162,32 +162,6 @@ glm::vec3 Helpers::SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst,
 	};
 }
 
-std::string Helpers::SmoothValueAssign(const std::string& src, const std::string& dst)
-{
-	if (src.length() > dst.length())
-	{
-		return src.substr(0, src.length() - 1);
-	}
-
-	for (int i = 0; i < src.length(); i++)
-	{
-		auto src_char = src.at(i);
-		auto dst_char = dst.at(i);
-		
-		if (src_char == dst_char)
-			continue;
-
-		return src.substr(0, src.length() - 1);
-	}
-
-	if (src.length() < dst.length())
-	{
-		return src + dst.at(src.length());
-	}
-
-	return dst;
-}
-
 float Helpers::SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction)
 {
 	auto src_deg = glm::degrees(src_radians);

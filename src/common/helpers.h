@@ -38,9 +38,10 @@ namespace Common::Helpers
 	nlohmann::json LoadJsonFromAsset(const Platform::Asset& asset);
 	nlohmann::json LoadBsonFromAsset(const Platform::Asset& asset);
 
-	float SmoothValueAssign(float src, float dst, Clock::Duration dTime, float friction = 0.1f);
-	glm::vec2 SmoothValueAssign(const glm::vec2& src, const glm::vec2& dst, Clock::Duration dTime, float friction = 0.1f);
-	glm::vec3 SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst, Clock::Duration dTime, float friction = 0.1f);
-	std::string SmoothValueAssign(const std::string& src, const std::string& dst);
-	float SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction = 0.1f);
+	inline const float DefaultFriction = 0.1f;
+
+	float SmoothValueAssign(float src, float dst, Clock::Duration dTime, float friction = DefaultFriction);
+	glm::vec2 SmoothValueAssign(const glm::vec2& src, const glm::vec2& dst, Clock::Duration dTime, float friction = DefaultFriction);
+	glm::vec3 SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst, Clock::Duration dTime, float friction = DefaultFriction);
+	float SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction);
 }
