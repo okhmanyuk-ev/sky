@@ -114,6 +114,7 @@ namespace Shared::SceneHelpers
 
 	template <class T> class BouncingButtonBehavior : public T
 	{
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
 	public:
 		void updateTransform() override
 		{
@@ -504,23 +505,55 @@ namespace Shared::SceneHelpers
 
 	template <class T> class Smoother : public T
 	{
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
 	public:
 		void updateTransform() override
 		{
 			auto prev_transform = T::getTransform();
 			T::updateTransform();
-			auto now = Clock::Now();
-			if (mPrevTimepoint.has_value())
+			
+			if (!mSmoothTransform)
+				return;
+			
+			auto now = FRAME->getUptime();
+			if (mPrevTransformTimepoint.has_value())
 			{
-				auto dTime = now - mPrevTimepoint.value();
+				auto dTime = now - mPrevTransformTimepoint.value();
 				auto new_transform = T::getTransform();
 				T::setTransform(Common::Helpers::SmoothValueAssign(prev_transform, new_transform, dTime));
 			}
-			mPrevTimepoint = now;
+			mPrevTransformTimepoint = now;
+		}
+
+		void updateAbsoluteSize() override
+		{
+			auto prev_size = T::getAbsoluteSize();
+			T::updateAbsoluteSize();
+
+			if (!mSmoothAbsoluteSize)
+				return;
+
+			auto now = FRAME->getUptime();
+			if (mPrevSizeTimepoint.has_value())
+			{
+				auto dTime = now - mPrevSizeTimepoint.value();
+				auto new_size = T::getAbsoluteSize();
+				T::setAbsoluteSize(Common::Helpers::SmoothValueAssign(prev_size, new_size, dTime));
+			}
+			mPrevSizeTimepoint = now;
 		}
 
 	private:
-		std::optional<Clock::TimePoint> mPrevTimepoint;
+		std::optional<Clock::Duration> mPrevTransformTimepoint;
+		std::optional<Clock::Duration> mPrevSizeTimepoint;
+
+	public:
+		void setSmoothTransform(bool value) { mSmoothTransform = value; }
+		void setSmoothAbsoluteSize(bool value) { mSmoothAbsoluteSize = value; }
+
+	private:
+		bool mSmoothTransform = true;
+		bool mSmoothAbsoluteSize = true;
 	};
 
 	// 3d
