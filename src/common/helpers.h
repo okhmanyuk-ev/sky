@@ -43,5 +43,6 @@ namespace Common::Helpers
 	float SmoothValueAssign(float src, float dst, Clock::Duration dTime, float friction = DefaultFriction);
 	glm::vec2 SmoothValueAssign(const glm::vec2& src, const glm::vec2& dst, Clock::Duration dTime, float friction = DefaultFriction);
 	glm::vec3 SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst, Clock::Duration dTime, float friction = DefaultFriction);
+	glm::mat4 SmoothValueAssign(const glm::mat4& src, const glm::mat4& dst, Clock::Duration dTime, float friction = DefaultFriction);
 	float SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction);
 }

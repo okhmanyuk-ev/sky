@@ -162,6 +162,21 @@ glm::vec3 Helpers::SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst,
 	};
 }
 
+glm::mat4 Helpers::SmoothValueAssign(const glm::mat4& src, const glm::mat4& dst, Clock::Duration dTime, float friction)
+{
+	glm::mat4 result = glm::mat4(1.0f);
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			result[i][j] = SmoothValueAssign(src[i][j], dst[i][j], dTime, friction);
+		}
+	}
+
+	return result;
+}
+
 float Helpers::SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction)
 {
 	auto src_deg = glm::degrees(src_radians);
