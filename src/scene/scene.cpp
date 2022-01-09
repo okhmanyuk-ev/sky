@@ -154,6 +154,9 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(std::shared_ptr<N
 	if (!node->isEnabled())
 		return { };
 
+	if (!node->isTransformReady())
+		return { };
+
 	if (!node->interactTest(node->unproject(pos)))
 		return { };
 
