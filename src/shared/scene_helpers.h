@@ -5,6 +5,7 @@
 #include <scene3d/all.h>
 #include <audio/system.h>
 #include "scene_manager.h"
+#include <common/helpers.h>
 
 namespace Shared::SceneHelpers
 {
@@ -499,6 +500,27 @@ namespace Shared::SceneHelpers
 		float mShockwaveSize = 1.0f;
 		float mShockwaveThickness = 1.0f;
 		float mShockwaveForce = 1.0f;
+	};
+
+	template <class T> class Smoother : public T
+	{
+	public:
+		void updateTransform() override
+		{
+			auto prev_transform = T::getTransform();
+			T::updateTransform();
+			auto now = Clock::Now();
+			if (mPrevTimepoint.has_value())
+			{
+				auto dTime = now - mPrevTimepoint.value();
+				auto new_transform = T::getTransform();
+				T::setTransform(Common::Helpers::SmoothValueAssign(prev_transform, new_transform, dTime));
+			}
+			mPrevTimepoint = now;
+		}
+
+	private:
+		std::optional<Clock::TimePoint> mPrevTimepoint;
 	};
 
 	// 3d
