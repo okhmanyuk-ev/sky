@@ -102,13 +102,21 @@ void ConsoleDevice::onFrame()
 
 	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoDecoration);
 
+	auto bg_width = IMGUI_SYSTEM->getLogicalWidth();
+
+	bg_width -= PLATFORM->getSafeAreaLeftMargin();
+	bg_width -= PLATFORM->getSafeAreaRightMargin();
+
+	auto bg_height = IMGUI_SYSTEM->getLogicalHeight();
+
 #if defined(PLATFORM_MOBILE)
-	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.33f));
+	bg_height *= 0.33f;
 #else
-	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), IMGUI_SYSTEM->getLogicalHeight() * 0.66f));
+	bg_height *= 0.66f;
 #endif
 
-	ImGui::SetWindowPos(ImVec2(0, -ImGui::GetWindowHeight() * mInterpolator.getValue()));
+	ImGui::SetWindowSize(ImVec2(bg_width, bg_height));
+	ImGui::SetWindowPos(ImVec2(PLATFORM->getSafeAreaLeftMargin(), -ImGui::GetWindowHeight() * mInterpolator.getValue()));
 
 	auto height = ImGui::GetWindowHeight();
 	auto top = ImGui::GetWindowPos().y;
@@ -244,7 +252,7 @@ void ConsoleDevice::showCandidates(float height, float top)
 	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, IMGUI_SYSTEM->getLogicalHeight() - height - top - 10));
 	
 	ImGui::Begin("ConsoleCandidates", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel & ~ImGuiWindowFlags_NoBringToFrontOnFocus);
-	ImGui::SetWindowPos(ImVec2(8, 4 + top + height));
+	ImGui::SetWindowPos(ImVec2(8 + PLATFORM->getSafeAreaLeftMargin(), 4 + top + height));
 
 	if (mSelectedCandidate == -1)
 		ImGui::SetScrollHere();
@@ -343,7 +351,7 @@ void ConsoleDevice::showCloseButton(float pos_y)
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
 
 	ImGui::Begin("ConsoleCloseButton", nullptr, ImGuiWindowFlags_NoDecoration);
-	ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10.0f, pos_y + 4.0f));
+	ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10.0f - PLATFORM->getSafeAreaRightMargin(), pos_y + 4.0f));
 
 	ImGui::Button("Close");
 

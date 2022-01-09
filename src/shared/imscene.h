@@ -1,5 +1,6 @@
 #pragma once
 
+#include <platform/all.h>
 #include <renderer/all.h>
 #include <graphics/all.h>
 #include <scene/all.h>
