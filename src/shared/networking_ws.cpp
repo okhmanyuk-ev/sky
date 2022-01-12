@@ -192,6 +192,25 @@ void SimpleChannel::addEventCallback(const std::string& name, EventCallback call
 	mEvents[name] = callback;
 }
 
+void SimpleChannel::addPlugin(std::shared_ptr<Plugin> plugin)
+{
+	auto key = plugin->getKey();
+	plugin->setSendCallback([this, key](const nlohmann::json& json){
+		sendEvent(key, json);
+	});
+	addEventCallback(key, [this, plugin](const nlohmann::json& json) {
+		plugin->read(json);
+	});
+	mPlugins.push_back(plugin);
+}
+
+// plugin
+
+void SimpleChannel::Plugin::send(const nlohmann::json& json)
+{
+	mSendCallback(json);
+}
+
 // userbaseserver
 
 std::tuple<Userbase::UID, std::shared_ptr<Userbase::Profile>> Userbase::auth(const std::string& platform, const std::string& uuid)
@@ -265,4 +284,24 @@ void Userbase::save(nlohmann::json& json)
 
 		users.push_back(user);
 	}
+}
+
+// RegularMessaging
+
+void RegularMessaging::Base::read(const nlohmann::json& json)
+{
+	mReadFieldsCallback(json);
+	send();
+}
+
+void RegularMessaging::Base::send()
+{
+	Plugin::send(mSendFieldsCallback());
+}
+
+RegularMessaging::Client::Client()
+{
+	FRAME->addOne([this] {
+		send();
+	});
 }

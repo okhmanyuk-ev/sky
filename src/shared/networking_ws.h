@@ -96,6 +96,7 @@ namespace Shared::NetworkingWS
 	{
 	public:
 		using EventCallback = std::function<void(const nlohmann::json&)>;
+		class Plugin;
 
 	public:
 		SimpleChannel();
@@ -118,6 +119,31 @@ namespace Shared::NetworkingWS
 
 	private:
 		bool mShowEventLogs = false;
+
+	public:
+		void addPlugin(std::shared_ptr<Plugin> plugin);
+
+	private:
+		std::list<std::shared_ptr<Plugin>> mPlugins;
+	};
+
+	class SimpleChannel::Plugin
+	{
+		friend SimpleChannel;
+	
+	protected:
+		virtual std::string getKey() = 0;
+		virtual void read(const nlohmann::json& json) = 0;
+		void send(const nlohmann::json& json);
+
+	public:
+		using SendCallback = std::function<void(const nlohmann::json& json)>;
+
+	protected:
+		void setSendCallback(SendCallback value) { mSendCallback = value; }
+
+	private:
+		SendCallback mSendCallback = nullptr;
 	};
 
 	class Userbase
@@ -142,4 +168,35 @@ namespace Shared::NetworkingWS
 		std::unordered_map</*uuid*/std::string, UID> mUIDS;
 		int mUsersCount = 0;
 	};
+
+	namespace RegularMessaging
+	{
+		class Base : public SimpleChannel::Plugin
+		{
+		protected:
+			std::string getKey() override { return "regular"; };
+			void read(const nlohmann::json& json) override;
+			void send();
+
+		private:
+			using ReadFieldsCallback = std::function<void(const nlohmann::json& json)>;
+			using SendFieldsCallback = std::function<nlohmann::json()>;
+
+		public:
+			void setReadFieldsCallback(ReadFieldsCallback value) { mReadFieldsCallback = value; }
+			void setSendFieldsCallback(SendFieldsCallback value) { mSendFieldsCallback = value; }
+
+		private:
+			ReadFieldsCallback mReadFieldsCallback = nullptr;
+			SendFieldsCallback mSendFieldsCallback = nullptr;
+		};
+
+		class Client : public Base
+		{
+		public:
+			Client();
+		};
+
+		class Server : public Base { };
+	}
 }
