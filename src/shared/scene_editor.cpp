@@ -140,6 +140,14 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 	if (auto label = std::dynamic_pointer_cast<Scene::Label>(node); label != nullptr)
 	{
+		auto outline_color = label->getOutlineColor()->getColor();
+		ImGui::ColorEdit4("OutlineColor", (float*)&outline_color);
+		label->getOutlineColor()->setColor(outline_color);
+
+		auto outline_thickness = label->getOutlineThickness();
+		ImGui::SliderFloat("Outline Thickness", &outline_thickness, 0.0f, 1.0f);
+		label->setOutlineThickness(outline_thickness);
+
 		auto fontSize = label->getFontSize();
 		ImGui::SliderFloat("Font Size", &fontSize, 0.0f, 96.0f);
 		label->setFontSize(fontSize);
