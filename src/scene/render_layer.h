@@ -24,10 +24,20 @@ namespace Scene
 			// https://stackoverflow.com/questions/2171085/opengl-blending-with-previous-contents-of-framebuffer
 			// http://www.shawnhargreaves.com/blog/premultiplied-alpha-and-image-composition.html
 
-			auto target = GRAPHICS->getRenderTarget(fmt::format("renderlayer_{}", (void*)this));
+			auto [pos, size] = T::getGlobalBounds();
+			auto width = static_cast<int>(glm::floor(size.x));
+			auto height = static_cast<int>(glm::floor(size.y));
+			auto target = GRAPHICS->getRenderTarget(fmt::format("renderlayer_{}", (void*)this), width, height);
+
+			auto view = glm::mat4(1.0f);
+			view = glm::translate(view, { -pos, 0.0f });
+			view = glm::scale(view, { PLATFORM->getScale(), PLATFORM->getScale(), 1.0f });
 
 			GRAPHICS->pushRenderTarget(target);
-			GRAPHICS->pushBlendMode(Renderer::BlendMode(Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha, 
+			GRAPHICS->pushViewport(target);
+			GRAPHICS->pushOrthoMatrix(target);
+			GRAPHICS->pushViewMatrix(view);
+			GRAPHICS->pushBlendMode(Renderer::BlendMode(Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha,
 				Renderer::Blend::One, Renderer::Blend::InvSrcAlpha));
 			GRAPHICS->clear();
 		}
@@ -40,24 +50,32 @@ namespace Scene
 				return;
 			}
 
-			GRAPHICS->pop(2);
-
-			auto target = GRAPHICS->getRenderTarget(fmt::format("renderlayer_{}", (void*)this));
+			auto target = GRAPHICS->getCurrentState().renderTarget;
+			
+			GRAPHICS->pop(5);
 
 			if (mPostprocessEnabled)
 				postprocess(target);
 
 			auto color = getRenderLayerColor()->getColor() * glm::vec4({ glm::vec3(getRenderLayerColor()->getAlpha()), 1.0f });
+			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
 
 			GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
-			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
+			GRAPHICS->pushModelMatrix(model);
 			GRAPHICS->drawSprite(target, { }, color);
 			GRAPHICS->pop(2);
 			
 			T::leaveDraw();
 		}
 
-		virtual void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) { }
+		virtual void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) 
+		{
+			if (mPostprocessFunc)
+				mPostprocessFunc(render_texture);
+		}
+
+	public:
+		using PostprocessFunc = std::function<void(std::shared_ptr<Renderer::RenderTarget>)>;
 
 	public:
 		bool isRenderLayerEnabled() const { return mRenderLayerEnabled; }
@@ -68,9 +86,12 @@ namespace Scene
 
 		auto getRenderLayerColor() const { return mRenderLayerColor; }
 
+		void setPostprocessFunc(PostprocessFunc value) { mPostprocessFunc = value; }
+
 	private:
 		bool mRenderLayerEnabled = true;
 		bool mPostprocessEnabled = true;
 		std::shared_ptr<Color> mRenderLayerColor = std::make_shared<Color>();
+		PostprocessFunc mPostprocessFunc = nullptr;
 	};
 }

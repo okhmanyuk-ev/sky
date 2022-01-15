@@ -5,6 +5,8 @@ using namespace Scene;
 
 void BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture)
 {
+	RenderLayer<Node>::postprocess(render_texture);
+
 	float factor = mDownscaleFactor * PLATFORM->getScale();
 
 	auto width = glm::floor(render_texture->getWidth() / factor);
