@@ -36,9 +36,14 @@ RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
 
 RenderTarget::~RenderTarget() 
 {
-	render_target_view->Release();
-	depth_stencil_texture->Release();
-	depth_stencil_view->Release();
+	if (render_target_view)
+		render_target_view->Release();
+	
+	if (depth_stencil_texture)
+		depth_stencil_texture->Release();
+	
+	if (depth_stencil_view)
+		depth_stencil_view->Release();
 }
 
 #endif

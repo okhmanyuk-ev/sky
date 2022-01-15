@@ -42,8 +42,11 @@ Texture::Texture(int width, int height, int channels, void* data, bool mipmap) :
 
 Texture::~Texture()
 {
-	shader_resource_view->Release();
-	texture2d->Release();
+	if (shader_resource_view)
+		shader_resource_view->Release();
+	
+	if (texture2d)
+		texture2d->Release();
 }
 
 void Texture::writePixels(int width, int height, int channels, void* data)
