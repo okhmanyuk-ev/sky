@@ -9,13 +9,16 @@ namespace Renderer
 {
 	struct Viewport
 	{
-		Viewport(const glm::vec2& _size, float _minDepth = 0.0f, float _maxDepth = 1.0f)
-		{
-			position = { 0.0f, 0.0f };
-			size = _size;
-			minDepth = _minDepth;
-			maxDepth = _maxDepth;
-		}
+		Viewport(const glm::vec2& _pos, const glm::vec2& _size, float _minDepth = 0.0f, float _maxDepth = 1.0f) :
+			position(_pos),
+			size(_size),
+			minDepth(_minDepth),
+			maxDepth(_maxDepth)
+		{ }
+
+		Viewport(const glm::vec2& _size, float _minDepth = 0.0f, float _maxDepth = 1.0f) :
+			Viewport({ 0.0f, 0.0f }, _size, _minDepth, _maxDepth)
+		{ }
 
 		Viewport(std::shared_ptr<RenderTarget> target = nullptr, float _minDepth = 0.0f, float _maxDepth = 1.0f) :
 			Viewport(target 
