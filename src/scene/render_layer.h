@@ -55,7 +55,7 @@ namespace Scene
 			GRAPHICS->pop(5);
 
 			if (mPostprocessEnabled)
-				postprocess(target);
+				target = postprocess(target);
 
 			auto color = getRenderLayerColor()->getColor() * glm::vec4({ glm::vec3(getRenderLayerColor()->getAlpha()), 1.0f });
 			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
@@ -68,14 +68,16 @@ namespace Scene
 			T::leaveDraw();
 		}
 
-		virtual void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) 
+		virtual std::shared_ptr<Renderer::RenderTarget> postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) 
 		{
 			if (mPostprocessFunc)
-				mPostprocessFunc(render_texture);
+				render_texture = mPostprocessFunc(render_texture);
+
+			return render_texture;
 		}
 
 	public:
-		using PostprocessFunc = std::function<void(std::shared_ptr<Renderer::RenderTarget>)>;
+		using PostprocessFunc = std::function<std::shared_ptr<Renderer::RenderTarget>(std::shared_ptr<Renderer::RenderTarget>)>;
 
 	public:
 		bool isRenderLayerEnabled() const { return mRenderLayerEnabled; }

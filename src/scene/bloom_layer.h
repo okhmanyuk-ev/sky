@@ -12,7 +12,7 @@ namespace Scene
 	class BloomLayer : public RenderLayer<Node>
 	{
 	protected:
-		void postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) override;
+		std::shared_ptr<Renderer::RenderTarget> postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) override;
 
 	public:
 		auto getBlurPasses() const { return mBlurPasses; }
