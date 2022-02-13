@@ -10,19 +10,15 @@ namespace Renderer
 	{
 		friend class SystemD3D11;
 		friend class SystemGL;
+
+	public:
+		using RenderTargetHandler = int;
+
 	public:
 		RenderTarget(int width, int height);
 		~RenderTarget();
 
-#if defined(RENDERER_D3D11)
 	private:
-		ID3D11RenderTargetView* render_target_view;
-		ID3D11Texture2D* depth_stencil_texture;
-		ID3D11DepthStencilView* depth_stencil_view;
-#elif defined(RENDERER_GL44) || defined(RENDERER_GLES3)
-	private:
-		GLuint framebuffer;
-		GLuint depth_stencil_renderbuffer;
-#endif
+		RenderTargetHandler mRenderTargetHandler = -1;
 	};
 }

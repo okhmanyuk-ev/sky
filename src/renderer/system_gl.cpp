@@ -277,7 +277,7 @@ void SystemGL::setTexture(std::shared_ptr<Texture> value)
 	if (value == nullptr)
 		return;
 
-	glBindTexture(GL_TEXTURE_2D, value->texture);
+	glBindTexture(GL_TEXTURE_2D, mTextureDefs.at(value->mHandler).texture);
 	mTextureBound = true;
 	updateGLSampler();
 }
@@ -296,7 +296,7 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 	else
 	{
 		mRenderTargetBound = true;
-		glBindFramebuffer(GL_FRAMEBUFFER, value->framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, mRenderTargetDefs.at(value->mRenderTargetHandler).framebuffer);
 	}
 
 	mCullModeDirty = true;  // when render target is active, we using reversed culling,
@@ -668,4 +668,110 @@ void SystemGL::updateGLSampler()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	}
 }
+
+Texture::Handler SystemGL::createTexture(int width, int height, bool mipmap)
+{
+	assert(!mTextureDefs.contains(mTextureDefIndex));
+
+	auto result = mTextureDefIndex;
+	mTextureDefIndex += 1;
+
+	auto& texture_def = mTextureDefs[result];
+	texture_def.mipmap = mipmap;
+	texture_def.width = width;
+	texture_def.height = height;
+
+	GLint last_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+
+	glGenTextures(1, &texture_def.texture);
+	glBindTexture(GL_TEXTURE_2D, texture_def.texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+	glBindTexture(GL_TEXTURE_2D, last_texture);
+
+	return result;
+}
+
+void SystemGL::destroyTexture(Texture::Handler value)
+{
+	assert(mTextureDefs.contains(value));
+
+	auto& texture_def = mTextureDefs[value];
+
+	glDeleteTextures(1, &texture_def.texture);
+
+	mTextureDefs.erase(value);
+}
+
+void SystemGL::textureWritePixels(Texture::Handler texture, int width, int height, int channels, void* data)
+{
+	const auto& texture_def = mTextureDefs.at(texture);
+	
+	assert(texture_def.width == width);
+	assert(texture_def.height == height);
+	assert(data);
+
+	GLint last_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+	glBindTexture(GL_TEXTURE_2D, texture_def.texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	if (texture_def.mipmap)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, last_texture);
+
+	// TODO: read abound pixel buffer objects (PBO)
+	// https://www.roxlu.com/2014/048/fast-pixel-transfers-with-pixel-buffer-objects
+}
+
+RenderTarget::RenderTargetHandler SystemGL::createRenderTarget(Texture::Handler texture)
+{
+	assert(!mRenderTargetDefs.contains(mRenderTargetDefIndex));
+	assert(mTextureDefs.contains(texture));
+
+	auto result = mRenderTargetDefIndex;
+	mRenderTargetDefIndex += 1;
+
+	const auto& texture_def = mTextureDefs.at(texture);
+	auto& render_target_def = mRenderTargetDefs[result];
+
+	GLint last_fbo;
+	GLint last_rbo;
+
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &last_fbo);
+	glGetIntegerv(GL_RENDERBUFFER_BINDING, &last_rbo);
+
+	glGenFramebuffers(1, &render_target_def.framebuffer);
+	glGenRenderbuffers(1, &render_target_def.depth_stencil_renderbuffer);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, render_target_def.framebuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, render_target_def.depth_stencil_renderbuffer);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_def.texture, 0);
+
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, texture_def.width, texture_def.height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_target_def.depth_stencil_renderbuffer);
+
+	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, last_fbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, last_rbo);
+
+	return result;
+}
+
+void SystemGL::destroyRenderTarget(RenderTarget::RenderTargetHandler value)
+{
+	assert(mRenderTargetDefs.contains(value));
+
+	auto& render_target_def = mRenderTargetDefs[value];
+	
+	glDeleteFramebuffers(1, &render_target_def.framebuffer);
+	glDeleteRenderbuffers(1, &render_target_def.depth_stencil_renderbuffer);
+
+	mRenderTargetDefs.erase(value);
+}
+
 #endif

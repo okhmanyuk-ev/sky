@@ -8,6 +8,10 @@ namespace Renderer
 	{
 		friend class SystemD3D11;
 		friend class SystemGL;
+
+	public:
+		using Handler = int;
+		
 	public:
 		Texture(int width, int height, bool mipmap = false);
 		Texture(int width, int height, int channels, void* data, bool mipmap = false);
@@ -25,13 +29,7 @@ namespace Renderer
 		int mHeight;
 		bool mMipmap;
 
-#if defined(RENDERER_D3D11)
 	protected:
-		ID3D11Texture2D* texture2d;
-		ID3D11ShaderResourceView* shader_resource_view;
-#elif defined(RENDERER_GL44) || defined(RENDERER_GLES3)
-	protected:
-		GLuint texture;
-#endif
+		Handler mHandler = -1;
 	};
 }

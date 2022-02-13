@@ -216,7 +216,7 @@ void SystemD3D11::setTexture(std::shared_ptr<Texture> value)
 	if (value == nullptr)
 		return;
 
-	Context->PSSetShaderResources(0, 1, &value->shader_resource_view);
+	Context->PSSetShaderResources(0, 1, &mTextureDefs.at(value->mHandler).shader_resource_view);
 }
 
 void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)
@@ -230,8 +230,8 @@ void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)
 	{
 		ID3D11ShaderResourceView* prev_shader_resource_view;
 		Context->PSGetShaderResources(0, 1, &prev_shader_resource_view);
-
-		if (prev_shader_resource_view == value->shader_resource_view)
+		
+		if (prev_shader_resource_view == mTextureDefs.at(value->mHandler).shader_resource_view)
 		{
 			ID3D11ShaderResourceView* null[] = { nullptr };
 			Context->PSSetShaderResources(0, 1, null); // remove old shader view
@@ -240,7 +240,7 @@ void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)
 		if (prev_shader_resource_view)
 			prev_shader_resource_view->Release(); // avoid memory leak
 
-		Context->OMSetRenderTargets(1, &value->render_target_view, value->depth_stencil_view);
+		Context->OMSetRenderTargets(1, &mRenderTargetDefs.at(value->mRenderTargetHandler).render_target_view, mRenderTargetDefs.at(value->mRenderTargetHandler).depth_stencil_view);
 
 		currentRenderTarget = value;
 	}
@@ -348,8 +348,8 @@ void SystemD3D11::clear(const glm::vec4& color)
 
 	if (currentRenderTarget != nullptr)
 	{
-		rtv = currentRenderTarget->render_target_view;
-		dsv = currentRenderTarget->depth_stencil_view;
+		rtv = mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler).render_target_view;
+		dsv = mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler).depth_stencil_view;
 	}
 
 	Context->ClearRenderTargetView(rtv, (float*)&color);
@@ -362,7 +362,7 @@ void SystemD3D11::clearStencil()
 	
 	if (currentRenderTarget != nullptr)
 	{
-		dsv = currentRenderTarget->depth_stencil_view;
+		dsv = mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler).depth_stencil_view;
 	}
 
 	Context->ClearDepthStencilView(dsv, D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -390,7 +390,7 @@ void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void
 	ID3D11Resource* resource = NULL;
 
 	if (currentRenderTarget)
-		currentRenderTarget->render_target_view->GetResource(&resource);
+		mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler).render_target_view->GetResource(&resource);
 	else
 		renderTargetView->GetResource(&resource);
 	
@@ -626,6 +626,136 @@ void SystemD3D11::setD3D11SamplerState(const SamplerState& value)
 	}
 
 	Context->PSSetSamplers(0, 1, &mD3D11SamplerStates.at(value));
+}
+
+Texture::Handler SystemD3D11::createTexture(int width, int height, bool mipmap)
+{
+	assert(!mTextureDefs.contains(mTextureDefIndex));
+
+	auto result = mTextureDefIndex;
+	mTextureDefIndex += 1;
+
+	auto& texture_def = mTextureDefs[result];
+	texture_def.mipmap = mipmap;
+	texture_def.width = width;
+	texture_def.height = height;
+
+	D3D11_TEXTURE2D_DESC texture2d_desc = { };
+	texture2d_desc.Width = width;
+	texture2d_desc.Height = height;
+
+	if (!mipmap)
+		texture2d_desc.MipLevels = 1;
+
+	texture2d_desc.ArraySize = 1;
+	texture2d_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	texture2d_desc.SampleDesc.Count = 1;
+	texture2d_desc.SampleDesc.Quality = 0;
+	texture2d_desc.Usage = D3D11_USAGE_DEFAULT;
+	texture2d_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	texture2d_desc.CPUAccessFlags = 0;
+	texture2d_desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS; // TODO: only in mapmap mode ?
+	SystemD3D11::Device->CreateTexture2D(&texture2d_desc, nullptr, &texture_def.texture2d);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc = { };
+	shader_resource_view_desc.Format = texture2d_desc.Format;
+	shader_resource_view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shader_resource_view_desc.Texture2D.MipLevels = -1;
+	shader_resource_view_desc.Texture2D.MostDetailedMip = 0;
+	SystemD3D11::Device->CreateShaderResourceView(texture_def.texture2d, &shader_resource_view_desc, &texture_def.shader_resource_view);
+
+	return result;
+}
+
+void SystemD3D11::destroyTexture(Texture::Handler value)
+{
+	assert(mTextureDefs.contains(value));
+
+	auto& texture_def = mTextureDefs[value];
+
+	if (texture_def.shader_resource_view)
+		texture_def.shader_resource_view->Release();
+
+	if (texture_def.texture2d)
+		texture_def.texture2d->Release();
+
+	mTextureDefs.erase(value);
+}
+
+void SystemD3D11::textureWritePixels(Texture::Handler texture, int width, int height, int channels, void* data)
+{
+	const auto& texture_def = mTextureDefs.at(texture);
+
+	assert(width == texture_def.width);
+	assert(height == texture_def.height);
+	assert(data);
+
+	if (!data)
+		return;
+
+	auto memPitch = width * channels;
+	auto memSlicePitch = width * height * channels;
+	SystemD3D11::Context->UpdateSubresource(texture_def.texture2d, 0, nullptr, data, memPitch, memSlicePitch);
+
+	if (texture_def.mipmap)
+		SystemD3D11::Context->GenerateMips(texture_def.shader_resource_view);
+}
+
+RenderTarget::RenderTargetHandler SystemD3D11::createRenderTarget(Texture::Handler texture)
+{
+	assert(!mRenderTargetDefs.contains(mRenderTargetDefIndex));
+	assert(mTextureDefs.contains(texture));
+
+	auto result = mRenderTargetDefIndex;
+	mRenderTargetDefIndex += 1;
+
+	const auto& texture_def = mTextureDefs.at(texture);
+	auto& render_target_def = mRenderTargetDefs[result];
+
+	D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc = { };
+	render_target_view_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	render_target_view_desc.Texture2D.MipSlice = 0;
+	SystemD3D11::Device->CreateRenderTargetView(texture_def.texture2d, &render_target_view_desc, &render_target_def.render_target_view);
+	
+	D3D11_TEXTURE2D_DESC texture2d_desc = { };
+	texture2d_desc.Width = texture_def.width;
+	texture2d_desc.Height = texture_def.height;
+	texture2d_desc.MipLevels = 1;
+	texture2d_desc.ArraySize = 1;
+	texture2d_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	texture2d_desc.SampleDesc.Count = 1;
+	texture2d_desc.SampleDesc.Quality = 0;
+	texture2d_desc.Usage = D3D11_USAGE_DEFAULT;
+	texture2d_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	texture2d_desc.CPUAccessFlags = 0;
+	texture2d_desc.MiscFlags = 0;
+	SystemD3D11::Device->CreateTexture2D(&texture2d_desc, nullptr, &render_target_def.depth_stencil_texture);
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc = {};
+	depth_stencil_view_desc.Format = texture2d_desc.Format;
+	depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	SystemD3D11::Device->CreateDepthStencilView(render_target_def.depth_stencil_texture, &depth_stencil_view_desc, &render_target_def.depth_stencil_view);
+
+	return result;
+}
+
+void SystemD3D11::destroyRenderTarget(RenderTarget::RenderTargetHandler value)
+{
+	assert(mRenderTargetDefs.contains(value));
+
+	auto& render_target_def = mRenderTargetDefs[value];
+	
+	if (render_target_def.render_target_view)
+		render_target_def.render_target_view->Release();
+	
+	if (render_target_def.depth_stencil_texture)
+		render_target_def.depth_stencil_texture->Release();
+	
+	if (render_target_def.depth_stencil_view)
+		render_target_def.depth_stencil_view->Release();
+
+	mRenderTargetDefs.erase(value);
 }
 
 #endif
