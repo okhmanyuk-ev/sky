@@ -105,5 +105,6 @@ namespace Renderer::Shaders
 		const Light::Material RedRubber = { { 0.05f, 0.0f, 0.0f }, { 0.5f, 0.4f, 0.4f }, { 0.7f, 0.04f, 0.04f }, 0.078125f * 128.0f };
 		const Light::Material WhiteRubber = { { 0.05f, 0.05f, 0.05f }, { 0.5f, 0.5f, 0.5f }, { 0.7f, 0.7f, 0.7f }, 0.078125f * 128.0f };
 		const Light::Material YellowRubber = { { 0.05f, 0.05f, 0.0f }, { 0.5f, 0.5f, 0.4f }, { 0.7f, 0.7f, 0.04f }, 0.078125f * 128.0f };
+		const Light::Material FullWhite = { { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, 32.0f };
 	}
 }

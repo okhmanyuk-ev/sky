@@ -21,16 +21,18 @@ void Scene::frame()
 	mDriver.setCameraPosition(mCamera->getPosition());
 
 	GRAPHICS->begin();
-	GRAPHICS->pushViewport(Renderer::Viewport());
+	GRAPHICS->pushRenderTarget(mRenderTarget);
+	GRAPHICS->pushViewport(mRenderTarget);
 	GRAPHICS->pushProjectionMatrix(mCamera->getProjectionMatrix());
 	GRAPHICS->pushViewMatrix(mCamera->getViewMatrix());
 	GRAPHICS->pushScissor(std::nullopt);
-	GRAPHICS->pushCullMode(Renderer::CullMode::None);
+	GRAPHICS->pushCullMode(Renderer::CullMode::Back);
 	GRAPHICS->pushDepthMode(Renderer::ComparisonFunc::Less);
 	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
 	GRAPHICS->pushTextureAddress(Renderer::TextureAddress::Wrap);
+	GRAPHICS->clear();
 	recursiveNodeDraw(mRoot);
-	GRAPHICS->pop(8);
+	GRAPHICS->pop(9);
 	GRAPHICS->end();
 }
 
