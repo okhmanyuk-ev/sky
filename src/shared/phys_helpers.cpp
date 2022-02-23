@@ -61,9 +61,13 @@ void World::draw()
 
 	mCamera.setPosition(-getNode()->getPosition());
 
-	mPhysDraw.begin(mCamera.getProjectionMatrix(), mCamera.getViewMatrix(), model);
+	GRAPHICS->begin();
+	GRAPHICS->pushViewMatrix(mCamera.getViewMatrix());
+	GRAPHICS->pushProjectionMatrix(mCamera.getProjectionMatrix());
+	GRAPHICS->pushModelMatrix(model);
 	mB2World.DebugDraw();
-	mPhysDraw.end();
+	GRAPHICS->pop(3);
+	GRAPHICS->end();
 }
 
 void World::addEntity(std::shared_ptr<Entity> entity)
@@ -109,81 +113,59 @@ void World::removeEntity(std::shared_ptr<Entity> entity)
 	mB2World.DestroyBody(entity->getB2Body());
 }
 
-PhysDraw::PhysDraw()
-{
-	//
-}
-
-PhysDraw::~PhysDraw()
-{
-	//
-}
-
-void PhysDraw::begin(const glm::mat4& projection, const glm::mat4& view, const glm::mat4& model)
-{
-	assert(!mWorking);
-	mWorking = true;
-
-	mRenderer.setProjectionMatrix(projection);
-	mRenderer.setViewMatrix(view);
-	mRenderer.setModelMatrix(model);
-}
-
-void PhysDraw::end()
-{
-	assert(mWorking);
-	mWorking = false;
-}
-
 void PhysDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	assert(mWorking);
-	mRenderer.begin(Renderer::Topology::LineStrip);
-	mRenderer.color({ color.r, color.g, color.b });
+	static auto builder = Graphics::MeshBuilder();
+	builder.begin();
+	builder.color({ color.r, color.g, color.b });
 	for (int i = 0; i < vertexCount; i++)
 	{
-		mRenderer.vertex({ vertices[i].x, vertices[i].y, 0.0f });
+		builder.vertex({ vertices[i].x, vertices[i].y, 0.0f });
 	}
-	mRenderer.vertex({ vertices[0].x, vertices[0].y, 0.0f });
-	mRenderer.end();
+	builder.vertex({ vertices[0].x, vertices[0].y, 0.0f });
+	auto [b_vertices, count] = builder.end();
+	GRAPHICS->draw(Renderer::Topology::LineStrip, b_vertices, count);
 }
 
 void PhysDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	assert(mWorking);
-
-	mRenderer.begin(Renderer::Topology::TriangleList);
-	mRenderer.color({ color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 0.5f });
-	for (int i = 1; i < vertexCount - 1; i++)
+	static auto builder = Graphics::MeshBuilder();
 	{
-		mRenderer.vertex({ vertices[0].x, vertices[0].y, 0.0f });
-		mRenderer.vertex({ vertices[i].x, vertices[i].y, 0.0f });
-		mRenderer.vertex({ vertices[i + 1].x, vertices[i + 1].y, 0.0f });
+		builder.begin();
+		builder.color({ color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 0.5f });
+		for (int i = 1; i < vertexCount - 1; i++)
+		{
+			builder.vertex({ vertices[0].x, vertices[0].y, 0.0f });
+			builder.vertex({ vertices[i].x, vertices[i].y, 0.0f });
+			builder.vertex({ vertices[i + 1].x, vertices[i + 1].y, 0.0f });
+		}
+		auto [b_vertices, count] = builder.end();
+		GRAPHICS->draw(Renderer::Topology::TriangleList, b_vertices, count);
 	}
-	mRenderer.end();
-
-	mRenderer.begin(Renderer::Topology::LineStrip);
-	mRenderer.color({ color.r, color.g, color.b });
-	for (int i = 0; i < vertexCount; i++)
 	{
-		mRenderer.vertex({ vertices[i].x, vertices[i].y, 0.0f });
+		builder.begin();
+		builder.color({ color.r, color.g, color.b });
+		for (int i = 0; i < vertexCount; i++)
+		{
+			builder.vertex({ vertices[i].x, vertices[i].y, 0.0f });
+		}
+		builder.vertex({ vertices[0].x, vertices[0].y, 0.0f });
+		auto [b_vertices, count] = builder.end();
+		GRAPHICS->draw(Renderer::Topology::LineStrip, b_vertices, count);
 	}
-	mRenderer.vertex({ vertices[0].x, vertices[0].y, 0.0f });
-	mRenderer.end();
 }
 
 void PhysDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
-	assert(mWorking);
-
 	const float segments = 16.0f;
 	const float increment = 2.0f * glm::pi<float>() / segments;
 
 	float sinInc = glm::sin(increment);
 	float cosInc = glm::cos(increment);
 
-	mRenderer.begin(Renderer::Topology::LineList);
-	mRenderer.color({ color.r, color.g, color.b, color.a });
+	static auto builder = Graphics::MeshBuilder();
+	builder.begin();
+	builder.color({ color.r, color.g, color.b, color.a });
 
 	auto v0 = glm::vec2({ center.x, center.y });
 	auto r1 = glm::vec2({ 1.0f, 0.0f });
@@ -193,19 +175,18 @@ void PhysDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& col
 	{
 		auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
 		auto v2 = v0 + radius * r2;
-		mRenderer.vertex(v1);
-		mRenderer.vertex(v2);
+		builder.vertex(v1);
+		builder.vertex(v2);
 		r1 = r2;
 		v1 = v2;
 	}
 
-	mRenderer.end();
+	auto [b_vertices, count] = builder.end();
+	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
 void PhysDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
-	assert(mWorking);
-
 	const float segments = 16.0f;
 	const float increment = 2.0f * glm::pi<float>() / segments;
 
@@ -216,74 +197,81 @@ void PhysDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2&
 	auto r1 = glm::vec2({ cosInc, sinInc });
 	auto v1 = v0 + radius * r1;
 
-	mRenderer.begin(Renderer::Topology::TriangleList);
-	mRenderer.color({ 0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f });
-	for (int i = 0; i < segments; i++)
+	static auto builder = Graphics::MeshBuilder();
+	
 	{
-		auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
-		auto v2 = v0 + radius * r2;
-		mRenderer.vertex(v0);
-		mRenderer.vertex(v1);
-		mRenderer.vertex(v2);
-		r1 = r2;
-		v1 = v2;
+		builder.begin();
+		builder.color({ 0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f });
+		for (int i = 0; i < segments; i++)
+		{
+			auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
+			auto v2 = v0 + radius * r2;
+			builder.vertex(v0);
+			builder.vertex(v1);
+			builder.vertex(v2);
+			r1 = r2;
+			v1 = v2;
+		}
+		auto [b_vertices, count] = builder.end();
+		GRAPHICS->draw(Renderer::Topology::TriangleList, b_vertices, count);
 	}
-	mRenderer.end();
 
-	mRenderer.begin(Renderer::Topology::LineList);
-	mRenderer.color({ color.r, color.g, color.b, color.a });
+	builder.begin();
+	builder.color({ color.r, color.g, color.b, color.a });
 	r1 = { 1.0f, 0.0f };
 	v1 = v0 + radius * r1;
 	for (int i = 0; i < segments; ++i)
 	{
 		auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
 		auto v2 = v0 + radius * r2;
-		mRenderer.vertex(v1);
-		mRenderer.vertex(v2);
+		builder.vertex(v1);
+		builder.vertex(v2);
 		r1 = r2;
 		v1 = v2;
 	}
-	mRenderer.vertex(v0);
-	mRenderer.vertex(v0 + radius * glm::vec2({ axis.x, axis.y }));
-	mRenderer.end();
+	builder.vertex(v0);
+	builder.vertex(v0 + radius * glm::vec2({ axis.x, axis.y }));
+	auto [b_vertices, count] = builder.end();
+	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
 void PhysDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-	assert(mWorking);
-
-	mRenderer.begin(Renderer::Topology::LineList);
-	mRenderer.color({ color.r, color.g, color.b, color.a });
-	mRenderer.vertex({ p1.x, p1.y });
-	mRenderer.vertex({ p2.x, p2.y });
-	mRenderer.end();
+	static auto builder = Graphics::MeshBuilder();
+	builder.begin();
+	builder.color({ color.r, color.g, color.b, color.a });
+	builder.vertex({ p1.x, p1.y });
+	builder.vertex({ p2.x, p2.y });
+	auto [b_vertices, count] = builder.end();
+	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
 void PhysDraw::DrawTransform(const b2Transform& xf)
 {
-	assert(mWorking);
-
 	const float AxisScale = 0.4f;
 	b2Vec2 p = xf.p;
 	b2Vec2 px = p + AxisScale * xf.q.GetXAxis();
 	b2Vec2 py = p + AxisScale * xf.q.GetYAxis();
 
-	mRenderer.begin(Renderer::Topology::LineList);
-	mRenderer.color(Graphics::Color::Red);
-	mRenderer.vertex({ p.x, p.y });
-	mRenderer.vertex({ px.x, px.y });
-	mRenderer.color(Graphics::Color::Lime);
-	mRenderer.vertex({ p.x, p.y });
-	mRenderer.vertex({ py.x, py.y });
-	mRenderer.end();
+	static auto builder = Graphics::MeshBuilder();
+	builder.begin();
+	builder.color(Graphics::Color::Red);
+	builder.vertex({ p.x, p.y });
+	builder.vertex({ px.x, px.y });
+	builder.color(Graphics::Color::Lime);
+	builder.vertex({ p.x, p.y });
+	builder.vertex({ py.x, py.y });
+	auto [b_vertices, count] = builder.end();
+	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
 void PhysDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
-	assert(mWorking);
-
-	mRenderer.begin(Renderer::Topology::PointList);
-	mRenderer.color({ color.r, color.g, color.b, color.a });
-	mRenderer.vertex({ p.x, p.y });
-	mRenderer.end();
+	static auto builder = Graphics::MeshBuilder();
+	builder.begin();
+	builder.color({ color.r, color.g, color.b, color.a });
+	builder.vertex({ p.x, p.y });
+	builder.end();
+	auto [b_vertices, count] = builder.end();
+	GRAPHICS->draw(Renderer::Topology::PointList, b_vertices, count);
 }
