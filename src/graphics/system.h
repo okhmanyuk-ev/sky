@@ -47,7 +47,8 @@ namespace Graphics
 			std::optional<std::shared_ptr<Renderer::Texture>> texture = std::nullopt);
 
 		// draw colored vertices
-		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices);
+		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices, 
+			std::optional<size_t> count = std::nullopt, size_t start = 0);
 
 		// draw indexed colored vertices
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,

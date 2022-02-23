@@ -32,8 +32,8 @@ Camera3D::Camera3D()
 
 void Camera3D::onFrame()
 {
-	auto yaw = mYaw * (mWorldUp.y * -1.0f);
-	auto pitch = mPitch * (mWorldUp.y * -1.0f);
+	auto yaw = mYaw;// *(mWorldUp.y * -1.0f);
+	auto pitch = mPitch;// *(mWorldUp.y * -1.0f);
 
 	float sinYaw = glm::sin(yaw);
 	float sinPitch = glm::sin(pitch);

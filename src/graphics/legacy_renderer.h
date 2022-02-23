@@ -9,12 +9,8 @@
 
 namespace Graphics
 {
-	class LegacyRenderer
+	class [[deprecated]] LegacyRenderer
 	{
-	public:
-		LegacyRenderer();
-		~LegacyRenderer();
-	
 	public:
 		void begin(Renderer::Topology topology);
 		void vertex(const glm::vec2& value);
@@ -27,7 +23,7 @@ namespace Graphics
 		void setViewMatrix(const glm::mat4& value) { mViewMatrix = value; }
 		void setModelMatrix(const glm::mat4& value) { mModelMatrix = value; }
 
-	private:		
+	private:
 		std::shared_ptr<Renderer::Shaders::Default> mShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColor::Layout);
 		
 	private:
@@ -40,5 +36,22 @@ namespace Graphics
 		glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
 		glm::mat4 mViewMatrix = glm::mat4(1.0f);
 		glm::mat4 mModelMatrix = glm::mat4(1.0f);
+	};
+
+	class MeshBuilder
+	{
+	public:
+		void begin();
+		void vertex(const glm::vec2& value);
+		void vertex(const glm::vec3& value);
+		void color(const glm::vec3& value);
+		void color(const glm::vec4& value);
+		std::tuple<std::vector<Renderer::Vertex::PositionColor>, size_t> end();
+
+	private:
+		bool mWorking = false;
+		size_t mVertexCount = 0;
+		std::vector<Renderer::Vertex::PositionColor> mVertices;
+		glm::vec4 mColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	};
 }

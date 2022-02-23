@@ -192,10 +192,11 @@ void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& ve
 	RENDERER->drawIndexed(indices.size / indices.stride);
 }
 
-void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices)
+void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
+	std::optional<size_t> count, size_t start)
 {
-	auto indices = std::vector<uint32_t>(vertices.size());
-	std::iota(indices.begin(), indices.end(), 0);
+	auto indices = std::vector<uint32_t>(count.value_or(vertices.size() - start));
+	std::iota(indices.begin(), indices.end(), start);
 	draw(topology, vertices, indices);
 }
 
