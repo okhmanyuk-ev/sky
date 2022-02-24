@@ -28,6 +28,7 @@ namespace Scene3D
 	public:
 		void setVertices(const std::vector<Renderer::Vertex::PositionColorNormal>& vertices);
 		void setVertices(const std::vector<Renderer::Vertex::PositionTextureNormal>& vertices);
+		void setVertices(const std::vector<Renderer::Vertex::PositionColorTextureNormal>& vertices);
 
 	public:
 		auto getTopology() const { return mTopology; }

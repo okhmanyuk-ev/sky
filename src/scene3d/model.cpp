@@ -98,6 +98,22 @@ void Model::setVertices(const std::vector<Renderer::Vertex::PositionTextureNorma
 	}
 }
 
+void Model::setVertices(const std::vector<Renderer::Vertex::PositionColorTextureNormal>& vertices)
+{
+	mPositionAttribs.clear();
+	mTexCoordAttribs.clear();
+	mNormalAttribs.clear();
+	mColorAttribs.clear();
+
+	for (const auto& vertex : vertices)
+	{
+		mPositionAttribs.push_back(vertex.pos);
+		mTexCoordAttribs.push_back(vertex.tex);
+		mNormalAttribs.push_back(vertex.normal);
+		mColorAttribs.push_back(vertex.col);
+	}
+}
+
 void Model::setPositionAttribs(const PositionAttribs& value)
 {
 	if (mPositionAttribs != value)
