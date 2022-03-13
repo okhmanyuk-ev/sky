@@ -6,7 +6,7 @@
 #include <graphics/color.h>
 #include <graphics/font.h>
 #include <graphics/image.h>
-#include <graphics/legacy_renderer.h>
+#include <graphics/mesh_builder.h>
 #include <graphics/system.h>
 #include <graphics/tex_cell.h>
 #include <graphics/tex_region.h>
