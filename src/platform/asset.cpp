@@ -4,9 +4,7 @@
 #include <platform/system_android.h>
 #include <fstream>
 #include <cassert>
-#if !defined(PLATFORM_IOS)
 #include <filesystem>
-#endif
 #include <sys/stat.h>
 
 using namespace Platform;
@@ -60,7 +58,12 @@ Asset::~Asset()
 
 void Asset::Write(const std::string& path, void* memory, size_t size, Storage storage)
 {
-#if defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_IOS)
+#if defined(PLATFORM_IOS)
+    assert(storage != Storage::Assets);
+    if (storage == Storage::Assets)
+        return;
+#endif
 	auto p = StoragePathToAbsolute(path, storage);
 	
 	auto dirs = std::filesystem::path(p).remove_filename().string();
@@ -76,15 +79,6 @@ void Asset::Write(const std::string& path, void* memory, size_t size, Storage st
 	if (storage != Storage::Assets)
 	{
 	//	std::experimental::filesystem::create_directories(std::experimental::filesystem::path(path).remove_filename().string());
-		auto p = StoragePathToAbsolute(path, storage);
-		std::ofstream file(p, std::ios::out | std::ios::binary);
-		file.write((char*)memory, size);
-		file.close();
-	}
-#elif defined(PLATFORM_IOS)
-    assert(storage != Storage::Assets);
-	if (storage != Storage::Assets)
-	{
 		auto p = StoragePathToAbsolute(path, storage);
 		std::ofstream file(p, std::ios::out | std::ios::binary);
 		file.write((char*)memory, size);
