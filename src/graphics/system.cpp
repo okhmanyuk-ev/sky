@@ -171,7 +171,8 @@ void System::clearStencil()
 
 void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices, 
 	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-	std::optional<std::shared_ptr<Renderer::Texture>> texture)
+	std::optional<std::shared_ptr<Renderer::Texture>> texture,
+	std::optional<size_t> count, size_t start)
 {
 	assert(shader);
 
@@ -189,7 +190,7 @@ void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& ve
 	RENDERER->setIndexBuffer(indices);
 	RENDERER->setVertexBuffer(vertices);
 	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
-	RENDERER->drawIndexed(indices.size / indices.stride);
+	RENDERER->drawIndexed(count.value_or(indices.size / indices.stride), start);
 }
 
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,

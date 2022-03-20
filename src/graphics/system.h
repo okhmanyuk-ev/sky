@@ -44,7 +44,8 @@ namespace Graphics
 		// TODO: hidden overload conflict when name "draw"
 		void drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices,
 			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-			std::optional<std::shared_ptr<Renderer::Texture>> texture = std::nullopt);
+			std::optional<std::shared_ptr<Renderer::Texture>> texture = std::nullopt,
+			std::optional<size_t> count = std::nullopt, size_t start = 0);
 
 		// draw colored vertices
 		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices, 

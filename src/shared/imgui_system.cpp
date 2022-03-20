@@ -5,6 +5,7 @@
 #include <graphics/color.h>
 #include <renderer/texture.h>
 #include <shared/imgui_user.h>
+#include <graphics/all.h>
 
 using namespace Shared;
 
@@ -90,32 +91,19 @@ void ImguiSystem::end()
 {
 	ImGui::Render();
 
+	GRAPHICS->begin();
+	GRAPHICS->pushSampler(mSampler);
+	GRAPHICS->pushOrthoMatrix(getLogicalWidth(), getLogicalHeight());
+	
 	auto drawData = ImGui::GetDrawData();
 	drawData->ScaleClipRects({ PLATFORM->getScale() * getScale(), PLATFORM->getScale() * getScale() });
-
-	auto view = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	auto projection = glm::orthoLH(0.0f, getLogicalWidth(), getLogicalHeight(), 0.0f, -1.0f, 1.0f);
-	auto model = glm::mat4(1.0f);
-	
-	mShader->setProjectionMatrix(projection);
-	mShader->setViewMatrix(view);
-	mShader->setModelMatrix(model);
-
-	RENDERER->setRenderTarget(nullptr);
-	RENDERER->setViewport(Renderer::Viewport());
-	RENDERER->setTopology(Renderer::Topology::TriangleList);
-	RENDERER->setSampler(mSampler);
-	RENDERER->setDepthMode(Renderer::DepthMode());
-	RENDERER->setCullMode(Renderer::CullMode::None);
-	RENDERER->setBlendMode(Renderer::BlendStates::NonPremultiplied);
-	RENDERER->setShader(mShader);
 
 	for (int i = 0; i < drawData->CmdListsCount; i++)
 	{
 		const auto cmds = drawData->CmdLists[i];
-		
-		RENDERER->setVertexBuffer({ cmds->VtxBuffer.Data, static_cast<size_t>(cmds->VtxBuffer.size()) });
-		RENDERER->setIndexBuffer({ cmds->IdxBuffer.Data, static_cast<size_t>(cmds->IdxBuffer.size()) });
+
+		auto vertex_buffer = Renderer::Buffer{ cmds->VtxBuffer.Data, static_cast<size_t>(cmds->VtxBuffer.size()) };
+		auto index_buffer = Renderer::Buffer{ cmds->IdxBuffer.Data, static_cast<size_t>(cmds->IdxBuffer.size()) };
 
 		int indexOffset = 0;
 
@@ -127,13 +115,17 @@ void ImguiSystem::end()
 			}
 			else
 			{
-				RENDERER->setTexture(*(std::shared_ptr<Renderer::Texture>*)cmd.TextureId);
-				RENDERER->setScissor({ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });
-				RENDERER->drawIndexed(cmd.ElemCount, indexOffset);
+				auto texture = *(std::shared_ptr<Renderer::Texture>*)cmd.TextureId;
+				GRAPHICS->pushScissor(Renderer::Scissor{ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });				
+				GRAPHICS->drawGeneric(Renderer::Topology::TriangleList, vertex_buffer, index_buffer, mShader, texture, cmd.ElemCount, indexOffset);
+				GRAPHICS->pop();
 			}
 			indexOffset += cmd.ElemCount;
 		}
 	}
+	
+	GRAPHICS->pop(2);
+	GRAPHICS->end();
 }
 
 void ImguiSystem::ensureFont() 
