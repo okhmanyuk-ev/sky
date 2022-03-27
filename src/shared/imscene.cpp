@@ -52,3 +52,10 @@ void ImScene::dontKill(std::shared_ptr<Scene::Node> node)
 {
 	destroyCallback(node, [] {});
 }
+
+void ImScene::dontKillUntilHaveChilds(std::shared_ptr<Scene::Node> node)
+{
+	destroyAction(node, Actions::Collection::Wait([node] {
+		return node->hasNodes();
+	}));
+}

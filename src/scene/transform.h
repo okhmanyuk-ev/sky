@@ -88,6 +88,8 @@ namespace Scene
 		auto getVerticalPosition() const { return mPosition.y; }
 		void setVerticalPosition(float value) { mPosition.y = value; }
 
+		void setOrigin(float value) { setOrigin({ value, value }); }
+
 		auto getHorizontalOrigin() const { return mOrigin.x; }
 		void setHorizontalOrigin(float value) { mOrigin.x = value; }
 

@@ -16,7 +16,7 @@ namespace Shared
 
 	public:
 		template<class T = Scene::Node>
-		std::shared_ptr<T> attachTemporaryNode(Scene::Node& target, std::optional<std::string> key = std::nullopt)
+		std::shared_ptr<T> spawn(Scene::Node& target, std::optional<std::string> key = std::nullopt)
 		{
 			std::shared_ptr<T> result = nullptr;
 			auto type_index = std::type_index(typeid(T)).hash_code();
@@ -24,17 +24,17 @@ namespace Shared
 			mTypesCount[type_key] += 1;
 			auto type_count = mTypesCount.at(type_key);
 			auto final_key = fmt::format("{}_{}", type_key, key.has_value() ? key.value() : std::to_string(type_count));
-			if (mNodes.count(final_key) != 0)
+			if (mNodes.contains(final_key))
 			{
 				auto node = mNodes.at(final_key);
 				result = std::dynamic_pointer_cast<T>(node);
 			}
-			mNodeWasInitialized = result == nullptr;
+			mNodeJustSpawned = result == nullptr;
 			if (result == nullptr)
 			{
 				result = std::make_shared<T>();
 				target.attach(result);
-				assert(mNodes.count(final_key) == 0);
+				assert(!mNodes.contains(final_key));
 				mNodes.insert({ final_key, result });
 			}
 			mUnusedNodes.erase(final_key);
@@ -47,16 +47,17 @@ namespace Shared
 			return result;
 		}
 
-		bool nodeWasInitialized() const { return mNodeWasInitialized; }
+		bool nodeJustSpawned() const { return mNodeJustSpawned; }
 		void destroyCallback(std::shared_ptr<Scene::Node> node, std::function<void()> func);
 		void destroyAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction action);
 		void dontKill(std::shared_ptr<Scene::Node> node);
+		void dontKillUntilHaveChilds(std::shared_ptr<Scene::Node> node);
 
 	private:
 		std::unordered_map<std::string, int> mTypesCount;
 		std::unordered_map<std::string, std::shared_ptr<Scene::Node>> mNodes;
 		std::set<std::string> mUnusedNodes;
-		bool mNodeWasInitialized = false;
+		bool mNodeJustSpawned = false;
 		std::map<std::shared_ptr<Scene::Node>, std::function<void()>> mDestroyCallbacks;
 	};
 }
