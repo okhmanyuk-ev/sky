@@ -556,6 +556,32 @@ namespace Shared::SceneHelpers
 		bool mSmoothAbsoluteSize = true;
 	};
 
+	class Checkbox : public Scene::Clickable<Scene::Node>
+	{
+	public:
+		Checkbox();
+
+	public:
+		using ChangeCallback = std::function<void(bool)>;
+
+	public:
+		auto getLabel() const { return mLabel; }
+		auto getOuterRectangle() const { return mOuterRectangle; }
+		auto getInnerRectangle() const { return mInnerRectangle; }
+
+		void setChecked(bool value) { mChecked = value; }
+		auto isChecked() const { return mChecked; }
+
+		void setChangeCallback(ChangeCallback value) { mChangeCallback = value; }
+
+	private:
+		std::shared_ptr<Scene::Label> mLabel;
+		std::shared_ptr<Scene::Rectangle> mOuterRectangle;
+		std::shared_ptr<Scene::Rectangle> mInnerRectangle;
+		bool mChecked = true;
+		ChangeCallback mChangeCallback = nullptr;
+	};
+
 	// 3d
 
 	std::vector<std::shared_ptr<Scene3D::Model>> MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension);

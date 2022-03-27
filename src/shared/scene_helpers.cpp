@@ -837,6 +837,51 @@ void SceneHelpers::Shockwave::draw()
 	Glass::draw();
 }
 
+// checkbox
+
+SceneHelpers::Checkbox::Checkbox()
+{
+	mOuterRectangle = std::make_shared<Scene::Rectangle>();
+	mOuterRectangle->setAlpha(0.33f);
+	mOuterRectangle->setStretch({ 0.0f, 1.0f });
+	mOuterRectangle->setMargin(8.0f);
+	mOuterRectangle->setX(4.0f);
+	mOuterRectangle->setAnchor({ 0.0f, 0.5f });
+	mOuterRectangle->setPivot({ 0.0f, 0.5f });
+	attach(mOuterRectangle);
+
+	mOuterRectangle->runAction(Actions::Collection::ExecuteInfinite([this] {
+		mOuterRectangle->setWidth(mOuterRectangle->getAbsoluteHeight() + mOuterRectangle->getVerticalMargin());
+	}));
+
+	mInnerRectangle = std::make_shared<Scene::Rectangle>();
+	mInnerRectangle->setAnchor(0.5f);
+	mInnerRectangle->setPivot(0.5f);
+	mInnerRectangle->setStretch(0.66f);
+	mInnerRectangle->setAlpha(0.66f);
+	mOuterRectangle->attach(mInnerRectangle);
+
+	mInnerRectangle->runAction(Actions::Collection::ExecuteInfinite([this] {
+		mInnerRectangle->setVisible(isChecked());
+	}));
+
+	mLabel = std::make_shared<Scene::Label>();
+	mLabel->setFontSize(12.0f);
+	mLabel->setText("label");
+	mLabel->setAnchor({ 1.0f, 0.5f });
+	mLabel->setPivot({ 0.0f, 0.5f });
+	mLabel->setX(8.0f);
+	mOuterRectangle->attach(mLabel);
+
+	setClickCallback([this] {
+		mChecked = !mChecked;
+		if (mChangeCallback)
+			mChangeCallback(mChecked);
+	});
+	setChooseBeginCallback([this] { mOuterRectangle->setAlpha(0.66f); });
+	setChooseEndCallback([this] { mOuterRectangle->setAlpha(0.33f); });
+}
+
 // 3d
 
 std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)
