@@ -6,30 +6,10 @@ void ImScene::onFrame()
 {
 	for (const auto& name : mUnusedNodes)
 	{
-		auto node = mNodes.at(name);
-		
-		bool dont_kill = mDontKillNodes.contains(node);
-		
-		if (!dont_kill)
-		{
-			if (mPreKillActions.contains(node))
-			{
-				node->runAction(Actions::Collection::MakeSequence(
-					std::move(mPreKillActions.at(node)),
-					Actions::Collection::Kill(node)
-				));
-			}
-			else
-			{
-				if (node->hasParent())
-				{
-					node->getParent()->detach(node);
-				}
-			}
-		}
-		mPreKillActions.erase(node);
+		auto node = mNodes.at(name);	
+		node->runAction(std::move(mDestroyActions.at(node)));
+		mDestroyActions.erase(node);
 		mNodes.erase(name);
-		mDontKillNodes.erase(node);
 	}
 
 	mUnusedNodes.clear();
@@ -42,15 +22,23 @@ void ImScene::onFrame()
 	mTypesCount.clear();
 }
 
-void ImScene::setupPreKillAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction action)
+void ImScene::destroyAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction _action)
 {
-	if (mPreKillActions.contains(node))
-		mPreKillActions.erase(node);
+	if (mDestroyActions.contains(node))
+		mDestroyActions.erase(node);
 
-	mPreKillActions.insert({ node, std::move(action) });
+	auto action = Actions::Collection::MakeSequence(
+		std::move(_action),
+		Actions::Collection::Kill(node)
+	);
+
+	mDestroyActions.insert({ node, std::move(action) });
 }
 
 void ImScene::dontKill(std::shared_ptr<Scene::Node> node)
 {
-	mDontKillNodes.insert(node);
+	if (mDestroyActions.contains(node))
+		mDestroyActions.erase(node);
+
+	mDestroyActions.insert({ node, nullptr });
 }

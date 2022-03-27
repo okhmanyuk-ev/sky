@@ -19,24 +19,17 @@ namespace Shared
 		std::shared_ptr<T> attachTemporaryNode(Scene::Node& target, std::optional<std::string> key = std::nullopt)
 		{
 			std::shared_ptr<T> result = nullptr;
-
 			auto type_index = std::type_index(typeid(T)).hash_code();
-
 			auto type_key = fmt::format("{}_{}", (void*)&target, type_index);
-
 			mTypesCount[type_key] += 1;
 			auto type_count = mTypesCount.at(type_key);
-			
 			auto final_key = fmt::format("{}_{}", type_key, key.has_value() ? key.value() : std::to_string(type_count));
-
 			if (mNodes.count(final_key) != 0)
 			{
 				auto node = mNodes.at(final_key);
 				result = std::dynamic_pointer_cast<T>(node);
 			}
-
 			mNodeWasInitialized = result == nullptr;
-
 			if (result == nullptr)
 			{
 				result = std::make_shared<T>();
@@ -44,15 +37,13 @@ namespace Shared
 				assert(mNodes.count(final_key) == 0);
 				mNodes.insert({ final_key, result });
 			}
-
 			mUnusedNodes.erase(final_key);
-
+			mDestroyActions.insert({ result, Actions::Collection::Kill(result) });
 			return result;
 		}
 
 		bool nodeWasInitialized() const { return mNodeWasInitialized; }
-
-		void setupPreKillAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction action);
+		void destroyAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction action);
 		void dontKill(std::shared_ptr<Scene::Node> node);
 
 	private:
@@ -60,7 +51,6 @@ namespace Shared
 		std::unordered_map<std::string, std::shared_ptr<Scene::Node>> mNodes;
 		std::set<std::string> mUnusedNodes;
 		bool mNodeWasInitialized = false;
-		std::map<std::shared_ptr<Scene::Node>, Actions::Collection::UAction> mPreKillActions;
-		std::set<std::shared_ptr<Scene::Node>> mDontKillNodes;
+		std::map<std::shared_ptr<Scene::Node>, Actions::Collection::UAction> mDestroyActions;
 	};
 }
