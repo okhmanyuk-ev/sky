@@ -38,11 +38,17 @@ namespace Shared
 				mNodes.insert({ final_key, result });
 			}
 			mUnusedNodes.erase(final_key);
-			mDestroyActions.insert({ result, Actions::Collection::Kill(result) });
+			destroyCallback(result, [result] {
+				if (!result->hasParent())
+					return;
+
+				result->getParent()->detach(result);
+			});
 			return result;
 		}
 
 		bool nodeWasInitialized() const { return mNodeWasInitialized; }
+		void destroyCallback(std::shared_ptr<Scene::Node> node, std::function<void()> func);
 		void destroyAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction action);
 		void dontKill(std::shared_ptr<Scene::Node> node);
 
@@ -51,6 +57,6 @@ namespace Shared
 		std::unordered_map<std::string, std::shared_ptr<Scene::Node>> mNodes;
 		std::set<std::string> mUnusedNodes;
 		bool mNodeWasInitialized = false;
-		std::map<std::shared_ptr<Scene::Node>, Actions::Collection::UAction> mDestroyActions;
+		std::map<std::shared_ptr<Scene::Node>, std::function<void()>> mDestroyCallbacks;
 	};
 }
