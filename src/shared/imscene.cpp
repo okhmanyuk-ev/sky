@@ -70,9 +70,9 @@ void ImScene::showAndHideWithScale()
 	if (IMSCENE->justAllocated())
 	{
 		mLastSpawn->setScale(0.0f);
-		mLastSpawn->runAction(Actions::Collection::ChangeScale(mLastSpawn, { 1.0f, 1.0f }, 0.25f, Easing::CubicOut));
+		mLastSpawn->runAction(Actions::Collection::ChangeScale(mLastSpawn, { 1.0f, 1.0f }, 0.25f, Easing::SinusoidalOut));
 	}
 
-	IMSCENE->destroyAction(Actions::Collection::ChangeScale(mLastSpawn, { 0.0f, 0.0f }, 0.25f, Easing::CubicIn));
+	IMSCENE->destroyAction(Actions::Collection::ChangeScale(mLastSpawn, { 0.0f, 0.0f }, 0.25f, Easing::SinusoidalIn));
 }
 
