@@ -1,9 +1,13 @@
 #include "imscene.h"
+#include <shared/stats_system.h>
 
 using namespace Shared;
 
 void ImScene::onFrame()
 {
+	if (!mNodes.empty())
+		STATS_INDICATE_GROUP("scene", "im nodes", mNodes.size());
+
 	for (const auto& name : mUnusedNodes)
 	{
 		auto node = mNodes.at(name);
