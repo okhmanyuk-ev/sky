@@ -38,7 +38,8 @@ namespace Shared
 				mNodes.insert({ final_key, result });
 			}
 			mUnusedNodes.erase(final_key);
-			destroyCallback(result, [result] {
+			mLastSpawn = result;
+			destroyCallback([result] {
 				if (!result->hasParent())
 					return;
 
@@ -47,17 +48,19 @@ namespace Shared
 			return result;
 		}
 
-		bool nodeJustSpawned() const { return mNodeJustSpawned; }
-		void destroyCallback(std::shared_ptr<Scene::Node> node, std::function<void()> func);
-		void destroyAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction action);
-		void dontKill(std::shared_ptr<Scene::Node> node);
-		void dontKillUntilHaveChilds(std::shared_ptr<Scene::Node> node);
+		bool justAllocated() const { return mNodeJustSpawned; }
+		void destroyCallback(std::function<void()> func);
+		void destroyAction(Actions::Collection::UAction action);
+		void dontKill();
+		void dontKillUntilHaveChilds();
+		void showAndHideWithScale();
 
 	private:
 		std::unordered_map<std::string, int> mTypesCount;
 		std::unordered_map<std::string, std::shared_ptr<Scene::Node>> mNodes;
 		std::set<std::string> mUnusedNodes;
 		bool mNodeJustSpawned = false;
+		std::shared_ptr<Scene::Node> mLastSpawn;
 		std::map<std::shared_ptr<Scene::Node>, std::function<void()>> mDestroyCallbacks;
 	};
 }

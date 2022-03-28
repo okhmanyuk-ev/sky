@@ -20,17 +20,18 @@ void ImScene::onFrame()
 	}
 
 	mTypesCount.clear();
+	mLastSpawn = nullptr;
 }
 
-void ImScene::destroyCallback(std::shared_ptr<Scene::Node> node, std::function<void()> func)
+void ImScene::destroyCallback(std::function<void()> func)
 {
-	if (mDestroyCallbacks.contains(node))
-		mDestroyCallbacks.erase(node);
+	if (mDestroyCallbacks.contains(mLastSpawn))
+		mDestroyCallbacks.erase(mLastSpawn);
 
-	mDestroyCallbacks.insert({ node, func });
+	mDestroyCallbacks.insert({ mLastSpawn, func });
 }
 
-void ImScene::destroyAction(std::shared_ptr<Scene::Node> node, Actions::Collection::UAction action)
+void ImScene::destroyAction(Actions::Collection::UAction action)
 {
 	auto make_shared_function = [](auto f) {
 		return [pf = std::make_shared<std::decay_t<decltype(f)>>(std::forward<decltype(f)>(f))] (auto&&...args)->decltype(auto) {
@@ -38,24 +39,36 @@ void ImScene::destroyAction(std::shared_ptr<Scene::Node> node, Actions::Collecti
 		};
 	};
 
-	auto func = make_shared_function([node, action = std::move(action)] () mutable {
+	auto func = make_shared_function([node = mLastSpawn, action = std::move(action)] () mutable {
 		node->runAction(Actions::Collection::MakeSequence(
 			std::move(action),
 			Actions::Collection::Kill(node)
 		));
 	});
 
-	destroyCallback(node, func);
+	destroyCallback(func);
 }
 
-void ImScene::dontKill(std::shared_ptr<Scene::Node> node)
+void ImScene::dontKill()
 {
-	destroyCallback(node, [] {});
+	destroyCallback([] {});
 }
 
-void ImScene::dontKillUntilHaveChilds(std::shared_ptr<Scene::Node> node)
+void ImScene::dontKillUntilHaveChilds()
 {
-	destroyAction(node, Actions::Collection::Wait([node] {
+	destroyAction(Actions::Collection::Wait([node = mLastSpawn] {
 		return node->hasNodes();
 	}));
 }
+
+void ImScene::showAndHideWithScale()
+{
+	if (IMSCENE->justAllocated())
+	{
+		mLastSpawn->setScale(0.0f);
+		mLastSpawn->runAction(Actions::Collection::ChangeScale(mLastSpawn, { 1.0f, 1.0f }, 0.25f, Easing::CubicOut));
+	}
+
+	IMSCENE->destroyAction(Actions::Collection::ChangeScale(mLastSpawn, { 0.0f, 0.0f }, 0.25f, Easing::CubicIn));
+}
+
