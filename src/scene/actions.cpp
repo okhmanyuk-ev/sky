@@ -422,6 +422,20 @@ Collection::UAction Collection::ChangeCirclePie(std::shared_ptr<Scene::Circle> c
 	});
 }
 
+Collection::UAction Collection::ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [circle](float value) {
+		circle->setPiePivot(value);
+	});
+}
+
+Collection::UAction Collection::ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([circle, dest, duration, easingFunction] {
+		return ChangeCirclePiePivot(circle, circle->getPiePivot(), dest, duration, easingFunction);
+	});
+}
+
 Collection::UAction Collection::ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction)
 {
 	return Interpolate(start, dest, duration, easingFunction, [circle](float value) {
@@ -504,6 +518,20 @@ Collection::UAction Collection::ChangeRadialAnchor(SceneTransform node, float de
 {
 	return Insert([node, dest, duration, easingFunction] {
 		return ChangeRadialAnchor(node, node->getRadialAnchor(), dest, duration, easingFunction);
+	});
+}
+
+Collection::UAction Collection::ChangeRadialPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction)
+{
+	return Interpolate(start, dest, duration, easingFunction, [node](float value) {
+		node->setRadialPivot(value);
+	});
+}
+
+Collection::UAction Collection::ChangeRadialPivot(SceneTransform node, float dest, float duration, EasingFunction easingFunction)
+{
+	return Insert([node, dest, duration, easingFunction] {
+		return ChangeRadialPivot(node, node->getRadialPivot(), dest, duration, easingFunction);
 	});
 }
 

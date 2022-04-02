@@ -99,6 +99,9 @@ namespace Actions::Collection
 	UAction ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 
+	UAction ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
 	UAction ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 
@@ -116,6 +119,9 @@ namespace Actions::Collection
 
 	UAction ChangeRadialAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeRadialAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+
+	UAction ChangeRadialPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	UAction ChangeRadialPivot(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 
 	UAction ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
