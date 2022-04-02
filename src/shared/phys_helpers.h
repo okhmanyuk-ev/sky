@@ -24,7 +24,8 @@ namespace Shared::PhysHelpers
 		enum class Type
 		{
 			Static,
-			Dynamic
+			Dynamic,
+			Kinematic
 		};
 
 	public:
@@ -42,6 +43,10 @@ namespace Shared::PhysHelpers
 		void setSize(const glm::vec2& value) { mSize = value; }
 		void setSize(float value) { setSize({ value, value }); }
 
+		auto getPivot() const { return mPivot; }
+		void setPivot(const glm::vec2& value) { mPivot = value; }
+		void setPivot(float value) { setPivot({ value, value }); }
+
 		auto isFixedRotation() const { return mFixedRotation; }
 		void setFixedRotation(bool value) { mFixedRotation = value; }
 
@@ -52,6 +57,7 @@ namespace Shared::PhysHelpers
 		Type mType = Type::Static;
 		glm::vec2 mPosition = { 0.0f, 0.0f };
 		glm::vec2 mSize = { 0.0f, 0.0f };
+		glm::vec2 mPivot = { 0.0f, 0.0f };
 		bool mFixedRotation = false;
 		bool mEnabled = true;
 
@@ -65,11 +71,13 @@ namespace Shared::PhysHelpers
 		std::shared_ptr<Scene::Node> mNode;
 
 	public:
-		auto getB2Body() const { return mB2Body; }
-		void setB2Body(b2Body* value) { mB2Body = value; }
+		auto getB2Fixture() const { return mB2Fixture; }
+		void setB2Fixture(b2Fixture* value) { mB2Fixture = value; }
+
+		auto getB2Body() const { return getB2Fixture()->GetBody(); }
 
 	private:
-		b2Body* mB2Body;
+		b2Fixture* mB2Fixture = nullptr;
 	};
 
 	class World

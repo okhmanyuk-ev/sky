@@ -13,12 +13,15 @@ Entity::Entity()
 
 void Entity::update()
 {
-	auto pos = mB2Body->GetPosition();
-	auto angle = mB2Body->GetAngle();
+	auto pos = getB2Body()->GetPosition();
+	auto angle = getB2Body()->GetAngle();
 
-	mNode->setPosition({ pos.x * World::Scale, pos.y * World::Scale });
+	pos *= World::Scale;
+
+	mNode->setPosition({ pos.x, pos.y });
 	mNode->setRotation(angle);
 	mNode->setSize(mSize);
+	mNode->setPivot(mPivot);
 }
 
 // world
@@ -59,7 +62,9 @@ void World::draw()
 	auto model = glm::mat4(1.0f);
 	model = glm::scale(model, { Scale, Scale, 1.0f });
 
-	mCamera.setPosition(-getNode()->getPosition());
+	auto pos = getNode()->getPosition();
+
+	mCamera.setPosition(-pos);
 
 	GRAPHICS->begin();
 	GRAPHICS->pushViewMatrix(mCamera.getViewMatrix());
@@ -78,15 +83,19 @@ void World::addEntity(std::shared_ptr<Entity> entity)
 	auto type = entity->getType();
 	auto pos = entity->getPosition() / Scale;
 	auto size = entity->getSize() / Scale;
+	auto pivot = entity->getPivot();
 	auto fixed_rotation = entity->isFixedRotation();
 	auto enabled = entity->isEnabled();
+	auto center = (size * 0.5f) - (pivot * size);
 
 	b2BodyDef bodyDef;
 
 	if (type == Entity::Type::Static)
 		bodyDef.type = b2_staticBody;
-	else
+	else if (type == Entity::Type::Dynamic)
 		bodyDef.type = b2_dynamicBody;
+	else 
+		bodyDef.type = b2_kinematicBody;
 
 	bodyDef.fixedRotation = fixed_rotation;
 	bodyDef.position = { pos.x, pos.y };
@@ -95,14 +104,14 @@ void World::addEntity(std::shared_ptr<Entity> entity)
 	auto body = mB2World.CreateBody(&bodyDef);
 
 	b2PolygonShape shape;
-	shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
+	shape.SetAsBox(size.x / 2.0f, size.y / 2.0f, { center.x, center.y }, 0.0f);
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &shape;
 	fixtureDef.density = 10.0f;
 
-	body->CreateFixture(&fixtureDef);
+	auto fixture = body->CreateFixture(&fixtureDef);
 	
-	entity->setB2Body(body);
+	entity->setB2Fixture(fixture);
 }
 
 void World::removeEntity(std::shared_ptr<Entity> entity)
