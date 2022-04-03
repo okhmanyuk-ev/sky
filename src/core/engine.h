@@ -16,23 +16,30 @@ namespace Core
 	
 	public:
 		Engine() { Context = this; }
+		~Engine() { Context = nullptr; }
 
 	public:
 		template <class T> void addSystem(std::shared_ptr<T> value)
 		{
+			assert(!hasSystem<T>());
 			auto index = std::type_index(typeid(T));
-			assert(mSystems.count(index) == 0);
 			mSystems[index] = value;
 		}
 
 		template <class T> void removeSystem()
 		{
+			assert(hasSystem<T>());
 			auto index = std::type_index(typeid(T));
-			assert(mSystems.count(index) > 0);
 			mSystems.erase(index);
 		}
 
-		template <class T> std::shared_ptr<T> getSystem()
+		template <class T> bool hasSystem() const
+		{
+			auto index = std::type_index(typeid(T));
+			return mSystems.contains(index);
+		}
+
+		template <class T> std::shared_ptr<T> getSystem() const
 		{
 			auto index = std::type_index(typeid(T));
 			return std::static_pointer_cast<T>(mSystems.at(index));
