@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <common/frame_system.h>
+#include <fmt/format.h>
 
 #define STATS ENGINE->getSystem<Shared::StatsSystem>()
 
@@ -35,11 +36,11 @@ namespace Shared
 		void onFrame() override;
 
 	public:
-		void indicate(const std::string& key, const std::string& value, const std::string& group = "");
-		void indicate(const std::string& key, int value, const std::string& group = "");
-		void indicate(const std::string& key, float value, const std::string& group = "");
-		void indicate(const std::string& key, size_t value, const std::string& group = "");
-		void indicate(const std::string& key, uint32_t value, const std::string& group = "");
+		template <class T> 
+		void indicate(const std::string& key, const T& value, const std::string& group = "")
+		{
+			mGroups[group][key] = { fmt::format("{}", value), FRAME->getUptime()};
+		}
 
 	public:
 		auto isEnabled() const { return mEnabled; }
