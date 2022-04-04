@@ -124,6 +124,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	CONSOLE->execute("hud_show_fps 1");
 	CONSOLE->execute("hud_show_drawcalls 1");
 	CONSOLE->execute("hud_show_batches 1");
+	CONSOLE->execute("hud_show_targets 1");
 #else
 	CONSOLE_DEVICE->setEnabled(false);
 	STATS->setEnabled(false);

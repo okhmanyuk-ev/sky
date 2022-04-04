@@ -26,6 +26,10 @@ PerformanceConsoleCommands::PerformanceConsoleCommands()
 		CVAR_GETTER_INT(mWantShowBatches),
 		CVAR_SETTER_INT(mWantShowBatches));
 
+	CONSOLE->registerCVar("hud_show_targets", "show render targets statistics", { "int" },
+		CVAR_GETTER_INT(mWantShowTargets),
+		CVAR_SETTER_INT(mWantShowTargets));
+
 	CONSOLE->registerCVar("hud_show_tasks", "show tasks count on screen", { "int" },
 		CVAR_GETTER_INT(mWantShowTasks),
 		CVAR_SETTER_INT(mWantShowTasks));
@@ -54,6 +58,9 @@ void PerformanceConsoleCommands::onFrame()
 
 	if (mWantShowBatches > 0)
 		ENGINE_STATS("batches", GRAPHICS->getBatchesCount());
+	
+	if (mWantShowTargets > 0)
+		ENGINE_STATS("targets", GRAPHICS->getRenderTargets().size());
 
 	if (mWantShowTasks > 1)
 		ENGINE_STATS("tasks", std::to_string(TASK->getTasksCount()) + " at " + std::to_string(TASK->getThreadsCount()) + " threads");
