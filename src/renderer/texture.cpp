@@ -18,9 +18,12 @@ Texture::Texture(int width, int height, int channels, void* data, bool mipmap) :
 
 Texture::~Texture()
 {
-	if (!ENGINE) {
+	if (!ENGINE) 
 		return; // TODO: game will crash when closing
-	}
+
+	if (!ENGINE->hasSystem<Renderer::System>())
+		return;
+
 	RENDERER->destroyTexture(mHandler);
 }
 

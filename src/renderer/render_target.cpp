@@ -11,5 +11,11 @@ RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
 
 RenderTarget::~RenderTarget() 
 {
+	if (!ENGINE) 
+		return;
+	
+	if (!ENGINE->hasSystem<Renderer::System>())
+		return;
+
 	RENDERER->destroyRenderTarget(mRenderTargetHandler);
 }
