@@ -93,8 +93,12 @@ namespace Shared::PhysHelpers
 		void draw();
 
 	public:
-		void addEntity(std::shared_ptr<Entity> entity);
+		void addEntity(std::shared_ptr<Entity> entity, Scene::Node::AttachDirection node_attach_direction = Scene::Node::AttachDirection::Back);
 		void removeEntity(std::shared_ptr<Entity> entity);
+		bool hasEntity(std::shared_ptr<Entity> entity) const;
+
+	public:
+		auto& getB2World() { return mB2World; }
 
 	private:
 		b2World mB2World = b2World({ 0.0f, 10.0f });

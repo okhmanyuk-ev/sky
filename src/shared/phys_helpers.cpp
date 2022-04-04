@@ -75,10 +75,12 @@ void World::draw()
 	GRAPHICS->end();
 }
 
-void World::addEntity(std::shared_ptr<Entity> entity)
+void World::addEntity(std::shared_ptr<Entity> entity, Scene::Node::AttachDirection node_attach_direction)
 {
+	assert(!hasEntity(entity));
+
 	mEntities.insert(entity);
-	mNode->attach(entity->getNode());
+	mNode->attach(entity->getNode(), node_attach_direction);
 
 	auto type = entity->getType();
 	auto pos = entity->getPosition() / Scale;
@@ -116,10 +118,15 @@ void World::addEntity(std::shared_ptr<Entity> entity)
 
 void World::removeEntity(std::shared_ptr<Entity> entity)
 {
-	assert(mEntities.count(entity) > 0);
+	assert(hasEntity(entity));
 	mEntities.erase(entity);
 	mNode->detach(entity->getNode());
 	mB2World.DestroyBody(entity->getB2Body());
+}
+
+bool World::hasEntity(std::shared_ptr<Entity> entity) const
+{
+	return mEntities.contains(entity);
 }
 
 void PhysDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
