@@ -1,6 +1,7 @@
 #include "phys_helpers.h"
 #include <console/system.h>
 #include <common/console_commands.h>
+#include <shared/stats_system.h>
 
 using namespace Shared::PhysHelpers;
 
@@ -15,6 +16,11 @@ inline b2BodyType EntTypeToB2Type(Entity::Type type)
 }
 
 // entity
+
+uint16_t Entity::getFilterCategoryBits() const
+{
+	return getB2Fixture()->GetFilterData().categoryBits;
+}
 
 void Entity::setFilterCategoryBits(uint16_t value)
 {
@@ -54,8 +60,10 @@ World::World()
 	mTimestepFixer.setForceTimeCompletion(false);
 	mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / 60.0f));
 
-	mB2World.SetDebugDraw(&mPhysDraw);
-	mPhysDraw.SetFlags(
+	mB2World.SetContactFilter(&mContactFilter);
+	mB2World.SetContactListener(&mContactListener);
+	mB2World.SetDebugDraw(&mDraw);
+	mDraw.SetFlags(
 		b2Draw::e_shapeBit
 		| b2Draw::e_jointBit
 	//	| b2Draw::e_aabbBit
@@ -69,6 +77,10 @@ World::World()
 void World::update(Clock::Duration delta)
 {
 	Scene::Node::update(delta);
+
+	STATS_INDICATE_GROUP("phys", "phys bodies", mB2World.GetBodyCount());
+	STATS_INDICATE_GROUP("phys", "phys contacts", mB2World.GetContactCount());
+	STATS_INDICATE_GROUP("phys", "phys joints", mB2World.GetJointCount());
 
 	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())
 	{
@@ -138,12 +150,19 @@ void World::attach(std::shared_ptr<Node> node, AttachDirection attach_direction)
 	body_def.userData.pointer = (uintptr_t)node.get();
 	body_def.type = EntTypeToB2Type(entity->getType());
 
-	b2PolygonShape shape;
-	shape.SetAsBox(size.x / 2.0f, size.y / 2.0f, { center.x, center.y }, 0.0f);
+	b2PolygonShape box_shape;
+	box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f, { center.x, center.y }, 0.0f);
+
+	b2CircleShape circle_shape;
+	circle_shape.m_radius = glm::min(size.x, size.y) * 0.5f;
 
 	b2FixtureDef fixture_def;
-	fixture_def.shape = &shape;
 	fixture_def.density = 10.0f;
+
+	if (entity->getShape() == Entity::Shape::Box)
+		fixture_def.shape = &box_shape;
+	else
+		fixture_def.shape = &circle_shape;
 
 	auto body = mB2World.CreateBody(&body_def);
 	auto fixture = body->CreateFixture(&fixture_def);
@@ -163,7 +182,9 @@ void World::detach(std::shared_ptr<Node> node)
 	mB2World.DestroyBody(entity->getB2Body());
 }
 
-void World::PhysDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+// draw
+
+void World::Draw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	static auto builder = Graphics::MeshBuilder();
 	builder.begin();
@@ -177,7 +198,7 @@ void World::PhysDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, con
 	GRAPHICS->draw(Renderer::Topology::LineStrip, b_vertices, count);
 }
 
-void World::PhysDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+void World::Draw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	static auto builder = Graphics::MeshBuilder();
 	{
@@ -205,7 +226,7 @@ void World::PhysDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
 	}
 }
 
-void World::PhysDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
+void World::Draw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
 	const float segments = 16.0f;
 	const float increment = 2.0f * glm::pi<float>() / segments;
@@ -235,7 +256,7 @@ void World::PhysDraw::DrawCircle(const b2Vec2& center, float radius, const b2Col
 	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
-void World::PhysDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
+void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
 	const float segments = 16.0f;
 	const float increment = 2.0f * glm::pi<float>() / segments;
@@ -285,7 +306,7 @@ void World::PhysDraw::DrawSolidCircle(const b2Vec2& center, float radius, const 
 	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
-void World::PhysDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
+void World::Draw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
 	static auto builder = Graphics::MeshBuilder();
 	builder.begin();
@@ -296,7 +317,7 @@ void World::PhysDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Co
 	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
-void World::PhysDraw::DrawTransform(const b2Transform& xf)
+void World::Draw::DrawTransform(const b2Transform& xf)
 {
 	const float AxisScale = 0.4f;
 	b2Vec2 p = xf.p;
@@ -315,7 +336,7 @@ void World::PhysDraw::DrawTransform(const b2Transform& xf)
 	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
-void World::PhysDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
+void World::Draw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
 	static auto builder = Graphics::MeshBuilder();
 	builder.begin();
@@ -324,4 +345,34 @@ void World::PhysDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& colo
 	builder.end();
 	auto [b_vertices, count] = builder.end();
 	GRAPHICS->draw(Renderer::Topology::PointList, b_vertices, count);
+}
+
+// contact filter
+
+bool World::ContactFilter::ShouldCollide(b2Fixture* fixtureA, b2Fixture* fixtureB)
+{
+	auto entA = static_cast<Entity*>((void*)fixtureA->GetBody()->GetUserData().pointer);
+	auto entB = static_cast<Entity*>((void*)fixtureB->GetBody()->GetUserData().pointer);
+
+	if (entA->getFilterLayer() != entB->getFilterLayer())
+		return false;
+
+	return b2ContactFilter::ShouldCollide(fixtureA, fixtureB);
+}
+
+// contact listener
+
+void World::ContactListener::BeginContact(b2Contact* contact)
+{
+	auto entA = static_cast<Entity*>((void*)contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+	auto entB = static_cast<Entity*>((void*)contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+
+	auto callbackA = entA->getContactCallback();
+	auto callbackB = entB->getContactCallback();
+
+	if (callbackA)
+		callbackA(*entB);
+
+	if (callbackB)
+		callbackB(*entA);
 }

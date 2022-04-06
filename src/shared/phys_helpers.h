@@ -16,18 +16,28 @@ namespace Shared::PhysHelpers
 			Kinematic
 		};
 
-	public:
-		auto isFixedRotation() const { return mFixedRotation; }
-		void setFixedRotation(bool value) { mFixedRotation = value; }
+		enum class Shape
+		{
+			Box,
+			Circle
+		};
 
+	public:
 		auto getType() const { return mType; }
 		void setType(Type value) { mType = value; }
 	
+		auto getShape() const { return mShape; }
+		void setShape(Shape value) { mShape = value; }
+
+		auto isFixedRotation() const { return mFixedRotation; }
+		void setFixedRotation(bool value) { mFixedRotation = value; }
+		
 		auto isBullet() const { return mBullet; }
 		void setBullet(bool value) { mBullet = value; }
 
 	private:
 		Type mType = Type::Static;
+		Shape mShape = Shape::Box;
 		bool mFixedRotation = false;
 		bool mBullet = false;
 	
@@ -41,13 +51,32 @@ namespace Shared::PhysHelpers
 		b2Fixture* mB2Fixture = nullptr;
 
 	public:
+		uint16_t getFilterCategoryBits() const;
 		void setFilterCategoryBits(uint16_t value);
+
 		void setFilterMaskBits(uint16_t value);
 		void setFilterGroupIndex(int16_t value);
+
+	public:
+		auto getFilterLayer() const { return mFilterLayer; }
+		void setFilterLayer(int value) { mFilterLayer = value; };
 		
+	private:
+		int mFilterLayer = 0;
+
 	public:
 		void applyLinearImpulseToCenter(const glm::vec2& impulse, bool wake);
 		void setGravityScale(float value);
+
+	public:
+		using ContactCallback = std::function<void(Entity&)>;
+
+	public:
+		auto getContactCallback() const { return mContactCallback; }
+		void setContactCallback(ContactCallback value) { mContactCallback = value; }
+
+	private:
+		ContactCallback mContactCallback = nullptr;
 	};
 
 	class World : public Scene::Node
@@ -78,9 +107,8 @@ namespace Shared::PhysHelpers
 		bool mPhysDrawEnabled = false;
 
 	private:
-		class PhysDraw : public b2Draw
+		class Draw : public b2Draw
 		{
-		public:
 			void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
 			void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
 			void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
@@ -90,7 +118,19 @@ namespace Shared::PhysHelpers
 			void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
 		};
 
+		class ContactFilter : public b2ContactFilter
+		{
+			bool ShouldCollide(b2Fixture* fixtureA, b2Fixture* fixtureB) override;
+		};
+
+		class ContactListener : public b2ContactListener
+		{
+			void BeginContact(b2Contact* contact) override;
+		};
+
 	private:
-		PhysDraw mPhysDraw;
+		Draw mDraw;
+		ContactFilter mContactFilter;
+		ContactListener mContactListener;
 	};
 }
