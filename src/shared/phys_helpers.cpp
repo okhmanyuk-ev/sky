@@ -4,16 +4,37 @@
 
 using namespace Shared::PhysHelpers;
 
-// entity
-
-Entity::Entity(Type type, bool fixed_rotation) : mType(type), mFixedRotation(fixed_rotation)
+inline b2BodyType EntTypeToB2Type(Entity::Type type)
 {
-	//
+	if (type == Entity::Type::Static)
+		return b2_staticBody;
+	else if (type == Entity::Type::Dynamic)
+		return b2_dynamicBody;
+	else
+		return b2_kinematicBody;
 }
 
-void Entity::update(Clock::Duration dTime)
+// entity
+
+void Entity::setFilterCategoryBits(uint16_t value)
 {
-	Scene::Node::update(dTime);
+	auto filter = getB2Fixture()->GetFilterData();
+	filter.categoryBits = value;
+	getB2Fixture()->SetFilterData(filter);
+}
+
+void Entity::setFilterMaskBits(uint16_t value)
+{
+	auto filter = getB2Fixture()->GetFilterData();
+	filter.maskBits = value;
+	getB2Fixture()->SetFilterData(filter);
+}
+
+void Entity::setFilterGroupIndex(int16_t value)
+{
+	auto filter = getB2Fixture()->GetFilterData();
+	filter.groupIndex = value;
+	getB2Fixture()->SetFilterData(filter);
 }
 
 // world
@@ -44,12 +65,18 @@ void World::update(Clock::Duration delta)
 		auto ptr = (void*)body->GetUserData().pointer;
 		auto entity = static_cast<Entity*>(ptr);
 		
-		auto pos = entity->getPosition();
-		auto angle = entity->getRotation();
+		auto ent_pos = entity->getPosition() / Scale;
+		auto ent_angle = entity->getRotation();
 
-		pos /= Scale;
+		auto body_pos = body->GetPosition();
+		auto body_angle = body->GetAngle();
 
-		body->SetTransform({ pos.x, pos.y }, angle);
+		if (ent_pos.x != body_pos.x || ent_pos.y != body_pos.y || ent_angle != body_angle)
+			body->SetTransform({ ent_pos.x, ent_pos.y }, ent_angle);
+
+		body->SetEnabled(entity->isEnabled());
+		body->SetFixedRotation(entity->isFixedRotation());
+		body->SetType(EntTypeToB2Type(entity->getType()));
 	}
 
 	mTimestepFixer.execute(delta, [this](auto delta) {
@@ -61,10 +88,8 @@ void World::update(Clock::Duration delta)
 		auto ptr = (void*)body->GetUserData().pointer;
 		auto entity = static_cast<Entity*>(ptr);
 
-		auto pos = body->GetPosition();
+		auto pos = Scale * body->GetPosition();
 		auto angle = body->GetAngle();
-
-		pos *= Scale;
 
 		entity->setPosition({ pos.x, pos.y });
 		entity->setRotation(angle);
@@ -94,39 +119,23 @@ void World::attach(std::shared_ptr<Node> node, AttachDirection attach_direction)
 	if (!entity)
 		return;
 
-	auto type = entity->getType();
-	auto fixed_rotation = entity->isFixedRotation();
-
-	//auto pos = entity->getPosition() / Scale;
 	auto size = entity->getSize() / Scale;
 	auto pivot = entity->getPivot();
-	auto enabled = entity->isEnabled();
 	auto center = (size * 0.5f) - (pivot * size);
 
-	b2BodyDef bodyDef;
-
-	// TODO: it seems we can change type in runtime, if so then remove this lines
-
-	if (type == Entity::Type::Static)
-		bodyDef.type = b2_staticBody;
-	else if (type == Entity::Type::Dynamic)
-		bodyDef.type = b2_dynamicBody;
-	else 
-		bodyDef.type = b2_kinematicBody;
-
-	bodyDef.fixedRotation = fixed_rotation; // TODO: maybe we can change this after spawn, if so then we can remove this line
-	bodyDef.enabled = enabled; // TODO: same as prev line
-	bodyDef.userData.pointer = (uintptr_t)node.get();
+	b2BodyDef body_def;
+	body_def.userData.pointer = (uintptr_t)node.get();
+	body_def.type = EntTypeToB2Type(entity->getType());
 
 	b2PolygonShape shape;
 	shape.SetAsBox(size.x / 2.0f, size.y / 2.0f, { center.x, center.y }, 0.0f);
 
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &shape;
-	fixtureDef.density = 10.0f;
+	b2FixtureDef fixture_def;
+	fixture_def.shape = &shape;
+	fixture_def.density = 10.0f;
 
-	auto body = mB2World.CreateBody(&bodyDef);
-	auto fixture = body->CreateFixture(&fixtureDef);
+	auto body = mB2World.CreateBody(&body_def);
+	auto fixture = body->CreateFixture(&fixture_def);
 	
 	entity->setB2Fixture(fixture);
 }

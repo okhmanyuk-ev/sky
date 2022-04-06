@@ -17,19 +17,16 @@ namespace Shared::PhysHelpers
 		};
 
 	public:
-		Entity(Type type, bool fixed_rotation = false);
-
-	public:
-		auto getType() const { return mType; }
 		auto isFixedRotation() const { return mFixedRotation; }
+		void setFixedRotation(bool value) { mFixedRotation = value; }
+
+		auto getType() const { return mType; }
+		void setType(Type value) { mType = value; }
 	
 	private:
 		Type mType = Type::Static;
 		bool mFixedRotation = false;
 	
-	public:
-		void update(Clock::Duration dTime) override;
-
 	public:
 		auto getB2Fixture() const { return mB2Fixture; }
 		void setB2Fixture(b2Fixture* value) { mB2Fixture = value; }
@@ -38,6 +35,11 @@ namespace Shared::PhysHelpers
 
 	private:
 		b2Fixture* mB2Fixture = nullptr;
+
+	public:
+		void setFilterCategoryBits(uint16_t value);
+		void setFilterMaskBits(uint16_t value);
+		void setFilterGroupIndex(int16_t value);
 	};
 
 	class World : public Scene::Node
