@@ -22,10 +22,10 @@ Node::~Node()
 	}
 }
 
-void Node::attach(std::shared_ptr<Node> node, AttachDirection attachDirection)
+void Node::attach(std::shared_ptr<Node> node, AttachDirection attach_direction)
 {
 	assert(node->mParent == nullptr);
-	if (attachDirection == AttachDirection::Back) 
+	if (attach_direction == AttachDirection::Back)
 	{
 		mNodes.push_back(node);
 	}

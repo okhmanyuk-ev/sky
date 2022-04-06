@@ -6,7 +6,7 @@
 
 namespace Shared::PhysHelpers
 {
-	class Entity
+	class Entity : public Scene::Node
 	{
 	public:
 		enum class Type
@@ -17,46 +17,18 @@ namespace Shared::PhysHelpers
 		};
 
 	public:
-		Entity();
+		Entity(Type type, bool fixed_rotation = false);
 
 	public:
 		auto getType() const { return mType; }
-		void setType(Type type) { mType = type; }
-
-		auto getPosition() const { return mPosition; }
-		void setPosition(const glm::vec2& value) { mPosition = value; }
-		void setPosition(float value) { setPosition({ value, value }); }
-
-		auto getSize() const { return mSize; }
-		void setSize(const glm::vec2& value) { mSize = value; }
-		void setSize(float value) { setSize({ value, value }); }
-
-		auto getPivot() const { return mPivot; }
-		void setPivot(const glm::vec2& value) { mPivot = value; }
-		void setPivot(float value) { setPivot({ value, value }); }
-
 		auto isFixedRotation() const { return mFixedRotation; }
-		void setFixedRotation(bool value) { mFixedRotation = value; }
-
-		auto isEnabled() const { return mEnabled; }
-		void setEnabled(bool value) { mEnabled = value; }
-
+	
 	private:
 		Type mType = Type::Static;
-		glm::vec2 mPosition = { 0.0f, 0.0f };
-		glm::vec2 mSize = { 0.0f, 0.0f };
-		glm::vec2 mPivot = { 0.0f, 0.0f };
 		bool mFixedRotation = false;
-		bool mEnabled = true;
-
+	
 	public:
-		void update();
-
-	public:
-		auto getNode() const { return mNode; }
-
-	private:
-		std::shared_ptr<Scene::Node> mNode;
+		void update(Clock::Duration dTime) override;
 
 	public:
 		auto getB2Fixture() const { return mB2Fixture; }
@@ -81,9 +53,8 @@ namespace Shared::PhysHelpers
 		void leaveDraw() override;
 
 	public:
-		void addEntity(std::shared_ptr<Entity> entity, Scene::Node::AttachDirection node_attach_direction = Scene::Node::AttachDirection::Back);
-		void removeEntity(std::shared_ptr<Entity> entity);
-		bool hasEntity(std::shared_ptr<Entity> entity) const;
+		void attach(std::shared_ptr<Node> node, AttachDirection attach_direction = AttachDirection::Back) override;
+		void detach(std::shared_ptr<Node> node) override;
 
 	public:
 		auto& getB2World() { return mB2World; }
@@ -94,8 +65,7 @@ namespace Shared::PhysHelpers
 	private:
 		b2World mB2World = b2World({ 0.0f, 10.0f });
 		Common::TimestepFixer mTimestepFixer;
-		std::set<std::shared_ptr<Entity>> mEntities;
-		bool mPhysDrawEnabled = true;
+		bool mPhysDrawEnabled = false;
 
 	private:
 		class PhysDraw : public b2Draw

@@ -1,27 +1,19 @@
 #include "phys_helpers.h"
+#include <console/system.h>
+#include <common/console_commands.h>
 
 using namespace Shared::PhysHelpers;
 
 // entity
 
-Entity::Entity()
+Entity::Entity(Type type, bool fixed_rotation) : mType(type), mFixedRotation(fixed_rotation)
 {
-	mNode = std::make_shared<Scene::Node>();
-	mNode->setAnchor(0.5f);
-	mNode->setPivot(0.5f);
+	//
 }
 
-void Entity::update()
+void Entity::update(Clock::Duration dTime)
 {
-	auto pos = getB2Body()->GetPosition();
-	auto angle = getB2Body()->GetAngle();
-
-	pos *= World::Scale;
-
-	mNode->setPosition({ pos.x, pos.y });
-	mNode->setRotation(angle);
-	mNode->setSize(mSize);
-	mNode->setPivot(mPivot);
+	Scene::Node::update(dTime);
 }
 
 // world
@@ -39,19 +31,43 @@ World::World()
 		| b2Draw::e_pairBit
 	//	| b2Draw::e_centerOfMassBit
 	);
+
+	CONSOLE->registerCVar("phys_draw", { "bool" }, CVAR_GETTER_BOOL_FUNC(isPhysDrawEnabled), CVAR_SETTER_BOOL_FUNC(setPhysDrawEnabled));
 }
 
 void World::update(Clock::Duration delta)
 {
 	Scene::Node::update(delta);
 
+	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())
+	{
+		auto ptr = (void*)body->GetUserData().pointer;
+		auto entity = static_cast<Entity*>(ptr);
+		
+		auto pos = entity->getPosition();
+		auto angle = entity->getRotation();
+
+		pos /= Scale;
+
+		body->SetTransform({ pos.x, pos.y }, angle);
+	}
+
 	mTimestepFixer.execute(delta, [this](auto delta) {
 		mB2World.Step(Clock::ToSeconds(delta), 6, 2);
 	});
 
-	for (auto entity : mEntities)
+	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())
 	{
-		entity->update();
+		auto ptr = (void*)body->GetUserData().pointer;
+		auto entity = static_cast<Entity*>(ptr);
+
+		auto pos = body->GetPosition();
+		auto angle = body->GetAngle();
+
+		pos *= Scale;
+
+		entity->setPosition({ pos.x, pos.y });
+		entity->setRotation(angle);
 	}
 }
 
@@ -69,18 +85,21 @@ void World::leaveDraw()
 	GRAPHICS->pop();
 }
 
-void World::addEntity(std::shared_ptr<Entity> entity, Scene::Node::AttachDirection node_attach_direction)
+void World::attach(std::shared_ptr<Node> node, AttachDirection attach_direction)
 {
-	assert(!hasEntity(entity));
+	Scene::Node::attach(node, attach_direction);
 
-	mEntities.insert(entity);
-	attach(entity->getNode(), node_attach_direction);
+	auto entity = std::dynamic_pointer_cast<Entity>(node);
+
+	if (!entity)
+		return;
 
 	auto type = entity->getType();
+	auto fixed_rotation = entity->isFixedRotation();
+
 	auto pos = entity->getPosition() / Scale;
 	auto size = entity->getSize() / Scale;
 	auto pivot = entity->getPivot();
-	auto fixed_rotation = entity->isFixedRotation();
 	auto enabled = entity->isEnabled();
 	auto center = (size * 0.5f) - (pivot * size);
 
@@ -96,31 +115,31 @@ void World::addEntity(std::shared_ptr<Entity> entity, Scene::Node::AttachDirecti
 	bodyDef.fixedRotation = fixed_rotation;
 	bodyDef.position = { pos.x, pos.y };
 	bodyDef.enabled = enabled;
-
-	auto body = mB2World.CreateBody(&bodyDef);
+	bodyDef.userData.pointer = (uintptr_t)node.get();
 
 	b2PolygonShape shape;
 	shape.SetAsBox(size.x / 2.0f, size.y / 2.0f, { center.x, center.y }, 0.0f);
+
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &shape;
 	fixtureDef.density = 10.0f;
 
+	auto body = mB2World.CreateBody(&bodyDef);
 	auto fixture = body->CreateFixture(&fixtureDef);
 	
 	entity->setB2Fixture(fixture);
 }
 
-void World::removeEntity(std::shared_ptr<Entity> entity)
+void World::detach(std::shared_ptr<Node> node)
 {
-	assert(hasEntity(entity));
-	mEntities.erase(entity);
-	detach(entity->getNode());
-	mB2World.DestroyBody(entity->getB2Body());
-}
+	Scene::Node::detach(node);
+	
+	auto entity = std::dynamic_pointer_cast<Entity>(node);
 
-bool World::hasEntity(std::shared_ptr<Entity> entity) const
-{
-	return mEntities.contains(entity);
+	if (!entity)
+		return;
+
+	mB2World.DestroyBody(entity->getB2Body());
 }
 
 void World::PhysDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
