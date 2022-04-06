@@ -6,18 +6,6 @@
 
 namespace Shared::PhysHelpers
 {
-	class PhysDraw : public b2Draw
-	{
-	public:
-		void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
-		void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
-		void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
-		void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override;
-		void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override;
-		void DrawTransform(const b2Transform& xf) override;
-		void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
-	};
-
 	class Entity
 	{
 	public:
@@ -80,7 +68,7 @@ namespace Shared::PhysHelpers
 		b2Fixture* mB2Fixture = nullptr;
 	};
 
-	class World
+	class World : public Scene::Node
 	{
 	public:
 		static inline const float Scale = 100.0f;
@@ -89,8 +77,8 @@ namespace Shared::PhysHelpers
 		World();
 
 	public:
-		void update(Clock::Duration delta);
-		void draw();
+		void update(Clock::Duration delta) override;
+		void leaveDraw() override;
 
 	public:
 		void addEntity(std::shared_ptr<Entity> entity, Scene::Node::AttachDirection node_attach_direction = Scene::Node::AttachDirection::Back);
@@ -99,20 +87,30 @@ namespace Shared::PhysHelpers
 
 	public:
 		auto& getB2World() { return mB2World; }
+		
+		auto isPhysDrawEnabled() const { return mPhysDrawEnabled; }
+		void setPhysDrawEnabled(bool value) { mPhysDrawEnabled = value; }
 
 	private:
 		b2World mB2World = b2World({ 0.0f, 10.0f });
 		Common::TimestepFixer mTimestepFixer;
-
-	public:
-		auto getNode() const { return mNode; }
-
-	private:
-		std::shared_ptr<Scene::Node> mNode;
 		std::set<std::shared_ptr<Entity>> mEntities;
+		bool mPhysDrawEnabled = true;
 
 	private:
-		Graphics::Camera2D mCamera;
+		class PhysDraw : public b2Draw
+		{
+		public:
+			void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+			void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+			void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
+			void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override;
+			void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override;
+			void DrawTransform(const b2Transform& xf) override;
+			void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
+		};
+
+	private:
 		PhysDraw mPhysDraw;
 	};
 }

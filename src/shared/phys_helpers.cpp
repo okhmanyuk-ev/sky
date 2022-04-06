@@ -28,10 +28,6 @@ void Entity::update()
 
 World::World()
 {
-	mNode = std::make_shared<Scene::Node>();
-	mNode->setAnchor(0.5f);
-	mNode->setPivot(0.5f);
-
 	mTimestepFixer.setForceTimeCompletion(false);
 	mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / 60.0f));
 
@@ -47,6 +43,8 @@ World::World()
 
 void World::update(Clock::Duration delta)
 {
+	Scene::Node::update(delta);
+
 	mTimestepFixer.execute(delta, [this](auto delta) {
 		mB2World.Step(Clock::ToSeconds(delta), 6, 2);
 	});
@@ -57,22 +55,18 @@ void World::update(Clock::Duration delta)
 	}
 }
 
-void World::draw()
+void World::leaveDraw()
 {
-	auto model = glm::mat4(1.0f);
-	model = glm::scale(model, { Scale, Scale, 1.0f });
+	Scene::Node::leaveDraw();
 
-	auto pos = getNode()->getPosition();
+	if (!isPhysDrawEnabled())
+		return;
 
-	mCamera.setPosition(-pos);
+	auto model = glm::scale(getTransform(), { Scale, Scale, 1.0f });
 
-	GRAPHICS->begin();
-	GRAPHICS->pushViewMatrix(mCamera.getViewMatrix());
-	GRAPHICS->pushProjectionMatrix(mCamera.getProjectionMatrix());
 	GRAPHICS->pushModelMatrix(model);
 	mB2World.DebugDraw();
-	GRAPHICS->pop(3);
-	GRAPHICS->end();
+	GRAPHICS->pop();
 }
 
 void World::addEntity(std::shared_ptr<Entity> entity, Scene::Node::AttachDirection node_attach_direction)
@@ -80,7 +74,7 @@ void World::addEntity(std::shared_ptr<Entity> entity, Scene::Node::AttachDirecti
 	assert(!hasEntity(entity));
 
 	mEntities.insert(entity);
-	mNode->attach(entity->getNode(), node_attach_direction);
+	attach(entity->getNode(), node_attach_direction);
 
 	auto type = entity->getType();
 	auto pos = entity->getPosition() / Scale;
@@ -120,7 +114,7 @@ void World::removeEntity(std::shared_ptr<Entity> entity)
 {
 	assert(hasEntity(entity));
 	mEntities.erase(entity);
-	mNode->detach(entity->getNode());
+	detach(entity->getNode());
 	mB2World.DestroyBody(entity->getB2Body());
 }
 
@@ -129,7 +123,7 @@ bool World::hasEntity(std::shared_ptr<Entity> entity) const
 	return mEntities.contains(entity);
 }
 
-void PhysDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+void World::PhysDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	static auto builder = Graphics::MeshBuilder();
 	builder.begin();
@@ -143,7 +137,7 @@ void PhysDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Co
 	GRAPHICS->draw(Renderer::Topology::LineStrip, b_vertices, count);
 }
 
-void PhysDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+void World::PhysDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	static auto builder = Graphics::MeshBuilder();
 	{
@@ -171,7 +165,7 @@ void PhysDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const
 	}
 }
 
-void PhysDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
+void World::PhysDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
 	const float segments = 16.0f;
 	const float increment = 2.0f * glm::pi<float>() / segments;
@@ -201,7 +195,7 @@ void PhysDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& col
 	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
-void PhysDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
+void World::PhysDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
 	const float segments = 16.0f;
 	const float increment = 2.0f * glm::pi<float>() / segments;
@@ -251,7 +245,7 @@ void PhysDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2&
 	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
-void PhysDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
+void World::PhysDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
 	static auto builder = Graphics::MeshBuilder();
 	builder.begin();
@@ -262,7 +256,7 @@ void PhysDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& co
 	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
-void PhysDraw::DrawTransform(const b2Transform& xf)
+void World::PhysDraw::DrawTransform(const b2Transform& xf)
 {
 	const float AxisScale = 0.4f;
 	b2Vec2 p = xf.p;
@@ -281,7 +275,7 @@ void PhysDraw::DrawTransform(const b2Transform& xf)
 	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
 }
 
-void PhysDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
+void World::PhysDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
 	static auto builder = Graphics::MeshBuilder();
 	builder.begin();
