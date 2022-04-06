@@ -23,9 +23,13 @@ namespace Shared::PhysHelpers
 		auto getType() const { return mType; }
 		void setType(Type value) { mType = value; }
 	
+		auto isBullet() const { return mBullet; }
+		void setBullet(bool value) { mBullet = value; }
+
 	private:
 		Type mType = Type::Static;
 		bool mFixedRotation = false;
+		bool mBullet = false;
 	
 	public:
 		auto getB2Fixture() const { return mB2Fixture; }
@@ -40,6 +44,10 @@ namespace Shared::PhysHelpers
 		void setFilterCategoryBits(uint16_t value);
 		void setFilterMaskBits(uint16_t value);
 		void setFilterGroupIndex(int16_t value);
+		
+	public:
+		void applyLinearImpulseToCenter(const glm::vec2& impulse, bool wake);
+		void setGravityScale(float value);
 	};
 
 	class World : public Scene::Node

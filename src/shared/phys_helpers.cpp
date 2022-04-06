@@ -37,6 +37,16 @@ void Entity::setFilterGroupIndex(int16_t value)
 	getB2Fixture()->SetFilterData(filter);
 }
 
+void Entity::applyLinearImpulseToCenter(const glm::vec2& impulse, bool wake)
+{
+	getB2Body()->ApplyLinearImpulseToCenter({ impulse.x, impulse.y }, wake);
+}
+
+void Entity::setGravityScale(float value)
+{
+	getB2Body()->SetGravityScale(value);
+}
+
 // world
 
 World::World()
@@ -77,6 +87,7 @@ void World::update(Clock::Duration delta)
 		body->SetEnabled(entity->isEnabled());
 		body->SetFixedRotation(entity->isFixedRotation());
 		body->SetType(EntTypeToB2Type(entity->getType()));
+		body->SetBullet(entity->isBullet());
 	}
 
 	mTimestepFixer.execute(delta, [this](auto delta) {
