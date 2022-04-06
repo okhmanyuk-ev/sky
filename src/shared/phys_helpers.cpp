@@ -97,13 +97,15 @@ void World::attach(std::shared_ptr<Node> node, AttachDirection attach_direction)
 	auto type = entity->getType();
 	auto fixed_rotation = entity->isFixedRotation();
 
-	auto pos = entity->getPosition() / Scale;
+	//auto pos = entity->getPosition() / Scale;
 	auto size = entity->getSize() / Scale;
 	auto pivot = entity->getPivot();
 	auto enabled = entity->isEnabled();
 	auto center = (size * 0.5f) - (pivot * size);
 
 	b2BodyDef bodyDef;
+
+	// TODO: it seems we can change type in runtime, if so then remove this lines
 
 	if (type == Entity::Type::Static)
 		bodyDef.type = b2_staticBody;
@@ -112,9 +114,8 @@ void World::attach(std::shared_ptr<Node> node, AttachDirection attach_direction)
 	else 
 		bodyDef.type = b2_kinematicBody;
 
-	bodyDef.fixedRotation = fixed_rotation;
-	bodyDef.position = { pos.x, pos.y };
-	bodyDef.enabled = enabled;
+	bodyDef.fixedRotation = fixed_rotation; // TODO: maybe we can change this after spawn, if so then we can remove this line
+	bodyDef.enabled = enabled; // TODO: same as prev line
 	bodyDef.userData.pointer = (uintptr_t)node.get();
 
 	b2PolygonShape shape;
