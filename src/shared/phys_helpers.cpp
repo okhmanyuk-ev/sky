@@ -58,7 +58,7 @@ void Entity::setGravityScale(float value)
 World::World()
 {
 	mTimestepFixer.setForceTimeCompletion(false);
-	mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / 60.0f));
+	mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / 120.0f));
 
 	mB2World.SetContactFilter(&mContactFilter);
 	mB2World.SetContactListener(&mContactListener);
@@ -72,6 +72,26 @@ World::World()
 	);
 
 	CONSOLE->registerCVar("phys_draw", { "bool" }, CVAR_GETTER_BOOL_FUNC(isPhysDrawEnabled), CVAR_SETTER_BOOL_FUNC(setPhysDrawEnabled));
+
+	auto getter = [this] {
+		auto fps = 1.0f / Clock::ToSeconds(mTimestepFixer.getTimestep());
+		return std::vector<std::string>({ std::to_string(fps) });
+	};
+
+	auto setter = [this](CON_ARGS) {
+		auto sec = std::stof(CON_ARG(0));
+		mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / sec));
+	};
+
+	CONSOLE->registerCVar("phys_timestep_fps", { "float" }, getter, setter);
+
+	CONSOLE->registerCVar("phys_timestep_enabled", { "bool" },
+		CVAR_GETTER_BOOL_FUNC(mTimestepFixer.isEnabled),
+		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setEnabled));
+
+	CONSOLE->registerCVar("phys_timestep_force_time_completion", { "bool" },
+		CVAR_GETTER_BOOL_FUNC(mTimestepFixer.getForceTimeCompletion),
+		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setForceTimeCompletion));
 }
 
 void World::update(Clock::Duration delta)

@@ -74,10 +74,12 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			auto fps = 1.0f / Clock::ToSeconds(mScene->getTimestepFixer().getTimestep());
 			return std::vector<std::string>({ std::to_string(fps) });
 		};
+
 		auto setter = [this](CON_ARGS) {
 			auto sec = std::stof(CON_ARG(0));
 			mScene->getTimestepFixer().setTimestep(Clock::FromSeconds(1.0f / sec));
 		};
+
 		CONSOLE->registerCVar("scene_timestep_fps", { "float" }, getter, setter);
 
 		CONSOLE->registerCVar("scene_timestep_enabled", { "bool" }, 
