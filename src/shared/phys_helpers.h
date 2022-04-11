@@ -3,6 +3,7 @@
 #include <graphics/all.h>
 #include <box2d/box2d.h>
 #include <scene/all.h>
+#include <shared/touch_emulator.h>
 
 namespace Shared::PhysHelpers
 {
@@ -79,13 +80,18 @@ namespace Shared::PhysHelpers
 		ContactCallback mContactCallback = nullptr;
 	};
 
-	class World : public Scene::Node
+	class World : public Scene::Node,
+		public Common::Event::Listenable<Shared::TouchEmulator::Event>
 	{
 	public:
 		static inline const float Scale = 100.0f;
 
 	public:
 		World();
+		~World();
+
+	private:
+		void onEvent(const Shared::TouchEmulator::Event& e) override;
 
 	public:
 		void update(Clock::Duration delta) override;
@@ -97,14 +103,20 @@ namespace Shared::PhysHelpers
 
 	public:
 		auto& getB2World() { return mB2World; }
-		
-		auto isPhysDrawEnabled() const { return mPhysDrawEnabled; }
-		void setPhysDrawEnabled(bool value) { mPhysDrawEnabled = value; }
+
+		auto isDebug() const { return mDebug; }
+		void setDebug(bool value) { mDebug = value; }
+
+		auto getShowStats() const { return mShowStats; }
+		void setShowStats(bool value) { mShowStats = value; }
 
 	private:
 		b2World mB2World = b2World({ 0.0f, 10.0f });
+		b2Body* mDummyBody = nullptr; // used for mouse moving
+		b2MouseJoint* mMouseJoint = nullptr;
 		Common::TimestepFixer mTimestepFixer;
-		bool mPhysDrawEnabled = false;
+		bool mDebug = false;
+		bool mShowStats = false;
 
 	private:
 		class Draw : public b2Draw

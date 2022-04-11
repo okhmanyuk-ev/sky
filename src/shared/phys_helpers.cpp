@@ -67,11 +67,15 @@ World::World()
 		b2Draw::e_shapeBit
 		| b2Draw::e_jointBit
 	//	| b2Draw::e_aabbBit
-		| b2Draw::e_pairBit
+	//	| b2Draw::e_pairBit
 	//	| b2Draw::e_centerOfMassBit
 	);
 
-	CONSOLE->registerCVar("phys_draw", { "bool" }, CVAR_GETTER_BOOL_FUNC(isPhysDrawEnabled), CVAR_SETTER_BOOL_FUNC(setPhysDrawEnabled));
+	b2BodyDef dummy_body_def;
+	mDummyBody = mB2World.CreateBody(&dummy_body_def);
+
+	CONSOLE->registerCVar("phys_debug", { "bool" }, CVAR_GETTER_BOOL_FUNC(isDebug), CVAR_SETTER_BOOL_FUNC(setDebug));
+	CONSOLE->registerCVar("phys_stats", { "bool" }, CVAR_GETTER_BOOL_FUNC(getShowStats), CVAR_SETTER_BOOL_FUNC(setShowStats));
 
 	auto getter = [this] {
 		auto fps = 1.0f / Clock::ToSeconds(mTimestepFixer.getTimestep());
@@ -94,19 +98,124 @@ World::World()
 		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setForceTimeCompletion));
 }
 
+World::~World()
+{
+	CONSOLE->removeCVar("phys_debug");
+	CONSOLE->removeCVar("phys_stats");
+	CONSOLE->removeCVar("phys_timestep_fps");
+	CONSOLE->removeCVar("phys_timestep_enabled");
+	CONSOLE->removeCVar("phys_timestep_force_time_completion");
+}
+
+void World::onEvent(const Shared::TouchEmulator::Event& e)
+{
+	class QueryCallback : public b2QueryCallback
+	{
+	public:
+		bool ReportFixture(b2Fixture* _fixture) override
+		{
+			if (_fixture->GetBody()->GetType() == b2_dynamicBody)
+			{
+				if (_fixture->TestPoint(point))
+				{
+					fixture = _fixture;
+					return false;
+				}
+			}
+			return true;
+		}
+
+		b2Vec2 point;
+		b2Fixture* fixture = nullptr;
+	};
+
+	auto unprojected_pos = unproject({ e.x, e.y });
+	auto world_pos = unprojected_pos / Scale;
+
+	if (e.type == Shared::TouchEmulator::Event::Type::Begin)
+	{
+		if (!isDebug())
+			return;
+
+		if (!getScene()->interactTest({ e.x, e.y }))
+			return;
+
+		auto p = b2Vec2(world_pos.x, world_pos.y);
+		auto d = b2Vec2(0.001f, 0.001f);
+
+		b2AABB aabb;
+		aabb.lowerBound = p - d;
+		aabb.upperBound = p + d;
+
+		QueryCallback query;
+		query.point = p;
+		mB2World.QueryAABB(&query, aabb);
+
+		if (query.fixture)
+		{
+			float frequencyHz = 5.0f;
+			float dampingRatio = 0.7f;
+
+			auto body = query.fixture->GetBody();
+			b2MouseJointDef jd;
+			jd.bodyA = mDummyBody;
+			jd.bodyB = body;
+			jd.target = p;
+			jd.maxForce = 1000.0f * body->GetMass();
+			b2LinearStiffness(jd.stiffness, jd.damping, frequencyHz, dampingRatio, jd.bodyA, jd.bodyB);
+
+			mMouseJoint = (b2MouseJoint*)mB2World.CreateJoint(&jd);
+			body->SetAwake(true);
+		}
+	}
+	else if (e.type == Shared::TouchEmulator::Event::Type::End)
+	{
+		if (mMouseJoint)
+		{
+			mB2World.DestroyJoint(mMouseJoint);
+			mMouseJoint = nullptr;
+		}
+	}
+	else
+	{
+		if (mMouseJoint)
+		{
+			mMouseJoint->SetTarget({ world_pos.x, world_pos.y });
+		}
+	}
+}
+
 void World::update(Clock::Duration delta)
 {
 	Scene::Node::update(delta);
 
-	STATS_INDICATE_GROUP("phys", "phys bodies", mB2World.GetBodyCount());
-	STATS_INDICATE_GROUP("phys", "phys contacts", mB2World.GetContactCount());
-	STATS_INDICATE_GROUP("phys", "phys joints", mB2World.GetJointCount());
+	if (mShowStats)
+	{
+		STATS_INDICATE_GROUP("phys", "phys bodies", mB2World.GetBodyCount());
+		STATS_INDICATE_GROUP("phys", "phys contacts", mB2World.GetContactCount());
+		STATS_INDICATE_GROUP("phys", "phys joints", mB2World.GetJointCount());
+
+		const auto& profile = mB2World.GetProfile();
+
+		STATS_INDICATE_GROUP("phys", "phys step", fmt::format("{:.3f}", profile.step));
+		STATS_INDICATE_GROUP("phys", "phys collide", fmt::format("{:.3f}", profile.collide));
+		STATS_INDICATE_GROUP("phys", "phys solve", fmt::format("{:.3f}", profile.solve));
+		STATS_INDICATE_GROUP("phys", "phys solve init", fmt::format("{:.3f}", profile.solveInit));
+		STATS_INDICATE_GROUP("phys", "phys solve velocity", fmt::format("{:.3f}", profile.solveVelocity));
+		STATS_INDICATE_GROUP("phys", "phys solve pos", fmt::format("{:.3f}", profile.solvePosition));
+		STATS_INDICATE_GROUP("phys", "phys broadphase", fmt::format("{:.3f}", profile.broadphase));
+		STATS_INDICATE_GROUP("phys", "phys solve toi", fmt::format("{:.3f}", profile.solveTOI));
+	}
 
 	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())
 	{
 		auto ptr = (void*)body->GetUserData().pointer;
+
+		if (ptr == nullptr)
+			continue;
+
 		auto entity = static_cast<Entity*>(ptr);
-		
+
 		auto ent_pos = entity->getPosition() / Scale;
 		auto ent_angle = entity->getRotation();
 
@@ -129,6 +238,10 @@ void World::update(Clock::Duration delta)
 	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())
 	{
 		auto ptr = (void*)body->GetUserData().pointer;
+
+		if (ptr == nullptr)
+			continue;
+
 		auto entity = static_cast<Entity*>(ptr);
 
 		auto pos = Scale * body->GetPosition();
@@ -143,7 +256,7 @@ void World::leaveDraw()
 {
 	Scene::Node::leaveDraw();
 
-	if (!isPhysDrawEnabled())
+	if (!isDebug())
 		return;
 
 	auto model = glm::scale(getTransform(), { Scale, Scale, 1.0f });
@@ -358,13 +471,19 @@ void World::Draw::DrawTransform(const b2Transform& xf)
 
 void World::Draw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
-	static auto builder = Graphics::MeshBuilder();
-	builder.begin();
-	builder.color({ color.r, color.g, color.b, color.a });
-	builder.vertex({ p.x, p.y });
-	builder.end();
-	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(Renderer::Topology::PointList, b_vertices, count);
+	auto _color = glm::vec4(color.r, color.g, color.b, color.a);
+	auto model = GRAPHICS->getCurrentState().modelMatrix;
+
+	auto unscaled_size = size / Scale;
+	auto half_size = unscaled_size * 0.5f;
+
+	model = glm::translate(model, { p.x, p.y, 0.0f });
+	model = glm::translate(model, { -half_size, -half_size, 0.0f });
+	model = glm::scale(model, { unscaled_size, unscaled_size, 1.0f });
+
+	GRAPHICS->pushModelMatrix(model);
+	GRAPHICS->drawCircle(_color, _color);
+	GRAPHICS->pop();
 }
 
 // contact filter
