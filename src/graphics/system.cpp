@@ -1,6 +1,7 @@
 #include "system.h"
 #include <vector>
 #include <numeric>
+#include <vulkan/vulkan.hpp>
 
 using namespace Graphics;
 
@@ -9,6 +10,16 @@ System::System()
 	mWhiteCircleTexture = makeGenericTexture({ 256, 256 }, [this] {
 		drawCircle();
 	});
+
+
+	VkInstanceCreateInfo create_info = {};
+	create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	//create_info.enabledExtensionCount = extensions_count;
+	//create_info.ppEnabledExtensionNames = extensions;
+
+
+	auto instance = vk::createInstance(create_info);
+
 }
 
 void System::onFrame()

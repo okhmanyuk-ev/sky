@@ -5,7 +5,7 @@ using namespace Renderer::Shaders;
 
 namespace
 {
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
+#if defined(RENDERER_GL44) || defined(RENDERER_GLES3) || defined(RENDERER_VK)
 	const char* srcFields =
 		R"(
 			float size;

@@ -15,6 +15,7 @@
 #include "system.h"
 #include "system_gl.h"
 #include "system_d3d11.h"
+#include "system_vulkan.h"
 #include "texture.h"
 #include "texture_address.h"
 #include "topology.h"

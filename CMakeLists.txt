@@ -383,3 +383,13 @@ set_property(TARGET box2d PROPERTY FOLDER ${LIBS_FOLDER})
 # magic_enum
 
 target_include_directories(${PROJECT_NAME} PUBLIC lib/magic_enum)
+
+# vulkan
+
+add_library(vulkan INTERFACE)
+target_link_libraries(vulkan INTERFACE ${PROJECT_SOURCE_DIR}/lib/vulkan/lib/vulkan-1.lib)
+target_include_directories(vulkan INTERFACE lib/vulkan/include)
+if(WIN32)
+	target_compile_definitions(vulkan INTERFACE -DVK_USE_PLATFORM_WIN32_KHR)
+endif()
+target_link_libraries(${PROJECT_NAME} vulkan)

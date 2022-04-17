@@ -6,7 +6,7 @@ using namespace Renderer::Shaders;
 namespace
 {
 	const char* shaderSource =
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
+#if defined(RENDERER_GL44) || defined(RENDERER_GLES3) || defined(RENDERER_VK)
 		R"(
 		layout (std140) uniform ConstantBuffer
 		{
