@@ -151,7 +151,7 @@ namespace Graphics
 		void pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
 		void pushStencilMode(const Renderer::StencilMode& value);
 
-		auto getCurrentState() const { return mStates.top(); }
+		const auto& getCurrentState() const { return mStates.top(); }
 		
 	public:
 		struct State

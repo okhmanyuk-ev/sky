@@ -16,16 +16,16 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT flags, 
 static vk::raii::Context gContext;
 static vk::raii::Instance gInstance = nullptr;
 static vk::raii::PhysicalDevice gPhysicalDevice = nullptr;
-static uint32_t gQueueFamilyIndex = -1;
 static vk::raii::Queue gQueue = nullptr;
 static vk::raii::Device gDevice = nullptr;
 static vk::raii::SurfaceKHR gSurface = nullptr;
-static vk::SurfaceFormatKHR gSurfaceFormat;
 static vk::raii::SwapchainKHR gSwapchain = nullptr;
-static int gMinImageCount = 2; // wtf constant doing here ?
+static vk::raii::RenderPass gRenderPass = nullptr;
+static vk::SurfaceFormatKHR gSurfaceFormat;
+static uint32_t gMinImageCount = 2; // wtf constant doing here ?
+static uint32_t gQueueFamilyIndex = -1;
 static uint32_t gSemaphoreIndex = 0;
 static uint32_t gFrameIndex = 0;
-static vk::raii::RenderPass gRenderPass = nullptr;
 static uint32_t gWidth = 0;
 static uint32_t gHeight = 0;
 
@@ -56,6 +56,13 @@ SystemVK::SystemVK()
 	auto instance_info = vk::InstanceCreateInfo()
 		.setPEnabledExtensionNames(extensions)
 		.setPEnabledLayerNames(layers);
+
+	auto version = gContext.enumerateInstanceVersion();
+
+	auto major_version = VK_API_VERSION_MAJOR(version);
+	auto minor_version = VK_API_VERSION_MINOR(version);
+
+	//LOGF("Vulkan {}.{}", major_version, minor_version);
 
 	gInstance = gContext.createInstance(instance_info);
 
@@ -219,7 +226,8 @@ void SystemVK::createSwapchain()
 			.setLevel(vk::CommandBufferLevel::ePrimary)
 			.setCommandPool(*frame.command_pool);
 
-		frame.command_buffer = std::move(gDevice.allocateCommandBuffers(buffer_allocate_info).at(0));
+		auto command_buffers = gDevice.allocateCommandBuffers(buffer_allocate_info);
+		frame.command_buffer = std::move(command_buffers.at(0));
 
 		auto fence_info = vk::FenceCreateInfo()
 			.setFlags(vk::FenceCreateFlagBits::eSignaled);

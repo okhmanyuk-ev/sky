@@ -10,16 +10,6 @@ System::System()
 	mWhiteCircleTexture = makeGenericTexture({ 256, 256 }, [this] {
 		drawCircle();
 	});
-
-
-	VkInstanceCreateInfo create_info = {};
-	create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	//create_info.enabledExtensionCount = extensions_count;
-	//create_info.ppEnabledExtensionNames = extensions;
-
-
-	auto instance = vk::createInstance(create_info);
-
 }
 
 void System::onFrame()
@@ -648,22 +638,25 @@ void System::drawString(const Font& font, const utf8_string& text, float size,
 
 glm::vec3 System::project(const glm::vec3& pos)
 {
-	const auto& state = mStates.top();
-	bool eq = state == mAppliedState.value();
+	const auto& state = getCurrentState();
 	assert(state == mAppliedState.value());
-	
+
 	auto scale = PLATFORM->getScale();
 
 	auto width = state.viewport.size.x / scale;
 	auto height = state.viewport.size.y / scale;
 
-	glm::vec4 viewport = { 0.0f, height, width, -height }; // TODO: { 0.0f, 0.0f, width, height }
-		
-	auto view = state.viewMatrix;
-	auto proj = state.projectionMatrix;
-	auto model = state.modelMatrix;
+	auto projected_pos = state.projectionMatrix * state.viewMatrix * state.modelMatrix * glm::vec4(pos, 1.0f);
 
-	return glm::project(pos, view * model, proj, viewport);
+	projected_pos.x += 1.0f;
+	projected_pos.y -= 1.0f;
+
+	projected_pos.x *= width;
+	projected_pos.y *= -height;
+
+	projected_pos *= 0.5f;
+
+	return projected_pos;
 }
 
 void System::pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size)
