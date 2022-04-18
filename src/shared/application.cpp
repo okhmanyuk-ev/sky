@@ -168,9 +168,13 @@ Application::~Application()
 
 void Application::run()
 {
-	while (!PLATFORM->isFinished())
+	while (true)
 	{
 		PLATFORM->process();
+
+		if (PLATFORM->isFinished())
+			break;
+
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
 		IMGUI_SYSTEM->begin();
