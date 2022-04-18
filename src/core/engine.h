@@ -22,30 +22,31 @@ namespace Core
 		template <class T> void addSystem(std::shared_ptr<T> value)
 		{
 			assert(!hasSystem<T>());
-			auto index = std::type_index(typeid(T));
-			mSystems[index] = value;
+			SystemRef<T>() = value;
 		}
 
 		template <class T> void removeSystem()
 		{
 			assert(hasSystem<T>());
-			auto index = std::type_index(typeid(T));
-			mSystems.erase(index);
+			SystemRef<T>() = nullptr;
 		}
 
 		template <class T> bool hasSystem() const
 		{
-			auto index = std::type_index(typeid(T));
-			return mSystems.contains(index);
+			return SystemRef<T>() != nullptr;
 		}
 
 		template <class T> std::shared_ptr<T> getSystem() const
 		{
-			auto index = std::type_index(typeid(T));
-			return std::static_pointer_cast<T>(mSystems.at(index));
+			assert(hasSystem<T>());
+			return SystemRef<T>();
 		}
 
 	private:
-		std::unordered_map<std::type_index, std::shared_ptr<void>> mSystems;
+		template <class T> std::shared_ptr<T>& SystemRef() const
+		{
+			static std::shared_ptr<T> ptr = nullptr;
+			return ptr;
+		}
 	};
 }
