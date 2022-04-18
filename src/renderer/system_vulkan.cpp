@@ -3,8 +3,7 @@
 #if defined(RENDERER_VK)
 #include <platform/system_windows.h>
 #include <console/device.h>
-
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_raii.hpp>
 
 using namespace Renderer;
 
@@ -14,29 +13,31 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT flags, 
 	return VK_FALSE;
 }
 
-static vk::Instance gInstance;
-static vk::PhysicalDevice gPhysicalDevice;
-static uint32_t gQueueFamily = -1;
-static vk::Queue gQueue;
-static vk::Device gDevice;
-static vk::SurfaceKHR gSurface;
+static vk::raii::Context gContext;
+static vk::raii::Instance gInstance = nullptr;
+static vk::raii::PhysicalDevice gPhysicalDevice = nullptr;
+static uint32_t gQueueFamilyIndex = -1;
+static vk::raii::Queue gQueue = nullptr;
+static vk::raii::Device gDevice = nullptr;
+static vk::raii::SurfaceKHR gSurface = nullptr;
 static vk::SurfaceFormatKHR gSurfaceFormat;
-static vk::SwapchainKHR gSwapchain;
+static vk::raii::SwapchainKHR gSwapchain = nullptr;
 static int gMinImageCount = 2; // wtf constant doing here ?
 static uint32_t gSemaphoreIndex = 0;
 static uint32_t gFrameIndex = 0;
-static vk::RenderPass gRenderPass;
+static vk::raii::RenderPass gRenderPass = nullptr;
+static uint32_t gWidth = 0;
+static uint32_t gHeight = 0;
 
 struct Frame
 {
-	vk::CommandPool command_pool;
-	vk::CommandBuffer command_buffer;
-	vk::Fence fence;
-	vk::Framebuffer framebuffer;
-	vk::Image backbuffer;
-	vk::ImageView backbuffer_view;
-	vk::Semaphore image_acquired_semaphore;
-	vk::Semaphore render_complete_semaphore;
+	vk::raii::CommandPool command_pool = nullptr;
+	vk::raii::CommandBuffer command_buffer = nullptr;
+	vk::raii::Fence fence = nullptr;
+	vk::raii::Framebuffer framebuffer = nullptr;
+	vk::raii::ImageView backbuffer_view = nullptr;
+	vk::raii::Semaphore image_acquired_semaphore = nullptr;
+	vk::raii::Semaphore render_complete_semaphore = nullptr;
 };
 
 static std::vector<Frame> gFrames;
@@ -52,9 +53,11 @@ SystemVK::SystemVK()
 		VK_KHR_WIN32_SURFACE_EXTENSION_NAME
 	};
 
-	gInstance = vk::createInstance(vk::InstanceCreateInfo()
+	auto instance_info = vk::InstanceCreateInfo()
 		.setPEnabledExtensionNames(extensions)
-		.setPEnabledLayerNames(layers));
+		.setPEnabledLayerNames(layers);
+
+	gInstance = gContext.createInstance(instance_info);
 
 	auto devices = gInstance.enumeratePhysicalDevices();
 	int device_index = 0;
@@ -68,7 +71,7 @@ SystemVK::SystemVK()
 		}
 	}
 
-	gPhysicalDevice = devices.at(device_index);
+	gPhysicalDevice = std::move(devices.at(device_index));
 
 	auto properties = gPhysicalDevice.getQueueFamilyProperties();
 
@@ -76,7 +79,7 @@ SystemVK::SystemVK()
 	{
 		if (properties[i].queueFlags & vk::QueueFlagBits::eGraphics)
 		{
-			gQueueFamily = i;
+			gQueueFamilyIndex = i;
 			break;
 		}
 	}
@@ -85,24 +88,24 @@ SystemVK::SystemVK()
 	auto queue_priority = { 1.0f };
 
 	auto queue_info = vk::DeviceQueueCreateInfo()
-		.setQueueFamilyIndex(gQueueFamily)
+		.setQueueFamilyIndex(gQueueFamilyIndex)
 		.setQueuePriorities(queue_priority);
 
-	auto create_info = vk::DeviceCreateInfo()
+	auto device_info = vk::DeviceCreateInfo()
 		.setQueueCreateInfoCount(1)
 		.setPQueueCreateInfos(&queue_info)
 		.setPEnabledExtensionNames(device_extensions);
 
-	gDevice = gPhysicalDevice.createDevice(create_info);
-	gQueue = gDevice.getQueue(gQueueFamily, 0);
+	gDevice = gPhysicalDevice.createDevice(device_info);
+	gQueue = gDevice.getQueue(gQueueFamilyIndex, 0);
 
 	auto surface_info = vk::Win32SurfaceCreateInfoKHR()
 		.setHinstance(Platform::SystemWindows::Instance)
 		.setHwnd(Platform::SystemWindows::Window);
+	
+	gSurface = vk::raii::SurfaceKHR(gInstance, surface_info);
 
-	gSurface = gInstance.createWin32SurfaceKHR(surface_info);
-
-	auto formats = gPhysicalDevice.getSurfaceFormatsKHR(gSurface);
+	auto formats = gPhysicalDevice.getSurfaceFormatsKHR(*gSurface);
 
 	if ((formats.size() == 1) && (formats.at(0).format == vk::Format::eUndefined))
 	{
@@ -128,23 +131,6 @@ SystemVK::SystemVK()
 			gSurfaceFormat = formats.at(0);
 		}
 	}
-
-	auto swapchain_info = vk::SwapchainCreateInfoKHR()
-		.setSurface(gSurface)
-		.setMinImageCount(gMinImageCount)
-		.setImageFormat(gSurfaceFormat.format)
-		.setImageColorSpace(gSurfaceFormat.colorSpace)
-		.setImageExtent({ 800, 600 })
-		.setImageUsage(vk::ImageUsageFlagBits::eColorAttachment)
-		.setPreTransform(vk::SurfaceTransformFlagBitsKHR::eIdentity)
-		.setImageArrayLayers(1)
-		.setImageSharingMode(vk::SharingMode::eExclusive)
-		.setQueueFamilyIndexCount(0)
-		.setPresentMode(vk::PresentModeKHR::eFifo)
-		.setClipped(true)
-		.setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque);
-
-	gSwapchain = gDevice.createSwapchainKHR(swapchain_info);
 
 	auto attachment = vk::AttachmentDescription()
 		.setFormat(gSurfaceFormat.format)
@@ -183,28 +169,57 @@ SystemVK::SystemVK()
 
 	gRenderPass = gDevice.createRenderPass(render_pass_info);
 
-	auto backbuffers = gDevice.getSwapchainImagesKHR(gSwapchain);
-	gFrames.resize(backbuffers.size());
+	createSwapchain();
+}
 
-	for (size_t i = 0; i < backbuffers.size(); i++)
-	{
-		gFrames[i].backbuffer = backbuffers[i];
-	}
+SystemVK::~SystemVK()
+{
+	//
+}
 
-	for (auto& frame : gFrames)
+void SystemVK::createSwapchain()
+{
+	gWidth = static_cast<uint32_t>(PLATFORM->getWidth());
+	gHeight = static_cast<uint32_t>(PLATFORM->getHeight());
+
+	auto swapchain_info = vk::SwapchainCreateInfoKHR()
+		.setSurface(*gSurface)
+		.setMinImageCount(gMinImageCount)
+		.setImageFormat(gSurfaceFormat.format)
+		.setImageColorSpace(gSurfaceFormat.colorSpace)
+		.setImageExtent({ gWidth, gHeight })
+		.setImageUsage(vk::ImageUsageFlagBits::eColorAttachment)
+		.setPreTransform(vk::SurfaceTransformFlagBitsKHR::eIdentity)
+		.setImageArrayLayers(1)
+		.setImageSharingMode(vk::SharingMode::eExclusive)
+		.setQueueFamilyIndexCount(0)
+		.setPresentMode(vk::PresentModeKHR::eFifo)
+		.setClipped(true)
+		.setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque);
+
+	gSwapchain = nullptr;
+	gSwapchain = gDevice.createSwapchainKHR(swapchain_info);
+
+	auto backbuffers = gSwapchain.getImages();
+
+	gFrames.clear();
+
+	for (const auto& backbuffer : backbuffers)
 	{
+		auto frame = Frame();
+
 		auto command_pool_info = vk::CommandPoolCreateInfo()
 			.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer)
-			.setQueueFamilyIndex(gQueueFamily);
+			.setQueueFamilyIndex(gQueueFamilyIndex);
 
 		frame.command_pool = gDevice.createCommandPool(command_pool_info);
 
 		auto buffer_allocate_info = vk::CommandBufferAllocateInfo()
 			.setCommandBufferCount(1)
 			.setLevel(vk::CommandBufferLevel::ePrimary)
-			.setCommandPool(frame.command_pool);
+			.setCommandPool(*frame.command_pool);
 
-		frame.command_buffer = gDevice.allocateCommandBuffers(buffer_allocate_info).at(0);
+		frame.command_buffer = std::move(gDevice.allocateCommandBuffers(buffer_allocate_info).at(0));
 
 		auto fence_info = vk::FenceCreateInfo()
 			.setFlags(vk::FenceCreateFlagBits::eSignaled);
@@ -230,30 +245,27 @@ SystemVK::SystemVK()
 				.setBaseArrayLayer(0)
 				.setLayerCount(1)
 			)
-			.setImage(frame.backbuffer);
+			.setImage(backbuffer);
 
 		frame.backbuffer_view = gDevice.createImageView(image_view_info);
 
 		auto framebuffer_info = vk::FramebufferCreateInfo()
-			.setRenderPass(gRenderPass)
+			.setRenderPass(*gRenderPass)
 			.setAttachmentCount(1)
-			.setPAttachments(&frame.backbuffer_view)
-			.setWidth(800) // TODO
-			.setHeight(600)
+			.setPAttachments(&*frame.backbuffer_view)
+			.setWidth(gWidth)
+			.setHeight(gHeight)
 			.setLayers(1);
 
 		frame.framebuffer = gDevice.createFramebuffer(framebuffer_info);
-	}
-}
 
-SystemVK::~SystemVK()
-{
-	//
+		gFrames.push_back(std::move(frame));
+	}
 }
 
 void SystemVK::onEvent(const Platform::System::ResizeEvent& e)
 {
-	//
+	createSwapchain();
 }
 
 void SystemVK::setTopology(const Renderer::Topology& value)
@@ -358,15 +370,17 @@ void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* m
 
 void SystemVK::present()
 {
-	auto image_acquired_semaphore = gFrames.at(gSemaphoreIndex).image_acquired_semaphore;
-	auto render_complete_semaphore = gFrames.at(gSemaphoreIndex).render_complete_semaphore;
+	const auto& image_acquired_semaphore = gFrames.at(gSemaphoreIndex).image_acquired_semaphore;
+	const auto& render_complete_semaphore = gFrames.at(gSemaphoreIndex).render_complete_semaphore;
 
-	auto acquire_result = gDevice.acquireNextImageKHR(gSwapchain, UINT64_MAX, image_acquired_semaphore, {}, &gFrameIndex);
+	auto [result, image_index] = gSwapchain.acquireNextImage(UINT64_MAX, *image_acquired_semaphore);
+
+	gFrameIndex = image_index;
 
 	const auto& frame = gFrames.at(gFrameIndex);
 
-	gDevice.waitForFences(1, &frame.fence, true, UINT64_MAX);
-	gDevice.resetFences(1, &frame.fence); // TODO: it seems fences can be allocated and destroyed right here, we dont need to store it (see sascha willems examples)
+	gDevice.waitForFences({ *frame.fence }, true, UINT64_MAX);
+	gDevice.resetFences({ *frame.fence });
 
 	auto begin_info = vk::CommandBufferBeginInfo()
 		.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
@@ -380,9 +394,9 @@ void SystemVK::present()
 	clear_value.color.float32[3] = 1.0f;
 
 	auto render_pass_begin_info = vk::RenderPassBeginInfo()
-		.setRenderPass(gRenderPass)
-		.setFramebuffer(frame.framebuffer)
-		.setRenderArea(vk::Rect2D({ 0, 0 }, { 800, 600 }))
+		.setRenderPass(*gRenderPass)
+		.setFramebuffer(*frame.framebuffer)
+		.setRenderArea({ { 0, 0 }, { gWidth, gHeight } })
 		.setClearValueCount(1)
 		.setPClearValues(&clear_value);
 
@@ -390,29 +404,31 @@ void SystemVK::present()
 
 	frame.command_buffer.endRenderPass();
 
+	frame.command_buffer.end();
+
 	vk::PipelineStageFlags wait_dst_stage_mask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
 
 	auto submit_info = vk::SubmitInfo()
 		.setWaitSemaphoreCount(1)
-		.setPWaitSemaphores(&image_acquired_semaphore)
+		.setPWaitSemaphores(&*image_acquired_semaphore)
 		.setPWaitDstStageMask(&wait_dst_stage_mask)
 		.setCommandBufferCount(1)
-		.setPCommandBuffers(&frame.command_buffer)
+		.setPCommandBuffers(&*frame.command_buffer)
 		.setSignalSemaphoreCount(1)
-		.setPSignalSemaphores(&render_complete_semaphore);
+		.setPSignalSemaphores(&*render_complete_semaphore);
 
-	gQueue.submit(1, &submit_info, frame.fence);
+	gQueue.submit({ submit_info }, *frame.fence); // TODO: can be called with no fence, check it out
 
 	auto present_info = vk::PresentInfoKHR()
 		.setWaitSemaphoreCount(1)
-		.setPWaitSemaphores(&render_complete_semaphore)
+		.setPWaitSemaphores(&*render_complete_semaphore)
 		.setSwapchainCount(1)
-		.setPSwapchains(&gSwapchain)
+		.setPSwapchains(&*gSwapchain)
 		.setPImageIndices(&gFrameIndex);
 
 	gQueue.presentKHR(present_info);
 
-	gSemaphoreIndex = (gSemaphoreIndex + 1) % gFrames.size();
+	gSemaphoreIndex = (gSemaphoreIndex + 1) % gFrames.size(); // TODO: maybe gFrameIndex can be used for both
 }
 
 Texture::Handler SystemVK::createTexture(int width, int height, bool mipmap)

@@ -25,4 +25,6 @@
         #include <OpenGLES/ES3/gl.h>
         #include <OpenGLES/ES3/glext.h>
     #endif
+#elif defined(RENDERER_VK)
+ //   #include <vulkan/vulkan_raii.hpp> // TODO: very long compile time if uncommented
 #endif

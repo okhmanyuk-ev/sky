@@ -23,6 +23,9 @@ namespace Renderer
 		~SystemVK();
 
 	private:
+		void createSwapchain();
+
+	private:
 		void onEvent(const Platform::System::ResizeEvent& e) override;
 
 	public:
