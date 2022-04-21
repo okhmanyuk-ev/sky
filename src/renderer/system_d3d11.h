@@ -57,8 +57,8 @@ namespace Renderer
 		bool mVsync = false;
 
 	public:
-		static ID3D11Device* Device;
-		static ID3D11DeviceContext* Context;
+		inline static ID3D11Device* Device = nullptr;
+		inline static ID3D11DeviceContext* Context = nullptr;
 
 	private:
 		IDXGISwapChain* mSwapChain;
