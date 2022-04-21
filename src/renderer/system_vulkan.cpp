@@ -4,6 +4,7 @@
 #include <platform/system_windows.h>
 #include <console/device.h>
 #include <vulkan/vulkan_raii.hpp>
+#include <iostream>
 
 using namespace Renderer;
 
@@ -20,9 +21,9 @@ static vk::raii::Queue gQueue = nullptr;
 static vk::raii::Device gDevice = nullptr;
 static vk::raii::SurfaceKHR gSurface = nullptr;
 static vk::raii::SwapchainKHR gSwapchain = nullptr;
-static vk::raii::RenderPass gRenderPass = nullptr;
+static vk::raii::CommandPool gCommandPool = nullptr;
 static vk::SurfaceFormatKHR gSurfaceFormat;
-static uint32_t gMinImageCount = 2; // wtf constant doing here ?
+static uint32_t gMinImageCount = 2; // TODO: https://github.com/nvpro-samples/nvpro_core/blob/f2c05e161bba9ab9a8c96c0173bf0edf7c168dfa/nvvk/swapchain_vk.cpp#L143
 static uint32_t gQueueFamilyIndex = -1;
 static uint32_t gSemaphoreIndex = 0;
 static uint32_t gFrameIndex = 0;
@@ -31,38 +32,55 @@ static uint32_t gHeight = 0;
 
 struct Frame
 {
-	vk::raii::CommandPool command_pool = nullptr;
 	vk::raii::CommandBuffer command_buffer = nullptr;
 	vk::raii::Fence fence = nullptr;
-	vk::raii::Framebuffer framebuffer = nullptr;
 	vk::raii::ImageView backbuffer_view = nullptr;
 	vk::raii::Semaphore image_acquired_semaphore = nullptr;
 	vk::raii::Semaphore render_complete_semaphore = nullptr;
 };
 
 static std::vector<Frame> gFrames;
+static std::vector<vk::ImageMemoryBarrier> barriers;
 
 SystemVK::SystemVK()
 {
-	auto layers = { 
-		"VK_LAYER_KHRONOS_validation" 
-	};
+	auto all_extensions = gContext.enumerateInstanceExtensionProperties();
+
+	for (auto extension : all_extensions)
+	{
+	//	std::cout << extension.extensionName << std::endl;
+	}
+
+	auto all_layers = gContext.enumerateInstanceLayerProperties();
+
+	for (auto layer : all_layers)
+	{
+	//	std::cout << e.layerName << std::endl;
+	}
 
 	auto extensions = {
 		VK_KHR_SURFACE_EXTENSION_NAME,
 		VK_KHR_WIN32_SURFACE_EXTENSION_NAME
 	};
 
-	auto instance_info = vk::InstanceCreateInfo()
-		.setPEnabledExtensionNames(extensions)
-		.setPEnabledLayerNames(layers);
+	auto layers = {
+		"VK_LAYER_KHRONOS_validation"
+	};
 
 	auto version = gContext.enumerateInstanceVersion();
 
 	auto major_version = VK_API_VERSION_MAJOR(version);
 	auto minor_version = VK_API_VERSION_MINOR(version);
 
-	//LOGF("Vulkan {}.{}", major_version, minor_version);
+	std::cout << "available vulkan version: " << major_version << "." << minor_version << std::endl;
+
+	auto application_info = vk::ApplicationInfo()
+		.setApiVersion(VK_API_VERSION_1_3);
+
+	auto instance_info = vk::InstanceCreateInfo()
+		.setPEnabledExtensionNames(extensions)
+		.setPEnabledLayerNames(layers)
+		.setPApplicationInfo(&application_info);
 
 	gInstance = gContext.createInstance(instance_info);
 
@@ -91,17 +109,32 @@ SystemVK::SystemVK()
 		}
 	}
 
-	auto device_extensions = { "VK_KHR_swapchain" };
+	auto all_device_extensions = gPhysicalDevice.enumerateDeviceExtensionProperties();
+
+	for (auto device_extension : all_device_extensions)
+	{
+	//	std::cout << device_extension.extensionName << std::endl;
+	}
+
+	auto device_extensions = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+	//	VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
+	};
+
 	auto queue_priority = { 1.0f };
 
 	auto queue_info = vk::DeviceQueueCreateInfo()
 		.setQueueFamilyIndex(gQueueFamilyIndex)
 		.setQueuePriorities(queue_priority);
 
+	auto device_features = gPhysicalDevice.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features>();
+
 	auto device_info = vk::DeviceCreateInfo()
 		.setQueueCreateInfoCount(1)
 		.setPQueueCreateInfos(&queue_info)
-		.setPEnabledExtensionNames(device_extensions);
+		.setPEnabledExtensionNames(device_extensions)
+		.setPEnabledFeatures(nullptr)
+		.setPNext(&device_features);
 
 	gDevice = gPhysicalDevice.createDevice(device_info);
 	gQueue = gDevice.getQueue(gQueueFamilyIndex, 0);
@@ -139,42 +172,11 @@ SystemVK::SystemVK()
 		}
 	}
 
-	auto attachment = vk::AttachmentDescription()
-		.setFormat(gSurfaceFormat.format)
-		.setSamples(vk::SampleCountFlagBits::e1)
-		.setLoadOp(vk::AttachmentLoadOp::eClear)
-		.setStoreOp(vk::AttachmentStoreOp::eStore)
-		.setStencilLoadOp(vk::AttachmentLoadOp::eDontCare)
-		.setStencilStoreOp(vk::AttachmentStoreOp::eDontCare)
-		.setInitialLayout(vk::ImageLayout::eUndefined)
-		.setFinalLayout(vk::ImageLayout::ePresentSrcKHR);
+	auto command_pool_info = vk::CommandPoolCreateInfo()
+		.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer)
+		.setQueueFamilyIndex(gQueueFamilyIndex);
 
-	auto color_attachment = vk::AttachmentReference()
-		.setAttachment(0)
-		.setLayout(vk::ImageLayout::eColorAttachmentOptimal);
-
-	auto subpass = vk::SubpassDescription()
-		.setPipelineBindPoint(vk::PipelineBindPoint::eGraphics)
-		.setColorAttachmentCount(1)
-		.setPColorAttachments(&color_attachment);
-
-	auto dependency = vk::SubpassDependency()
-		.setSrcSubpass(VK_SUBPASS_EXTERNAL)
-		.setDstSubpass(0)
-		.setSrcStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput)
-		.setDstStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput)
-		.setSrcAccessMask(vk::AccessFlagBits::eNone)
-		.setDstAccessMask(vk::AccessFlagBits::eColorAttachmentWrite);
-
-	auto render_pass_info = vk::RenderPassCreateInfo()
-		.setAttachmentCount(1)
-		.setPAttachments(&attachment)
-		.setSubpassCount(1)
-		.setPSubpasses(&subpass)
-		.setDependencyCount(1)
-		.setPDependencies(&dependency);
-
-	gRenderPass = gDevice.createRenderPass(render_pass_info);
+	gCommandPool = gDevice.createCommandPool(command_pool_info);
 
 	createSwapchain();
 }
@@ -199,32 +201,28 @@ void SystemVK::createSwapchain()
 		.setPreTransform(vk::SurfaceTransformFlagBitsKHR::eIdentity)
 		.setImageArrayLayers(1)
 		.setImageSharingMode(vk::SharingMode::eExclusive)
-		.setQueueFamilyIndexCount(0)
+		.setQueueFamilyIndexCount(1)
+		.setPQueueFamilyIndices(&gQueueFamilyIndex)
 		.setPresentMode(vk::PresentModeKHR::eFifo)
 		.setClipped(true)
-		.setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque);
+		.setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque)
+		.setOldSwapchain(*gSwapchain);
 
-	gSwapchain = nullptr;
 	gSwapchain = gDevice.createSwapchainKHR(swapchain_info);
 
 	auto backbuffers = gSwapchain.getImages();
 
 	gFrames.clear();
+	barriers.clear();
 
 	for (const auto& backbuffer : backbuffers)
 	{
 		auto frame = Frame();
 
-		auto command_pool_info = vk::CommandPoolCreateInfo()
-			.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer)
-			.setQueueFamilyIndex(gQueueFamilyIndex);
-
-		frame.command_pool = gDevice.createCommandPool(command_pool_info);
-
 		auto buffer_allocate_info = vk::CommandBufferAllocateInfo()
 			.setCommandBufferCount(1)
 			.setLevel(vk::CommandBufferLevel::ePrimary)
-			.setCommandPool(*frame.command_pool);
+			.setCommandPool(*gCommandPool);
 
 		auto command_buffers = gDevice.allocateCommandBuffers(buffer_allocate_info);
 		frame.command_buffer = std::move(command_buffers.at(0));
@@ -257,18 +255,54 @@ void SystemVK::createSwapchain()
 
 		frame.backbuffer_view = gDevice.createImageView(image_view_info);
 
-		auto framebuffer_info = vk::FramebufferCreateInfo()
-			.setRenderPass(*gRenderPass)
-			.setAttachmentCount(1)
-			.setPAttachments(&*frame.backbuffer_view)
-			.setWidth(gWidth)
-			.setHeight(gHeight)
-			.setLayers(1);
-
-		frame.framebuffer = gDevice.createFramebuffer(framebuffer_info);
-
 		gFrames.push_back(std::move(frame));
+
+		auto range = vk::ImageSubresourceRange()
+			.setAspectMask(vk::ImageAspectFlagBits::eColor)
+			.setBaseMipLevel(0)
+			.setLevelCount(VK_REMAINING_MIP_LEVELS)
+			.setBaseArrayLayer(0)
+			.setLayerCount(VK_REMAINING_ARRAY_LAYERS);
+
+		auto barrier = vk::ImageMemoryBarrier()
+			.setDstAccessMask(vk::AccessFlagBits::eNone)
+			.setSrcAccessMask(vk::AccessFlagBits::eNone)
+			.setOldLayout(vk::ImageLayout::eUndefined)
+			.setNewLayout(vk::ImageLayout::ePresentSrcKHR)
+			.setImage(backbuffer)
+			.setSubresourceRange(range);
+
+		barriers.push_back(std::move(barrier));
 	}
+
+
+	// begin temp cmd buffer (wtf?)
+	// without this code validation layers says presentKHR have bad image eUndefined, must be ePresentSrcKHR
+
+	auto buffer_allocate_info = vk::CommandBufferAllocateInfo()
+		.setCommandBufferCount(1)
+		.setLevel(vk::CommandBufferLevel::ePrimary)
+		.setCommandPool(*gCommandPool);
+
+	auto command_buffers = gDevice.allocateCommandBuffers(buffer_allocate_info);
+	auto command_buffer = std::move(command_buffers.at(0));
+
+	auto begin_info = vk::CommandBufferBeginInfo()
+		.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+
+	command_buffer.begin(begin_info);
+	command_buffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe, 
+		vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {}, barriers);
+	command_buffer.end();
+
+	auto submit_info = vk::SubmitInfo()
+		.setCommandBufferCount(1)
+		.setPCommandBuffers(&*command_buffer);
+
+	gQueue.submit({ submit_info });
+	gQueue.waitIdle();
+
+	// end of temp cmd buffer
 }
 
 void SystemVK::onEvent(const Platform::System::ResizeEvent& e)
@@ -400,26 +434,31 @@ void SystemVK::present()
 	clear_value.color.float32[1] = 0.5f;
 	clear_value.color.float32[2] = 0.2f;
 	clear_value.color.float32[3] = 1.0f;
+	
+	auto color_attachment = vk::RenderingAttachmentInfo()
+		.setImageView(*frame.backbuffer_view)
+		.setImageLayout(vk::ImageLayout::eAttachmentOptimal)
+		.setLoadOp(vk::AttachmentLoadOp::eClear)
+		.setStoreOp(vk::AttachmentStoreOp::eStore)
+		.setClearValue(clear_value);
 
-	auto render_pass_begin_info = vk::RenderPassBeginInfo()
-		.setRenderPass(*gRenderPass)
-		.setFramebuffer(*frame.framebuffer)
+	auto rendering_info = vk::RenderingInfo()
 		.setRenderArea({ { 0, 0 }, { gWidth, gHeight } })
-		.setClearValueCount(1)
-		.setPClearValues(&clear_value);
+		.setLayerCount(1)
+		.setColorAttachmentCount(1)
+		.setPColorAttachments(&color_attachment);
 
-	frame.command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline);
-
-	frame.command_buffer.endRenderPass();
+	frame.command_buffer.beginRendering(rendering_info);
+	frame.command_buffer.endRendering();
 
 	frame.command_buffer.end();
 
 	vk::PipelineStageFlags wait_dst_stage_mask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
 
 	auto submit_info = vk::SubmitInfo()
+		.setPWaitDstStageMask(&wait_dst_stage_mask)
 		.setWaitSemaphoreCount(1)
 		.setPWaitSemaphores(&*image_acquired_semaphore)
-		.setPWaitDstStageMask(&wait_dst_stage_mask)
 		.setCommandBufferCount(1)
 		.setPCommandBuffers(&*frame.command_buffer)
 		.setSignalSemaphoreCount(1)
@@ -435,6 +474,7 @@ void SystemVK::present()
 		.setPImageIndices(&gFrameIndex);
 
 	gQueue.presentKHR(present_info);
+	gQueue.waitIdle();
 
 	gSemaphoreIndex = (gSemaphoreIndex + 1) % gFrames.size(); // TODO: maybe gFrameIndex can be used for both
 }
