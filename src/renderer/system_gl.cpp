@@ -394,23 +394,43 @@ void SystemGL::setTextureAddressMode(const TextureAddress& value)
 	updateGLSampler();
 }
 
-void SystemGL::clear(const glm::vec4& color) 
-{
-	GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
-	glDisable(GL_SCISSOR_TEST);
-	glClearColor(color.r, color.g, color.b , color.a);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	
-	if (last_enable_scissor_test) 
-		glEnable(GL_SCISSOR_TEST); 
-	else 
-		glDisable(GL_SCISSOR_TEST);
-}
 
-void SystemGL::clearStencil()
+void SystemGL::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
-	glClearStencil(0);
-	glClear(GL_STENCIL_BUFFER_BIT);
+	auto scissor_was_enabled = glIsEnabled(GL_SCISSOR_TEST);
+	
+	if (scissor_was_enabled)
+	{
+		glDisable(GL_SCISSOR_TEST);
+	}
+
+	GLbitfield flags = 0;
+
+	if (color.has_value())
+	{
+		flags |= GL_COLOR_BUFFER_BIT;
+		auto _color = color.value();
+		glClearColor(_color.r, _color.g, _color.b, _color.a);
+	}
+
+	if (depth.has_value())
+	{
+		flags |= GL_DEPTH_BUFFER_BIT;
+		glClearDepth(depth.value());
+	}
+
+	if (stencil.has_value())
+	{
+		flags |= GL_STENCIL_BUFFER_BIT;
+		glClearStencil(stencil.value());
+	}
+
+	glClear(flags);
+
+	if (scissor_was_enabled)
+	{
+		glEnable(GL_SCISSOR_TEST);
+	}
 }
 
 void SystemGL::draw(size_t vertexCount, size_t vertexOffset)

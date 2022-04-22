@@ -39,8 +39,8 @@ namespace Renderer
 		void setBlendMode(const BlendMode& value) override;
 		void setTextureAddressMode(const TextureAddress& value) override;
 
-		void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 1.0f }) override;
-		void clearStencil() override;
+		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
+			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0) override;
 
 		void draw(size_t vertexCount, size_t vertexOffset = 0) override;
 		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0) override;

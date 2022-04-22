@@ -37,8 +37,8 @@ namespace Graphics
 
 		void flush();
 
-		void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f });
-		void clearStencil();
+		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
+			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
 		// generic
 		// TODO: hidden overload conflict when name "draw"

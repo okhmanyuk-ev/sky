@@ -385,12 +385,7 @@ void SystemVK::setTextureAddressMode(const TextureAddress& value)
 	//
 }
 
-void SystemVK::clear(const glm::vec4& color)
-{
-	//
-}
-
-void SystemVK::clearStencil()
+void SystemVK::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
 	//
 }

@@ -16,6 +16,8 @@
 #include <renderer/stencil.h>
 #include <renderer/texture_address.h>
 
+#include <optional>
+
 #define RENDERER ENGINE->getSystem<Renderer::System>()
 
 namespace Renderer
@@ -42,8 +44,8 @@ namespace Renderer
 		virtual void setBlendMode(const BlendMode& value) = 0;
 		virtual void setTextureAddressMode(const TextureAddress& value) = 0;
 
-		virtual void clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) = 0;
-		virtual void clearStencil() = 0;
+		virtual void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }, 
+			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0) = 0;
 
 		virtual void draw(size_t vertexCount, size_t vertexOffset = 0);
 		virtual void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0);

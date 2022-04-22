@@ -30,7 +30,7 @@ namespace Scene
 
 			if (ClipLayer == 0)
 			{
-				GRAPHICS->clearStencil();
+				GRAPHICS->clear(std::nullopt, std::nullopt, 0);
 			}
 
 			ClipLayer += 1;

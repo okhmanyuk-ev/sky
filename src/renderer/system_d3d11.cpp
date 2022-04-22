@@ -338,31 +338,35 @@ void SystemD3D11::setTextureAddressMode(const TextureAddress& value)
 	mSamplerStateDirty = true;
 }
 
-void SystemD3D11::clear(const glm::vec4& color) 
+void SystemD3D11::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
 	auto rtv = renderTargetView;
 	auto dsv = depthStencilView;
 
 	if (currentRenderTarget != nullptr)
 	{
-		rtv = mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler).render_target_view;
-		dsv = mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler).depth_stencil_view;
+		auto rtd = mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler);
+		rtv = rtd.render_target_view;
+		dsv = rtd.depth_stencil_view;
 	}
 
-	Context->ClearRenderTargetView(rtv, (float*)&color);
-	Context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-}
-
-void SystemD3D11::clearStencil()
-{
-	auto dsv = depthStencilView;
-	
-	if (currentRenderTarget != nullptr)
+	if (color.has_value())
 	{
-		dsv = mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler).depth_stencil_view;
+		Context->ClearRenderTargetView(rtv, (float*)&color.value());
 	}
 
-	Context->ClearDepthStencilView(dsv, D3D11_CLEAR_STENCIL, 1.0f, 0);
+	if (depth.has_value() || stencil.has_value())
+	{
+		UINT flags = 0;
+
+		if (depth.has_value())
+			flags |= D3D11_CLEAR_DEPTH;
+
+		if (stencil.has_value())
+			flags |= D3D11_CLEAR_STENCIL;
+
+		Context->ClearDepthStencilView(dsv, flags, depth.value_or(1.0f), stencil.value_or(0));
+	}
 }
 
 void SystemD3D11::draw(size_t vertexCount, size_t vertexOffset)

@@ -158,16 +158,10 @@ void System::flush()
 	mBatch.indicesCount = 0;
 }
 
-void System::clear(const glm::vec4& color)
+void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
 	applyState();
-	RENDERER->clear(color);
-}
-
-void System::clearStencil()
-{
-	applyState();
-	RENDERER->clearStencil();
+	RENDERER->clear(color, depth, stencil);
 }
 
 void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices, 
@@ -849,7 +843,7 @@ std::shared_ptr<Renderer::Texture> System::makeGenericTexture(const glm::ivec2& 
 	pushRenderTarget(result);
 	pushViewport(result);
 	pushOrthoMatrix(1.0f, 1.0f);
-	clear({ Graphics::Color::White, 0.0f });
+	clear(glm::vec4{ Graphics::Color::White, 0.0f });
 	callback();
 	pop(4);
 
