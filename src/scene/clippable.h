@@ -40,7 +40,7 @@ namespace Scene
 			stencil.writeMask = 255;
 			stencil.readMask = 255;
 			stencil.reference = ClipLayer;
-			stencil.func = Renderer::ComparisonFunc::Equal;
+			stencil.func = Renderer::ComparisonFunc::LessEqual;
 			stencil.depthFailOp = Renderer::StencilOp::Keep;
 			stencil.failOp = Renderer::StencilOp::Keep;
 			stencil.passOp = Renderer::StencilOp::Keep;
@@ -126,6 +126,52 @@ namespace Scene
 			GRAPHICS->pop();
 
 			T::leaveDraw();
+		}
+	};
+
+	template <class T> class Rounded : public T
+	{
+		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
+
+	protected:
+		void draw() override
+		{
+			auto state = GRAPHICS->getCurrentState();
+
+			state.stencilMode.enabled = true;
+			state.stencilMode.writeMask = 255;
+			state.stencilMode.readMask = 255;
+			state.stencilMode.reference = 0;
+			state.stencilMode.func = Renderer::ComparisonFunc::Equal;
+			state.stencilMode.depthFailOp = Renderer::StencilOp::Keep;
+			state.stencilMode.failOp = Renderer::StencilOp::Keep;
+			state.stencilMode.passOp = Renderer::StencilOp::IncrementSaturation;
+
+			state.blendMode.colorMask = { false, false, false, false };
+
+			auto absolute_size = T::getAbsoluteSize();
+			state.modelMatrix = glm::scale(T::getTransform(), { absolute_size, 1.0f });
+
+			GRAPHICS->push(state);
+			GRAPHICS->clear(std::nullopt, std::nullopt, 0);
+			GRAPHICS->drawRoundedRectangle({ Graphics::Color::White, 1.0f }, absolute_size, 1.0f, false);
+			GRAPHICS->pop();
+
+			Renderer::StencilMode stencil;
+			stencil.enabled = true;
+			stencil.writeMask = 255;
+			stencil.readMask = 255;
+			stencil.reference = 1;
+			stencil.func = Renderer::ComparisonFunc::Equal;
+			stencil.depthFailOp = Renderer::StencilOp::Keep;
+			stencil.failOp = Renderer::StencilOp::Keep;
+			stencil.passOp = Renderer::StencilOp::Keep;
+
+			GRAPHICS->pushStencilMode(stencil);
+
+			T::draw();
+
+			GRAPHICS->pop();
 		}
 	};
 }

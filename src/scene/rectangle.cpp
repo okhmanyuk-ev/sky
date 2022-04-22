@@ -10,8 +10,6 @@ void Rectangle::draw()
 	if (getAlpha() <= 0.0f)
 		return;
 
-	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
-
 	auto color = getColor();
 
 	auto top_left_color = color;
@@ -41,6 +39,9 @@ void Rectangle::draw()
 	bottom_right_color *= edge_bottom_color;
 	bottom_right_color *= edge_right_color;
 
+	auto absolute_size = getAbsoluteSize();
+	auto model = glm::scale(getTransform(), { absolute_size, 1.0f });
+
 	GRAPHICS->pushModelMatrix(model);
 
 	if (mRounding > 0.0f)
@@ -57,12 +58,12 @@ void Rectangle::draw()
 
 		if (one_color && mSlicedSpriteOptimizationEnabled)
 		{
-			GRAPHICS->drawRoundedSlicedRectangle(top_left_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
+			GRAPHICS->drawRoundedSlicedRectangle(top_left_color, absolute_size, mRounding, mAbsoluteRounding);
 		}
 		else
 		{
 			GRAPHICS->drawRoundedRectangle(top_left_color, top_right_color, bottom_left_color,
-				bottom_right_color, getAbsoluteSize(), mRounding, mAbsoluteRounding);
+				bottom_right_color, absolute_size, mRounding, mAbsoluteRounding);
 		}
 	}
 	else
