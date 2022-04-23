@@ -418,7 +418,7 @@ void SystemGL::clear(std::optional<glm::vec4> color, std::optional<float> depth,
 	if (depth.has_value())
 	{
 		flags |= GL_DEPTH_BUFFER_BIT;
-		glClearDepth(depth.value());
+		glClearDepthf(depth.value());
 	}
 
 	if (stencil.has_value())
