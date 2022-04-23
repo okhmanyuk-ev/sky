@@ -445,11 +445,27 @@ void ConsoleDevice::enterInput()
 	}
 	else
 	{
-		std::string line(mInputText);
+		auto line = std::string(mInputText);
+		
+		auto trim = [](std::string str) {
+			while (str.starts_with(" "))
+				str = str.substr(1);
+
+			while (str.ends_with(" "))
+				str = str.substr(0, str.size() - 1);
+
+			return str;
+		};
+
+		line = trim(line);
+
 		PLATFORM->setVirtualKeyboardText("");
 		mInputText[0] = 0x00;
-		mInputHistory.push_back(line);
-		mInputHistoryPos = static_cast<int>(mInputHistory.size());
+		if (!line.empty())
+		{
+			mInputHistory.push_back(line);
+			mInputHistoryPos = static_cast<int>(mInputHistory.size());
+		}
 		writeLine("] " + line);
 		EVENT->emit(ReadEvent({ line }));
 	}
