@@ -4,6 +4,7 @@
 #include <platform/system_windows.h>
 #include <platform/system_android.h>
 #include <platform/system_ios.h>
+#include <console/device.h>
 
 using namespace Renderer;
 
@@ -79,8 +80,7 @@ namespace
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
 	const GLchar* message, const void* userParam)
 {
-	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+	LOGF("[OpenGL] type: {}, id: {}, severity: {}, msg: {}", type, id, severity, message);
 }
 #endif
 
@@ -163,7 +163,7 @@ SystemGL::SystemGL()
 
 	auto version = glGetString(GL_VERSION);
 
-	//glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
 #elif defined(RENDERER_GLES3)
     #if defined(PLATFORM_ANDROID)
@@ -224,12 +224,14 @@ SystemGL::SystemGL()
 
 	glGenBuffers(1, &mGLVertexBuffer);
 	glGenBuffers(1, &mGLIndexBuffer);
+	glGenBuffers(1, &mGLPixelBuffer);
 	
 	setBlendMode(BlendStates::NonPremultiplied);
 }
 
 SystemGL::~SystemGL()
 {
+	glDeleteBuffers(1, &mGLPixelBuffer);
 	glDeleteBuffers(1, &mGLVertexBuffer);
 	glDeleteBuffers(1, &mGLIndexBuffer);
 #if defined(RENDERER_GL44)
@@ -484,6 +486,53 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* m
 	}
 
 	free(temp);
+}
+
+void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
+{
+	auto dst_texture_handler = dst_texture->mHandler;
+	assert(mTextureDefs.contains(dst_texture_handler));
+
+	const auto& texture_def = mTextureDefs.at(dst_texture_handler);
+
+	assert(texture_def.width == size.x);
+	assert(texture_def.height == size.y);
+
+	if (size.x <= 0 || size.y <= 0)
+		return;
+
+	auto x = (GLint)pos.x;
+	auto y = mRenderTargetBound ? (GLint)pos.y : (GLint)(PLATFORM->getHeight() - pos.y - size.y);
+	auto w = (GLint)size.x;
+	auto h = (GLint)size.y;
+	
+	glBindBuffer(GL_PIXEL_PACK_BUFFER, mGLPixelBuffer);
+	glBufferData(GL_PIXEL_PACK_BUFFER, w * h * 4, nullptr, GL_STATIC_READ);
+	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+
+	glBindTexture(GL_TEXTURE_2D, texture_def.texture);
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mGLPixelBuffer);
+	
+	bool image_is_flipped = !mRenderTargetBound;
+
+	if (!image_is_flipped)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	}
+	else
+	{
+		for (int i = 0; i < h; i++)
+		{
+			auto pbo_offset = (void*)(size_t)(w * (h - i - 1) * 4);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i, w, 1, GL_RGBA, GL_UNSIGNED_BYTE, pbo_offset);
+		}
+	}
+
+	if (texture_def.mipmap)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 void SystemGL::present()

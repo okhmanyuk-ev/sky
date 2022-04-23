@@ -18,15 +18,12 @@ void Glass::draw()
 
 	if (size != mPrevSize)
 	{
-		mImage = std::make_shared<Graphics::Image>(w, h, 4);
 		setTexture(std::make_shared<Renderer::Texture>(w, h, mGenerateMipmaps));
 		mPrevSize = size;
 	}
 
 	GRAPHICS->flush();
-	RENDERER->readPixels({ x, y }, { w, h }, mImage->getMemory());
-
-	getTexture()->writePixels(w, h, mImage->getChannels(), mImage->getMemory());
+	RENDERER->readPixels({ x, y }, { w, h }, getTexture());
 
 	Sprite::draw();
 }
@@ -46,7 +43,7 @@ void BlurredGlass::draw()
 		return;
 
 	auto static shader = std::make_shared<Renderer::Shaders::MipmapBias>(Renderer::Vertex::PositionColorTexture::Layout);
-	shader->setBias(mBlurIntensity * 6.0f);
+	shader->setBias(mBlurIntensity * 8.0f);
 	setShader(shader);
 
 	Glass::draw();

@@ -51,6 +51,7 @@ namespace Renderer
 		virtual void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0);
 
 		virtual void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) = 0;
+		virtual void readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture) = 0;
 
 		virtual void present();
 

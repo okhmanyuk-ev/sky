@@ -482,6 +482,84 @@ void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void
 	texture->Release();
 }
 
+void SystemD3D11::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
+{
+	auto dst_texture_handler = dst_texture->mHandler;
+	assert(mTextureDefs.contains(dst_texture_handler));
+
+	const auto& texture_def = mTextureDefs.at(dst_texture_handler);
+
+	assert(texture_def.width == size.x);
+	assert(texture_def.height == size.y);
+
+	if (size.x <= 0 || size.y <= 0)
+		return;
+
+	ID3D11Resource* resource = NULL;
+
+	if (currentRenderTarget)
+		mRenderTargetDefs.at(currentRenderTarget->mRenderTargetHandler).render_target_view->GetResource(&resource);
+	else
+		renderTargetView->GetResource(&resource);
+
+	ID3D11Texture2D* texture = NULL;
+	resource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&texture);
+
+	D3D11_TEXTURE2D_DESC desc = { 0 };
+	texture->GetDesc(&desc);
+	auto back_w = desc.Width;
+	auto back_h = desc.Height;
+	texture->Release();
+
+	auto src_x = (UINT)pos.x;
+	auto src_y = (UINT)pos.y;
+	auto src_w = (UINT)size.x;
+	auto src_h = (UINT)size.y;
+
+	UINT dst_x = 0;
+	UINT dst_y = 0;
+
+	if (pos.x < 0)
+	{
+		src_x = 0;
+		if (-pos.x > size.x)
+			src_w = 0;
+		else
+			src_w += pos.x;
+
+		dst_x = -pos.x;
+	}
+
+	if (pos.y < 0)
+	{
+		src_y = 0;
+		if (-pos.y > size.y)
+			src_h = 0;
+		else
+			src_h += pos.y;
+
+		dst_y = -pos.y;
+	}
+
+	D3D11_BOX box;
+	box.left = src_x;
+	box.right = src_x + src_w;
+	box.top = src_y;
+	box.bottom = src_y + src_h;
+	box.front = 0;
+	box.back = 1;
+
+	if (pos.y < (int)back_h && pos.x < (int)back_w)
+	{
+		Context->CopySubresourceRegion(texture_def.texture2d, 0, dst_x, dst_y, 0, resource, 0, &box);
+
+		if (texture_def.mipmap)
+			Context->GenerateMips(texture_def.shader_resource_view);
+	}
+
+	resource->Release();
+}
+
 void SystemD3D11::present()
 {
 	System::present();

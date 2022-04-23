@@ -10,7 +10,6 @@ namespace Scene
 		void draw() override;
 
 	private:
-		std::shared_ptr<Graphics::Image> mImage = nullptr;
 		glm::vec2 mPrevSize = { 0.0f, 0.0f };
 
 	public:
