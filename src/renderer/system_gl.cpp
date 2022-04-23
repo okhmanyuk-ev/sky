@@ -80,7 +80,51 @@ namespace
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
 	const GLchar* message, const void* userParam)
 {
-	LOGF("[OpenGL] type: {}, id: {}, severity: {}, msg: {}", type, id, severity, message);
+	static const std::unordered_map<GLenum, std::string> SourceMap = {
+		{ GL_DEBUG_SOURCE_API, "GL_DEBUG_SOURCE_API" },
+		{ GL_DEBUG_SOURCE_WINDOW_SYSTEM, "GL_DEBUG_SOURCE_WINDOW_SYSTEM" },
+		{ GL_DEBUG_SOURCE_SHADER_COMPILER, "GL_DEBUG_SOURCE_SHADER_COMPILER" },
+		{ GL_DEBUG_SOURCE_THIRD_PARTY, "GL_DEBUG_SOURCE_THIRD_PARTY" },
+		{ GL_DEBUG_SOURCE_APPLICATION, "GL_DEBUG_SOURCE_APPLICATION" },
+		{ GL_DEBUG_SOURCE_OTHER, "GL_DEBUG_SOURCE_OTHER" },
+	};
+	
+	static const std::unordered_map<GLenum, std::string> TypeMap = {
+		{ GL_DEBUG_TYPE_ERROR, "GL_DEBUG_TYPE_ERROR" },
+		{ GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR, "GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR" },
+		{ GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR, "GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR" },
+		{ GL_DEBUG_TYPE_PORTABILITY, "GL_DEBUG_TYPE_PORTABILITY" },
+		{ GL_DEBUG_TYPE_PERFORMANCE, "GL_DEBUG_TYPE_PERFORMANCE" },
+		{ GL_DEBUG_TYPE_MARKER, "GL_DEBUG_TYPE_MARKER" },
+		{ GL_DEBUG_TYPE_PUSH_GROUP, "GL_DEBUG_TYPE_PUSH_GROUP" },
+		{ GL_DEBUG_TYPE_POP_GROUP, "GL_DEBUG_TYPE_POP_GROUP" },
+		{ GL_DEBUG_TYPE_OTHER, "GL_DEBUG_TYPE_OTHER" },
+	};
+
+	static const std::unordered_map<GLenum, std::string> SeverityMap = {
+		{ GL_DEBUG_SEVERITY_HIGH, "GL_DEBUG_SEVERITY_HIGH" },
+		{ GL_DEBUG_SEVERITY_MEDIUM, "GL_DEBUG_SEVERITY_MEDIUM" },
+		{ GL_DEBUG_SEVERITY_LOW, "GL_DEBUG_SEVERITY_LOW" },
+		{ GL_DEBUG_SEVERITY_NOTIFICATION, "GL_DEBUG_SEVERITY_NOTIFICATION" },
+	};
+
+	std::string source_str = "unknown";
+	std::string type_str = "unknown";
+	std::string severity_str = "unknown";
+
+	if (SourceMap.contains(source))
+		source_str = SourceMap.at(source);
+
+	if (TypeMap.contains(type))
+		type_str = TypeMap.at(type);
+
+	if (SeverityMap.contains(severity))
+		severity_str = SeverityMap.at(severity);
+
+	if (type == GL_DEBUG_TYPE_OTHER)
+		return;
+
+	LOGF("[OpenGL] source: {}, type: {}, id: {}, severity: {}, msg: {}", source_str, type_str, id, severity_str, message);
 }
 #endif
 
@@ -718,7 +762,7 @@ void SystemGL::updateGLSampler()
 	else if (mSampler == Sampler::LinearMipmapLinear)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // mag parameter support only linear or nearest filters
 	}
 
 	if (mTextureAddress == TextureAddress::Clamp)
