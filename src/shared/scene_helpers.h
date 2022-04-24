@@ -294,12 +294,22 @@ namespace Shared::SceneHelpers
 		{
 			T::leaveDraw();
 
+			if (!mOutlined)
+				return;
+
 			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
 			
 			GRAPHICS->pushModelMatrix(model);
 			GRAPHICS->drawLineRectangle();
 			GRAPHICS->pop();
 		}
+
+	public:
+		bool isOutlined() const { return mOutlined; }
+		void setOutlined(bool value) { mOutlined = value; }
+
+	private:
+		bool mOutlined = true;
 	};
 
 	template <typename T> class MovableByHand : public T
