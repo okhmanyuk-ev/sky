@@ -552,7 +552,7 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 	
 	glBindBuffer(GL_PIXEL_PACK_BUFFER, mGLPixelBuffer);
 	glBufferData(GL_PIXEL_PACK_BUFFER, w * h * 4, nullptr, GL_STATIC_READ);
-	glReadPixels(x, y, w, h, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
 	glBindTexture(GL_TEXTURE_2D, texture_def.texture);
@@ -562,14 +562,14 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 
 	if (!image_is_flipped)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	}
 	else
 	{
 		for (int i = 0; i < h; i++)
 		{
 			auto pbo_offset = (void*)(size_t)(w * (h - i - 1) * 4);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i, w, 1, GL_BGRA, GL_UNSIGNED_BYTE, pbo_offset);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i, w, 1, GL_RGBA, GL_UNSIGNED_BYTE, pbo_offset);
 		}
 	}
 
