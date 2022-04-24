@@ -90,20 +90,49 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().getForceTimeCompletion),
 			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion));
 
-		CONSOLE->registerCommand("spawn_blur_glass", [this](CON_ARGS) {
-			auto blur = std::make_shared<SceneHelpers::BlurredGlassDemo>();
+		CONSOLE->registerCommand("spawn_blur_glass", std::nullopt, {}, { "intensity", "passes", "outlined" }, [this](CON_ARGS) {
+			float intensity = 0.5f;
+
+			if (CON_ARG_EXIST(0))
+				intensity = CON_ARG_FLOAT(0);
+
+			int passes = 1;
+
+			if (CON_ARG_EXIST(1))
+				passes = CON_ARG_INT(1);
+
+			bool outlined = true;
+
+			if (CON_ARG_EXIST(2))
+				outlined = CON_ARG_BOOL(2);
+
+			auto blur = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::BlurredGlass>>>>();
+			blur->setOutlined(outlined);
 			blur->setSize(192.0f);
 			blur->setAnchor(0.5f);
 			blur->setPivot(0.5f);
-			blur->setBlurIntensity(0.75f);
+			blur->setBlurIntensity(intensity);
+			blur->setBlurPasses(passes);
 			getScene()->getRoot()->attach(blur);
 		});
 
-		CONSOLE->registerCommand("spawn_gray_glass", [this](CON_ARGS) {
+		CONSOLE->registerCommand("spawn_gray_glass", std::nullopt, {}, { "intensity", "outlined" }, [this](CON_ARGS) {
+			float intensity = 0.5f;
+
+			if (CON_ARG_EXIST(0))
+				intensity = CON_ARG_FLOAT(0);
+			
+			bool outlined = true;
+
+			if (CON_ARG_EXIST(1))
+				outlined = CON_ARG_BOOL(1);
+
 			auto gray = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::GrayscaledGlass>>>>();
+			gray->setOutlined(outlined);
 			gray->setSize(192.0f);
 			gray->setAnchor(0.5f);
 			gray->setPivot(0.5f);
+			gray->setGrayscaleIntensity(intensity);
 			getScene()->getRoot()->attach(gray);
 		});
 

@@ -775,6 +775,7 @@ SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 
 	auto scrollbox = std::make_shared<Scene::Scrollbox>();
 	scrollbox->setStretch(1.0f);
+	scrollbox->setOverscrollEnabled(false);
 	scrollbox->getBounding()->setStretch(1.0f);
 	scrollbox->getBounding()->setAnchor(0.5f);
 	scrollbox->getBounding()->setPivot(0.5f);
