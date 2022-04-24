@@ -136,6 +136,12 @@ namespace Scene
 	protected:
 		void draw() override
 		{
+			if (mRounding <= 0.0f)
+			{
+				T::draw();
+				return;
+			}
+
 			auto state = GRAPHICS->getCurrentState();
 
 			state.stencilMode.enabled = true;
@@ -154,7 +160,7 @@ namespace Scene
 
 			GRAPHICS->push(state);
 			GRAPHICS->clear(std::nullopt, std::nullopt, 0);
-			GRAPHICS->drawRoundedRectangle({ Graphics::Color::White, 1.0f }, absolute_size, 1.0f, false);
+			GRAPHICS->drawRoundedRectangle({ Graphics::Color::White, 1.0f }, absolute_size, mRounding, false);
 			GRAPHICS->pop();
 
 			Renderer::StencilMode stencil;
@@ -173,5 +179,12 @@ namespace Scene
 
 			GRAPHICS->pop();
 		}
+
+	public:
+		auto getRounding() const { return mRounding; }
+		void setRounding(float value) { mRounding = value; }
+
+	private:
+		float mRounding = 1.0f;
 	};
 }

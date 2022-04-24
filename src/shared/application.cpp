@@ -90,7 +90,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().getForceTimeCompletion),
 			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion));
 
-		CONSOLE->registerCommand("spawn_blur_glass", std::nullopt, {}, { "intensity", "passes", "outlined" }, [this](CON_ARGS) {
+		CONSOLE->registerCommand("spawn_blur_glass", std::nullopt, {}, { "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
 			float intensity = 0.5f;
 
 			if (CON_ARG_EXIST(0))
@@ -106,17 +106,23 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			if (CON_ARG_EXIST(2))
 				outlined = CON_ARG_BOOL(2);
 
-			auto blur = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::BlurredGlass>>>>();
-			blur->setOutlined(outlined);
+			float rounding = 0.0f;
+
+			if (CON_ARG_EXIST(3))
+				rounding = CON_ARG_FLOAT(3);
+
+			auto blur = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::BlurredGlass>>>>>();
 			blur->setSize(192.0f);
 			blur->setAnchor(0.5f);
 			blur->setPivot(0.5f);
+			blur->setOutlined(outlined);
 			blur->setBlurIntensity(intensity);
 			blur->setBlurPasses(passes);
+			blur->setRounding(rounding);
 			getScene()->getRoot()->attach(blur);
 		});
 
-		CONSOLE->registerCommand("spawn_gray_glass", std::nullopt, {}, { "intensity", "outlined" }, [this](CON_ARGS) {
+		CONSOLE->registerCommand("spawn_gray_glass", std::nullopt, {}, { "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
 			float intensity = 0.5f;
 
 			if (CON_ARG_EXIST(0))
@@ -127,11 +133,17 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			if (CON_ARG_EXIST(1))
 				outlined = CON_ARG_BOOL(1);
 
-			auto gray = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::GrayscaledGlass>>>>();
-			gray->setOutlined(outlined);
+			float rounding = 0.0f;
+
+			if (CON_ARG_EXIST(2))
+				rounding = CON_ARG_FLOAT(2);
+
+			auto gray = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::GrayscaledGlass>>>>>();
 			gray->setSize(192.0f);
 			gray->setAnchor(0.5f);
 			gray->setPivot(0.5f);
+			gray->setOutlined(outlined);
+			gray->setRounding(rounding);
 			gray->setGrayscaleIntensity(intensity);
 			getScene()->getRoot()->attach(gray);
 		});
