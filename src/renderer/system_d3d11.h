@@ -72,10 +72,6 @@ namespace Renderer
 
 		std::shared_ptr<RenderTarget> currentRenderTarget = nullptr;
 
-	public:
-		const static std::unordered_map<Vertex::Attribute::Format, DXGI_FORMAT> Format;
-		const static std::unordered_map<Vertex::Attribute::Type, std::string> Semantic; // TODO: move to shader class
-
 	private:
 		void prepareForDrawing();
 

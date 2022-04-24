@@ -5,24 +5,6 @@
 
 using namespace Renderer;
 
-const std::unordered_map<Vertex::Attribute::Format, DXGI_FORMAT> SystemD3D11::Format = {
-	{ Vertex::Attribute::Format::R32F, DXGI_FORMAT_R32_FLOAT },
-	{ Vertex::Attribute::Format::R32G32F, DXGI_FORMAT_R32G32_FLOAT },
-	{ Vertex::Attribute::Format::R32G32B32F, DXGI_FORMAT_R32G32B32_FLOAT },
-	{ Vertex::Attribute::Format::R32G32B32A32F, DXGI_FORMAT_R32G32B32A32_FLOAT },
-	{ Vertex::Attribute::Format::R8UN, DXGI_FORMAT_R8_UNORM },
-	{ Vertex::Attribute::Format::R8G8UN, DXGI_FORMAT_R8G8_UNORM },
-//	{ Vertex::Attribute::Format::R8G8B8UN, DXGI_FORMAT_R8G8B8_UNORM }, // TODO: fix
-	{ Vertex::Attribute::Format::R8G8B8A8UN, DXGI_FORMAT_R8G8B8A8_UNORM }
-};
-
-const std::unordered_map<Vertex::Attribute::Type, std::string> SystemD3D11::Semantic = {
-	{ Vertex::Attribute::Type::Position, "POSITION" },
-	{ Vertex::Attribute::Type::Color, "COLOR" },
-	{ Vertex::Attribute::Type::TexCoord, "TEXCOORD" },
-	{ Vertex::Attribute::Type::Normal, "NORMAL" }
-};
-
 SystemD3D11::SystemD3D11()
 {
 	{

@@ -54,11 +54,29 @@ ShaderCustom::ShaderCustom(const Vertex::Layout& layout, const std::set<Vertex::
 	SystemD3D11::Device->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &mImpl->vertexShader);
 	SystemD3D11::Device->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &mImpl->pixelShader);
 
+	static const std::unordered_map<Vertex::Attribute::Type, std::string> Semantic = {
+		{ Vertex::Attribute::Type::Position, "POSITION" },
+		{ Vertex::Attribute::Type::Color, "COLOR" },
+		{ Vertex::Attribute::Type::TexCoord, "TEXCOORD" },
+		{ Vertex::Attribute::Type::Normal, "NORMAL" }
+	};
+
+	static const std::unordered_map<Vertex::Attribute::Format, DXGI_FORMAT> Format = {
+		{ Vertex::Attribute::Format::R32F, DXGI_FORMAT_R32_FLOAT },
+		{ Vertex::Attribute::Format::R32G32F, DXGI_FORMAT_R32G32_FLOAT },
+		{ Vertex::Attribute::Format::R32G32B32F, DXGI_FORMAT_R32G32B32_FLOAT },
+		{ Vertex::Attribute::Format::R32G32B32A32F, DXGI_FORMAT_R32G32B32A32_FLOAT },
+		{ Vertex::Attribute::Format::R8UN, DXGI_FORMAT_R8_UNORM },
+		{ Vertex::Attribute::Format::R8G8UN, DXGI_FORMAT_R8G8_UNORM },
+		//	{ Vertex::Attribute::Format::R8G8B8UN, DXGI_FORMAT_R8G8B8_UNORM }, // TODO: fix
+		{ Vertex::Attribute::Format::R8G8B8A8UN, DXGI_FORMAT_R8G8B8A8_UNORM }
+	};
+
 	std::vector<D3D11_INPUT_ELEMENT_DESC> input;
 
 	for (auto& attrib : layout.attributes)
 	{
-		input.push_back({ SystemD3D11::Semantic.at(attrib.type).c_str(), 0, SystemD3D11::Format.at(attrib.format), 0,
+		input.push_back({ Semantic.at(attrib.type).c_str(), 0, Format.at(attrib.format), 0,
 			static_cast<UINT>(attrib.offset), D3D11_INPUT_PER_VERTEX_DATA, 0 });
 	}
 
