@@ -63,10 +63,15 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 		if (CON_ARG_EXIST(0) && (name.find(CON_ARG(0)) == std::string::npos))
 			continue;
 
-		auto description = command.getDescription();
-
 		auto s = " - " + name;
-			
+
+		auto args = command.getArgsAsString();
+
+		if (!args.empty())
+			s += " " + args;
+
+		auto description = command.getDescription();
+		
 		if (description.has_value())
 			s += " - " + description.value();
 
