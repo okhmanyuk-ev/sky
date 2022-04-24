@@ -32,8 +32,12 @@ namespace Scene
 		auto getBlurIntensity() const { return mBlurIntensity; }
 		void setBlurIntensity(float value) { mBlurIntensity = value; }
 
+		auto getBlurPasses() const { return mBlurPasses; }
+		void setBlurPasses(int value) { mBlurPasses = value; }
+
 	private:
 		float mBlurIntensity = 1.0f;
+		int mBlurPasses = 1;
 	};
 
 	class GrayscaledGlass : public Glass

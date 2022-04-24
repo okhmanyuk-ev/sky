@@ -238,6 +238,11 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::SliderFloat("Blur Intensity", &intensity, 0.0f, 1.0f);
 		blur->setBlurIntensity(intensity);
 		ImGui::Separator();
+
+		auto passes = blur->getBlurPasses();		
+		ImGui::SliderInt("Blur Passes", &passes, 1, 8);
+		blur->setBlurPasses(passes);
+		ImGui::Separator();
 	}
 
 	if (auto shockwave = std::dynamic_pointer_cast<Shared::SceneHelpers::Shockwave>(node); shockwave != nullptr)

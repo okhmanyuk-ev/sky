@@ -46,7 +46,10 @@ void BlurredGlass::draw()
 	shader->setBias(mBlurIntensity * 8.0f);
 	setShader(shader);
 
-	Glass::draw();
+	for (int i = 0; i < mBlurPasses; i++)
+	{
+		Glass::draw();
+	}
 }
 
 // grayscaled glass
