@@ -458,6 +458,22 @@ void System::drawCircleTexture(const glm::vec4& color)
 	pop();
 }
 
+void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::vec2 & top_left_uv,
+	const glm::vec2& top_right_uv, const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
+	const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
+{
+	static auto vertices = std::vector<Renderer::Vertex::PositionColorTexture>(4);
+
+	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color, top_left_uv };
+	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color, bottom_left_uv };
+	vertices[2] = { { 1.0f, 1.0f, 0.0f }, color, bottom_right_uv };
+	vertices[3] = { { 1.0f, 0.0f, 0.0f }, color, top_right_uv };
+
+	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
+
+	draw(Renderer::Topology::TriangleList, texture, vertices, indices, shader);
+}
+
 void System::drawSprite(std::shared_ptr<Renderer::Texture> texture,
 	const TexRegion& tex_region, const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
@@ -469,16 +485,12 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture,
 	float s_x2 = (tex_region.size.x > 0.0f ? (tex_region.size.x / tex_w) : 1.0f) + s_x1;
 	float s_y2 = (tex_region.size.y > 0.0f ? (tex_region.size.y / tex_h) : 1.0f) + s_y1;
 
-	static auto vertices = std::vector<Renderer::Vertex::PositionColorTexture>(4);
+	glm::vec2 top_left_uv = { s_x1, s_y1 };
+	glm::vec2 top_right_uv = { s_x2, s_y1 };
+	glm::vec2 bottom_left_uv = { s_x1, s_y2 };
+	glm::vec2 bottom_right_uv = { s_x2, s_y2 };
 
-	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color, { s_x1, s_y1 } };
-	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color, { s_x1, s_y2 } };
-	vertices[2] = { { 1.0f, 1.0f, 0.0f }, color, { s_x2, s_y2 } };
-	vertices[3] = { { 1.0f, 0.0f, 0.0f }, color, { s_x2, s_y1 } };
-	
-	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
-	
-	draw(Renderer::Topology::TriangleList, texture, vertices, indices, shader);
+	drawSprite(texture, top_left_uv, top_right_uv, bottom_left_uv, bottom_right_uv, color, shader);
 }
 
 void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader)

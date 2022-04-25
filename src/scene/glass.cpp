@@ -1,4 +1,5 @@
 #include "glass.h"
+#include <common/helpers.h> // invlerp
 
 using namespace Scene;
 
@@ -24,6 +25,21 @@ void Glass::draw()
 
 	GRAPHICS->flush();
 	RENDERER->readPixels({ x, y }, { w, h }, getTexture());
+
+	auto tl = project({ 0.0f, 0.0f });
+	auto tr = project({ getAbsoluteWidth(), 0.0f });
+	auto bl = project({ 0.0f, getAbsoluteHeight() });
+	auto br = project({ getAbsoluteWidth(), getAbsoluteHeight() });
+
+	glm::vec2 min_pos = { static_cast<float>(x), static_cast<float>(y) };
+	glm::vec2 max_pos = min_pos + glm::vec2{ static_cast<float>(w), static_cast<float>(h) };
+
+	Sprite::DirectTexCoords coords;
+	coords.top_left_uv = Common::Helpers::invLerp(min_pos, max_pos, tl);
+	coords.top_right_uv = Common::Helpers::invLerp(min_pos, max_pos, tr);
+	coords.bottom_left_uv = Common::Helpers::invLerp(min_pos, max_pos, bl);
+	coords.bottom_right_uv = Common::Helpers::invLerp(min_pos, max_pos, br);
+	setDirectTexCoords(coords);
 
 	Sprite::draw();
 }

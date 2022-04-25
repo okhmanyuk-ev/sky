@@ -20,7 +20,17 @@ void Sprite::draw()
 	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->pushTextureAddress(mTextureAddress);
 	GRAPHICS->pushModelMatrix(model);
-	GRAPHICS->drawSprite(mTexture, mTexRegion, getColor(), mShader);
+	if (mDirectTexCoords.has_value())
+	{
+		auto coords = mDirectTexCoords.value();
+
+		GRAPHICS->drawSprite(mTexture, coords.top_left_uv, coords.top_right_uv, coords.bottom_left_uv, 
+			coords.bottom_right_uv, getColor(), mShader);
+	}
+	else
+	{
+		GRAPHICS->drawSprite(mTexture, mTexRegion, getColor(), mShader);
+	}
 	GRAPHICS->pop(4);
 }
 

@@ -45,4 +45,12 @@ namespace Common::Helpers
 	glm::vec3 SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst, Clock::Duration dTime, float friction = DefaultFriction);
 	glm::mat4 SmoothValueAssign(const glm::mat4& src, const glm::mat4& dst, Clock::Duration dTime, float friction = DefaultFriction);
 	float SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction);
+
+	// TODO: find identical function in glm
+	// TODO: it seems every smoothstep function call should be changed to this
+	template<typename T>
+	inline T invLerp(T edge0, T edge1, T x) 
+	{
+		return (x - edge0) / (edge1 - edge0);
+	};
 }

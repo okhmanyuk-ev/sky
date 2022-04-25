@@ -44,5 +44,21 @@ namespace Scene
 		Graphics::TexRegion mTexRegion = {};
 		Renderer::TextureAddress mTextureAddress = DefaultTextureAddress;
 		std::shared_ptr<Renderer::ShaderMatrices> mShader = nullptr;
+
+	public:
+		struct DirectTexCoords
+		{
+			glm::vec2 top_left_uv = { 0.0f, 0.0f };
+			glm::vec2 top_right_uv = { 0.0f, 0.0f };
+			glm::vec2 bottom_left_uv = { 0.0f, 0.0f };
+			glm::vec2 bottom_right_uv = { 0.0f, 0.0f };
+		};
+
+	public:
+		auto getDirectTexCoords() const { return mDirectTexCoords; }
+		void setDirectTexCoords(std::optional<DirectTexCoords> value) { mDirectTexCoords = value; }
+
+	private:
+		std::optional<DirectTexCoords> mDirectTexCoords;
 	};
 }

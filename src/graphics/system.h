@@ -96,6 +96,10 @@ namespace Graphics
 		void drawCircleTexture(const glm::vec4& color = { Color::White, 1.0f });
 
 		// sprite
+		void drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::vec2& top_left_uv, 
+			const glm::vec2& top_right_uv, const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
+			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+
 		void drawSprite(std::shared_ptr<Renderer::Texture> texture, 
 			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f }, 
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
