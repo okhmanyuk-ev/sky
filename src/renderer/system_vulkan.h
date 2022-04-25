@@ -8,6 +8,7 @@
 #include <common/hash.h>
 #include <renderer/low_level_api.h>
 #include <map>
+#include <vulkan/vulkan_raii.hpp>
 
 namespace Renderer
 {
@@ -52,6 +53,7 @@ namespace Renderer
 		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0) override;
 
 		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) override;
+		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture) override;
 
 		void present() override;
 
@@ -65,6 +67,29 @@ namespace Renderer
 
 		RenderTarget::RenderTargetHandler createRenderTarget(Texture::Handler texture) override;
 		void destroyRenderTarget(RenderTarget::RenderTargetHandler value) override;
+
+	private:
+		void setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image,
+			vk::Format format, vk::ImageLayout oldImageLayout, vk::ImageLayout newImageLayout);
+
+		template <typename Func>
+		void oneTimeSubmit(vk::raii::CommandBuffer const& commandBuffer, vk::raii::Queue const& queue, Func const& func)
+		{
+			commandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+			func(commandBuffer);
+			commandBuffer.end();
+			vk::SubmitInfo submitInfo(nullptr, nullptr, *commandBuffer);
+			queue.submit(submitInfo, nullptr);
+			queue.waitIdle();
+		}
+
+		template <typename Func>
+		void oneTimeSubmit(vk::raii::Device const& device, vk::raii::CommandPool const& commandPool, vk::raii::Queue const& queue, Func const& func)
+		{
+			vk::raii::CommandBuffers commandBuffers(device, { *commandPool, vk::CommandBufferLevel::ePrimary, 1 });
+			oneTimeSubmit(commandBuffers.front(), queue, func);
+		}
+
 	};
 }
 #endif

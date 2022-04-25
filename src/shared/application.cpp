@@ -7,6 +7,8 @@
 #include <shared/scene_manager.h>
 #include <shared/scene_helpers.h>
 
+#include <renderer/system_vulkan.h>
+
 using namespace Shared;
 
 Application::Application(const std::string& appname, const Flags& flags) : mFlags(flags)
