@@ -62,6 +62,9 @@ void BlurredGlass::draw()
 	shader->setBias(mBlurIntensity * 8.0f);
 	setShader(shader);
 
+	if (mBlurPasses < 1)
+		mBlurPasses = 1;
+
 	for (int i = 0; i < mBlurPasses; i++)
 	{
 		Glass::draw();
