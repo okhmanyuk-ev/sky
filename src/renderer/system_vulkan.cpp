@@ -13,43 +13,16 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT flags, 
 	return VK_FALSE;
 }
 
-static vk::raii::Context gContext;
-static vk::raii::Instance gInstance = nullptr;
-static vk::raii::PhysicalDevice gPhysicalDevice = nullptr;
-static vk::raii::Queue gQueue = nullptr;
-static vk::raii::Device gDevice = nullptr;
-static vk::raii::SurfaceKHR gSurface = nullptr;
-static vk::raii::SwapchainKHR gSwapchain = nullptr;
-static vk::raii::CommandPool gCommandPool = nullptr;
-static vk::SurfaceFormatKHR gSurfaceFormat;
-static uint32_t gMinImageCount = 2; // TODO: https://github.com/nvpro-samples/nvpro_core/blob/f2c05e161bba9ab9a8c96c0173bf0edf7c168dfa/nvvk/swapchain_vk.cpp#L143
-static uint32_t gQueueFamilyIndex = -1;
-static uint32_t gSemaphoreIndex = 0;
-static uint32_t gFrameIndex = 0;
-static uint32_t gWidth = 0;
-static uint32_t gHeight = 0;
-
-struct Frame
-{
-	vk::raii::CommandBuffer command_buffer = nullptr;
-	vk::raii::Fence fence = nullptr;
-	vk::raii::ImageView backbuffer_view = nullptr;
-	vk::raii::Semaphore image_acquired_semaphore = nullptr;
-	vk::raii::Semaphore render_complete_semaphore = nullptr;
-};
-
-static std::vector<Frame> gFrames;
-
 SystemVK::SystemVK()
 {
-	auto all_extensions = gContext.enumerateInstanceExtensionProperties();
+	auto all_extensions = mContext.enumerateInstanceExtensionProperties();
 
 	for (auto extension : all_extensions)
 	{
 	//	std::cout << extension.extensionName << std::endl;
 	}
 
-	auto all_layers = gContext.enumerateInstanceLayerProperties();
+	auto all_layers = mContext.enumerateInstanceLayerProperties();
 
 	for (auto layer : all_layers)
 	{
@@ -65,7 +38,7 @@ SystemVK::SystemVK()
 		"VK_LAYER_KHRONOS_validation"
 	};
 
-	auto version = gContext.enumerateInstanceVersion();
+	auto version = mContext.enumerateInstanceVersion();
 
 	auto major_version = VK_API_VERSION_MAJOR(version);
 	auto minor_version = VK_API_VERSION_MINOR(version);
@@ -80,9 +53,9 @@ SystemVK::SystemVK()
 		.setPEnabledLayerNames(layers)
 		.setPApplicationInfo(&application_info);
 
-	gInstance = gContext.createInstance(instance_info);
+	mInstance = mContext.createInstance(instance_info);
 
-	auto devices = gInstance.enumeratePhysicalDevices();
+	auto devices = mInstance.enumeratePhysicalDevices();
 	int device_index = 0;
 	for (size_t i = 0; i < devices.size(); i++)
 	{
@@ -94,20 +67,20 @@ SystemVK::SystemVK()
 		}
 	}
 
-	gPhysicalDevice = std::move(devices.at(device_index));
+	mPhysicalDevice = std::move(devices.at(device_index));
 
-	auto properties = gPhysicalDevice.getQueueFamilyProperties();
+	auto properties = mPhysicalDevice.getQueueFamilyProperties();
 
 	for (size_t i = 0; i < properties.size(); i++)
 	{
 		if (properties[i].queueFlags & vk::QueueFlagBits::eGraphics)
 		{
-			gQueueFamilyIndex = i;
+			mQueueFamilyIndex = i;
 			break;
 		}
 	}
 
-	auto all_device_extensions = gPhysicalDevice.enumerateDeviceExtensionProperties();
+	auto all_device_extensions = mPhysicalDevice.enumerateDeviceExtensionProperties();
 
 	for (auto device_extension : all_device_extensions)
 	{
@@ -122,10 +95,10 @@ SystemVK::SystemVK()
 	auto queue_priority = { 1.0f };
 
 	auto queue_info = vk::DeviceQueueCreateInfo()
-		.setQueueFamilyIndex(gQueueFamilyIndex)
+		.setQueueFamilyIndex(mQueueFamilyIndex)
 		.setQueuePriorities(queue_priority);
 
-	auto device_features = gPhysicalDevice.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features>();
+	auto device_features = mPhysicalDevice.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features>();
 
 	auto device_info = vk::DeviceCreateInfo()
 		.setQueueCreateInfoCount(1)
@@ -134,20 +107,20 @@ SystemVK::SystemVK()
 		.setPEnabledFeatures(nullptr)
 		.setPNext(&device_features);
 
-	gDevice = gPhysicalDevice.createDevice(device_info);
-	gQueue = gDevice.getQueue(gQueueFamilyIndex, 0);
+	mDevice = mPhysicalDevice.createDevice(device_info);
+	mQueue = mDevice.getQueue(mQueueFamilyIndex, 0);
 
 	auto surface_info = vk::Win32SurfaceCreateInfoKHR()
 		.setHinstance(Platform::SystemWindows::Instance)
 		.setHwnd(Platform::SystemWindows::Window);
 	
-	gSurface = vk::raii::SurfaceKHR(gInstance, surface_info);
+	mSurface = vk::raii::SurfaceKHR(mInstance, surface_info);
 
-	auto formats = gPhysicalDevice.getSurfaceFormatsKHR(*gSurface);
+	auto formats = mPhysicalDevice.getSurfaceFormatsKHR(*mSurface);
 
 	if ((formats.size() == 1) && (formats.at(0).format == vk::Format::eUndefined))
 	{
-		gSurfaceFormat = {
+		mSurfaceFormat = {
 			vk::Format::eB8G8R8A8Unorm,
 			formats.at(0).colorSpace
 		};
@@ -159,22 +132,22 @@ SystemVK::SystemVK()
 		{
 			if (format.format == vk::Format::eB8G8R8A8Unorm)
 			{
-				gSurfaceFormat = format;
+				mSurfaceFormat = format;
 				found = true;
 				break;
 			}
 		}
 		if (!found)
 		{
-			gSurfaceFormat = formats.at(0);
+			mSurfaceFormat = formats.at(0);
 		}
 	}
 
 	auto command_pool_info = vk::CommandPoolCreateInfo()
 		.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer)
-		.setQueueFamilyIndex(gQueueFamilyIndex);
+		.setQueueFamilyIndex(mQueueFamilyIndex);
 
-	gCommandPool = gDevice.createCommandPool(command_pool_info);
+	mCommandPool = mDevice.createCommandPool(command_pool_info);
 
 	createSwapchain();
 }
@@ -186,31 +159,31 @@ SystemVK::~SystemVK()
 
 void SystemVK::createSwapchain()
 {
-	gWidth = static_cast<uint32_t>(PLATFORM->getWidth());
-	gHeight = static_cast<uint32_t>(PLATFORM->getHeight());
+	mWidth = static_cast<uint32_t>(PLATFORM->getWidth());
+	mHeight = static_cast<uint32_t>(PLATFORM->getHeight());
 
 	auto swapchain_info = vk::SwapchainCreateInfoKHR()
-		.setSurface(*gSurface)
-		.setMinImageCount(gMinImageCount)
-		.setImageFormat(gSurfaceFormat.format)
-		.setImageColorSpace(gSurfaceFormat.colorSpace)
-		.setImageExtent({ gWidth, gHeight })
+		.setSurface(*mSurface)
+		.setMinImageCount(mMinImageCount)
+		.setImageFormat(mSurfaceFormat.format)
+		.setImageColorSpace(mSurfaceFormat.colorSpace)
+		.setImageExtent({ mWidth, mHeight })
 		.setImageUsage(vk::ImageUsageFlagBits::eColorAttachment)
 		.setPreTransform(vk::SurfaceTransformFlagBitsKHR::eIdentity)
 		.setImageArrayLayers(1)
 		.setImageSharingMode(vk::SharingMode::eExclusive)
 		.setQueueFamilyIndexCount(1)
-		.setPQueueFamilyIndices(&gQueueFamilyIndex)
+		.setPQueueFamilyIndices(&mQueueFamilyIndex)
 		.setPresentMode(vk::PresentModeKHR::eFifo)
 		.setClipped(true)
 		.setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque)
-		.setOldSwapchain(*gSwapchain);
+		.setOldSwapchain(*mSwapchain);
 
-	gSwapchain = gDevice.createSwapchainKHR(swapchain_info);
+	mSwapchain = mDevice.createSwapchainKHR(swapchain_info);
 
-	auto backbuffers = gSwapchain.getImages();
+	auto backbuffers = mSwapchain.getImages();
 
-	gFrames.clear();
+	mFrames.clear();
 
 	for (auto& backbuffer : backbuffers)
 	{
@@ -219,22 +192,22 @@ void SystemVK::createSwapchain()
 		auto buffer_allocate_info = vk::CommandBufferAllocateInfo()
 			.setCommandBufferCount(1)
 			.setLevel(vk::CommandBufferLevel::ePrimary)
-			.setCommandPool(*gCommandPool);
+			.setCommandPool(*mCommandPool);
 
-		auto command_buffers = gDevice.allocateCommandBuffers(buffer_allocate_info);
+		auto command_buffers = mDevice.allocateCommandBuffers(buffer_allocate_info);
 		frame.command_buffer = std::move(command_buffers.at(0));
 
 		auto fence_info = vk::FenceCreateInfo()
 			.setFlags(vk::FenceCreateFlagBits::eSignaled);
 
-		frame.fence = gDevice.createFence(fence_info);
+		frame.fence = mDevice.createFence(fence_info);
 
-		frame.image_acquired_semaphore = gDevice.createSemaphore({});
-		frame.render_complete_semaphore = gDevice.createSemaphore({});
+		frame.image_acquired_semaphore = mDevice.createSemaphore({});
+		frame.render_complete_semaphore = mDevice.createSemaphore({});
 
 		auto image_view_info = vk::ImageViewCreateInfo()
 			.setViewType(vk::ImageViewType::e2D)
-			.setFormat(gSurfaceFormat.format)
+			.setFormat(mSurfaceFormat.format)
 			.setComponents(vk::ComponentMapping()
 				.setR(vk::ComponentSwizzle::eR)
 				.setG(vk::ComponentSwizzle::eG)
@@ -250,14 +223,14 @@ void SystemVK::createSwapchain()
 			)
 			.setImage(backbuffer);
 
-		frame.backbuffer_view = gDevice.createImageView(image_view_info);
+		frame.backbuffer_view = mDevice.createImageView(image_view_info);
 
-		oneTimeSubmit(gDevice, gCommandPool, gQueue, [&](auto& cmd) {
-			setImageLayout(cmd, backbuffer, gSurfaceFormat.format, vk::ImageLayout::eUndefined, 
+		oneTimeSubmit(mDevice, mCommandPool, mQueue, [&](auto& cmd) {
+			setImageLayout(cmd, backbuffer, mSurfaceFormat.format, vk::ImageLayout::eUndefined, 
 				vk::ImageLayout::ePresentSrcKHR);
 		});
 
-		gFrames.push_back(std::move(frame));
+		mFrames.push_back(std::move(frame));
 	}
 }
 
@@ -368,47 +341,14 @@ void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 
 void SystemVK::present()
 {
-	const auto& image_acquired_semaphore = gFrames.at(gSemaphoreIndex).image_acquired_semaphore;
-	const auto& render_complete_semaphore = gFrames.at(gSemaphoreIndex).render_complete_semaphore;
+	begin();
+	end();
 
-	auto [result, image_index] = gSwapchain.acquireNextImage(UINT64_MAX, *image_acquired_semaphore);
+	const auto& image_acquired_semaphore = mFrames.at(mSemaphoreIndex).image_acquired_semaphore;
+	const auto& render_complete_semaphore = mFrames.at(mSemaphoreIndex).render_complete_semaphore;
 
-	gFrameIndex = image_index;
-
-	const auto& frame = gFrames.at(gFrameIndex);
-
-	gDevice.waitForFences({ *frame.fence }, true, UINT64_MAX);
-	gDevice.resetFences({ *frame.fence });
-
-	auto begin_info = vk::CommandBufferBeginInfo()
-		.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
-
-	frame.command_buffer.begin(begin_info);
-
-	auto clear_value = vk::ClearValue();
-	clear_value.color.float32[0] = 0.2f;
-	clear_value.color.float32[1] = 0.5f;
-	clear_value.color.float32[2] = 0.2f;
-	clear_value.color.float32[3] = 1.0f;
+	const auto& frame = getFrame();
 	
-	auto color_attachment = vk::RenderingAttachmentInfo()
-		.setImageView(*frame.backbuffer_view)
-		.setImageLayout(vk::ImageLayout::eAttachmentOptimal)
-		.setLoadOp(vk::AttachmentLoadOp::eClear)
-		.setStoreOp(vk::AttachmentStoreOp::eStore)
-		.setClearValue(clear_value);
-
-	auto rendering_info = vk::RenderingInfo()
-		.setRenderArea({ { 0, 0 }, { gWidth, gHeight } })
-		.setLayerCount(1)
-		.setColorAttachmentCount(1)
-		.setPColorAttachments(&color_attachment);
-
-	frame.command_buffer.beginRendering(rendering_info);
-	frame.command_buffer.endRendering();
-
-	frame.command_buffer.end();
-
 	vk::PipelineStageFlags wait_dst_stage_mask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
 
 	auto submit_info = vk::SubmitInfo()
@@ -420,19 +360,19 @@ void SystemVK::present()
 		.setSignalSemaphoreCount(1)
 		.setPSignalSemaphores(&*render_complete_semaphore);
 
-	gQueue.submit({ submit_info }, *frame.fence); // TODO: can be called with no fence, check it out
+	mQueue.submit({ submit_info }, *frame.fence); // TODO: can be called with no fence, check it out
 
 	auto present_info = vk::PresentInfoKHR()
 		.setWaitSemaphoreCount(1)
 		.setPWaitSemaphores(&*render_complete_semaphore)
 		.setSwapchainCount(1)
-		.setPSwapchains(&*gSwapchain)
-		.setPImageIndices(&gFrameIndex);
+		.setPSwapchains(&*mSwapchain)
+		.setPImageIndices(&mFrameIndex);
 
-	gQueue.presentKHR(present_info);
-	gQueue.waitIdle();
+	mQueue.presentKHR(present_info);
+	mQueue.waitIdle();
 
-	gSemaphoreIndex = (gSemaphoreIndex + 1) % gFrames.size(); // TODO: maybe gFrameIndex can be used for both
+	mSemaphoreIndex = (mSemaphoreIndex + 1) % mFrames.size(); // TODO: maybe gFrameIndex can be used for both
 }
 
 Texture::Handler SystemVK::createTexture(int width, int height, bool mipmap)
@@ -458,6 +398,62 @@ RenderTarget::RenderTargetHandler SystemVK::createRenderTarget(Texture::Handler 
 void SystemVK::destroyRenderTarget(RenderTarget::RenderTargetHandler value)
 {
 	//
+}
+
+void SystemVK::begin()
+{
+	assert(!mWorking);
+	mWorking = true;
+
+	const auto& image_acquired_semaphore = mFrames.at(mSemaphoreIndex).image_acquired_semaphore;
+
+	auto [result, image_index] = mSwapchain.acquireNextImage(UINT64_MAX, *image_acquired_semaphore);
+
+	mFrameIndex = image_index;
+
+	const auto& frame = getFrame();
+
+	mDevice.waitForFences({ *frame.fence }, true, UINT64_MAX);
+	mDevice.resetFences({ *frame.fence });
+
+	auto begin_info = vk::CommandBufferBeginInfo()
+		.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+
+	const auto& cmd = getCommandBuffer();
+
+	cmd.begin(begin_info);
+
+	auto clear_color = vk::ClearColorValue()
+		.setFloat32({ 0.2f, 0.5f, 0.2f, 1.0f });
+
+	auto clear_value = vk::ClearValue()
+		.setColor(clear_color);
+
+	auto color_attachment = vk::RenderingAttachmentInfo()
+		.setImageView(*frame.backbuffer_view)
+		.setImageLayout(vk::ImageLayout::eAttachmentOptimal)
+		.setLoadOp(vk::AttachmentLoadOp::eClear)
+		.setStoreOp(vk::AttachmentStoreOp::eStore)
+		.setClearValue(clear_value);
+
+	auto rendering_info = vk::RenderingInfo()
+		.setRenderArea({ { 0, 0 }, { mWidth, mHeight } })
+		.setLayerCount(1)
+		.setColorAttachmentCount(1)
+		.setPColorAttachments(&color_attachment);
+
+	cmd.beginRendering(rendering_info);
+}
+
+void SystemVK::end()
+{
+	assert(mWorking);
+	mWorking = false;
+
+	const auto& cmd = getCommandBuffer();
+
+	cmd.endRendering();
+	cmd.end();
 }
 
 void SystemVK::setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image, 

@@ -69,6 +69,42 @@ namespace Renderer
 		void destroyRenderTarget(RenderTarget::RenderTargetHandler value) override;
 
 	private:
+		vk::raii::Context mContext;
+		vk::raii::Instance mInstance = nullptr;
+		vk::raii::PhysicalDevice mPhysicalDevice = nullptr;
+		vk::raii::Queue mQueue = nullptr;
+		vk::raii::Device mDevice = nullptr;
+		vk::raii::SurfaceKHR mSurface = nullptr;
+		vk::raii::SwapchainKHR mSwapchain = nullptr;
+		vk::raii::CommandPool mCommandPool = nullptr;
+		vk::SurfaceFormatKHR mSurfaceFormat;
+		uint32_t mMinImageCount = 2; // TODO: https://github.com/nvpro-samples/nvpro_core/blob/f2c05e161bba9ab9a8c96c0173bf0edf7c168dfa/nvvk/swapchain_vk.cpp#L143
+		uint32_t mQueueFamilyIndex = -1;
+		uint32_t mSemaphoreIndex = 0;
+		uint32_t mFrameIndex = 0;
+		uint32_t mWidth = 0;
+		uint32_t mHeight = 0;
+		bool mWorking = false;
+
+		struct Frame
+		{
+			vk::raii::CommandBuffer command_buffer = nullptr;
+			vk::raii::Fence fence = nullptr;
+			vk::raii::ImageView backbuffer_view = nullptr;
+			vk::raii::Semaphore image_acquired_semaphore = nullptr;
+			vk::raii::Semaphore render_complete_semaphore = nullptr;
+		};
+
+		std::vector<Frame> mFrames;
+
+	private:
+		void begin();
+		void end();
+
+		const auto& getFrame() const { return mFrames.at(mFrameIndex); }
+		const auto& getCommandBuffer() const { return getFrame().command_buffer; }
+
+	private: // utils
 		void setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image,
 			vk::Format format, vk::ImageLayout oldImageLayout, vk::ImageLayout newImageLayout);
 
