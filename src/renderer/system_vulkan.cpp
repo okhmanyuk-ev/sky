@@ -149,12 +149,22 @@ SystemVK::SystemVK()
 
 	mCommandPool = mDevice.createCommandPool(command_pool_info);
 
+	auto command_buffer_allocate_info = vk::CommandBufferAllocateInfo()
+		.setCommandBufferCount(1)
+		.setLevel(vk::CommandBufferLevel::eSecondary)
+		.setCommandPool(*mCommandPool);
+
+	auto command_buffers = mDevice.allocateCommandBuffers(command_buffer_allocate_info);
+	mCommandBuffer = std::move(command_buffers.at(0));
+
 	createSwapchain();
+
+	begin();
 }
 
 SystemVK::~SystemVK()
 {
-	//
+	end();
 }
 
 void SystemVK::createSwapchain()
@@ -241,7 +251,15 @@ void SystemVK::onEvent(const Platform::System::ResizeEvent& e)
 
 void SystemVK::setTopology(const Renderer::Topology& value)
 {
-	//
+	static const std::map<Renderer::Topology, vk::PrimitiveTopology> TopologyMap = {
+		{ Renderer::Topology::PointList, vk::PrimitiveTopology::ePointList },
+		{ Renderer::Topology::LineList, vk::PrimitiveTopology::eLineList },
+		{ Renderer::Topology::LineStrip, vk::PrimitiveTopology::eLineStrip },
+		{ Renderer::Topology::TriangleList, vk::PrimitiveTopology::eTriangleList },
+		{ Renderer::Topology::TriangleStrip, vk::PrimitiveTopology::eTriangleStrip },
+	};
+
+	mCommandBuffer.setPrimitiveTopology(TopologyMap.at(value));
 }
 
 void SystemVK::setViewport(const Viewport& value) 
@@ -316,17 +334,63 @@ void SystemVK::setTextureAddressMode(const TextureAddress& value)
 
 void SystemVK::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
-	//
+	auto clear_rect = vk::ClearRect()
+		.setBaseArrayLayer(0)
+		.setLayerCount(1)
+		.setRect({ { 0, 0 }, { mWidth, mHeight } });
+
+	if (color.has_value())
+	{
+		auto value = color.value();
+
+		auto clear_color_value = vk::ClearColorValue()
+			.setFloat32({ value.r, value.g, value.b, value.a });
+
+		auto clear_value = vk::ClearValue()
+			.setColor(clear_color_value);
+		
+		auto attachment = vk::ClearAttachment()
+			.setAspectMask(vk::ImageAspectFlagBits::eColor)
+			.setColorAttachment(0)
+			.setClearValue(clear_value);
+
+		mCommandBuffer.clearAttachments({ attachment }, { clear_rect });
+	}
+
+	if (depth.has_value() || stencil.has_value())
+	{
+		auto clear_depth_stencil_value = vk::ClearDepthStencilValue()
+			.setDepth(depth.value_or(1.0f))
+			.setStencil((uint32_t)stencil.value_or(0)); // TODO: maybe we should change argument uint8_t -> uint32_t
+
+		auto clear_value = vk::ClearValue()
+			.setDepthStencil(clear_depth_stencil_value);
+
+		auto aspect_mask = vk::ImageAspectFlags();
+
+		if (depth.has_value())
+			aspect_mask |= vk::ImageAspectFlagBits::eDepth;
+
+		if (stencil.has_value())
+			aspect_mask |= vk::ImageAspectFlagBits::eStencil;
+
+		auto attachment = vk::ClearAttachment()
+			.setAspectMask(aspect_mask)
+			.setColorAttachment(0)
+			.setClearValue(clear_value);
+
+		mCommandBuffer.clearAttachments({ attachment }, { clear_rect });
+	}
 }
 
 void SystemVK::draw(size_t vertexCount, size_t vertexOffset)
 {
-	//
+	//mCommandBuffer.draw(vertexCount, 0, vertexOffset, 0);
 }
 
 void SystemVK::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOffset)
 {
-	//
+	//mCommandBuffer.drawIndexed(indexCount, 0, indexOffset, vertexOffset, 0);
 }
 
 void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory)
@@ -341,14 +405,46 @@ void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 
 void SystemVK::present()
 {
-	begin();
 	end();
 
 	const auto& image_acquired_semaphore = mFrames.at(mSemaphoreIndex).image_acquired_semaphore;
-	const auto& render_complete_semaphore = mFrames.at(mSemaphoreIndex).render_complete_semaphore;
+
+	auto [result, image_index] = mSwapchain.acquireNextImage(UINT64_MAX, *image_acquired_semaphore);
+
+	mFrameIndex = image_index;
 
 	const auto& frame = getFrame();
-	
+
+	mDevice.waitForFences({ *frame.fence }, true, UINT64_MAX);
+	mDevice.resetFences({ *frame.fence });
+
+	auto begin_info = vk::CommandBufferBeginInfo()
+		.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+
+	const auto& cmd = getCommandBuffer();
+
+	cmd.begin(begin_info);
+
+	auto color_attachment = vk::RenderingAttachmentInfo()
+		.setImageView(*frame.backbuffer_view)
+		.setImageLayout(vk::ImageLayout::eAttachmentOptimal)
+		.setLoadOp(vk::AttachmentLoadOp::eDontCare)
+		.setStoreOp(vk::AttachmentStoreOp::eStore);
+
+	auto rendering_info = vk::RenderingInfo()
+		.setRenderArea({ { 0, 0 }, { mWidth, mHeight } })
+		.setLayerCount(1)
+		.setColorAttachmentCount(1)
+		.setPColorAttachments(&color_attachment)
+		.setFlags(vk::RenderingFlagBits::eContentsSecondaryCommandBuffers);
+
+	cmd.beginRendering(rendering_info);
+	cmd.executeCommands({ *mCommandBuffer });
+	cmd.endRendering();
+	cmd.end();
+
+	const auto& render_complete_semaphore = mFrames.at(mSemaphoreIndex).render_complete_semaphore;
+
 	vk::PipelineStageFlags wait_dst_stage_mask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
 
 	auto submit_info = vk::SubmitInfo()
@@ -373,6 +469,8 @@ void SystemVK::present()
 	mQueue.waitIdle();
 
 	mSemaphoreIndex = (mSemaphoreIndex + 1) % mFrames.size(); // TODO: maybe gFrameIndex can be used for both
+
+	begin();
 }
 
 Texture::Handler SystemVK::createTexture(int width, int height, bool mipmap)
@@ -405,44 +503,19 @@ void SystemVK::begin()
 	assert(!mWorking);
 	mWorking = true;
 
-	const auto& image_acquired_semaphore = mFrames.at(mSemaphoreIndex).image_acquired_semaphore;
+	auto inheritance_rendering_info = vk::CommandBufferInheritanceRenderingInfo()
+		.setColorAttachmentCount(1)
+		.setPColorAttachmentFormats(&mSurfaceFormat.format)
+		.setRasterizationSamples(vk::SampleCountFlagBits::e1);
 
-	auto [result, image_index] = mSwapchain.acquireNextImage(UINT64_MAX, *image_acquired_semaphore);
-
-	mFrameIndex = image_index;
-
-	const auto& frame = getFrame();
-
-	mDevice.waitForFences({ *frame.fence }, true, UINT64_MAX);
-	mDevice.resetFences({ *frame.fence });
+	auto inheritance_info = vk::CommandBufferInheritanceInfo()
+		.setPNext(&inheritance_rendering_info);
 
 	auto begin_info = vk::CommandBufferBeginInfo()
-		.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+		.setFlags(vk::CommandBufferUsageFlagBits::eRenderPassContinue)
+		.setPInheritanceInfo(&inheritance_info);
 
-	const auto& cmd = getCommandBuffer();
-
-	cmd.begin(begin_info);
-
-	auto clear_color = vk::ClearColorValue()
-		.setFloat32({ 0.2f, 0.5f, 0.2f, 1.0f });
-
-	auto clear_value = vk::ClearValue()
-		.setColor(clear_color);
-
-	auto color_attachment = vk::RenderingAttachmentInfo()
-		.setImageView(*frame.backbuffer_view)
-		.setImageLayout(vk::ImageLayout::eAttachmentOptimal)
-		.setLoadOp(vk::AttachmentLoadOp::eClear)
-		.setStoreOp(vk::AttachmentStoreOp::eStore)
-		.setClearValue(clear_value);
-
-	auto rendering_info = vk::RenderingInfo()
-		.setRenderArea({ { 0, 0 }, { mWidth, mHeight } })
-		.setLayerCount(1)
-		.setColorAttachmentCount(1)
-		.setPColorAttachments(&color_attachment);
-
-	cmd.beginRendering(rendering_info);
+	mCommandBuffer.begin(begin_info);
 }
 
 void SystemVK::end()
@@ -450,10 +523,7 @@ void SystemVK::end()
 	assert(mWorking);
 	mWorking = false;
 
-	const auto& cmd = getCommandBuffer();
-
-	cmd.endRendering();
-	cmd.end();
+	mCommandBuffer.end();
 }
 
 void SystemVK::setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image, 

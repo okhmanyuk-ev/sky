@@ -77,6 +77,7 @@ namespace Renderer
 		vk::raii::SurfaceKHR mSurface = nullptr;
 		vk::raii::SwapchainKHR mSwapchain = nullptr;
 		vk::raii::CommandPool mCommandPool = nullptr;
+		vk::raii::CommandBuffer mCommandBuffer = nullptr;
 		vk::SurfaceFormatKHR mSurfaceFormat;
 		uint32_t mMinImageCount = 2; // TODO: https://github.com/nvpro-samples/nvpro_core/blob/f2c05e161bba9ab9a8c96c0173bf0edf7c168dfa/nvvk/swapchain_vk.cpp#L143
 		uint32_t mQueueFamilyIndex = -1;
