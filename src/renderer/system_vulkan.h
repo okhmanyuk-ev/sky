@@ -102,9 +102,6 @@ namespace Renderer
 		void begin();
 		void end();
 
-		const auto& getFrame() const { return mFrames.at(mFrameIndex); }
-		const auto& getCommandBuffer() const { return getFrame().command_buffer; }
-
 	private: // utils
 		void setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image,
 			vk::Format format, vk::ImageLayout oldImageLayout, vk::ImageLayout newImageLayout);

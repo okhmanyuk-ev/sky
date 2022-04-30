@@ -264,12 +264,24 @@ void SystemVK::setTopology(const Renderer::Topology& value)
 
 void SystemVK::setViewport(const Viewport& value) 
 {
-	//
+	auto viewport = vk::Viewport()
+		.setX(value.position.x)
+		.setY(value.position.y)
+		.setWidth(value.size.x)
+		.setHeight(value.size.y)
+		.setMinDepth(value.minDepth)
+		.setMaxDepth(value.maxDepth);
+
+	mCommandBuffer.setViewport(0, { viewport });
 }
 
 void SystemVK::setScissor(const Scissor& value)
 {
-	//
+	/*auto scissor = vk::Rect2D()
+		.setOffset({ static_cast<int>(value.position.x), static_cast<int>(value.position.y) })
+		.setExtent({ static_cast<int>(value.size.x), static_cast<int>(value.size.y) });
+
+	mCommandBuffer.setScissor(0, { scissor });*/
 }
 
 void SystemVK::setScissor(std::nullptr_t value)
@@ -307,19 +319,38 @@ void SystemVK::setSampler(const Sampler& value)
 	//
 }
 
+const static std::unordered_map<ComparisonFunc, vk::CompareOp> CompareOpMap = {
+	{ ComparisonFunc::Always, vk::CompareOp::eAlways },
+	{ ComparisonFunc::Never, vk::CompareOp::eNever },
+	{ ComparisonFunc::Less, vk::CompareOp::eLess },
+	{ ComparisonFunc::Equal, vk::CompareOp::eEqual },
+	{ ComparisonFunc::NotEqual, vk::CompareOp::eNotEqual },
+	{ ComparisonFunc::LessEqual, vk::CompareOp::eLessOrEqual },
+	{ ComparisonFunc::Greater, vk::CompareOp::eGreater },
+	{ ComparisonFunc::GreaterEqual, vk::CompareOp::eGreaterOrEqual }
+};
+
 void SystemVK::setDepthMode(const DepthMode& value)
 {
-	//
+	mCommandBuffer.setDepthTestEnable(value.enabled);
+	mCommandBuffer.setDepthCompareOp(CompareOpMap.at(value.func));
+	mCommandBuffer.setDepthWriteEnable(true);
 }
 
 void SystemVK::setStencilMode(const StencilMode& value)
 {
-	//
+	mCommandBuffer.setStencilTestEnable(value.enabled);
 }
 
 void SystemVK::setCullMode(const CullMode& value)
 {
-	//
+	const static std::unordered_map<CullMode, vk::CullModeFlags> CullModeMap = {
+		{ CullMode::None, vk::CullModeFlagBits::eNone },
+		{ CullMode::Front, vk::CullModeFlagBits::eFront },
+		{ CullMode::Back, vk::CullModeFlagBits::eBack },
+	};
+
+	mCommandBuffer.setCullMode(CullModeMap.at(value));
 }
 
 void SystemVK::setBlendMode(const BlendMode& value)
@@ -413,7 +444,7 @@ void SystemVK::present()
 
 	mFrameIndex = image_index;
 
-	const auto& frame = getFrame();
+	const auto& frame = mFrames.at(mFrameIndex);
 
 	mDevice.waitForFences({ *frame.fence }, true, UINT64_MAX);
 	mDevice.resetFences({ *frame.fence });
@@ -421,7 +452,7 @@ void SystemVK::present()
 	auto begin_info = vk::CommandBufferBeginInfo()
 		.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
 
-	const auto& cmd = getCommandBuffer();
+	const auto& cmd = frame.command_buffer;
 
 	cmd.begin(begin_info);
 
