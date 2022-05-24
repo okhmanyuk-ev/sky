@@ -272,7 +272,7 @@ void SystemVK::setViewport(const Viewport& value)
 		.setMinDepth(value.minDepth)
 		.setMaxDepth(value.maxDepth);
 
-	mCommandBuffer.setViewportWithCount({ viewport });
+	mCommandBuffer.setViewport(0, { viewport });
 }
 
 void SystemVK::setScissor(const Scissor& value)
@@ -281,7 +281,7 @@ void SystemVK::setScissor(const Scissor& value)
 		.setOffset({ static_cast<int32_t>(value.position.x), static_cast<int32_t>(value.position.y) })
 		.setExtent({ static_cast<uint32_t>(value.size.x), static_cast<uint32_t>(value.size.y) });
 
-	mCommandBuffer.setScissorWithCount({ rect });
+	mCommandBuffer.setScissor(0, { rect });
 }
 
 void SystemVK::setScissor(std::nullptr_t value)
@@ -781,6 +781,13 @@ static uint32_t GetMemoryType(vk::MemoryPropertyFlags properties, uint32_t type_
 
 void SystemVK::drawTest()
 {
+	struct Vertex
+	{
+		glm::vec2 pos;
+		glm::vec2 uv;
+		glm::vec4 col;
+	};
+
 	if (!pipeline_created)
 	{
 		auto sampler_create_info = vk::SamplerCreateInfo()
@@ -845,13 +852,6 @@ void SystemVK::drawTest()
 				.setPName("main")
 		};
 
-		struct Vertex
-		{
-			glm::vec2 pos;
-			glm::vec2 uv;
-			glm::vec4 col;
-		};
-
 		auto vertex_input_binding_description = vk::VertexInputBindingDescription()
 			.setStride(sizeof(Vertex))
 			.setInputRate(vk::VertexInputRate::eVertex)
@@ -885,7 +885,9 @@ void SystemVK::drawTest()
 		auto pipeline_input_assembly_state_create_info = vk::PipelineInputAssemblyStateCreateInfo()
 			.setTopology(vk::PrimitiveTopology::eTriangleList);
 
-		auto pipeline_viewport_state_create_info = vk::PipelineViewportStateCreateInfo();
+		auto pipeline_viewport_state_create_info = vk::PipelineViewportStateCreateInfo()
+			.setViewportCount(1)
+			.setScissorCount(1);
 
 		auto pipeline_rasterization_state_create_info = vk::PipelineRasterizationStateCreateInfo()
 			.setPolygonMode(vk::PolygonMode::eFill);
@@ -911,8 +913,8 @@ void SystemVK::drawTest()
 			.setPAttachments(&pipeline_color_blent_attachment_state);
 
 		auto dynamic_states = {
-			vk::DynamicState::eViewportWithCount,
-			vk::DynamicState::eScissorWithCount,
+			vk::DynamicState::eViewport,
+			vk::DynamicState::eScissor,
 			vk::DynamicState::ePrimitiveTopology,
 			vk::DynamicState::eLineWidth,
 			vk::DynamicState::eCullMode,
@@ -989,21 +991,7 @@ void SystemVK::drawTest()
 
 		//
 
-		std::vector<Vertex> vertices = {
-			Vertex{ { 0.0f, -0.5f }, { 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-			Vertex{ { -0.5f, 0.5f }, { 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-			Vertex{ { 0.5f, 0.5f }, { 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
-		};
 
-		std::vector<uint32_t> indices = { 0, 1, 2 };
-
-		auto vertices_mem = mVertexBufferMemory.mapMemory(0, mVertexBufferSize);
-		memcpy(vertices_mem, vertices.data(), vertices.size() * sizeof(Vertex));
-		mVertexBufferMemory.unmapMemory();
-
-		auto indices_mem = mIndexBufferMemory.mapMemory(0, mIndexBufferSize);
-		memcpy(indices_mem, indices.data(), indices.size() * sizeof(uint32_t));
-		mIndexBufferMemory.unmapMemory();
 
 		// descriptor pool
 
@@ -1141,6 +1129,32 @@ void SystemVK::drawTest()
 		pipeline_created = true;
 	}
 
+	std::vector<Vertex> vertices = {
+		Vertex{ { 0.0f, -0.5f }, { 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		Vertex{ { -0.5f, 0.5f }, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		Vertex{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+	};
+
+	std::vector<uint32_t> indices = { 0, 1, 2 };
+
+	auto vertices_mem = mVertexBufferMemory.mapMemory(0, VK_WHOLE_SIZE);
+	memcpy(vertices_mem, vertices.data(), vertices.size() * sizeof(Vertex));
+
+	auto indices_mem = mIndexBufferMemory.mapMemory(0, VK_WHOLE_SIZE);
+	memcpy(indices_mem, indices.data(), indices.size() * sizeof(uint32_t));
+
+	/*auto vertex_buffer_mapped_memory_range = vk::MappedMemoryRange()
+		.setMemory(*mVertexBufferMemory)
+		.setSize(VK_WHOLE_SIZE);
+
+	auto index_buffer_mapped_memory_range = vk::MappedMemoryRange()
+		.setMemory(*mIndexBufferMemory)
+		.setSize(VK_WHOLE_SIZE);
+
+	mDevice.flushMappedMemoryRanges({ vertex_buffer_mapped_memory_range, index_buffer_mapped_memory_range });*/
+	mVertexBufferMemory.unmapMemory();
+	mIndexBufferMemory.unmapMemory();
+
 	struct PushConstants
 	{
 		glm::vec2 scale;
@@ -1154,15 +1168,31 @@ void SystemVK::drawTest()
 	mCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { *mTempDescriptorSet }, {});
 	mCommandBuffer.bindIndexBuffer(*mIndexBuffer, 0, vk::IndexType::eUint32);
 	mCommandBuffer.bindVertexBuffers(0, { *mVertexBuffer }, { 0 });
-	setTopology(Renderer::Topology::TriangleList);
-	setCullMode(Renderer::CullMode::None);
 	mCommandBuffer.setFrontFace(vk::FrontFace::eCounterClockwise);
 	mCommandBuffer.setLineWidth(1.0f);
+	setTopology(Renderer::Topology::TriangleList);
+	setCullMode(Renderer::CullMode::None);
 	setViewport(Renderer::Viewport());
 	setScissor(nullptr);
-	//drawIndexed(3);
-
 	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);
+
+	std::vector<Vertex> vertices2 = {
+		Vertex{ { -0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f, 0.5f } },
+		Vertex{ { 0.5f, -0.5f }, { 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f, 0.5f } },
+		Vertex{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 0.0f, 1.0f, 1.0f, 0.5f } },
+	};
+
+	/*auto vertices_mem2 = mVertexBufferMemory.mapMemory(0, VK_WHOLE_SIZE);
+	memcpy(vertices_mem2, vertices2.data(), vertices2.size() * sizeof(Vertex));
+
+	auto vertex_buffer_mapped_memory_range2 = vk::MappedMemoryRange()
+		.setMemory(*mVertexBufferMemory)
+		.setSize(VK_WHOLE_SIZE);
+
+	mDevice.flushMappedMemoryRanges({ vertex_buffer_mapped_memory_range2 });
+	mVertexBufferMemory.unmapMemory();
+
+	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);*/
 }
 
 #endif
