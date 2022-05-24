@@ -93,8 +93,6 @@ namespace Renderer
 		vk::raii::ImageView mTempImageView = nullptr; // TODO: del
 		vk::raii::DescriptorSet mTempDescriptorSet = nullptr; // TODO: del
 		vk::raii::DeviceMemory mTempMemory = nullptr; // TODO: del
-		vk::raii::Buffer mTempUploadBuffer = nullptr; // TODO: del
-		vk::raii::DeviceMemory mTempUploadBufferMemory = nullptr; // TODO: del
 		vk::SurfaceFormatKHR mSurfaceFormat;
 		uint32_t mMinImageCount = 2; // TODO: https://github.com/nvpro-samples/nvpro_core/blob/f2c05e161bba9ab9a8c96c0173bf0edf7c168dfa/nvvk/swapchain_vk.cpp#L143
 		uint32_t mQueueFamilyIndex = -1;

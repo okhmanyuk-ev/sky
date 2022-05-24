@@ -1093,14 +1093,15 @@ void SystemVK::drawTest()
 
 			mDevice.updateDescriptorSets({ write_descriptor_set }, {});
 
-			auto buffer_create_info = vk::BufferCreateInfo()
-				.setSize(tex_pixels_size)
-				.setUsage(vk::BufferUsageFlagBits::eTransferSrc)
-				.setSharingMode(vk::SharingMode::eExclusive);
-
-			mTempUploadBuffer = mDevice.createBuffer(buffer_create_info);
 			{
-				auto req = mTempUploadBuffer.getMemoryRequirements();
+				auto buffer_create_info = vk::BufferCreateInfo()
+					.setSize(tex_pixels_size)
+					.setUsage(vk::BufferUsageFlagBits::eTransferSrc)
+					.setSharingMode(vk::SharingMode::eExclusive);
+
+				auto upload_buffer = mDevice.createBuffer(buffer_create_info);
+			
+				auto req = upload_buffer.getMemoryRequirements();
 
 				//bd->BufferMemoryAlignment = (bd->BufferMemoryAlignment > req.alignment) ? bd->BufferMemoryAlignment : req.alignment;
 
@@ -1108,31 +1109,32 @@ void SystemVK::drawTest()
 					.setAllocationSize(req.size)
 					.setMemoryTypeIndex(GetMemoryType(vk::MemoryPropertyFlagBits::eHostVisible, req.memoryTypeBits, mPhysicalDevice));
 
-				mTempUploadBufferMemory = mDevice.allocateMemory(memory_allocate_info);
+				auto upload_buffer_memory = mDevice.allocateMemory(memory_allocate_info);
+
+				upload_buffer.bindMemory(*upload_buffer_memory, 0);
+
+				auto map = upload_buffer_memory.mapMemory(0, tex_pixels_size);
+				memcpy(map, tex_pixels.data(), tex_pixels_size);
+				upload_buffer_memory.unmapMemory();
+
+				oneTimeSubmit(mDevice, mCommandPool, mQueue, [&](auto& cmd) {
+					setImageLayout(cmd, *mTempImage, vk::Format::eUndefined, vk::ImageLayout::eUndefined,
+						vk::ImageLayout::eTransferDstOptimal);
+
+					auto image_subresource_layers = vk::ImageSubresourceLayers()
+						.setAspectMask(vk::ImageAspectFlagBits::eColor)
+						.setLayerCount(1);
+
+					auto region = vk::BufferImageCopy()
+						.setImageSubresource(image_subresource_layers)
+						.setImageExtent({ tex_width, tex_height, 1 });
+
+					cmd.copyBufferToImage(*upload_buffer, *mTempImage, vk::ImageLayout::eTransferDstOptimal, { region });
+
+					setImageLayout(cmd, *mTempImage, vk::Format::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+						vk::ImageLayout::eShaderReadOnlyOptimal);
+				});
 			}
-			mTempUploadBuffer.bindMemory(*mTempUploadBufferMemory, 0);
-
-			auto map = mTempUploadBufferMemory.mapMemory(0, tex_pixels_size);
-			memcpy(map, tex_pixels.data(), tex_pixels_size);
-			mTempUploadBufferMemory.unmapMemory();
-
-			oneTimeSubmit(mDevice, mCommandPool, mQueue, [&](auto& cmd) {
-				setImageLayout(cmd, *mTempImage, vk::Format::eUndefined, vk::ImageLayout::eUndefined,
-					vk::ImageLayout::eTransferDstOptimal);
-
-				auto image_subresource_layers = vk::ImageSubresourceLayers()
-					.setAspectMask(vk::ImageAspectFlagBits::eColor)
-					.setLayerCount(1);
-
-				auto region = vk::BufferImageCopy()
-					.setImageSubresource(image_subresource_layers)
-					.setImageExtent({ tex_width, tex_height, 1 });
-
-				cmd.copyBufferToImage(*mTempUploadBuffer, *mTempImage, vk::ImageLayout::eTransferDstOptimal, { region });
-
-				setImageLayout(cmd, *mTempImage, vk::Format::eUndefined, vk::ImageLayout::eTransferDstOptimal,
-					vk::ImageLayout::eShaderReadOnlyOptimal);
-			});
 		}
 		//
 
