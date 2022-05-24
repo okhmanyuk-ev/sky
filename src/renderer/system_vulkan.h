@@ -78,6 +78,23 @@ namespace Renderer
 		vk::raii::SwapchainKHR mSwapchain = nullptr;
 		vk::raii::CommandPool mCommandPool = nullptr;
 		vk::raii::CommandBuffer mCommandBuffer = nullptr;
+		vk::raii::Sampler mSampler = nullptr;
+		vk::raii::DescriptorSetLayout mDescriptorSetLayout = nullptr;
+		vk::raii::PipelineLayout mPipelineLayout = nullptr;
+		vk::raii::Pipeline mPipeline = nullptr;
+		vk::raii::Buffer mVertexBuffer = nullptr;
+		vk::raii::Buffer mIndexBuffer = nullptr;
+		vk::raii::DeviceMemory mVertexBufferMemory = nullptr;
+		vk::raii::DeviceMemory mIndexBufferMemory = nullptr;
+		vk::DeviceSize mVertexBufferSize = 0;
+		vk::DeviceSize mIndexBufferSize = 0;
+		vk::raii::DescriptorPool mDescriptorPool = nullptr;
+		vk::raii::Image mTempImage = nullptr; // TODO: del
+		vk::raii::ImageView mTempImageView = nullptr; // TODO: del
+		vk::raii::DescriptorSet mTempDescriptorSet = nullptr; // TODO: del
+		vk::raii::DeviceMemory mTempMemory = nullptr; // TODO: del
+		vk::raii::Buffer mTempUploadBuffer = nullptr; // TODO: del
+		vk::raii::DeviceMemory mTempUploadBufferMemory = nullptr; // TODO: del
 		vk::SurfaceFormatKHR mSurfaceFormat;
 		uint32_t mMinImageCount = 2; // TODO: https://github.com/nvpro-samples/nvpro_core/blob/f2c05e161bba9ab9a8c96c0173bf0edf7c168dfa/nvvk/swapchain_vk.cpp#L143
 		uint32_t mQueueFamilyIndex = -1;
@@ -124,6 +141,8 @@ namespace Renderer
 			oneTimeSubmit(commandBuffers.front(), queue, func);
 		}
 
+	private:
+		void drawTest(); // TODO: del
 	};
 }
 #endif
