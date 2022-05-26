@@ -1,6 +1,6 @@
 #pragma once
 
-#include <renderer/low_level_api.h>
+#include <memory>
 
 namespace Renderer
 {
@@ -10,26 +10,25 @@ namespace Renderer
 		friend class SystemGL;
 
 	public:
-		using Handler = int;
-		
-	public:
 		Texture(int width, int height, bool mipmap = false);
 		Texture(int width, int height, int channels, void* data, bool mipmap = false);
 		~Texture();
 
 	public:
 		void writePixels(int width, int height, int channels, void* data);
-		
+
 	public:
 		auto getWidth() const { return mWidth; }
 		auto getHeight() const { return mHeight; }
-		
+		auto isMipmap() const { return mMipmap; }
+
 	private:
 		int mWidth;
 		int mHeight;
 		bool mMipmap;
 
 	protected:
-		Handler mHandler = -1;
+		struct TextureImpl;
+		std::unique_ptr<TextureImpl> mTextureImpl;
 	};
 }

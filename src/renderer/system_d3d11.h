@@ -225,37 +225,6 @@ namespace Renderer
 		SamplerState mSamplerState;
 		bool mSamplerStateDirty = true;
 		void setD3D11SamplerState(const SamplerState& value);
-
-	protected:
-		Texture::Handler createTexture(int width, int height, bool mipmap) override;
-		void destroyTexture(Texture::Handler value) override;
-		void textureWritePixels(Texture::Handler texture, int width, int height, int channels, void* data) override;
-
-		RenderTarget::RenderTargetHandler createRenderTarget(Texture::Handler texture) override;
-		void destroyRenderTarget(RenderTarget::RenderTargetHandler value) override;
-
-	private:
-		struct TextureDef
-		{
-			ID3D11Texture2D* texture2d;
-			ID3D11ShaderResourceView* shader_resource_view;
-			bool mipmap;
-			int width;
-			int height;
-		};
-
-		std::map<Texture::Handler, TextureDef> mTextureDefs;
-		Texture::Handler mTextureDefIndex = 0;
-
-		struct RenderTargetDef
-		{
-			ID3D11RenderTargetView* render_target_view;
-			ID3D11Texture2D* depth_stencil_texture;
-			ID3D11DepthStencilView* depth_stencil_view;
-		};
-
-		std::map<RenderTarget::RenderTargetHandler, RenderTargetDef> mRenderTargetDefs;
-		RenderTarget::RenderTargetHandler mRenderTargetDefIndex = 0;
 	};
 }
 #endif

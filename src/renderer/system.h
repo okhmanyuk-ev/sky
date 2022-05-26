@@ -24,9 +24,6 @@ namespace Renderer
 {
 	class System
 	{
-		friend class Texture;
-		friend class RenderTarget;
-
 	public:
 		virtual void setTopology(const Topology& value) = 0;
 		virtual void setViewport(const Viewport& value) = 0;
@@ -64,13 +61,5 @@ namespace Renderer
 	private:
 		int mDrawcalls = 0;
 		int mDrawcallsPublic = 0;
-
-	protected:
-		virtual Texture::Handler createTexture(int width, int height, bool mipmap) = 0;
-		virtual void destroyTexture(Texture::Handler value) = 0;
-		virtual void textureWritePixels(Texture::Handler texture, int width, int height, int channels, void* data) = 0;
-
-		virtual RenderTarget::RenderTargetHandler createRenderTarget(Texture::Handler texture) = 0;
-		virtual void destroyRenderTarget(RenderTarget::RenderTargetHandler value) = 0;
 	};
 }

@@ -8,6 +8,94 @@
 
 using namespace Renderer;
 
+struct Texture::TextureImpl
+{
+	GLuint texture;
+};
+
+Texture::Texture(int width, int height, bool mipmap) :
+	mWidth(width),
+	mHeight(height),
+	mMipmap(mipmap)
+{
+	mTextureImpl = std::make_unique<TextureImpl>();
+
+	GLint last_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+
+	glGenTextures(1, &mTextureImpl->texture);
+	glBindTexture(GL_TEXTURE_2D, mTextureImpl->texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+	glBindTexture(GL_TEXTURE_2D, last_texture);
+}
+
+Texture::Texture(int width, int height, int channels, void* data, bool mipmap) : Texture(width, height, mipmap)
+{
+	writePixels(width, height, channels, data);
+}
+
+Texture::~Texture()
+{
+	glDeleteTextures(1, &mTextureImpl->texture);
+}
+
+void Texture::writePixels(int width, int height, int channels, void* data)
+{
+	assert(width == mWidth);
+	assert(height == mHeight);
+	assert(data);
+
+	GLint last_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+	glBindTexture(GL_TEXTURE_2D, mTextureImpl->texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	if (mMipmap)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, last_texture);
+}
+
+struct RenderTarget::RenderTargetImpl
+{
+	GLuint framebuffer;
+	GLuint depth_stencil_renderbuffer;
+};
+
+RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
+{
+	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
+
+	GLint last_fbo;
+	GLint last_rbo;
+
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &last_fbo);
+	glGetIntegerv(GL_RENDERBUFFER_BINDING, &last_rbo);
+
+	glGenFramebuffers(1, &mRenderTargetImpl->framebuffer);
+	glGenRenderbuffers(1, &mRenderTargetImpl->depth_stencil_renderbuffer);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, mRenderTargetImpl->framebuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, mRenderTargetImpl->depth_stencil_renderbuffer);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureImpl->texture, 0);
+
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRenderTargetImpl->depth_stencil_renderbuffer);
+
+	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, last_fbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, last_rbo);
+}
+
+RenderTarget::~RenderTarget()
+{
+	glDeleteFramebuffers(1, &mRenderTargetImpl->framebuffer);
+	glDeleteRenderbuffers(1, &mRenderTargetImpl->depth_stencil_renderbuffer);
+}
+
 bool SystemGL::IsRenderTargetBound() 
 {
 	return mRenderTargetBound;
@@ -323,7 +411,7 @@ void SystemGL::setTexture(std::shared_ptr<Texture> value)
 	if (value == nullptr)
 		return;
 
-	glBindTexture(GL_TEXTURE_2D, mTextureDefs.at(value->mHandler).texture);
+	glBindTexture(GL_TEXTURE_2D, value->mTextureImpl->texture);
 	mTextureBound = true;
 	updateGLSampler();
 }
@@ -342,7 +430,7 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 	else
 	{
 		mRenderTargetBound = true;
-		glBindFramebuffer(GL_FRAMEBUFFER, mRenderTargetDefs.at(value->mRenderTargetHandler).framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, value->mRenderTargetImpl->framebuffer);
 	}
 
 	mCullModeDirty = true;  // when render target is active, we using reversed culling,
@@ -534,13 +622,8 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* m
 
 void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
 {
-	auto dst_texture_handler = dst_texture->mHandler;
-	assert(mTextureDefs.contains(dst_texture_handler));
-
-	const auto& texture_def = mTextureDefs.at(dst_texture_handler);
-
-	assert(texture_def.width == size.x);
-	assert(texture_def.height == size.y);
+	assert(dst_texture->getWidth() == size.x);
+	assert(dst_texture->getHeight() == size.y);
 
 	if (size.x <= 0 || size.y <= 0)
 		return;
@@ -555,7 +638,7 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
-	glBindTexture(GL_TEXTURE_2D, texture_def.texture);
+	glBindTexture(GL_TEXTURE_2D, dst_texture->mTextureImpl->texture);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mGLPixelBuffer);
 	
 	bool image_is_flipped = !mRenderTargetBound;
@@ -573,7 +656,7 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 		}
 	}
 
-	if (texture_def.mipmap)
+	if (dst_texture->isMipmap())
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
@@ -780,111 +863,6 @@ void SystemGL::updateGLSampler()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	}
-}
-
-Texture::Handler SystemGL::createTexture(int width, int height, bool mipmap)
-{
-	assert(!mTextureDefs.contains(mTextureDefIndex));
-
-	auto result = mTextureDefIndex;
-	mTextureDefIndex += 1;
-
-	auto& texture_def = mTextureDefs[result];
-	texture_def.mipmap = mipmap;
-	texture_def.width = width;
-	texture_def.height = height;
-
-	GLint last_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-
-	glGenTextures(1, &texture_def.texture);
-	glBindTexture(GL_TEXTURE_2D, texture_def.texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
-	glBindTexture(GL_TEXTURE_2D, last_texture);
-
-	return result;
-}
-
-void SystemGL::destroyTexture(Texture::Handler value)
-{
-	assert(mTextureDefs.contains(value));
-
-	auto& texture_def = mTextureDefs[value];
-
-	glDeleteTextures(1, &texture_def.texture);
-
-	mTextureDefs.erase(value);
-}
-
-void SystemGL::textureWritePixels(Texture::Handler texture, int width, int height, int channels, void* data)
-{
-	const auto& texture_def = mTextureDefs.at(texture);
-	
-	assert(texture_def.width == width);
-	assert(texture_def.height == height);
-	assert(data);
-
-	GLint last_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	glBindTexture(GL_TEXTURE_2D, texture_def.texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	if (texture_def.mipmap)
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, last_texture);
-
-	// TODO: read abound pixel buffer objects (PBO)
-	// https://www.roxlu.com/2014/048/fast-pixel-transfers-with-pixel-buffer-objects
-}
-
-RenderTarget::RenderTargetHandler SystemGL::createRenderTarget(Texture::Handler texture)
-{
-	assert(!mRenderTargetDefs.contains(mRenderTargetDefIndex));
-	assert(mTextureDefs.contains(texture));
-
-	auto result = mRenderTargetDefIndex;
-	mRenderTargetDefIndex += 1;
-
-	const auto& texture_def = mTextureDefs.at(texture);
-	auto& render_target_def = mRenderTargetDefs[result];
-
-	GLint last_fbo;
-	GLint last_rbo;
-
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &last_fbo);
-	glGetIntegerv(GL_RENDERBUFFER_BINDING, &last_rbo);
-
-	glGenFramebuffers(1, &render_target_def.framebuffer);
-	glGenRenderbuffers(1, &render_target_def.depth_stencil_renderbuffer);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, render_target_def.framebuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, render_target_def.depth_stencil_renderbuffer);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_def.texture, 0);
-
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, texture_def.width, texture_def.height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_target_def.depth_stencil_renderbuffer);
-
-	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, last_fbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, last_rbo);
-
-	return result;
-}
-
-void SystemGL::destroyRenderTarget(RenderTarget::RenderTargetHandler value)
-{
-	assert(mRenderTargetDefs.contains(value));
-
-	auto& render_target_def = mRenderTargetDefs[value];
-	
-	glDeleteFramebuffers(1, &render_target_def.framebuffer);
-	glDeleteRenderbuffers(1, &render_target_def.depth_stencil_renderbuffer);
-
-	mRenderTargetDefs.erase(value);
 }
 
 #endif

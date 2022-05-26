@@ -136,35 +136,6 @@ namespace Renderer
 		void setGLVertexBuffer(const Buffer& value);
 		void setGLIndexBuffer(const Buffer& value);
 		void setGLCullMode(const CullMode& value);
-
-	protected:
-		Texture::Handler createTexture(int width, int height, bool mipmap) override;
-		void destroyTexture(Texture::Handler value) override;
-		void textureWritePixels(Texture::Handler texture, int width, int height, int channels, void* data) override;
-
-		RenderTarget::RenderTargetHandler createRenderTarget(Texture::Handler texture) override;
-		void destroyRenderTarget(RenderTarget::RenderTargetHandler value) override;
-
-	private:
-		struct TextureDef
-		{
-			GLuint texture;
-			bool mipmap;
-			int width;
-			int height;
-		};
-
-		std::map<Texture::Handler, TextureDef> mTextureDefs;
-		Texture::Handler mTextureDefIndex = 0;
-
-		struct RenderTargetDef
-		{
-			GLuint framebuffer;
-			GLuint depth_stencil_renderbuffer;
-		};
-
-		std::map<RenderTarget::RenderTargetHandler, RenderTargetDef> mRenderTargetDefs;
-		RenderTarget::RenderTargetHandler mRenderTargetDefIndex = 0;
 	};
 
 	using SystemCrossplatform = SystemGL;

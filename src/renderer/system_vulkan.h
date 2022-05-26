@@ -59,14 +59,6 @@ namespace Renderer
 
 		bool isVsync() const override { return false; }
 		void setVsync(bool value) override { }
-	
-	protected:
-		Texture::Handler createTexture(int width, int height, bool mipmap) override;
-		void destroyTexture(Texture::Handler value) override;
-		void textureWritePixels(Texture::Handler texture, int width, int height, int channels, void* data) override;
-
-		RenderTarget::RenderTargetHandler createRenderTarget(Texture::Handler texture) override;
-		void destroyRenderTarget(RenderTarget::RenderTargetHandler value) override;
 
 	private:
 		vk::raii::Context mContext;

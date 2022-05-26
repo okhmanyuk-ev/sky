@@ -12,13 +12,11 @@ namespace Renderer
 		friend class SystemGL;
 
 	public:
-		using RenderTargetHandler = int;
-
-	public:
 		RenderTarget(int width, int height);
 		~RenderTarget();
 
 	private:
-		RenderTargetHandler mRenderTargetHandler = -1;
+		struct RenderTargetImpl;
+		std::unique_ptr<RenderTargetImpl> mRenderTargetImpl;
 	};
 }

@@ -7,6 +7,51 @@
 
 using namespace Renderer;
 
+struct Texture::TextureImpl
+{
+
+};
+
+Texture::Texture(int width, int height, bool mipmap) :
+	mWidth(width),
+	mHeight(height),
+	mMipmap(mipmap)
+{
+	mTextureImpl = std::make_unique<TextureImpl>();
+}
+
+Texture::Texture(int width, int height, int channels, void* data, bool mipmap) : Texture(width, height, mipmap)
+{
+	writePixels(width, height, channels, data);
+}
+
+Texture::~Texture()
+{
+
+}
+
+void Texture::writePixels(int width, int height, int channels, void* data)
+{
+	assert(width == mWidth);
+	assert(height == mHeight);
+	assert(data);
+}
+
+struct RenderTarget::RenderTargetImpl
+{
+
+};
+
+RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
+{
+	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
+}
+
+RenderTarget::~RenderTarget()
+{
+
+}
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage, void* pUserData)
 {
 	LOGF("[vulkan] {}", pMessage);
@@ -505,31 +550,6 @@ void SystemVK::present()
 	mSemaphoreIndex = (mSemaphoreIndex + 1) % mFrames.size(); // TODO: maybe gFrameIndex can be used for both
 
 	begin();
-}
-
-Texture::Handler SystemVK::createTexture(int width, int height, bool mipmap)
-{
-	return 0;
-}
-
-void SystemVK::destroyTexture(Texture::Handler value)
-{
-	//
-}
-
-void SystemVK::textureWritePixels(Texture::Handler texture, int width, int height, int channels, void* data)
-{
-	//
-}
-
-RenderTarget::RenderTargetHandler SystemVK::createRenderTarget(Texture::Handler texture)
-{
-	return 0;
-}
-
-void SystemVK::destroyRenderTarget(RenderTarget::RenderTargetHandler value)
-{
-	//
 }
 
 void SystemVK::begin()
