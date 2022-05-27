@@ -7,6 +7,8 @@
 
 using namespace Renderer;
 
+bool pipeline_created = false;
+
 static uint32_t GetMemoryType(vk::MemoryPropertyFlags properties, uint32_t type_bits, vk::raii::PhysicalDevice& physical_device)
 {
 	auto prop = physical_device.getMemoryProperties();
@@ -168,7 +170,7 @@ SystemVK::SystemVK()
 
 	for (auto layer : all_layers)
 	{
-	//	std::cout << e.layerName << std::endl;
+	//	std::cout << layer.layerName << std::endl;
 	}
 
 	auto extensions = {
@@ -231,7 +233,7 @@ SystemVK::SystemVK()
 
 	auto device_extensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-	//	VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
+		VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME
 	};
 
 	auto queue_priority = { 1.0f };
@@ -240,7 +242,11 @@ SystemVK::SystemVK()
 		.setQueueFamilyIndex(mQueueFamilyIndex)
 		.setQueuePriorities(queue_priority);
 
-	auto device_features = mPhysicalDevice.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features>();
+	auto device_features = mPhysicalDevice.getFeatures2<vk::PhysicalDeviceFeatures2, 
+		vk::PhysicalDeviceVulkan13Features>();
+
+	auto device_properties = mPhysicalDevice.getProperties2<vk::PhysicalDeviceProperties2, 
+		vk::PhysicalDeviceVulkan13Properties>(); // TODO: unused
 
 	auto device_info = vk::DeviceCreateInfo()
 		.setQueueCreateInfoCount(1)
@@ -299,28 +305,6 @@ SystemVK::SystemVK()
 	auto command_buffers = mDevice.allocateCommandBuffers(command_buffer_allocate_info);
 	mCommandBuffer = std::move(command_buffers.at(0));
 
-
-	std::vector<vk::DescriptorPoolSize> pool_sizes = {
-		{ vk::DescriptorType::eSampler, 1000 },
-		{ vk::DescriptorType::eCombinedImageSampler, 1000 },
-		{ vk::DescriptorType::eSampledImage, 1000 },
-		{ vk::DescriptorType::eStorageImage, 1000 },
-		{ vk::DescriptorType::eUniformTexelBuffer, 1000 },
-		{ vk::DescriptorType::eStorageTexelBuffer, 1000 },
-		{ vk::DescriptorType::eUniformBuffer, 1000 },
-		{ vk::DescriptorType::eStorageBuffer, 1000 },
-		{ vk::DescriptorType::eUniformBufferDynamic, 1000 },
-		{ vk::DescriptorType::eStorageBufferDynamic, 1000 },
-		{ vk::DescriptorType::eInputAttachment, 1000 }
-	};
-
-	auto descriptor_pool_create_info = vk::DescriptorPoolCreateInfo()
-		.setFlags(vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet)
-		.setMaxSets(uint32_t(1000 * pool_sizes.size()))
-		.setPoolSizes(pool_sizes);
-
-	mDescriptorPool = mDevice.createDescriptorPool(descriptor_pool_create_info);
-
 	auto descriptor_set_layout_binding = vk::DescriptorSetLayoutBinding()
 		.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
 		.setDescriptorCount(1)
@@ -328,16 +312,10 @@ SystemVK::SystemVK()
 
 	auto descriptor_set_layout_create_info = vk::DescriptorSetLayoutCreateInfo()
 		.setBindingCount(1)
+		.setFlags(vk::DescriptorSetLayoutCreateFlagBits::ePushDescriptorKHR)
 		.setPBindings(&descriptor_set_layout_binding);
 
 	mDescriptorSetLayout = mDevice.createDescriptorSetLayout(descriptor_set_layout_create_info);
-
-	auto descriptor_set_allocate_info = vk::DescriptorSetAllocateInfo()
-		.setDescriptorPool(*mDescriptorPool)
-		.setDescriptorSetCount(1)
-		.setPSetLayouts(&*mDescriptorSetLayout);
-
-	mDescriptorSet = std::move(mDevice.allocateDescriptorSets(descriptor_set_allocate_info).at(0));
 
 	auto sampler_create_info = vk::SamplerCreateInfo()
 		.setMagFilter(vk::Filter::eLinear)
@@ -589,18 +567,20 @@ void SystemVK::setTexture(std::shared_ptr<Texture> value)
 	if (value == nullptr)
 		return;
 
+	if (!pipeline_created) // TODO: remove when pipeline layout will be nice constructed 
+		return;
+
 	auto descriptor_image_info = vk::DescriptorImageInfo()
 		.setSampler(*mSampler)
 		.setImageView(*value->mTextureImpl->image_view)
 		.setImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
 
 	auto write_descriptor_set = vk::WriteDescriptorSet()
-		.setDstSet(*mDescriptorSet)
 		.setDescriptorCount(1)
 		.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
 		.setPImageInfo(&descriptor_image_info);
 
-	mDevice.updateDescriptorSets({ write_descriptor_set }, {});
+	mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { write_descriptor_set });
 }
 
 void SystemVK::setRenderTarget(std::shared_ptr<RenderTarget> value)
@@ -951,7 +931,6 @@ void SystemVK::setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::
 
 
 
-bool pipeline_created = false;
 
 //-----------------------------------------------------------------------------
 // SHADERS
@@ -1229,7 +1208,6 @@ void SystemVK::drawTest()
 	setTexture(texture);
 	mCommandBuffer.pushConstants<PushConstants>(*mPipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, { push_constants });
 	mCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *mPipeline);
-	mCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { *mDescriptorSet }, {});
 	setIndexBuffer(indices);
 	setVertexBuffer(vertices);
 	mCommandBuffer.setFrontFace(vk::FrontFace::eCounterClockwise);
@@ -1246,11 +1224,10 @@ void SystemVK::drawTest()
 		Vertex{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
 	};
 
-	uint32_t red_pixel = 0x0000FFFF;
+	uint32_t red_pixel = 0xFF0000FF;
 	static auto red_texture = std::make_shared<Texture>(1, 1, 4, &red_pixel);
 
-	//setTexture(red_texture); // TODO: this should work
-
+	setTexture(red_texture);
 	setVertexBuffer(vertices2);
 
 	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);
