@@ -14,6 +14,9 @@ void Label::draw()
 	if (getAlpha() <= 0.0f && (mOutlineColor->getAlpha() <= 0.0f || mOutlineThickness <= 0.0f))
 		return;
 
+	if (mMesh.vertices.empty())
+		return;
+
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 

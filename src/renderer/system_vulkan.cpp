@@ -334,14 +334,115 @@ void SystemVK::setScissor(std::nullptr_t value)
 	setScissor({ { 0.0f, 0.0f }, { static_cast<float>(mWidth), static_cast<float>(mHeight) } });
 }
 
+static uint32_t GetMemoryType(vk::MemoryPropertyFlags properties, uint32_t type_bits, vk::raii::PhysicalDevice& physical_device)
+{
+	auto prop = physical_device.getMemoryProperties();
+
+	for (uint32_t i = 0; i < prop.memoryTypeCount; i++)
+		if ((prop.memoryTypes[i].propertyFlags & properties) == properties && type_bits & (1 << i))
+			return i;
+
+	return 0xFFFFFFFF; // Unable to find memoryType
+}
+
 void SystemVK::setVertexBuffer(const Buffer& value)
 {
-	//
+	assert(value.size > 0);
+
+	auto create_buffer = [&] {
+		DeviceBuffer buffer;
+
+		auto buffer_create_info = vk::BufferCreateInfo()
+			.setSize(value.size)
+			.setUsage(vk::BufferUsageFlagBits::eVertexBuffer)
+			.setSharingMode(vk::SharingMode::eExclusive);
+
+		buffer.buffer = mDevice.createBuffer(buffer_create_info);
+
+		auto memory_requirements = buffer.buffer.getMemoryRequirements();
+
+		auto memory_allocate_info = vk::MemoryAllocateInfo()
+			.setAllocationSize(memory_requirements.size)
+			.setMemoryTypeIndex(GetMemoryType(vk::MemoryPropertyFlagBits::eHostVisible, memory_requirements.memoryTypeBits, mPhysicalDevice));
+
+		buffer.memory = mDevice.allocateMemory(memory_allocate_info);
+		buffer.size = memory_requirements.size;
+
+		buffer.buffer.bindMemory(*buffer.memory, 0);
+
+		return buffer;
+	};
+
+	if (mVertexBuffers.size() < mVertexBufferIndex + 1)
+	{
+		assert(mVertexBuffers.size() == mVertexBufferIndex);
+		mVertexBuffers.push_back(create_buffer());
+	}
+
+	auto& buffer = mVertexBuffers[mVertexBufferIndex];
+	
+	if (buffer.size < value.size)
+	{
+		buffer = create_buffer();
+	}
+
+	auto mem = buffer.memory.mapMemory(0, VK_WHOLE_SIZE);
+	memcpy(mem, value.data, value.size);
+	buffer.memory.unmapMemory();
+	
+	mCommandBuffer.bindVertexBuffers(0, { *buffer.buffer }, { 0 });
+
+	mVertexBufferIndex += 1;
 }
 
 void SystemVK::setIndexBuffer(const Buffer& value)
 {
-	//
+	assert(value.size > 0);
+
+	auto create_buffer = [&] {
+		DeviceBuffer buffer;
+
+		auto buffer_create_info = vk::BufferCreateInfo()
+			.setSize(value.size)
+			.setUsage(vk::BufferUsageFlagBits::eIndexBuffer)
+			.setSharingMode(vk::SharingMode::eExclusive);
+
+		buffer.buffer = mDevice.createBuffer(buffer_create_info);
+
+		auto memory_requirements = buffer.buffer.getMemoryRequirements();
+
+		auto memory_allocate_info = vk::MemoryAllocateInfo()
+			.setAllocationSize(memory_requirements.size)
+			.setMemoryTypeIndex(GetMemoryType(vk::MemoryPropertyFlagBits::eHostVisible, memory_requirements.memoryTypeBits, mPhysicalDevice));
+
+		buffer.memory = mDevice.allocateMemory(memory_allocate_info);
+		buffer.size = memory_requirements.size;
+
+		buffer.buffer.bindMemory(*buffer.memory, 0);
+
+		return buffer;
+	};
+
+	if (mIndexBuffers.size() < mIndexBufferIndex + 1)
+	{
+		assert(mIndexBuffers.size() == mIndexBufferIndex);
+		mIndexBuffers.push_back(create_buffer());
+	}
+
+	auto& buffer = mIndexBuffers[mIndexBufferIndex];
+
+	if (buffer.size < value.size)
+	{
+		buffer = create_buffer();
+	}
+
+	auto mem = buffer.memory.mapMemory(0, VK_WHOLE_SIZE);
+	memcpy(mem, value.data, value.size);
+	buffer.memory.unmapMemory();
+
+	mCommandBuffer.bindIndexBuffer(*buffer.buffer, 0, value.stride == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
+	
+	mIndexBufferIndex += 1;
 }
 
 void SystemVK::setTexture(std::shared_ptr<Texture> value)
@@ -484,6 +585,23 @@ void SystemVK::present()
 {
 	drawTest();
 
+	size_t total_vertex_buffers_size = 0;
+
+	for (const auto& vertex_buffer : mVertexBuffers)
+	{
+		total_vertex_buffers_size += vertex_buffer.size;
+	}
+
+	size_t total_index_buffers_size = 0;
+
+	for (const auto& index_buffer : mIndexBuffers)
+	{
+		total_index_buffers_size += index_buffer.size;
+	}
+
+	std::cout << "vertex buffers: " << mVertexBuffers.size() << ", total size: " << total_vertex_buffers_size << std::endl;
+	std::cout << "index buffers: " << mIndexBuffers.size() << ", total size: " << total_index_buffers_size<< std::endl;
+
 	end();
 
 	const auto& image_acquired_semaphore = mFrames.at(mSemaphoreIndex).image_acquired_semaphore;
@@ -556,6 +674,9 @@ void SystemVK::begin()
 {
 	assert(!mWorking);
 	mWorking = true;
+
+	mVertexBufferIndex = 0;
+	mIndexBufferIndex = 0;
 
 	auto inheritance_rendering_info = vk::CommandBufferInheritanceRenderingInfo()
 		.setColorAttachmentCount(1)
@@ -788,17 +909,6 @@ static uint32_t __glsl_shader_frag_spv[] =
 	0x00010038
 };
 
-static uint32_t GetMemoryType(vk::MemoryPropertyFlags properties, uint32_t type_bits, vk::raii::PhysicalDevice& physical_device)
-{
-	auto prop = physical_device.getMemoryProperties();
-
-	for (uint32_t i = 0; i < prop.memoryTypeCount; i++)
-		if ((prop.memoryTypes[i].propertyFlags & properties) == properties && type_bits & (1 << i))
-			return i;
-
-	return 0xFFFFFFFF; // Unable to find memoryType
-}
-
 void SystemVK::drawTest()
 {
 	struct Vertex
@@ -965,54 +1075,6 @@ void SystemVK::drawTest()
 			
 		mPipeline = mDevice.createGraphicsPipeline(nullptr, graphics_pipeline_create_info);
 
-		// vertex buffer
-
-		auto vertex_buffer_size = 1024;
-
-		auto vertex_buffer_create_info = vk::BufferCreateInfo()
-			.setSize(vertex_buffer_size)
-			.setUsage(vk::BufferUsageFlagBits::eVertexBuffer)
-			.setSharingMode(vk::SharingMode::eExclusive);
-
-		mVertexBuffer = mDevice.createBuffer(vertex_buffer_create_info);
-
-		auto vertex_buffer_req = mVertexBuffer.getMemoryRequirements();
-
-		auto vertex_buffer_memory_allocate_info = vk::MemoryAllocateInfo()
-			.setAllocationSize(vertex_buffer_req.size)
-			.setMemoryTypeIndex(GetMemoryType(vk::MemoryPropertyFlagBits::eHostVisible, vertex_buffer_req.memoryTypeBits, mPhysicalDevice));
-
-		mVertexBufferMemory = mDevice.allocateMemory(vertex_buffer_memory_allocate_info);
-		mVertexBufferSize = vertex_buffer_req.size;
-
-		mVertexBuffer.bindMemory(*mVertexBufferMemory, 0);
-
-		// index buffer
-
-		auto index_buffer_size = 1024;
-
-		auto index_buffer_create_info = vk::BufferCreateInfo()
-			.setSize(index_buffer_size)
-			.setUsage(vk::BufferUsageFlagBits::eIndexBuffer)
-			.setSharingMode(vk::SharingMode::eExclusive);
-
-		mIndexBuffer = mDevice.createBuffer(index_buffer_create_info);
-
-		auto index_buffer_req = mIndexBuffer.getMemoryRequirements();
-
-		auto index_buffer_memory_allocate_info = vk::MemoryAllocateInfo()
-			.setAllocationSize(index_buffer_req.size)
-			.setMemoryTypeIndex(GetMemoryType(vk::MemoryPropertyFlagBits::eHostVisible, index_buffer_req.memoryTypeBits, mPhysicalDevice));
-
-		mIndexBufferMemory = mDevice.allocateMemory(index_buffer_memory_allocate_info);
-		mIndexBufferSize = index_buffer_req.size;
-
-		mIndexBuffer.bindMemory(*mIndexBufferMemory, 0);
-
-		//
-
-
-
 		// descriptor pool
 
 		std::vector<vk::DescriptorPoolSize> pool_sizes = {
@@ -1144,7 +1206,6 @@ void SystemVK::drawTest()
 				});
 			}
 		}
-		//
 
 		pipeline_created = true;
 	}
@@ -1157,24 +1218,6 @@ void SystemVK::drawTest()
 
 	std::vector<uint32_t> indices = { 0, 1, 2 };
 
-	auto vertices_mem = mVertexBufferMemory.mapMemory(0, VK_WHOLE_SIZE);
-	memcpy(vertices_mem, vertices.data(), vertices.size() * sizeof(Vertex));
-
-	auto indices_mem = mIndexBufferMemory.mapMemory(0, VK_WHOLE_SIZE);
-	memcpy(indices_mem, indices.data(), indices.size() * sizeof(uint32_t));
-
-	/*auto vertex_buffer_mapped_memory_range = vk::MappedMemoryRange()
-		.setMemory(*mVertexBufferMemory)
-		.setSize(VK_WHOLE_SIZE);
-
-	auto index_buffer_mapped_memory_range = vk::MappedMemoryRange()
-		.setMemory(*mIndexBufferMemory)
-		.setSize(VK_WHOLE_SIZE);
-
-	mDevice.flushMappedMemoryRanges({ vertex_buffer_mapped_memory_range, index_buffer_mapped_memory_range });*/
-	mVertexBufferMemory.unmapMemory();
-	mIndexBufferMemory.unmapMemory();
-
 	struct PushConstants
 	{
 		glm::vec2 scale;
@@ -1186,8 +1229,8 @@ void SystemVK::drawTest()
 	mCommandBuffer.pushConstants<PushConstants>(*mPipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, { push_constants });
 	mCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *mPipeline);
 	mCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { *mTempDescriptorSet }, {});
-	mCommandBuffer.bindIndexBuffer(*mIndexBuffer, 0, vk::IndexType::eUint32);
-	mCommandBuffer.bindVertexBuffers(0, { *mVertexBuffer }, { 0 });
+	setIndexBuffer(indices);
+	setVertexBuffer(vertices);
 	mCommandBuffer.setFrontFace(vk::FrontFace::eCounterClockwise);
 	mCommandBuffer.setLineWidth(1.0f);
 	setTopology(Renderer::Topology::TriangleList);
@@ -1202,17 +1245,9 @@ void SystemVK::drawTest()
 		Vertex{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 0.0f, 1.0f, 1.0f, 0.5f } },
 	};
 
-	/*auto vertices_mem2 = mVertexBufferMemory.mapMemory(0, VK_WHOLE_SIZE);
-	memcpy(vertices_mem2, vertices2.data(), vertices2.size() * sizeof(Vertex));
+	setVertexBuffer(vertices2);
 
-	auto vertex_buffer_mapped_memory_range2 = vk::MappedMemoryRange()
-		.setMemory(*mVertexBufferMemory)
-		.setSize(VK_WHOLE_SIZE);
-
-	mDevice.flushMappedMemoryRanges({ vertex_buffer_mapped_memory_range2 });
-	mVertexBufferMemory.unmapMemory();
-
-	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);*/
+	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);
 }
 
 #endif

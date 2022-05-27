@@ -170,6 +170,8 @@ void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& ve
 	std::optional<size_t> count, size_t start)
 {
 	assert(shader);
+	assert(vertices.size > 0);
+	assert(indices.size > 0);
 
 	applyState();
 	flush();
@@ -253,6 +255,8 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 {
 	assert(mWorking);
 	assert(texture);
+	assert(!vertices.empty());
+	assert(!indices.empty());
 
 	applyState();
 	
@@ -601,6 +605,9 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
 	float smoothFactor, const glm::vec4& color)
 {
+	assert(!vertices.empty());
+	assert(!indices.empty());
+
 	static auto shader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionColorTexture::Layout);
 	shader->setMinValue(minValue);
 	shader->setMaxValue(maxValue);
@@ -613,13 +620,19 @@ void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Text
 void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 
 	float smoothFactor, const glm::vec4& color)
 {
-	drawSdf(mesh.topology, font.getTexture(), mesh.vertices, mesh.indices, minValue, 
+	assert(!mesh.vertices.empty());
+	assert(!mesh.indices.empty());
+
+	drawSdf(mesh.topology, font.getTexture(), mesh.vertices, mesh.indices, minValue,
 		maxValue, smoothFactor, color);
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, float size,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
+	assert(!mesh.vertices.empty());
+	assert(!mesh.indices.empty());
+
 	float fixedOutlineThickness = glm::lerp(0.0f, 0.75f, outlineThickness);
 
 	const float min = 0.0f;

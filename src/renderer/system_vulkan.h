@@ -74,12 +74,20 @@ namespace Renderer
 		vk::raii::DescriptorSetLayout mDescriptorSetLayout = nullptr;
 		vk::raii::PipelineLayout mPipelineLayout = nullptr;
 		vk::raii::Pipeline mPipeline = nullptr;
-		vk::raii::Buffer mVertexBuffer = nullptr;
-		vk::raii::Buffer mIndexBuffer = nullptr;
-		vk::raii::DeviceMemory mVertexBufferMemory = nullptr;
-		vk::raii::DeviceMemory mIndexBufferMemory = nullptr;
-		vk::DeviceSize mVertexBufferSize = 0;
-		vk::DeviceSize mIndexBufferSize = 0;
+
+		struct DeviceBuffer
+		{
+			vk::raii::Buffer buffer = nullptr;
+			vk::raii::DeviceMemory memory = nullptr;
+			vk::DeviceSize size = 0;
+		};
+
+		std::vector<DeviceBuffer> mVertexBuffers;
+		std::vector<DeviceBuffer> mIndexBuffers;
+
+		int mVertexBufferIndex = 0;
+		int mIndexBufferIndex = 0;
+
 		vk::raii::DescriptorPool mDescriptorPool = nullptr;
 		vk::raii::Image mTempImage = nullptr; // TODO: del
 		vk::raii::ImageView mTempImageView = nullptr; // TODO: del
