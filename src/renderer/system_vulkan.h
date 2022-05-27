@@ -19,6 +19,7 @@ namespace Renderer
 	class SystemVK : public System,
 		Common::Event::Listenable<Platform::System::ResizeEvent>
 	{
+		friend Texture;
 	public:
 		SystemVK();
 		~SystemVK();
@@ -61,14 +62,14 @@ namespace Renderer
 		void setVsync(bool value) override { }
 
 	private:
-		vk::raii::Context mContext;
-		vk::raii::Instance mInstance = nullptr;
-		vk::raii::PhysicalDevice mPhysicalDevice = nullptr;
-		vk::raii::Queue mQueue = nullptr;
-		vk::raii::Device mDevice = nullptr;
+		static inline vk::raii::Context mContext;
+		static inline vk::raii::Instance mInstance = nullptr;
+		static inline vk::raii::PhysicalDevice mPhysicalDevice = nullptr;
+		static inline vk::raii::Queue mQueue = nullptr;
+		static inline vk::raii::Device mDevice = nullptr;
 		vk::raii::SurfaceKHR mSurface = nullptr;
 		vk::raii::SwapchainKHR mSwapchain = nullptr;
-		vk::raii::CommandPool mCommandPool = nullptr;
+		static inline vk::raii::CommandPool mCommandPool = nullptr;
 		vk::raii::CommandBuffer mCommandBuffer = nullptr;
 		vk::raii::Sampler mSampler = nullptr;
 		vk::raii::DescriptorSetLayout mDescriptorSetLayout = nullptr;
@@ -89,10 +90,7 @@ namespace Renderer
 		int mIndexBufferIndex = 0;
 
 		vk::raii::DescriptorPool mDescriptorPool = nullptr;
-		vk::raii::Image mTempImage = nullptr; // TODO: del
-		vk::raii::ImageView mTempImageView = nullptr; // TODO: del
-		vk::raii::DescriptorSet mTempDescriptorSet = nullptr; // TODO: del
-		vk::raii::DeviceMemory mTempMemory = nullptr; // TODO: del
+		vk::raii::DescriptorSet mDescriptorSet = nullptr;
 		vk::SurfaceFormatKHR mSurfaceFormat;
 		uint32_t mMinImageCount = 2; // TODO: https://github.com/nvpro-samples/nvpro_core/blob/f2c05e161bba9ab9a8c96c0173bf0edf7c168dfa/nvvk/swapchain_vk.cpp#L143
 		uint32_t mQueueFamilyIndex = -1;
@@ -118,11 +116,11 @@ namespace Renderer
 		void end();
 
 	private: // utils
-		void setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image,
+		static void setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image,
 			vk::Format format, vk::ImageLayout oldImageLayout, vk::ImageLayout newImageLayout);
 
 		template <typename Func>
-		void oneTimeSubmit(vk::raii::CommandBuffer const& commandBuffer, vk::raii::Queue const& queue, Func const& func)
+		static void oneTimeSubmit(vk::raii::CommandBuffer const& commandBuffer, vk::raii::Queue const& queue, Func const& func)
 		{
 			commandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
 			func(commandBuffer);
@@ -133,7 +131,7 @@ namespace Renderer
 		}
 
 		template <typename Func>
-		void oneTimeSubmit(vk::raii::Device const& device, vk::raii::CommandPool const& commandPool, vk::raii::Queue const& queue, Func const& func)
+		static void oneTimeSubmit(vk::raii::Device const& device, vk::raii::CommandPool const& commandPool, vk::raii::Queue const& queue, Func const& func)
 		{
 			vk::raii::CommandBuffers commandBuffers(device, { *commandPool, vk::CommandBufferLevel::ePrimary, 1 });
 			oneTimeSubmit(commandBuffers.front(), queue, func);
