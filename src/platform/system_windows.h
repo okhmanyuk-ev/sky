@@ -62,6 +62,7 @@ namespace Platform
 		void purchase(const std::string& product) override;
 
 		void haptic(HapticType hapticType) override { /*nothing*/ }
+		void alert(const std::string& text) override;
 
 	private:
 		bool mCursorHidden = false;

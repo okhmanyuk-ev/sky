@@ -69,6 +69,8 @@ namespace Platform
         
         virtual std::string getUUID() const = 0;
 
+		virtual void alert(const std::string& text) { };
+
 	public:
 		enum class HapticType
 		{

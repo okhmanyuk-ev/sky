@@ -293,6 +293,11 @@ void SystemWindows::purchase(const std::string& product)
 	));
 }
 
+void SystemWindows::alert(const std::string& text)
+{
+	MessageBox(Window, text.c_str(), "Alert", MB_OK | MB_ICONEXCLAMATION);
+}
+
 void SystemWindows::makeWindow()
 {
 	WNDCLASSEX windowClass = { };
