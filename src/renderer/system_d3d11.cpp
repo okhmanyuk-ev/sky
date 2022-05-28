@@ -122,30 +122,28 @@ RenderTarget::~RenderTarget()
 
 SystemD3D11::SystemD3D11()
 {
-	{
-		DXGI_SWAP_CHAIN_DESC sd = {};
-		sd.BufferCount = 2;
-		sd.BufferDesc.Width = 0;
-		sd.BufferDesc.Height = 0;
-		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		sd.BufferDesc.RefreshRate.Numerator = 60;
-		sd.BufferDesc.RefreshRate.Denominator = 5;
-		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		sd.OutputWindow = Platform::SystemWindows::Window;
-		sd.SampleDesc.Count = 1;
-		sd.SampleDesc.Quality = 0;
-		sd.Windowed = TRUE; // TODO: make false when fullscreen ?		
-		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	DXGI_SWAP_CHAIN_DESC sd = {};
+	sd.BufferCount = 2;
+	sd.BufferDesc.Width = 0;
+	sd.BufferDesc.Height = 0;
+	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sd.BufferDesc.RefreshRate.Numerator = 60;
+	sd.BufferDesc.RefreshRate.Denominator = 5;
+	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	sd.OutputWindow = Platform::SystemWindows::Window;
+	sd.SampleDesc.Count = 1;
+	sd.SampleDesc.Quality = 0;
+	sd.Windowed = TRUE; // TODO: make false when fullscreen ?		
+	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
-		D3D_FEATURE_LEVEL feature;
-		std::vector<D3D_FEATURE_LEVEL> features = { D3D_FEATURE_LEVEL_11_0, };
+	std::vector<D3D_FEATURE_LEVEL> features = { D3D_FEATURE_LEVEL_11_0, };
+	UINT flags = 0;// D3D11_CREATE_DEVICE_DEBUG | D3D11_CREATE_DEVICE_SINGLETHREADED;
 
-		D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, NULL, features.data(),
-			static_cast<UINT>(features.size()), D3D11_SDK_VERSION, &sd, &mSwapChain, &Device,
-			&feature, &Context);
-	}
-
+	D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flags, features.data(),
+		static_cast<UINT>(features.size()), D3D11_SDK_VERSION, &sd, &mSwapChain, &Device,
+		nullptr, &Context);
+	
 	createRenderTarget();
 
 	setRenderTarget(nullptr);
