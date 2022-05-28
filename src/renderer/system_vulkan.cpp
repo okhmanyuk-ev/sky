@@ -233,7 +233,8 @@ SystemVK::SystemVK()
 
 	auto device_extensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-		VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME
+		VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
+		VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME,
 	};
 
 	auto queue_priority = { 1.0f };
@@ -243,19 +244,21 @@ SystemVK::SystemVK()
 		.setQueuePriorities(queue_priority);
 
 	auto device_features = mPhysicalDevice.getFeatures2<vk::PhysicalDeviceFeatures2, 
-		vk::PhysicalDeviceVulkan13Features>();
+		vk::PhysicalDeviceVulkan13Features,
+		vk::PhysicalDeviceVertexInputDynamicStateFeaturesEXT>();
 
-	auto device_properties = mPhysicalDevice.getProperties2<vk::PhysicalDeviceProperties2, 
-		vk::PhysicalDeviceVulkan13Properties>(); // TODO: unused
+	//auto device_properties = mPhysicalDevice.getProperties2<vk::PhysicalDeviceProperties2, 
+	//	vk::PhysicalDeviceVulkan13Properties>(); // TODO: unused
 
 	auto device_info = vk::DeviceCreateInfo()
 		.setQueueCreateInfoCount(1)
 		.setPQueueCreateInfos(&queue_info)
 		.setPEnabledExtensionNames(device_extensions)
 		.setPEnabledFeatures(nullptr)
-		.setPNext(&device_features);
+		.setPNext(&device_features.get<vk::PhysicalDeviceFeatures2>());
 
 	mDevice = mPhysicalDevice.createDevice(device_info);
+
 	mQueue = mDevice.getQueue(mQueueFamilyIndex, 0);
 
 	auto surface_info = vk::Win32SurfaceCreateInfoKHR()
@@ -497,7 +500,7 @@ void SystemVK::setVertexBuffer(const Buffer& value)
 	}
 
 	auto& buffer = mVertexBuffers[mVertexBufferIndex];
-	
+
 	if (buffer.size < value.size)
 	{
 		buffer = create_buffer();
@@ -1043,13 +1046,6 @@ static uint32_t __glsl_shader_frag_spv[] =
 
 void SystemVK::drawTest()
 {
-	struct Vertex
-	{
-		glm::vec2 pos;
-		glm::vec2 uv;
-		glm::vec4 col;
-	};
-
 	if (!pipeline_created)
 	{
 		auto push_constant_range = vk::PushConstantRange()
@@ -1089,35 +1085,6 @@ void SystemVK::drawTest()
 				.setPName("main")
 		};
 
-		auto vertex_input_binding_description = vk::VertexInputBindingDescription()
-			.setInputRate(vk::VertexInputRate::eVertex)
-			.setBinding(0);
-		
-		auto vertex_input_attribute_descriptions = {
-			vk::VertexInputAttributeDescription()
-				.setLocation(0)
-				.setBinding(vertex_input_binding_description.binding)
-				.setFormat(vk::Format::eR32G32Sfloat)
-				.setOffset(offsetof(Vertex, pos)),
-
-			vk::VertexInputAttributeDescription()
-				.setLocation(1)
-				.setBinding(vertex_input_binding_description.binding)
-				.setFormat(vk::Format::eR32G32Sfloat)
-				.setOffset(offsetof(Vertex, uv)),
-
-			vk::VertexInputAttributeDescription()
-				.setLocation(2)
-				.setBinding(vertex_input_binding_description.binding)
-				.setFormat(vk::Format::eR32G32B32A32Sfloat)
-				.setOffset(offsetof(Vertex, col))
-		};
-
-		auto pipeline_vertex_input_state_create_info = vk::PipelineVertexInputStateCreateInfo()
-			.setVertexBindingDescriptionCount(1)
-			.setPVertexBindingDescriptions(&vertex_input_binding_description)
-			.setVertexAttributeDescriptions(vertex_input_attribute_descriptions);
-
 		auto pipeline_input_assembly_state_create_info = vk::PipelineInputAssemblyStateCreateInfo()
 			.setTopology(vk::PrimitiveTopology::eTriangleList);
 
@@ -1156,6 +1123,7 @@ void SystemVK::drawTest()
 			vk::DynamicState::eCullMode,
 			vk::DynamicState::eFrontFace,
 			vk::DynamicState::eVertexInputBindingStride,
+			vk::DynamicState::eVertexInputEXT
 		};
 
 		auto pipeline_dynamic_state_create_info = vk::PipelineDynamicStateCreateInfo()
@@ -1169,7 +1137,6 @@ void SystemVK::drawTest()
 			.setLayout(*mPipelineLayout)
 			.setFlags(vk::PipelineCreateFlagBits())
 			.setStages(pipeline_shader_stage_create_info)
-			.setPVertexInputState(&pipeline_vertex_input_state_create_info)
 			.setPInputAssemblyState(&pipeline_input_assembly_state_create_info)
 			.setPViewportState(&pipeline_viewport_state_create_info)
 			.setPRasterizationState(&pipeline_rasterization_state_create_info)
@@ -1185,33 +1152,52 @@ void SystemVK::drawTest()
 		pipeline_created = true;
 	}
 
+	struct Vertex
+	{
+		glm::vec2 pos;
+		glm::vec2 uv;
+		glm::vec4 col;
+	};
+
 	std::vector<Vertex> vertices = {
-		Vertex{ { 0.0f, -0.5f }, { 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-		Vertex{ { -0.5f, 0.5f }, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-		Vertex{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { 0.0f, -0.5f }, { 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ { -0.5f, 0.5f }, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
 	};
 
 	std::vector<uint32_t> indices = { 0, 1, 2 };
-
+	
 	struct PushConstants
 	{
 		glm::vec2 scale;
 		glm::vec2 translate;
 	};
-
 	auto push_constants = PushConstants{ { 1.0f, 1.0f }, { 0.0f, 0.0f } };
 
-	uint32_t white_pixel = 0xFFFFFFFF;
+	auto vertex_input_binding_description = vk::VertexInputBindingDescription2EXT()
+		.setInputRate(vk::VertexInputRate::eVertex)
+		.setDivisor(1)
+		.setBinding(0);
 
+	std::vector<vk::VertexInputAttributeDescription2EXT> vertex_input_attribute_descriptions = {
+		{ 0, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, pos) },
+		{ 1, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, uv) },
+		{ 2, 0, vk::Format::eR32G32B32A32Sfloat, offsetof(Vertex, col) },
+	};
+
+	mCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *mPipeline);
+	mCommandBuffer.setVertexInputEXT({ vertex_input_binding_description }, { vertex_input_attribute_descriptions });
+	mCommandBuffer.pushConstants<PushConstants>(*mPipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, { push_constants });
+
+	uint32_t white_pixel = 0xFFFFFFFF;
 	static auto texture = std::make_shared<Texture>(1, 1, 4, &white_pixel);
 
 	setTexture(texture);
-	mCommandBuffer.pushConstants<PushConstants>(*mPipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, { push_constants });
-	mCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *mPipeline);
-	setIndexBuffer(indices);
-	setVertexBuffer(vertices);
+
 	mCommandBuffer.setFrontFace(vk::FrontFace::eCounterClockwise);
 	mCommandBuffer.setLineWidth(1.0f);
+	setVertexBuffer(vertices);
+	setIndexBuffer(indices);
 	setTopology(Renderer::Topology::TriangleList);
 	setCullMode(Renderer::CullMode::None);
 	setViewport(Renderer::Viewport());
@@ -1219,9 +1205,9 @@ void SystemVK::drawTest()
 	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);
 
 	std::vector<Vertex> vertices2 = {
-		Vertex{ { -0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
-		Vertex{ { 0.5f, -0.5f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
-		Vertex{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
+		{ { -0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
+		{ { 0.5f, -0.5f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
+		{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
 	};
 
 	uint32_t red_pixel = 0xFF0000FF;
