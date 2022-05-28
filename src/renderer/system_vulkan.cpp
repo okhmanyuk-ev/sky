@@ -506,9 +506,9 @@ void SystemVK::setVertexBuffer(const Buffer& value)
 	auto mem = buffer.memory.mapMemory(0, VK_WHOLE_SIZE);
 	memcpy(mem, value.data, value.size);
 	buffer.memory.unmapMemory();
-	
-	mCommandBuffer.bindVertexBuffers(0, { *buffer.buffer }, { 0 });
 
+	mCommandBuffer.bindVertexBuffers2(0, { *buffer.buffer }, { 0 }, nullptr, { value.stride });
+	
 	mVertexBufferIndex += 1;
 }
 
@@ -1090,7 +1090,6 @@ void SystemVK::drawTest()
 		};
 
 		auto vertex_input_binding_description = vk::VertexInputBindingDescription()
-			.setStride(sizeof(Vertex))
 			.setInputRate(vk::VertexInputRate::eVertex)
 			.setBinding(0);
 		
@@ -1155,7 +1154,8 @@ void SystemVK::drawTest()
 			vk::DynamicState::ePrimitiveTopology,
 			vk::DynamicState::eLineWidth,
 			vk::DynamicState::eCullMode,
-			vk::DynamicState::eFrontFace
+			vk::DynamicState::eFrontFace,
+			vk::DynamicState::eVertexInputBindingStride,
 		};
 
 		auto pipeline_dynamic_state_create_info = vk::PipelineDynamicStateCreateInfo()
