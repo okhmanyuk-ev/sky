@@ -884,7 +884,14 @@ void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 
 void SystemVK::present()
 {
-	drawTest();
+	try
+	{
+		drawTest();
+	}
+	catch (const std::exception& e)
+	{
+		PLATFORM->alert(e.what());
+	}
 
 	size_t total_vertex_buffers_size = 0;
 
@@ -1103,41 +1110,70 @@ void SystemVK::setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::
 
 static std::string vertex_shader_code = R"(
 #version 450 core
-layout(location = 0) in vec2 aPos;
-layout(location = 1) in vec2 aUV;
-layout(location = 2) in vec4 aColor;
-layout(push_constant) uniform uPushConstant { vec2 uScale; vec2 uTranslate; } pc;
 
-out gl_PerVertex { vec4 gl_Position; };
-layout(location = 0) out struct { vec4 Color; vec2 UV; } Out;
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec2 aTexCoord;
+layout(location = 2) in vec4 aColor;
+
+layout(push_constant) uniform constants
+{
+	mat4 projection;
+	mat4 view;
+	mat4 model;
+} pc;
+
+layout(location = 0) out struct 
+{
+	vec4 Color;
+	vec2 TexCoord;
+} Out;
+
+out gl_PerVertex 
+{
+	vec4 gl_Position;
+};
 
 void main()
 {
 	Out.Color = aColor;
-	Out.UV = aUV;
-	gl_Position = vec4(aPos * pc.uScale + pc.uTranslate, 0, 1);
+	Out.TexCoord = aTexCoord;
+	gl_Position = pc.projection * pc.view * pc.model * vec4(aPosition, 1.0);
 }
 )";
 
 static std::string fragment_shader_code = R"(
 #version 450 core
-layout(location = 0) out vec4 fColor;
+
+layout(location = 0) out vec4 result;
 layout(set=0, binding=0) uniform sampler2D sTexture;
-layout(location = 0) in struct { vec4 Color; vec2 UV; } In;
+
+layout(location = 0) in struct 
+{
+	vec4 Color;
+	vec2 TexCoord;
+} In;
+
 void main()
 {
-	fColor = In.Color * texture(sTexture, In.UV.st);
+	result = In.Color * texture(sTexture, In.TexCoord.st);
 }
 )";
 
 void SystemVK::drawTest()
 {
+	struct PushConstants
+	{
+		glm::mat4 projection = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
+	};
+
 	if (!pipeline_created)
 	{
 		auto push_constant_range = vk::PushConstantRange()
 			.setStageFlags(vk::ShaderStageFlagBits::eVertex)
 			.setOffset(0)
-			.setSize(sizeof(float) * 4);
+			.setSize(sizeof(PushConstants));
 
 		auto pipeline_layout_create_info = vk::PipelineLayoutCreateInfo()
 			.setSetLayoutCount(1)
@@ -1240,33 +1276,28 @@ void SystemVK::drawTest()
 
 	struct Vertex
 	{
-		glm::vec2 pos;
+		glm::vec3 pos;
 		glm::vec2 uv;
 		glm::vec4 col;
 	};
 
 	std::vector<Vertex> vertices = {
-		{ { 0.0f, -0.5f }, { 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-		{ { -0.5f, 0.5f }, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-		{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { 0.0f, -0.5f, 0.0f }, { 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ { -0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		{ { 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
 	};
 
 	std::vector<uint32_t> indices = { 0, 1, 2 };
 	
-	struct PushConstants
-	{
-		glm::vec2 scale;
-		glm::vec2 translate;
-	};
-	auto push_constants = PushConstants{ { 1.0f, 1.0f }, { 0.0f, 0.0f } };
-
+	PushConstants push_constants;
+	
 	auto vertex_input_binding_description = vk::VertexInputBindingDescription2EXT()
 		.setInputRate(vk::VertexInputRate::eVertex)
 		.setDivisor(1)
 		.setBinding(0);
 
 	std::vector<vk::VertexInputAttributeDescription2EXT> vertex_input_attribute_descriptions = {
-		{ 0, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, pos) },
+		{ 0, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, pos) },
 		{ 1, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, uv) },
 		{ 2, 0, vk::Format::eR32G32B32A32Sfloat, offsetof(Vertex, col) },
 	};
@@ -1291,9 +1322,9 @@ void SystemVK::drawTest()
 	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);
 
 	std::vector<Vertex> vertices2 = {
-		{ { -0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
-		{ { 0.5f, -0.5f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
-		{ { 0.5f, 0.5f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
+		{ { -0.5f, 0.0f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
+		{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
+		{ { 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
 	};
 
 	uint32_t red_pixel = 0xFF0000FF;
