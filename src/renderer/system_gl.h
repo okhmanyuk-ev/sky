@@ -81,23 +81,10 @@ namespace Renderer
 		static const std::unordered_map<Vertex::Attribute::Format, GLenum> Type;
 		static const std::unordered_map<Vertex::Attribute::Format, GLboolean> Normalize;
 
-
-
-
-
-
-
-
-
-
-
-		static bool IsRenderTargetBound();
+		static inline bool IsRenderTargetBound() { return mRenderTargetBound; };
 
 	private:
-		static bool mRenderTargetBound;
-
-
-
+		static inline bool mRenderTargetBound = false;
 
 	private:
 		void prepareForDrawing();

@@ -96,13 +96,6 @@ RenderTarget::~RenderTarget()
 	glDeleteRenderbuffers(1, &mRenderTargetImpl->depth_stencil_renderbuffer);
 }
 
-bool SystemGL::IsRenderTargetBound() 
-{
-	return mRenderTargetBound;
-}
-
-bool SystemGL::mRenderTargetBound = false;
-
 const std::unordered_map<Topology, GLenum> SystemGL::Topology = {
 	{ Topology::PointList, GL_POINTS },
 	{ Topology::LineList, GL_LINES },
