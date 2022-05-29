@@ -39,6 +39,7 @@ namespace
 		#endif
 		#ifdef HAS_TEXCOORD_ATTRIB
 			vTexCoord = aTexCoord;
+			vTexCoord.y = 1.0 - vTexCoord.y;
 		#endif
 
 			gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);

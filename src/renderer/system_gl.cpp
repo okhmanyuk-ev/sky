@@ -45,16 +45,30 @@ void Texture::writePixels(int width, int height, int channels, void* data)
 	assert(width == mWidth);
 	assert(height == mHeight);
 	assert(data);
+	
+	auto temp_data = malloc(width * height * 4);
+
+	const auto row_size = width * 4;
+
+	for (int i = 0; i < height; i++)
+	{
+		auto src = (void*)(size_t(data) + size_t(i) * row_size);
+		auto dst = (void*)(size_t(temp_data) + size_t(height - 1 - i) * row_size);
+
+		memcpy(dst, src, row_size);
+	}
 
 	GLint last_texture;
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
 	glBindTexture(GL_TEXTURE_2D, mTextureImpl->texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, temp_data);
 
 	if (mMipmap)
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, last_texture);
+
+	free(temp_data);
 }
 
 struct RenderTarget::RenderTargetImpl
@@ -521,7 +535,6 @@ void SystemGL::setTextureAddressMode(const TextureAddress& value)
 	updateGLSampler();
 }
 
-
 void SystemGL::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
 	auto scissor_was_enabled = glIsEnabled(GL_SCISSOR_TEST);
@@ -585,16 +598,11 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* m
 		return;
 
 	auto x = (GLint)pos.x;
-	auto y = mRenderTargetBound ? (GLint)pos.y : (GLint)(PLATFORM->getHeight() - pos.y - size.y);
+	auto y = (GLint)(PLATFORM->getHeight() - pos.y - size.y);
 	auto w = (GLint)size.x;
 	auto h = (GLint)size.y;
 
 	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, memory);
-
-	// fix upside down problem
-
-	if (mRenderTargetBound)
-		return;
 
 	size_t row_size = w * 4;
 
@@ -622,7 +630,7 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 		return;
 
 	auto x = (GLint)pos.x;
-	auto y = mRenderTargetBound ? (GLint)pos.y : (GLint)(PLATFORM->getHeight() - pos.y - size.y);
+	auto y = (GLint)(PLATFORM->getHeight() - pos.y - size.y);
 	auto w = (GLint)size.x;
 	auto h = (GLint)size.y;
 	
@@ -634,20 +642,7 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 	glBindTexture(GL_TEXTURE_2D, dst_texture->mTextureImpl->texture);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mGLPixelBuffer);
 	
-	bool image_is_flipped = !mRenderTargetBound;
-
-	if (!image_is_flipped)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	}
-	else
-	{
-		for (int i = 0; i < h; i++)
-		{
-			auto pbo_offset = (void*)(size_t)(w * (h - i - 1) * 4);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i, w, 1, GL_RGBA, GL_UNSIGNED_BYTE, pbo_offset);
-		}
-	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 	if (dst_texture->isMipmap())
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -702,7 +697,7 @@ void SystemGL::prepareForDrawing()
 		mViewportDirty = false;
 		glViewport(
 			(GLint)mViewport.position.x,
-			mRenderTargetBound ? (GLint)mViewport.position.y : (GLint)(PLATFORM->getHeight() - mViewport.position.y - mViewport.size.y),
+			(GLint)(PLATFORM->getHeight() - mViewport.position.y - mViewport.size.y),
 			(GLint)mViewport.size.x,
 			(GLint)mViewport.size.y);
 
@@ -718,7 +713,7 @@ void SystemGL::prepareForDrawing()
 		mScissorDirty = false;
 		glScissor(
 			(GLint)mScissor.position.x,
-			mRenderTargetBound ? (GLint)mScissor.position.y : (GLint)(PLATFORM->getHeight() - mScissor.position.y - mScissor.size.y),
+			(GLint)(PLATFORM->getHeight() - mScissor.position.y - mScissor.size.y),
 			(GLint)mScissor.size.x,
 			(GLint)mScissor.size.y);
 	}
@@ -801,18 +796,7 @@ void SystemGL::setGLCullMode(const CullMode& value)
 	{
 		glEnable(GL_CULL_FACE);
 		glFrontFace(GL_CW);
-
-		auto cull = value;
-
-		if (IsRenderTargetBound())
-		{
-			if (cull == CullMode::Back)
-				cull = CullMode::Front;
-			else
-				cull = CullMode::Back;
-		}
-
-		glCullFace(CullMap.at(cull));	
+		glCullFace(CullMap.at(value));
 	}
 	else
 	{

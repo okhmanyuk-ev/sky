@@ -183,12 +183,6 @@ void ShaderCustom::update()
 
 	mImpl->constantBuffer = mConstantBuffer;
 
-	if (SystemGL::IsRenderTargetBound())
-	{
-		auto orientationMatrix = glm::scale(glm::mat4(1.0f), { 1.0f, -1.0f, 1.0f });
-		mImpl->constantBuffer.projection = orientationMatrix * mImpl->constantBuffer.projection;
-	}
-
     auto ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(ConstantBuffer) + mImpl->customConstantBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     memcpy(ptr, &mImpl->constantBuffer, sizeof(ConstantBuffer));
     memcpy((void*)((size_t)ptr + sizeof(ConstantBuffer)), mCustomConstantBuffer, mImpl->customConstantBufferSize);
