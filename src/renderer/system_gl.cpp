@@ -697,7 +697,7 @@ void SystemGL::prepareForDrawing()
 		mViewportDirty = false;
 		glViewport(
 			(GLint)mViewport.position.x,
-			(GLint)(PLATFORM->getHeight() - mViewport.position.y - mViewport.size.y),
+			mRenderTargetBound ? (GLint)mViewport.position.y : (GLint)(PLATFORM->getHeight() - mViewport.position.y - mViewport.size.y),
 			(GLint)mViewport.size.x,
 			(GLint)mViewport.size.y);
 
