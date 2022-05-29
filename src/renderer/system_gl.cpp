@@ -712,10 +712,10 @@ void SystemGL::prepareForDrawing()
 	{
 		mScissorDirty = false;
 		glScissor(
-			(GLint)mScissor.position.x,
-			(GLint)(PLATFORM->getHeight() - mScissor.position.y - mScissor.size.y),
-			(GLint)mScissor.size.x,
-			(GLint)mScissor.size.y);
+			(GLint)glm::round(mScissor.position.x),
+			(GLint)glm::round(PLATFORM->getHeight() - mScissor.position.y - mScissor.size.y),
+			(GLint)glm::round(mScissor.size.x),
+			(GLint)glm::round(mScissor.size.y));
 	}
 
 	// shader
