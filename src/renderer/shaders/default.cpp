@@ -213,3 +213,129 @@ std::string Default::MakeDefinesFromFlags(const Vertex::Layout& layout, const st
 
 	return result;
 }
+
+// default cross
+
+static std::string vertex_code = R"(
+layout(location = 0) in vec3 aPosition;
+
+#ifdef HAS_COLOR_ATTRIB
+layout(location = 1) in vec4 aColor;
+#endif
+
+#ifdef HAS_TEXCOORD_ATTRIB
+layout(location = 2) in vec2 aTexCoord;
+#endif
+
+layout(binding = 1) uniform UBO
+{
+	mat4 projection;
+	mat4 view;
+	mat4 model;
+} ubo;
+
+layout(location = 0) out struct 
+{
+#ifdef HAS_COLOR_ATTRIB
+	vec4 Color;
+#endif
+#ifdef HAS_TEXCOORD_ATTRIB
+	vec2 TexCoord;
+#endif
+} Out;
+
+out gl_PerVertex 
+{
+	vec4 gl_Position;
+};
+
+void main()
+{
+#ifdef HAS_COLOR_ATTRIB
+	Out.Color = aColor;
+#endif
+#ifdef HAS_TEXCOORD_ATTRIB
+	Out.TexCoord = aTexCoord;
+#ifdef FLIP_TEXCOORD_Y
+	Out.TexCoord.y = 1.0 - Out.TexCoord.y;
+#endif
+#endif
+	gl_Position = ubo.projection * ubo.view * ubo.model * vec4(aPosition, 1.0);
+}
+)";
+
+static std::string fragment_code = R"(
+layout(location = 0) out vec4 result;
+
+#ifdef HAS_TEXCOORD_ATTRIB
+layout(binding = 0) uniform sampler2D sTexture;
+#endif
+
+layout(location = 0) in struct 
+{
+#ifdef HAS_COLOR_ATTRIB
+	vec4 Color;
+#endif
+#ifdef HAS_TEXCOORD_ATTRIB
+	vec2 TexCoord;
+#endif
+} In;
+
+void main()
+{
+	result = vec4(1.0);
+#ifdef HAS_COLOR_ATTRIB
+	result *= In.Color;
+#endif
+#ifdef HAS_TEXCOORD_ATTRIB
+	result *= texture(sTexture, In.TexCoord.st);
+#endif
+}
+)";
+
+Generic::Generic(const Vertex::Layout& layout, const std::set<Flag>& flags) :
+	ShaderCrossWithMatrices(layout, FinalizeShaderCode(layout, vertex_code, flags), 
+		FinalizeShaderCode(layout, fragment_code, flags))
+{
+}
+
+Generic::Generic(const Vertex::Layout& layout) : Generic(layout, MakeFlagsFromLayout(layout))
+{
+}
+
+std::string Generic::FinalizeShaderCode(const Vertex::Layout& layout, const std::string& source,
+	const std::set<Flag>& flags)
+{
+	std::string result;
+
+	result += "#version 450 core\n";
+
+	if (flags.count(Flag::Colored) > 0)
+	{
+		assert(layout.hasAttribute(Renderer::Vertex::Attribute::Type::Color));
+		result += "#define HAS_COLOR_ATTRIB\n";
+	}
+
+	if (flags.count(Flag::Textured) > 0)
+	{
+		assert(layout.hasAttribute(Renderer::Vertex::Attribute::Type::TexCoord));
+		result += "#define HAS_TEXCOORD_ATTRIB\n";
+	}
+
+	result += source;
+
+	return result;
+}
+
+std::set<Generic::Flag> Generic::MakeFlagsFromLayout(const Vertex::Layout& layout)
+{
+	std::set<Flag> result = { };
+
+	if (layout.hasAttribute(Vertex::Attribute::Type::Color))
+		result.insert(Flag::Colored);
+
+	if (layout.hasAttribute(Vertex::Attribute::Type::TexCoord))
+		result.insert(Flag::Textured);
+
+	return result;
+}
