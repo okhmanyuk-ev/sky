@@ -43,7 +43,7 @@ namespace Shared
 			{ Renderer::Vertex::Attribute::Type::TexCoord, Renderer::Vertex::Attribute::Format::R32G32F, offsetof(ImDrawVert, uv) } } 
 		};
 
-		std::shared_ptr<Renderer::ShaderCross> mShader = nullptr;
+		std::shared_ptr<Renderer::ShaderCrossWithMatrices> mShader = nullptr;
 		
 	public:
 		auto getSampler() const { return mSampler; }

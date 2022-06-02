@@ -49,24 +49,48 @@ namespace Renderer
 		std::unique_ptr<Impl> mImpl;
 	};
 
-	class ShaderCross : public Shader, public ShaderMatrices
+	class ShaderCross : public Shader
 	{
-	private:
-		struct alignas(16) ConstantBuffer
-		{
-			glm::mat4 view = glm::mat4(1.0f);
-			glm::mat4 projection = glm::mat4(1.0f);
-			glm::mat4 model = glm::mat4(1.0f);
-		};
-
 	public:
-		ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code);
-
+		ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code, 
+			const std::string& fragment_code);
 		virtual ~ShaderCross();
 
 	protected:
 		void apply() override;
 		void update() override;
+
+	public:
+		void pushConstants(void* memory, size_t size);
+		
+		template <class T>
+		void pushConstants(T ubo) { pushConstants(&ubo, sizeof(T)); }
+
+	private:
+		struct Impl;
+		std::unique_ptr<Impl> mImpl;
+	};
+
+	class ShaderCrossWithMatrices : public ShaderCross, public ShaderMatrices
+	{
+	public:
+		ShaderCrossWithMatrices(const Vertex::Layout& layout, const std::string& vertex_code,
+			const std::string& fragment_code) : ShaderCross(layout, vertex_code, fragment_code) { }
+
+	private:
+		struct alignas(16) ConstantBuffer
+		{
+			glm::mat4 projection = glm::mat4(1.0f);
+			glm::mat4 view = glm::mat4(1.0f);
+			glm::mat4 model = glm::mat4(1.0f);
+		};
+
+	protected:
+		void update() override
+		{
+			ShaderCross::update();
+			pushConstants(mConstantBuffer);
+		}
 
 	public:
 		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
@@ -80,9 +104,5 @@ namespace Renderer
 
 	private:
 		ConstantBuffer mConstantBuffer;
-
-	private:
-		struct Impl;
-		std::unique_ptr<Impl> mImpl;
 	};
 }

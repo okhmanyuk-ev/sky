@@ -66,7 +66,7 @@ void main()
 
 ImguiSystem::ImguiSystem()
 {
-	mShader = std::make_shared<Renderer::ShaderCross>(ImguiLayout, vertex_shader_code, fragment_shader_code);
+	mShader = std::make_shared<Renderer::ShaderCrossWithMatrices>(ImguiLayout, vertex_shader_code, fragment_shader_code);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

@@ -154,9 +154,6 @@ struct ShaderCross::Impl
 	ID3D11PixelShader* pixelShader = nullptr;
 	ID3D11Buffer* constantBuffer = nullptr;
 	ID3D11InputLayout* inputLayout = nullptr;
-
-	void* appliedConstantBuffer = nullptr;
-	bool forceDirty = false;
 };
 
 ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code)
@@ -219,23 +216,11 @@ ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex
 	}
 
 	SystemD3D11::Device->CreateInputLayout(input.data(), static_cast<UINT>(input.size()), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &mImpl->inputLayout);
-
-	{
-		D3D11_BUFFER_DESC desc = {};
-		desc.ByteWidth = sizeof(mConstantBuffer);
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		desc.MiscFlags = 0;
-		SystemD3D11::Device->CreateBuffer(&desc, NULL, &mImpl->constantBuffer);
-	}
-
-	mImpl->appliedConstantBuffer = malloc(sizeof(ConstantBuffer));
 }
 
 ShaderCross::~ShaderCross()
 {
-	free(mImpl->appliedConstantBuffer);
+	//
 }
 
 void ShaderCross::apply()
@@ -245,25 +230,35 @@ void ShaderCross::apply()
 	SystemD3D11::Context->PSSetShader(mImpl->pixelShader, nullptr, 0);
 	SystemD3D11::Context->VSSetConstantBuffers(1, 1, &mImpl->constantBuffer);
 	SystemD3D11::Context->PSSetConstantBuffers(1, 1, &mImpl->constantBuffer);
-	mImpl->forceDirty = true;
 }
 
 void ShaderCross::update()
 {
-	bool dirty = mImpl->forceDirty;
+	// nothing
+}
 
-	if (!dirty && memcmp(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer)) != 0)
-		dirty = true;
+void ShaderCross::pushConstants(void* memory, size_t size)
+{
+	D3D11_BUFFER_DESC desc = {};
 
-	if (!dirty)
-		return;
-
-	mImpl->forceDirty = false;
-	memcpy(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer));
+	if (!mImpl->constantBuffer)
+	{
+		desc.ByteWidth = size;
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		desc.MiscFlags = 0;
+		SystemD3D11::Device->CreateBuffer(&desc, NULL, &mImpl->constantBuffer);
+	}
+	else
+	{
+		mImpl->constantBuffer->GetDesc(&desc);
+		assert(desc.ByteWidth == size); // ubo size cannot be changed by this way
+	}
 
 	D3D11_MAPPED_SUBRESOURCE resource;
 	SystemD3D11::Context->Map(mImpl->constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	memcpy(resource.pData, &mConstantBuffer, sizeof(ConstantBuffer));
+	memcpy(resource.pData, memory, size);
 	SystemD3D11::Context->Unmap(mImpl->constantBuffer, 0);
 }
 

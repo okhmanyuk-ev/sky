@@ -201,10 +201,6 @@ struct ShaderCross::Impl
 	GLuint vao;
 	GLint uniformTexture;
 	std::map<Vertex::Attribute::Type, GLint> attribLocations;
-	ConstantBuffer constantBuffer;
-	void* appliedConstantBuffer = nullptr;
-	bool forceDirty = false;
-
 	GLuint ubo;
 };
 
@@ -262,12 +258,10 @@ ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex
 
 	glGenBuffers(1, &mImpl->ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, mImpl->ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), nullptr, GL_DYNAMIC_DRAW);
-
-	int ubo_index = glGetUniformBlockIndex(mImpl->program, "UBO");
+	int ubo_index = glGetUniformBlockIndex(mImpl->program, "UBO"); // TODO: do not use direct strings
 	glUniformBlockBinding(mImpl->program, ubo_index, 0);
 
-	mImpl->uniformTexture = glGetUniformLocation(mImpl->program, "sTexture");
+	mImpl->uniformTexture = glGetUniformLocation(mImpl->program, "sTexture"); // TODO: do not use direct strings
 
 	glGenVertexArrays(1, &mImpl->vao);
 	glBindVertexArray(mImpl->vao);
@@ -280,9 +274,7 @@ ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex
 		mImpl->attribLocations[attrib.type] = i;
 		i++;
 	}
-	glBindVertexArray(0);	
-	
-	mImpl->appliedConstantBuffer = malloc(sizeof(ConstantBuffer));
+	glBindVertexArray(0);
 }
 
 ShaderCross::~ShaderCross()
@@ -290,17 +282,12 @@ ShaderCross::~ShaderCross()
 	glDeleteVertexArrays(1, &mImpl->vao);
 	glDeleteProgram(mImpl->program);
 	glDeleteBuffers(1, &mImpl->ubo);
-	
-	free(mImpl->appliedConstantBuffer);
 }
 
 void ShaderCross::apply()
 {
 	glUseProgram(mImpl->program);
 	glBindVertexArray(mImpl->vao);
-
-	glBindBuffer(GL_UNIFORM_BUFFER, mImpl->ubo);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, mImpl->ubo);
 
 	for (auto& attrib : mImpl->layout.attributes)
 	{
@@ -311,29 +298,17 @@ void ShaderCross::apply()
 			SystemGL::Type.at(attrib.format), SystemGL::Normalize.at(attrib.format), (GLsizei)mImpl->layout.stride,
 			(void*)attrib.offset);
 	}
-
-	mImpl->forceDirty = true;
 }
 
 void ShaderCross::update()
 {
-	bool dirty = mImpl->forceDirty;
-
-	if (!dirty && memcmp(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer)) != 0)
-		dirty = true;
-
-	if (!dirty)
-		return;
-
-	mImpl->forceDirty = false;
-	memcpy(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer));
-
-	mImpl->constantBuffer = mConstantBuffer;
-
-    auto ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(ConstantBuffer), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-    memcpy(ptr, &mImpl->constantBuffer, sizeof(ConstantBuffer));
-    glUnmapBuffer(GL_UNIFORM_BUFFER);
-
 	glUniform1i(mImpl->uniformTexture, 0);
 }
+
+void ShaderCross::pushConstants(void* memory, size_t size)
+{
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, mImpl->ubo);
+	glBufferData(GL_UNIFORM_BUFFER, size, memory, GL_DYNAMIC_DRAW);
+}
+
 #endif
