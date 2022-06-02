@@ -61,48 +61,13 @@ namespace Renderer
 		void update() override;
 
 	public:
-		void pushConstants(void* memory, size_t size);
+		void pushConstants(int slot, void* memory, size_t size);
 		
 		template <class T>
-		void pushConstants(T ubo) { pushConstants(&ubo, sizeof(T)); }
+		void pushConstants(int slot, T ubo) { pushConstants(slot, &ubo, sizeof(T)); }
 
 	private:
 		struct Impl;
 		std::unique_ptr<Impl> mImpl;
-	};
-
-	class ShaderCrossWithMatrices : public ShaderCross, public ShaderMatrices
-	{
-	public:
-		ShaderCrossWithMatrices(const Vertex::Layout& layout, const std::string& vertex_code,
-			const std::string& fragment_code) : ShaderCross(layout, vertex_code, fragment_code) { }
-
-	private:
-		struct alignas(16) ConstantBuffer
-		{
-			glm::mat4 projection = glm::mat4(1.0f);
-			glm::mat4 view = glm::mat4(1.0f);
-			glm::mat4 model = glm::mat4(1.0f);
-		};
-
-	protected:
-		void update() override
-		{
-			ShaderCross::update();
-			pushConstants(mConstantBuffer);
-		}
-
-	public:
-		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
-		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; }
-
-		glm::mat4 getViewMatrix() const override { return mConstantBuffer.view; }
-		void setViewMatrix(const glm::mat4& value) override { mConstantBuffer.view = value; }
-
-		glm::mat4 getModelMatrix() const override { return mConstantBuffer.model; }
-		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; }
-
-	private:
-		ConstantBuffer mConstantBuffer;
 	};
 }

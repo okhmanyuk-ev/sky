@@ -4,10 +4,10 @@
 
 namespace Renderer::Shaders
 {
-	class Sdf : public Default
+	class Sdf : public Generic
 	{
 	private:
-		struct alignas(16) CustomConstantBuffer
+		struct alignas(16) Settings
 		{
 			glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 			float minValue = 0.0f;
@@ -18,20 +18,23 @@ namespace Renderer::Shaders
 	public:
 		Sdf(const Vertex::Layout& layout);
 
+	protected:
+		void update() override;
+
 	public:
-		auto getMinValue() const { return mCustomConstantBuffer.minValue; }
-		void setMinValue(float value) { mCustomConstantBuffer.minValue = value; }
+		auto getMinValue() const { return mSettings.minValue; }
+		void setMinValue(float value) { mSettings.minValue = value; }
 
-		auto getMaxValue() const { return mCustomConstantBuffer.maxValue; }
-		void setMaxValue(float value) { mCustomConstantBuffer.maxValue = value; }
+		auto getMaxValue() const { return mSettings.maxValue; }
+		void setMaxValue(float value) { mSettings.maxValue = value; }
 
-		auto getSmoothFactor() const { return mCustomConstantBuffer.smoothFactor; }
-		void setSmoothFactor(float value) { mCustomConstantBuffer.smoothFactor = value; }
+		auto getSmoothFactor() const { return mSettings.smoothFactor; }
+		void setSmoothFactor(float value) { mSettings.smoothFactor = value; }
 
-		auto getColor() const { return mCustomConstantBuffer.color; }
-		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; }
+		auto getColor() const { return mSettings.color; }
+		void setColor(const glm::vec4& value) { mSettings.color = value; }
 
 	private:
-		CustomConstantBuffer mCustomConstantBuffer;
+		Settings mSettings;
 	};
 }

@@ -152,7 +152,7 @@ struct ShaderCross::Impl
 {
 	ID3D11VertexShader* vertexShader = nullptr;
 	ID3D11PixelShader* pixelShader = nullptr;
-	ID3D11Buffer* constantBuffer = nullptr;
+	std::map<int, ID3D11Buffer*> constantBuffers;
 	ID3D11InputLayout* inputLayout = nullptr;
 };
 
@@ -228,8 +228,11 @@ void ShaderCross::apply()
 	SystemD3D11::Context->IASetInputLayout(mImpl->inputLayout);
 	SystemD3D11::Context->VSSetShader(mImpl->vertexShader, nullptr, 0);
 	SystemD3D11::Context->PSSetShader(mImpl->pixelShader, nullptr, 0);
-	SystemD3D11::Context->VSSetConstantBuffers(1, 1, &mImpl->constantBuffer);
-	SystemD3D11::Context->PSSetConstantBuffers(1, 1, &mImpl->constantBuffer);
+	for (auto [slot, buffer] : mImpl->constantBuffers)
+	{
+		SystemD3D11::Context->VSSetConstantBuffers(slot, 1, &buffer);
+		SystemD3D11::Context->PSSetConstantBuffers(slot, 1, &buffer);
+	}
 }
 
 void ShaderCross::update()
@@ -237,29 +240,29 @@ void ShaderCross::update()
 	// nothing
 }
 
-void ShaderCross::pushConstants(void* memory, size_t size)
+void ShaderCross::pushConstants(int slot, void* memory, size_t size)
 {
 	D3D11_BUFFER_DESC desc = {};
 
-	if (!mImpl->constantBuffer)
+	if (!mImpl->constantBuffers.contains(slot))
 	{
 		desc.ByteWidth = size;
 		desc.Usage = D3D11_USAGE_DYNAMIC;
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		desc.MiscFlags = 0;
-		SystemD3D11::Device->CreateBuffer(&desc, NULL, &mImpl->constantBuffer);
+		SystemD3D11::Device->CreateBuffer(&desc, NULL, &mImpl->constantBuffers[slot]);
 	}
 	else
 	{
-		mImpl->constantBuffer->GetDesc(&desc);
+		mImpl->constantBuffers.at(slot)->GetDesc(&desc);
 		assert(desc.ByteWidth == size); // ubo size cannot be changed by this way
 	}
 
 	D3D11_MAPPED_SUBRESOURCE resource;
-	SystemD3D11::Context->Map(mImpl->constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	SystemD3D11::Context->Map(mImpl->constantBuffers.at(slot), 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	memcpy(resource.pData, memory, size);
-	SystemD3D11::Context->Unmap(mImpl->constantBuffer, 0);
+	SystemD3D11::Context->Unmap(mImpl->constantBuffers.at(slot), 0);
 }
 
 #endif

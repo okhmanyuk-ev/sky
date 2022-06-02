@@ -3,72 +3,44 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-namespace
+static std::string src_ubo = R"(
+layout(binding = 2) uniform _settings
 {
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3) || defined(RENDERER_VK)
-	const char* srcFields =
-		R"(
-			vec4 uColor;
-			float uMinValue;
-			float uMaxValue;
-			float uSmoothFactor;
-		)";
-	
-	const char* srcFragment =
-		R"(
-		vec4 fragment(vec4 result)
-		{
-			float distance = texture(uTexture, vTexCoord).a;
-			float minAlpha = smoothstep(uMinValue - uSmoothFactor, uMinValue + uSmoothFactor, distance);
-			float maxAlpha = smoothstep(uMaxValue + uSmoothFactor, uMaxValue - uSmoothFactor, distance);
-			result = vec4(0.0, 0.0, 0.0, 0.0);
-			if (maxAlpha > 0.0 && minAlpha > 0.0)
-			{
-				if (maxAlpha > 0.0)
-				{
-					result = vec4(uColor.rgb, uColor.a * maxAlpha);
-				}
-				if (minAlpha > 0.0 && minAlpha < maxAlpha)
-				{
-					result = vec4(uColor.rgb, uColor.a * minAlpha);
-				}
-			}
-			return result;
-		})";
-#elif defined(RENDERER_D3D11)
-	const char* srcFields =
-		R"(
-			float4 color;
-			float minValue;
-			float maxValue;
-			float smoothFactor;
-		)";
+	vec4 color;
+	float min_value;
+	float max_value;
+	float smooth_factor;
+} settings;
+)";
 
-	const char* srcFragment = 
-		R"(
-		float4 fragment(float4 result, PixelInput input)
+static std::string src_fragment = R"(
+vec4 fragment(vec4 result)
+{
+	float distance = texture(sTexture, In.TexCoord).a;
+	float min_alpha = smoothstep(settings.min_value - settings.smooth_factor, settings.min_value + settings.smooth_factor, distance);
+	float max_alpha = smoothstep(settings.max_value + settings.smooth_factor, settings.max_value - settings.smooth_factor, distance);
+	result = vec4(0.0, 0.0, 0.0, 0.0);
+	if (max_alpha > 0.0 && min_alpha > 0.0)
+	{
+		if (max_alpha > 0.0)
 		{
-			float distance = texture0.Sample(sampler0, input.uv).a;
-			float minAlpha = smoothstep(minValue - smoothFactor, minValue + smoothFactor, distance);
-			float maxAlpha = smoothstep(maxValue + smoothFactor, maxValue - smoothFactor, distance);
-			result = float4(0.0, 0.0, 0.0, 0.0);
-			if (maxAlpha > 0.0 && minAlpha > 0.0)
-			{
-				if (maxAlpha > 0.0)
-				{
-					result = float4(color.rgb, color.a * maxAlpha);
-				}
-				if (minAlpha > 0.0 && minAlpha < maxAlpha)
-				{
-					result = float4(color.rgb, color.a * minAlpha);
-				}
-			}
-			return result;
-		})";
-#endif
+			result = vec4(settings.color.rgb, settings.color.a * max_alpha);
+		}
+		if (min_alpha > 0.0 && min_alpha < max_alpha)
+		{
+			result = vec4(settings.color.rgb, settings.color.a * min_alpha);
+		}
+	}
+	return result;
+}
+)";
+
+Sdf::Sdf(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
+{
 }
 
-Sdf::Sdf(const Vertex::Layout& layout) : Default(layout, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
+void Sdf::update()
 {
-	setCustomConstantBuffer(&mCustomConstantBuffer);
+	Generic::update();
+	pushConstants(2, mSettings);
 }

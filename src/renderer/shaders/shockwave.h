@@ -4,10 +4,10 @@
 
 namespace Renderer::Shaders
 {
-	class Shockwave : public Default
+	class Shockwave : public Generic
 	{
 	private:
-		struct alignas(16) CustomConstantBuffer
+		struct alignas(16) Settings
 		{
 			float size = 1.0f;
 			float thickness = 1.0f;
@@ -17,17 +17,20 @@ namespace Renderer::Shaders
 	public:
 		Shockwave(const Vertex::Layout& layout);
 
+	protected:
+		void update() override;
+
 	public:
-		auto getSize() const { return mCustomConstantBuffer.size; }
-		void setSize(float value) { mCustomConstantBuffer.size = value; }
+		auto getSize() const { return mSettings.size; }
+		void setSize(float value) { mSettings.size = value; }
 
-		auto getThickness() const { return mCustomConstantBuffer.thickness; }
-		void setThickness(float value) { mCustomConstantBuffer.thickness = value; }
+		auto getThickness() const { return mSettings.thickness; }
+		void setThickness(float value) { mSettings.thickness = value; }
 
-		auto getForce() const { return mCustomConstantBuffer.force; }
-		void setForce(float value) { mCustomConstantBuffer.force = value; }
+		auto getForce() const { return mSettings.force; }
+		void setForce(float value) { mSettings.force = value; }
 
 	private:
-		CustomConstantBuffer mCustomConstantBuffer;
+		Settings mSettings;
 	};
 }

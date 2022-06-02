@@ -3,40 +3,28 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-namespace
+static std::string src_ubo = R"(
+layout(binding = 2) uniform _settings
 {
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3) || defined(RENDERER_VK)
-	const char* srcFields =
-		R"(
-			float uIntensity;
-		)";
+	float intensity;
+} settings;
+)";
 
-	const char* srcFragment =
-		R"(
-		vec4 fragment(vec4 result)
-		{
-			float gray = dot(result.rgb, vec3(0.299, 0.587, 0.114));
-			result.rgb = mix(result.rgb, vec3(gray), uIntensity);
-			return result;
-		})";
-#elif defined(RENDERER_D3D11)
-	const char* srcFields =
-		R"(
-			float intensity;
-		)";
+static std::string src_fragment = R"(
+vec4 fragment(vec4 result)
+{
+	float gray = dot(result.rgb, vec3(0.299, 0.587, 0.114));
+	result.rgb = mix(result.rgb, vec3(gray), settings.intensity);
+	return result;
+}
+)";
 
-	const char* srcFragment =
-		R"(
-		float4 fragment(float4 result, PixelInput input)
-		{
-			float3 gray = dot(result.rgb, float3(0.299, 0.587, 0.114)); 
-			result.rgb = lerp(result.rgb, gray, intensity);
-			return result;
-		})";
-#endif
+Grayscale::Grayscale(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
+{
 }
 
-Grayscale::Grayscale(const Vertex::Layout& layout) : Default(layout, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
+void Grayscale::update()
 {
-	setCustomConstantBuffer(&mCustomConstantBuffer);
+	Generic::update();
+	pushConstants(2, mSettings);
 }

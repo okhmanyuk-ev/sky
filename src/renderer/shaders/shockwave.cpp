@@ -3,66 +3,41 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-namespace
+static std::string src_ubo = R"(
+layout(binding = 2) uniform _settings
 {
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3) || defined(RENDERER_VK)
-	const char* srcFields =
-		R"(
-			float size;
-			float thickness;
-			float force;
-		)";
+	float size;
+	float thickness;
+	float force;
+} settings;
+)";
 
-	const char* srcFragment =
-		R"(
-		vec4 fragment(vec4 result)
-		{
-			const vec2 center = vec2(0.5, 0.5);
-			float d = distance(vTexCoord, center);
+static std::string src_fragment = R"(
+vec4 fragment(vec4 result)
+{
+	const vec2 center = vec2(0.5, 0.5);
+	float d = distance(In.TexCoord, center);
 		
-			float scaled_size = size * 0.5;
-			float scaled_thickness = thickness * 0.25;
+	float scaled_size = settings.size * 0.5;
+	float scaled_thickness = settings.thickness * 0.25;
 
-			float mask = (1.0 - smoothstep(scaled_size - scaled_thickness, scaled_size, d));
-			mask *= smoothstep(scaled_size - scaled_thickness - scaled_thickness, scaled_size - scaled_thickness, d);
+	float mask = (1.0 - smoothstep(scaled_size - scaled_thickness, scaled_size, d));
+	mask *= smoothstep(scaled_size - scaled_thickness - scaled_thickness, scaled_size - scaled_thickness, d);
 			
-			vec2 disp = (vTexCoord - center) * mask * force;
+	vec2 disp = (In.TexCoord - center) * mask * settings.force;
 
-			result = texture(uTexture, vTexCoord - disp);
+	result = texture(sTexture, In.TexCoord - disp);
 
-			return result;
-		})";
-#elif defined(RENDERER_D3D11)
-	const char* srcFields =
-		R"(
-			float size;
-			float thickness;
-			float force;
-		)";
+	return result;
+}
+)";
 
-	const char* srcFragment =
-		R"(
-		float4 fragment(float4 result, PixelInput input)
-		{
-			const float2 center = float2(0.5, 0.5);
-			float d = distance(input.uv, center);
-		
-			float scaled_size = size * 0.5;
-			float scaled_thickness = thickness * 0.25;
-
-			float mask = (1.0 - smoothstep(scaled_size - scaled_thickness, scaled_size, d));
-			mask *= smoothstep(scaled_size - scaled_thickness - scaled_thickness, scaled_size - scaled_thickness, d);
-			
-			float2 disp = (input.uv - center) * mask * force;
-
-			result = texture0.Sample(sampler0, input.uv - disp);
-
-			return result;
-		})";
-#endif
+Shockwave::Shockwave(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
+{
 }
 
-Shockwave::Shockwave(const Vertex::Layout& layout) : Default(layout, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
+void Shockwave::update()
 {
-	setCustomConstantBuffer(&mCustomConstantBuffer);
+	Generic::update();
+	pushConstants(2, mSettings);
 }

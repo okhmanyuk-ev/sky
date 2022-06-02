@@ -199,9 +199,8 @@ struct ShaderCross::Impl
 	Vertex::Layout layout;
 	GLuint program;
 	GLuint vao;
-	GLint uniformTexture;
 	std::map<Vertex::Attribute::Type, GLint> attribLocations;
-	GLuint ubo;
+	std::map<int, GLuint> ubos;
 };
 
 ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code)
@@ -256,13 +255,6 @@ ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	glGenBuffers(1, &mImpl->ubo);
-	glBindBuffer(GL_UNIFORM_BUFFER, mImpl->ubo);
-	int ubo_index = glGetUniformBlockIndex(mImpl->program, "UBO"); // TODO: do not use direct strings
-	glUniformBlockBinding(mImpl->program, ubo_index, 0);
-
-	mImpl->uniformTexture = glGetUniformLocation(mImpl->program, "sTexture"); // TODO: do not use direct strings
-
 	glGenVertexArrays(1, &mImpl->vao);
 	glBindVertexArray(mImpl->vao);
 
@@ -281,7 +273,9 @@ ShaderCross::~ShaderCross()
 {
 	glDeleteVertexArrays(1, &mImpl->vao);
 	glDeleteProgram(mImpl->program);
-	glDeleteBuffers(1, &mImpl->ubo);
+
+	for (auto [slot, ubo] : mImpl->ubos)
+		glDeleteBuffers(1, &ubo);
 }
 
 void ShaderCross::apply()
@@ -302,12 +296,17 @@ void ShaderCross::apply()
 
 void ShaderCross::update()
 {
-	glUniform1i(mImpl->uniformTexture, 0);
+	// nothing
 }
 
-void ShaderCross::pushConstants(void* memory, size_t size)
+void ShaderCross::pushConstants(int slot, void* memory, size_t size)
 {
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, mImpl->ubo);
+	if (!mImpl->ubos.contains(slot))
+	{
+		glGenBuffers(1, &mImpl->ubos[slot]);
+	}
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, slot, mImpl->ubos.at(slot));
 	glBufferData(GL_UNIFORM_BUFFER, size, memory, GL_DYNAMIC_DRAW);
 }
 
