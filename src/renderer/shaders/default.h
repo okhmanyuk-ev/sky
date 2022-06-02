@@ -39,6 +39,7 @@ namespace Renderer::Shaders
 			glm::mat4 projection = glm::mat4(1.0f);
 			glm::mat4 view = glm::mat4(1.0f);
 			glm::mat4 model = glm::mat4(1.0f);
+			float lod_bias = 0.0f;
 		};
 
 	public:
@@ -64,6 +65,9 @@ namespace Renderer::Shaders
 
 		glm::mat4 getModelMatrix() const override { return mConstantBuffer.model; }
 		void setModelMatrix(const glm::mat4& value) override { mConstantBuffer.model = value; }
+
+		auto getLodBias() const { return mConstantBuffer.lod_bias; }
+		void setLodBias(float value) { mConstantBuffer.lod_bias = value; }
 
 	protected:
 		void update() override;

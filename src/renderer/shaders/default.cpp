@@ -253,6 +253,7 @@ layout(binding = 1) uniform constants
 	mat4 projection;
 	mat4 view;
 	mat4 model;
+	float lod_bias;
 } ubo;
 
 layout(location = 0) out struct 
@@ -311,6 +312,14 @@ layout(location = 0) out vec4 result;
 layout(binding = 0) uniform sampler2D sTexture;
 #endif
 
+layout(binding = 1) uniform constants
+{
+	mat4 projection;
+	mat4 view;
+	mat4 model;
+	float lod_bias;
+} ubo;
+
 layout(location = 0) in struct 
 {
 #ifdef HAS_COLOR_ATTRIB
@@ -332,7 +341,7 @@ void main()
 	result *= In.Color;
 #endif
 #ifdef HAS_TEXCOORD_ATTRIB
-	result *= texture(sTexture, In.TexCoord.st);
+	result *= texture(sTexture, In.TexCoord.st, ubo.lod_bias);
 #endif
 #ifdef HAS_ADDITIONAL_FRAGMENT_FUNC
 	result = fragment(result);

@@ -58,8 +58,13 @@ void BlurredGlass::draw()
 	if (mBlurIntensity <= 0.0f)
 		return;
 
-	auto static shader = std::make_shared<Renderer::Shaders::MipmapBias>(Renderer::Vertex::PositionColorTexture::Layout);
-	shader->setBias(mBlurIntensity * 8.0f);
+	// TODO: add lod bias feature to graphics system
+	// GRAPHICS->pushLodBias(...);
+	// ...
+	// GRAPHICS->pop();
+
+	auto static shader = std::make_shared<Renderer::Shaders::Generic>(Renderer::Vertex::PositionColorTexture::Layout);
+	shader->setLodBias(mBlurIntensity * 8.0f);
 	setShader(shader);
 
 	if (mBlurPasses < 1)
