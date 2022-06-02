@@ -6,11 +6,68 @@
 #include <renderer/texture.h>
 #include <shared/imgui_user.h>
 #include <graphics/all.h>
+#include <renderer/shader_compiler.h>
 
 using namespace Shared;
 
+static std::string vertex_shader_code = R"(
+#version 450 core
+
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec4 aColor;
+layout(location = 2) in vec2 aTexCoord;
+
+layout(binding = 1) uniform UBO
+{
+	mat4 projection;
+	mat4 view;
+	mat4 model;
+} ubo;
+
+layout(location = 0) out struct 
+{
+	vec4 Color;
+	vec2 TexCoord;
+} Out;
+
+out gl_PerVertex 
+{
+	vec4 gl_Position;
+};
+
+void main()
+{
+	Out.Color = aColor;
+	Out.TexCoord = aTexCoord;
+#ifdef FLIP_TEXCOORD_Y
+	Out.TexCoord.y = 1.0 - Out.TexCoord.y;
+#endif
+	gl_Position = ubo.projection * ubo.view * ubo.model * vec4(aPosition, 1.0);
+}
+)";
+
+static std::string fragment_shader_code = R"(
+#version 450 core
+
+layout(location = 0) out vec4 result;
+layout(binding = 0) uniform sampler2D sTexture;
+
+layout(location = 0) in struct 
+{
+	vec4 Color;
+	vec2 TexCoord;
+} In;
+
+void main()
+{
+	result = In.Color * texture(sTexture, In.TexCoord.st);
+}
+)";
+
 ImguiSystem::ImguiSystem()
 {
+	mShader = std::make_shared<Renderer::ShaderCross>(ImguiLayout, vertex_shader_code, fragment_shader_code);
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	

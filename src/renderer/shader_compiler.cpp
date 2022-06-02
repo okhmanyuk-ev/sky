@@ -111,7 +111,7 @@ const TBuiltInResource DefaultTBuiltInResource = {
 	}
 };
 
-std::vector<uint32_t> Renderer::CompileGlslToSpirv(Renderer::ShaderStage stage, const std::string& code)
+std::vector<uint32_t> Renderer::CompileGlslToSpirv(Renderer::ShaderStage stage, const std::string& code, const std::vector<std::string>& defines)
 {
 	auto translateShaderStage = [](Renderer::ShaderStage stage) {
 		switch (stage)
@@ -130,6 +130,15 @@ std::vector<uint32_t> Renderer::CompileGlslToSpirv(Renderer::ShaderStage stage, 
 
 	glslang::TShader shader(translated_stage);
 	shader.setStrings(&str, 1);
+
+	std::string preamble;
+
+	for (auto define : defines)
+	{
+		preamble += "#define " + define + "\n";
+	}
+
+	shader.setPreamble(preamble.c_str());
 
 	auto messages = (EShMessages)(EShMsgSpvRules | EShMsgVulkanRules);
 
@@ -160,10 +169,20 @@ std::vector<uint32_t> Renderer::CompileGlslToSpirv(Renderer::ShaderStage stage, 
 std::string Renderer::CompileSpirvToHlsl(const std::vector<uint32_t>& spirv)
 {
 	auto compiler = spirv_cross::CompilerHLSL(spirv);
-	
+
 	spirv_cross::CompilerHLSL::Options options;
 	options.shader_model = 40;
 	compiler.set_hlsl_options(options);
+
+	return compiler.compile();
+}
+
+std::string Renderer::CompileSpirvToGlsl(const std::vector<uint32_t>& spirv)
+{
+	auto compiler = spirv_cross::CompilerGLSL(spirv);
+
+	spirv_cross::CompilerGLSL::Options options;
+	compiler.set_common_options(options);
 
 	return compiler.compile();
 }

@@ -6,6 +6,7 @@
 #include <renderer/system_gl.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <renderer/shader_compiler.h>
 
 using namespace Renderer;
 
@@ -186,6 +187,151 @@ void ShaderCustom::update()
     auto ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(ConstantBuffer) + mImpl->customConstantBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     memcpy(ptr, &mImpl->constantBuffer, sizeof(ConstantBuffer));
     memcpy((void*)((size_t)ptr + sizeof(ConstantBuffer)), mCustomConstantBuffer, mImpl->customConstantBufferSize);
+    glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+	glUniform1i(mImpl->uniformTexture, 0);
+}
+
+// shader cross
+
+struct ShaderCross::Impl
+{
+	Vertex::Layout layout;
+	GLuint program;
+	GLuint vao;
+	GLint uniformTexture;
+	std::map<Vertex::Attribute::Type, GLint> attribLocations;
+	ConstantBuffer constantBuffer;
+	void* appliedConstantBuffer = nullptr;
+	bool forceDirty = false;
+
+	GLuint ubo;
+};
+
+ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code)
+{
+    mImpl = std::make_unique<Impl>();
+	mImpl->layout = layout;
+
+	auto vertex_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Vertex, vertex_code, { "FLIP_TEXCOORD_Y" });
+	auto fragment_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Fragment, fragment_code);
+
+	auto glsl_vert = Renderer::CompileSpirvToGlsl(vertex_shader_spirv);
+	auto glsl_frag = Renderer::CompileSpirvToGlsl(fragment_shader_spirv);
+
+	auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	auto v = glsl_vert.c_str();
+	glShaderSource(vertexShader, 1, &v, NULL);
+	glCompileShader(vertexShader);
+
+	GLint isCompiled = 0;
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
+	if (isCompiled == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
+		std::string errorLog;
+		errorLog.resize(maxLength);
+		glGetShaderInfoLog(vertexShader, maxLength, &maxLength, &errorLog[0]);
+		throw std::runtime_error(errorLog);
+	}
+
+	auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	auto f = glsl_frag.c_str();
+	glShaderSource(fragmentShader, 1, &f, NULL);
+	glCompileShader(fragmentShader);
+
+	isCompiled = 0;
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isCompiled);
+	if (isCompiled == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
+		std::string errorLog;
+		errorLog.resize(maxLength);
+		glGetShaderInfoLog(fragmentShader, maxLength, &maxLength, &errorLog[0]);
+		throw std::runtime_error(errorLog);
+	}
+
+	mImpl->program = glCreateProgram();
+	glAttachShader(mImpl->program, vertexShader);
+	glAttachShader(mImpl->program, fragmentShader);
+	glLinkProgram(mImpl->program);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	glGenBuffers(1, &mImpl->ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, mImpl->ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ConstantBuffer), nullptr, GL_DYNAMIC_DRAW);
+
+	int ubo_index = glGetUniformBlockIndex(mImpl->program, "UBO");
+	glUniformBlockBinding(mImpl->program, ubo_index, 0);
+
+	mImpl->uniformTexture = glGetUniformLocation(mImpl->program, "sTexture");
+
+	glGenVertexArrays(1, &mImpl->vao);
+	glBindVertexArray(mImpl->vao);
+
+	int i = 0;
+
+	for (auto& attrib : layout.attributes)
+	{
+		glEnableVertexAttribArray(i);
+		mImpl->attribLocations[attrib.type] = i;
+		i++;
+	}
+	glBindVertexArray(0);	
+	
+	mImpl->appliedConstantBuffer = malloc(sizeof(ConstantBuffer));
+}
+
+ShaderCross::~ShaderCross()
+{
+	glDeleteVertexArrays(1, &mImpl->vao);
+	glDeleteProgram(mImpl->program);
+	glDeleteBuffers(1, &mImpl->ubo);
+	
+	free(mImpl->appliedConstantBuffer);
+}
+
+void ShaderCross::apply()
+{
+	glUseProgram(mImpl->program);
+	glBindVertexArray(mImpl->vao);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, mImpl->ubo);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, mImpl->ubo);
+
+	for (auto& attrib : mImpl->layout.attributes)
+	{
+		if (mImpl->attribLocations.count(attrib.type) == 0)
+			continue;
+
+		glVertexAttribPointer(mImpl->attribLocations.at(attrib.type), SystemGL::Size.at(attrib.format),
+			SystemGL::Type.at(attrib.format), SystemGL::Normalize.at(attrib.format), (GLsizei)mImpl->layout.stride,
+			(void*)attrib.offset);
+	}
+
+	mImpl->forceDirty = true;
+}
+
+void ShaderCross::update()
+{
+	bool dirty = mImpl->forceDirty;
+
+	if (!dirty && memcmp(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer)) != 0)
+		dirty = true;
+
+	if (!dirty)
+		return;
+
+	mImpl->forceDirty = false;
+	memcpy(mImpl->appliedConstantBuffer, &mConstantBuffer, sizeof(ConstantBuffer));
+
+	mImpl->constantBuffer = mConstantBuffer;
+
+    auto ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(ConstantBuffer), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+    memcpy(ptr, &mImpl->constantBuffer, sizeof(ConstantBuffer));
     glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 	glUniform1i(mImpl->uniformTexture, 0);
