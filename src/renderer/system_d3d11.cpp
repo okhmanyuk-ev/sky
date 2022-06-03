@@ -303,12 +303,17 @@ void SystemD3D11::setIndexBuffer(const Buffer& value)
 	Context->IASetIndexBuffer(mD3D11IndexBuffer, value.stride == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
 }
 
-void SystemD3D11::setTexture(std::shared_ptr<Texture> value)
+void SystemD3D11::setTexture(int binding, std::shared_ptr<Texture> value)
 {
 	if (value == nullptr)
 		return;
 
-	Context->PSSetShaderResources(0, 1, &value->mTextureImpl->shader_resource_view);
+	Context->PSSetShaderResources((UINT)binding, 1, &value->mTextureImpl->shader_resource_view);
+}
+
+void SystemD3D11::setTexture(std::shared_ptr<Texture> value)
+{
+	setTexture(0, value);
 }
 
 void SystemD3D11::setRenderTarget(std::shared_ptr<RenderTarget> value)

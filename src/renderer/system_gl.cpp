@@ -413,14 +413,20 @@ void SystemGL::setIndexBuffer(const Buffer& value)
 	mIndexBufferDirty = true;
 }
 
-void SystemGL::setTexture(std::shared_ptr<Texture> value)
+void SystemGL::setTexture(int binding, std::shared_ptr<Texture> value)
 {
 	if (value == nullptr)
 		return;
 
+	glActiveTexture(GL_TEXTURE0 + binding);
 	glBindTexture(GL_TEXTURE_2D, value->mTextureImpl->texture);
 	mTextureBound = true;
 	updateGLSampler();
+}
+
+void SystemGL::setTexture(std::shared_ptr<Texture> value)
+{
+	setTexture(0, value);
 }
 
 void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value) 

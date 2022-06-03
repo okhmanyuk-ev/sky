@@ -30,6 +30,7 @@ namespace Renderer
 		void setScissor(std::nullptr_t value) override;
 		void setVertexBuffer(const Buffer& value) override;
 		void setIndexBuffer(const Buffer& value) override;
+		void setTexture(int binding, std::shared_ptr<Texture> value) override;
 		void setTexture(std::shared_ptr<Texture> value) override;
 		void setRenderTarget(std::shared_ptr<RenderTarget> value) override;
 		void setShader(std::shared_ptr<Shader> value) override;
