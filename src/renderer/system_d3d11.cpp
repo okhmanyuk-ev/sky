@@ -222,7 +222,6 @@ void SystemD3D11::setViewport(const Viewport& value)
 	vp.TopLeftX = value.position.x;
 	vp.TopLeftY = value.position.y;
 	Context->RSSetViewports(1, &vp);
-	mViewport = value;
 }
 
 void SystemD3D11::setScissor(const Scissor& value) 
@@ -235,8 +234,7 @@ void SystemD3D11::setScissor(const Scissor& value)
 	ss.right = static_cast<LONG>(value.position.x + value.size.x);
 	ss.bottom = static_cast<LONG>(value.position.y + value.size.y);
 	Context->RSSetScissorRects(1, &ss);
-	mScissor = value;
-
+	
 	mRasterizerStateDirty = true;
 }
 

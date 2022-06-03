@@ -256,12 +256,6 @@ SystemGL::SystemGL()
 
 	glewInit();
 
-	auto win_system = std::dynamic_pointer_cast<Platform::SystemWindows>(PLATFORM);
-	win_system->destroyWindow();
-	win_system->makeWindow();
-
-	mHDC = GetDC(Platform::SystemWindows::Window);
-
 	const int pixelAttribs[] = {
 		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
 		WGL_SUPPORT_OPENGL_ARB, GL_TRUE,

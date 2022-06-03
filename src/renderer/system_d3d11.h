@@ -209,9 +209,6 @@ namespace Renderer
 		std::unordered_map<RasterizerState, ID3D11RasterizerState*, RasterizerState::Hasher, RasterizerState::Comparer> mD3D11RasterizerStates;
 		std::unordered_map<BlendMode, ID3D11BlendState*, BlendModeHasher> mD3D11BlendModes;
 
-		Viewport mViewport;
-		Scissor mScissor;
-
 		std::shared_ptr<Shader> mShader = nullptr;
 		bool mShaderDirty = false;
 

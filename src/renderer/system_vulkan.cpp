@@ -566,7 +566,7 @@ void SystemVK::setIndexBuffer(const Buffer& value)
 	mIndexBufferIndex += 1;
 }
 
-void SystemVK::setTexture(std::shared_ptr<Texture> value)
+void SystemVK::setTexture(int binding, std::shared_ptr<Texture> value)
 {
 	if (value == nullptr)
 		return;
@@ -584,7 +584,12 @@ void SystemVK::setTexture(std::shared_ptr<Texture> value)
 		.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
 		.setPImageInfo(&descriptor_image_info);
 
-	mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { write_descriptor_set });
+	mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, binding, { write_descriptor_set });
+}
+
+void SystemVK::setTexture(std::shared_ptr<Texture> value)
+{
+	setTexture(0, value);
 }
 
 void SystemVK::setRenderTarget(std::shared_ptr<RenderTarget> value)

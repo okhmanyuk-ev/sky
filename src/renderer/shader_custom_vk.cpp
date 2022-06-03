@@ -29,4 +29,36 @@ void ShaderCustom::update()
 {
 	//
 }
+
+struct ShaderCross::Impl
+{
+
+};
+
+ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code,
+	const std::string& fragment_code)
+{
+	//
+}
+
+ShaderCross::~ShaderCross()
+{
+	//
+}
+
+void ShaderCross::apply()
+{
+	//
+}
+
+void ShaderCross::update()
+{
+	//
+}
+
+void ShaderCross::pushConstants(int slot, void* memory, size_t size)
+{
+	//
+}
+
 #endif
