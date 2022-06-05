@@ -197,10 +197,10 @@ namespace Graphics
 		int mBatchesCountPublic = 0;
 
 	private:
-		std::shared_ptr<Renderer::Shaders::Default> mTexturedShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout);
-		std::shared_ptr<Renderer::Shaders::Default> mColoredShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColor::Layout);
-		std::shared_ptr<Renderer::Shaders::Default> mBatchColorShader = std::make_shared<Renderer::Shaders::Default>(Renderer::Vertex::PositionColorTexture::Layout,
-			std::set<Renderer::Shaders::Default::Flag>({ Renderer::Shaders::Default::Flag::Colored }));
+		std::shared_ptr<Renderer::Shaders::Generic> mTexturedShader = std::make_shared<Renderer::Shaders::Generic>(Renderer::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::Shaders::Generic> mColoredShader = std::make_shared<Renderer::Shaders::Generic>(Renderer::Vertex::PositionColor::Layout);
+		std::shared_ptr<Renderer::Shaders::Generic> mBatchColorShader = std::make_shared<Renderer::Shaders::Generic>(Renderer::Vertex::PositionColorTexture::Layout,
+			std::set<Renderer::Shaders::Generic::Flag>({ Renderer::Shaders::Generic::Flag::Colored }));
 
 	private:
 		enum class BatchMode
