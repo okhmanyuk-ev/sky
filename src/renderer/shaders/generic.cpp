@@ -1,4 +1,4 @@
-#include "default.h"
+#include "generic.h"
 
 using namespace Renderer;
 using namespace Renderer::Shaders;
