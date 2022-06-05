@@ -258,6 +258,7 @@ layout(binding = 1) uniform constants
 
 layout(location = 0) out struct 
 {
+	vec3 Position;
 #ifdef HAS_COLOR_ATTRIB
 	vec4 Color;
 #endif
@@ -273,6 +274,7 @@ out gl_PerVertex
 
 void main()
 {
+	Out.Position = aPosition;
 #ifdef HAS_COLOR_ATTRIB
 	Out.Color = aColor;
 #endif
@@ -322,6 +324,7 @@ layout(binding = 1) uniform constants
 
 layout(location = 0) in struct 
 {
+	vec3 Position;
 #ifdef HAS_COLOR_ATTRIB
 	vec4 Color;
 #endif

@@ -3,90 +3,55 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-namespace
+static std::string src_ubo = R"(
+layout(binding = 2) uniform _settings
 {
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3) || defined(RENDERER_VK)
-	const char* srcFields =
-		R"(
-			vec4 color;
-			vec4 inner_color;
-			vec4 outer_color;
-			float fill;
-			float pie;
-		)";
+	vec4 color;
+	vec4 inner_color;
+	vec4 outer_color;
+	float fill;
+	float pie;
+} settings;
+)";
 
-	const char* srcFragment =
-		R"(
-		vec4 fragment(vec4 result)
-		{
-			const float Pi = 3.14159265;
+static std::string src_fragment = R"(
+vec4 fragment(vec4 result)
+{
+	const float Pi = 3.14159265;
 
-			vec2 center = vec2(0.5, 0.5);
+	vec2 center = vec2(0.5, 0.5);
 
-			vec2 p = vPosition.xy - center;
-			float angle = atan(-p.x, p.y);
-			float normalized_angle = (angle + Pi) / 2.0 / Pi;			
+	vec2 p = In.Position.xy - center;
+	float angle = atan(-p.x, p.y);
+	float normalized_angle = (angle + Pi) / 2.0 / Pi;			
 
-			if (normalized_angle > pie)
-				discard;
+	if (normalized_angle > settings.pie)
+		discard;
 
-			float maxRadius = 0.5;
-			float minRadius = maxRadius * (1.0f - fill);
+	float maxRadius = 0.5;
+	float minRadius = maxRadius * (1.0f - settings.fill);
 			
-			float radius = distance(vPosition.xy, center);
+	float radius = distance(In.Position.xy, center);
 
-			if (radius > maxRadius || radius < minRadius)
-				discard;
+	if (radius > maxRadius || radius < minRadius)
+	{
+		return vec4(0.0); // TODO: discard not working here on D3D11
+	}
 
-			float t = (radius - minRadius) / (maxRadius - minRadius);
-			result *= mix(inner_color, outer_color, t);
+	float t = (radius - minRadius) / (maxRadius - minRadius);
+	result *= mix(settings.inner_color, settings.outer_color, t);
 
-			result *= color;
-			return result;
-
-		})";
-#elif defined(RENDERER_D3D11)
-	const char* srcFields =
-		R"(
-			float4 color;
-			float4 inner_color;
-			float4 outer_color;
-			float fill;
-			float pie;
-		)";
-
-	const char* srcFragment =
-		R"(
-		float4 fragment(float4 result, PixelInput input)
-		{
-			static const float Pi = 3.14159265;
-
-			float2 center = float2(0.5, 0.5);
-
-			float2 p = input.pos - center;
-			float angle = atan2(-p.x, p.y);
-			float normalized_angle = (angle + Pi) / 2.0 / Pi;			
-
-			if (normalized_angle > pie)
-				discard;
-
-			float maxRadius = 0.5;
-			float minRadius = maxRadius * (1.0f - fill);
-			
-			float radius = distance(input.pos, center);
-
-			if (radius > maxRadius || radius < minRadius)
-				discard;
-
-			float t = (radius - minRadius) / (maxRadius - minRadius);
-			result *= lerp(inner_color, outer_color, t);
-			result *= color;
-			return result;
-		})";
-#endif
+	result *= settings.color;
+	return result;
 }
+)";
 
-Circle::Circle(const Vertex::Layout& layout) : Default(layout, sizeof(CustomConstantBuffer), CustomCode{ srcFields, srcFragment })
+Circle::Circle(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
 {
-	setCustomConstantBuffer(&mCustomConstantBuffer);
 };
+
+void Circle::update()
+{
+	Generic::update();
+	pushConstants(2, mSettings);
+}

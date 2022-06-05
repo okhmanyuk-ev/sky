@@ -4,10 +4,10 @@
 
 namespace Renderer::Shaders
 {
-	class Circle : public Default
+	class Circle : public Generic
 	{
 	private:
-		struct alignas(16) CustomConstantBuffer
+		struct alignas(16) Settings
 		{
 			glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 			glm::vec4 inner_color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -18,24 +18,27 @@ namespace Renderer::Shaders
 
 	public:
 		Circle(const Vertex::Layout& layout);
-		
+
+	protected:
+		void update() override;
+
 	public:
-		auto getColor() const { return mCustomConstantBuffer.color; }
-		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; }
+		auto getColor() const { return mSettings.color; }
+		void setColor(const glm::vec4& value) { mSettings.color = value; }
 
-		auto getFill() const { return mCustomConstantBuffer.fill; }
-		void setFill(float value) { mCustomConstantBuffer.fill = value; }
+		auto getFill() const { return mSettings.fill; }
+		void setFill(float value) { mSettings.fill = value; }
 
-		auto getPie() const { return mCustomConstantBuffer.pie; }
-		void setPie(float value) { mCustomConstantBuffer.pie = value; }
+		auto getPie() const { return mSettings.pie; }
+		void setPie(float value) { mSettings.pie = value; }
 
-		auto getInnerColor() const { return mCustomConstantBuffer.inner_color; }
-		void setInnerColor(const glm::vec4& value) { mCustomConstantBuffer.inner_color = value; }
+		auto getInnerColor() const { return mSettings.inner_color; }
+		void setInnerColor(const glm::vec4& value) { mSettings.inner_color = value; }
 
-		auto getOuterColor() const { return mCustomConstantBuffer.outer_color; }
-		void setOuterColor(const glm::vec4& value) { mCustomConstantBuffer.outer_color = value; }
+		auto getOuterColor() const { return mSettings.outer_color; }
+		void setOuterColor(const glm::vec4& value) { mSettings.outer_color = value; }
 
 	private:
-		CustomConstantBuffer mCustomConstantBuffer;
+		Settings mSettings;
 	};
 }
