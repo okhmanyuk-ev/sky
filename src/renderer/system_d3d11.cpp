@@ -155,6 +155,11 @@ SystemD3D11::~SystemD3D11()
 	mSwapChain->Release();
 	Context->Release();
 	Device->Release();
+
+	for (auto [slot, constant_buffer] : mD3D11ConstantBuffers)
+	{
+		constant_buffer->Release();
+	}
 }
 
 void SystemD3D11::onEvent(const Platform::System::ResizeEvent& e)
@@ -299,6 +304,36 @@ void SystemD3D11::setIndexBuffer(const Buffer& value)
 	Context->Unmap(mD3D11IndexBuffer, 0);
 
 	Context->IASetIndexBuffer(mD3D11IndexBuffer, value.stride == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
+}
+
+void SystemD3D11::setUniformBuffer(int slot, void* memory, size_t size)
+{
+	D3D11_BUFFER_DESC desc = {};
+
+	if (mD3D11ConstantBuffers.contains(slot))
+		mD3D11ConstantBuffers.at(slot)->GetDesc(&desc);
+
+	if (desc.ByteWidth < size)
+	{
+		if (mD3D11ConstantBuffers.contains(slot))
+			mD3D11ConstantBuffers.at(slot)->Release();
+
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.ByteWidth = static_cast<UINT>(size);
+		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		Device->CreateBuffer(&desc, nullptr, &mD3D11ConstantBuffers[slot]);
+	}
+
+	auto constant_buffer = mD3D11ConstantBuffers.at(slot);
+
+	D3D11_MAPPED_SUBRESOURCE resource;
+	Context->Map(constant_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	memcpy(resource.pData, memory, size);
+	Context->Unmap(constant_buffer, 0);
+
+	Context->VSSetConstantBuffers(slot, 1, &constant_buffer);
+	Context->PSSetConstantBuffers(slot, 1, &constant_buffer);
 }
 
 void SystemD3D11::setTexture(int binding, std::shared_ptr<Texture> value)

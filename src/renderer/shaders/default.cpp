@@ -341,7 +341,7 @@ void main()
 	result *= In.Color;
 #endif
 #ifdef HAS_TEXCOORD_ATTRIB
-	result *= texture(sTexture, In.TexCoord.st, ubo.lod_bias);
+	result *= texture(sTexture, In.TexCoord, ubo.lod_bias);
 #endif
 #ifdef HAS_ADDITIONAL_FRAGMENT_FUNC
 	result = fragment(result);

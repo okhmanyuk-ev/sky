@@ -31,6 +31,7 @@ namespace Renderer
 		virtual void setScissor(std::nullptr_t value) = 0;
 		virtual void setVertexBuffer(const Buffer& value) = 0;
 		virtual void setIndexBuffer(const Buffer& value) = 0;
+		virtual void setUniformBuffer(int slot, void* memory, size_t size) = 0;
 		virtual void setTexture(int binding, std::shared_ptr<Texture> value) = 0;
 		virtual void setTexture(std::shared_ptr<Texture> value) = 0;
 		virtual void setRenderTarget(std::shared_ptr<RenderTarget> value) = 0;

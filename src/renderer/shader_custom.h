@@ -52,16 +52,19 @@ namespace Renderer
 	class ShaderCross : public Shader
 	{
 	public:
-		ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code, 
+		ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code,
 			const std::string& fragment_code);
 		virtual ~ShaderCross();
 
 	protected:
 		void apply() override;
-		void update() override;
+		void update() override {}
 
 	public:
-		void pushConstants(int slot, void* memory, size_t size);
+		void pushConstants(int slot, void* memory, size_t size)
+		{
+			RENDERER->setUniformBuffer(slot, memory, size);
+		}
 		
 		template <class T>
 		void pushConstants(int slot, T ubo) { pushConstants(slot, &ubo, sizeof(T)); }

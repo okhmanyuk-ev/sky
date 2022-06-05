@@ -367,6 +367,10 @@ SystemGL::~SystemGL()
 	glDeleteBuffers(1, &mGLPixelBuffer);
 	glDeleteBuffers(1, &mGLVertexBuffer);
 	glDeleteBuffers(1, &mGLIndexBuffer);
+	for (auto [slot, ubo] : mGLUniformBuffers)
+	{
+		glDeleteBuffers(1, &ubo);
+	}
 #if defined(RENDERER_GL44)
 	wglDeleteContext(mWglContext);
 #endif
@@ -405,6 +409,17 @@ void SystemGL::setIndexBuffer(const Buffer& value)
 {
 	mIndexBuffer = value;
 	mIndexBufferDirty = true;
+}
+
+void SystemGL::setUniformBuffer(int slot, void* memory, size_t size)
+{
+	if (!mGLUniformBuffers.contains(slot))
+	{
+		glGenBuffers(1, &mGLUniformBuffers[slot]);
+	}
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, slot, mGLUniformBuffers.at(slot));
+	glBufferData(GL_UNIFORM_BUFFER, size, memory, GL_DYNAMIC_DRAW);
 }
 
 void SystemGL::setTexture(int binding, std::shared_ptr<Texture> value)

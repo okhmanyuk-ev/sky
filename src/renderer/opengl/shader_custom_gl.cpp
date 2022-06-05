@@ -200,7 +200,6 @@ struct ShaderCross::Impl
 	GLuint program;
 	GLuint vao;
 	std::map<Vertex::Attribute::Type, GLint> attribLocations;
-	std::map<int, GLuint> ubos;
 };
 
 ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code)
@@ -273,9 +272,6 @@ ShaderCross::~ShaderCross()
 {
 	glDeleteVertexArrays(1, &mImpl->vao);
 	glDeleteProgram(mImpl->program);
-
-	for (auto [slot, ubo] : mImpl->ubos)
-		glDeleteBuffers(1, &ubo);
 }
 
 void ShaderCross::apply()
@@ -292,22 +288,6 @@ void ShaderCross::apply()
 			SystemGL::Type.at(attrib.format), SystemGL::Normalize.at(attrib.format), (GLsizei)mImpl->layout.stride,
 			(void*)attrib.offset);
 	}
-}
-
-void ShaderCross::update()
-{
-	// nothing
-}
-
-void ShaderCross::pushConstants(int slot, void* memory, size_t size)
-{
-	if (!mImpl->ubos.contains(slot))
-	{
-		glGenBuffers(1, &mImpl->ubos[slot]);
-	}
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, slot, mImpl->ubos.at(slot));
-	glBufferData(GL_UNIFORM_BUFFER, size, memory, GL_DYNAMIC_DRAW);
 }
 
 #endif

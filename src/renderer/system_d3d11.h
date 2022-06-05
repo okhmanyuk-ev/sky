@@ -30,6 +30,7 @@ namespace Renderer
 		void setScissor(std::nullptr_t value) override;
 		void setVertexBuffer(const Buffer& value) override;
 		void setIndexBuffer(const Buffer& value) override;
+		void setUniformBuffer(int slot, void* memory, size_t size) override;
 		void setTexture(int binding, std::shared_ptr<Texture> value) override;
 		void setTexture(std::shared_ptr<Texture> value) override;
 		void setRenderTarget(std::shared_ptr<RenderTarget> value) override;
@@ -203,6 +204,7 @@ namespace Renderer
 	private:
 		ID3D11Buffer* mD3D11VertexBuffer = nullptr;
 		ID3D11Buffer* mD3D11IndexBuffer = nullptr;
+		std::unordered_map<int, ID3D11Buffer*> mD3D11ConstantBuffers;
 		std::unordered_map<Texture*, ID3D11ShaderResourceView*> mD3D11TextureViews;
 		std::unordered_map<SamplerState, ID3D11SamplerState*, SamplerState::Hasher, SamplerState::Comparer> mD3D11SamplerStates;
 		std::unordered_map<DepthStencilState, ID3D11DepthStencilState*, DepthStencilState::Hasher, DepthStencilState::Comparer> mD3D11DepthStencilStates;
