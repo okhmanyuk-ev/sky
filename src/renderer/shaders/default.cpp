@@ -297,14 +297,14 @@ std::string Generic::GenerateFragmentCode(const Vertex::Layout& layout, const st
 {
 	auto result = MakeShaderHeader(layout, flags);
 
-	if (additional_ubo.has_value())
-	{
-		result += additional_ubo.value();
-	}
-
 	if (additional_fragment_func.has_value())
 	{
 		result += "#define HAS_ADDITIONAL_FRAGMENT_FUNC\n";
+	}
+
+	if (additional_ubo.has_value())
+	{
+		result += additional_ubo.value();
 	}
 
 	result += R"(

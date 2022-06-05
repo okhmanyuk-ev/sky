@@ -35,7 +35,7 @@ vec4 fragment(vec4 result)
 
 	if (radius > maxRadius || radius < minRadius)
 	{
-		return vec4(0.0); // TODO: discard not working here on D3D11
+		return vec4(0.0); // TODO: discard not working here on D3D11 (discard should be)
 	}
 
 	float t = (radius - minRadius) / (maxRadius - minRadius);

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <renderer/shader_custom.h>
+#include <renderer/shaders/default.h>
 
 namespace Renderer::Shaders
 {
-	class Rounded : public ShaderCustom
+	class Rounded : public Generic
 	{
 	private:
-		struct alignas(16) CustomConstantBuffer
+		struct alignas(16) Settings
 		{
 			glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 			glm::vec2 size;
@@ -15,31 +15,22 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		enum class Flag
-		{
-			Textured,
-			Colored
-		};
-
-	private:
-		static std::set<Flag> MakeFlagsFromLayout(const Vertex::Layout& layout);
-		static std::string MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags);
-
-	public:
-		Rounded(const Vertex::Layout& layout, const std::set<Flag>& flags);
 		Rounded(const Vertex::Layout& layout);
-		
+
+	protected:
+		void update() override;
+
 	public:
-		auto getSize() const { return mCustomConstantBuffer.size; }
-		void setSize(const glm::vec2& value) { mCustomConstantBuffer.size = value; }
+		auto getSize() const { return mSettings.size; }
+		void setSize(const glm::vec2& value) { mSettings.size = value; }
 
-		auto getRadius() const { return mCustomConstantBuffer.radius; }
-		void setRadius(float value) { mCustomConstantBuffer.radius = value; }
+		auto getRadius() const { return mSettings.radius; }
+		void setRadius(float value) { mSettings.radius = value; }
 
-		auto getColor() const { return mCustomConstantBuffer.color; }
-		void setColor(const glm::vec4& value) { mCustomConstantBuffer.color = value; }
+		auto getColor() const { return mSettings.color; }
+		void setColor(const glm::vec4& value) { mSettings.color = value; }
 
 	private:
-		CustomConstantBuffer mCustomConstantBuffer;
+		Settings mSettings;
 	};
 }
