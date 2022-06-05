@@ -60,15 +60,6 @@ namespace Renderer
 		void apply() override;
 		void update() override {}
 
-	public:
-		void pushConstants(int slot, void* memory, size_t size)
-		{
-			RENDERER->setUniformBuffer(slot, memory, size);
-		}
-		
-		template <class T>
-		void pushConstants(int slot, T ubo) { pushConstants(slot, &ubo, sizeof(T)); }
-
 	private:
 		struct Impl;
 		std::unique_ptr<Impl> mImpl;

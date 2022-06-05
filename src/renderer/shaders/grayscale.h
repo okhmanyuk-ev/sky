@@ -1,6 +1,6 @@
 #pragma once
 
-#include <renderer/shaders/default.h>
+#include <renderer/shaders/generic.h>
 
 namespace Renderer::Shaders
 {

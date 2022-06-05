@@ -40,5 +40,5 @@ Rounded::Rounded(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fr
 void Rounded::update()
 {
 	Generic::update();
-	pushConstants(2, mSettings);
+	RENDERER->setUniformBuffer(2, mSettings);
 }

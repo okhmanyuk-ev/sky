@@ -14,7 +14,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include <renderer/shaders/default.h>
+#include <renderer/shaders/generic.h>
 
 #include <cstddef>
 

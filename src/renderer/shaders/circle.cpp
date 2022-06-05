@@ -53,5 +53,5 @@ Circle::Circle(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_frag
 void Circle::update()
 {
 	Generic::update();
-	pushConstants(2, mSettings);
+	RENDERER->setUniformBuffer(2, mSettings);
 }

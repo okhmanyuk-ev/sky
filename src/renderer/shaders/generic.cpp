@@ -17,7 +17,7 @@ Generic::Generic(const Vertex::Layout& layout, std::optional<std::string> additi
 void Generic::update()
 {
 	ShaderCross::update();
-	ShaderCross::pushConstants(1, mConstantBuffer);
+	RENDERER->setUniformBuffer(1, mConstantBuffer);
 }
 
 std::string Generic::GenerateVertexCode(const Vertex::Layout& layout, const std::set<Flag>& flags)

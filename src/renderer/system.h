@@ -57,6 +57,9 @@ namespace Renderer
 		virtual bool isVsync() const = 0;
 		virtual void setVsync(bool value) = 0;
 
+		template <class T>
+		void setUniformBuffer(int slot, const T& buffer) { setUniformBuffer(slot, &const_cast<T&>(buffer), sizeof(T)); }
+
 	public:
 		int getDrawcalls() const { return mDrawcallsPublic; }
 

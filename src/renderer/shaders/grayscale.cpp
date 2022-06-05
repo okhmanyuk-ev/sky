@@ -26,5 +26,5 @@ Grayscale::Grayscale(const Vertex::Layout& layout) : Generic(layout, src_ubo, sr
 void Grayscale::update()
 {
 	Generic::update();
-	pushConstants(2, mSettings);
+	RENDERER->setUniformBuffer(2, mSettings);
 }
