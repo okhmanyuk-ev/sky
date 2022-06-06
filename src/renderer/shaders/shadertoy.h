@@ -4,7 +4,7 @@
 
 namespace Renderer::Shaders
 {
-	class Shadertoy : public ShaderCustom
+	/*class Shadertoy : public ShaderCustom
 	{
 	public:
 		enum class Flag
@@ -36,5 +36,5 @@ namespace Renderer::Shaders
 
 	private:
 		CustomConstantBuffer mCustomConstantBuffer;
-	};
+	};*/
 }

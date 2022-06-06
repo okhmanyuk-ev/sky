@@ -1,10 +1,10 @@
 #pragma once
 
-#include <renderer/shader_custom.h>
+#include <renderer/shaders/generic.h>
 
 namespace Renderer::Shaders
 {
-	class Light : public ShaderCustom
+	class Light : public Generic
 	{
 	public:
 		struct DirectionalLight
@@ -47,19 +47,7 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		enum class Flag
-		{
-			Textured,
-			Colored
-		};
-
-	private:
-		static std::set<Flag> MakeFlagsFromLayout(const Vertex::Layout& layout);
-		static std::string MakeDefinesFromFlags(const Vertex::Layout& layout, const std::string& source, const std::set<Flag>& flags);
-
-	public:
-		Light(const Vertex::Layout& layout, const std::set<Flag>& flags);
-		Light(const Vertex::Layout& layout);
+		Light(const Vertex::Layout& layout, const std::set<Flag>& flags) : Generic(layout, flags) {}
 
 	public:
 		void setEyePosition(const glm::vec3& value) { mCustomConstantBuffer.eyePosition = value; }

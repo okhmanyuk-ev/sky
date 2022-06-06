@@ -3,7 +3,7 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-namespace
+/*namespace
 {
 	const char* shaderSource =
 //#if defined(RENDERER_GL44) || defined(RENDERER_GLES3)
@@ -112,4 +112,4 @@ std::string Shadertoy::MakeDefinesFromFlags(const Vertex::Layout& layout, const 
 	}
 
 	return result;
-}
+}*/
