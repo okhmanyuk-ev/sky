@@ -165,8 +165,11 @@ ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex
 	ID3DBlob* vertex_shader_error;
 	ID3DBlob* pixel_shader_error;
 
-	auto vertex_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Vertex, vertex_code);
-	auto fragment_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Fragment, fragment_code);
+	std::vector<std::string> defines;
+	AddLocationDefines(layout, defines);
+
+	auto vertex_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Vertex, vertex_code, defines);
+	auto fragment_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Fragment, fragment_code, defines);
 
 	auto hlsl_vert = Renderer::CompileSpirvToHlsl(vertex_shader_spirv);
 	auto hlsl_frag = Renderer::CompileSpirvToHlsl(fragment_shader_spirv);

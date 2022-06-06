@@ -25,14 +25,14 @@ std::string Generic::GenerateVertexCode(const Vertex::Layout& layout, const std:
 	auto result = MakeShaderHeader(layout, flags);
 
 	result += R"(
-layout(location = 0) in vec3 aPosition;
+layout(location = POSITION_LOCATION) in vec3 aPosition;
 
 #ifdef HAS_COLOR_ATTRIB
-layout(location = 1) in vec4 aColor;
+layout(location = COLOR_LOCATION) in vec4 aColor;
 #endif
 
 #ifdef HAS_TEXCOORD_ATTRIB
-layout(location = 2) in vec2 aTexCoord;
+layout(location = TEXCOORD_LOCATION) in vec2 aTexCoord;
 #endif
 
 layout(binding = 1) uniform constants

@@ -207,8 +207,12 @@ ShaderCross::ShaderCross(const Vertex::Layout& layout, const std::string& vertex
     mImpl = std::make_unique<Impl>();
 	mImpl->layout = layout;
 
-	auto vertex_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Vertex, vertex_code, { "FLIP_TEXCOORD_Y" });
-	auto fragment_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Fragment, fragment_code);
+	std::vector<std::string> defines;
+	AddLocationDefines(layout, defines);
+	defines.push_back("FLIP_TEXCOORD_Y");
+
+	auto vertex_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Vertex, vertex_code, defines);
+	auto fragment_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Fragment, fragment_code, defines);
 
 	auto glsl_vert = Renderer::CompileSpirvToGlsl(vertex_shader_spirv);
 	auto glsl_frag = Renderer::CompileSpirvToGlsl(fragment_shader_spirv);

@@ -14,8 +14,8 @@ layout(binding = 1) uniform constants
 	float threshold;
 } ubo;
 
-layout(location = 0) in vec3 aPosition;
-layout(location = 2) in vec2 aTexCoord;
+layout(location = POSITION_LOCATION) in vec3 aPosition;
+layout(location = TEXCOORD_LOCATION) in vec2 aTexCoord;
 
 layout(location = 0) out struct { vec2 TexCoord; } Out;
 
