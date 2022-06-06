@@ -3,106 +3,67 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-namespace
+static std::string src_vertex = R"(
+#version 450
+
+layout(binding = 1) uniform constants
 {
-	const char* shaderSource =
-#if defined(RENDERER_GL44) || defined(RENDERER_GLES3) || defined(RENDERER_VK)
-		R"(
-		layout (std140) uniform ConstantBuffer
-		{			
-			mat4 uViewMatrix;
-			mat4 uProjectionMatrix;
-			mat4 uModelMatrix;
+	mat4 view;
+	mat4 projection;
+	mat4 model;
+	float threshold;
+} ubo;
 
-			float uThreshold;
-		};
+layout(location = 0) in vec3 aPosition;
+layout(location = 2) in vec2 aTexCoord;
 
-		uniform sampler2D uTexture;
+layout(location = 0) out struct { vec2 TexCoord; } Out;
 
-		#ifdef VERTEX_SHADER
-		in vec3 aPosition;
-		in vec2 aTexCoord;
+out gl_PerVertex { vec4 gl_Position; };
 
-		out vec2 vTexCoord;
-		
-		void main()
-		{
-			gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
-			vTexCoord = aTexCoord;
-			vTexCoord.y = 1.0 - vTexCoord.y;
-		}
-		#endif
-
-		#ifdef FRAGMENT_SHADER
-		in vec2 vTexCoord;
-
-		out vec4 fragColor;
-
-		void main()
-		{
-			vec4 result = texture(uTexture, vTexCoord);
-
-			vec3 luminanceVector = vec3(0.2125, 0.7154, 0.0721);
-
-			float luminance = dot(luminanceVector, result.xyz);
-			luminance = max(0.0, luminance - uThreshold);
-			result *= sign(luminance);
-
-			fragColor = result;
-		}
-		#endif
-		)";
-#elif defined(RENDERER_D3D11)
-		R"(
-		cbuffer ConstantBuffer : register(b0)
-		{			
-			float4x4 viewMatrix;
-			float4x4 projectionMatrix;
-			float4x4 modelMatrix;
-
-			float threshold;
-		};
-
-		struct VertexInput
-		{
-			float3 pos : POSITION0;
-			float2 uv : TEXCOORD0;
-		};
-
-		struct PixelInput
-		{
-			float4 pixelPosition : SV_POSITION;
-			float2 uv : TEXCOORD0;
-		};
-
-		sampler sampler0;
-		Texture2D texture0;
-
-		PixelInput vs_main(VertexInput input)
-		{
-			PixelInput result;
-			result.pixelPosition = mul(projectionMatrix, mul(viewMatrix, mul(modelMatrix, float4(input.pos, 1.0))));
-			result.uv = input.uv;
-			return result;
-		};
-
-		float4 ps_main(PixelInput input) : SV_TARGET
-		{
-			float4 result = texture0.Sample(sampler0, input.uv);
-
-			float3 luminanceVector = float3(0.2125, 0.7154, 0.0721);
-
-			float luminance = dot(luminanceVector, result.rgb);
-			luminance = max(0.0, luminance - threshold);
-			result *= sign(luminance);
-
-			return result;
-		})";
+void main()
+{
+	gl_Position = ubo.projection * ubo.view * ubo.model * vec4(aPosition, 1.0);
+	Out.TexCoord = aTexCoord;
+#ifdef FLIP_TEXCOORD_Y
+	Out.TexCoord.y = 1.0 - Out.TexCoord.y;
 #endif
+})";
+
+static std::string src_fragment = R"(
+#version 450
+
+layout(binding = 1) uniform constants
+{
+	mat4 view;
+	mat4 projection;
+	mat4 model;
+	float threshold;
+} ubo;
+
+layout(binding = 0) uniform sampler2D sTexture;
+
+layout(location = 0) in struct { vec2 TexCoord; } In;
+
+layout(location = 0) out vec4 result;
+
+void main()
+{
+	result = texture(sTexture, In.TexCoord);
+
+	vec3 luminanceVector = vec3(0.2125, 0.7154, 0.0721);
+
+	float luminance = dot(luminanceVector, result.xyz);
+	luminance = max(0.0, luminance - ubo.threshold);
+	result *= sign(luminance);
+})";
+
+BrightFilter::BrightFilter(const Vertex::Layout& layout) : ShaderCross(layout, src_vertex, src_fragment)
+{
 }
 
-BrightFilter::BrightFilter(const Vertex::Layout& layout) :
-	ShaderCustom(layout, { Vertex::Attribute::Type::Position, Vertex::Attribute::Type::TexCoord }, sizeof(CustomConstantBuffer), shaderSource)
+void BrightFilter::update()
 {
-	setCustomConstantBuffer(&mCustomConstantBuffer);
+	ShaderCross::update();
+	RENDERER->setUniformBuffer(1, mSettings);
 }
