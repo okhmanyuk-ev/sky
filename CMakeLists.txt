@@ -51,18 +51,6 @@ file (GLOB RENDERER_SHADERS_SRC
     src/renderer/shaders/*.h
 )
 
-file(GLOB RENDERER_D3D11_SRC
-	src/renderer/d3d11/*.cpp
-	src/renderer/d3d11/*.mm
-    src/renderer/d3d11/*.h
-)
-
-file(GLOB RENDERER_OPENGL_SRC
-	src/renderer/opengl/*.cpp
-	src/renderer/opengl/*.mm
-    src/renderer/opengl/*.h
-)
-
 file(GLOB AUDIO_SRC
 	src/audio/*.cpp
 	src/audio/*.h
@@ -99,8 +87,6 @@ source_group("common" FILES ${COMMON_SRC})
 source_group("platform" FILES ${PLATFORM_SRC})
 source_group("graphics" FILES ${GRAPHICS_SRC})
 source_group("renderer" FILES ${RENDERER_SRC})
-source_group("renderer\\d3d11" FILES ${RENDERER_D3D11_SRC})
-source_group("renderer\\opengl" FILES ${RENDERER_OPENGL_SRC})
 source_group("renderer\\shaders" FILES ${RENDERER_SHADERS_SRC})
 source_group("audio" FILES ${AUDIO_SRC})
 source_group("scene" FILES ${SCENE_SRC})
@@ -117,8 +103,6 @@ add_library(${PROJECT_NAME} STATIC
 	${GRAPHICS_SRC}
 	${RENDERER_SRC}
 	${RENDERER_SHADERS_SRC}
-	${RENDERER_D3D11_SRC}
-	${RENDERER_OPENGL_SRC}
 	${AUDIO_SRC}
 	${SCENE_SRC}
 	${SCENE3D_SRC}

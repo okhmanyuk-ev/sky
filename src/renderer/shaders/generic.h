@@ -1,11 +1,11 @@
 #pragma once
 
-#include <renderer/shader_custom.h>
+#include <renderer/shader.h>
 #include <optional>
 
 namespace Renderer::Shaders
 {
-	class Generic : public ShaderCross, public ShaderMatrices
+	class Generic : public Shader, public ShaderMatrices
 	{
 	private:
 		struct alignas(16) Matrices

@@ -10,7 +10,6 @@
 #include "sampler.h"
 #include "scissor.h"
 #include "shader.h"
-#include "shader_custom.h"
 #include "stencil.h"
 #include "system.h"
 #include "system_gl.h"

@@ -1,11 +1,12 @@
 #include "generic.h"
+#include <renderer/system.h>
 
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
 Generic::Generic(const Vertex::Layout& layout, const std::set<Flag>& flags,
 	std::optional<std::string> additional_ubo, std::optional<std::string> additional_fragment_func) :
-	ShaderCross(layout, GenerateVertexCode(layout, flags), GenerateFragmentCode(layout, flags, additional_ubo, additional_fragment_func))
+	Shader(layout, GenerateVertexCode(layout, flags), GenerateFragmentCode(layout, flags, additional_ubo, additional_fragment_func))
 {
 }
 
@@ -16,7 +17,7 @@ Generic::Generic(const Vertex::Layout& layout, std::optional<std::string> additi
 
 void Generic::update()
 {
-	ShaderCross::update();
+	Shader::update();
 	RENDERER->setUniformBuffer(1, mConstantBuffer);
 }
 

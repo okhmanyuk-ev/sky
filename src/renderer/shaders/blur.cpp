@@ -1,4 +1,5 @@
 #include "blur.h"
+#include <renderer/system.h>
 
 using namespace Renderer;
 using namespace Renderer::Shaders;
@@ -65,12 +66,12 @@ void main()
 	result += texture(sTexture, In.TexCoord - off2) * 0.0702702703;
 })";
 
-Blur::Blur(const Vertex::Layout& layout) : ShaderCross(layout, src_vertex, src_fragment)
+Blur::Blur(const Vertex::Layout& layout) : Shader(layout, src_vertex, src_fragment)
 {
 }
 
 void Blur::update()
 {
-	ShaderCross::update();
+	Shader::update();
 	RENDERER->setUniformBuffer(1, mSettings);
 }

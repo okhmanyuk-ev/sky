@@ -1,4 +1,5 @@
 #include "bright_filter.h"
+#include <renderer/system.h>
 
 using namespace Renderer;
 using namespace Renderer::Shaders;
@@ -58,12 +59,12 @@ void main()
 	result *= sign(luminance);
 })";
 
-BrightFilter::BrightFilter(const Vertex::Layout& layout) : ShaderCross(layout, src_vertex, src_fragment)
+BrightFilter::BrightFilter(const Vertex::Layout& layout) : Shader(layout, src_vertex, src_fragment)
 {
 }
 
 void BrightFilter::update()
 {
-	ShaderCross::update();
+	Shader::update();
 	RENDERER->setUniformBuffer(1, mSettings);
 }

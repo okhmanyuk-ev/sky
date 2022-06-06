@@ -1,12 +1,12 @@
 #pragma once
 
-#include <renderer/shader_custom.h>
+#include <renderer/shader.h>
 
 namespace Renderer::Shaders
 {
 	// https://github.com/cansik/processing-bloom-filter
 
-	class BrightFilter : public ShaderCross, public ShaderMatrices
+	class BrightFilter : public Shader, public ShaderMatrices
 	{
 	private:
 		struct alignas(16) Settings

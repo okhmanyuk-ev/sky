@@ -1,10 +1,10 @@
 #pragma once
 
-#include <renderer/shader_custom.h>
+#include <renderer/shader.h>
 
 namespace Renderer::Shaders
 {
-	class Blur : public ShaderCross, public ShaderMatrices
+	class Blur : public Shader, public ShaderMatrices
 	{
 	public:
 		enum class Direction
