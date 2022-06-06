@@ -4,7 +4,7 @@
 
 namespace Renderer::Shaders
 {
-	class Blur : public ShaderCustom
+	class Blur : public ShaderCross, public ShaderMatrices
 	{
 	public:
 		enum class Direction
@@ -14,8 +14,11 @@ namespace Renderer::Shaders
 		};
 
 	private:
-		struct alignas(16) ConstantBuffer
+		struct alignas(16) Settings
 		{
+			glm::mat4 projection = glm::mat4(1.0f);
+			glm::mat4 view = glm::mat4(1.0f);
+			glm::mat4 model = glm::mat4(1.0f);
 			glm::vec2 direction = { 0.0f, 0.0f };
 			glm::vec2 resolution = { 0.0f, 0.0f };
 		};
@@ -23,12 +26,24 @@ namespace Renderer::Shaders
 	public:
 		Blur(const Vertex::Layout& layout);
 
+	protected:
+		void update() override;
+
 	public:
-		void setDirection(Direction value) { mConstantBuffer.direction = (value == Direction::Horizontal ? glm::vec2(1.0f, 0.0f) : glm::vec2(0.0f, 1.0f)); }
-		void setResolution(const glm::vec2& value) { mConstantBuffer.resolution = value; }
+		glm::mat4 getProjectionMatrix() const override { return mSettings.projection; }
+		void setProjectionMatrix(const glm::mat4& value) override { mSettings.projection = value; }
+
+		glm::mat4 getViewMatrix() const override { return mSettings.view; }
+		void setViewMatrix(const glm::mat4& value) override { mSettings.view = value; }
+
+		glm::mat4 getModelMatrix() const override { return mSettings.model; }
+		void setModelMatrix(const glm::mat4& value) override { mSettings.model = value; }
+
+		void setDirection(Direction value) { mSettings.direction = (value == Direction::Horizontal ? glm::vec2(1.0f, 0.0f) : glm::vec2(0.0f, 1.0f)); }
+		void setResolution(const glm::vec2& value) { mSettings.resolution = value; }
 
 	private:
-		ConstantBuffer mConstantBuffer;
+		Settings mSettings;
 	};
 
 	class Blur2 : public ShaderCustom
