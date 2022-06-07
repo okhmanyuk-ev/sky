@@ -9,6 +9,7 @@ namespace Renderer
 		friend class SystemD3D11;
 		friend class SystemGL;
 		friend class SystemVK;
+		friend class SystemSkygfx;
 
 	public:
 		Texture(int width, int height, bool mipmap = false);

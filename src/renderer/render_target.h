@@ -10,6 +10,7 @@ namespace Renderer
 	{
 		friend class SystemD3D11;
 		friend class SystemGL;
+		friend class SystemSkygfx;
 
 	public:
 		RenderTarget(int width, int height);

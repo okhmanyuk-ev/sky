@@ -15,6 +15,7 @@ namespace Renderer
 		friend class SystemD3D11;
 		friend class SystemGL;
 		friend class SystemVK;
+		friend class SystemSkygfx;
 	
 	public:
 		Shader(const Vertex::Layout& layout, const std::string& vertex_code,
