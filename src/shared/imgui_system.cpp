@@ -6,7 +6,6 @@
 #include <renderer/texture.h>
 #include <shared/imgui_user.h>
 #include <graphics/all.h>
-#include <renderer/shader_compiler.h>
 
 using namespace Shared;
 

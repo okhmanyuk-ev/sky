@@ -1,0 +1,3 @@
+[submodule "lib/sky-gfx"]
+	path = lib/sky-gfx
+	url = git@github.com:okhmanyuk-ev/sky-gfx.git

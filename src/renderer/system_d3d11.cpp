@@ -2,7 +2,7 @@
 
 #if defined(RENDERER_D3D11)
 #include <platform/system_windows.h>
-#include <renderer/shader_compiler.h>
+#include <skygfx/shader_compiler.h>
 
 using namespace Renderer;
 
@@ -25,12 +25,12 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 
 	std::vector<std::string> defines;
 	AddLocationDefines(layout, defines);
+	
+	auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_code, defines);
+	auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_code, defines);
 
-	auto vertex_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Vertex, vertex_code, defines);
-	auto fragment_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Fragment, fragment_code, defines);
-
-	auto hlsl_vert = Renderer::CompileSpirvToHlsl(vertex_shader_spirv);
-	auto hlsl_frag = Renderer::CompileSpirvToHlsl(fragment_shader_spirv);
+	auto hlsl_vert = skygfx::CompileSpirvToHlsl(vertex_shader_spirv);
+	auto hlsl_frag = skygfx::CompileSpirvToHlsl(fragment_shader_spirv);
 
 	D3DCompile(hlsl_vert.c_str(), hlsl_vert.size(), NULL, NULL, NULL, "main", "vs_4_0", 0, 0, &vertexShaderBlob, &vertex_shader_error);
 	D3DCompile(hlsl_frag.c_str(), hlsl_frag.size(), NULL, NULL, NULL, "main", "ps_4_0", 0, 0, &pixelShaderBlob, &pixel_shader_error);

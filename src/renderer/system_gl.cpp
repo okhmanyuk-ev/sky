@@ -5,7 +5,7 @@
 #include <platform/system_android.h>
 #include <platform/system_ios.h>
 #include <console/device.h>
-#include <renderer/shader_compiler.h>
+#include <skygfx/shader_compiler.h>
 
 using namespace Renderer;
 
@@ -26,11 +26,11 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 	AddLocationDefines(layout, defines);
 	defines.push_back("FLIP_TEXCOORD_Y");
 
-	auto vertex_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Vertex, vertex_code, defines);
-	auto fragment_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Fragment, fragment_code, defines);
+	auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_code, defines);
+	auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_code, defines);
 
-	auto glsl_vert = Renderer::CompileSpirvToGlsl(vertex_shader_spirv);
-	auto glsl_frag = Renderer::CompileSpirvToGlsl(fragment_shader_spirv);
+	auto glsl_vert = skygfx::CompileSpirvToGlsl(vertex_shader_spirv);
+	auto glsl_frag = skygfx::CompileSpirvToGlsl(fragment_shader_spirv);
 
 	auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	auto v = glsl_vert.c_str();
