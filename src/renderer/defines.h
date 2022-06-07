@@ -4,8 +4,9 @@
 
 #if defined(PLATFORM_WINDOWS)
 //	#define RENDERER_D3D11
-	#define RENDERER_GL44
+//	#define RENDERER_GL44
 //	#define RENDERER_VK 
+	#define RENDERER_SKYGFX
 #elif defined(PLATFORM_ANDROID)
 	#define RENDERER_GLES3
 #elif defined(PLATFORM_IOS)
@@ -28,6 +29,9 @@
 #elif defined(RENDERER_MTL)
     #define RENDERER_NAME "Metal"
     #define RENDERER_NAME_LONG "Metal 1.0"
+#elif defined(RENDERER_SKYGFX) // temporary
+	#define RENDERER_NAME "skygfx" 
+	#define RENDERER_NAME_LONG "skygfx"
 #endif
 
 /*

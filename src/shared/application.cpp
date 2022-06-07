@@ -8,6 +8,7 @@
 #include <shared/scene_helpers.h>
 
 #include <renderer/system_vulkan.h>
+#include <renderer/system_skygfx.h>
 
 using namespace Shared;
 
