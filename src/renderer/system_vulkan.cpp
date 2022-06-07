@@ -21,6 +21,22 @@ static uint32_t GetMemoryType(vk::MemoryPropertyFlags properties, uint32_t type_
 	return 0xFFFFFFFF; // Unable to find memoryType
 }
 
+struct Shader::Impl
+{
+};
+
+Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code)
+{
+}
+
+Shader::~Shader()
+{
+}
+
+void Shader::apply()
+{
+}
+
 struct Texture::TextureImpl
 {
 	vk::raii::Image image = nullptr;
@@ -564,6 +580,11 @@ void SystemVK::setIndexBuffer(const Buffer& value)
 	mCommandBuffer.bindIndexBuffer(*buffer.buffer, 0, value.stride == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
 	
 	mIndexBufferIndex += 1;
+}
+
+void SystemVK::setUniformBuffer(int slot, void* memory, size_t size)
+{
+	//
 }
 
 void SystemVK::setTexture(int binding, std::shared_ptr<Texture> value)
