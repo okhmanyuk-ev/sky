@@ -167,10 +167,12 @@ void SystemSkygfx::setSampler(const Sampler& value)
 
 void SystemSkygfx::setDepthMode(const DepthMode& value)
 {
+	mDevice->setDepthMode(*(skygfx::DepthMode*)&value);
 }
 
 void SystemSkygfx::setStencilMode(const StencilMode& value)
 {
+	mDevice->setStencilMode(*(skygfx::StencilMode*)&value);
 }
 
 void SystemSkygfx::setCullMode(const CullMode& value)
@@ -179,6 +181,7 @@ void SystemSkygfx::setCullMode(const CullMode& value)
 
 void SystemSkygfx::setBlendMode(const BlendMode& value)
 {
+	mDevice->setBlendMode(*(skygfx::BlendMode*)&value);
 }
 
 void SystemSkygfx::setTextureAddressMode(const TextureAddress& value)
@@ -209,7 +212,7 @@ void SystemSkygfx::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std
 
 void SystemSkygfx::present()
 {
-	static std::string vertex_shader_code = R"(
+	/*static std::string vertex_shader_code = R"(
 	#version 450 core
 
 	layout(location = POSITION_LOCATION) in vec3 aPosition;
@@ -255,10 +258,7 @@ void SystemSkygfx::present()
 	mDevice->setShader(shader);
 	mDevice->setVertexBuffer(vertices);
 	mDevice->setIndexBuffer(indices);
-	mDevice->drawIndexed(static_cast<uint32_t>(indices.size()));
-
-
-
+	mDevice->drawIndexed(static_cast<uint32_t>(indices.size()));*/
 
 	mDevice->present();
 }
