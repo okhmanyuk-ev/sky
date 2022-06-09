@@ -76,15 +76,15 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 	glGenVertexArrays(1, &mImpl->vao);
 	glBindVertexArray(mImpl->vao);
 
-	int i = 0;
-
-	for (auto& attrib : layout.attributes)
+	for (int i = 0; i < layout.attributes.size(); i++)
 	{
+		const auto& attrib = layout.attributes.at(i);
+
 		glEnableVertexAttribArray(i);
-		mImpl->attribLocations[attrib.type] = i;
-		i++;
+		glVertexAttribFormat(i, SystemGL::Size.at(attrib.format), SystemGL::Type.at(attrib.format),
+			SystemGL::Normalize.at(attrib.format), (GLuint)attrib.offset);
+		glVertexAttribBinding(i, 0);
 	}
-	glBindVertexArray(0);
 }
 
 Shader::~Shader()
@@ -97,16 +97,6 @@ void Shader::apply()
 {
 	glUseProgram(mImpl->program);
 	glBindVertexArray(mImpl->vao);
-
-	for (auto& attrib : mImpl->layout.attributes)
-	{
-		if (mImpl->attribLocations.count(attrib.type) == 0)
-			continue;
-
-		glVertexAttribPointer(mImpl->attribLocations.at(attrib.type), SystemGL::Size.at(attrib.format),
-			SystemGL::Type.at(attrib.format), SystemGL::Normalize.at(attrib.format), (GLsizei)mImpl->layout.stride,
-			(void*)attrib.offset);
-	}
 }
 
 struct Texture::TextureImpl
@@ -550,9 +540,6 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 		mRenderTargetBound = true;
 		glBindFramebuffer(GL_FRAMEBUFFER, value->mRenderTargetImpl->framebuffer);
 	}
-
-	mCullModeDirty = true;  // when render target is active, we using reversed culling,
-							// because image is flipped vertically
 }
 
 void SystemGL::setShader(std::shared_ptr<Shader> value)
@@ -607,8 +594,16 @@ void SystemGL::setStencilMode(const StencilMode& value)
 
 void SystemGL::setCullMode(const CullMode& value)
 {
-	mCullMode = value;
-	mCullModeDirty = true;
+	if (value != CullMode::None)
+	{
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CW);
+		glCullFace(CullMap.at(value));
+	}
+	else
+	{
+		glDisable(GL_CULL_FACE);
+	}
 }
 
 void SystemGL::setBlendMode(const BlendMode& value)
@@ -771,9 +766,6 @@ void SystemGL::setVsync(bool value)
 
 void SystemGL::prepareForDrawing()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
-
 	// shader
 
 	if (mShaderDirty)
@@ -797,12 +789,6 @@ void SystemGL::prepareForDrawing()
 		setGLVertexBuffer(mVertexBuffer);
 		mVertexBufferDirty = false;
 	}
-
-	if (mCullModeDirty)
-	{
-		setGLCullMode(mCullMode);
-		mCullModeDirty = false;
-	}
 }
 
 void SystemGL::setGLVertexBuffer(const Buffer& value)
@@ -822,6 +808,8 @@ void SystemGL::setGLVertexBuffer(const Buffer& value)
         memcpy(ptr, value.data, value.size);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
+
+	glBindVertexBuffer(0, mGLVertexBuffer, 0, (GLsizei)value.stride);
 }
 
 void SystemGL::setGLIndexBuffer(const Buffer& value)
@@ -844,20 +832,6 @@ void SystemGL::setGLIndexBuffer(const Buffer& value)
     }
 
 	mGLIndexType = value.stride == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-}
-
-void SystemGL::setGLCullMode(const CullMode& value)
-{
-	if (value != CullMode::None)
-	{
-		glEnable(GL_CULL_FACE);
-		glFrontFace(GL_CW);
-		glCullFace(CullMap.at(value));
-	}
-	else
-	{
-		glDisable(GL_CULL_FACE);
-	}
 }
 
 void SystemGL::updateGLSampler()
