@@ -114,7 +114,7 @@ struct Texture::TextureImpl
 	GLuint texture;
 };
 
-Texture::Texture(int width, int height, bool mipmap) :
+Texture::Texture(int width, int height, int channels, void* data, bool mipmap) :
 	mWidth(width),
 	mHeight(height),
 	mMipmap(mipmap)
@@ -128,48 +128,31 @@ Texture::Texture(int width, int height, bool mipmap) :
 	glBindTexture(GL_TEXTURE_2D, mTextureImpl->texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-	glBindTexture(GL_TEXTURE_2D, last_texture);
-}
+	if (data)
+	{
+		auto temp_data = malloc(width * height * 4);
+		const auto row_size = width * 4;
 
-Texture::Texture(int width, int height, int channels, void* data, bool mipmap) : Texture(width, height, mipmap)
-{
-	writePixels(width, height, channels, data);
+		for (int i = 0; i < height; i++)
+		{
+			auto src = (void*)(size_t(data) + size_t(i) * row_size);
+			auto dst = (void*)(size_t(temp_data) + size_t(height - 1 - i) * row_size);
+			memcpy(dst, src, row_size);
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, temp_data);
+		free(temp_data);
+
+		if (mMipmap)
+			glGenerateMipmap(GL_TEXTURE_2D);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, last_texture);
 }
 
 Texture::~Texture()
 {
 	glDeleteTextures(1, &mTextureImpl->texture);
-}
-
-void Texture::writePixels(int width, int height, int channels, void* data)
-{
-	assert(width == mWidth);
-	assert(height == mHeight);
-	assert(data);
-	
-	auto temp_data = malloc(width * height * 4);
-
-	const auto row_size = width * 4;
-
-	for (int i = 0; i < height; i++)
-	{
-		auto src = (void*)(size_t(data) + size_t(i) * row_size);
-		auto dst = (void*)(size_t(temp_data) + size_t(height - 1 - i) * row_size);
-
-		memcpy(dst, src, row_size);
-	}
-
-	GLint last_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	glBindTexture(GL_TEXTURE_2D, mTextureImpl->texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, temp_data);
-
-	if (mMipmap)
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, last_texture);
-
-	free(temp_data);
 }
 
 struct RenderTarget::RenderTargetImpl
@@ -178,7 +161,7 @@ struct RenderTarget::RenderTargetImpl
 	GLuint depth_stencil_renderbuffer;
 };
 
-RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
+RenderTarget::RenderTarget(int width, int height) : Texture(width, height, 4, nullptr)
 {
 	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
 

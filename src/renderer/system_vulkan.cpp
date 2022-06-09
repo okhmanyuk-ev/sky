@@ -4,7 +4,7 @@
 #include <platform/system_windows.h>
 #include <iostream>
 #include <console/device.h>
-#include "shader_compiler.h"
+#include <skygfx/shader_compiler.h>
 
 using namespace Renderer;
 
@@ -44,7 +44,7 @@ struct Texture::TextureImpl
 	vk::raii::DeviceMemory memory = nullptr;
 };
 
-Texture::Texture(int width, int height, bool mipmap) : // TODO: make unit32_t
+Texture::Texture(int width, int height, int channels, void* data, bool mipmap) : // TODO: make unit32_t
 	mWidth(width),
 	mHeight(height),
 	mMipmap(mipmap)
@@ -91,11 +91,52 @@ Texture::Texture(int width, int height, bool mipmap) : // TODO: make unit32_t
 	mTextureImpl->image = std::move(image);
 	mTextureImpl->image_view = std::move(image_view);
 	mTextureImpl->memory = std::move(memory);
-}
 
-Texture::Texture(int width, int height, int channels, void* data, bool mipmap) : Texture(width, height, mipmap)
-{
-	writePixels(width, height, channels, data);
+	if (data)
+	{
+		auto size = width * height * channels;
+
+		auto buffer_create_info = vk::BufferCreateInfo()
+			.setSize(size)
+			.setUsage(vk::BufferUsageFlagBits::eTransferSrc)
+			.setSharingMode(vk::SharingMode::eExclusive);
+
+		auto upload_buffer = SystemVK::mDevice.createBuffer(buffer_create_info);
+
+		auto req = upload_buffer.getMemoryRequirements();
+
+		//bd->BufferMemoryAlignment = (bd->BufferMemoryAlignment > req.alignment) ? bd->BufferMemoryAlignment : req.alignment;
+
+		auto memory_allocate_info = vk::MemoryAllocateInfo()
+			.setAllocationSize(req.size)
+			.setMemoryTypeIndex(GetMemoryType(vk::MemoryPropertyFlagBits::eHostVisible, req.memoryTypeBits, SystemVK::mPhysicalDevice));
+
+		auto upload_buffer_memory = SystemVK::mDevice.allocateMemory(memory_allocate_info);
+
+		upload_buffer.bindMemory(*upload_buffer_memory, 0);
+
+		auto map = upload_buffer_memory.mapMemory(0, size);
+		memcpy(map, data, size);
+		upload_buffer_memory.unmapMemory();
+
+		SystemVK::oneTimeSubmit(SystemVK::mDevice, SystemVK::mCommandPool, SystemVK::mQueue, [&](auto& cmd) {
+			SystemVK::setImageLayout(cmd, *mTextureImpl->image, vk::Format::eUndefined, vk::ImageLayout::eUndefined,
+				vk::ImageLayout::eTransferDstOptimal);
+
+			auto image_subresource_layers = vk::ImageSubresourceLayers()
+				.setAspectMask(vk::ImageAspectFlagBits::eColor)
+				.setLayerCount(1);
+
+			auto region = vk::BufferImageCopy()
+				.setImageSubresource(image_subresource_layers)
+				.setImageExtent({ static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1 });
+
+			cmd.copyBufferToImage(*upload_buffer, *mTextureImpl->image, vk::ImageLayout::eTransferDstOptimal, { region });
+
+			SystemVK::setImageLayout(cmd, *mTextureImpl->image, vk::Format::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+				vk::ImageLayout::eShaderReadOnlyOptimal);
+		});
+	}
 }
 
 Texture::~Texture()
@@ -103,62 +144,12 @@ Texture::~Texture()
 
 }
 
-void Texture::writePixels(int width, int height, int channels, void* data)
-{
-	assert(width == mWidth);
-	assert(height == mHeight);
-	assert(data);
-
-	auto size = width * height * channels;
-
-	auto buffer_create_info = vk::BufferCreateInfo()
-		.setSize(size)
-		.setUsage(vk::BufferUsageFlagBits::eTransferSrc)
-		.setSharingMode(vk::SharingMode::eExclusive);
-
-	auto upload_buffer = SystemVK::mDevice.createBuffer(buffer_create_info);
-
-	auto req = upload_buffer.getMemoryRequirements();
-
-	//bd->BufferMemoryAlignment = (bd->BufferMemoryAlignment > req.alignment) ? bd->BufferMemoryAlignment : req.alignment;
-
-	auto memory_allocate_info = vk::MemoryAllocateInfo()
-		.setAllocationSize(req.size)
-		.setMemoryTypeIndex(GetMemoryType(vk::MemoryPropertyFlagBits::eHostVisible, req.memoryTypeBits, SystemVK::mPhysicalDevice));
-
-	auto upload_buffer_memory = SystemVK::mDevice.allocateMemory(memory_allocate_info);
-
-	upload_buffer.bindMemory(*upload_buffer_memory, 0);
-
-	auto map = upload_buffer_memory.mapMemory(0, size);
-	memcpy(map, data, size);
-	upload_buffer_memory.unmapMemory();
-
-	SystemVK::oneTimeSubmit(SystemVK::mDevice, SystemVK::mCommandPool, SystemVK::mQueue, [&](auto& cmd) {
-		SystemVK::setImageLayout(cmd, *mTextureImpl->image, vk::Format::eUndefined, vk::ImageLayout::eUndefined,
-			vk::ImageLayout::eTransferDstOptimal);
-
-		auto image_subresource_layers = vk::ImageSubresourceLayers()
-			.setAspectMask(vk::ImageAspectFlagBits::eColor)
-			.setLayerCount(1);
-
-		auto region = vk::BufferImageCopy()
-			.setImageSubresource(image_subresource_layers)
-			.setImageExtent({ static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1 });
-
-		cmd.copyBufferToImage(*upload_buffer, *mTextureImpl->image, vk::ImageLayout::eTransferDstOptimal, { region });
-
-		SystemVK::setImageLayout(cmd, *mTextureImpl->image, vk::Format::eUndefined, vk::ImageLayout::eTransferDstOptimal,
-			vk::ImageLayout::eShaderReadOnlyOptimal);
-	});
-}
-
 struct RenderTarget::RenderTargetImpl
 {
 
 };
 
-RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
+RenderTarget::RenderTarget(int width, int height) : Texture(width, height, 4, nullptr)
 {
 	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
 }
@@ -1045,8 +1036,8 @@ void SystemVK::drawTest()
 
 		mPipelineLayout = mDevice.createPipelineLayout(pipeline_layout_create_info);
 		
-		auto vertex_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Vertex, vertex_shader_code);
-		auto fragment_shader_spirv = Renderer::CompileGlslToSpirv(Renderer::ShaderStage::Fragment, fragment_shader_code);
+		auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_shader_code);
+		auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_shader_code);
 
 		auto vertex_shader_module_create_info = vk::ShaderModuleCreateInfo()
 			.setCode(vertex_shader_spirv);

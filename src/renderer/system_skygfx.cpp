@@ -30,35 +30,24 @@ struct Texture::TextureImpl
 	std::shared_ptr<skygfx::Texture> texture;
 };
 
-Texture::Texture(int width, int height, bool mipmap) :
+Texture::Texture(int width, int height, int channels, void* data, bool mipmap) :
 	mWidth(width),
 	mHeight(height),
 	mMipmap(mipmap)
 {
 	mTextureImpl = std::make_unique<TextureImpl>();
-	//uint32_t pixel = 0xFFFFFFFF;
-	//mTextureImpl->texture = std::make_shared<skygfx::Texture>(1, 1, 4, &pixel);
-}
-
-Texture::Texture(int width, int height, int channels, void* data, bool mipmap) : Texture(width, height, mipmap)
-{
-	writePixels(width, height, channels, data);
+	mTextureImpl->texture = std::make_shared<skygfx::Texture>(width, height, channels, data, mMipmap);
 }
 
 Texture::~Texture()
 {
 }
 
-void Texture::writePixels(int width, int height, int channels, void* data)
-{
-	mTextureImpl->texture = std::make_shared<skygfx::Texture>(width, height, channels, data, mMipmap);
-}
-
 struct RenderTarget::RenderTargetImpl
 {
 };
 
-RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
+RenderTarget::RenderTarget(int width, int height) : Texture(width, height, 4, nullptr)
 {
 	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
 }

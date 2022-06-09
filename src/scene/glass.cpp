@@ -19,7 +19,7 @@ void Glass::draw()
 
 	if (size != mPrevSize)
 	{
-		setTexture(std::make_shared<Renderer::Texture>(w, h, mGenerateMipmaps));
+		setTexture(std::make_shared<Renderer::Texture>(w, h, 4, nullptr, mGenerateMipmaps));
 		mPrevSize = size;
 	}
 

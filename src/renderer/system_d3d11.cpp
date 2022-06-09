@@ -98,7 +98,7 @@ struct Texture::TextureImpl
 	ID3D11ShaderResourceView* shader_resource_view;
 };
 
-Texture::Texture(int width, int height, bool mipmap) :
+Texture::Texture(int width, int height, int channels, void* data, bool mipmap) :
 	mWidth(width),
 	mHeight(height),
 	mMipmap(mipmap)
@@ -128,11 +128,16 @@ Texture::Texture(int width, int height, bool mipmap) :
 	shader_resource_view_desc.Texture2D.MipLevels = -1;
 	shader_resource_view_desc.Texture2D.MostDetailedMip = 0;
 	SystemD3D11::Device->CreateShaderResourceView(mTextureImpl->texture2d, &shader_resource_view_desc, &mTextureImpl->shader_resource_view);
-}
 
-Texture::Texture(int width, int height, int channels, void* data, bool mipmap) : Texture(width, height, mipmap)
-{
-	writePixels(width, height, channels, data);
+	if (data)
+	{
+		auto memPitch = width * channels;
+		auto memSlicePitch = width * height * channels;
+		SystemD3D11::Context->UpdateSubresource(mTextureImpl->texture2d, 0, nullptr, data, memPitch, memSlicePitch);
+
+		if (mMipmap)
+			SystemD3D11::Context->GenerateMips(mTextureImpl->shader_resource_view);
+	}
 }
 
 Texture::~Texture()
@@ -144,20 +149,6 @@ Texture::~Texture()
 		mTextureImpl->texture2d->Release();
 }
 
-void Texture::writePixels(int width, int height, int channels, void* data)
-{
-	assert(width == mWidth);
-	assert(height == mHeight);
-	assert(data);
-
-	auto memPitch = width * channels;
-	auto memSlicePitch = width * height * channels;
-	SystemD3D11::Context->UpdateSubresource(mTextureImpl->texture2d, 0, nullptr, data, memPitch, memSlicePitch);
-
-	if (mMipmap)
-		SystemD3D11::Context->GenerateMips(mTextureImpl->shader_resource_view);
-}
-
 struct RenderTarget::RenderTargetImpl
 {
 	ID3D11RenderTargetView* render_target_view;
@@ -165,7 +156,7 @@ struct RenderTarget::RenderTargetImpl
 	ID3D11DepthStencilView* depth_stencil_view;
 };
 
-RenderTarget::RenderTarget(int width, int height) : Texture(width, height)
+RenderTarget::RenderTarget(int width, int height) : Texture(width, height, 4, nullptr)
 {
 	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
 
