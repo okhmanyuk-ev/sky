@@ -45,11 +45,14 @@ Texture::~Texture()
 
 struct RenderTarget::RenderTargetImpl
 {
+	std::shared_ptr<skygfx::RenderTarget> render_target;
 };
 
 RenderTarget::RenderTarget(int width, int height) : Texture(width, height, 4, nullptr)
 {
 	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
+	mRenderTargetImpl->render_target = std::make_shared<skygfx::RenderTarget>(width, height);
+	mTextureImpl->texture = mRenderTargetImpl->render_target;
 }
 
 RenderTarget::~RenderTarget()
@@ -124,6 +127,10 @@ void SystemSkygfx::setTexture(std::shared_ptr<Texture> value)
 
 void SystemSkygfx::setRenderTarget(std::shared_ptr<RenderTarget> value)
 {
+	if (value == nullptr)
+		mDevice->setRenderTarget(nullptr);
+	else
+		mDevice->setRenderTarget(*value->mRenderTargetImpl->render_target);
 }
 
 void SystemSkygfx::setShader(std::shared_ptr<Shader> value)
