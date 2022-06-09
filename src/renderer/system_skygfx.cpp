@@ -191,6 +191,7 @@ void SystemSkygfx::readPixels(const glm::ivec2& pos, const glm::ivec2& size, voi
 
 void SystemSkygfx::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
 {
+	mDevice->readPixels(pos, size, *dst_texture->mTextureImpl->texture);
 }
 
 void SystemSkygfx::present()
