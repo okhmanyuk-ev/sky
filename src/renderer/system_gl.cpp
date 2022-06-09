@@ -467,15 +467,27 @@ void SystemGL::setTopology(const Renderer::Topology& value)
 
 void SystemGL::setViewport(const Viewport& value) 
 {
-	mViewport = value;
-	mViewportDirty = true;
+	glViewport(
+		(GLint)value.position.x,
+		(GLint)value.position.y,
+		(GLint)value.size.x,
+		(GLint)value.size.y);
+
+#if defined(RENDERER_GL44)
+	glDepthRange((GLclampd)value.minDepth, (GLclampd)value.maxDepth);
+#elif defined(RENDERER_GLES3)
+	glDepthRangef((GLfloat)value.minDepth, (GLfloat)value.maxDepth);
+#endif
 }
 
 void SystemGL::setScissor(const Scissor& value) 
 {
 	glEnable(GL_SCISSOR_TEST);
-	mScissor = value;
-	mScissorDirty = true;
+	glScissor(
+		(GLint)glm::round(value.position.x),
+		(GLint)glm::round(PLATFORM->getHeight() - value.position.y - value.size.y),
+		(GLint)glm::round(value.size.x),
+		(GLint)glm::round(value.size.y));
 }
 
 void SystemGL::setScissor(std::nullptr_t value)
@@ -761,32 +773,6 @@ void SystemGL::prepareForDrawing()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
-
-	if (mViewportDirty)
-	{
-		mViewportDirty = false;
-		glViewport(
-			(GLint)mViewport.position.x,
-			mRenderTargetBound ? (GLint)mViewport.position.y : (GLint)(PLATFORM->getHeight() - mViewport.position.y - mViewport.size.y),
-			(GLint)mViewport.size.x,
-			(GLint)mViewport.size.y);
-
-#if defined(RENDERER_GL44)
-		glDepthRange((GLclampd)mViewport.minDepth, (GLclampd)mViewport.maxDepth);
-#elif defined(RENDERER_GLES3)
-		glDepthRangef((GLfloat)mViewport.minDepth, (GLfloat)mViewport.maxDepth);
-#endif
-	}
-
-	if (mScissorDirty)
-	{
-		mScissorDirty = false;
-		glScissor(
-			(GLint)glm::round(mScissor.position.x),
-			(GLint)glm::round(PLATFORM->getHeight() - mScissor.position.y - mScissor.size.y),
-			(GLint)glm::round(mScissor.size.x),
-			(GLint)glm::round(mScissor.size.y));
-	}
 
 	// shader
 

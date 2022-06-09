@@ -102,12 +102,6 @@ namespace Renderer
 		Buffer mVertexBuffer;
 		bool mVertexBufferDirty = false;
 
-		Viewport mViewport;
-		bool mViewportDirty = true;
-
-		Scissor mScissor;
-		bool mScissorDirty = true;
-
 		std::shared_ptr<Shader> mShader = nullptr;
 		bool mShaderDirty = false;
 
