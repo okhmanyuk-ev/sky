@@ -725,11 +725,6 @@ void SystemVK::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexO
 	//mCommandBuffer.drawIndexed(indexCount, 1, indexOffset, vertexOffset, 0);
 }
 
-void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory)
-{
-	//
-}
-
 void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
 {
 	//

@@ -185,10 +185,6 @@ void SystemSkygfx::drawIndexed(size_t indexCount, size_t indexOffset, size_t ver
 	mDevice->drawIndexed(indexCount, indexOffset);
 }
 
-void SystemSkygfx::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory)
-{
-}
-
 void SystemSkygfx::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
 {
 	mDevice->readPixels(pos, size, *dst_texture->mTextureImpl->texture);

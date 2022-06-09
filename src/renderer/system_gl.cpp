@@ -691,35 +691,6 @@ void SystemGL::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexO
 #endif
 }
 
-void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory)
-{
-	if (size.x <= 0 || size.y <= 0)
-		return;
-
-	auto x = (GLint)pos.x;
-	auto y = (GLint)(PLATFORM->getHeight() - pos.y - size.y);
-	auto w = (GLint)size.x;
-	auto h = (GLint)size.y;
-
-	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, memory);
-
-	size_t row_size = w * 4;
-
-	auto temp = malloc(row_size);
-
-	for (int i = 0; i < h / 2; i++)
-	{
-		auto top_row = (void*)(size_t(memory) + size_t(i) * row_size);
-		auto bottom_row = (void*)(size_t(memory) + size_t(h - 1 - i) * row_size);
-
-		memcpy(temp, top_row, row_size);
-		memcpy(top_row, bottom_row, row_size);
-		memcpy(bottom_row, temp, row_size);
-	}
-
-	free(temp);
-}
-
 void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
 {
 	assert(dst_texture->getWidth() == size.x);

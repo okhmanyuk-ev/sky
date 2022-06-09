@@ -48,7 +48,6 @@ namespace Renderer
 		void draw(size_t vertexCount, size_t vertexOffset = 0) override;
 		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0) override;
 
-		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, void* memory) override;
 		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture) override;
 
 		void present() override;
