@@ -72,6 +72,7 @@ SystemSkygfx::~SystemSkygfx()
 
 void SystemSkygfx::onEvent(const Platform::System::ResizeEvent& e)
 {
+	mDevice->resize(e.width, e.height);
 }
 
 void SystemSkygfx::setTopology(const Renderer::Topology& value)
