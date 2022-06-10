@@ -12,7 +12,6 @@ namespace Renderer
 {
 	class Shader
 	{
-		friend class SystemD3D11;
 		friend class SystemGL;
 		friend class SystemVK;
 		friend class SystemSkygfx;

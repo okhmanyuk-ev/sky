@@ -8,7 +8,6 @@ namespace Renderer
 {
 	class RenderTarget : public Texture
 	{
-		friend class SystemD3D11;
 		friend class SystemGL;
 		friend class SystemSkygfx;
 

@@ -18,7 +18,6 @@
 #include <shared/localization_system.h>
 #include <shared/stats_system.h>
 #include <shared/cache_system.h>
-#include <renderer/system_d3d11.h>
 #include <renderer/system_gl.h>
 #include <shared/touch_emulator.h>
 #include <shared/gesture_detector.h>

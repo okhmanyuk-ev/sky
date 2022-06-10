@@ -13,7 +13,6 @@
 #include "stencil.h"
 #include "system.h"
 #include "system_gl.h"
-#include "system_d3d11.h"
 //#include "system_vulkan.h" // TODO: very long compile time if uncommented (vulkan_raii.hpp)
 #include "texture.h"
 #include "texture_address.h"

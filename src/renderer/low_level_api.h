@@ -2,12 +2,7 @@
 
 #include <renderer/defines.h>
 
-#if defined(RENDERER_D3D11)
-    #include <d3dcompiler.h>
-    #include <d3d11.h>
-    #pragma comment(lib, "d3d11")
-    #pragma comment(lib, "d3dcompiler")
-#elif defined(RENDERER_GL44)
+#if defined(RENDERER_GL44)
     #define GLEW_STATIC
     #include <GL/glew.h>
     #include <GL/GL.h>
