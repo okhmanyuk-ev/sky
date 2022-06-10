@@ -528,7 +528,6 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 {
 	if (value == nullptr)
 	{
-		mRenderTargetBound = false;
 #if defined(PLATFORM_IOS)
 		[mGLKView bindDrawable];
 #else
@@ -537,7 +536,6 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 	}
 	else
 	{
-		mRenderTargetBound = true;
 		glBindFramebuffer(GL_FRAMEBUFFER, value->mRenderTargetImpl->framebuffer);
 	}
 }

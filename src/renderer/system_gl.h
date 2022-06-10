@@ -83,9 +83,6 @@ namespace Renderer
 		static const std::unordered_map<Vertex::Attribute::Format, GLboolean> Normalize;
 
 	private:
-		bool mRenderTargetBound = false;
-
-	private:
 		void prepareForDrawing();
 
 	private:
