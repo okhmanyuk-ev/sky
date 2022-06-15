@@ -2,4 +2,6 @@
 
 # Features
 - Platforms: Windows, iOS, Android
-- Rendering API: D3D11, OpenGL 4.4, OpenGL ES 3.2
+- Rendering API: D3D11, OpenGL, OpenGL ES
+- SDF font rendering
+- Batching 2D objects to reduce drawcalls
