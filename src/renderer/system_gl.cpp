@@ -23,8 +23,8 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 	mImpl = std::make_unique<Impl>();
 	mImpl->layout = layout;
 
-	_defines = defines;
-	AddLocationDefines(layout, _defines);
+	auto _defines = defines;
+	skygfx::AddShaderLocationDefines(*(skygfx::Vertex::Layout*)&layout, _defines);
 	_defines.push_back("FLIP_TEXCOORD_Y");
 
 	auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_code, _defines);
