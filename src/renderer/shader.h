@@ -37,25 +37,6 @@ namespace Renderer
 				assert(layout.hasAttribute(attrib));
 			}
 		}
-
-	private:
-		static void AddLocationDefines(const Vertex::Layout& layout, std::vector<std::string>& defines)
-		{
-			const std::unordered_map<Vertex::Attribute::Type, std::string> Names = {
-				{ Vertex::Attribute::Type::Position, "POSITION_LOCATION" },
-				{ Vertex::Attribute::Type::Color, "COLOR_LOCATION" },
-				{ Vertex::Attribute::Type::TexCoord, "TEXCOORD_LOCATION" },
-				{ Vertex::Attribute::Type::Normal, "NORMAL_LOCATION" },
-			};
-
-			for (int i = 0; i < layout.attributes.size(); i++)
-			{
-				const auto& attrib = layout.attributes.at(i);
-				assert(Names.contains(attrib.type));
-				auto name = Names.at(attrib.type);
-				defines.push_back(name + " " + std::to_string(i));
-			}
-		}
 	};
 
 	class ShaderMatrices
