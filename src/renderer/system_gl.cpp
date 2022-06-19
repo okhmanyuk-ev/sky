@@ -17,17 +17,18 @@ struct Shader::Impl
 	std::map<Vertex::Attribute::Type, GLint> attribLocations;
 };
 
-Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code)
+Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code, 
+	const std::vector<std::string>& defines)
 {
 	mImpl = std::make_unique<Impl>();
 	mImpl->layout = layout;
 
-	std::vector<std::string> defines;
-	AddLocationDefines(layout, defines);
-	defines.push_back("FLIP_TEXCOORD_Y");
+	_defines = defines;
+	AddLocationDefines(layout, _defines);
+	_defines.push_back("FLIP_TEXCOORD_Y");
 
-	auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_code, defines);
-	auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_code, defines);
+	auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_code, _defines);
+	auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_code, _defines);
 
 	auto glsl_vert = skygfx::CompileSpirvToGlsl(vertex_shader_spirv);
 	auto glsl_frag = skygfx::CompileSpirvToGlsl(fragment_shader_spirv);

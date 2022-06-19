@@ -10,10 +10,11 @@ struct Shader::Impl
 	std::shared_ptr<skygfx::Shader> shader;
 };
 
-Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code)
+Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code, 
+	const std::vector<std::string>& defines)
 {
 	mImpl = std::make_unique<Impl>();
-	mImpl->shader = std::make_shared<skygfx::Shader>(*(skygfx::Vertex::Layout*)&layout, vertex_code, fragment_code);
+	mImpl->shader = std::make_shared<skygfx::Shader>(*(skygfx::Vertex::Layout*)&layout, vertex_code, fragment_code, defines);
 }
 
 Shader::~Shader()

@@ -25,9 +25,11 @@ namespace Renderer::Shaders
 
 	public:
 		Generic(const Vertex::Layout& layout, const std::set<Flag>& flags,
-			std::optional<std::string> additional_fragment_func = std::nullopt);
-		Generic(const Vertex::Layout& layout,
-			std::optional<std::string> additional_fragment_func = std::nullopt);
+			std::optional<std::string> additional_fragment_func = std::nullopt,
+			const std::vector<std::string>& defines = {});
+		Generic(const Vertex::Layout& layout, 
+			std::optional<std::string> additional_fragment_func = std::nullopt,
+			const std::vector<std::string>& defines = {});
 
 		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
 		void setProjectionMatrix(const glm::mat4& value) override { mConstantBuffer.projection = value; }
@@ -53,8 +55,8 @@ namespace Renderer::Shaders
 		static std::string GenerateFragmentCode(const Vertex::Layout& layout, const std::set<Flag>& flags,
 			std::optional<std::string> additional_fragment_func = std::nullopt);
 
-		static std::string MakeShaderHeader(const Vertex::Layout& layout, const std::set<Flag>& flags);
-
+		static std::vector<std::string> GenerateDefines(const std::vector<std::string>& defines, 
+			const Vertex::Layout& layout, const std::set<Flag>& flags, bool custom_fragment_func);
 		static std::set<Flag> MakeFlagsFromLayout(const Vertex::Layout& layout);
 	};
 }

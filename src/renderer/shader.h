@@ -18,7 +18,7 @@ namespace Renderer
 	
 	public:
 		Shader(const Vertex::Layout& layout, const std::string& vertex_code,
-			const std::string& fragment_code);
+			const std::string& fragment_code, const std::vector<std::string>& defines = {});
 		virtual ~Shader();
 
 	protected:
