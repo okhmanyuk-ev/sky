@@ -4,16 +4,14 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-static std::string src_ubo = R"(
+static std::string src_fragment = R"(
 layout(binding = 2) uniform _settings
 {
 	float size;
 	float thickness;
 	float force;
 } settings;
-)";
 
-static std::string src_fragment = R"(
 vec4 fragment(vec4 result)
 {
 	const vec2 center = vec2(0.5, 0.5);
