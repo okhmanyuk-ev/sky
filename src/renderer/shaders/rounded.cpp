@@ -4,16 +4,14 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-static std::string src_ubo = R"(
+static std::string src_fragment = R"(
 layout(binding = 2) uniform _settings
 {
 	vec4 color;
 	vec2 size;
 	float radius;
 } settings;
-)";
 
-static std::string src_fragment = R"(
 vec4 fragment(vec4 result)
 {
 	vec2 p = vec2(In.Position) * settings.size;
@@ -34,7 +32,7 @@ vec4 fragment(vec4 result)
 }
 )";
 
-Rounded::Rounded(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
+Rounded::Rounded(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
 };
 

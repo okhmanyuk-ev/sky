@@ -4,14 +4,12 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-static std::string src_ubo = R"(
+static std::string src_fragment = R"(
 layout(binding = 2) uniform _settings
 {
 	float intensity;
 } settings;
-)";
 
-static std::string src_fragment = R"(
 vec4 fragment(vec4 result)
 {
 	float gray = dot(result.rgb, vec3(0.299, 0.587, 0.114));
@@ -20,7 +18,7 @@ vec4 fragment(vec4 result)
 }
 )";
 
-Grayscale::Grayscale(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
+Grayscale::Grayscale(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
 }
 

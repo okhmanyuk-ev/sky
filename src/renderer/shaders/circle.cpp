@@ -4,7 +4,7 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-static std::string src_ubo = R"(
+static std::string src_fragment = R"(
 layout(binding = 2) uniform _settings
 {
 	vec4 color;
@@ -13,9 +13,7 @@ layout(binding = 2) uniform _settings
 	float fill;
 	float pie;
 } settings;
-)";
 
-static std::string src_fragment = R"(
 vec4 fragment(vec4 result)
 {
 	const float Pi = 3.14159265;
@@ -53,7 +51,7 @@ vec4 fragment(vec4 result)
 }
 )";
 
-Circle::Circle(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
+Circle::Circle(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
 };
 

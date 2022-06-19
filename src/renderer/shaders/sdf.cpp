@@ -4,7 +4,7 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-static std::string src_ubo = R"(
+static std::string src_fragment = R"(
 layout(binding = 2) uniform _settings
 {
 	vec4 color;
@@ -12,9 +12,7 @@ layout(binding = 2) uniform _settings
 	float max_value;
 	float smooth_factor;
 } settings;
-)";
 
-static std::string src_fragment = R"(
 vec4 fragment(vec4 result)
 {
 	float distance = texture(sTexture, In.TexCoord).a;
@@ -36,7 +34,7 @@ vec4 fragment(vec4 result)
 }
 )";
 
-Sdf::Sdf(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
+Sdf::Sdf(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
 }
 

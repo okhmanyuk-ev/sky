@@ -33,7 +33,7 @@ vec4 fragment(vec4 result)
 }
 )";
 
-Shockwave::Shockwave(const Vertex::Layout& layout) : Generic(layout, src_ubo, src_fragment)
+Shockwave::Shockwave(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
 }
 

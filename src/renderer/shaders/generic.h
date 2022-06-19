@@ -25,10 +25,8 @@ namespace Renderer::Shaders
 
 	public:
 		Generic(const Vertex::Layout& layout, const std::set<Flag>& flags,
-			std::optional<std::string> additional_ubo = std::nullopt,
 			std::optional<std::string> additional_fragment_func = std::nullopt);
 		Generic(const Vertex::Layout& layout,
-			std::optional<std::string> additional_ubo = std::nullopt,
 			std::optional<std::string> additional_fragment_func = std::nullopt);
 
 		glm::mat4 getProjectionMatrix() const override { return mConstantBuffer.projection; }
@@ -53,7 +51,6 @@ namespace Renderer::Shaders
 		static std::string GenerateVertexCode(const Vertex::Layout& layout, const std::set<Flag>& flags);
 		
 		static std::string GenerateFragmentCode(const Vertex::Layout& layout, const std::set<Flag>& flags,
-			std::optional<std::string> additional_ubo = std::nullopt, 
 			std::optional<std::string> additional_fragment_func = std::nullopt);
 
 		static std::string MakeShaderHeader(const Vertex::Layout& layout, const std::set<Flag>& flags);

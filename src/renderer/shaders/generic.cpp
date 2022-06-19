@@ -4,14 +4,13 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-Generic::Generic(const Vertex::Layout& layout, const std::set<Flag>& flags,
-	std::optional<std::string> additional_ubo, std::optional<std::string> additional_fragment_func) :
-	Shader(layout, GenerateVertexCode(layout, flags), GenerateFragmentCode(layout, flags, additional_ubo, additional_fragment_func))
+Generic::Generic(const Vertex::Layout& layout, const std::set<Flag>& flags, std::optional<std::string> additional_fragment_func) :
+	Shader(layout, GenerateVertexCode(layout, flags), GenerateFragmentCode(layout, flags, additional_fragment_func))
 {
 }
 
-Generic::Generic(const Vertex::Layout& layout, std::optional<std::string> additional_ubo,
-	std::optional<std::string> additional_fragment_func) : Generic(layout, MakeFlagsFromLayout(layout), additional_ubo, additional_fragment_func)
+Generic::Generic(const Vertex::Layout& layout, std::optional<std::string> additional_fragment_func) : 
+	Generic(layout, MakeFlagsFromLayout(layout), additional_fragment_func)
 {
 }
 
@@ -77,7 +76,6 @@ void main()
 }
 
 std::string Generic::GenerateFragmentCode(const Vertex::Layout& layout, const std::set<Flag>& flags,
-	std::optional<std::string> additional_ubo,
 	std::optional<std::string> additional_fragment_func)
 {
 	auto result = MakeShaderHeader(layout, flags);
@@ -85,11 +83,6 @@ std::string Generic::GenerateFragmentCode(const Vertex::Layout& layout, const st
 	if (additional_fragment_func.has_value())
 	{
 		result += "#define HAS_ADDITIONAL_FRAGMENT_FUNC\n";
-	}
-
-	if (additional_ubo.has_value())
-	{
-		result += additional_ubo.value();
 	}
 
 	result += R"(
