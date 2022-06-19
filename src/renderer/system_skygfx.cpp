@@ -178,11 +178,13 @@ void SystemSkygfx::clear(std::optional<glm::vec4> color, std::optional<float> de
 
 void SystemSkygfx::draw(size_t vertexCount, size_t vertexOffset)
 {
+	System::draw(vertexCount, vertexOffset);
 	mDevice->draw(vertexCount, vertexOffset);
 }
 
 void SystemSkygfx::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOffset)
 {
+	System::drawIndexed(indexCount, indexOffset, vertexOffset);
 	mDevice->drawIndexed(indexCount, indexOffset);
 }
 
@@ -193,6 +195,7 @@ void SystemSkygfx::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std
 
 void SystemSkygfx::present()
 {
+	System::present();
 	mDevice->present();
 }
 
