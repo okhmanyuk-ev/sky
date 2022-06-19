@@ -48,6 +48,7 @@ namespace Renderer::Shaders
 
 	public:
 		Light(const Vertex::Layout& layout, const std::set<Flag>& flags);
+		Light(const Vertex::Layout& layout);
 
 	protected:
 		void update() override;

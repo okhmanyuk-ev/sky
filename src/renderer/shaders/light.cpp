@@ -92,7 +92,11 @@ vec4 fragment(vec4 result)
 
 Light::Light(const Vertex::Layout& layout, const std::set<Flag>& flags) : Generic(layout, flags, src_fragment)
 {
-};
+}
+
+Light::Light(const Vertex::Layout& layout) : Generic(layout, src_fragment)
+{
+}
 
 void Light::update()
 {
