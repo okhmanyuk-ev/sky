@@ -24,25 +24,31 @@ vec4 fragment(vec4 result)
 
 	vec2 p = In.Position.xy - center;
 	float angle = atan(-p.x, p.y);
-	float normalized_angle = (angle + Pi) / 2.0 / Pi;			
+	float normalized_angle = (angle + Pi) / 2.0 / Pi;
 
 	if (normalized_angle > settings.pie)
-		discard;
-
-	float maxRadius = 0.5;
-	float minRadius = maxRadius * (1.0f - settings.fill);
-			
-	float radius = distance(In.Position.xy, center);
-
-	if (radius > maxRadius || radius < minRadius)
 	{
-		return vec4(0.0); // TODO: discard not working here on D3D11 (discard should be)
+		discard;
+		// TODO: 'return result;' isnt working here
 	}
+	else // early returns via discard are not working in d3d11
+	{
+		float max_radius = 0.5;
+		float min_radius = max_radius * (1.0f - settings.fill);
+			
+		float radius = distance(In.Position.xy, center);
 
-	float t = (radius - minRadius) / (maxRadius - minRadius);
-	result *= mix(settings.inner_color, settings.outer_color, t);
-
-	result *= settings.color;
+		if (radius > max_radius || radius < min_radius)	
+		{
+			discard;
+		}
+		else
+		{
+			float t = (radius - min_radius) / (max_radius - min_radius);
+			result *= mix(settings.inner_color, settings.outer_color, t);
+			result *= settings.color;
+		}
+	}
 	return result;
 }
 )";

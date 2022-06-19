@@ -63,7 +63,7 @@ SystemSkygfx::SystemSkygfx()
 {
 	auto width = PLATFORM->getWidth();
 	auto height = PLATFORM->getHeight();
-	mDevice = std::make_shared<skygfx::Device>(skygfx::BackendType::OpenGL44, Platform::SystemWindows::Window, width, height);
+	mDevice = std::make_shared<skygfx::Device>(skygfx::BackendType::D3D11, Platform::SystemWindows::Window, width, height);
 }
 
 SystemSkygfx::~SystemSkygfx()
