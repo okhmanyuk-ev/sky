@@ -137,8 +137,7 @@ void main()
 #ifdef HAS_ADDITIONAL_FRAGMENT_FUNC_FEATURE
 	result = fragment(result);
 #endif
-}
-)";
+})";
 
 	if (additional_fragment_func.has_value())
 	{

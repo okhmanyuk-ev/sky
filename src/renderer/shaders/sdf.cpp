@@ -31,8 +31,7 @@ vec4 fragment(vec4 result)
 		}
 	}
 	return result;
-}
-)";
+})";
 
 Sdf::Sdf(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {

@@ -48,8 +48,7 @@ vec4 fragment(vec4 result)
 		}
 	}
 	return result;
-}
-)";
+})";
 
 Circle::Circle(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {

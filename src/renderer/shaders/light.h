@@ -37,9 +37,9 @@ namespace Renderer::Shaders
 		};
 
 	private:
-		struct CustomConstantBuffer
+		struct alignas(16) Settings
 		{
-			alignas(16) glm::vec3 eyePosition = { 0.0f, 0.0f, 0.0 };
+			glm::vec3 eyePosition = { 0.0f, 0.0f, 0.0 };
 
 			DirectionalLight directionalLight;
 			PointLight pointLight;
@@ -47,22 +47,25 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Light(const Vertex::Layout& layout, const std::set<Flag>& flags) : Generic(layout, flags) {}
+		Light(const Vertex::Layout& layout, const std::set<Flag>& flags);
+
+	protected:
+		void update() override;
 
 	public:
-		void setEyePosition(const glm::vec3& value) { mCustomConstantBuffer.eyePosition = value; }
+		void setEyePosition(const glm::vec3& value) { mSettings.eyePosition = value; }
 
-		auto getDirectionalLight() const { return mCustomConstantBuffer.directionalLight; }
-		void setDirectionalLight(const DirectionalLight& value) { mCustomConstantBuffer.directionalLight = value; }
+		auto getDirectionalLight() const { return mSettings.directionalLight; }
+		void setDirectionalLight(const DirectionalLight& value) { mSettings.directionalLight = value; }
 
-		auto getPointLight() const { return mCustomConstantBuffer.pointLight; }
-		void setPointLight(const PointLight& value) { mCustomConstantBuffer.pointLight = value; }
+		auto getPointLight() const { return mSettings.pointLight; }
+		void setPointLight(const PointLight& value) { mSettings.pointLight = value; }
 
-		auto getMaterial() const { return mCustomConstantBuffer.material; }
-		void setMaterial(const Material& value) { mCustomConstantBuffer.material = value; }
+		auto getMaterial() const { return mSettings.material; }
+		void setMaterial(const Material& value) { mSettings.material = value; }
 
 	private:
-		CustomConstantBuffer mCustomConstantBuffer;
+		Settings mSettings;
 	};
 
 	namespace Materials

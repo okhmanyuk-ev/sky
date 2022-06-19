@@ -29,8 +29,7 @@ vec4 fragment(vec4 result)
 		discard;
 
 	return result;
-}
-)";
+})";
 
 Rounded::Rounded(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {

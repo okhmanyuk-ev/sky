@@ -28,8 +28,7 @@ vec4 fragment(vec4 result)
 	result = texture(sTexture, In.TexCoord - disp);
 
 	return result;
-}
-)";
+})";
 
 Shockwave::Shockwave(const Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
