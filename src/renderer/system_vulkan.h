@@ -86,9 +86,11 @@ namespace Renderer
 
 		std::vector<DeviceBuffer> mVertexBuffers;
 		std::vector<DeviceBuffer> mIndexBuffers;
+		std::vector<DeviceBuffer> mUniformBuffers;
 
 		int mVertexBufferIndex = 0;
 		int mIndexBufferIndex = 0;
+		int mUniformBufferIndex = 0;
 
 		vk::SurfaceFormatKHR mSurfaceFormat;
 		uint32_t mMinImageCount = 2; // TODO: https://github.com/nvpro-samples/nvpro_core/blob/f2c05e161bba9ab9a8c96c0173bf0edf7c168dfa/nvvk/swapchain_vk.cpp#L143

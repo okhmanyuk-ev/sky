@@ -317,18 +317,6 @@ SystemVK::SystemVK()
 	auto command_buffers = mDevice.allocateCommandBuffers(command_buffer_allocate_info);
 	mCommandBuffer = std::move(command_buffers.at(0));
 
-	auto descriptor_set_layout_binding = vk::DescriptorSetLayoutBinding()
-		.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
-		.setDescriptorCount(1)
-		.setStageFlags(vk::ShaderStageFlagBits::eFragment);
-
-	auto descriptor_set_layout_create_info = vk::DescriptorSetLayoutCreateInfo()
-		.setBindingCount(1)
-		.setFlags(vk::DescriptorSetLayoutCreateFlagBits::ePushDescriptorKHR)
-		.setPBindings(&descriptor_set_layout_binding);
-
-	mDescriptorSetLayout = mDevice.createDescriptorSetLayout(descriptor_set_layout_create_info);
-
 	auto sampler_create_info = vk::SamplerCreateInfo()
 		.setMagFilter(vk::Filter::eLinear)
 		.setMinFilter(vk::Filter::eLinear)
@@ -576,7 +564,62 @@ void SystemVK::setIndexBuffer(const Buffer& value)
 
 void SystemVK::setUniformBuffer(int slot, void* memory, size_t size)
 {
-	//
+	assert(size > 0);
+
+	auto create_buffer = [&] {
+		DeviceBuffer buffer;
+
+		auto buffer_create_info = vk::BufferCreateInfo()
+			.setSize(size)
+			.setUsage(vk::BufferUsageFlagBits::eUniformBuffer)
+			.setSharingMode(vk::SharingMode::eExclusive);
+
+		buffer.buffer = mDevice.createBuffer(buffer_create_info);
+
+		auto memory_requirements = buffer.buffer.getMemoryRequirements();
+
+		auto memory_allocate_info = vk::MemoryAllocateInfo()
+			.setAllocationSize(memory_requirements.size)
+			.setMemoryTypeIndex(GetMemoryType(vk::MemoryPropertyFlagBits::eHostVisible, memory_requirements.memoryTypeBits, mPhysicalDevice));
+
+		buffer.memory = mDevice.allocateMemory(memory_allocate_info);
+		buffer.size = memory_requirements.size;
+
+		buffer.buffer.bindMemory(*buffer.memory, 0);
+
+		return buffer;
+	};
+
+	if (mUniformBuffers.size() < mUniformBufferIndex + 1)
+	{
+		assert(mUniformBuffers.size() == mUniformBufferIndex);
+		mUniformBuffers.push_back(create_buffer());
+	}
+
+	auto& buffer = mUniformBuffers[mUniformBufferIndex];
+
+	if (buffer.size < size)
+	{
+		buffer = create_buffer();
+	}
+
+	auto mem = buffer.memory.mapMemory(0, VK_WHOLE_SIZE);
+	memcpy(mem, memory, size);
+	buffer.memory.unmapMemory();
+	
+	auto descriptor_buffer_info = vk::DescriptorBufferInfo()
+		.setBuffer(*buffer.buffer)
+		.setRange(VK_WHOLE_SIZE);
+
+	auto write_descriptor_set = vk::WriteDescriptorSet()
+		.setDescriptorCount(1)
+		.setDstBinding(slot)
+		.setDescriptorType(vk::DescriptorType::eUniformBuffer)
+		.setPBufferInfo(&descriptor_buffer_info);
+
+	mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { write_descriptor_set });
+
+	mUniformBufferIndex += 1;
 }
 
 void SystemVK::setTexture(int binding, std::shared_ptr<Texture> value)
@@ -594,10 +637,11 @@ void SystemVK::setTexture(int binding, std::shared_ptr<Texture> value)
 
 	auto write_descriptor_set = vk::WriteDescriptorSet()
 		.setDescriptorCount(1)
+		.setDstBinding(binding)
 		.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
 		.setPImageInfo(&descriptor_image_info);
 
-	mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, binding, { write_descriptor_set });
+	mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { write_descriptor_set });
 }
 
 void SystemVK::setTexture(std::shared_ptr<Texture> value)
@@ -964,72 +1008,64 @@ layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec2 aTexCoord;
 layout(location = 2) in vec4 aColor;
 
-layout(push_constant) uniform constants
+layout(binding = 1) uniform _ubo
 {
 	mat4 projection;
 	mat4 view;
 	mat4 model;
-} pc;
+} ubo;
 
-layout(location = 0) out struct 
-{
-	vec4 Color;
-	vec2 TexCoord;
-} Out;
-
-out gl_PerVertex 
-{
-	vec4 gl_Position;
-};
+layout(location = 0) out struct { vec4 Color; vec2 TexCoord; } Out;
+out gl_PerVertex { vec4 gl_Position; };
 
 void main()
 {
 	Out.Color = aColor;
 	Out.TexCoord = aTexCoord;
-	gl_Position = pc.projection * pc.view * pc.model * vec4(aPosition, 1.0);
-}
-)";
+	gl_Position = ubo.projection * ubo.view * ubo.model * vec4(aPosition, 1.0);
+})";
 
 static std::string fragment_shader_code = R"(
 #version 450 core
 
 layout(location = 0) out vec4 result;
-layout(set=0, binding=0) uniform sampler2D sTexture;
+layout(binding = 0) uniform sampler2D sTexture;
 
-layout(location = 0) in struct 
-{
-	vec4 Color;
-	vec2 TexCoord;
-} In;
+layout(location = 0) in struct { vec4 Color; vec2 TexCoord; } In;
 
 void main()
 {
 	result = In.Color * texture(sTexture, In.TexCoord.st);
-}
-)";
+})";
 
 void SystemVK::drawTest()
 {
-	struct PushConstants
-	{
-		glm::mat4 projection = glm::mat4(1.0f);
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 model = glm::mat4(1.0f);
-	};
-
 	if (!pipeline_created)
 	{
-		auto push_constant_range = vk::PushConstantRange()
-			.setStageFlags(vk::ShaderStageFlagBits::eVertex)
-			.setOffset(0)
-			.setSize(sizeof(PushConstants));
+		auto bindings = {
+			vk::DescriptorSetLayoutBinding()
+				.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
+				.setDescriptorCount(1)
+				.setBinding(0)
+				.setStageFlags(vk::ShaderStageFlagBits::eAll),
+
+			vk::DescriptorSetLayoutBinding()
+				.setDescriptorType(vk::DescriptorType::eUniformBuffer)
+				.setDescriptorCount(1)
+				.setBinding(1)
+				.setStageFlags(vk::ShaderStageFlagBits::eAll)
+		};
+
+		auto descriptor_set_layout_create_info = vk::DescriptorSetLayoutCreateInfo()
+			.setFlags(vk::DescriptorSetLayoutCreateFlagBits::ePushDescriptorKHR)
+			.setBindings(bindings);
+
+		mDescriptorSetLayout = mDevice.createDescriptorSetLayout(descriptor_set_layout_create_info);
 
 		auto pipeline_layout_create_info = vk::PipelineLayoutCreateInfo()
 			.setSetLayoutCount(1)
-			.setPSetLayouts(&*mDescriptorSetLayout)
-			.setPushConstantRangeCount(1)
-			.setPPushConstantRanges(&push_constant_range);
-
+			.setPSetLayouts(&*mDescriptorSetLayout);
+	
 		mPipelineLayout = mDevice.createPipelineLayout(pipeline_layout_create_info);
 		
 		auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_shader_code);
@@ -1138,8 +1174,13 @@ void SystemVK::drawTest()
 
 	std::vector<uint32_t> indices = { 0, 1, 2 };
 	
-	PushConstants push_constants;
-	
+	struct UBO
+	{
+		glm::mat4 projection = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
+	} ubo;
+
 	auto vertex_input_binding_description = vk::VertexInputBindingDescription2EXT()
 		.setInputRate(vk::VertexInputRate::eVertex)
 		.setDivisor(1)
@@ -1153,8 +1194,7 @@ void SystemVK::drawTest()
 
 	mCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *mPipeline);
 	mCommandBuffer.setVertexInputEXT({ vertex_input_binding_description }, { vertex_input_attribute_descriptions });
-	mCommandBuffer.pushConstants<PushConstants>(*mPipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, { push_constants });
-
+	
 	uint32_t white_pixel = 0xFFFFFFFF;
 	static auto texture = std::make_shared<Texture>(1, 1, 4, &white_pixel);
 
@@ -1164,6 +1204,7 @@ void SystemVK::drawTest()
 	mCommandBuffer.setLineWidth(1.0f);
 	setVertexBuffer(vertices);
 	setIndexBuffer(indices);
+	System::setUniformBuffer(1, ubo);
 	setTopology(Renderer::Topology::TriangleList);
 	setCullMode(Renderer::CullMode::None);
 	setViewport(Renderer::Viewport());
