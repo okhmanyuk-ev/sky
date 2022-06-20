@@ -25,7 +25,8 @@ struct Shader::Impl
 {
 };
 
-Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code)
+Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code,
+	const std::vector<std::string>& defines)
 {
 }
 
@@ -44,7 +45,7 @@ struct Texture::TextureImpl
 	vk::raii::DeviceMemory memory = nullptr;
 };
 
-Texture::Texture(int width, int height, int channels, void* data, bool mipmap) : // TODO: make unit32_t
+Texture::Texture(uint32_t width, uint32_t height, uint32_t channels, void* data, bool mipmap) : // TODO: make 
 	mWidth(width),
 	mHeight(height),
 	mMipmap(mipmap)
@@ -54,7 +55,7 @@ Texture::Texture(int width, int height, int channels, void* data, bool mipmap) :
 	auto image_create_info = vk::ImageCreateInfo()
 		.setImageType(vk::ImageType::e2D)
 		.setFormat(vk::Format::eR8G8B8A8Unorm)
-		.setExtent({ static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1 })
+		.setExtent({ width, height, 1 })
 		.setMipLevels(1)
 		.setArrayLayers(1)
 		.setSamples(vk::SampleCountFlagBits::e1)
@@ -129,7 +130,7 @@ Texture::Texture(int width, int height, int channels, void* data, bool mipmap) :
 
 			auto region = vk::BufferImageCopy()
 				.setImageSubresource(image_subresource_layers)
-				.setImageExtent({ static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1 });
+				.setImageExtent({ width, height, 1 });
 
 			cmd.copyBufferToImage(*upload_buffer, *mTextureImpl->image, vk::ImageLayout::eTransferDstOptimal, { region });
 
@@ -149,7 +150,7 @@ struct RenderTarget::RenderTargetImpl
 
 };
 
-RenderTarget::RenderTarget(int width, int height) : Texture(width, height, 4, nullptr)
+RenderTarget::RenderTarget(uint32_t width, uint32_t height) : Texture(width, height, 4, nullptr)
 {
 	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
 }

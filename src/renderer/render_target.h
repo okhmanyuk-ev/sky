@@ -12,7 +12,7 @@ namespace Renderer
 		friend class SystemSkygfx;
 
 	public:
-		RenderTarget(int width, int height);
+		RenderTarget(uint32_t width, uint32_t height);
 		~RenderTarget();
 
 	private:

@@ -105,7 +105,7 @@ struct Texture::TextureImpl
 	GLuint texture;
 };
 
-Texture::Texture(int width, int height, int channels, void* data, bool mipmap) :
+Texture::Texture(uint32_t width, uint32_t height, uint32_t channels, void* data, bool mipmap) :
 	mWidth(width),
 	mHeight(height),
 	mMipmap(mipmap)
@@ -152,7 +152,7 @@ struct RenderTarget::RenderTargetImpl
 	GLuint depth_stencil_renderbuffer;
 };
 
-RenderTarget::RenderTarget(int width, int height) : Texture(width, height, 4, nullptr)
+RenderTarget::RenderTarget(uint32_t width, uint32_t height) : Texture(width, height, 4, nullptr)
 {
 	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
 

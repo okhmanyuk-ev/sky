@@ -11,7 +11,7 @@ namespace Renderer
 		friend class SystemSkygfx;
 
 	public:
-		Texture(int width, int height, int channels, void* data, bool mipmap = false);
+		Texture(uint32_t width, uint32_t height, uint32_t channels, void* data, bool mipmap = false);
 		~Texture();
 
 	public:
