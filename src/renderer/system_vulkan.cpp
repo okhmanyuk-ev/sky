@@ -142,12 +142,10 @@ Texture::Texture(uint32_t width, uint32_t height, uint32_t channels, void* data,
 
 Texture::~Texture()
 {
-
 }
 
 struct RenderTarget::RenderTargetImpl
 {
-
 };
 
 RenderTarget::RenderTarget(uint32_t width, uint32_t height) : Texture(width, height, 4, nullptr)
@@ -157,7 +155,6 @@ RenderTarget::RenderTarget(uint32_t width, uint32_t height) : Texture(width, hei
 
 RenderTarget::~RenderTarget()
 {
-
 }
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage, void* pUserData)
@@ -1042,19 +1039,36 @@ void SystemVK::drawTest()
 {
 	if (!pipeline_created)
 	{
-		auto bindings = {
-			vk::DescriptorSetLayoutBinding()
-				.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
-				.setDescriptorCount(1)
-				.setBinding(0)
-				.setStageFlags(vk::ShaderStageFlagBits::eAll),
+		auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_shader_code);
+		auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_shader_code);
 
-			vk::DescriptorSetLayoutBinding()
-				.setDescriptorType(vk::DescriptorType::eUniformBuffer)
-				.setDescriptorCount(1)
-				.setBinding(1)
-				.setStageFlags(vk::ShaderStageFlagBits::eAll)
+		auto vertex_shader_reflection = skygfx::MakeSpirvReflection(vertex_shader_spirv);
+		auto fragment_shader_reflection = skygfx::MakeSpirvReflection(fragment_shader_spirv);
+
+		static const std::unordered_map<skygfx::ShaderStage, vk::ShaderStageFlagBits> StageMap = {
+			{ skygfx::ShaderStage::Vertex, vk::ShaderStageFlagBits::eVertex },
+			{ skygfx::ShaderStage::Fragment, vk::ShaderStageFlagBits::eFragment }
 		};
+		static const std::unordered_map<skygfx::ShaderReflection::DescriptorSet::Type, vk::DescriptorType> TypeMap = {
+			{ skygfx::ShaderReflection::DescriptorSet::Type::CombinedImageSampler, vk::DescriptorType::eCombinedImageSampler },
+			{ skygfx::ShaderReflection::DescriptorSet::Type::UniformBuffer, vk::DescriptorType::eUniformBuffer }
+		};
+			
+		std::vector<vk::DescriptorSetLayoutBinding> bindings;
+
+		for (const auto& reflection : { vertex_shader_reflection, fragment_shader_reflection })
+		{
+			for (const auto& descriptor_set : reflection.descriptor_sets)
+			{
+				auto binding = vk::DescriptorSetLayoutBinding()
+					.setDescriptorType(TypeMap.at(descriptor_set.type))
+					.setDescriptorCount(1)
+					.setBinding(descriptor_set.binding)
+					.setStageFlags(StageMap.at(reflection.stage));
+
+				bindings.push_back(binding);
+			}
+		}
 
 		auto descriptor_set_layout_create_info = vk::DescriptorSetLayoutCreateInfo()
 			.setFlags(vk::DescriptorSetLayoutCreateFlagBits::ePushDescriptorKHR)
@@ -1065,11 +1079,8 @@ void SystemVK::drawTest()
 		auto pipeline_layout_create_info = vk::PipelineLayoutCreateInfo()
 			.setSetLayoutCount(1)
 			.setPSetLayouts(&*mDescriptorSetLayout);
-	
+
 		mPipelineLayout = mDevice.createPipelineLayout(pipeline_layout_create_info);
-		
-		auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_shader_code);
-		auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_shader_code);
 
 		auto vertex_shader_module_create_info = vk::ShaderModuleCreateInfo()
 			.setCode(vertex_shader_spirv);
