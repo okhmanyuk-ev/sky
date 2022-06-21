@@ -8,8 +8,6 @@
 
 using namespace Renderer;
 
-bool pipeline_created = false;
-
 static uint32_t GetMemoryType(vk::MemoryPropertyFlags properties, uint32_t type_bits, vk::raii::PhysicalDevice& physical_device)
 {
 	auto prop = physical_device.getMemoryProperties();
@@ -23,11 +21,119 @@ static uint32_t GetMemoryType(vk::MemoryPropertyFlags properties, uint32_t type_
 
 struct Shader::Impl
 {
+	vk::raii::DescriptorSetLayout descriptor_set_layout = nullptr;
+	vk::raii::PipelineLayout pipeline_layout = nullptr;
+	vk::raii::ShaderModule vertex_shader_module = nullptr;
+	vk::raii::ShaderModule fragment_shader_module = nullptr;
+	vk::VertexInputBindingDescription vertex_input_binding_description;
+	std::vector<vk::VertexInputAttributeDescription> vertex_input_attribute_descriptions;
 };
 
 Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code,
 	const std::vector<std::string>& defines)
 {
+	mImpl = std::make_unique<Impl>();
+
+	auto _defines = defines;
+
+	skygfx::AddShaderLocationDefines(*(skygfx::Vertex::Layout*)&layout, _defines);
+
+	auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_code, _defines);
+	auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_code, _defines);
+
+	auto vertex_shader_reflection = skygfx::MakeSpirvReflection(vertex_shader_spirv);
+	auto fragment_shader_reflection = skygfx::MakeSpirvReflection(fragment_shader_spirv);
+
+	static const std::unordered_map<skygfx::ShaderStage, vk::ShaderStageFlagBits> StageMap = {
+		{ skygfx::ShaderStage::Vertex, vk::ShaderStageFlagBits::eVertex },
+		{ skygfx::ShaderStage::Fragment, vk::ShaderStageFlagBits::eFragment }
+	};
+
+	static const std::unordered_map<skygfx::ShaderReflection::DescriptorSet::Type, vk::DescriptorType> TypeMap = {
+		{ skygfx::ShaderReflection::DescriptorSet::Type::CombinedImageSampler, vk::DescriptorType::eCombinedImageSampler },
+		{ skygfx::ShaderReflection::DescriptorSet::Type::UniformBuffer, vk::DescriptorType::eUniformBuffer }
+	};
+		
+	std::vector<vk::DescriptorSetLayoutBinding> bindings;
+
+	for (const auto& reflection : { vertex_shader_reflection, fragment_shader_reflection })
+	{
+		for (const auto& descriptor_set : reflection.descriptor_sets)
+		{
+			bool overwritten = false;
+
+			for (auto& binding : bindings)
+			{
+				if (binding.binding == descriptor_set.binding)
+				{
+					binding.stageFlags |= StageMap.at(reflection.stage);
+					overwritten = true;
+					break;
+				}
+			}
+
+			if (overwritten)
+				continue;
+
+			auto binding = vk::DescriptorSetLayoutBinding()
+				.setDescriptorType(TypeMap.at(descriptor_set.type))
+				.setDescriptorCount(1)
+				.setBinding(descriptor_set.binding)
+				.setStageFlags(StageMap.at(reflection.stage));
+
+			bindings.push_back(binding);
+		}
+	}
+
+	auto descriptor_set_layout_create_info = vk::DescriptorSetLayoutCreateInfo()
+		.setFlags(vk::DescriptorSetLayoutCreateFlagBits::ePushDescriptorKHR)
+		.setBindings(bindings);
+
+	mImpl->descriptor_set_layout = SystemVK::mDevice.createDescriptorSetLayout(descriptor_set_layout_create_info);
+
+	auto pipeline_layout_create_info = vk::PipelineLayoutCreateInfo()
+		.setSetLayoutCount(1)
+		.setPSetLayouts(&*mImpl->descriptor_set_layout);
+
+	mImpl->pipeline_layout = SystemVK::mDevice.createPipelineLayout(pipeline_layout_create_info);
+
+	auto vertex_shader_module_create_info = vk::ShaderModuleCreateInfo()
+		.setCode(vertex_shader_spirv);
+
+	auto fragment_shader_module_create_info = vk::ShaderModuleCreateInfo()
+		.setCode(fragment_shader_spirv);
+
+	mImpl->vertex_shader_module = SystemVK::mDevice.createShaderModule(vertex_shader_module_create_info);
+	mImpl->fragment_shader_module = SystemVK::mDevice.createShaderModule(fragment_shader_module_create_info);
+
+	static const std::unordered_map<Vertex::Attribute::Format, vk::Format> Format = {
+		{ Vertex::Attribute::Format::R32F, vk::Format::eR32Sfloat },
+		{ Vertex::Attribute::Format::R32G32F, vk::Format::eR32G32Sfloat },
+		{ Vertex::Attribute::Format::R32G32B32F, vk::Format::eR32G32B32Sfloat },
+		{ Vertex::Attribute::Format::R32G32B32A32F, vk::Format::eR32G32B32A32Sfloat },
+		{ Vertex::Attribute::Format::R8UN, vk::Format::eR8Unorm },
+		{ Vertex::Attribute::Format::R8G8UN, vk::Format::eR8G8Unorm },
+		{ Vertex::Attribute::Format::R8G8B8UN, vk::Format::eR8G8B8Unorm },
+		{ Vertex::Attribute::Format::R8G8B8A8UN, vk::Format::eR8G8B8A8Unorm }
+	};
+
+	mImpl->vertex_input_binding_description = vk::VertexInputBindingDescription()
+		.setStride(layout.stride)
+		.setInputRate(vk::VertexInputRate::eVertex)
+		.setBinding(0);
+
+	for (int i = 0; i < layout.attributes.size(); i++)
+	{
+		const auto& attrib = layout.attributes.at(i);
+
+		auto vertex_input_attribute_description = vk::VertexInputAttributeDescription()
+			.setBinding(0)
+			.setLocation(i)
+			.setFormat(Format.at(attrib.format))
+			.setOffset(attrib.offset);
+
+		mImpl->vertex_input_attribute_descriptions.push_back(vertex_input_attribute_description);
+	}
 }
 
 Shader::~Shader()
@@ -250,8 +356,7 @@ SystemVK::SystemVK()
 		.setQueuePriorities(queue_priority);
 
 	auto device_features = mPhysicalDevice.getFeatures2<vk::PhysicalDeviceFeatures2, 
-		vk::PhysicalDeviceVulkan13Features,
-		vk::PhysicalDeviceVertexInputDynamicStateFeaturesEXT>();
+		vk::PhysicalDeviceVulkan13Features>();
 
 	//auto device_properties = mPhysicalDevice.getProperties2<vk::PhysicalDeviceProperties2, 
 	//	vk::PhysicalDeviceVulkan13Properties>(); // TODO: unused
@@ -604,18 +709,7 @@ void SystemVK::setUniformBuffer(int slot, void* memory, size_t size)
 	memcpy(mem, memory, size);
 	buffer.memory.unmapMemory();
 	
-	auto descriptor_buffer_info = vk::DescriptorBufferInfo()
-		.setBuffer(*buffer.buffer)
-		.setRange(VK_WHOLE_SIZE);
-
-	auto write_descriptor_set = vk::WriteDescriptorSet()
-		.setDescriptorCount(1)
-		.setDstBinding(slot)
-		.setDescriptorType(vk::DescriptorType::eUniformBuffer)
-		.setPBufferInfo(&descriptor_buffer_info);
-
-	mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { write_descriptor_set });
-
+	mUniformBuffersPushQueue[slot] = *buffer.buffer;
 	mUniformBufferIndex += 1;
 }
 
@@ -624,21 +718,7 @@ void SystemVK::setTexture(int binding, std::shared_ptr<Texture> value)
 	if (value == nullptr)
 		return;
 
-	if (!pipeline_created) // TODO: remove when pipeline layout will be nice constructed 
-		return;
-
-	auto descriptor_image_info = vk::DescriptorImageInfo()
-		.setSampler(*mSampler)
-		.setImageView(*value->mTextureImpl->image_view)
-		.setImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
-
-	auto write_descriptor_set = vk::WriteDescriptorSet()
-		.setDescriptorCount(1)
-		.setDstBinding(binding)
-		.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
-		.setPImageInfo(&descriptor_image_info);
-
-	mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, *mPipelineLayout, 0, { write_descriptor_set });
+	mTexturesPushQueue[binding] = *value->mTextureImpl->image_view;
 }
 
 void SystemVK::setTexture(std::shared_ptr<Texture> value)
@@ -653,7 +733,8 @@ void SystemVK::setRenderTarget(std::shared_ptr<RenderTarget> value)
 
 void SystemVK::setShader(std::shared_ptr<Shader> value)
 {
-	//
+	mShader = value;
+	mShader->apply();
 }
 
 void SystemVK::setSampler(const Sampler& value)
@@ -758,13 +839,14 @@ void SystemVK::clear(std::optional<glm::vec4> color, std::optional<float> depth,
 
 void SystemVK::draw(size_t vertexCount, size_t vertexOffset)
 {
-	//mCommandBuffer.draw(vertexCount, 0, vertexOffset, 0);
+	prepareForDrawing(mShader);
+	mCommandBuffer.draw(vertexCount, 0, vertexOffset, 0);
 }
 
 void SystemVK::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOffset)
 {
-	// TODO: confirmed, just uncomment
-	//mCommandBuffer.drawIndexed(indexCount, 1, indexOffset, vertexOffset, 0);
+	prepareForDrawing(mShader);
+	mCommandBuffer.drawIndexed(indexCount, 1, indexOffset, vertexOffset, 0);
 }
 
 void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
@@ -899,6 +981,136 @@ void SystemVK::end()
 	mCommandBuffer.end();
 }
 
+void SystemVK::prepareForDrawing(std::shared_ptr<Shader> shader)
+{
+	assert(shader);
+
+	if (!mPipelines.contains(shader.get()))
+	{
+		auto pipeline_shader_stage_create_info = {
+			vk::PipelineShaderStageCreateInfo()
+				.setStage(vk::ShaderStageFlagBits::eVertex)
+				.setModule(*shader->mImpl->vertex_shader_module)
+				.setPName("main"),
+
+			vk::PipelineShaderStageCreateInfo()
+				.setStage(vk::ShaderStageFlagBits::eFragment)
+				.setModule(*shader->mImpl->fragment_shader_module)
+				.setPName("main")
+		};
+
+		auto pipeline_input_assembly_state_create_info = vk::PipelineInputAssemblyStateCreateInfo()
+			.setTopology(vk::PrimitiveTopology::eTriangleList);
+
+		auto pipeline_viewport_state_create_info = vk::PipelineViewportStateCreateInfo()
+			.setViewportCount(1)
+			.setScissorCount(1);
+
+		auto pipeline_rasterization_state_create_info = vk::PipelineRasterizationStateCreateInfo()
+			.setPolygonMode(vk::PolygonMode::eFill);
+
+		auto pipeline_multisample_state_create_info = vk::PipelineMultisampleStateCreateInfo()
+			.setRasterizationSamples(vk::SampleCountFlagBits::e1);
+
+		auto pipeline_depth_stencil_state_create_info = vk::PipelineDepthStencilStateCreateInfo();
+
+		auto pipeline_color_blent_attachment_state = vk::PipelineColorBlendAttachmentState()
+			.setBlendEnable(true)
+			.setSrcColorBlendFactor(vk::BlendFactor::eSrcAlpha)
+			.setDstColorBlendFactor(vk::BlendFactor::eOneMinusSrcAlpha)
+			.setColorBlendOp(vk::BlendOp::eAdd)
+			.setSrcAlphaBlendFactor(vk::BlendFactor::eOne)
+			.setDstAlphaBlendFactor(vk::BlendFactor::eOneMinusSrcAlpha)
+			.setAlphaBlendOp(vk::BlendOp::eAdd)
+			.setColorWriteMask(vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
+				vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA);
+
+		auto pipeline_color_blend_state_create_info = vk::PipelineColorBlendStateCreateInfo()
+			.setAttachmentCount(1)
+			.setPAttachments(&pipeline_color_blent_attachment_state);
+
+		auto pipeline_vertex_input_state_create_info = vk::PipelineVertexInputStateCreateInfo()
+			.setVertexBindingDescriptionCount(1)
+			.setPVertexBindingDescriptions(&shader->mImpl->vertex_input_binding_description)
+			.setVertexAttributeDescriptions(shader->mImpl->vertex_input_attribute_descriptions);
+
+		auto dynamic_states = {
+			vk::DynamicState::eViewport,
+			vk::DynamicState::eScissor,
+			vk::DynamicState::ePrimitiveTopology,
+			vk::DynamicState::eLineWidth,
+			vk::DynamicState::eCullMode,
+			vk::DynamicState::eFrontFace,
+			vk::DynamicState::eVertexInputBindingStride
+		};
+
+		auto pipeline_dynamic_state_create_info = vk::PipelineDynamicStateCreateInfo()
+			.setDynamicStates(dynamic_states);
+
+		auto pipeline_rendering_create_info = vk::PipelineRenderingCreateInfo()
+			.setColorAttachmentCount(1)
+			.setColorAttachmentFormats(mSurfaceFormat.format);
+
+		auto graphics_pipeline_create_info = vk::GraphicsPipelineCreateInfo()
+			.setLayout(*shader->mImpl->pipeline_layout)
+			.setFlags(vk::PipelineCreateFlagBits())
+			.setStages(pipeline_shader_stage_create_info)
+			.setPVertexInputState(&pipeline_vertex_input_state_create_info)
+			.setPInputAssemblyState(&pipeline_input_assembly_state_create_info)
+			.setPViewportState(&pipeline_viewport_state_create_info)
+			.setPRasterizationState(&pipeline_rasterization_state_create_info)
+			.setPMultisampleState(&pipeline_multisample_state_create_info)
+			.setPDepthStencilState(&pipeline_depth_stencil_state_create_info)
+			.setPColorBlendState(&pipeline_color_blend_state_create_info)
+			.setPDynamicState(&pipeline_dynamic_state_create_info)
+			.setRenderPass(nullptr)
+			.setPNext(&pipeline_rendering_create_info);
+
+		mPipelines.insert({ shader.get(), mDevice.createGraphicsPipeline(nullptr, graphics_pipeline_create_info) });
+	}
+
+	auto pipeline = *mPipelines.at(shader.get());
+
+	mCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
+
+	auto pipeline_layout = *shader->mImpl->pipeline_layout;
+
+	for (const auto& [slot, image_view] : mTexturesPushQueue)
+	{
+		auto descriptor_image_info = vk::DescriptorImageInfo()
+			.setSampler(*mSampler)
+			.setImageView(image_view)
+			.setImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
+
+		auto write_descriptor_set = vk::WriteDescriptorSet()
+			.setDescriptorCount(1)
+			.setDstBinding(slot)
+			.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
+			.setPImageInfo(&descriptor_image_info);
+		
+		mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, pipeline_layout, 0, { write_descriptor_set });
+	}
+
+	mTexturesPushQueue.clear();
+
+	for (const auto& [slot, buffer] : mUniformBuffersPushQueue)
+	{
+		auto descriptor_buffer_info = vk::DescriptorBufferInfo()
+			.setBuffer(buffer)
+			.setRange(VK_WHOLE_SIZE);
+
+		auto write_descriptor_set = vk::WriteDescriptorSet()
+			.setDescriptorCount(1)
+			.setDstBinding(slot)
+			.setDescriptorType(vk::DescriptorType::eUniformBuffer)
+			.setPBufferInfo(&descriptor_buffer_info);
+
+		mCommandBuffer.pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, pipeline_layout, 0, { write_descriptor_set });
+	}
+
+	mUniformBuffersPushQueue.clear();
+}
+
 void SystemVK::setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image, 
 	vk::Format format, vk::ImageLayout oldImageLayout, vk::ImageLayout newImageLayout)
 {
@@ -1001,9 +1213,9 @@ void SystemVK::setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::
 static std::string vertex_shader_code = R"(
 #version 450 core
 
-layout(location = 0) in vec3 aPosition;
-layout(location = 1) in vec2 aTexCoord;
-layout(location = 2) in vec4 aColor;
+layout(location = POSITION_LOCATION) in vec3 aPosition;
+layout(location = COLOR_LOCATION) in vec4 aColor;
+layout(location = TEXCOORD_LOCATION) in vec2 aTexCoord;
 
 layout(binding = 1) uniform _ubo
 {
@@ -1037,150 +1249,16 @@ void main()
 
 void SystemVK::drawTest()
 {
-	if (!pipeline_created)
-	{
-		auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_shader_code);
-		auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_shader_code);
+	using Vertex = Renderer::Vertex::PositionColorTexture;
 
-		auto vertex_shader_reflection = skygfx::MakeSpirvReflection(vertex_shader_spirv);
-		auto fragment_shader_reflection = skygfx::MakeSpirvReflection(fragment_shader_spirv);
-
-		static const std::unordered_map<skygfx::ShaderStage, vk::ShaderStageFlagBits> StageMap = {
-			{ skygfx::ShaderStage::Vertex, vk::ShaderStageFlagBits::eVertex },
-			{ skygfx::ShaderStage::Fragment, vk::ShaderStageFlagBits::eFragment }
-		};
-		static const std::unordered_map<skygfx::ShaderReflection::DescriptorSet::Type, vk::DescriptorType> TypeMap = {
-			{ skygfx::ShaderReflection::DescriptorSet::Type::CombinedImageSampler, vk::DescriptorType::eCombinedImageSampler },
-			{ skygfx::ShaderReflection::DescriptorSet::Type::UniformBuffer, vk::DescriptorType::eUniformBuffer }
-		};
-			
-		std::vector<vk::DescriptorSetLayoutBinding> bindings;
-
-		for (const auto& reflection : { vertex_shader_reflection, fragment_shader_reflection })
-		{
-			for (const auto& descriptor_set : reflection.descriptor_sets)
-			{
-				auto binding = vk::DescriptorSetLayoutBinding()
-					.setDescriptorType(TypeMap.at(descriptor_set.type))
-					.setDescriptorCount(1)
-					.setBinding(descriptor_set.binding)
-					.setStageFlags(StageMap.at(reflection.stage));
-
-				bindings.push_back(binding);
-			}
-		}
-
-		auto descriptor_set_layout_create_info = vk::DescriptorSetLayoutCreateInfo()
-			.setFlags(vk::DescriptorSetLayoutCreateFlagBits::ePushDescriptorKHR)
-			.setBindings(bindings);
-
-		mDescriptorSetLayout = mDevice.createDescriptorSetLayout(descriptor_set_layout_create_info);
-
-		auto pipeline_layout_create_info = vk::PipelineLayoutCreateInfo()
-			.setSetLayoutCount(1)
-			.setPSetLayouts(&*mDescriptorSetLayout);
-
-		mPipelineLayout = mDevice.createPipelineLayout(pipeline_layout_create_info);
-
-		auto vertex_shader_module_create_info = vk::ShaderModuleCreateInfo()
-			.setCode(vertex_shader_spirv);
-
-		auto fragment_shader_module_create_info = vk::ShaderModuleCreateInfo()
-			.setCode(fragment_shader_spirv);
-
-		auto vertex_shader_module = mDevice.createShaderModule(vertex_shader_module_create_info);
-		auto fragment_shader_module = mDevice.createShaderModule(fragment_shader_module_create_info);
-
-		auto pipeline_shader_stage_create_info = {
-			vk::PipelineShaderStageCreateInfo()
-				.setStage(vk::ShaderStageFlagBits::eVertex)
-				.setModule(*vertex_shader_module)
-				.setPName("main"),
-
-			vk::PipelineShaderStageCreateInfo()
-				.setStage(vk::ShaderStageFlagBits::eFragment)
-				.setModule(*fragment_shader_module)
-				.setPName("main")
-		};
-
-		auto pipeline_input_assembly_state_create_info = vk::PipelineInputAssemblyStateCreateInfo()
-			.setTopology(vk::PrimitiveTopology::eTriangleList);
-
-		auto pipeline_viewport_state_create_info = vk::PipelineViewportStateCreateInfo()
-			.setViewportCount(1)
-			.setScissorCount(1);
-
-		auto pipeline_rasterization_state_create_info = vk::PipelineRasterizationStateCreateInfo()
-			.setPolygonMode(vk::PolygonMode::eFill);
-
-		auto pipeline_multisample_state_create_info = vk::PipelineMultisampleStateCreateInfo()
-			.setRasterizationSamples(vk::SampleCountFlagBits::e1);
-
-		auto pipeline_depth_stencil_state_create_info = vk::PipelineDepthStencilStateCreateInfo();
-
-		auto pipeline_color_blent_attachment_state = vk::PipelineColorBlendAttachmentState()
-			.setBlendEnable(true)
-			.setSrcColorBlendFactor(vk::BlendFactor::eSrcAlpha)
-			.setDstColorBlendFactor(vk::BlendFactor::eOneMinusSrcAlpha)
-			.setColorBlendOp(vk::BlendOp::eAdd)
-			.setSrcAlphaBlendFactor(vk::BlendFactor::eOne)
-			.setDstAlphaBlendFactor(vk::BlendFactor::eOneMinusSrcAlpha)
-			.setAlphaBlendOp(vk::BlendOp::eAdd)
-			.setColorWriteMask(vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
-				vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA);
-
-		auto pipeline_color_blend_state_create_info = vk::PipelineColorBlendStateCreateInfo()
-			.setAttachmentCount(1)
-			.setPAttachments(&pipeline_color_blent_attachment_state);
-
-		auto dynamic_states = {
-			vk::DynamicState::eViewport,
-			vk::DynamicState::eScissor,
-			vk::DynamicState::ePrimitiveTopology,
-			vk::DynamicState::eLineWidth,
-			vk::DynamicState::eCullMode,
-			vk::DynamicState::eFrontFace,
-			vk::DynamicState::eVertexInputBindingStride,
-			vk::DynamicState::eVertexInputEXT
-		};
-
-		auto pipeline_dynamic_state_create_info = vk::PipelineDynamicStateCreateInfo()
-			.setDynamicStates(dynamic_states);
-		
-		auto pipeline_rendering_create_info = vk::PipelineRenderingCreateInfo()
-			.setColorAttachmentCount(1)
-			.setColorAttachmentFormats(mSurfaceFormat.format);
-
-		auto graphics_pipeline_create_info = vk::GraphicsPipelineCreateInfo()
-			.setLayout(*mPipelineLayout)
-			.setFlags(vk::PipelineCreateFlagBits())
-			.setStages(pipeline_shader_stage_create_info)
-			.setPInputAssemblyState(&pipeline_input_assembly_state_create_info)
-			.setPViewportState(&pipeline_viewport_state_create_info)
-			.setPRasterizationState(&pipeline_rasterization_state_create_info)
-			.setPMultisampleState(&pipeline_multisample_state_create_info)
-			.setPDepthStencilState(&pipeline_depth_stencil_state_create_info)
-			.setPColorBlendState(&pipeline_color_blend_state_create_info)
-			.setPDynamicState(&pipeline_dynamic_state_create_info)
-			.setRenderPass(nullptr)
-			.setPNext(&pipeline_rendering_create_info);
-			
-		mPipeline = mDevice.createGraphicsPipeline(nullptr, graphics_pipeline_create_info);
-
-		pipeline_created = true;
-	}
-
-	struct Vertex
-	{
-		glm::vec3 pos;
-		glm::vec2 uv;
-		glm::vec4 col;
-	};
+	static auto shader = std::make_shared<Shader>(Vertex::Layout, vertex_shader_code, fragment_shader_code);
+	
+	setShader(shader);
 
 	std::vector<Vertex> vertices = {
-		{ { 0.0f, -0.5f, 0.0f }, { 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-		{ { -0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-		{ { 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ {  0.0f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
+		{ { -0.5f,  0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
+		{ {  0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
 	};
 
 	std::vector<uint32_t> indices = { 0, 1, 2 };
@@ -1191,20 +1269,6 @@ void SystemVK::drawTest()
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 model = glm::mat4(1.0f);
 	} ubo;
-
-	auto vertex_input_binding_description = vk::VertexInputBindingDescription2EXT()
-		.setInputRate(vk::VertexInputRate::eVertex)
-		.setDivisor(1)
-		.setBinding(0);
-
-	std::vector<vk::VertexInputAttributeDescription2EXT> vertex_input_attribute_descriptions = {
-		{ 0, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, pos) },
-		{ 1, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, uv) },
-		{ 2, 0, vk::Format::eR32G32B32A32Sfloat, offsetof(Vertex, col) },
-	};
-
-	mCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *mPipeline);
-	mCommandBuffer.setVertexInputEXT({ vertex_input_binding_description }, { vertex_input_attribute_descriptions });
 	
 	uint32_t white_pixel = 0xFFFFFFFF;
 	static auto texture = std::make_shared<Texture>(1, 1, 4, &white_pixel);
@@ -1220,12 +1284,12 @@ void SystemVK::drawTest()
 	setCullMode(Renderer::CullMode::None);
 	setViewport(Renderer::Viewport());
 	setScissor(nullptr);
-	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);
+	drawIndexed(3);
 
 	std::vector<Vertex> vertices2 = {
-		{ { -0.5f, 0.0f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
-		{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
-		{ { 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f } },
+		{ { -0.5f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f }, { 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f }, { 0.0f, 0.0f } },
+		{ { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f }, { 0.0f, 0.0f } },
 	};
 
 	uint32_t red_pixel = 0xFF0000FF;
@@ -1233,8 +1297,7 @@ void SystemVK::drawTest()
 
 	setTexture(red_texture);
 	setVertexBuffer(vertices2);
-
-	mCommandBuffer.drawIndexed(3, 1, 0, 0, 0);
+	drawIndexed(3);
 }
 
 #endif

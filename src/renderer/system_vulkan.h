@@ -20,6 +20,8 @@ namespace Renderer
 		Common::Event::Listenable<Platform::System::ResizeEvent>
 	{
 		friend Texture;
+		friend Shader;
+
 	public:
 		SystemVK();
 		~SystemVK();
@@ -73,9 +75,6 @@ namespace Renderer
 		static inline vk::raii::CommandPool mCommandPool = nullptr;
 		vk::raii::CommandBuffer mCommandBuffer = nullptr;
 		vk::raii::Sampler mSampler = nullptr;
-		vk::raii::DescriptorSetLayout mDescriptorSetLayout = nullptr;
-		vk::raii::PipelineLayout mPipelineLayout = nullptr;
-		vk::raii::Pipeline mPipeline = nullptr;
 
 		struct DeviceBuffer
 		{
@@ -112,9 +111,17 @@ namespace Renderer
 
 		std::vector<Frame> mFrames;
 
+		std::unordered_map<int, vk::ImageView> mTexturesPushQueue;
+		std::unordered_map<int, vk::Buffer> mUniformBuffersPushQueue;
+
+		std::shared_ptr<Shader> mShader = nullptr;
+
+		std::unordered_map<void*, vk::raii::Pipeline> mPipelines;
+
 	private:
 		void begin();
 		void end();
+		void prepareForDrawing(std::shared_ptr<Shader> shader);
 
 	private: // utils
 		static void setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::Image image,
