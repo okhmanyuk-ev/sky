@@ -541,9 +541,9 @@ void SystemVK::setViewport(const Viewport& value)
 {
 	auto viewport = vk::Viewport()
 		.setX(value.position.x)
-		.setY(value.position.y)
+		.setY(value.size.y - value.position.y)
 		.setWidth(value.size.x)
-		.setHeight(value.size.y)
+		.setHeight(-value.size.y)
 		.setMinDepth(value.minDepth)
 		.setMaxDepth(value.maxDepth);
 
@@ -984,6 +984,8 @@ void SystemVK::end()
 void SystemVK::prepareForDrawing(std::shared_ptr<Shader> shader)
 {
 	assert(shader);
+
+	shader->update();
 
 	if (!mPipelines.contains(shader.get()))
 	{
