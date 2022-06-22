@@ -856,32 +856,6 @@ void SystemVK::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 
 void SystemVK::present()
 {
-	try
-	{
-		drawTest();
-	}
-	catch (const std::exception& e)
-	{
-		PLATFORM->alert(e.what());
-	}
-
-	size_t total_vertex_buffers_size = 0;
-
-	for (const auto& vertex_buffer : mVertexBuffers)
-	{
-		total_vertex_buffers_size += vertex_buffer.size;
-	}
-
-	size_t total_index_buffers_size = 0;
-
-	for (const auto& index_buffer : mIndexBuffers)
-	{
-		total_index_buffers_size += index_buffer.size;
-	}
-
-	std::cout << "vertex buffers: " << mVertexBuffers.size() << ", total size: " << total_vertex_buffers_size << std::endl;
-	std::cout << "index buffers: " << mIndexBuffers.size() << ", total size: " << total_index_buffers_size<< std::endl;
-
 	end();
 
 	const auto& image_acquired_semaphore = mFrames.at(mSemaphoreIndex).image_acquired_semaphore;
@@ -957,6 +931,7 @@ void SystemVK::begin()
 
 	mVertexBufferIndex = 0;
 	mIndexBufferIndex = 0;
+	mUniformBufferIndex = 0;
 
 	auto inheritance_rendering_info = vk::CommandBufferInheritanceRenderingInfo()
 		.setColorAttachmentCount(1)
@@ -1188,118 +1163,6 @@ void SystemVK::setImageLayout(vk::raii::CommandBuffer const& commandBuffer, vk::
 		image,
 		imageSubresourceRange);
 	return commandBuffer.pipelineBarrier(sourceStage, destinationStage, {}, nullptr, nullptr, imageMemoryBarrier);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-static std::string vertex_shader_code = R"(
-#version 450 core
-
-layout(location = POSITION_LOCATION) in vec3 aPosition;
-layout(location = COLOR_LOCATION) in vec4 aColor;
-layout(location = TEXCOORD_LOCATION) in vec2 aTexCoord;
-
-layout(binding = 1) uniform _ubo
-{
-	mat4 projection;
-	mat4 view;
-	mat4 model;
-} ubo;
-
-layout(location = 0) out struct { vec4 Color; vec2 TexCoord; } Out;
-out gl_PerVertex { vec4 gl_Position; };
-
-void main()
-{
-	Out.Color = aColor;
-	Out.TexCoord = aTexCoord;
-	gl_Position = ubo.projection * ubo.view * ubo.model * vec4(aPosition, 1.0);
-})";
-
-static std::string fragment_shader_code = R"(
-#version 450 core
-
-layout(location = 0) out vec4 result;
-layout(binding = 0) uniform sampler2D sTexture;
-
-layout(location = 0) in struct { vec4 Color; vec2 TexCoord; } In;
-
-void main()
-{
-	result = In.Color * texture(sTexture, In.TexCoord.st);
-})";
-
-void SystemVK::drawTest()
-{
-	using Vertex = Renderer::Vertex::PositionColorTexture;
-
-	static auto shader = std::make_shared<Shader>(Vertex::Layout, vertex_shader_code, fragment_shader_code);
-	
-	setShader(shader);
-
-	std::vector<Vertex> vertices = {
-		{ {  0.0f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
-		{ { -0.5f,  0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
-		{ {  0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-	};
-
-	std::vector<uint32_t> indices = { 0, 1, 2 };
-	
-	struct UBO
-	{
-		glm::mat4 projection = glm::mat4(1.0f);
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 model = glm::mat4(1.0f);
-	} ubo;
-	
-	uint32_t white_pixel = 0xFFFFFFFF;
-	static auto texture = std::make_shared<Texture>(1, 1, 4, &white_pixel);
-
-	setTexture(texture);
-
-	mCommandBuffer.setFrontFace(vk::FrontFace::eCounterClockwise);
-	mCommandBuffer.setLineWidth(1.0f);
-	setVertexBuffer(vertices);
-	setIndexBuffer(indices);
-	System::setUniformBuffer(1, ubo);
-	setTopology(Renderer::Topology::TriangleList);
-	setCullMode(Renderer::CullMode::None);
-	setViewport(Renderer::Viewport());
-	setScissor(nullptr);
-	drawIndexed(3);
-
-	std::vector<Vertex> vertices2 = {
-		{ { -0.5f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f }, { 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f }, { 0.0f, 0.0f } },
-		{ { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 0.5f }, { 0.0f, 0.0f } },
-	};
-
-	uint32_t red_pixel = 0xFF0000FF;
-	static auto red_texture = std::make_shared<Texture>(1, 1, 4, &red_pixel);
-
-	setTexture(red_texture);
-	setVertexBuffer(vertices2);
-	drawIndexed(3);
 }
 
 #endif

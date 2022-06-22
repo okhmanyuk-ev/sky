@@ -144,9 +144,6 @@ namespace Renderer
 			vk::raii::CommandBuffers commandBuffers(device, { *commandPool, vk::CommandBufferLevel::ePrimary, 1 });
 			oneTimeSubmit(commandBuffers.front(), queue, func);
 		}
-
-	private:
-		void drawTest(); // TODO: del
 	};
 }
 #endif
