@@ -2,6 +2,7 @@
 
 #if defined(RENDERER_SKYGFX)
 #include <platform/system_windows.h>
+#include <platform/system_ios.h>
 
 using namespace Renderer;
 
@@ -64,7 +65,22 @@ SystemSkygfx::SystemSkygfx()
 {
 	auto width = PLATFORM->getWidth();
 	auto height = PLATFORM->getHeight();
-	mDevice = std::make_shared<skygfx::Device>(skygfx::BackendType::D3D11, Platform::SystemWindows::Window, width, height);
+	
+	auto type = skygfx::BackendType::D3D11;
+	
+#if defined(PLATFORM_IOS)
+	type = skygfx::BackendType::Metal;
+#endif
+	
+	void* window = nullptr;
+	
+#if defined(PLATFORM_WINDOWS)
+	window = Platform::SystemWindows::Window;
+#elif defined(PLATFORM_IOS)
+	window = Platform::SystemIos::Window; // TODO: maybe we should send rootView here
+#endif
+	
+	mDevice = std::make_shared<skygfx::Device>(type, window, width, height);
 }
 
 SystemSkygfx::~SystemSkygfx()
