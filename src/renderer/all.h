@@ -19,6 +19,7 @@
 #include "topology.h"
 #include "vertex.h"
 #include "viewport.h"
+#include "techniques.h"
 
 #include "shaders/blur.h"
 #include "shaders/bright_filter.h"
