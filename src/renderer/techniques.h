@@ -25,6 +25,19 @@ namespace Renderer::Techniques
 			glm::vec3 specular = { 1.0f, 1.0f, 1.0f };
 		};
 
+		struct PointLight
+		{
+			glm::vec3 position = { 0.0f, 0.0f, 0.0f };
+
+			float constantAttenuation = 1.0f;
+			float linearAttenuation = 0.001f;
+			float quadraticAttenuation = 0.001f;
+
+			glm::vec3 ambient = { 1.0f, 1.0f, 1.0f };
+			glm::vec3 diffuse = { 1.0f, 1.0f, 1.0f };
+			glm::vec3 specular = { 1.0f, 1.0f, 1.0f };
+		};
+
 		struct Material
 		{
 			glm::vec3 ambient = { 0.5f, 0.5f, 0.5f };
@@ -38,16 +51,17 @@ namespace Renderer::Techniques
 			Matrices matrices;
 			glm::vec3 eye_position = { 0.0f, 0.0f, 0.0f };
 			DirectionalLight directional_light;
+			PointLight point_light;
 			Material material;
 		};
 
-		struct SubIndices
+		struct IndexBatch
 		{
 			int index_offset;
 			int index_count;
 		};
 
-		using TexturesMap = std::unordered_map<std::shared_ptr<Renderer::Texture>, SubIndices>;
+		using TexturesMap = std::unordered_map<std::shared_ptr<Renderer::Texture>, IndexBatch>;
 
 		void Draw(const Buffer& vertex_buffer, const Buffer& index_buffer, const Vertex::Layout& layout,
 			const Settings& settings, const TexturesMap& textures_map, std::shared_ptr<RenderTarget> target = nullptr);
