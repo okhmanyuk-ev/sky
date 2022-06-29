@@ -16,6 +16,14 @@ namespace Scene3D
 		using NormalAttribs = std::vector<glm::vec3>;
 		using TexCoordAttribs = std::vector<glm::vec2>;
 
+		struct IndexRange
+		{
+			uint32_t offset = 0;
+			uint32_t count = 0;
+		};
+
+		using TexturesMap = std::unordered_map<std::shared_ptr<Renderer::Texture>, IndexRange>;
+
 	public:
 		void draw(Driver& driver) override;
 
@@ -52,8 +60,10 @@ namespace Scene3D
 		const auto& getTexCoordAttribs() const { return mTexCoordAttribs; }
 		void setTexCoordAttribs(const TexCoordAttribs& value);
 
-		auto getTexture() const { return mTexture; }
-		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexture = value; }
+		const auto& getTexturesMap() const { return mTexturesMap; }
+		void setTexturesMap(const TexturesMap& value) { mTexturesMap = value; }
+
+		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexturesMap = { { { value, { } } } }; } // TODO: find better solution
 
 	private:
 		Renderer::Topology mTopology = Renderer::Topology::TriangleList;
@@ -65,6 +75,6 @@ namespace Scene3D
 		NormalAttribs mNormalAttribs;
 		TexCoordAttribs mTexCoordAttribs;
 		Renderer::Shaders::Light::Material mMaterial;
-		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
+		TexturesMap mTexturesMap;
 	};
 }

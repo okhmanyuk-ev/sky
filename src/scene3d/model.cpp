@@ -26,7 +26,20 @@ void Model::draw(Driver& driver)
 	}
 
 	GRAPHICS->pushModelMatrix(getTransform());
-	GRAPHICS->drawGeneric(mTopology, mVertices.value(), mIndices, shader, mTexture);
+	if (mTexturesMap.size() == 1 && mTexturesMap.begin()->second.count == 0)
+	{
+		GRAPHICS->drawGeneric(mTopology, mVertices.value(), mIndices, shader, mTexturesMap.begin()->first);
+	}
+	else
+	{
+		GRAPHICS->draw(mTopology, mVertices.value(), mIndices, shader, [&] {
+			for (const auto& [texture, index_range] : mTexturesMap)
+			{
+				RENDERER->setTexture(texture);
+				RENDERER->drawIndexed(index_range.count, index_range.offset);
+			}
+		});
+	}
 	GRAPHICS->pop();
 }
 

@@ -164,10 +164,9 @@ void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, s
 	RENDERER->clear(color, depth, stencil);
 }
 
-void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices, 
+void System::draw(Renderer::Topology topology, const Renderer::Buffer& vertices,
 	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-	std::optional<std::shared_ptr<Renderer::Texture>> texture,
-	std::optional<size_t> count, size_t start)
+	std::function<void()> draw_func)
 {
 	assert(shader);
 	assert(vertices.size > 0);
@@ -182,12 +181,22 @@ void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& ve
 	shader->setViewMatrix(state.viewMatrix);
 	shader->setModelMatrix(state.modelMatrix);
 
-	RENDERER->setTexture(texture.value_or(nullptr));
 	RENDERER->setTopology(topology);
 	RENDERER->setIndexBuffer(indices);
 	RENDERER->setVertexBuffer(vertices);
 	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
-	RENDERER->drawIndexed(count.value_or(indices.size / indices.stride), start);
+	draw_func();
+}
+
+void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices, 
+	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
+	std::optional<std::shared_ptr<Renderer::Texture>> texture,
+	std::optional<size_t> count, size_t start)
+{
+	draw(topology, vertices, indices, shader, [&] {
+		RENDERER->setTexture(texture.value_or(nullptr));
+		RENDERER->drawIndexed(count.value_or(indices.size / indices.stride), start);
+	});
 }
 
 void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
