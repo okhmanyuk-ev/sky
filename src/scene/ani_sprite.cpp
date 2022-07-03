@@ -14,12 +14,6 @@ void AniSprite::update(Clock::Duration delta)
 {
 	Node::update(delta);
 
-	if (getAbsoluteWidth() <= 0.0f)
-		setWidth(mSprite->getTexRegion().size.x);
-
-	if (getAbsoluteHeight() <= 0.0f)
-		setHeight(mSprite->getTexRegion().size.y);
-
 	const auto& states = mAnimation->getStates();
 
 	if (states.count(mState) == 0)
@@ -49,6 +43,12 @@ void AniSprite::update(Clock::Duration delta)
 
 	mSprite->setTexRegion(region);
 	mSprite->setAdaptSize(mMaxRegionSize);
+
+	if (getAbsoluteWidth() <= 0.0f)
+		setWidth(region.size.x);
+
+	if (getAbsoluteHeight() <= 0.0f)
+		setHeight(region.size.y);
 }
 
 void AniSprite::randomizeProgress()
