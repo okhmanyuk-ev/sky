@@ -4,7 +4,7 @@ using namespace Scene;
 
 AniSprite::AniSprite()
 {
-	mSprite = std::make_shared<Sprite>();
+	mSprite = std::make_shared<Adaptive<Sprite>>();
 	mSprite->setAnchor(0.5f);
 	mSprite->setPivot(0.5f);
 	attach(mSprite);
@@ -48,14 +48,7 @@ void AniSprite::update(Clock::Duration delta)
 	const auto& region = regions.at(frame);
 
 	mSprite->setTexRegion(region);
-	mSprite->setSize(region.size);
-
-	auto w_scale = getWidth() / mMaxRegionSize.x;
-	auto h_scale = getHeight() / mMaxRegionSize.y;
-
-	auto min_scale = glm::min(w_scale, h_scale);
-
-	mSprite->setScale(min_scale);
+	mSprite->setAdaptSize(mMaxRegionSize);
 }
 
 void AniSprite::randomizeProgress()

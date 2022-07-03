@@ -2,6 +2,7 @@
 
 #include <scene/node.h>
 #include <scene/sprite.h>
+#include <scene/adaptive.h>
 #include <graphics/animation.h>
 
 namespace Scene
@@ -39,7 +40,7 @@ namespace Scene
 		void setPlaying(bool value) { mPlaying = value; }
 
 	private:
-		std::shared_ptr<Sprite> mSprite = nullptr;
+		std::shared_ptr<Adaptive<Sprite>> mSprite = nullptr;
 		float mFrequency = 10.0f;
 		std::string mState = "idle";
 		Clock::Duration mAccumulator = Clock::Duration::zero();
