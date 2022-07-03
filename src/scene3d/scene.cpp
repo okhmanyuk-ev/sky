@@ -20,6 +20,8 @@ void Scene::frame()
 	
 	mDriver.setCameraPosition(mCamera->getPosition());
 
+	// TODO: remove graphics system using 
+
 	GRAPHICS->begin();
 	GRAPHICS->pushRenderTarget(mRenderTarget);
 	GRAPHICS->pushViewport(mRenderTarget);
@@ -31,7 +33,16 @@ void Scene::frame()
 	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
 	GRAPHICS->pushTextureAddress(Renderer::TextureAddress::Wrap);
 	GRAPHICS->clear();
+	
+	mForwardLightTechnique.setProjectionMatrix(mCamera->getProjectionMatrix());
+	mForwardLightTechnique.setViewMatrix(mCamera->getViewMatrix());
+	mForwardLightTechnique.setEyePosition(mCamera->getPosition());
+	mForwardLightTechnique.setDirectionalLight(mDriver.getDirectionalLight());
+	mForwardLightTechnique.setPointLight(mDriver.getPointLight());
+
+	GRAPHICS->applyState();
 	recursiveNodeDraw(mRoot);
+
 	GRAPHICS->pop(9);
 	GRAPHICS->end();
 }
@@ -69,11 +80,11 @@ void Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
 	if (!node->isTransformReady())
 		return;
 
-	node->enterDraw(mDriver);
-	node->draw(mDriver);
+	node->enterDraw(mForwardLightTechnique);
+	node->draw(mForwardLightTechnique);
 
 	for (auto _node : node->getNodes())
 		recursiveNodeDraw(_node);
 
-	node->leaveDraw(mDriver);
+	node->leaveDraw(mForwardLightTechnique);
 }

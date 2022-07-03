@@ -6,7 +6,6 @@ using namespace Scene3D;
 
 Node::Node()
 {
-	//
 }
 
 Node::~Node()
@@ -35,22 +34,18 @@ void Node::detach(std::shared_ptr<Node> node)
 
 void Node::update(Clock::Duration dTime)
 {
-	//
 }
 
-void Node::enterDraw(Driver& driver)
+void Node::enterDraw(Renderer::Technique& technique)
 {
-	//
 }
 
-void Node::draw(Driver& driver)
+void Node::draw(Renderer::Technique& technique)
 {
-	//
 }
 
-void Node::leaveDraw(Driver& driver)
+void Node::leaveDraw(Renderer::Technique& technique)
 {
-	//
 }
 
 void Node::updateTransform()

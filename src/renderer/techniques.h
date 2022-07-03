@@ -6,64 +6,63 @@
 #include <renderer/render_target.h>
 #include <unordered_map>
 
-namespace Renderer::Techniques
+#include <renderer/shaders/light.h> // TODO: del
+
+namespace Renderer
 {
-	namespace ForwardLighting
+	class Technique
 	{
-		struct Matrices
+	public:
+		struct IndexRange
 		{
-			glm::mat4 view = glm::mat4(1.0f);
-			glm::mat4 projection = glm::mat4(1.0f);
-			glm::mat4 model = glm::mat4(1.0f);
+			uint32_t offset = 0;
+			uint32_t count = 0;
 		};
 
-		struct DirectionalLight
-		{
-			glm::vec3 direction = { 0.75f, 0.75f, 0.75f };
-			glm::vec3 ambient = { 0.5f, 0.5f, 0.5f };
-			glm::vec3 diffuse = { 1.0f, 1.0f, 1.0f };
-			glm::vec3 specular = { 1.0f, 1.0f, 1.0f };
-		};
+		using TexturesMap = std::unordered_map<std::shared_ptr<Renderer::Texture>, IndexRange>;
 
-		struct PointLight
-		{
-			glm::vec3 position = { 0.0f, 0.0f, 0.0f };
+	public:
+		virtual void draw(const Buffer& vertex_buffer, const Buffer& index_buffer, const Vertex::Layout& layout,
+			const TexturesMap& textures_map) = 0;
 
-			float constantAttenuation = 1.0f;
-			float linearAttenuation = 0.001f;
-			float quadraticAttenuation = 0.001f;
+	public:
+		const auto& getProjectionMatrix() const { return mProjectionMatrix; }
+		void setProjectionMatrix(const glm::mat4& value) { mProjectionMatrix = value; }
 
-			glm::vec3 ambient = { 1.0f, 1.0f, 1.0f };
-			glm::vec3 diffuse = { 1.0f, 1.0f, 1.0f };
-			glm::vec3 specular = { 1.0f, 1.0f, 1.0f };
-		};
+		const auto& getViewMatrix() const { return mViewMatrix; }
+		void setViewMatrix(const glm::mat4& value) { mViewMatrix = value; }
 
-		struct Material
-		{
-			glm::vec3 ambient = { 0.5f, 0.5f, 0.5f };
-			glm::vec3 diffuse = { 0.5f, 0.5f, 0.5f };
-			glm::vec3 specular = { 0.5f, 0.5f, 0.5f };
-			float shininess = 32.0f;
-		};
+		const auto& getModelMatrix() const { return mModelMatrix; }
+		void setModelMatrix(const glm::mat4& value) { mModelMatrix = value; }
 
-		struct Settings
-		{
-			Matrices matrices;
-			glm::vec3 eye_position = { 0.0f, 0.0f, 0.0f };
-			DirectionalLight directional_light;
-			PointLight point_light;
-			Material material;
-		};
+		auto getMaterial() const { return mMaterial; }
+		void setMaterial(const Renderer::Shaders::Light::Material& value) { mMaterial = value; }
 
-		struct IndexBatch
-		{
-			int index_offset;
-			int index_count;
-		};
+	private:
+		glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
+		glm::mat4 mViewMatrix = glm::mat4(1.0f);
+		glm::mat4 mModelMatrix = glm::mat4(1.0f);
+		Renderer::Shaders::Light::Material mMaterial; // TODO: this should not be here
+	};
 
-		using TexturesMap = std::unordered_map<std::shared_ptr<Renderer::Texture>, IndexBatch>;
+	class ForwardLightTechnique : public Technique
+	{
+	public:
+		void draw(const Buffer& vertex_buffer, const Buffer& index_buffer, const Vertex::Layout& layout,
+			const TexturesMap& textures_map) override;
 
-		void Draw(const Buffer& vertex_buffer, const Buffer& index_buffer, const Vertex::Layout& layout,
-			const Settings& settings, const TexturesMap& textures_map, std::shared_ptr<RenderTarget> target = nullptr);
-	}
+	public:
+		void setEyePosition(const glm::vec3& value) { mEyePosition = value; }
+
+		auto getDirectionalLight() const { return mDirectionalLight; }
+		void setDirectionalLight(const Renderer::Shaders::Light::DirectionalLight& value) { mDirectionalLight = value; }
+
+		auto getPointLight() const { return mPointLight; }
+		void setPointLight(const Renderer::Shaders::Light::PointLight& value) { mPointLight = value; }
+
+	private:
+		glm::vec3 mEyePosition = { 0.0f, 0.0f, 0.0f };
+		Renderer::Shaders::Light::DirectionalLight mDirectionalLight;
+		Renderer::Shaders::Light::PointLight mPointLight;
+	};
 }

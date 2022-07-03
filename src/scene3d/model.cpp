@@ -3,21 +3,12 @@
 
 using namespace Scene3D;
 
-void Model::draw(Driver& driver)
+void Model::draw(Renderer::Technique& technique)
 {
-	Node::draw(driver);
-	
-	static std::map<std::set<Renderer::Shaders::Light::Flag>, std::shared_ptr<Renderer::Shaders::Light>> shaders;
+	Node::draw(technique);
 
 	if (!mVertices.has_value())
-		std::tie(mVertices, mShaderFlags) = generateVertices();
-
-	if (!shaders.contains(mShaderFlags))
-		shaders[mShaderFlags] = std::make_shared<Renderer::Shaders::Light>(Vertex::Layout, mShaderFlags);
-	
-	auto shader = shaders.at(mShaderFlags);
-
-	driver.prepareShader(*shader, mMaterial);
+		std::tie(mVertices, mShaderFlags) = generateVertices(); // TODO: shader flags is unused
 
 	if (mIndices.empty())
 	{
@@ -25,22 +16,9 @@ void Model::draw(Driver& driver)
 		std::iota(mIndices.begin(), mIndices.end(), 0);
 	}
 
-	GRAPHICS->pushModelMatrix(getTransform());
-	if (mTexturesMap.size() == 1 && mTexturesMap.begin()->second.count == 0)
-	{
-		GRAPHICS->drawGeneric(mTopology, mVertices.value(), mIndices, shader, mTexturesMap.begin()->first);
-	}
-	else
-	{
-		GRAPHICS->draw(mTopology, mVertices.value(), mIndices, shader, [&] {
-			for (const auto& [texture, index_range] : mTexturesMap)
-			{
-				RENDERER->setTexture(texture);
-				RENDERER->drawIndexed(index_range.count, index_range.offset);
-			}
-		});
-	}
-	GRAPHICS->pop();
+	technique.setModelMatrix(getTransform());
+	technique.setMaterial(mMaterial);
+	technique.draw(mVertices.value(), mIndices, Vertex::Layout, mTexturesMap);
 }
 
 std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>> Model::generateVertices()

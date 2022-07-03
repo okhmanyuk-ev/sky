@@ -4,6 +4,8 @@
 #include <renderer/all.h>
 #include <graphics/all.h>
 #include <scene3d/node.h>
+#include <scene3d/driver.h>
+#include <renderer/techniques.h>
 
 namespace Scene3D
 {
@@ -27,7 +29,8 @@ namespace Scene3D
 	private:
 		std::shared_ptr<Node> mRoot;
 		std::shared_ptr<Graphics::Camera3D> mCamera;
-		Driver mDriver;
+		Driver mDriver; // TODO: del
+		Renderer::ForwardLightTechnique mForwardLightTechnique;
 		std::shared_ptr<Renderer::RenderTarget> mRenderTarget = nullptr;
 
 	private:

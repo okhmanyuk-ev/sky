@@ -3,7 +3,7 @@
 #include <core/engine.h>
 #include <core/clock.h>
 #include <scene3d/transform.h>
-#include <scene3d/driver.h>
+#include <renderer/techniques.h>
 #include <graphics/all.h>
 
 namespace Scene3D
@@ -20,9 +20,9 @@ namespace Scene3D
 
 	public:
 		virtual void update(Clock::Duration dTime);
-		virtual void enterDraw(Driver& driver);
-		virtual void draw(Driver& driver);
-		virtual void leaveDraw(Driver& driver);
+		virtual void enterDraw(Renderer::Technique& technique);
+		virtual void draw(Renderer::Technique& technique);
+		virtual void leaveDraw(Renderer::Technique& technique);
 
 		virtual void updateTransform();
 
