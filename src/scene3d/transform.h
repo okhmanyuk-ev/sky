@@ -13,9 +13,13 @@ namespace Scene3D
 		auto getRotation() const { return mRotation; }
 		void setRotation(const glm::vec3& value) { mRotation = value; }
 
+		auto getPosition() const { return mPosition; }
+		void setPosition(const glm::vec3& value) { mPosition = value; }
+
 	private:
 		glm::vec3 mScale = { 1.0f, 1.0f, 1.0f };
 		glm::vec3 mRotation = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 mPosition = { 0.0f, 0.0f, 0.0f };
 
 	public:
 		void setScale(float value) { setScale({ value, value, value }); }

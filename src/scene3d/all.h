@@ -5,3 +5,4 @@
 #include <scene3d/scene.h>
 #include <scene3d/transform.h>
 #include <scene3d/driver.h>
+#include <scene3d/cube.h>

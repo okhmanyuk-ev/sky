@@ -54,7 +54,7 @@ void Node::updateTransform()
 
 	mTransform = hasParent() ? getParent()->getTransform() : glm::mat4(1.0f);
 	//mTransform = glm::translate(mTransform, { getAnchor() * parent_size, 0.0f });
-	//mTransform = glm::translate(mTransform, { getPosition(), 0.0f });
+	mTransform = glm::translate(mTransform, getPosition());
 	mTransform = glm::rotate(mTransform, getRotation().x, { 1.0f, 0.0f, 0.0f });
 	mTransform = glm::rotate(mTransform, getRotation().y, { 0.0f, 1.0f, 0.0f });
 	mTransform = glm::rotate(mTransform, getRotation().z, { 0.0f, 0.0f, 1.0f });

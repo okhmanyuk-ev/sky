@@ -18,7 +18,19 @@ void Model::draw(Renderer::Technique& technique)
 
 	technique.setModelMatrix(getTransform());
 	technique.setMaterial(mMaterial);
-	technique.draw(mVertices.value(), mIndices, Vertex::Layout, mTexturesMap);
+	
+	if (std::holds_alternative<Renderer::Technique::TexturesMap>(mTexturesMap))
+	{
+		auto textures_map = std::get<Renderer::Technique::TexturesMap>(mTexturesMap);
+		technique.draw(mVertices.value(), mIndices, Vertex::Layout, textures_map);
+	}
+	else
+	{
+		auto texture = std::get<std::shared_ptr<Renderer::Texture>>(mTexturesMap);
+		auto index_range = Renderer::Technique::IndexRange();
+		index_range.count = mIndices.size();
+		technique.draw(mVertices.value(), mIndices, Vertex::Layout, { { texture, index_range } });
+	}
 }
 
 std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>> Model::generateVertices()
