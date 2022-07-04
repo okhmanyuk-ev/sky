@@ -7,10 +7,17 @@ using namespace Shared;
 FirstPersonCameraController::FirstPersonCameraController(std::shared_ptr<Graphics::Camera3D> camera) :
 	mCamera(camera)
 {
-	//
+	mTimestepFixer.setSkipLongFrames(true);
 }
 
 void FirstPersonCameraController::onFrame()
+{
+	mTimestepFixer.execute([this](auto dtime) {
+		update(dtime);
+	});
+}
+
+void FirstPersonCameraController::update(Clock::Duration dTime)
 {
 	if (ImGui::IsAnyItemActive())
 		return;
@@ -33,7 +40,7 @@ void FirstPersonCameraController::onFrame()
 	mMouseCaptured = false;
 
 	{
-		auto offset = mSensivity * Clock::ToSeconds(FRAME->getTimeDelta()) * 1.5f;
+		auto offset = mSensivity * Clock::ToSeconds(dTime) * 1.5f;
 
 		if (mLeftArrow)
 			mCamera->setYaw(mCamera->getYaw() + offset);
@@ -61,7 +68,7 @@ void FirstPersonCameraController::onFrame()
 			mCamera->setYaw(mCamera->getYaw() + (pi * 2.0f));
 	}
 	{
-		auto speed = mSpeed * Clock::ToSeconds(FRAME->getTimeDelta()) * 50.0f;
+		auto speed = mSpeed * Clock::ToSeconds(dTime) * 50.0f;
 
 		if (mKeyShift)
 			speed *= 3.0f;
@@ -89,7 +96,7 @@ void FirstPersonCameraController::onFrame()
 			direction *= speed;
 		}
 
-		mSmoothDirection = Common::Helpers::SmoothValueAssign(mSmoothDirection, direction, FRAME->getTimeDelta());
+		mSmoothDirection = Common::Helpers::SmoothValueAssign(mSmoothDirection, direction, dTime, 0.075f);
 		
 		if (glm::length(mSmoothDirection) > 0.0f)
 		{

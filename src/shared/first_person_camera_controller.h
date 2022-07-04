@@ -3,6 +3,7 @@
 #include <graphics/camera.h>
 #include <common/event_system.h>
 #include <common/frame_system.h>
+#include <common/timestep_fixer.h>
 #include <platform/system.h>
 #include <platform/input.h>
 
@@ -21,6 +22,7 @@ namespace Shared
 
 	private:
 		void onFrame() override;
+		void update(Clock::Duration dTime);
 
 	private:
 		void onEvent(const Platform::Input::Keyboard::Event& e) override;
@@ -61,5 +63,6 @@ namespace Shared
 		float mSpeed = 1.0f;
 		bool mMouseCaptured = false;
 		glm::vec2 mSmoothDirection = { 0.0f, 0.0f };
+		Common::TimestepFixer mTimestepFixer;
 	};
 }
