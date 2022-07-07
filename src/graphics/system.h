@@ -148,8 +148,7 @@ namespace Graphics
 		void pushBlendMode(Renderer::BlendMode value);
 		void pushDepthMode(Renderer::DepthMode value);
 		void pushCullMode(Renderer::CullMode value);
-		void pushViewport(const Renderer::Viewport& value);
-		void pushViewport(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
+		void pushViewport(std::optional<Renderer::Viewport> value);
 		void pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value);
 		void pushScissor(std::optional<Renderer::Scissor> value);
 		void pushViewMatrix(const glm::mat4& value);
@@ -170,7 +169,7 @@ namespace Graphics
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			std::shared_ptr<Renderer::RenderTarget> renderTarget = nullptr;
 			std::optional<Renderer::Scissor> scissor = std::nullopt;
-			Renderer::Viewport viewport = Renderer::Viewport();
+			std::optional<Renderer::Viewport> viewport = std::nullopt;
 			Renderer::DepthMode depthMode = Renderer::DepthMode();
 			Renderer::CullMode cullMode = Renderer::CullMode::None;
 			Renderer::BlendMode blendMode = Renderer::BlendStates::NonPremultiplied;

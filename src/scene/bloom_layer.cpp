@@ -20,7 +20,6 @@ std::shared_ptr<Renderer::RenderTarget> BloomLayer::postprocess(std::shared_ptr<
 	GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
 
 	GRAPHICS->pushRenderTarget(target1);
-	GRAPHICS->pushViewport(target1);
 
 	GRAPHICS->clear();
 	GRAPHICS->drawSprite(render_texture, mBrightFilterShader);
@@ -42,18 +41,16 @@ std::shared_ptr<Renderer::RenderTarget> BloomLayer::postprocess(std::shared_ptr<
 		GRAPHICS->drawSprite(target2, mBlurShader);
 	}
 
-	GRAPHICS->pop(2);
+	GRAPHICS->pop();
 
 	auto result = GRAPHICS->getRenderTarget(fmt::format("bloom_result_{}", (void*)this), render_texture->getWidth(), render_texture->getHeight());
 
 	GRAPHICS->pushRenderTarget(result);
-	GRAPHICS->pushViewport(result);
 	GRAPHICS->clear();
 	GRAPHICS->drawSprite(render_texture); // comment to get only blur effect
 	GRAPHICS->drawSprite(target1, {}, glm::vec4(mGlowIntensity));
-	GRAPHICS->pop(2);
 	
-	GRAPHICS->pop(3);
+	GRAPHICS->pop(4);
 
 	return result;
 }

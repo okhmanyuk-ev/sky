@@ -24,7 +24,6 @@ void Scene::frame()
 
 	GRAPHICS->begin();
 	GRAPHICS->pushRenderTarget(mRenderTarget);
-	GRAPHICS->pushViewport(mRenderTarget);
 	GRAPHICS->pushProjectionMatrix(mCamera->getProjectionMatrix());
 	GRAPHICS->pushViewMatrix(mCamera->getViewMatrix());
 	GRAPHICS->pushScissor(std::nullopt);
@@ -42,8 +41,7 @@ void Scene::frame()
 
 	GRAPHICS->applyState();
 	recursiveNodeDraw(mRoot);
-
-	GRAPHICS->pop(9);
+	GRAPHICS->pop(8);
 	GRAPHICS->end();
 }
 

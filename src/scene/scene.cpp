@@ -187,10 +187,15 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const glm::vec2& 
 
 void Scene::Scene::frame()
 {
-	mViewport = Renderer::Viewport(mRenderTarget);
-	
-	if (!mRenderTarget)
+	if (mRenderTarget)
 	{
+		mViewport.size.x = static_cast<float>(mRenderTarget->getWidth());
+		mViewport.size.y = static_cast<float>(mRenderTarget->getHeight());
+	}
+	else
+	{
+		mViewport.size.x = static_cast<float>(PLATFORM->getWidth());
+		mViewport.size.y = static_cast<float>(PLATFORM->getHeight());
 		mViewport.size /= PLATFORM->getScale();
 	}
 
@@ -207,10 +212,9 @@ void Scene::Scene::frame()
 
 	GRAPHICS->begin();
 	GRAPHICS->pushRenderTarget(mRenderTarget);
-	GRAPHICS->pushViewport(mRenderTarget);
 	GRAPHICS->pushOrthoMatrix(mRenderTarget);
 	recursiveNodeDraw(mRoot);
-	GRAPHICS->pop(3);
+	GRAPHICS->pop(2);
 	GRAPHICS->end();
 }
 

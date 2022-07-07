@@ -28,7 +28,7 @@ namespace Renderer
 
 	public:
 		void setTopology(const Topology& value) override;
-		void setViewport(const Viewport& value) override;
+		void setViewport(std::optional<Viewport> value) override;
 		void setScissor(const Scissor& value) override;
 		void setScissor(std::nullptr_t value) override;
 		void setVertexBuffer(const Buffer& value) override;

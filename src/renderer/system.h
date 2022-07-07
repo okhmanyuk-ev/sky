@@ -26,7 +26,7 @@ namespace Renderer
 	{
 	public:
 		virtual void setTopology(const Topology& value) = 0;
-		virtual void setViewport(const Viewport& value) = 0;
+		virtual void setViewport(std::optional<Viewport> value) = 0;
 		virtual void setScissor(const Scissor& value) = 0;
 		virtual void setScissor(std::nullptr_t value) = 0;
 		virtual void setVertexBuffer(const Buffer& value) = 0;

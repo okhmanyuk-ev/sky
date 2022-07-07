@@ -136,8 +136,30 @@ void System::flush()
 	auto shader_matrices = std::dynamic_pointer_cast<Renderer::ShaderMatrices>(mBatch.shader);
 	assert(shader_matrices);
 
+	float width;
+	float height;
+
+	if (state.viewport.has_value())
+	{
+		width = state.viewport->size.x;
+		height = state.viewport->size.y;
+	}
+	else
+	{
+		if (state.renderTarget)
+		{
+			width = static_cast<float>(state.renderTarget->getWidth());
+			height = static_cast<float>(state.renderTarget->getHeight());
+		}
+		else
+		{
+			width = static_cast<float>(PLATFORM->getWidth());
+			height = static_cast<float>(PLATFORM->getHeight());
+		}
+	}
+
 	auto view = glm::lookAtLH(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	auto projection = glm::orthoLH(0.0f, state.viewport.size.x / scale, state.viewport.size.y / scale, 0.0f, -1.0f, 1.0f);
+	auto projection = glm::orthoLH(0.0f, width / scale, height / scale, 0.0f, -1.0f, 1.0f);
 	auto model = glm::mat4(1.0f);
 
 	shader_matrices->setProjectionMatrix(projection);
@@ -671,8 +693,30 @@ glm::vec3 System::project(const glm::vec3& pos)
 
 	auto scale = PLATFORM->getScale();
 
-	auto width = state.viewport.size.x / scale;
-	auto height = state.viewport.size.y / scale;
+	float width;
+	float height;
+
+	if (state.viewport.has_value())
+	{
+		width = state.viewport->size.x;
+		height = state.viewport->size.y;
+	}
+	else
+	{
+		if (state.renderTarget)
+		{
+			width = static_cast<float>(state.renderTarget->getWidth());
+			height = static_cast<float>(state.renderTarget->getHeight());
+		}
+		else
+		{
+			width = static_cast<float>(PLATFORM->getWidth());
+			height = static_cast<float>(PLATFORM->getHeight());
+		}
+	}
+
+	width /= scale;
+	height /= scale;
 
 	auto projected_pos = state.projectionMatrix * state.viewMatrix * state.modelMatrix * glm::vec4(pos, 1.0f);
 
@@ -754,16 +798,11 @@ void System::pushCullMode(Renderer::CullMode value)
 	push(state);
 }
 
-void System::pushViewport(const Renderer::Viewport& value)
+void System::pushViewport(std::optional<Renderer::Viewport> value)
 {
 	auto state = mStates.top();
 	state.viewport = value;
 	push(state);
-}
-
-void System::pushViewport(std::shared_ptr<Renderer::RenderTarget> target)
-{
-	pushViewport(Renderer::Viewport(target));
 }
 
 void System::pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value)
@@ -875,11 +914,10 @@ std::shared_ptr<Renderer::Texture> System::makeGenericTexture(const glm::ivec2& 
 
 	pushCleanState();
 	pushRenderTarget(result);
-	pushViewport(result);
 	pushOrthoMatrix(1.0f, 1.0f);
 	clear(glm::vec4{ Graphics::Color::White, 0.0f });
 	callback();
-	pop(4);
+	pop(3);
 
 	if (!working)
 		end();

@@ -34,7 +34,6 @@ namespace Scene
 			view = glm::scale(view, { PLATFORM->getScale(), PLATFORM->getScale(), 1.0f });
 
 			GRAPHICS->pushRenderTarget(target);
-			GRAPHICS->pushViewport(target);
 			GRAPHICS->pushOrthoMatrix(target);
 			GRAPHICS->pushViewMatrix(view);
 			GRAPHICS->pushBlendMode(Renderer::BlendMode(Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha,
@@ -52,7 +51,7 @@ namespace Scene
 
 			auto target = GRAPHICS->getCurrentState().renderTarget;
 			
-			GRAPHICS->pop(5);
+			GRAPHICS->pop(4);
 
 			if (mPostprocessEnabled)
 				target = postprocess(target);
