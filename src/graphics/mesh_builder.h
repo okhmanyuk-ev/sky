@@ -17,7 +17,7 @@ namespace Graphics
 		void vertex(const glm::vec3& value);
 		void color(const glm::vec3& value);
 		void color(const glm::vec4& value);
-		std::tuple<std::vector<Renderer::Vertex::PositionColor>, size_t> end();
+		std::tuple<const std::vector<Renderer::Vertex::PositionColor>&, size_t> end();
 
 	private:
 		bool mWorking = false;

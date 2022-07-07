@@ -40,7 +40,7 @@ void MeshBuilder::color(const glm::vec4& value)
 	mColor = value;
 }
 
-std::tuple<std::vector<Renderer::Vertex::PositionColor>, size_t> MeshBuilder::end()
+std::tuple<const std::vector<Renderer::Vertex::PositionColor>&, size_t> MeshBuilder::end()
 {
 	assert(mWorking);
 	mWorking = false;
