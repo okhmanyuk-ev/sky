@@ -110,14 +110,17 @@ void SystemSkygfx::setViewport(std::optional<Viewport> value)
 	}
 }
 
-void SystemSkygfx::setScissor(const Scissor& value)
+void SystemSkygfx::setScissor(std::optional<Scissor> value)
 {
-	mDevice->setScissor(*(skygfx::Scissor*)&value);
-}
-
-void SystemSkygfx::setScissor(std::nullptr_t value)
-{
-	mDevice->setScissor(value);
+	if (value.has_value())
+	{
+		auto scissor = value.value();
+		mDevice->setScissor(*(skygfx::Scissor*)&scissor);
+	}
+	else
+	{
+		mDevice->setScissor(std::nullopt);
+	}
 }
 
 void SystemSkygfx::setVertexBuffer(const Buffer& value)
