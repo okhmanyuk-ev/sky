@@ -175,12 +175,36 @@ void SystemSkygfx::setSampler(const Sampler& value)
 
 void SystemSkygfx::setDepthMode(const DepthMode& value)
 {
-	mDevice->setDepthMode(*(skygfx::DepthMode*)&value);
+	if (!value.enabled)
+	{
+		mDevice->setDepthMode(std::nullopt);
+	}
+	else
+	{
+		auto depth_mode = skygfx::DepthMode();
+		depth_mode.func = (skygfx::ComparisonFunc)value.func;
+		mDevice->setDepthMode(depth_mode);
+	}
 }
 
 void SystemSkygfx::setStencilMode(const StencilMode& value)
 {
-	mDevice->setStencilMode(*(skygfx::StencilMode*)&value);
+	if (!value.enabled)
+	{
+		mDevice->setStencilMode(std::nullopt);
+	}
+	else
+	{
+		auto stencil_mode = skygfx::StencilMode();
+		stencil_mode.read_mask = value.readMask;
+		stencil_mode.write_mask = value.writeMask;
+		stencil_mode.depth_fail_op = (skygfx::StencilOp)value.depthFailOp;
+		stencil_mode.fail_op = (skygfx::StencilOp)value.failOp;
+		stencil_mode.func = (skygfx::ComparisonFunc)value.func;
+		stencil_mode.pass_op = (skygfx::StencilOp)value.passOp;
+		stencil_mode.reference = value.reference;
+		mDevice->setStencilMode(stencil_mode);
+	}
 }
 
 void SystemSkygfx::setCullMode(const CullMode& value)
