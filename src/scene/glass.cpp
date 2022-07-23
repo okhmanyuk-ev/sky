@@ -48,7 +48,6 @@ void Glass::draw()
 
 BlurredGlass::BlurredGlass()
 {
-	setSampler(Renderer::Sampler::LinearMipmapLinear);
 	setBlendMode(Renderer::BlendStates::Opaque);
 	setGenerateMipmaps(true);
 }

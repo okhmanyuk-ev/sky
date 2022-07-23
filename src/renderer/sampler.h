@@ -5,7 +5,6 @@ namespace Renderer
 	enum class Sampler
 	{
 		Linear,
-		Nearest,
-		LinearMipmapLinear
+		Nearest
 	};
 }
