@@ -146,7 +146,7 @@ void SystemSkygfx::setTexture(int binding, std::shared_ptr<Texture> value)
 	if (!value->mTextureImpl->texture)
 		return;
 
-	mDevice->setTexture(*value->mTextureImpl->texture);
+	mDevice->setTexture((uint32_t)binding, *value->mTextureImpl->texture);
 }
 
 void SystemSkygfx::setTexture(std::shared_ptr<Texture> value)
