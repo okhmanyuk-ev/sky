@@ -16,17 +16,20 @@
 
 namespace Renderer
 {
-	class SystemGL : public System
+	class SystemGL : public System,
+		Common::Event::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
 		SystemGL();
 		~SystemGL();
 
+	private:
+		void onEvent(const Platform::System::ResizeEvent& e) override;
+
     public:
 		void setTopology(const Topology& value) override;
-		void setViewport(const Viewport& value) override;
-		void setScissor(const Scissor& value) override;
-		void setScissor(std::nullptr_t value) override;
+		void setViewport(std::optional<Viewport> value) override;
+		void setScissor(std::optional<Scissor> value) override;
 		void setVertexBuffer(const Buffer& value) override;
 		void setIndexBuffer(const Buffer& value) override;
 		void setUniformBuffer(int slot, void* memory, size_t size) override;
@@ -102,7 +105,7 @@ namespace Renderer
 		std::shared_ptr<Shader> mShader = nullptr;
 		bool mShaderDirty = false;
 
-		bool mTextureBound = false;
+		std::unordered_map<uint32_t, std::shared_ptr<Texture>> mCurrentTextures;
 		Sampler mSampler = Sampler::Nearest;
 		TextureAddress mTextureAddress = TextureAddress::Clamp;
 		
@@ -110,6 +113,14 @@ namespace Renderer
 
 		void setGLVertexBuffer(const Buffer& value);
 		void setGLIndexBuffer(const Buffer& value);
+
+		std::optional<Viewport> mViewport;
+		bool mViewportDirty = true;
+
+		std::shared_ptr<RenderTarget> mCurrentRenderTarget = nullptr;
+
+		uint32_t mBackbufferWidth = 0;
+		uint32_t mBackbufferHeight = 0;
 	};
 
 	using SystemCrossplatform = SystemGL;

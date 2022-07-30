@@ -435,6 +435,9 @@ SystemGL::SystemGL()
 	glGenBuffers(1, &mGLPixelBuffer);
 	
 	setBlendMode(BlendStates::NonPremultiplied);
+
+	mBackbufferWidth = PLATFORM->getWidth();
+	mBackbufferHeight = PLATFORM->getHeight();
 }
 
 SystemGL::~SystemGL()
@@ -451,39 +454,38 @@ SystemGL::~SystemGL()
 #endif
 }
 
+void SystemGL::onEvent(const Platform::System::ResizeEvent& e)
+{
+	mBackbufferWidth = e.width;
+	mBackbufferHeight = e.height;
+}
+
 void SystemGL::setTopology(const Renderer::Topology& value) 
 {
 	mGLTopology = SystemGL::Topology.at(value);
 }
 
-void SystemGL::setViewport(const Viewport& value) 
+void SystemGL::setViewport(std::optional<Viewport> value) 
 {
-	glViewport(
-		(GLint)value.position.x,
-		(GLint)value.position.y,
-		(GLint)value.size.x,
-		(GLint)value.size.y);
-
-#if defined(RENDERER_GL44)
-	glDepthRange((GLclampd)value.minDepth, (GLclampd)value.maxDepth);
-#elif defined(RENDERER_GLES3)
-	glDepthRangef((GLfloat)value.minDepth, (GLfloat)value.maxDepth);
-#endif
+	mViewport = value;
+	mViewportDirty = true;
 }
 
-void SystemGL::setScissor(const Scissor& value) 
+void SystemGL::setScissor(std::optional<Scissor> value) 
 {
-	glEnable(GL_SCISSOR_TEST);
-	glScissor(
-		(GLint)glm::round(value.position.x),
-		(GLint)glm::round(PLATFORM->getHeight() - value.position.y - value.size.y),
-		(GLint)glm::round(value.size.x),
-		(GLint)glm::round(value.size.y));
-}
-
-void SystemGL::setScissor(std::nullptr_t value)
-{
-	glDisable(GL_SCISSOR_TEST);
+	if (value.has_value())
+	{
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(
+			(GLint)glm::round(value.value().position.x),
+			(GLint)glm::round(PLATFORM->getHeight() - value.value().position.y - value.value().size.y),
+			(GLint)glm::round(value.value().size.x),
+			(GLint)glm::round(value.value().size.y));
+	}
+	else
+	{
+		glDisable(GL_SCISSOR_TEST);
+	}
 }
 
 void SystemGL::setVertexBuffer(const Buffer& value) 
@@ -516,7 +518,7 @@ void SystemGL::setTexture(int binding, std::shared_ptr<Texture> value)
 
 	glActiveTexture(GL_TEXTURE0 + binding);
 	glBindTexture(GL_TEXTURE_2D, value->mTextureImpl->texture);
-	mTextureBound = true;
+	mCurrentTextures[binding] = value;
 	updateGLSampler();
 }
 
@@ -539,6 +541,11 @@ void SystemGL::setRenderTarget(std::shared_ptr<RenderTarget> value)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, value->mRenderTargetImpl->framebuffer);
 	}
+
+	mCurrentRenderTarget = value;
+
+	if (!mViewport.has_value())
+		mViewportDirty = true;
 }
 
 void SystemGL::setShader(std::shared_ptr<Shader> value)
@@ -788,6 +795,37 @@ void SystemGL::prepareForDrawing()
 		setGLVertexBuffer(mVertexBuffer);
 		mVertexBufferDirty = false;
 	}
+
+	if (mViewportDirty)
+	{
+		float width;
+		float height;
+
+		if (mCurrentRenderTarget == nullptr)
+		{
+			width = static_cast<float>(mBackbufferWidth);
+			height = static_cast<float>(mBackbufferHeight);
+		}
+		else
+		{
+			width = static_cast<float>(mCurrentRenderTarget->getWidth());
+			height = static_cast<float>(mCurrentRenderTarget->getHeight());
+		}
+
+		auto viewport = mViewport.value_or(Viewport{ { 0.0f, 0.0f }, { width, height } });
+
+		glViewport(
+			(GLint)viewport.position.x,
+			(GLint)viewport.position.y,
+			(GLint)viewport.size.x,
+			(GLint)viewport.size.y);
+
+#if defined(RENDERER_GL44)
+		glDepthRange((GLclampd)viewport.minDepth, (GLclampd)viewport.maxDepth);
+#elif defined(RENDERER_GLES3)
+		glDepthRangef((GLfloat)viewport.minDepth, (GLfloat)viewport.maxDepth);
+#endif
+	}
 }
 
 void SystemGL::setGLVertexBuffer(const Buffer& value)
@@ -835,39 +873,38 @@ void SystemGL::setGLIndexBuffer(const Buffer& value)
 
 void SystemGL::updateGLSampler()
 {
-	if (!mTextureBound)
-		return;
+	for (auto [binding, texture] : mCurrentTextures)
+	{
+		glActiveTexture(GL_TEXTURE0 + binding);
 
-	if (mSampler == Sampler::Linear)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-	else if (mSampler == Sampler::Nearest)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
-	else if (mSampler == Sampler::LinearMipmapLinear)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // mag parameter support only linear or nearest filters
-	}
+		bool texture_has_mipmap = texture->isMipmap();
 
-	if (mTextureAddress == TextureAddress::Clamp)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	}
-	else if (mTextureAddress == TextureAddress::Wrap)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	}
-	else if (mTextureAddress == TextureAddress::MirrorWrap)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		if (mSampler == Sampler::Linear)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture_has_mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+		else if (mSampler == Sampler::Nearest)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture_has_mipmap ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+
+		if (mTextureAddress == TextureAddress::Clamp)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		}
+		else if (mTextureAddress == TextureAddress::Wrap)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+		else if (mTextureAddress == TextureAddress::MirrorWrap)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		}
 	}
 }
 

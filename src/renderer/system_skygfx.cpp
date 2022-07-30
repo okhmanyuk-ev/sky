@@ -219,7 +219,7 @@ void SystemSkygfx::setBlendMode(const BlendMode& value)
 
 void SystemSkygfx::setTextureAddressMode(const TextureAddress& value)
 {
-	mDevice->setTextureAddressMode(*(skygfx::TextureAddress*)&value);
+	mDevice->setTextureAddress(*(skygfx::TextureAddress*)&value);
 }
 
 void SystemSkygfx::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)

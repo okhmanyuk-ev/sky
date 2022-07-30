@@ -25,7 +25,7 @@ namespace Renderer
 	class System
 	{
 	public:
-		virtual void setTopology(const Topology& value) = 0;
+		virtual void setTopology(const Topology& value) = 0; // TODO: remove const
 		virtual void setViewport(std::optional<Viewport> value) = 0;
 		virtual void setScissor(std::optional<Scissor> value) = 0;
 		virtual void setVertexBuffer(const Buffer& value) = 0;
