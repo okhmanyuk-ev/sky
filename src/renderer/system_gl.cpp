@@ -9,12 +9,27 @@
 
 using namespace Renderer;
 
+void CheckErrors()
+{
+	auto error = glGetError();
+	/*
+	 GL_NO_ERROR	0	No user error reported since the last call to glGetError.
+	 GL_INVALID_ENUM	1280	Set when an enumeration parameter is not legal.
+	 GL_INVALID_VALUE	1281	Set when a value parameter is not legal.
+	 GL_INVALID_OPERATION	1282	Set when the state for a command is not legal for its given parameters.
+	 GL_STACK_OVERFLOW	1283	Set when a stack pushing operation causes a stack overflow.
+	 GL_STACK_UNDERFLOW	1284	Set when a stack popping operation occurs while the stack is at its lowest point.
+	 GL_OUT_OF_MEMORY	1285	Set when a memory allocation operation cannot allocate (enough) memory.
+	 GL_INVALID_FRAMEBUFFER_OPERATION	1286	Set when reading or writing to a framebuffer that is not complete.
+	 */
+	assert(error == GL_NO_ERROR);
+}
+
 struct Shader::Impl
 {
 	Vertex::Layout layout;
 	GLuint program;
 	GLuint vao;
-	std::map<Vertex::Attribute::Type, GLint> attribLocations;
 };
 
 Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code, 
@@ -29,9 +44,17 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 
 	auto vertex_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Vertex, vertex_code, _defines);
 	auto fragment_shader_spirv = skygfx::CompileGlslToSpirv(skygfx::ShaderStage::Fragment, fragment_code, _defines);
-
-	auto glsl_vert = skygfx::CompileSpirvToGlsl(vertex_shader_spirv);
-	auto glsl_frag = skygfx::CompileSpirvToGlsl(fragment_shader_spirv);
+	
+#if defined(RENDERER_GLES3)
+	bool es = true;
+	uint32_t version = 300;
+#else
+	bool es = false;
+	uint32_t version = 450;
+#endif
+	
+	auto glsl_vert = skygfx::CompileSpirvToGlsl(vertex_shader_spirv, es, version);
+	auto glsl_frag = skygfx::CompileSpirvToGlsl(fragment_shader_spirv, es, version);
 
 	auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	auto v = glsl_vert.c_str();
@@ -71,6 +94,19 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 	glAttachShader(mImpl->program, vertexShader);
 	glAttachShader(mImpl->program, fragmentShader);
 	glLinkProgram(mImpl->program);
+
+	GLint link_status = 0;
+	glGetProgramiv(mImpl->program, GL_LINK_STATUS, &link_status);
+	if (link_status == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetProgramiv(mImpl->program, GL_INFO_LOG_LENGTH, &maxLength);
+		std::string errorLog;
+		errorLog.resize(maxLength);
+		glGetProgramInfoLog(mImpl->program, maxLength, &maxLength, &errorLog[0]);
+		throw std::runtime_error(errorLog);
+	}
+
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
@@ -82,9 +118,11 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 		const auto& attrib = layout.attributes.at(i);
 
 		glEnableVertexAttribArray(i);
+#if defined(RENDERER_GL44)
 		glVertexAttribFormat(i, SystemGL::Size.at(attrib.format), SystemGL::Type.at(attrib.format),
 			SystemGL::Normalize.at(attrib.format), (GLuint)attrib.offset);
 		glVertexAttribBinding(i, 0);
+#endif
 	}
 }
 
@@ -98,6 +136,17 @@ void Shader::apply()
 {
 	glUseProgram(mImpl->program);
 	glBindVertexArray(mImpl->vao);
+
+#if defined(RENDERER_GLES3)
+	for (int i = 0; i < mImpl->layout.attributes.size(); i++)
+	{
+		const auto& attrib = mImpl->layout.attributes.at(i);
+
+		glVertexAttribPointer(i, SystemGL::Size.at(attrib.format),
+			SystemGL::Type.at(attrib.format), SystemGL::Normalize.at(attrib.format),
+			(GLsizei)mImpl->layout.stride, (void*)attrib.offset);
+	}
+#endif
 }
 
 struct Texture::TextureImpl
@@ -735,6 +784,7 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 
 void SystemGL::present()
 {
+	CheckErrors();
 	System::present();
 #if defined(RENDERER_GL44)
 	SwapBuffers(mHDC);
@@ -772,6 +822,9 @@ void SystemGL::setVsync(bool value)
 
 void SystemGL::prepareForDrawing()
 {
+	glBindBuffer(GL_ARRAY_BUFFER, mGLVertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLIndexBuffer);
+	
 	// shader
 
 	if (mShaderDirty)
@@ -779,17 +832,15 @@ void SystemGL::prepareForDrawing()
 		mShader->apply();
 		mShaderDirty = false;
 	}
-
+	
 	mShader->update();
-
-	// opengl crashes when index or vertex buffers are binded before VAO from shader classes 
-
+	
 	if (mIndexBufferDirty) 
 	{
 		setGLIndexBuffer(mIndexBuffer);
 		mIndexBufferDirty = false;
 	}
-
+	
 	if (mVertexBufferDirty)
 	{
 		setGLVertexBuffer(mVertexBuffer);
@@ -846,7 +897,9 @@ void SystemGL::setGLVertexBuffer(const Buffer& value)
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
+#if defined(RENDERER_GL44)
 	glBindVertexBuffer(0, mGLVertexBuffer, 0, (GLsizei)value.stride);
+#endif
 }
 
 void SystemGL::setGLIndexBuffer(const Buffer& value)
