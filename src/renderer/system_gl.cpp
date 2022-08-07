@@ -48,6 +48,8 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 #if defined(RENDERER_GLES3)
 	bool es = true;
 	uint32_t version = 300;
+	// TODO: android can be 320
+	// TODO: since 310 we have uniform(std140, binding = 1), 300 have uniform(std140)
 #else
 	bool es = false;
 	uint32_t version = 450;
@@ -55,7 +57,7 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 	
 	auto glsl_vert = skygfx::CompileSpirvToGlsl(vertex_shader_spirv, es, version);
 	auto glsl_frag = skygfx::CompileSpirvToGlsl(fragment_shader_spirv, es, version);
-
+		
 	auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	auto v = glsl_vert.c_str();
 	glShaderSource(vertexShader, 1, &v, NULL);
@@ -123,6 +125,22 @@ Shader::Shader(const Vertex::Layout& layout, const std::string& vertex_code, con
 			SystemGL::Normalize.at(attrib.format), (GLuint)attrib.offset);
 		glVertexAttribBinding(i, 0);
 #endif
+	}
+	
+	if (es && version <= 300)
+	{
+		auto fix_bindings = [&](const skygfx::ShaderReflection& reflection) {
+			for (const auto& descriptor_set : reflection.descriptor_sets)
+			{
+				if (descriptor_set.type != skygfx::ShaderReflection::DescriptorSet::Type::UniformBuffer)
+					continue;
+				
+				auto block_index = glGetUniformBlockIndex(mImpl->program, descriptor_set.type_name.c_str());
+				glUniformBlockBinding(mImpl->program, block_index, descriptor_set.binding);
+			}
+		};
+		fix_bindings(skygfx::MakeSpirvReflection(vertex_shader_spirv));
+		fix_bindings(skygfx::MakeSpirvReflection(fragment_shader_spirv));
 	}
 }
 
@@ -783,7 +801,7 @@ void SystemGL::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::sh
 }
 
 void SystemGL::present()
-{
+{	
 	CheckErrors();
 	System::present();
 #if defined(RENDERER_GL44)
