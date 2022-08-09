@@ -69,7 +69,8 @@ SystemSkygfx::SystemSkygfx()
 	auto type = skygfx::BackendType::D3D11;
 	
 #if defined(PLATFORM_IOS)
-	type = skygfx::BackendType::Metal;
+	//type = skygfx::BackendType::Metal;
+	type = skygfx::BackendType::OpenGL44;
 #endif
 	
 	void* window = nullptr;

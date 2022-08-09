@@ -8,8 +8,8 @@
 #elif defined(PLATFORM_ANDROID)
 	#define RENDERER_GLES3
 #elif defined(PLATFORM_IOS)
-	#define RENDERER_GLES3
-//	#define RENDERER_SKYGFX
+//	#define RENDERER_GLES3
+	#define RENDERER_SKYGFX
 #endif
 
 #if defined(RENDERER_GL44)
