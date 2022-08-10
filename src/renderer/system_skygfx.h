@@ -2,11 +2,9 @@
 
 #include <renderer/system.h>
 
-#if defined(RENDERER_SKYGFX)
 #include <platform/system.h>
 #include <common/event_system.h>
 #include <common/hash.h>
-#include <renderer/low_level_api.h>
 #include <map>
 #include <skygfx/skygfx.h>
 
@@ -64,4 +62,3 @@ namespace Renderer
 		std::shared_ptr<skygfx::Device> mDevice;
 	};
 }
-#endif

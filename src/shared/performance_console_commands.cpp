@@ -4,7 +4,6 @@
 
 #include <imgui.h>
 #include <shared/imgui_user.h>
-#include <renderer/defines.h>
 #include <shared/stats_system.h>
 #include <network/system.h>
 #include <common/helpers.h>

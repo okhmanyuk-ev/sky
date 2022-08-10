@@ -5,7 +5,6 @@
 #include <cassert>
 #include <shared/imgui_user.h>
 #include <platform/defines.h>
-#include <renderer/defines.h>
 #include <platform/system_android.h>
 #include <shared/imgui_system.h>
 
@@ -122,7 +121,6 @@ void ConsoleDevice::onFrame()
 	auto top = ImGui::GetWindowPos().y;
 
 	auto engineName = std::string("Sky Engine");
-	auto apiName = std::string(RENDERER_NAME_LONG);
 	auto buildName = std::string(__DATE__) + " " + std::string(__TIME__);
 	
 	const float margin = 17.0f;
@@ -136,8 +134,8 @@ void ConsoleDevice::onFrame()
 	ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(engineName.c_str()).x);
 	ImGui::TextDisabled("%s", engineName.c_str());
 
-	ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(apiName.c_str()).x);
-	ImGui::TextDisabled("%s", apiName.c_str());
+	// ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(apiName.c_str()).x);
+	// ImGui::TextDisabled("%s", apiName.c_str());
 	
 	ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(buildName.c_str()).x);
 	ImGui::TextDisabled("%s", buildName.c_str());

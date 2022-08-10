@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/engine.h>
-#include <renderer/defines.h>
 #include <renderer/topology.h>
 #include <renderer/viewport.h>
 #include <renderer/scissor.h>

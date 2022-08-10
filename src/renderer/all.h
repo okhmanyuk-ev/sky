@@ -4,7 +4,6 @@
 #include "buffer.h"
 #include "comparison.h"
 #include "depth.h"
-#include "low_level_api.h"
 #include "rasterizer_state.h"
 #include "render_target.h"
 #include "sampler.h"
@@ -12,8 +11,6 @@
 #include "shader.h"
 #include "stencil.h"
 #include "system.h"
-#include "system_gl.h"
-//#include "system_vulkan.h" // TODO: very long compile time if uncommented (vulkan_raii.hpp)
 #include "texture.h"
 #include "texture_address.h"
 #include "topology.h"

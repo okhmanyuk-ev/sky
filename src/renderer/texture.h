@@ -6,8 +6,6 @@ namespace Renderer
 {
 	class Texture
 	{
-		friend class SystemGL;
-		friend class SystemVK;
 		friend class SystemSkygfx;
 
 	public:

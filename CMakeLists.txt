@@ -117,7 +117,6 @@ endif()
 
 if(APPLE)
 	set(OBJC_SOURCES
-		src/renderer/system_gl.cpp
 		src/renderer/system_skygfx.cpp
 		src/platform/asset.cpp
 	)
@@ -127,15 +126,11 @@ if(APPLE)
 		"-ObjC"
 		"-framework UIKit"
 		"-framework CoreGraphics"
-		"-framework GLKit"
-		"-framework OpenGLES"
 		"-framework Foundation"
 		"-framework AVFoundation"
 		"-framework AudioToolbox"
 		"-framework StoreKit"
 	)
-
-	add_definitions(-DGLES_SILENCE_DEPRECATION)
 elseif(ANDROID)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -frtti -fexceptions -Wno-error=format-security")
 
@@ -303,20 +298,6 @@ set_property(TARGET fmt PROPERTY FOLDER ${LIBS_FOLDER})
 # nlohmann_json
 
 target_include_directories(${PROJECT_NAME} PUBLIC lib/nlohmann_json)
-
-# glew
-
-if(WIN32)
-	file(GLOB GLEW_SRC 
-		lib/glew/src/glew.c
-		lib/glew/include/GL/glew.h
-	)
-	add_library(glew STATIC ${GLEW_SRC})
-	target_link_libraries(${PROJECT_NAME} glew)
-	target_include_directories(glew PUBLIC lib/glew/include)
-	target_compile_definitions(glew PRIVATE -DGLEW_STATIC)
-	set_property(TARGET glew PROPERTY FOLDER ${LIBS_FOLDER})
-endif()
 
 # tinyobjloader
 

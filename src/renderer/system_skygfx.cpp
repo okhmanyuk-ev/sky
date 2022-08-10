@@ -1,6 +1,5 @@
 #include "system_skygfx.h"
 
-#if defined(RENDERER_SKYGFX)
 #include <platform/system_windows.h>
 #include <platform/system_ios.h>
 
@@ -250,5 +249,3 @@ void SystemSkygfx::present()
 	System::present();
 	mDevice->present();
 }
-
-#endif
