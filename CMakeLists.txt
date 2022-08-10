@@ -369,7 +369,7 @@ set_property(TARGET box2d PROPERTY FOLDER ${LIBS_FOLDER})
 
 target_include_directories(${PROJECT_NAME} PUBLIC lib/magic_enum)
 
-# sky-gfx
+# skygfx
 
-add_subdirectory(lib/sky-gfx)
-target_link_libraries(${PROJECT_NAME} sky-gfx)
+add_subdirectory(lib/skygfx)
+target_link_libraries(${PROJECT_NAME} skygfx)
