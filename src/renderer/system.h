@@ -17,42 +17,52 @@
 
 #include <optional>
 
+#include <skygfx/skygfx.h>
+#include <common/event_system.h>
+
 #define RENDERER ENGINE->getSystem<Renderer::System>()
 
 namespace Renderer
 {
-	class System
+	class System : public Common::Event::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
-		virtual void setTopology(const Topology& value) = 0; // TODO: remove const
-		virtual void setViewport(std::optional<Viewport> value) = 0;
-		virtual void setScissor(std::optional<Scissor> value) = 0;
-		virtual void setVertexBuffer(const Buffer& value) = 0;
-		virtual void setIndexBuffer(const Buffer& value) = 0;
-		virtual void setUniformBuffer(int slot, void* memory, size_t size) = 0;
-		virtual void setTexture(int binding, std::shared_ptr<Texture> value) = 0;
-		virtual void setTexture(std::shared_ptr<Texture> value) = 0;
-		virtual void setRenderTarget(std::shared_ptr<RenderTarget> value) = 0;
-		virtual void setShader(std::shared_ptr<Shader> value) = 0;
-		virtual void setSampler(const Sampler& value) = 0;
-		virtual void setDepthMode(const DepthMode& value) = 0;
-		virtual void setStencilMode(const StencilMode& value) = 0;
-		virtual void setCullMode(const CullMode& value) = 0;
-		virtual void setBlendMode(const BlendMode& value) = 0;
-		virtual void setTextureAddressMode(const TextureAddress& value) = 0;
+		System();
+		~System();
 
-		virtual void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }, 
-			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0) = 0;
+	private:
+		void onEvent(const Platform::System::ResizeEvent& e) override;
 
-		virtual void draw(size_t vertexCount, size_t vertexOffset = 0);
-		virtual void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0);
+	public:
+		void setTopology(const Topology& value); // TODO: remove const
+		void setViewport(std::optional<Viewport> value);
+		void setScissor(std::optional<Scissor> value);
+		void setVertexBuffer(const Buffer& value);
+		void setIndexBuffer(const Buffer& value);
+		void setUniformBuffer(int slot, void* memory, size_t size);
+		void setTexture(int binding, std::shared_ptr<Texture> value);
+		void setTexture(std::shared_ptr<Texture> value);
+		void setRenderTarget(std::shared_ptr<RenderTarget> value);
+		void setShader(std::shared_ptr<Shader> value);
+		void setSampler(const Sampler& value);
+		void setDepthMode(const DepthMode& value);
+		void setStencilMode(const StencilMode& value);
+		void setCullMode(const CullMode& value);
+		void setBlendMode(const BlendMode& value);
+		void setTextureAddressMode(const TextureAddress& value);
 
-		virtual void readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture) = 0;
+		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }, 
+			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
-		virtual void present();
+		void draw(size_t vertexCount, size_t vertexOffset = 0);
+		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0);
 
-		virtual bool isVsync() const = 0;
-		virtual void setVsync(bool value) = 0;
+		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture);
+
+		void present();
+
+		bool isVsync() const { return mVsync; }
+		void setVsync(bool value) { mVsync = value; }
 
 		template <class T>
 		void setUniformBuffer(int slot, const T& buffer) { setUniformBuffer(slot, &const_cast<T&>(buffer), sizeof(T)); }
@@ -61,7 +71,9 @@ namespace Renderer
 		int getDrawcalls() const { return mDrawcallsPublic; }
 
 	private:
+		bool mVsync = false;
 		int mDrawcalls = 0;
 		int mDrawcallsPublic = 0;
+		std::shared_ptr<skygfx::Device> mDevice;
 	};
 }

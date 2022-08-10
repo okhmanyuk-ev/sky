@@ -12,9 +12,7 @@ namespace Renderer
 {
 	class Shader
 	{
-		friend class SystemGL;
-		friend class SystemVK;
-		friend class SystemSkygfx;
+		friend class System;
 	
 	public:
 		Shader(const Vertex::Layout& layout, const std::string& vertex_code,

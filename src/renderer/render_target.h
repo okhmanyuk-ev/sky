@@ -7,7 +7,7 @@ namespace Renderer
 {
 	class RenderTarget : public Texture
 	{
-		friend class SystemSkygfx;
+		friend class System;
 
 	public:
 		RenderTarget(uint32_t width, uint32_t height);
