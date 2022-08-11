@@ -4,7 +4,7 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-Generic::Generic(const Vertex::Layout& layout, const std::set<Flag>& flags, 
+Generic::Generic(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags,
 	std::optional<std::string> additional_fragment_func, const std::vector<std::string>& defines) :
 	Shader(layout, 
 		GenerateVertexCode(layout, flags), 
@@ -13,7 +13,7 @@ Generic::Generic(const Vertex::Layout& layout, const std::set<Flag>& flags,
 {
 }
 
-Generic::Generic(const Vertex::Layout& layout, std::optional<std::string> additional_fragment_func, 
+Generic::Generic(const skygfx::Vertex::Layout& layout, std::optional<std::string> additional_fragment_func,
 	const std::vector<std::string>& defines) :
 	Generic(layout, MakeFlagsFromLayout(layout), additional_fragment_func, defines)
 {
@@ -25,7 +25,7 @@ void Generic::update()
 	RENDERER->setUniformBuffer(1, mConstantBuffer);
 }
 
-std::string Generic::GenerateVertexCode(const Vertex::Layout& layout, const std::set<Flag>& flags)
+std::string Generic::GenerateVertexCode(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags)
 {
 	return R"(
 #version 450 core
@@ -87,7 +87,7 @@ void main()
 })";
 }
 
-std::string Generic::GenerateFragmentCode(const Vertex::Layout& layout, const std::set<Flag>& flags,
+std::string Generic::GenerateFragmentCode(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags,
 	std::optional<std::string> additional_fragment_func)
 {
 	std::string result = R"(
@@ -147,16 +147,16 @@ void main()
 	return result;
 }
 
-std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>& defines, const Vertex::Layout& layout, 
+std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>& defines, const skygfx::Vertex::Layout& layout,
 	const std::set<Flag>& flags, bool custom_fragment_func)
 {
 	auto result = defines;
 
-	const static std::unordered_map<Renderer::Vertex::Attribute::Type, std::string> AttribsDefines = {
-		{ Renderer::Vertex::Attribute::Type::Position, "HAS_POSITION_ATTRIB" },
-		{ Renderer::Vertex::Attribute::Type::Color, "HAS_COLOR_ATTRIB" },
-		{ Renderer::Vertex::Attribute::Type::TexCoord, "HAS_TEXCOORD_ATTRIB" },
-		{ Renderer::Vertex::Attribute::Type::Normal, "HAS_NORMAL_ATTRIB" },
+	const static std::unordered_map<skygfx::Vertex::Attribute::Type, std::string> AttribsDefines = {
+		{ skygfx::Vertex::Attribute::Type::Position, "HAS_POSITION_ATTRIB" },
+		{ skygfx::Vertex::Attribute::Type::Color, "HAS_COLOR_ATTRIB" },
+		{ skygfx::Vertex::Attribute::Type::TexCoord, "HAS_TEXCOORD_ATTRIB" },
+		{ skygfx::Vertex::Attribute::Type::Normal, "HAS_NORMAL_ATTRIB" },
 	};
 
 	const static std::unordered_map<Flag, std::string> FeatureDefines = {
@@ -180,14 +180,14 @@ std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>
 	return result;
 }
 
-std::set<Generic::Flag> Generic::MakeFlagsFromLayout(const Vertex::Layout& layout)
+std::set<Generic::Flag> Generic::MakeFlagsFromLayout(const skygfx::Vertex::Layout& layout)
 {
 	std::set<Flag> result = { };
 
-	if (layout.hasAttribute(Vertex::Attribute::Type::Color))
+	if (layout.hasAttribute(skygfx::Vertex::Attribute::Type::Color))
 		result.insert(Flag::Colored);
 
-	if (layout.hasAttribute(Vertex::Attribute::Type::TexCoord))
+	if (layout.hasAttribute(skygfx::Vertex::Attribute::Type::TexCoord))
 		result.insert(Flag::Textured);
 
 	return result;

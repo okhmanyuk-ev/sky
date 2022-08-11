@@ -14,12 +14,12 @@ namespace Graphics
 		void vertex(const glm::vec3& value);
 		void color(const glm::vec3& value);
 		void color(const glm::vec4& value);
-		std::tuple<const std::vector<Renderer::Vertex::PositionColor>&, size_t> end();
+		std::tuple<const std::vector<skygfx::Vertex::PositionColor>&, size_t> end();
 
 	private:
 		bool mWorking = false;
 		size_t mVertexCount = 0;
-		std::vector<Renderer::Vertex::PositionColor> mVertices;
+		std::vector<skygfx::Vertex::PositionColor> mVertices;
 		glm::vec4 mColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	};
 }

@@ -24,7 +24,7 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Blur(const Vertex::Layout& layout);
+		Blur(const skygfx::Vertex::Layout& layout);
 
 	protected:
 		void update() override;

@@ -59,7 +59,7 @@ void main()
 	result *= sign(luminance);
 })";
 
-BrightFilter::BrightFilter(const Vertex::Layout& layout) : Shader(layout, src_vertex, src_fragment)
+BrightFilter::BrightFilter(const skygfx::Vertex::Layout& layout) : Shader(layout, src_vertex, src_fragment)
 {
 }
 

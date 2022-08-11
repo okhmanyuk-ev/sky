@@ -216,7 +216,7 @@ void System::drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vert
 	});
 }
 
-void System::draw(skygfx::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
+void System::draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
 	std::optional<size_t> count, size_t start)
 {
 	auto indices = std::vector<uint32_t>(count.value_or(vertices.size() - start));
@@ -224,7 +224,7 @@ void System::draw(skygfx::Topology topology, const std::vector<Renderer::Vertex:
 	draw(topology, vertices, indices);
 }
 
-void System::draw(skygfx::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
+void System::draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
 	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
@@ -268,7 +268,7 @@ void System::draw(skygfx::Topology topology, const std::vector<Renderer::Vertex:
 }
 
 void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+	const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	auto indices = std::vector<uint32_t>(vertices.size());
@@ -276,7 +276,7 @@ void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> 
 	draw(topology, texture, vertices, indices, shader);
 }
 
-void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
@@ -309,7 +309,7 @@ void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> 
 			auto& dst_vertex = mBatch.vertices.at(start_vertex);
 			dst_vertex.pos = project(src_vertex.pos);
 			dst_vertex.col = src_vertex.col;
-			dst_vertex.tex = src_vertex.tex;
+			dst_vertex.texcoord = src_vertex.texcoord;
 			start_vertex += 1;
 		}
 
@@ -328,7 +328,7 @@ void System::drawRectangle(const glm::vec4& top_left_color,
 	const glm::vec4& top_right_color, const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, 
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	static auto vertices = std::vector<Renderer::Vertex::PositionColor>(4);
+	static auto vertices = std::vector<skygfx::Vertex::PositionColor>(4);
 
 	vertices[0] = { { 0.0f, 0.0f, 0.0f }, top_left_color };
 	vertices[1] = { { 0.0f, 1.0f, 0.0f }, bottom_left_color };
@@ -354,7 +354,7 @@ void System::drawRectangle(std::shared_ptr<Renderer::ShaderMatrices> shader)
 void System::drawRoundedRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding)
 {
-	static auto shader = std::make_shared<Renderer::Shaders::Rounded>(Renderer::Vertex::PositionColor::Layout);
+	static auto shader = std::make_shared<Renderer::Shaders::Rounded>(skygfx::Vertex::PositionColor::Layout);
 	shader->setSize(size);
 	if (absolute_rounding)
 	{
@@ -404,7 +404,7 @@ void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 
 void System::drawLineRectangle(const glm::vec4& color)
 {
-	static auto vertices = std::vector<Renderer::Vertex::PositionColor>(4);
+	static auto vertices = std::vector<skygfx::Vertex::PositionColor>(4);
 
 	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color };
 	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color };
@@ -419,7 +419,7 @@ void System::drawLineRectangle(const glm::vec4& color)
 void System::drawCircle(const glm::vec4& inner_color, const glm::vec4& outer_color, 
 	float fill, float pie)
 {
-	static auto shader = std::make_shared<Renderer::Shaders::Circle>(Renderer::Vertex::PositionColor::Layout);
+	static auto shader = std::make_shared<Renderer::Shaders::Circle>(skygfx::Vertex::PositionColor::Layout);
 	shader->setFill(fill);
 	shader->setPie(pie);
 	shader->setInnerColor(inner_color);
@@ -439,7 +439,7 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 	float cosInc = glm::cos(increment);
 
 	auto r1 = glm::vec2({ sinInc, -cosInc });
-	auto vertices = std::vector<Renderer::Vertex::PositionColor>();
+	auto vertices = std::vector<skygfx::Vertex::PositionColor>();
 
 	auto radius_inner = Radius * (1.0f - fill);
 	auto radius_outer = Radius;
@@ -492,7 +492,7 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::v
 	const glm::vec2& top_right_uv, const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
 	const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	static auto vertices = std::vector<Renderer::Vertex::PositionColorTexture>(4);
+	static auto vertices = std::vector<skygfx::Vertex::PositionColorTexture>(4);
 
 	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color, top_left_uv };
 	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color, bottom_left_uv };
@@ -546,7 +546,7 @@ void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture,
 		p2 = (size - edge_size.value()) / size;
 	}
 
-	static auto vertices = std::vector<Renderer::Vertex::PositionColorTexture>(36);
+	static auto vertices = std::vector<skygfx::Vertex::PositionColorTexture>(36);
 
 	// top left
 
@@ -627,14 +627,14 @@ void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture,
 }
 
 void System::drawSdf(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+	const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
 	float smoothFactor, const glm::vec4& color)
 {
 	assert(!vertices.empty());
 	assert(!indices.empty());
 
-	static auto shader = std::make_shared<Renderer::Shaders::Sdf>(Renderer::Vertex::PositionColorTexture::Layout);
+	static auto shader = std::make_shared<Renderer::Shaders::Sdf>(skygfx::Vertex::PositionColorTexture::Layout);
 	shader->setMinValue(minValue);
 	shader->setMaxValue(maxValue);
 	shader->setSmoothFactor(smoothFactor);

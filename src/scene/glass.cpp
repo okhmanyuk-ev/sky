@@ -62,7 +62,7 @@ void BlurredGlass::draw()
 	// ...
 	// GRAPHICS->pop();
 
-	auto static shader = std::make_shared<Renderer::Shaders::Generic>(Renderer::Vertex::PositionColorTexture::Layout);
+	auto static shader = std::make_shared<Renderer::Shaders::Generic>(skygfx::Vertex::PositionColorTexture::Layout);
 	shader->setLodBias(mBlurIntensity * 8.0f);
 	setShader(shader);
 
@@ -82,7 +82,7 @@ void GrayscaledGlass::draw()
 	if (mGrayscaleIntensity <= 0.0f)
 		return;
 
-	auto static shader = std::make_shared<Renderer::Shaders::Grayscale>(Renderer::Vertex::PositionColorTexture::Layout);
+	auto static shader = std::make_shared<Renderer::Shaders::Grayscale>(skygfx::Vertex::PositionColorTexture::Layout);
 	shader->setIntensity(mGrayscaleIntensity);
 	setShader(shader);
 	Glass::draw();

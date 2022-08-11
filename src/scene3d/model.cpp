@@ -54,7 +54,7 @@ std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>>
 			vertex.col = mColorAttribs.at(i);
 		
 		if (has_tex)
-			vertex.tex = mTexCoordAttribs.at(i);
+			vertex.texcoord = mTexCoordAttribs.at(i);
 		
 		if (has_normal)
 			vertex.normal = mNormalAttribs.at(i);
@@ -73,7 +73,7 @@ std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>>
 	return { result, flags };
 }
 
-void Model::setVertices(const std::vector<Renderer::Vertex::PositionColorNormal>& vertices)
+void Model::setVertices(const std::vector<skygfx::Vertex::PositionColorNormal>& vertices)
 {
 	mPositionAttribs.clear();
 	mColorAttribs.clear();
@@ -87,7 +87,7 @@ void Model::setVertices(const std::vector<Renderer::Vertex::PositionColorNormal>
 	}
 }
 
-void Model::setVertices(const std::vector<Renderer::Vertex::PositionTextureNormal>& vertices)
+void Model::setVertices(const std::vector<skygfx::Vertex::PositionTextureNormal>& vertices)
 {
 	mPositionAttribs.clear();
 	mTexCoordAttribs.clear();
@@ -96,12 +96,12 @@ void Model::setVertices(const std::vector<Renderer::Vertex::PositionTextureNorma
 	for (const auto& vertex : vertices)
 	{
 		mPositionAttribs.push_back(vertex.pos);
-		mTexCoordAttribs.push_back(vertex.tex);
+		mTexCoordAttribs.push_back(vertex.texcoord);
 		mNormalAttribs.push_back(vertex.normal);
 	}
 }
 
-void Model::setVertices(const std::vector<Renderer::Vertex::PositionColorTextureNormal>& vertices)
+void Model::setVertices(const std::vector<skygfx::Vertex::PositionColorTextureNormal>& vertices)
 {
 	mPositionAttribs.clear();
 	mTexCoordAttribs.clear();
@@ -111,7 +111,7 @@ void Model::setVertices(const std::vector<Renderer::Vertex::PositionColorTexture
 	for (const auto& vertex : vertices)
 	{
 		mPositionAttribs.push_back(vertex.pos);
-		mTexCoordAttribs.push_back(vertex.tex);
+		mTexCoordAttribs.push_back(vertex.texcoord);
 		mNormalAttribs.push_back(vertex.normal);
 		mColorAttribs.push_back(vertex.col);
 	}

@@ -15,7 +15,7 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Shockwave(const Vertex::Layout& layout);
+		Shockwave(const skygfx::Vertex::Layout& layout);
 
 	protected:
 		void update() override;

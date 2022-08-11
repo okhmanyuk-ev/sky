@@ -2,7 +2,6 @@
 
 #include <glm/glm.hpp>
 #include <renderer/buffer.h>
-#include <renderer/vertex.h>
 #include <renderer/render_target.h>
 #include <unordered_map>
 
@@ -22,7 +21,7 @@ namespace Renderer
 		using TexturesMap = std::unordered_map<std::shared_ptr<Renderer::Texture>, IndexRange>;
 
 	public:
-		virtual void draw(const Buffer& vertex_buffer, const Buffer& index_buffer, const Vertex::Layout& layout,
+		virtual void draw(const Buffer& vertex_buffer, const Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
 			const TexturesMap& textures_map) = 0;
 
 	public:
@@ -48,7 +47,7 @@ namespace Renderer
 	class ForwardLightTechnique : public Technique
 	{
 	public:
-		void draw(const Buffer& vertex_buffer, const Buffer& index_buffer, const Vertex::Layout& layout,
+		void draw(const Buffer& vertex_buffer, const Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
 			const TexturesMap& textures_map) override;
 
 	public:

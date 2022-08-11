@@ -4,7 +4,7 @@ using namespace Scene3D;
 
 Cube::Cube()
 {
-	const std::vector<Renderer::Vertex::PositionTextureNormal> Vertices = {
+	const std::vector<skygfx::Vertex::PositionTextureNormal> Vertices = {
 		/* front */
 		/* 0  */ { { -1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
 		/* 1  */ { {  1.0f,  1.0f,  1.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },

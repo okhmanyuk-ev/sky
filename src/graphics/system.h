@@ -53,21 +53,21 @@ namespace Graphics
 			std::optional<size_t> count = std::nullopt, size_t start = 0);
 
 		// draw colored vertices
-		void draw(skygfx::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
+		void draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
 			std::optional<size_t> count = std::nullopt, size_t start = 0);
 
 		// draw indexed colored vertices
-		void draw(skygfx::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
+		void draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
 			const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw colored and textured vertices
 		void draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+			const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw indexed colored and textured vertices
 		void draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+			const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 			const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 		
 		// colored rectangle
@@ -118,7 +118,7 @@ namespace Graphics
 
 		// sdf mesh
 		void drawSdf(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
-			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+			const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
 			float smoothFactor, const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
@@ -201,9 +201,9 @@ namespace Graphics
 		int mBatchesCountPublic = 0;
 
 	private:
-		std::shared_ptr<Renderer::Shaders::Generic> mTexturedShader = std::make_shared<Renderer::Shaders::Generic>(Renderer::Vertex::PositionColorTexture::Layout);
-		std::shared_ptr<Renderer::Shaders::Generic> mColoredShader = std::make_shared<Renderer::Shaders::Generic>(Renderer::Vertex::PositionColor::Layout);
-		std::shared_ptr<Renderer::Shaders::Generic> mBatchColorShader = std::make_shared<Renderer::Shaders::Generic>(Renderer::Vertex::PositionColorTexture::Layout,
+		std::shared_ptr<Renderer::Shaders::Generic> mTexturedShader = std::make_shared<Renderer::Shaders::Generic>(skygfx::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::Shaders::Generic> mColoredShader = std::make_shared<Renderer::Shaders::Generic>(skygfx::Vertex::PositionColor::Layout);
+		std::shared_ptr<Renderer::Shaders::Generic> mBatchColorShader = std::make_shared<Renderer::Shaders::Generic>(skygfx::Vertex::PositionColorTexture::Layout,
 			std::set<Renderer::Shaders::Generic::Flag>({ Renderer::Shaders::Generic::Flag::Colored }));
 
 	private:
@@ -226,7 +226,7 @@ namespace Graphics
 			size_t indicesCount = 0;
 
 			std::vector<uint32_t> indices;
-			std::vector<Renderer::Vertex::PositionColorTexture> vertices;
+			std::vector<skygfx::Vertex::PositionColorTexture> vertices;
 		} mBatch;
 
 	public:

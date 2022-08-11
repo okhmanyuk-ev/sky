@@ -240,7 +240,7 @@ void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const gl
 SceneHelpers::GrayscaleSprite::GrayscaleSprite()
 {
 	if (!Shader)
-		Shader = std::make_shared<Renderer::Shaders::Grayscale>(Renderer::Vertex::PositionColorTexture::Layout);
+		Shader = std::make_shared<Renderer::Shaders::Grayscale>(skygfx::Vertex::PositionColorTexture::Layout);
 
 	setShader(Shader);
 }
@@ -828,7 +828,7 @@ SceneHelpers::Shockwave::Shockwave()
 
 void SceneHelpers::Shockwave::draw()
 {
-	static auto shader = std::make_shared<Renderer::Shaders::Shockwave>(Renderer::Vertex::PositionColorTexture::Layout);
+	static auto shader = std::make_shared<Renderer::Shaders::Shockwave>(skygfx::Vertex::PositionColorTexture::Layout);
 	shader->setSize(mShockwaveSize);
 	shader->setThickness(mShockwaveThickness);
 	shader->setForce(mShockwaveForce);

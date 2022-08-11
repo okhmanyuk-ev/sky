@@ -66,7 +66,7 @@ void main()
 	result += texture(sTexture, In.TexCoord - off2) * 0.0702702703;
 })";
 
-Blur::Blur(const Vertex::Layout& layout) : Shader(layout, src_vertex, src_fragment)
+Blur::Blur(const skygfx::Vertex::Layout& layout) : Shader(layout, src_vertex, src_fragment)
 {
 }
 

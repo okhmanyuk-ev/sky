@@ -12,7 +12,6 @@
 #include "system.h"
 #include "texture.h"
 #include "texture_address.h"
-#include "vertex.h"
 #include "techniques.h"
 
 #include "shaders/blur.h"

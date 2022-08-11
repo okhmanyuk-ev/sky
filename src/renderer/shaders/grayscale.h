@@ -13,7 +13,7 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Grayscale(const Vertex::Layout& layout);
+		Grayscale(const skygfx::Vertex::Layout& layout);
 
 	protected:
 		void update() override;

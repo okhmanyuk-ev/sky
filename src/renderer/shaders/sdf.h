@@ -16,7 +16,7 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Sdf(const Vertex::Layout& layout);
+		Sdf(const skygfx::Vertex::Layout& layout);
 
 	protected:
 		void update() override;

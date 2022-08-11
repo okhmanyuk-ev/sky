@@ -99,7 +99,7 @@ void Trail::draw()
 	if (mSegments.size() < 2)
 		return;
 
-	auto vertices = std::vector<Renderer::Vertex::PositionColor>();
+	auto vertices = std::vector<skygfx::Vertex::PositionColor>();
 
 	for (int i = mSegments.size() - 1; i >= 0; i--)
 	{

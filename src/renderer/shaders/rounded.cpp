@@ -31,7 +31,7 @@ vec4 fragment(vec4 result)
 	return result;
 })";
 
-Rounded::Rounded(const Vertex::Layout& layout) : Generic(layout, src_fragment)
+Rounded::Rounded(const skygfx::Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
 };
 

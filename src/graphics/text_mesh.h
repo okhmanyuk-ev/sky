@@ -17,7 +17,7 @@ namespace Graphics
 		};
 
 		skygfx::Topology topology = skygfx::Topology::TriangleList;
-		std::vector<Renderer::Vertex::PositionColorTexture> vertices;
+		std::vector<skygfx::Vertex::PositionColorTexture> vertices;
 		std::vector<uint32_t> indices;
 
 		std::vector<glm::vec2> symbol_positions;

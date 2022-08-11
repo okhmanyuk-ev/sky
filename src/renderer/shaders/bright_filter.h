@@ -18,7 +18,7 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		BrightFilter(const Vertex::Layout& layout);
+		BrightFilter(const skygfx::Vertex::Layout& layout);
 
 	protected:
 		void update() override;

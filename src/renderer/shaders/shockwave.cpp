@@ -30,7 +30,7 @@ vec4 fragment(vec4 result)
 	return result;
 })";
 
-Shockwave::Shockwave(const Vertex::Layout& layout) : Generic(layout, src_fragment)
+Shockwave::Shockwave(const skygfx::Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
 }
 

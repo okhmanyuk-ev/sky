@@ -28,8 +28,8 @@ namespace Scene
 		void setBrightThreshold(float value) { mBrightFilterShader->setThreshold(value); }
 
 	private:
-		std::shared_ptr<Renderer::Shaders::Blur> mBlurShader = std::make_shared<Renderer::Shaders::Blur>(Renderer::Vertex::PositionColorTexture::Layout);
-		std::shared_ptr<Renderer::Shaders::BrightFilter> mBrightFilterShader = std::make_shared<Renderer::Shaders::BrightFilter>(Renderer::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::Shaders::Blur> mBlurShader = std::make_shared<Renderer::Shaders::Blur>(skygfx::Vertex::PositionColorTexture::Layout);
+		std::shared_ptr<Renderer::Shaders::BrightFilter> mBrightFilterShader = std::make_shared<Renderer::Shaders::BrightFilter>(skygfx::Vertex::PositionColorTexture::Layout);
 		int mBlurPasses = 1;
 		float mGlowIntensity = 2.0f;
 		float mDownscaleFactor = 4.0f;

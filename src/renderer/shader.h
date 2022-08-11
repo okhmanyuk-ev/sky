@@ -1,12 +1,12 @@
 #pragma once
 
-#include <renderer/vertex.h>
 #include <set>
 #include <vector>
 #include <string>
 #include <cassert>
 #include <unordered_map>
 #include <memory>
+#include <skygfx/skygfx.h>
 
 namespace Renderer
 {
@@ -15,7 +15,7 @@ namespace Renderer
 		friend class System;
 	
 	public:
-		Shader(const Vertex::Layout& layout, const std::string& vertex_code,
+		Shader(const skygfx::Vertex::Layout& layout, const std::string& vertex_code,
 			const std::string& fragment_code, const std::vector<std::string>& defines = {});
 		virtual ~Shader();
 
@@ -28,7 +28,7 @@ namespace Renderer
 		std::unique_ptr<Impl> mImpl;
 
 	protected:
-		static void checkRequiredAttribs(const std::set<Vertex::Attribute::Type>& requiredAttribs, const Vertex::Layout& layout)
+		static void checkRequiredAttribs(const std::set<skygfx::Vertex::Attribute::Type>& requiredAttribs, const skygfx::Vertex::Layout& layout)
 		{
 			for (auto& attrib : requiredAttribs)
 			{

@@ -21,15 +21,15 @@ namespace Scene3D
 		void draw(Renderer::Technique& technique) override;
 
 	private:
-		using Vertex = Renderer::Vertex::PositionColorTextureNormal;
+		using Vertex = skygfx::Vertex::PositionColorTextureNormal;
 
 	private:
 		std::tuple<std::vector<Vertex>, std::set<Renderer::Shaders::Light::Flag>> generateVertices();
 
 	public:
-		void setVertices(const std::vector<Renderer::Vertex::PositionColorNormal>& vertices);
-		void setVertices(const std::vector<Renderer::Vertex::PositionTextureNormal>& vertices);
-		void setVertices(const std::vector<Renderer::Vertex::PositionColorTextureNormal>& vertices);
+		void setVertices(const std::vector<skygfx::Vertex::PositionColorNormal>& vertices);
+		void setVertices(const std::vector<skygfx::Vertex::PositionTextureNormal>& vertices);
+		void setVertices(const std::vector<skygfx::Vertex::PositionColorTextureNormal>& vertices);
 
 	public:
 		auto getTopology() const { return mTopology; }

@@ -90,11 +90,11 @@ vec4 fragment(vec4 result)
 	return result;
 })";
 
-Light::Light(const Vertex::Layout& layout, const std::set<Flag>& flags) : Generic(layout, flags, src_fragment)
+Light::Light(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags) : Generic(layout, flags, src_fragment)
 {
 }
 
-Light::Light(const Vertex::Layout& layout) : Generic(layout, src_fragment)
+Light::Light(const skygfx::Vertex::Layout& layout) : Generic(layout, src_fragment)
 {
 }
 
