@@ -132,16 +132,13 @@ void Trail::draw()
 
 	auto holder = mHolder.lock();
 
-	auto stencil = Renderer::StencilMode();
-
-	stencil.enabled = true;
-	stencil.writeMask = 255;
-	stencil.readMask = 255;
-
-	stencil.func = Renderer::ComparisonFunc::Greater;
-	stencil.depthFailOp = Renderer::StencilOp::Increment;
-	stencil.failOp = Renderer::StencilOp::Increment;
-	stencil.passOp = Renderer::StencilOp::Increment;
+	auto stencil = skygfx::StencilMode();
+	stencil.write_mask = 255;
+	stencil.read_mask = 255;
+	stencil.func = skygfx::ComparisonFunc::Greater;
+	stencil.depth_fail_op = skygfx::StencilOp::Increment;
+	stencil.fail_op = skygfx::StencilOp::Increment;
+	stencil.pass_op = skygfx::StencilOp::Increment;
 
 	GRAPHICS->pushStencilMode(stencil);
 	GRAPHICS->pushModelMatrix(holder->getTransform());

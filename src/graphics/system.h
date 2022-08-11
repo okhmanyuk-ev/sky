@@ -146,7 +146,7 @@ namespace Graphics
 		void pushCleanState();
 		void pushSampler(skygfx::Sampler value);
 		void pushBlendMode(skygfx::BlendMode value);
-		void pushDepthMode(Renderer::DepthMode value);
+		void pushDepthMode(std::optional<skygfx::DepthMode> value);
 		void pushCullMode(skygfx::CullMode value);
 		void pushViewport(std::optional<skygfx::Viewport> value);
 		void pushRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
@@ -157,7 +157,7 @@ namespace Graphics
 		void pushTextureAddress(skygfx::TextureAddress value);
 		void pushOrthoMatrix(float width, float height);
 		void pushOrthoMatrix(std::shared_ptr<skygfx::RenderTarget> target = nullptr);
-		void pushStencilMode(const Renderer::StencilMode& value);
+		void pushStencilMode(std::optional<skygfx::StencilMode> value);
 
 		const auto& getCurrentState() const { return mStates.top(); }
 		
@@ -170,12 +170,12 @@ namespace Graphics
 			std::shared_ptr<skygfx::RenderTarget> renderTarget = nullptr;
 			std::optional<skygfx::Scissor> scissor = std::nullopt;
 			std::optional<skygfx::Viewport> viewport = std::nullopt;
-			Renderer::DepthMode depthMode = Renderer::DepthMode();
+			std::optional<skygfx::DepthMode> depth_mode = std::nullopt;
 			skygfx::CullMode cullMode = skygfx::CullMode::None;
 			skygfx::BlendMode blendMode = skygfx::BlendStates::NonPremultiplied;
 			skygfx::Sampler sampler = skygfx::Sampler::Nearest;
 			skygfx::TextureAddress textureAddress = skygfx::TextureAddress::Clamp;
-			Renderer::StencilMode stencilMode = Renderer::StencilMode();
+			std::optional<skygfx::StencilMode> stencil_mode = std::nullopt;
 		};
 
 	private:
@@ -255,12 +255,12 @@ namespace Graphics
 			left.renderTarget == right.renderTarget &&
 			left.scissor == right.scissor &&
 			left.viewport == right.viewport &&
-			left.depthMode == right.depthMode &&
+			left.depth_mode == right.depth_mode &&
 			left.cullMode == right.cullMode &&
 			left.blendMode == right.blendMode &&
 			left.sampler == right.sampler &&
 			left.textureAddress == right.textureAddress &&
-			left.stencilMode == right.stencilMode;
+			left.stencil_mode == right.stencil_mode;
 	}
 
 	inline bool operator!=(const System::State& left, const System::State& right)

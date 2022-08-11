@@ -1,9 +1,6 @@
 #pragma once
 
-#include "comparison.h"
-#include "depth.h"
 #include "shader.h"
-#include "stencil.h"
 #include "system.h"
 #include "techniques.h"
 

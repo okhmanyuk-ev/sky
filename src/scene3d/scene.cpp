@@ -28,7 +28,7 @@ void Scene::frame()
 	GRAPHICS->pushViewMatrix(mCamera->getViewMatrix());
 	GRAPHICS->pushScissor(std::nullopt);
 	GRAPHICS->pushCullMode(skygfx::CullMode::Back);
-	GRAPHICS->pushDepthMode(Renderer::ComparisonFunc::Less);
+	GRAPHICS->pushDepthMode(skygfx::ComparisonFunc::Less);
 	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushTextureAddress(skygfx::TextureAddress::Wrap);
 	GRAPHICS->clear();

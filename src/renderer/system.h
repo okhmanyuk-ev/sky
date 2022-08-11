@@ -2,8 +2,6 @@
 
 #include <core/engine.h>
 #include <renderer/shader.h>
-#include <renderer/depth.h>
-#include <renderer/stencil.h>
 
 #include <optional>
 
@@ -36,8 +34,8 @@ namespace Renderer
 		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
 		void setShader(std::shared_ptr<Shader> value);
 		void setSampler(skygfx::Sampler value);
-		void setDepthMode(const DepthMode& value);
-		void setStencilMode(const StencilMode& value);
+		void setDepthMode(std::optional<skygfx::DepthMode> value);
+		void setStencilMode(std::optional<skygfx::StencilMode> value);
 		void setCullMode(skygfx::CullMode value);
 		void setBlendMode(const skygfx::BlendMode& value);
 		void setTextureAddressMode(skygfx::TextureAddress value);

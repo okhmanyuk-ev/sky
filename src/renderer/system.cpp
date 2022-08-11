@@ -120,38 +120,14 @@ void System::setSampler(skygfx::Sampler value)
 	mDevice->setSampler(value);
 }
 
-void System::setDepthMode(const DepthMode& value)
+void System::setDepthMode(std::optional<skygfx::DepthMode> value)
 {
-	if (!value.enabled)
-	{
-		mDevice->setDepthMode(std::nullopt);
-	}
-	else
-	{
-		auto depth_mode = skygfx::DepthMode();
-		depth_mode.func = (skygfx::ComparisonFunc)value.func;
-		mDevice->setDepthMode(depth_mode);
-	}
+	mDevice->setDepthMode(value);
 }
 
-void System::setStencilMode(const StencilMode& value)
+void System::setStencilMode(std::optional<skygfx::StencilMode> value)
 {
-	if (!value.enabled)
-	{
-		mDevice->setStencilMode(std::nullopt);
-	}
-	else
-	{
-		auto stencil_mode = skygfx::StencilMode();
-		stencil_mode.read_mask = value.readMask;
-		stencil_mode.write_mask = value.writeMask;
-		stencil_mode.depth_fail_op = (skygfx::StencilOp)value.depthFailOp;
-		stencil_mode.fail_op = (skygfx::StencilOp)value.failOp;
-		stencil_mode.func = (skygfx::ComparisonFunc)value.func;
-		stencil_mode.pass_op = (skygfx::StencilOp)value.passOp;
-		stencil_mode.reference = value.reference;
-		mDevice->setStencilMode(stencil_mode);
-	}
+	mDevice->setStencilMode(value);
 }
 
 void System::setCullMode(skygfx::CullMode value)

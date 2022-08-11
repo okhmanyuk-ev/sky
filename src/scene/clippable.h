@@ -35,30 +35,28 @@ namespace Scene
 
 			ClipLayer += 1;
 
-			Renderer::StencilMode stencil;
-			stencil.enabled = true;
-			stencil.writeMask = 255;
-			stencil.readMask = 255;
+			skygfx::StencilMode stencil;
+			stencil.write_mask = 255;
+			stencil.read_mask = 255;
 			stencil.reference = ClipLayer;
-			stencil.func = Renderer::ComparisonFunc::LessEqual;
-			stencil.depthFailOp = Renderer::StencilOp::Keep;
-			stencil.failOp = Renderer::StencilOp::Keep;
-			stencil.passOp = Renderer::StencilOp::Keep;
+			stencil.func = skygfx::ComparisonFunc::LessEqual;
+			stencil.depth_fail_op = skygfx::StencilOp::Keep;
+			stencil.fail_op = skygfx::StencilOp::Keep;
+			stencil.pass_op = skygfx::StencilOp::Keep;
 
 			GRAPHICS->pushStencilMode(stencil);
 		}
 
 		void draw() override
 		{
-			Renderer::StencilMode stencil;
-			stencil.enabled = true;
-			stencil.writeMask = 255;
-			stencil.readMask = 255;
+			skygfx::StencilMode stencil;
+			stencil.write_mask = 255;
+			stencil.read_mask = 255;
 			stencil.reference = ClipLayer - 1;
-			stencil.func = Renderer::ComparisonFunc::Equal;
-			stencil.depthFailOp = Renderer::StencilOp::Keep;
-			stencil.failOp = Renderer::StencilOp::Keep;
-			stencil.passOp = Renderer::StencilOp::IncrementSaturation;
+			stencil.func = skygfx::ComparisonFunc::Equal;
+			stencil.depth_fail_op = skygfx::StencilOp::Keep;
+			stencil.fail_op = skygfx::StencilOp::Keep;
+			stencil.pass_op = skygfx::StencilOp::IncrementSaturation;
 
 			GRAPHICS->pushStencilMode(stencil);
 
@@ -142,17 +140,17 @@ namespace Scene
 				return;
 			}
 
+			skygfx::StencilMode stencil;
+			stencil.write_mask = 255;
+			stencil.read_mask = 255;
+			stencil.reference = 0;
+			stencil.func = skygfx::ComparisonFunc::Equal;
+			stencil.depth_fail_op = skygfx::StencilOp::Keep;
+			stencil.fail_op = skygfx::StencilOp::Keep;
+			stencil.pass_op = skygfx::StencilOp::IncrementSaturation;
+
 			auto state = GRAPHICS->getCurrentState();
-
-			state.stencilMode.enabled = true;
-			state.stencilMode.writeMask = 255;
-			state.stencilMode.readMask = 255;
-			state.stencilMode.reference = 0;
-			state.stencilMode.func = Renderer::ComparisonFunc::Equal;
-			state.stencilMode.depthFailOp = Renderer::StencilOp::Keep;
-			state.stencilMode.failOp = Renderer::StencilOp::Keep;
-			state.stencilMode.passOp = Renderer::StencilOp::IncrementSaturation;
-
+			state.stencil_mode = stencil;
 			state.blendMode.colorMask = { false, false, false, false };
 
 			auto absolute_size = T::getAbsoluteSize();
@@ -163,15 +161,13 @@ namespace Scene
 			GRAPHICS->drawRoundedRectangle({ Graphics::Color::White, 1.0f }, absolute_size, mRounding, false);
 			GRAPHICS->pop();
 
-			Renderer::StencilMode stencil;
-			stencil.enabled = true;
-			stencil.writeMask = 255;
-			stencil.readMask = 255;
+			stencil.write_mask = 255;
+			stencil.read_mask = 255;
 			stencil.reference = 1;
-			stencil.func = Renderer::ComparisonFunc::Equal;
-			stencil.depthFailOp = Renderer::StencilOp::Keep;
-			stencil.failOp = Renderer::StencilOp::Keep;
-			stencil.passOp = Renderer::StencilOp::Keep;
+			stencil.func = skygfx::ComparisonFunc::Equal;
+			stencil.depth_fail_op = skygfx::StencilOp::Keep;
+			stencil.fail_op = skygfx::StencilOp::Keep;
+			stencil.pass_op = skygfx::StencilOp::Keep;
 
 			GRAPHICS->pushStencilMode(stencil);
 

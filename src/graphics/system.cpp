@@ -80,12 +80,12 @@ void System::applyState()
 
 		renderTargetChanged = applied_state.renderTarget != state.renderTarget;
 		viewportChanged = applied_state.viewport != state.viewport;
-		depthModeChanged = applied_state.depthMode != state.depthMode;
+		depthModeChanged = applied_state.depth_mode != state.depth_mode;
 		cullModeChanged = applied_state.cullMode != state.cullMode;
 		blendModeChanged = applied_state.blendMode != state.blendMode;
 		samplerChanged = applied_state.sampler != state.sampler;
 		textureAddressChanged = applied_state.textureAddress != state.textureAddress;
-		stencilChanged = applied_state.stencilMode != state.stencilMode;
+		stencilChanged = applied_state.stencil_mode != state.stencil_mode;
 	}
 
 	if (scissorChanged)
@@ -95,7 +95,7 @@ void System::applyState()
 		RENDERER->setRenderTarget(state.renderTarget);
 
 	if (depthModeChanged)
-		RENDERER->setDepthMode(state.depthMode);
+		RENDERER->setDepthMode(state.depth_mode);
 	
 	if (cullModeChanged)
 		RENDERER->setCullMode(state.cullMode);
@@ -113,7 +113,7 @@ void System::applyState()
 		RENDERER->setTextureAddressMode(state.textureAddress);
 	
 	if (stencilChanged)
-		RENDERER->setStencilMode(state.stencilMode);
+		RENDERER->setStencilMode(state.stencil_mode);
 
 	mAppliedState = state;
 }
@@ -779,10 +779,10 @@ void System::pushBlendMode(skygfx::BlendMode value)
 	push(state);
 }
 
-void System::pushDepthMode(Renderer::DepthMode value)
+void System::pushDepthMode(std::optional<skygfx::DepthMode> value)
 {
 	auto state = mStates.top();
-	state.depthMode = value;
+	state.depth_mode = value;
 	push(state);
 }
 
@@ -855,10 +855,10 @@ void System::pushOrthoMatrix(std::shared_ptr<skygfx::RenderTarget> target)
 		pushOrthoMatrix(PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight());
 }
 
-void System::pushStencilMode(const Renderer::StencilMode& value)
+void System::pushStencilMode(std::optional<skygfx::StencilMode> value)
 {
 	auto state = mStates.top();
-	state.stencilMode = value;
+	state.stencil_mode = value;
 	push(state);
 }
 
