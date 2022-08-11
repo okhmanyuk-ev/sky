@@ -97,17 +97,9 @@ void System::setTopology(skygfx::Topology value)
 	mDevice->setTopology(value);
 }
 
-void System::setViewport(std::optional<Viewport> value)
+void System::setViewport(std::optional<skygfx::Viewport> value)
 {
-	if (value.has_value())
-	{
-		auto viewport = value.value();
-		mDevice->setViewport(*(skygfx::Viewport*)&viewport);
-	}
-	else
-	{
-		mDevice->setViewport(std::nullopt);
-	}
+	mDevice->setViewport(value);
 }
 
 void System::setScissor(std::optional<Scissor> value)

@@ -73,7 +73,7 @@ namespace Scene
 		std::shared_ptr<RootNode> mRoot = std::make_shared<RootNode>();
 		std::list<std::weak_ptr<Node>> mTouchedNodes;
 		std::shared_ptr<Renderer::RenderTarget> mRenderTarget = nullptr;
-		Renderer::Viewport mViewport;
+		skygfx::Viewport mViewport;
 		InteractTestCallback mInteractTestCallback = nullptr;
 		BatchGroups mBatchGroups;
 		bool mBatchGroupsEnabled = true;

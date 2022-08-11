@@ -14,7 +14,6 @@
 #include "texture.h"
 #include "texture_address.h"
 #include "vertex.h"
-#include "viewport.h"
 #include "techniques.h"
 
 #include "shaders/blur.h"

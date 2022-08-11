@@ -793,7 +793,7 @@ void System::pushCullMode(Renderer::CullMode value)
 	push(state);
 }
 
-void System::pushViewport(std::optional<Renderer::Viewport> value)
+void System::pushViewport(std::optional<skygfx::Viewport> value)
 {
 	auto state = mStates.top();
 	state.viewport = value;
