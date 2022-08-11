@@ -12,7 +12,7 @@ namespace Scene
 	{
 	public:
 		inline static std::shared_ptr<Renderer::Texture> DefaultTexture = nullptr;
-		inline static Renderer::TextureAddress DefaultTextureAddress = Renderer::TextureAddress::Clamp;
+		inline static skygfx::TextureAddress DefaultTextureAddress = skygfx::TextureAddress::Clamp;
 
 	protected:
 		void update(Clock::Duration dTime) override;
@@ -34,7 +34,7 @@ namespace Scene
 		void setTexRegion(const Graphics::TexRegion& value) { mTexRegion = value; }
 
 		auto getTextureAddress() const { return mTextureAddress; }
-		void setTextureAddress(Renderer::TextureAddress value) { mTextureAddress = value; }
+		void setTextureAddress(skygfx::TextureAddress value) { mTextureAddress = value; }
 
 		auto getShader() const { return mShader; }
 		void setShader(std::shared_ptr<Renderer::ShaderMatrices> value) { mShader = value; }
@@ -42,7 +42,7 @@ namespace Scene
 	private:
 		std::shared_ptr<Renderer::Texture> mTexture = DefaultTexture;
 		Graphics::TexRegion mTexRegion = {};
-		Renderer::TextureAddress mTextureAddress = DefaultTextureAddress;
+		skygfx::TextureAddress mTextureAddress = DefaultTextureAddress;
 		std::shared_ptr<Renderer::ShaderMatrices> mShader = nullptr;
 
 	public:

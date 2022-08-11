@@ -47,7 +47,7 @@ namespace Shared
 		
 	public:
 		auto getSampler() const { return mSampler; }
-		void setSampler(Renderer::Sampler value) { mSampler = value; }
+		void setSampler(skygfx::Sampler value) { mSampler = value; }
 
 		auto isScaleIndependence() const { return mScaleIndependence; }
 		void setScaleIndependence(bool value) { mScaleIndependence = value; }
@@ -59,7 +59,7 @@ namespace Shared
 		float getScale() const;
 
 	private:
-		Renderer::Sampler mSampler = Renderer::Sampler::Nearest;
+		skygfx::Sampler mSampler = skygfx::Sampler::Nearest;
 		bool mScaleIndependence = false;
 		glm::vec2 mLogicalSize = { 0.0f, 0.0f };
 

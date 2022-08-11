@@ -152,9 +152,9 @@ void System::setShader(std::shared_ptr<Shader> value)
 	value->apply();
 }
 
-void System::setSampler(const Sampler& value)
+void System::setSampler(skygfx::Sampler value)
 {
-	mDevice->setSampler(*(skygfx::Sampler*)&value);
+	mDevice->setSampler(value);
 }
 
 void System::setDepthMode(const DepthMode& value)
@@ -191,9 +191,9 @@ void System::setStencilMode(const StencilMode& value)
 	}
 }
 
-void System::setCullMode(const CullMode& value)
+void System::setCullMode(skygfx::CullMode value)
 {
-	mDevice->setCullMode(*(skygfx::CullMode*)&value);
+	mDevice->setCullMode(value);
 }
 
 void System::setBlendMode(const BlendMode& value)
@@ -201,9 +201,9 @@ void System::setBlendMode(const BlendMode& value)
 	mDevice->setBlendMode(*(skygfx::BlendMode*)&value);
 }
 
-void System::setTextureAddressMode(const TextureAddress& value)
+void System::setTextureAddressMode(skygfx::TextureAddress value)
 {
-	mDevice->setTextureAddress(*(skygfx::TextureAddress*)&value);
+	mDevice->setTextureAddress(value);
 }
 
 void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)

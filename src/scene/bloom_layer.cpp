@@ -15,7 +15,7 @@ std::shared_ptr<Renderer::RenderTarget> BloomLayer::postprocess(std::shared_ptr<
 	auto target1 = GRAPHICS->getRenderTarget(fmt::format("bloom_temp_1_{}", (void*)this), (int)width, (int)height);
 	auto target2 = GRAPHICS->getRenderTarget(fmt::format("bloom_temp_2_{}", (void*)this), (int)width, (int)height);
 
-	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
+	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
 	GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
 

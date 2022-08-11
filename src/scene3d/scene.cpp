@@ -27,10 +27,10 @@ void Scene::frame()
 	GRAPHICS->pushProjectionMatrix(mCamera->getProjectionMatrix());
 	GRAPHICS->pushViewMatrix(mCamera->getViewMatrix());
 	GRAPHICS->pushScissor(std::nullopt);
-	GRAPHICS->pushCullMode(Renderer::CullMode::Back);
+	GRAPHICS->pushCullMode(skygfx::CullMode::Back);
 	GRAPHICS->pushDepthMode(Renderer::ComparisonFunc::Less);
-	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
-	GRAPHICS->pushTextureAddress(Renderer::TextureAddress::Wrap);
+	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
+	GRAPHICS->pushTextureAddress(skygfx::TextureAddress::Wrap);
 	GRAPHICS->clear();
 	
 	mForwardLightTechnique.setProjectionMatrix(mCamera->getProjectionMatrix());

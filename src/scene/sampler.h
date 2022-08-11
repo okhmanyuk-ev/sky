@@ -1,19 +1,19 @@
 #pragma once
 
-#include <renderer/sampler.h>
+#include <renderer/all.h>
 
 namespace Scene
 {
 	class Sampler
 	{
 	public:
-		inline static Renderer::Sampler DefaultSampler = Renderer::Sampler::Nearest;
+		inline static skygfx::Sampler DefaultSampler = skygfx::Sampler::Nearest;
 
 	public:
 		auto getSampler() const { return mSampler; }
-		void setSampler(Renderer::Sampler value) { mSampler = value; }
+		void setSampler(skygfx::Sampler value) { mSampler = value; }
 
 	private:
-		Renderer::Sampler mSampler = DefaultSampler;
+		skygfx::Sampler mSampler = DefaultSampler;
 	};
 }

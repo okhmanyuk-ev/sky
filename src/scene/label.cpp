@@ -20,7 +20,7 @@ void Label::draw()
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
-	GRAPHICS->pushSampler(Renderer::Sampler::Linear);
+	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushModelMatrix(model);
 	GRAPHICS->drawString(*mFont, mMesh, mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor());
 	GRAPHICS->pop(2);

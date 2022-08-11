@@ -5,12 +5,9 @@
 #include <renderer/texture.h>
 #include <renderer/render_target.h>
 #include <renderer/shader.h>
-#include <renderer/sampler.h>
 #include <renderer/depth.h>
-#include <renderer/rasterizer_state.h>
 #include <renderer/blend.h>
 #include <renderer/stencil.h>
-#include <renderer/texture_address.h>
 
 #include <optional>
 
@@ -42,12 +39,12 @@ namespace Renderer
 		void setTexture(std::shared_ptr<Texture> value);
 		void setRenderTarget(std::shared_ptr<RenderTarget> value);
 		void setShader(std::shared_ptr<Shader> value);
-		void setSampler(const Sampler& value);
+		void setSampler(skygfx::Sampler value);
 		void setDepthMode(const DepthMode& value);
 		void setStencilMode(const StencilMode& value);
-		void setCullMode(const CullMode& value);
+		void setCullMode(skygfx::CullMode value);
 		void setBlendMode(const BlendMode& value);
-		void setTextureAddressMode(const TextureAddress& value);
+		void setTextureAddressMode(skygfx::TextureAddress value);
 
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }, 
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);

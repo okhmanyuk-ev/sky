@@ -144,17 +144,17 @@ namespace Graphics
 		void pop(int count = 1);
 
 		void pushCleanState();
-		void pushSampler(Renderer::Sampler value);
+		void pushSampler(skygfx::Sampler value);
 		void pushBlendMode(Renderer::BlendMode value);
 		void pushDepthMode(Renderer::DepthMode value);
-		void pushCullMode(Renderer::CullMode value);
+		void pushCullMode(skygfx::CullMode value);
 		void pushViewport(std::optional<skygfx::Viewport> value);
 		void pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value);
 		void pushScissor(std::optional<skygfx::Scissor> value);
 		void pushViewMatrix(const glm::mat4& value);
 		void pushProjectionMatrix(const glm::mat4& value);
 		void pushModelMatrix(const glm::mat4& value);
-		void pushTextureAddress(Renderer::TextureAddress value);
+		void pushTextureAddress(skygfx::TextureAddress value);
 		void pushOrthoMatrix(float width, float height);
 		void pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
 		void pushStencilMode(const Renderer::StencilMode& value);
@@ -171,10 +171,10 @@ namespace Graphics
 			std::optional<skygfx::Scissor> scissor = std::nullopt;
 			std::optional<skygfx::Viewport> viewport = std::nullopt;
 			Renderer::DepthMode depthMode = Renderer::DepthMode();
-			Renderer::CullMode cullMode = Renderer::CullMode::None;
+			skygfx::CullMode cullMode = skygfx::CullMode::None;
 			Renderer::BlendMode blendMode = Renderer::BlendStates::NonPremultiplied;
-			Renderer::Sampler sampler = Renderer::Sampler::Nearest;
-			Renderer::TextureAddress textureAddress = Renderer::TextureAddress::Clamp;
+			skygfx::Sampler sampler = skygfx::Sampler::Nearest;
+			skygfx::TextureAddress textureAddress = skygfx::TextureAddress::Clamp;
 			Renderer::StencilMode stencilMode = Renderer::StencilMode();
 		};
 

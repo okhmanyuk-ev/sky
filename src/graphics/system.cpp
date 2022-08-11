@@ -397,7 +397,7 @@ void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 		edge_size = (glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;
 	}
 
-	pushSampler(Renderer::Sampler::Linear);
+	pushSampler(skygfx::Sampler::Linear);
 	drawSlicedSprite(mWhiteCircleTexture, center_region, size, edge_size, color);
 	pop();
 }
@@ -483,7 +483,7 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 
 void System::drawCircleTexture(const glm::vec4& color)
 {
-	pushSampler(Renderer::Sampler::Linear);
+	pushSampler(skygfx::Sampler::Linear);
 	drawSprite(mWhiteCircleTexture, {}, color);
 	pop();
 }
@@ -765,7 +765,7 @@ void System::pushCleanState()
 	push(State{});
 }
 
-void System::pushSampler(Renderer::Sampler value)
+void System::pushSampler(skygfx::Sampler value)
 {
 	auto state = mStates.top();
 	state.sampler = value;
@@ -786,7 +786,7 @@ void System::pushDepthMode(Renderer::DepthMode value)
 	push(state);
 }
 
-void System::pushCullMode(Renderer::CullMode value) 
+void System::pushCullMode(skygfx::CullMode value)
 {
 	auto state = mStates.top();
 	state.cullMode = value;
@@ -835,7 +835,7 @@ void System::pushModelMatrix(const glm::mat4& value)
 	push(state);
 }
 
-void System::pushTextureAddress(Renderer::TextureAddress value)
+void System::pushTextureAddress(skygfx::TextureAddress value)
 {
 	auto state = mStates.top();
 	state.textureAddress = value;
