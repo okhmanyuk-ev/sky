@@ -114,7 +114,7 @@ namespace Scene
 			
 			auto [pos, size] = T::getGlobalBounds();
 
-			auto scissor = Renderer::Scissor();
+			auto scissor = skygfx::Scissor();
 			scissor.position = pos;
 			scissor.size = size;
 

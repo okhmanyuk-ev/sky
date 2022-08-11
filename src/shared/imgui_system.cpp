@@ -114,7 +114,7 @@ void ImguiSystem::end()
 			else
 			{
 				auto texture = *(std::shared_ptr<Renderer::Texture>*)cmd.TextureId;
-				GRAPHICS->pushScissor(Renderer::Scissor{ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });				
+				GRAPHICS->pushScissor(skygfx::Scissor{ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });
 				GRAPHICS->drawGeneric(skygfx::Topology::TriangleList, vertex_buffer, index_buffer, mShader, texture, cmd.ElemCount, indexOffset);
 				GRAPHICS->pop();
 			}

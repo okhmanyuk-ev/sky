@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/engine.h>
-#include <renderer/scissor.h>
 #include <renderer/buffer.h>
 #include <renderer/texture.h>
 #include <renderer/render_target.h>
@@ -17,6 +16,7 @@
 
 #include <skygfx/skygfx.h>
 #include <common/event_system.h>
+#include <platform/all.h>
 
 #define RENDERER ENGINE->getSystem<Renderer::System>()
 
@@ -34,7 +34,7 @@ namespace Renderer
 	public:
 		void setTopology(skygfx::Topology value);
 		void setViewport(std::optional<skygfx::Viewport> value);
-		void setScissor(std::optional<Scissor> value);
+		void setScissor(std::optional<skygfx::Scissor> value);
 		void setVertexBuffer(const Buffer& value);
 		void setIndexBuffer(const Buffer& value);
 		void setUniformBuffer(int slot, void* memory, size_t size);

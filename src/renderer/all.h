@@ -7,7 +7,6 @@
 #include "rasterizer_state.h"
 #include "render_target.h"
 #include "sampler.h"
-#include "scissor.h"
 #include "shader.h"
 #include "stencil.h"
 #include "system.h"

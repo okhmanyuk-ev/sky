@@ -150,7 +150,7 @@ namespace Graphics
 		void pushCullMode(Renderer::CullMode value);
 		void pushViewport(std::optional<skygfx::Viewport> value);
 		void pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value);
-		void pushScissor(std::optional<Renderer::Scissor> value);
+		void pushScissor(std::optional<skygfx::Scissor> value);
 		void pushViewMatrix(const glm::mat4& value);
 		void pushProjectionMatrix(const glm::mat4& value);
 		void pushModelMatrix(const glm::mat4& value);
@@ -168,7 +168,7 @@ namespace Graphics
 			glm::mat4 viewMatrix = glm::mat4(1.0f);
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			std::shared_ptr<Renderer::RenderTarget> renderTarget = nullptr;
-			std::optional<Renderer::Scissor> scissor = std::nullopt;
+			std::optional<skygfx::Scissor> scissor = std::nullopt;
 			std::optional<skygfx::Viewport> viewport = std::nullopt;
 			Renderer::DepthMode depthMode = Renderer::DepthMode();
 			Renderer::CullMode cullMode = Renderer::CullMode::None;

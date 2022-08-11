@@ -807,7 +807,7 @@ void System::pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value)
 	push(state);
 }
 
-void System::pushScissor(std::optional<Renderer::Scissor> value)
+void System::pushScissor(std::optional<skygfx::Scissor> value)
 {
 	auto state = mStates.top();
 	state.scissor = value;
