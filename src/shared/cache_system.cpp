@@ -52,7 +52,7 @@ const nlohmann::json& CacheSystem::getJson(const std::string& name)
 	return mJsons.at(name);
 }
 
-void CacheSystem::loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name)
+void CacheSystem::loadTexture(std::shared_ptr<skygfx::Texture> texture, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
 		return;
@@ -65,7 +65,7 @@ void CacheSystem::loadTexture(std::shared_ptr<Graphics::Image> image, const std:
 	if (mTextures.count(name) > 0)
 		return;
 
-	auto texture = std::make_shared<Renderer::Texture>(image->getWidth(), image->getHeight(), image->getChannels(), image->getMemory());
+	auto texture = std::make_shared<skygfx::Texture>(image->getWidth(), image->getHeight(), image->getChannels(), image->getMemory());
 
 	loadTexture(texture, name);
 }

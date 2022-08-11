@@ -1,7 +1,7 @@
 #pragma once
 
 #include <platform/asset.h>
-#include <renderer/texture.h>
+#include <renderer/all.h>
 #include <unordered_map>
 #include <memory>
 #include <tinyutf8.hpp>
@@ -48,7 +48,7 @@ namespace Graphics
 		void setCustomVerticalOffset(float value) { mCustomVerticalOffset = value; }
 
 	private:
-		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
+		std::shared_ptr<skygfx::Texture> mTexture = nullptr;
 		std::unordered_map<utf8_string::value_type, Glyph> mGlyphs;
 		std::unordered_map<utf8_string::value_type, std::unordered_map<utf8_string::value_type, float>> mKernings;
 		float mAscent = 0.0f;

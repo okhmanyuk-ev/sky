@@ -66,7 +66,7 @@ void AniSprite::randomizeProgress()
 	mProgress = glm::linearRand<size_t>(0, frames.size() - 1);
 }
 
-void AniSprite::setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas, std::shared_ptr<Graphics::Animation> animation)
+void AniSprite::setAnimation(std::shared_ptr<skygfx::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas, std::shared_ptr<Graphics::Animation> animation)
 { 
 	mSprite->setTexture(texture);
 	mAnimation = animation;;

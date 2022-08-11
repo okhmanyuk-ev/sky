@@ -2,11 +2,9 @@
 
 #include "comparison.h"
 #include "depth.h"
-#include "render_target.h"
 #include "shader.h"
 #include "stencil.h"
 #include "system.h"
-#include "texture.h"
 #include "techniques.h"
 
 #include "shaders/blur.h"

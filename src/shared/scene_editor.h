@@ -28,7 +28,7 @@ namespace Shared
 		void showBatchGroupsMenu();
 		
 	public:
-		static void drawImage(std::shared_ptr<Renderer::Texture> texture, std::optional<Graphics::TexRegion> region = std::nullopt,
+		static void drawImage(std::shared_ptr<skygfx::Texture> texture, std::optional<Graphics::TexRegion> region = std::nullopt,
 			float max_size = 256.0f);
 		
 	public:

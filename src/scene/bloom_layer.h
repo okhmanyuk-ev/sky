@@ -1,7 +1,6 @@
 #pragma once
 
 #include <scene/render_layer.h>
-#include <renderer/render_target.h>
 #include <common/event_system.h>
 #include <stack>
 #include <renderer/shaders/blur.h>
@@ -12,7 +11,7 @@ namespace Scene
 	class BloomLayer : public RenderLayer<Node>
 	{
 	protected:
-		std::shared_ptr<Renderer::RenderTarget> postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) override;
+		std::shared_ptr<skygfx::RenderTarget> postprocess(std::shared_ptr<skygfx::RenderTarget> render_texture) override;
 
 	public:
 		auto getBlurPasses() const { return mBlurPasses; }

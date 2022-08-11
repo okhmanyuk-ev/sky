@@ -58,7 +58,7 @@ namespace Scene
 		auto getRoot() const { return mRoot; }
 
 		auto getRenderTarget() const { return mRenderTarget; }
-		void setRenderTarget(std::shared_ptr<Renderer::RenderTarget> value) { mRenderTarget = value; }
+		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value) { mRenderTarget = value; }
 
 		auto getViewport() const { return mViewport; }
 
@@ -72,7 +72,7 @@ namespace Scene
 	private:
 		std::shared_ptr<RootNode> mRoot = std::make_shared<RootNode>();
 		std::list<std::weak_ptr<Node>> mTouchedNodes;
-		std::shared_ptr<Renderer::RenderTarget> mRenderTarget = nullptr;
+		std::shared_ptr<skygfx::RenderTarget> mRenderTarget = nullptr;
 		skygfx::Viewport mViewport;
 		InteractTestCallback mInteractTestCallback = nullptr;
 		BatchGroups mBatchGroups;

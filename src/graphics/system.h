@@ -49,7 +49,7 @@ namespace Graphics
 		// TODO: maybe remove after adding draw with draw_func
 		void drawGeneric(skygfx::Topology topology, const skygfx::Buffer& vertices,
 			const skygfx::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-			std::optional<std::shared_ptr<Renderer::Texture>> texture = std::nullopt,
+			std::optional<std::shared_ptr<skygfx::Texture>> texture = std::nullopt,
 			std::optional<size_t> count = std::nullopt, size_t start = 0);
 
 		// draw colored vertices
@@ -61,12 +61,12 @@ namespace Graphics
 			const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw colored and textured vertices
-		void draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+		void draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
 			const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw indexed colored and textured vertices
-		void draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+		void draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
 			const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 			const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 		
@@ -101,23 +101,23 @@ namespace Graphics
 		void drawCircleTexture(const glm::vec4& color = { Color::White, 1.0f });
 
 		// sprite
-		void drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::vec2& top_left_uv, 
+		void drawSprite(std::shared_ptr<skygfx::Texture> texture, const glm::vec2& top_left_uv,
 			const glm::vec2& top_right_uv, const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
 			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
-		void drawSprite(std::shared_ptr<Renderer::Texture> texture, 
+		void drawSprite(std::shared_ptr<skygfx::Texture> texture,
 			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f }, 
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
-		void drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader);
+		void drawSprite(std::shared_ptr<skygfx::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader);
 
 		// sliced sprite
-		void drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, const TexRegion& center_region, 
+		void drawSlicedSprite(std::shared_ptr<skygfx::Texture> texture, const TexRegion& center_region,
 			const glm::vec2& size, std::optional<float> edge_size = std::nullopt,
 			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// sdf mesh
-		void drawSdf(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+		void drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
 			const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
 			float smoothFactor, const glm::vec4& color = { Graphics::Color::White, 1.0f });
@@ -149,14 +149,14 @@ namespace Graphics
 		void pushDepthMode(Renderer::DepthMode value);
 		void pushCullMode(skygfx::CullMode value);
 		void pushViewport(std::optional<skygfx::Viewport> value);
-		void pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value);
+		void pushRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
 		void pushScissor(std::optional<skygfx::Scissor> value);
 		void pushViewMatrix(const glm::mat4& value);
 		void pushProjectionMatrix(const glm::mat4& value);
 		void pushModelMatrix(const glm::mat4& value);
 		void pushTextureAddress(skygfx::TextureAddress value);
 		void pushOrthoMatrix(float width, float height);
-		void pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target = nullptr);
+		void pushOrthoMatrix(std::shared_ptr<skygfx::RenderTarget> target = nullptr);
 		void pushStencilMode(const Renderer::StencilMode& value);
 
 		const auto& getCurrentState() const { return mStates.top(); }
@@ -167,7 +167,7 @@ namespace Graphics
 			glm::mat4 projectionMatrix = glm::mat4(1.0f);
 			glm::mat4 viewMatrix = glm::mat4(1.0f);
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
-			std::shared_ptr<Renderer::RenderTarget> renderTarget = nullptr;
+			std::shared_ptr<skygfx::RenderTarget> renderTarget = nullptr;
 			std::optional<skygfx::Scissor> scissor = std::nullopt;
 			std::optional<skygfx::Viewport> viewport = std::nullopt;
 			Renderer::DepthMode depthMode = Renderer::DepthMode();
@@ -219,7 +219,7 @@ namespace Graphics
 			BatchMode mode = BatchMode::None;
 			std::shared_ptr<Renderer::Shader> shader = nullptr;
 
-			std::optional<std::shared_ptr<Renderer::Texture>> texture;
+			std::optional<std::shared_ptr<skygfx::Texture>> texture;
 			std::optional<skygfx::Topology> topology;
 			
 			size_t verticesCount = 0;
@@ -230,20 +230,20 @@ namespace Graphics
 		} mBatch;
 
 	public:
-		std::shared_ptr<Renderer::RenderTarget> getRenderTarget(const std::string& name, int width, int height);
-		std::shared_ptr<Renderer::RenderTarget> getRenderTarget(const std::string& name);
+		std::shared_ptr<skygfx::RenderTarget> getRenderTarget(const std::string& name, int width, int height);
+		std::shared_ptr<skygfx::RenderTarget> getRenderTarget(const std::string& name);
 
 		const auto& getRenderTargets() const { return mRenderTargets; }
 
 	private:
-		std::map<std::string, std::shared_ptr<Renderer::RenderTarget>> mRenderTargets;
+		std::map<std::string, std::shared_ptr<skygfx::RenderTarget>> mRenderTargets;
 		std::set<std::string> mUnusedRenderTargets;
 
 	public:
-		std::shared_ptr<Renderer::Texture> makeGenericTexture(const glm::ivec2& size, std::function<void()> callback);
+		std::shared_ptr<skygfx::Texture> makeGenericTexture(const glm::ivec2& size, std::function<void()> callback);
 		
 	private:
-		std::shared_ptr<Renderer::Texture> mWhiteCircleTexture = nullptr;
+		std::shared_ptr<skygfx::Texture> mWhiteCircleTexture = nullptr;
 	};
 
 	inline bool operator==(const System::State& left, const System::State& right)

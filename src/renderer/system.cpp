@@ -26,40 +26,6 @@ void Shader::apply()
 	this->update();
 }
 
-struct Texture::TextureImpl
-{
-	std::shared_ptr<skygfx::Texture> texture;
-};
-
-Texture::Texture(uint32_t width, uint32_t height, uint32_t channels, void* data, bool mipmap) :
-	mWidth(width),
-	mHeight(height),
-	mMipmap(mipmap)
-{
-	mTextureImpl = std::make_unique<TextureImpl>();
-	mTextureImpl->texture = std::make_shared<skygfx::Texture>(width, height, channels, data, mMipmap);
-}
-
-Texture::~Texture()
-{
-}
-
-struct RenderTarget::RenderTargetImpl
-{
-	std::shared_ptr<skygfx::RenderTarget> render_target;
-};
-
-RenderTarget::RenderTarget(uint32_t width, uint32_t height) : Texture(width, height, 4, nullptr)
-{
-	mRenderTargetImpl = std::make_unique<RenderTargetImpl>();
-	mRenderTargetImpl->render_target = std::make_shared<skygfx::RenderTarget>(width, height);
-	mTextureImpl->texture = mRenderTargetImpl->render_target;
-}
-
-RenderTarget::~RenderTarget()
-{
-}
-
 System::System()
 {
 	auto width = PLATFORM->getWidth();
@@ -122,28 +88,25 @@ void System::setUniformBuffer(int slot, void* memory, size_t size)
 	mDevice->setUniformBuffer(slot, memory, size);
 }
 
-void System::setTexture(int binding, std::shared_ptr<Texture> value)
+void System::setTexture(int binding, std::shared_ptr<skygfx::Texture> value)
 {
 	if (!value)
 		return;
 
-	if (!value->mTextureImpl->texture)
-		return;
-
-	mDevice->setTexture((uint32_t)binding, *value->mTextureImpl->texture);
+	mDevice->setTexture(binding, *value);
 }
 
-void System::setTexture(std::shared_ptr<Texture> value)
+void System::setTexture(std::shared_ptr<skygfx::Texture> value)
 {
 	setTexture(0, value);
 }
 
-void System::setRenderTarget(std::shared_ptr<RenderTarget> value)
+void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 {
 	if (value == nullptr)
 		mDevice->setRenderTarget(nullptr);
 	else
-		mDevice->setRenderTarget(*value->mRenderTargetImpl->render_target);
+		mDevice->setRenderTarget(*value);
 }
 
 void System::setShader(std::shared_ptr<Shader> value)
@@ -223,9 +186,9 @@ void System::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOff
 	mDevice->drawIndexed(indexCount, indexOffset);
 }
 
-void System::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture)
+void System::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<skygfx::Texture> dst_texture)
 {
-	mDevice->readPixels(pos, size, *dst_texture->mTextureImpl->texture);
+	mDevice->readPixels(pos, size, *dst_texture);
 }
 
 void System::present()

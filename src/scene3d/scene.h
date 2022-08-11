@@ -24,14 +24,14 @@ namespace Scene3D
 		auto& getDriver() { return mDriver; }
 
 		auto getRenderTarget() const { return mRenderTarget; }
-		void setRenderTarget(std::shared_ptr<Renderer::RenderTarget> value) { mRenderTarget = value; }
+		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value) { mRenderTarget = value; }
 
 	private:
 		std::shared_ptr<Node> mRoot;
 		std::shared_ptr<Graphics::Camera3D> mCamera;
 		Driver mDriver; // TODO: del
 		Renderer::ForwardLightTechnique mForwardLightTechnique;
-		std::shared_ptr<Renderer::RenderTarget> mRenderTarget = nullptr;
+		std::shared_ptr<skygfx::RenderTarget> mRenderTarget = nullptr;
 
 	private:
 		void recursiveNodeUpdateTransform(std::shared_ptr<Node> node);

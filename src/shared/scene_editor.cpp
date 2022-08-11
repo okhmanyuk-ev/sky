@@ -431,7 +431,7 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::ve
 	GRAPHICS->end();
 }
 
-void SceneEditor::drawImage(std::shared_ptr<Renderer::Texture> texture, std::optional<Graphics::TexRegion> region, float max_size)
+void SceneEditor::drawImage(std::shared_ptr<skygfx::Texture> texture, std::optional<Graphics::TexRegion> region, float max_size)
 {
 	glm::vec2 size = { (float)texture->getWidth(), (float)texture->getHeight() };
 

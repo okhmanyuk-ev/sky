@@ -3,7 +3,7 @@
 
 using namespace Scene;
 
-std::shared_ptr<Renderer::RenderTarget> BloomLayer::postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture)
+std::shared_ptr<skygfx::RenderTarget> BloomLayer::postprocess(std::shared_ptr<skygfx::RenderTarget> render_texture)
 {
 	render_texture = RenderLayer<Node>::postprocess(render_texture);
 

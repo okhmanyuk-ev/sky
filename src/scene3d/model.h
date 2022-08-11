@@ -56,7 +56,7 @@ namespace Scene3D
 		const auto& getTexturesMap() const { return mTexturesMap; }
 		void setTexturesMap(const Renderer::Technique::TexturesMap& value) { mTexturesMap = value; }
 
-		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexturesMap = value; }
+		void setTexture(std::shared_ptr<skygfx::Texture> value) { mTexturesMap = value; }
 
 	private:
 		skygfx::Topology mTopology = skygfx::Topology::TriangleList;
@@ -68,6 +68,6 @@ namespace Scene3D
 		NormalAttribs mNormalAttribs;
 		TexCoordAttribs mTexCoordAttribs;
 		Renderer::Shaders::Light::Material mMaterial;
-		std::variant<Renderer::Technique::TexturesMap, std::shared_ptr<Renderer::Texture>> mTexturesMap;
+		std::variant<Renderer::Technique::TexturesMap, std::shared_ptr<skygfx::Texture>> mTexturesMap;
 	};
 }

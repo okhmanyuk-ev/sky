@@ -11,7 +11,7 @@ namespace Scene
 	class Sprite : public Node, public Color, public Blend, public Sampler
 	{
 	public:
-		inline static std::shared_ptr<Renderer::Texture> DefaultTexture = nullptr;
+		inline static std::shared_ptr<skygfx::Texture> DefaultTexture = nullptr;
 		inline static skygfx::TextureAddress DefaultTextureAddress = skygfx::TextureAddress::Clamp;
 
 	protected:
@@ -27,7 +27,7 @@ namespace Scene
 
 	public:
 		auto getTexture() const { return mTexture; }
-		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexture = value; }
+		void setTexture(std::shared_ptr<skygfx::Texture> value) { mTexture = value; }
 		void setTexture(const Graphics::TexCell& value);
 
 		auto getTexRegion() const { return mTexRegion; }
@@ -40,7 +40,7 @@ namespace Scene
 		void setShader(std::shared_ptr<Renderer::ShaderMatrices> value) { mShader = value; }
 
 	private:
-		std::shared_ptr<Renderer::Texture> mTexture = DefaultTexture;
+		std::shared_ptr<skygfx::Texture> mTexture = DefaultTexture;
 		Graphics::TexRegion mTexRegion = {};
 		skygfx::TextureAddress mTextureAddress = DefaultTextureAddress;
 		std::shared_ptr<Renderer::ShaderMatrices> mShader = nullptr;

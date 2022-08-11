@@ -3,7 +3,6 @@
 #include <common/event_system.h>
 #include <platform/system.h>
 #include <graphics/color.h>
-#include <renderer/texture.h>
 #include <shared/imgui_user.h>
 #include <graphics/all.h>
 
@@ -113,7 +112,7 @@ void ImguiSystem::end()
 			}
 			else
 			{
-				auto texture = *(std::shared_ptr<Renderer::Texture>*)cmd.TextureId;
+				auto texture = *(std::shared_ptr<skygfx::Texture>*)cmd.TextureId;
 				GRAPHICS->pushScissor(skygfx::Scissor{ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });
 				GRAPHICS->drawGeneric(skygfx::Topology::TriangleList, vertex_buffer, index_buffer, mShader, texture, cmd.ElemCount, indexOffset);
 				GRAPHICS->pop();
@@ -138,7 +137,7 @@ void ImguiSystem::ensureFont()
 	int32_t height;
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
-	io.Fonts->TexID = ImGui::User::GetImTextureID(std::make_shared<Renderer::Texture>(width, height, 4, data));
+	io.Fonts->TexID = ImGui::User::GetImTextureID(std::make_shared<skygfx::Texture>(width, height, 4, data));
 }
 
 void ImguiSystem::onEvent(const Platform::Input::Touch::Event& e)

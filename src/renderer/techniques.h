@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <renderer/render_target.h>
+#include <skygfx/skygfx.h>
 #include <unordered_map>
 
 #include <renderer/shaders/light.h> // TODO: del
@@ -17,7 +17,7 @@ namespace Renderer
 			uint32_t count = 0;
 		};
 
-		using TexturesMap = std::unordered_map<std::shared_ptr<Renderer::Texture>, IndexRange>;
+		using TexturesMap = std::unordered_map<std::shared_ptr<skygfx::Texture>, IndexRange>;
 
 	public:
 		virtual void draw(const skygfx::Buffer& vertex_buffer, const skygfx::Buffer& index_buffer, const skygfx::Vertex::Layout& layout,

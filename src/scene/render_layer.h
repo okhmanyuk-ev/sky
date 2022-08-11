@@ -2,7 +2,6 @@
 
 #include <scene/node.h>
 #include <scene/color.h>
-#include <renderer/render_target.h>
 #include <common/event_system.h>
 #include <stack>
 #include <fmt/format.h>
@@ -67,7 +66,7 @@ namespace Scene
 			T::leaveDraw();
 		}
 
-		virtual std::shared_ptr<Renderer::RenderTarget> postprocess(std::shared_ptr<Renderer::RenderTarget> render_texture) 
+		virtual std::shared_ptr<skygfx::RenderTarget> postprocess(std::shared_ptr<skygfx::RenderTarget> render_texture)
 		{
 			if (mPostprocessFunc)
 				render_texture = mPostprocessFunc(render_texture);
@@ -76,7 +75,7 @@ namespace Scene
 		}
 
 	public:
-		using PostprocessFunc = std::function<std::shared_ptr<Renderer::RenderTarget>(std::shared_ptr<Renderer::RenderTarget>)>;
+		using PostprocessFunc = std::function<std::shared_ptr<skygfx::RenderTarget>(std::shared_ptr<skygfx::RenderTarget>)>;
 
 	public:
 		bool isRenderLayerEnabled() const { return mRenderLayerEnabled; }

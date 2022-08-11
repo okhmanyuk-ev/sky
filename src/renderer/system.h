@@ -1,8 +1,6 @@
 #pragma once
 
 #include <core/engine.h>
-#include <renderer/texture.h>
-#include <renderer/render_target.h>
 #include <renderer/shader.h>
 #include <renderer/depth.h>
 #include <renderer/stencil.h>
@@ -33,9 +31,9 @@ namespace Renderer
 		void setVertexBuffer(const skygfx::Buffer& value);
 		void setIndexBuffer(const skygfx::Buffer& value);
 		void setUniformBuffer(int slot, void* memory, size_t size);
-		void setTexture(int binding, std::shared_ptr<Texture> value);
-		void setTexture(std::shared_ptr<Texture> value);
-		void setRenderTarget(std::shared_ptr<RenderTarget> value);
+		void setTexture(int binding, std::shared_ptr<skygfx::Texture> value);
+		void setTexture(std::shared_ptr<skygfx::Texture> value);
+		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
 		void setShader(std::shared_ptr<Shader> value);
 		void setSampler(skygfx::Sampler value);
 		void setDepthMode(const DepthMode& value);
@@ -50,7 +48,7 @@ namespace Renderer
 		void draw(size_t vertexCount, size_t vertexOffset = 0);
 		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0);
 
-		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<Renderer::Texture> dst_texture);
+		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<skygfx::Texture> dst_texture);
 
 		void present();
 

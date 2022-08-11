@@ -38,7 +38,7 @@ namespace Shared
 		const nlohmann::json& getJson(const std::string& name);
 
 	public:
-		void loadTexture(std::shared_ptr<Renderer::Texture> texture, const std::string& name);
+		void loadTexture(std::shared_ptr<skygfx::Texture> texture, const std::string& name);
 		void loadTexture(std::shared_ptr<Graphics::Image> image, const std::string& name);
 		void loadTexture(const std::string& path, const std::string& name);
 		void loadTexture(const std::string& path);
@@ -64,7 +64,7 @@ namespace Shared
 		void makeAtlases();
 
 	private:
-		std::unordered_map<std::string, std::shared_ptr<Renderer::Texture>> mTextures;
+		std::unordered_map<std::string, std::shared_ptr<skygfx::Texture>> mTextures;
 		std::unordered_map<std::string, std::shared_ptr<Graphics::Font>> mFonts;
 		std::unordered_map<std::string, std::shared_ptr<Graphics::Atlas>> mAtlases;
 		std::unordered_map<std::string, std::shared_ptr<Graphics::Animation>> mAnimations;

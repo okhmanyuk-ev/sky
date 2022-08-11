@@ -33,7 +33,7 @@ namespace Scene
 		auto getAnimation() const { return mAnimation; }
 		auto getAtlas() const { return mAtlas; }
 
-		void setAnimation(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas,
+		void setAnimation(std::shared_ptr<skygfx::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas,
 			std::shared_ptr<Graphics::Animation> animation);
 
 		bool isPlaying() const { return mPlaying; }

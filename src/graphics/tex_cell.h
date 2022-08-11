@@ -1,6 +1,6 @@
 #pragma  once
 
-#include <renderer/texture.h>
+#include <renderer/all.h>
 #include <graphics/tex_region.h>
 #include <memory>
 
@@ -10,12 +10,12 @@ namespace Graphics
 	{
 	public:
 		TexCell() { }
-		TexCell(std::shared_ptr<Renderer::Texture> texture, const TexRegion& region) :
+		TexCell(std::shared_ptr<skygfx::Texture> texture, const TexRegion& region) :
 			mTexture(texture), mRegion(region)
 		{ }
 
 	public:
-		operator std::shared_ptr<Renderer::Texture>() const { return mTexture; }
+		operator std::shared_ptr<skygfx::Texture>() const { return mTexture; }
 
 	public:
 		auto getTexture() const { return mTexture; }
@@ -38,7 +38,7 @@ namespace Graphics
 		}
 
 	private:
-		std::shared_ptr<Renderer::Texture> mTexture = nullptr;
+		std::shared_ptr<skygfx::Texture> mTexture = nullptr;
 		TexRegion mRegion = {};
 	};
 }

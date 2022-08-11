@@ -207,7 +207,7 @@ void System::draw(skygfx::Topology topology, const skygfx::Buffer& vertices,
 
 void System::drawGeneric(skygfx::Topology topology, const skygfx::Buffer& vertices,
 	const skygfx::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-	std::optional<std::shared_ptr<Renderer::Texture>> texture,
+	std::optional<std::shared_ptr<skygfx::Texture>> texture,
 	std::optional<size_t> count, size_t start)
 {
 	draw(topology, vertices, indices, shader, [&] {
@@ -267,7 +267,7 @@ void System::draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::P
 	}
 }
 
-void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+void System::draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
 	const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
@@ -276,7 +276,7 @@ void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> 
 	draw(topology, texture, vertices, indices, shader);
 }
 
-void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
+void System::draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture, const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
@@ -488,7 +488,7 @@ void System::drawCircleTexture(const glm::vec4& color)
 	pop();
 }
 
-void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::vec2 & top_left_uv,
+void System::drawSprite(std::shared_ptr<skygfx::Texture> texture, const glm::vec2 & top_left_uv,
 	const glm::vec2& top_right_uv, const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
 	const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
@@ -504,7 +504,7 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::v
 	draw(skygfx::Topology::TriangleList, texture, vertices, indices, shader);
 }
 
-void System::drawSprite(std::shared_ptr<Renderer::Texture> texture,
+void System::drawSprite(std::shared_ptr<skygfx::Texture> texture,
 	const TexRegion& tex_region, const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	float tex_w = static_cast<float>(texture->getWidth());
@@ -523,12 +523,12 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture,
 	drawSprite(texture, top_left_uv, top_right_uv, bottom_left_uv, bottom_right_uv, color, shader);
 }
 
-void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader)
+void System::drawSprite(std::shared_ptr<skygfx::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	drawSprite(texture, { }, { Color::White, 1.0f }, shader);
 }
 
-void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture, 
+void System::drawSlicedSprite(std::shared_ptr<skygfx::Texture> texture,
 	const TexRegion& center_region, const glm::vec2& size, std::optional<float> edge_size,
 	const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
@@ -626,7 +626,7 @@ void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture,
 	draw(skygfx::Topology::TriangleList, texture, vertices, indices, shader);
 }
 
-void System::drawSdf(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
 	const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
 	float smoothFactor, const glm::vec4& color)
@@ -800,7 +800,7 @@ void System::pushViewport(std::optional<skygfx::Viewport> value)
 	push(state);
 }
 
-void System::pushRenderTarget(std::shared_ptr<Renderer::RenderTarget> value)
+void System::pushRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 {
 	auto state = mStates.top();
 	state.renderTarget = value;
@@ -847,7 +847,7 @@ void System::pushOrthoMatrix(float width, float height)
 	pushProjectionMatrix(glm::orthoLH(0.0f, width, height, 0.0f, -1.0f, 1.0f));
 }
 
-void System::pushOrthoMatrix(std::shared_ptr<Renderer::RenderTarget> target)
+void System::pushOrthoMatrix(std::shared_ptr<skygfx::RenderTarget> target)
 {
 	if (target)
 		pushOrthoMatrix((float)target->getWidth(), (float)target->getHeight());
@@ -870,7 +870,7 @@ void System::setBatching(bool value)
 	mBatching = value; 
 }
 
-std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::string& name, int width, int height)
+std::shared_ptr<skygfx::RenderTarget> System::getRenderTarget(const std::string& name, int width, int height)
 {
 	if (mRenderTargets.contains(name))
 	{
@@ -884,7 +884,7 @@ std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::strin
 
 	if (!mRenderTargets.contains(name)) 
 	{
-		auto target = std::make_shared<Renderer::RenderTarget>(width, height);
+		auto target = std::make_shared<skygfx::RenderTarget>(width, height);
 		mRenderTargets.insert({ name, target });
 	}
 
@@ -893,14 +893,14 @@ std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::strin
 	return mRenderTargets.at(name);
 }
 
-std::shared_ptr<Renderer::RenderTarget> System::getRenderTarget(const std::string& name)
+std::shared_ptr<skygfx::RenderTarget> System::getRenderTarget(const std::string& name)
 {
 	return getRenderTarget(name, PLATFORM->getWidth(), PLATFORM->getHeight());
 }
 
-std::shared_ptr<Renderer::Texture> System::makeGenericTexture(const glm::ivec2& size, std::function<void()> callback)
+std::shared_ptr<skygfx::Texture> System::makeGenericTexture(const glm::ivec2& size, std::function<void()> callback)
 {
-	auto result = std::make_shared<Renderer::RenderTarget>(size.x, size.y);
+	auto result = std::make_shared<skygfx::RenderTarget>(size.x, size.y);
 
 	auto working = mWorking;
 

@@ -3,8 +3,7 @@
 #include <core/engine.h>
 #include <common/frame_system.h>
 #include <common/event_system.h>
-#include <renderer/system.h>
-#include <renderer/texture.h>
+#include <renderer/all.h>
 
 #include <platform/system.h>
 #include <platform/input.h>
@@ -13,8 +12,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-
-#include <renderer/shaders/generic.h>
 
 #include <cstddef>
 

@@ -26,7 +26,7 @@ void Model::draw(Renderer::Technique& technique)
 	}
 	else
 	{
-		auto texture = std::get<std::shared_ptr<Renderer::Texture>>(mTexturesMap);
+		auto texture = std::get<std::shared_ptr<skygfx::Texture>>(mTexturesMap);
 		auto index_range = Renderer::Technique::IndexRange();
 		index_range.count = mIndices.size();
 		technique.draw(mVertices.value(), mIndices, Vertex::Layout, { { texture, index_range } });
