@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/engine.h>
-#include <renderer/topology.h>
 #include <renderer/viewport.h>
 #include <renderer/scissor.h>
 #include <renderer/buffer.h>
@@ -34,7 +33,7 @@ namespace Renderer
 		void onEvent(const Platform::System::ResizeEvent& e) override;
 
 	public:
-		void setTopology(const Topology& value); // TODO: remove const
+		void setTopology(skygfx::Topology value);
 		void setViewport(std::optional<Viewport> value);
 		void setScissor(std::optional<Scissor> value);
 		void setVertexBuffer(const Buffer& value);

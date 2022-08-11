@@ -181,7 +181,7 @@ void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, s
 	RENDERER->clear(color, depth, stencil);
 }
 
-void System::draw(Renderer::Topology topology, const Renderer::Buffer& vertices,
+void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
 	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 	std::function<void()> draw_func)
 {
@@ -205,7 +205,7 @@ void System::draw(Renderer::Topology topology, const Renderer::Buffer& vertices,
 	draw_func();
 }
 
-void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices, 
+void System::drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
 	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 	std::optional<std::shared_ptr<Renderer::Texture>> texture,
 	std::optional<size_t> count, size_t start)
@@ -216,7 +216,7 @@ void System::drawGeneric(Renderer::Topology topology, const Renderer::Buffer& ve
 	});
 }
 
-void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
+void System::draw(skygfx::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 	std::optional<size_t> count, size_t start)
 {
 	auto indices = std::vector<uint32_t>(count.value_or(vertices.size() - start));
@@ -224,7 +224,7 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	draw(topology, vertices, indices);
 }
 
-void System::draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
+void System::draw(skygfx::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
@@ -267,7 +267,7 @@ void System::draw(Renderer::Topology topology, const std::vector<Renderer::Verte
 	}
 }
 
-void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
@@ -276,7 +276,7 @@ void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture
 	draw(topology, texture, vertices, indices, shader);
 }
 
-void System::draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
+void System::draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture, const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
@@ -337,7 +337,7 @@ void System::drawRectangle(const glm::vec4& top_left_color,
 
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 
-	draw(Renderer::Topology::TriangleList, vertices, indices, shader);
+	draw(skygfx::Topology::TriangleList, vertices, indices, shader);
 }
 
 void System::drawRectangle(const glm::vec4& color,
@@ -413,7 +413,7 @@ void System::drawLineRectangle(const glm::vec4& color)
 	
 	static const std::vector<uint32_t> indices = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
-	draw(Renderer::Topology::LineList, vertices, indices);
+	draw(skygfx::Topology::LineList, vertices, indices);
 }
 
 void System::drawCircle(const glm::vec4& inner_color, const glm::vec4& outer_color, 
@@ -478,7 +478,7 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 		v1_inner = v2_inner;
 	}
 
-	draw(Renderer::Topology::TriangleList, vertices);
+	draw(skygfx::Topology::TriangleList, vertices);
 }
 
 void System::drawCircleTexture(const glm::vec4& color)
@@ -501,7 +501,7 @@ void System::drawSprite(std::shared_ptr<Renderer::Texture> texture, const glm::v
 
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 
-	draw(Renderer::Topology::TriangleList, texture, vertices, indices, shader);
+	draw(skygfx::Topology::TriangleList, texture, vertices, indices, shader);
 }
 
 void System::drawSprite(std::shared_ptr<Renderer::Texture> texture,
@@ -623,10 +623,10 @@ void System::drawSlicedSprite(std::shared_ptr<Renderer::Texture> texture,
 		32, 33, 34, 32, 34, 35
 	};
 
-	draw(Renderer::Topology::TriangleList, texture, vertices, indices, shader);
+	draw(skygfx::Topology::TriangleList, texture, vertices, indices, shader);
 }
 
-void System::drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+void System::drawSdf(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 	const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 	const std::vector<uint32_t>& indices, float minValue, float maxValue,
 	float smoothFactor, const glm::vec4& color)

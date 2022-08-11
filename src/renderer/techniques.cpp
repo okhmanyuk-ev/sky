@@ -17,7 +17,7 @@ void ForwardLightTechnique::draw(const Buffer& vertex_buffer, const Buffer& inde
 	Shader->setPointLight(getPointLight());
 	Shader->setMaterial(getMaterial());
 
-	RENDERER->setTopology(Renderer::Topology::TriangleList);
+	RENDERER->setTopology(skygfx::Topology::TriangleList);
 	RENDERER->setVertexBuffer(vertex_buffer);
 	RENDERER->setIndexBuffer(index_buffer);
 	RENDERER->setShader(Shader);

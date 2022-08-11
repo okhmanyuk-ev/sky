@@ -40,33 +40,33 @@ namespace Graphics
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
-		void draw(Renderer::Topology topology, const Renderer::Buffer& vertices,
+		void draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
 			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 			std::function<void()> draw_func);
 
 		// generic
 		// TODO: hidden overload conflict when name "draw"
 		// TODO: maybe remove after adding draw with draw_func
-		void drawGeneric(Renderer::Topology topology, const Renderer::Buffer& vertices,
+		void drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
 			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 			std::optional<std::shared_ptr<Renderer::Texture>> texture = std::nullopt,
 			std::optional<size_t> count = std::nullopt, size_t start = 0);
 
 		// draw colored vertices
-		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices, 
+		void draw(skygfx::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 			std::optional<size_t> count = std::nullopt, size_t start = 0);
 
 		// draw indexed colored vertices
-		void draw(Renderer::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
+		void draw(skygfx::Topology topology, const std::vector<Renderer::Vertex::PositionColor>& vertices,
 			const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw colored and textured vertices
-		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+		void draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// draw indexed colored and textured vertices
-		void draw(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture, 
+		void draw(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 			const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 		
@@ -117,7 +117,7 @@ namespace Graphics
 			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
 
 		// sdf mesh
-		void drawSdf(Renderer::Topology topology, std::shared_ptr<Renderer::Texture> texture,
+		void drawSdf(skygfx::Topology topology, std::shared_ptr<Renderer::Texture> texture,
 			const std::vector<Renderer::Vertex::PositionColorTexture>& vertices,
 			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
 			float smoothFactor, const glm::vec4& color = { Graphics::Color::White, 1.0f });
@@ -220,7 +220,7 @@ namespace Graphics
 			std::shared_ptr<Renderer::Shader> shader = nullptr;
 
 			std::optional<std::shared_ptr<Renderer::Texture>> texture;
-			std::optional<Renderer::Topology> topology;
+			std::optional<skygfx::Topology> topology;
 			
 			size_t verticesCount = 0;
 			size_t indicesCount = 0;

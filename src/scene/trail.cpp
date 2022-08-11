@@ -145,7 +145,7 @@ void Trail::draw()
 
 	GRAPHICS->pushStencilMode(stencil);
 	GRAPHICS->pushModelMatrix(holder->getTransform());
-	GRAPHICS->draw(Renderer::Topology::TriangleStrip, vertices);
+	GRAPHICS->draw(skygfx::Topology::TriangleStrip, vertices);
 	GRAPHICS->pop(2);
 }
 

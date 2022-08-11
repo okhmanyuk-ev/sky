@@ -328,7 +328,7 @@ void World::Draw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b
 	}
 	builder.vertex({ vertices[0].x, vertices[0].y, 0.0f });
 	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(Renderer::Topology::LineStrip, b_vertices, count);
+	GRAPHICS->draw(skygfx::Topology::LineStrip, b_vertices, count);
 }
 
 void World::Draw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -344,7 +344,7 @@ void World::Draw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, co
 			builder.vertex({ vertices[i + 1].x, vertices[i + 1].y, 0.0f });
 		}
 		auto [b_vertices, count] = builder.end();
-		GRAPHICS->draw(Renderer::Topology::TriangleList, b_vertices, count);
+		GRAPHICS->draw(skygfx::Topology::TriangleList, b_vertices, count);
 	}
 	{
 		builder.begin();
@@ -355,7 +355,7 @@ void World::Draw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, co
 		}
 		builder.vertex({ vertices[0].x, vertices[0].y, 0.0f });
 		auto [b_vertices, count] = builder.end();
-		GRAPHICS->draw(Renderer::Topology::LineStrip, b_vertices, count);
+		GRAPHICS->draw(skygfx::Topology::LineStrip, b_vertices, count);
 	}
 }
 
@@ -386,7 +386,7 @@ void World::Draw::DrawCircle(const b2Vec2& center, float radius, const b2Color& 
 	}
 
 	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
+	GRAPHICS->draw(skygfx::Topology::LineList, b_vertices, count);
 }
 
 void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
@@ -417,7 +417,7 @@ void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 			v1 = v2;
 		}
 		auto [b_vertices, count] = builder.end();
-		GRAPHICS->draw(Renderer::Topology::TriangleList, b_vertices, count);
+		GRAPHICS->draw(skygfx::Topology::TriangleList, b_vertices, count);
 	}
 
 	builder.begin();
@@ -436,7 +436,7 @@ void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 	builder.vertex(v0);
 	builder.vertex(v0 + radius * glm::vec2({ axis.x, axis.y }));
 	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
+	GRAPHICS->draw(skygfx::Topology::LineList, b_vertices, count);
 }
 
 void World::Draw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
@@ -447,7 +447,7 @@ void World::Draw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color&
 	builder.vertex({ p1.x, p1.y });
 	builder.vertex({ p2.x, p2.y });
 	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
+	GRAPHICS->draw(skygfx::Topology::LineList, b_vertices, count);
 }
 
 void World::Draw::DrawTransform(const b2Transform& xf)
@@ -466,7 +466,7 @@ void World::Draw::DrawTransform(const b2Transform& xf)
 	builder.vertex({ p.x, p.y });
 	builder.vertex({ py.x, py.y });
 	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(Renderer::Topology::LineList, b_vertices, count);
+	GRAPHICS->draw(skygfx::Topology::LineList, b_vertices, count);
 }
 
 void World::Draw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)

@@ -7,7 +7,7 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin,
 {
 	TextMesh mesh;
 
-	mesh.topology = Renderer::Topology::TriangleList;
+	mesh.topology = skygfx::Topology::TriangleList;
 
 	const auto texture = font.getTexture();
 
@@ -139,7 +139,7 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 		height += font.getAscent() - font.getDescent() + font.getLinegap();
 	};
 
-	result.topology = Renderer::Topology::TriangleList;
+	result.topology = skygfx::Topology::TriangleList;
 
 	auto begin = text.begin();
 	auto it = begin;

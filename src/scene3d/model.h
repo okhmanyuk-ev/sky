@@ -33,7 +33,7 @@ namespace Scene3D
 
 	public:
 		auto getTopology() const { return mTopology; }
-		void setTopology(Renderer::Topology value) { mTopology = value; }
+		void setTopology(skygfx::Topology value) { mTopology = value; }
 
 		const auto& getIndices() const { return mIndices; }
 		void setIndices(const Indices& value) { mIndices = value; }
@@ -59,7 +59,7 @@ namespace Scene3D
 		void setTexture(std::shared_ptr<Renderer::Texture> value) { mTexturesMap = value; }
 
 	private:
-		Renderer::Topology mTopology = Renderer::Topology::TriangleList;
+		skygfx::Topology mTopology = skygfx::Topology::TriangleList;
 		Indices mIndices;
 		std::optional<std::vector<Vertex>> mVertices;
 		std::set<Renderer::Shaders::Light::Flag> mShaderFlags;

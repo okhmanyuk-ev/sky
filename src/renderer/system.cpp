@@ -92,9 +92,9 @@ void System::onEvent(const Platform::System::ResizeEvent& e)
 	mDevice->resize(e.width, e.height);
 }
 
-void System::setTopology(const Renderer::Topology& value)
+void System::setTopology(skygfx::Topology value)
 {
-	mDevice->setTopology(*(skygfx::Topology*)&value);
+	mDevice->setTopology(value);
 }
 
 void System::setViewport(std::optional<Viewport> value)

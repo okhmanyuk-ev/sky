@@ -1,9 +1,6 @@
 #pragma once
 
-#include <renderer/topology.h>
-#include <renderer/vertex.h>
-#include <renderer/system.h>
-#include <renderer/shaders/generic.h>
+#include <renderer/all.h>
 #include <platform/system.h>
 #include <glm/glm.hpp>
 

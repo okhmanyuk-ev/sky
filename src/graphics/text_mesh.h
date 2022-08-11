@@ -1,8 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <renderer/vertex.h>
-#include <renderer/topology.h>
+#include <renderer/all.h>
 #include "font.h"
 #include "tinyutf8.hpp"
 
@@ -17,7 +16,7 @@ namespace Graphics
 			Right
 		};
 
-		Renderer::Topology topology = Renderer::Topology::TriangleList;
+		skygfx::Topology topology = skygfx::Topology::TriangleList;
 		std::vector<Renderer::Vertex::PositionColorTexture> vertices;
 		std::vector<uint32_t> indices;
 
