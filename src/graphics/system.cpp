@@ -181,8 +181,8 @@ void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, s
 	RENDERER->clear(color, depth, stencil);
 }
 
-void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
-	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
+void System::draw(skygfx::Topology topology, const skygfx::Buffer& vertices,
+	const skygfx::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 	std::function<void()> draw_func)
 {
 	assert(shader);
@@ -205,8 +205,8 @@ void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
 	draw_func();
 }
 
-void System::drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
-	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
+void System::drawGeneric(skygfx::Topology topology, const skygfx::Buffer& vertices,
+	const skygfx::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 	std::optional<std::shared_ptr<Renderer::Texture>> texture,
 	std::optional<size_t> count, size_t start)
 {
@@ -772,7 +772,7 @@ void System::pushSampler(skygfx::Sampler value)
 	push(state);
 }
 
-void System::pushBlendMode(Renderer::BlendMode value)
+void System::pushBlendMode(skygfx::BlendMode value)
 {
 	auto state = mStates.top();
 	state.blendMode = value;

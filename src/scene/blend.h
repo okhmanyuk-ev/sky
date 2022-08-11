@@ -1,6 +1,6 @@
 #pragma once
 
-#include <renderer/blend.h>
+#include <renderer/all.h>
 
 namespace Scene
 {
@@ -8,9 +8,9 @@ namespace Scene
 	{
 	public:
 		auto getBlendMode() const { return mBlendMode; }
-		void setBlendMode(Renderer::BlendMode value) { mBlendMode = value; }
+		void setBlendMode(skygfx::BlendMode value) { mBlendMode = value; }
 
 	private:
-		Renderer::BlendMode mBlendMode = Renderer::BlendStates::NonPremultiplied;
+		skygfx::BlendMode mBlendMode = skygfx::BlendStates::NonPremultiplied;
 	};
 }

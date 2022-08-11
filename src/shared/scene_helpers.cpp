@@ -823,7 +823,7 @@ std::shared_ptr<SceneHelpers::Shockwave> SceneHelpers::Shockwave::MakeAnimated(f
 
 SceneHelpers::Shockwave::Shockwave()
 {
-	setBlendMode(Renderer::BlendStates::Opaque);
+	setBlendMode(skygfx::BlendStates::Opaque);
 }
 
 void SceneHelpers::Shockwave::draw()

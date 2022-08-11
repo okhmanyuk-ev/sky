@@ -48,7 +48,7 @@ void Glass::draw()
 
 BlurredGlass::BlurredGlass()
 {
-	setBlendMode(Renderer::BlendStates::Opaque);
+	setBlendMode(skygfx::BlendStates::Opaque);
 	setGenerateMipmaps(true);
 }
 

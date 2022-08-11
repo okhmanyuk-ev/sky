@@ -1,12 +1,10 @@
 #pragma once
 
 #include <core/engine.h>
-#include <renderer/buffer.h>
 #include <renderer/texture.h>
 #include <renderer/render_target.h>
 #include <renderer/shader.h>
 #include <renderer/depth.h>
-#include <renderer/blend.h>
 #include <renderer/stencil.h>
 
 #include <optional>
@@ -32,8 +30,8 @@ namespace Renderer
 		void setTopology(skygfx::Topology value);
 		void setViewport(std::optional<skygfx::Viewport> value);
 		void setScissor(std::optional<skygfx::Scissor> value);
-		void setVertexBuffer(const Buffer& value);
-		void setIndexBuffer(const Buffer& value);
+		void setVertexBuffer(const skygfx::Buffer& value);
+		void setIndexBuffer(const skygfx::Buffer& value);
 		void setUniformBuffer(int slot, void* memory, size_t size);
 		void setTexture(int binding, std::shared_ptr<Texture> value);
 		void setTexture(std::shared_ptr<Texture> value);
@@ -43,7 +41,7 @@ namespace Renderer
 		void setDepthMode(const DepthMode& value);
 		void setStencilMode(const StencilMode& value);
 		void setCullMode(skygfx::CullMode value);
-		void setBlendMode(const BlendMode& value);
+		void setBlendMode(const skygfx::BlendMode& value);
 		void setTextureAddressMode(skygfx::TextureAddress value);
 
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }, 

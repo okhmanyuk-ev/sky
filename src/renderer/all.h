@@ -1,7 +1,5 @@
 #pragma once
 
-#include "blend.h"
-#include "buffer.h"
 #include "comparison.h"
 #include "depth.h"
 #include "render_target.h"

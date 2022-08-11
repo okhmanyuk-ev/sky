@@ -107,14 +107,14 @@ void System::setScissor(std::optional<skygfx::Scissor> value)
 	mDevice->setScissor(value);
 }
 
-void System::setVertexBuffer(const Buffer& value)
+void System::setVertexBuffer(const skygfx::Buffer& value)
 {
-	mDevice->setVertexBuffer(*(skygfx::Buffer*)&value);
+	mDevice->setVertexBuffer(value);
 }
 
-void System::setIndexBuffer(const Buffer& value)
+void System::setIndexBuffer(const skygfx::Buffer& value)
 {
-	mDevice->setIndexBuffer(*(skygfx::Buffer*)&value);
+	mDevice->setIndexBuffer(value);
 }
 
 void System::setUniformBuffer(int slot, void* memory, size_t size)
@@ -196,9 +196,9 @@ void System::setCullMode(skygfx::CullMode value)
 	mDevice->setCullMode(value);
 }
 
-void System::setBlendMode(const BlendMode& value)
+void System::setBlendMode(const skygfx::BlendMode& value)
 {
-	mDevice->setBlendMode(*(skygfx::BlendMode*)&value);
+	mDevice->setBlendMode(value);
 }
 
 void System::setTextureAddressMode(skygfx::TextureAddress value)

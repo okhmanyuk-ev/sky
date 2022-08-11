@@ -36,8 +36,8 @@ namespace Scene
 			GRAPHICS->pushRenderTarget(target);
 			GRAPHICS->pushOrthoMatrix(target);
 			GRAPHICS->pushViewMatrix(view);
-			GRAPHICS->pushBlendMode(Renderer::BlendMode(Renderer::Blend::SrcAlpha, Renderer::Blend::InvSrcAlpha,
-				Renderer::Blend::One, Renderer::Blend::InvSrcAlpha));
+			GRAPHICS->pushBlendMode(skygfx::BlendMode(skygfx::Blend::SrcAlpha, skygfx::Blend::InvSrcAlpha,
+				skygfx::Blend::One, skygfx::Blend::InvSrcAlpha));
 			GRAPHICS->clear();
 		}
 
@@ -59,7 +59,7 @@ namespace Scene
 			auto color = getRenderLayerColor()->getColor() * glm::vec4({ glm::vec3(getRenderLayerColor()->getAlpha()), 1.0f });
 			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
 
-			GRAPHICS->pushBlendMode(Renderer::BlendStates::AlphaBlend);
+			GRAPHICS->pushBlendMode(skygfx::BlendStates::AlphaBlend);
 			GRAPHICS->pushModelMatrix(model);
 			GRAPHICS->drawSprite(target, { }, color);
 			GRAPHICS->pop(2);

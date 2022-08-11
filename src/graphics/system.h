@@ -40,15 +40,15 @@ namespace Graphics
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
-		void draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
-			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
+		void draw(skygfx::Topology topology, const skygfx::Buffer& vertices,
+			const skygfx::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 			std::function<void()> draw_func);
 
 		// generic
 		// TODO: hidden overload conflict when name "draw"
 		// TODO: maybe remove after adding draw with draw_func
-		void drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
-			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
+		void drawGeneric(skygfx::Topology topology, const skygfx::Buffer& vertices,
+			const skygfx::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 			std::optional<std::shared_ptr<Renderer::Texture>> texture = std::nullopt,
 			std::optional<size_t> count = std::nullopt, size_t start = 0);
 
@@ -145,7 +145,7 @@ namespace Graphics
 
 		void pushCleanState();
 		void pushSampler(skygfx::Sampler value);
-		void pushBlendMode(Renderer::BlendMode value);
+		void pushBlendMode(skygfx::BlendMode value);
 		void pushDepthMode(Renderer::DepthMode value);
 		void pushCullMode(skygfx::CullMode value);
 		void pushViewport(std::optional<skygfx::Viewport> value);
@@ -172,7 +172,7 @@ namespace Graphics
 			std::optional<skygfx::Viewport> viewport = std::nullopt;
 			Renderer::DepthMode depthMode = Renderer::DepthMode();
 			skygfx::CullMode cullMode = skygfx::CullMode::None;
-			Renderer::BlendMode blendMode = Renderer::BlendStates::NonPremultiplied;
+			skygfx::BlendMode blendMode = skygfx::BlendStates::NonPremultiplied;
 			skygfx::Sampler sampler = skygfx::Sampler::Nearest;
 			skygfx::TextureAddress textureAddress = skygfx::TextureAddress::Clamp;
 			Renderer::StencilMode stencilMode = Renderer::StencilMode();
