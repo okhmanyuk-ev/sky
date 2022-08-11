@@ -19,22 +19,14 @@ namespace Renderer
 			const std::string& fragment_code, const std::vector<std::string>& defines = {});
 		virtual ~Shader();
 
-	protected:
-		void apply();
+	public:
 		virtual void update() {};
 
 	private:
-		struct Impl;
-		std::unique_ptr<Impl> mImpl;
+		std::shared_ptr<skygfx::Shader> mShader;
 
 	protected:
-		static void checkRequiredAttribs(const std::set<skygfx::Vertex::Attribute::Type>& requiredAttribs, const skygfx::Vertex::Layout& layout)
-		{
-			for (auto& attrib : requiredAttribs)
-			{
-				assert(layout.hasAttribute(attrib));
-			}
-		}
+		static void checkRequiredAttribs(const std::set<skygfx::Vertex::Attribute::Type>& requiredAttribs, const skygfx::Vertex::Layout& layout);
 	};
 
 	class ShaderMatrices

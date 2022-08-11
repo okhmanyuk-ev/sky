@@ -5,27 +5,6 @@
 
 using namespace Renderer;
 
-struct Shader::Impl
-{
-	std::shared_ptr<skygfx::Shader> shader;
-};
-
-Shader::Shader(const skygfx::Vertex::Layout& layout, const std::string& vertex_code, const std::string& fragment_code,
-	const std::vector<std::string>& defines)
-{
-	mImpl = std::make_unique<Impl>();
-	mImpl->shader = std::make_shared<skygfx::Shader>(layout, vertex_code, fragment_code, defines);
-}
-
-Shader::~Shader()
-{
-}
-
-void Shader::apply()
-{
-	this->update();
-}
-
 System::System()
 {
 	auto width = PLATFORM->getWidth();
@@ -111,8 +90,8 @@ void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 
 void System::setShader(std::shared_ptr<Shader> value)
 {
-	mDevice->setShader(*value->mImpl->shader);
-	value->apply();
+	mDevice->setShader(*value->mShader);
+	value->update();
 }
 
 void System::setSampler(skygfx::Sampler value)
