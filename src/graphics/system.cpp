@@ -161,8 +161,10 @@ void System::flush()
 	shader_matrices->setViewMatrix(view);
 	shader_matrices->setModelMatrix(model);
 
+	if (mBatch.texture.has_value())
+		RENDERER->setTexture(*mBatch.texture.value());
+
 	RENDERER->setShader(mBatch.shader);
-	RENDERER->setTexture(mBatch.texture.value_or(nullptr));
 	RENDERER->setTopology(mBatch.topology.value());
 	RENDERER->setIndexBuffer(mBatch.indices);
 	RENDERER->setVertexBuffer(mBatch.vertices);
@@ -211,7 +213,9 @@ void System::drawGeneric(skygfx::Topology topology, const skygfx::Buffer& vertic
 	std::optional<size_t> count, size_t start)
 {
 	draw(topology, vertices, indices, shader, [&] {
-		RENDERER->setTexture(texture.value_or(nullptr));
+		if (texture.has_value())
+			RENDERER->setTexture(*texture.value());
+		
 		RENDERER->drawIndexed(count.value_or(indices.size / indices.stride), start);
 	});
 }

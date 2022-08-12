@@ -24,7 +24,7 @@ void ForwardLightTechnique::draw(const skygfx::Buffer& vertex_buffer, const skyg
 
 	for (const auto& [texture, index_range] : textures_map)
 	{
-		RENDERER->setTexture(texture);
+		RENDERER->setTexture(*texture);
 		RENDERER->drawIndexed(index_range.count, index_range.offset);
 	}
 }

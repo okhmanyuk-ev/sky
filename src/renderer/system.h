@@ -28,9 +28,9 @@ namespace Renderer
 		void setScissor(std::optional<skygfx::Scissor> value);
 		void setVertexBuffer(const skygfx::Buffer& value);
 		void setIndexBuffer(const skygfx::Buffer& value);
-		void setUniformBuffer(int slot, void* memory, size_t size);
-		void setTexture(int binding, std::shared_ptr<skygfx::Texture> value);
-		void setTexture(std::shared_ptr<skygfx::Texture> value);
+		void setUniformBuffer(uint32_t slot, void* memory, size_t size);
+		void setTexture(uint32_t binding, const skygfx::Texture& value);
+		void setTexture(const skygfx::Texture& value);
 		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
 		void setShader(std::shared_ptr<Shader> value);
 		void setSampler(skygfx::Sampler value);

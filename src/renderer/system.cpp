@@ -62,20 +62,17 @@ void System::setIndexBuffer(const skygfx::Buffer& value)
 	mDevice->setIndexBuffer(value);
 }
 
-void System::setUniformBuffer(int slot, void* memory, size_t size)
+void System::setUniformBuffer(uint32_t slot, void* memory, size_t size)
 {
 	mDevice->setUniformBuffer(slot, memory, size);
 }
 
-void System::setTexture(int binding, std::shared_ptr<skygfx::Texture> value)
+void System::setTexture(uint32_t binding, const skygfx::Texture& value)
 {
-	if (!value)
-		return;
-
-	mDevice->setTexture(binding, *value);
+	mDevice->setTexture(binding, value);
 }
 
-void System::setTexture(std::shared_ptr<skygfx::Texture> value)
+void System::setTexture(const skygfx::Texture& value)
 {
 	setTexture(0, value);
 }
