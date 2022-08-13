@@ -52,19 +52,65 @@ void System::setScissor(std::optional<skygfx::Scissor> value)
 	mDevice->setScissor(value);
 }
 
-void System::setVertexBuffer(const skygfx::Buffer& value)
+void System::setVertexBuffer(const Buffer& value)
 {
-	mDevice->setVertexBuffer(value);
+	assert(value.size > 0);
+
+	size_t size = 0;
+
+	if (mVertexBuffer)
+		size = mVertexBuffer->getSize();
+
+	if (size < value.size)
+		mVertexBuffer = std::make_shared<skygfx::VertexBuffer>(value.data, value.size, value.stride);
+	else
+		mVertexBuffer->write(value.data, value.size, value.stride);
+
+	mDevice->setVertexBuffer(*mVertexBuffer);
 }
 
-void System::setIndexBuffer(const skygfx::Buffer& value)
+void System::setIndexBuffer(const Buffer& value)
 {
-	mDevice->setIndexBuffer(value);
+	assert(value.size > 0);
+
+	size_t size = 0;
+
+	if (mIndexBuffer)
+		size = mIndexBuffer->getSize();
+
+	if (size < value.size)
+		mIndexBuffer = std::make_shared<skygfx::IndexBuffer>(value.data, value.size, value.stride);
+	else
+		mIndexBuffer->write(value.data, value.size, value.stride);
+
+	mDevice->setIndexBuffer(*mIndexBuffer);
 }
 
-void System::setUniformBuffer(uint32_t slot, void* memory, size_t size)
+void System::setUniformBuffer(uint32_t binding, void* memory, size_t size)
 {
-	mDevice->setUniformBuffer(slot, memory, size);
+	assert(size > 0);
+
+	std::shared_ptr<skygfx::UniformBuffer> uniform_buffer = nullptr;
+
+	if (mUniformBuffers.contains(binding))
+		uniform_buffer = mUniformBuffers.at(binding);
+
+	size_t uniform_buffer_size = 0;
+
+	if (uniform_buffer)
+		uniform_buffer_size = uniform_buffer->getSize();
+
+	if (uniform_buffer_size < size)
+	{
+		uniform_buffer = std::make_shared<skygfx::UniformBuffer>(memory, size);
+		mUniformBuffers[binding] = uniform_buffer;
+	}
+	else
+	{
+		uniform_buffer->write(memory, size);
+	}
+
+	mDevice->setUniformBuffer(binding, *uniform_buffer);
 }
 
 void System::setTexture(uint32_t binding, const skygfx::Texture& value)

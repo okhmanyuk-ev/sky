@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include <renderer/shaders/light.h> // TODO: del
+#include <renderer/system.h>
 
 namespace Renderer
 {
@@ -20,7 +21,7 @@ namespace Renderer
 		using TexturesMap = std::unordered_map<std::shared_ptr<skygfx::Texture>, IndexRange>;
 
 	public:
-		virtual void draw(const skygfx::Buffer& vertex_buffer, const skygfx::Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
+		virtual void draw(const Renderer::Buffer& vertex_buffer, const Renderer::Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
 			const TexturesMap& textures_map) = 0;
 
 	public:
@@ -46,7 +47,7 @@ namespace Renderer
 	class ForwardLightTechnique : public Technique
 	{
 	public:
-		void draw(const skygfx::Buffer& vertex_buffer, const skygfx::Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
+		void draw(const Renderer::Buffer& vertex_buffer, const Renderer::Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
 			const TexturesMap& textures_map) override;
 
 	public:

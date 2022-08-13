@@ -99,8 +99,8 @@ void ImguiSystem::end()
 	{
 		const auto cmds = drawData->CmdLists[i];
 
-		auto vertex_buffer = skygfx::Buffer{ cmds->VtxBuffer.Data, static_cast<size_t>(cmds->VtxBuffer.size()) };
-		auto index_buffer = skygfx::Buffer{ cmds->IdxBuffer.Data, static_cast<size_t>(cmds->IdxBuffer.size()) };
+		auto vertex_buffer = Renderer::Buffer{ cmds->VtxBuffer.Data, static_cast<size_t>(cmds->VtxBuffer.size()) };
+		auto index_buffer = Renderer::Buffer{ cmds->IdxBuffer.Data, static_cast<size_t>(cmds->IdxBuffer.size()) };
 
 		int indexOffset = 0;
 

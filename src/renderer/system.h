@@ -13,6 +13,17 @@
 
 namespace Renderer
 {
+	struct Buffer
+	{
+		Buffer() {}
+		template<typename T> Buffer(T* memory, size_t count) : data((void*)memory), size(count * sizeof(T)), stride(sizeof(T)) {}
+		template<typename T> Buffer(const std::vector<T>& values) : Buffer(values.data(), values.size()) {}
+
+		void* data = nullptr;
+		size_t size = 0;
+		size_t stride = 0;
+	};
+
 	class System : public Common::Event::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
@@ -26,9 +37,9 @@ namespace Renderer
 		void setTopology(skygfx::Topology value);
 		void setViewport(std::optional<skygfx::Viewport> value);
 		void setScissor(std::optional<skygfx::Scissor> value);
-		void setVertexBuffer(const skygfx::Buffer& value);
-		void setIndexBuffer(const skygfx::Buffer& value);
-		void setUniformBuffer(uint32_t slot, void* memory, size_t size);
+		void setVertexBuffer(const Buffer& value);
+		void setIndexBuffer(const Buffer& value);
+		void setUniformBuffer(uint32_t binding, void* memory, size_t size);
 		void setTexture(uint32_t binding, const skygfx::Texture& value);
 		void setTexture(const skygfx::Texture& value);
 		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
@@ -64,5 +75,8 @@ namespace Renderer
 		int mDrawcalls = 0;
 		int mDrawcallsPublic = 0;
 		std::shared_ptr<skygfx::Device> mDevice;
+		std::shared_ptr<skygfx::VertexBuffer> mVertexBuffer;
+		std::shared_ptr<skygfx::IndexBuffer> mIndexBuffer;
+		std::unordered_map<uint32_t, std::shared_ptr<skygfx::UniformBuffer>> mUniformBuffers;
 	};
 }
