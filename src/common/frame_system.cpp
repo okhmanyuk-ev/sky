@@ -52,6 +52,10 @@ void FrameSystem::frame()
 	auto now = Clock::Now();
 
 	mTimeDelta = Clock::FromSeconds(Clock::ToSeconds<double>(now - mLastTime) * mTimeScale);
+
+	if (mTimeDeltaLimit.has_value() && mTimeDelta > mTimeDeltaLimit.value())
+		mTimeDelta = mTimeDeltaLimit.value();
+
 	mLastTime = now;
 
 	mUptime += mTimeDelta;

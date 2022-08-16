@@ -54,6 +54,9 @@ namespace Common
 		auto getUptime() const { return mUptime; }
 		auto getFrameCount() { return mFrameCount; }
 
+		auto getTimeDeltaLimit() const { return mTimeDeltaLimit; }
+		void setTimeDeltaLimit(std::optional<Clock::Duration> value) { mTimeDeltaLimit = value; }
+
 	private:
 		std::list<StatusCallback> mFramers;
 		std::list<Callback> mThreadsafeCallbacks;
@@ -63,6 +66,7 @@ namespace Common
 		Clock::TimePoint mLastTime = Clock::Now();
 		Clock::Duration mTimeDelta = Clock::Duration::zero();
 		Clock::Duration mUptime = Clock::Duration::zero();
+		std::optional<Clock::Duration> mTimeDeltaLimit; // this can save from animation breaks
 		uint64_t mFrameCount = 0;
 		std::mutex mMutex;
 	};
