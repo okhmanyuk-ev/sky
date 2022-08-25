@@ -10,13 +10,6 @@ System::System()
 	auto width = PLATFORM->getWidth();
 	auto height = PLATFORM->getHeight();
 
-	auto type = skygfx::BackendType::D3D11;
-
-#if defined(PLATFORM_IOS)
-	//type = skygfx::BackendType::Metal;
-	type = skygfx::BackendType::OpenGL44;
-#endif
-
 	void* window = nullptr;
 
 #if defined(PLATFORM_WINDOWS)
@@ -25,7 +18,7 @@ System::System()
 	window = Platform::SystemIos::Window; // TODO: maybe we should send rootView here
 #endif
 
-	mDevice = std::make_shared<skygfx::Device>(window, width, height, type);
+	mDevice = std::make_shared<skygfx::Device>(window, width, height);
 }
 
 System::~System()
