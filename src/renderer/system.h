@@ -75,8 +75,5 @@ namespace Renderer
 		int mDrawcalls = 0;
 		int mDrawcallsPublic = 0;
 		std::shared_ptr<skygfx::Device> mDevice;
-		std::shared_ptr<skygfx::VertexBuffer> mVertexBuffer;
-		std::shared_ptr<skygfx::IndexBuffer> mIndexBuffer;
-		std::unordered_map<uint32_t, std::shared_ptr<skygfx::UniformBuffer>> mUniformBuffers;
 	};
 }

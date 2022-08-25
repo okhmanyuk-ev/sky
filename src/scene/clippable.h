@@ -63,7 +63,7 @@ namespace Scene
 			if (mDrawOnlyStencil)
 			{
 				auto blend = GRAPHICS->getCurrentState().blendMode;
-				blend.colorMask = { false, false, false, false };
+				blend.color_mask = { false, false, false, false };
 				GRAPHICS->pushBlendMode(blend);
 			}
 
@@ -151,7 +151,7 @@ namespace Scene
 
 			auto state = GRAPHICS->getCurrentState();
 			state.stencil_mode = stencil;
-			state.blendMode.colorMask = { false, false, false, false };
+			state.blendMode.color_mask = { false, false, false, false };
 
 			auto absolute_size = T::getAbsoluteSize();
 			state.modelMatrix = glm::scale(T::getTransform(), { absolute_size, 1.0f });

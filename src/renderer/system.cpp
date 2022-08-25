@@ -25,7 +25,7 @@ System::System()
 	window = Platform::SystemIos::Window; // TODO: maybe we should send rootView here
 #endif
 
-	mDevice = std::make_shared<skygfx::Device>(type, window, width, height);
+	mDevice = std::make_shared<skygfx::Device>(window, width, height, type);
 }
 
 System::~System()
@@ -54,63 +54,17 @@ void System::setScissor(std::optional<skygfx::Scissor> value)
 
 void System::setVertexBuffer(const Buffer& value)
 {
-	assert(value.size > 0);
-
-	size_t size = 0;
-
-	if (mVertexBuffer)
-		size = mVertexBuffer->getSize();
-
-	if (size < value.size)
-		mVertexBuffer = std::make_shared<skygfx::VertexBuffer>(value.data, value.size, value.stride);
-	else
-		mVertexBuffer->write(value.data, value.size, value.stride);
-
-	mDevice->setVertexBuffer(*mVertexBuffer);
+	mDevice->setDynamicVertexBuffer(value.data, value.size, value.stride);
 }
 
 void System::setIndexBuffer(const Buffer& value)
 {
-	assert(value.size > 0);
-
-	size_t size = 0;
-
-	if (mIndexBuffer)
-		size = mIndexBuffer->getSize();
-
-	if (size < value.size)
-		mIndexBuffer = std::make_shared<skygfx::IndexBuffer>(value.data, value.size, value.stride);
-	else
-		mIndexBuffer->write(value.data, value.size, value.stride);
-
-	mDevice->setIndexBuffer(*mIndexBuffer);
+	mDevice->setDynamicIndexBuffer(value.data, value.size, value.stride);
 }
 
 void System::setUniformBuffer(uint32_t binding, void* memory, size_t size)
 {
-	assert(size > 0);
-
-	std::shared_ptr<skygfx::UniformBuffer> uniform_buffer = nullptr;
-
-	if (mUniformBuffers.contains(binding))
-		uniform_buffer = mUniformBuffers.at(binding);
-
-	size_t uniform_buffer_size = 0;
-
-	if (uniform_buffer)
-		uniform_buffer_size = uniform_buffer->getSize();
-
-	if (uniform_buffer_size < size)
-	{
-		uniform_buffer = std::make_shared<skygfx::UniformBuffer>(memory, size);
-		mUniformBuffers[binding] = uniform_buffer;
-	}
-	else
-	{
-		uniform_buffer->write(memory, size);
-	}
-
-	mDevice->setUniformBuffer(binding, *uniform_buffer);
+	mDevice->setDynamicUniformBuffer(binding, memory, size);
 }
 
 void System::setTexture(uint32_t binding, const skygfx::Texture& value)
