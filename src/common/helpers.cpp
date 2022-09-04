@@ -138,45 +138,6 @@ nlohmann::json Helpers::LoadBsonFromAsset(const Platform::Asset& asset)
 	return nlohmann::json::from_bson(std::string((char*)asset.getMemory(), asset.getSize()));
 }
 
-float Helpers::SmoothValueAssign(float src, float dst, Clock::Duration dTime, float friction)
-{
-	auto distance = dst - src;
-	auto delta = Clock::ToSeconds(dTime) * 100.0f;
-	return src + (distance * delta * friction);
-}
-
-glm::vec2 Helpers::SmoothValueAssign(const glm::vec2& src, const glm::vec2& dst, Clock::Duration dTime, float friction)
-{
-	return {
-		SmoothValueAssign(src.x, dst.x, dTime, friction),
-		SmoothValueAssign(src.y, dst.y, dTime, friction)
-	};
-}
-
-glm::vec3 Helpers::SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst, Clock::Duration dTime, float friction)
-{
-	return {
-		SmoothValueAssign(src.x, dst.x, dTime, friction),
-		SmoothValueAssign(src.y, dst.y, dTime, friction),
-		SmoothValueAssign(src.z, dst.z, dTime, friction)
-	};
-}
-
-glm::mat4 Helpers::SmoothValueAssign(const glm::mat4& src, const glm::mat4& dst, Clock::Duration dTime, float friction)
-{
-	glm::mat4 result = glm::mat4(1.0f);
-
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			result[i][j] = SmoothValueAssign(src[i][j], dst[i][j], dTime, friction);
-		}
-	}
-
-	return result;
-}
-
 float Helpers::SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction)
 {
 	auto src_deg = glm::degrees(src_radians);

@@ -40,10 +40,14 @@ namespace Common::Helpers
 
 	inline const float DefaultFriction = 0.1f;
 
-	float SmoothValueAssign(float src, float dst, Clock::Duration dTime, float friction = DefaultFriction);
-	glm::vec2 SmoothValueAssign(const glm::vec2& src, const glm::vec2& dst, Clock::Duration dTime, float friction = DefaultFriction);
-	glm::vec3 SmoothValueAssign(const glm::vec3& src, const glm::vec3& dst, Clock::Duration dTime, float friction = DefaultFriction);
-	glm::mat4 SmoothValueAssign(const glm::mat4& src, const glm::mat4& dst, Clock::Duration dTime, float friction = DefaultFriction);
+	template<class T>
+	T SmoothValueAssign(T src, T dst, Clock::Duration dTime, float friction = DefaultFriction)
+	{
+		auto distance = dst - src;
+		auto delta = Clock::ToSeconds(dTime) * 100.0f;
+		return src + (distance * delta * friction);
+	}
+
 	float SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction);
 
 	// TODO: find identical function in glm
