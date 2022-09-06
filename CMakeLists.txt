@@ -117,7 +117,7 @@ endif()
 
 if(APPLE)
 	set(OBJC_SOURCES
-		src/renderer/system_skygfx.cpp
+		src/renderer/system.cpp
 		src/platform/asset.cpp
 	)
 	set_source_files_properties(${OBJC_SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++ -fembed-bitcode")
