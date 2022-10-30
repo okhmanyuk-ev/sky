@@ -5,6 +5,8 @@
 #define GLFW_EXPOSE_NATIVE_COCOA
 #include <GLFW/glfw3native.h>
 
+#include <common/event_system.h>
+
 using namespace Platform;
 
 int main(int argc, char* argv[])
@@ -43,6 +45,19 @@ SystemMac::SystemMac(const std::string& appname) : mAppName(appname)
 	glfwGetWindowContentScale(mWindow, &x_scale, &y_scale);
 	
 	mScale = std::fmaxf(x_scale, y_scale);
+	
+	glfwSetMouseButtonCallback(mWindow, MouseButtonCallback);
+	glfwSetKeyCallback(mWindow, KeyCallback);
+	glfwSetScrollCallback(mWindow, ScrollCallback);
+	glfwSetWindowSizeCallback(mWindow, WindowSizeCallback);
+	
+	double mouse_x;
+	double mouse_y;
+	
+	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
+	
+	mPrevMouseX = (int)mouse_x;
+	mPrevMouseY = (int)mouse_y;
 }
 
 SystemMac::~SystemMac()
@@ -53,6 +68,28 @@ SystemMac::~SystemMac()
 void SystemMac::process()
 {
 	glfwPollEvents();
+
+	double mouse_x;
+	double mouse_y;
+
+	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
+
+	auto mouse_x_i = (int)mouse_x;
+	auto mouse_y_i = (int)mouse_y;
+
+	if (mouse_x_i != mPrevMouseX || mouse_y_i != mPrevMouseY)
+	{
+		mPrevMouseX = mouse_x_i;
+		mPrevMouseY = mouse_y_i;
+		
+		Input::Mouse::Event e;
+
+		e.type = Input::Mouse::Event::Type::Move;
+		e.x = mouse_x_i;
+		e.y = mouse_y_i;
+
+		EVENT->emit(e);
+	}
 }
 
 void SystemMac::quit()
@@ -122,6 +159,71 @@ void SystemMac::purchase(const std::string& product)
 
 void SystemMac::alert(const std::string& text)
 {
+}
+
+void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	Input::Mouse::Event e;
+
+	static const std::unordered_map<int, Input::Mouse::Event::Type> TypeMap = {
+		{ GLFW_PRESS, Input::Mouse::Event::Type::ButtonDown },
+		{ GLFW_RELEASE, Input::Mouse::Event::Type::ButtonUp },
+	};
+	
+	static const std::unordered_map<int, Input::Mouse::Button> ButtonMap = {
+		{ GLFW_MOUSE_BUTTON_LEFT, Input::Mouse::Button::Left },
+		{ GLFW_MOUSE_BUTTON_MIDDLE, Input::Mouse::Button::Middle },
+		{ GLFW_MOUSE_BUTTON_RIGHT, Input::Mouse::Button::Right },
+	};
+
+	double x;
+	double y;
+	glfwGetCursorPos(window, &x, &y);
+
+	e.type = TypeMap.at(action);
+	e.button = ButtonMap.at(button);
+	e.x = (int)x;
+	e.y = (int)y;
+
+	EVENT->emit(e);
+}
+
+void SystemMac::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	/*Input::Keyboard::Event e;
+	
+	static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {
+		{ GLFW_PRESS, Input::Keyboard::Event::Type::Pressed },
+		{ GLFW_RELEASE, Input::Keyboard::Event::Type::Released },
+	};
+
+	e.type = TypeMap.at(action);
+
+	EVENT->emit(e);*/
+}
+
+void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	Input::Mouse::Event e;
+
+	double x;
+	double y;
+	glfwGetCursorPos(window, &x, &y);
+
+	e.type = Input::Mouse::Event::Type::Wheel;
+	e.x = (int)x;
+	e.y = (int)y;
+	e.wheelX = (float)xoffset;
+	e.wheelY = (float)yoffset;
+
+ 	EVENT->emit(e);
+}
+
+void SystemMac::WindowSizeCallback(GLFWwindow* window, int width, int height)
+{
+	//mWidth = width;
+	//mHeight = height;
+	//EVENT->emit(ResizeEvent({ width, height }));
 }
 
 #endif

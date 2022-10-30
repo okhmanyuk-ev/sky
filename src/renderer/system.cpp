@@ -21,6 +21,8 @@ System::System()
 	window = Platform::SystemMac::Window;
 #endif
 
+	assert(window != nullptr);
+
 	mDevice = std::make_shared<skygfx::Device>(window, width, height);
 }
 
