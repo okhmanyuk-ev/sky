@@ -116,6 +116,15 @@ if(MSVC)
 endif()
 
 if(APPLE)
+	if(CMAKE_OSX_SYSROOT STREQUAL iphoneos)
+		set(IOS True)
+	endif()
+	if(IOS)
+		target_compile_definitions(${PROJECT_NAME} PUBLIC -DPLATFORM_IOS)
+	else()
+		target_compile_definitions(${PROJECT_NAME} PUBLIC -DPLATFORM_MAC)
+	endif()
+
 	set(OBJC_SOURCES
 		src/renderer/system.cpp
 		src/platform/asset.cpp
@@ -124,13 +133,18 @@ if(APPLE)
 
 	target_link_libraries(${PROJECT_NAME}
 		"-ObjC"
-		"-framework UIKit"
 		"-framework CoreGraphics"
 		"-framework Foundation"
 		"-framework AVFoundation"
 		"-framework AudioToolbox"
 		"-framework StoreKit"
 	)
+
+	if(IOS)
+		target_link_libraries(${PROJECT_NAME}
+			"-framework UIKit"
+		)
+	endif()
 elseif(ANDROID)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -frtti -fexceptions -Wno-error=format-security")
 
@@ -229,14 +243,18 @@ elseif(ANDROID)
 	target_link_libraries(${PROJECT_NAME} fmod)
 	target_link_libraries(${PROJECT_NAME} fmodstudio)
 elseif(APPLE)
-	target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodL_iphonesimulator.a)
-	target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodL_iphoneos.a)
-	target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmod_iphonesimulator.a)
-	target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmod_iphoneos.a)
-	target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudioL_iphonesimulator.a)
-	target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudioL_iphoneos.a)
-	target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudio_iphonesimulator.a)
-	target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudio_iphoneos.a)
+	if(IOS)
+		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodL_iphonesimulator.a)
+		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodL_iphoneos.a)
+		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmod_iphonesimulator.a)
+		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmod_iphoneos.a)
+		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudioL_iphonesimulator.a)
+		target_link_libraries(${PROJECT_NAME} debug ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudioL_iphoneos.a)
+		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudio_iphonesimulator.a)
+		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudio_iphoneos.a)
+	else()
+		# TODO: implement for mac	
+	endif()
 endif()
 
 function(copy_required_libs TARGET_NAME)
@@ -317,7 +335,7 @@ target_include_directories(asio INTERFACE lib/asio/include)
 target_link_libraries(${PROJECT_NAME} asio)
 
 if(WIN32)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DWIN32_LEAN_AND_MEAN)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC -DWIN32_LEAN_AND_MEAN)
 endif()
 
 # websocketpp
@@ -337,7 +355,7 @@ target_include_directories(websocketpp INTERFACE lib/websocketpp)
 target_link_libraries(${PROJECT_NAME} websocketpp)
 
 if(WIN32)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
 
 # box2d
@@ -354,3 +372,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC lib/magic_enum)
 
 add_subdirectory(lib/skygfx)
 target_link_libraries(${PROJECT_NAME} skygfx)
+
+# glfw
+
+if(APPLE AND NOT IOS)
+	set(GLFW_INSTALL OFF)
+	set(GLFW_BUILD_DOCS OFF)
+	add_subdirectory(lib/glfw)
+	set_property(TARGET glfw PROPERTY FOLDER ${LIBS_FOLDER}/glfw)
+	set_property(TARGET update_mappings PROPERTY FOLDER ${LIBS_FOLDER}/glfw)
+	target_link_libraries(${PROJECT_NAME} glfw)
+endif()

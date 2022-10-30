@@ -43,7 +43,7 @@ void GraphicalConsoleCommands::onFrame()
 		ImGui::Begin("Render Targets");
 		for (const auto& [name, target] : GRAPHICS->getRenderTargets())
 		{
-			ImGui::Text(name.c_str());
+			ImGui::Text("%s", name.c_str());
 			ImGui::Text("%dx%d", target->getWidth(), target->getHeight());
 			auto width = ImGui::GetContentRegionAvailWidth();
 			SceneEditor::drawImage(target, std::nullopt, width);

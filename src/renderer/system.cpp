@@ -2,6 +2,7 @@
 
 #include <platform/system_windows.h>
 #include <platform/system_ios.h>
+#include <platform/system_mac.h>
 
 using namespace Renderer;
 
@@ -15,7 +16,9 @@ System::System()
 #if defined(PLATFORM_WINDOWS)
 	window = Platform::SystemWindows::Window;
 #elif defined(PLATFORM_IOS)
-	window = Platform::SystemIos::Window; // TODO: maybe we should send rootView here
+	window = Platform::SystemIos::Window;
+#elif defined(PLATFORM_MAC)
+	window = Platform::SystemMac::Window;
 #endif
 
 	mDevice = std::make_shared<skygfx::Device>(window, width, height);

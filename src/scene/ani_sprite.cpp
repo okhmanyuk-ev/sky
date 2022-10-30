@@ -63,7 +63,7 @@ void AniSprite::randomizeProgress()
 
 	const auto& frames = states.at(mState);
 
-	mProgress = glm::linearRand<size_t>(0, frames.size() - 1);
+	mProgress = glm::linearRand(0, (int)frames.size() - 1);
 }
 
 void AniSprite::setAnimation(std::shared_ptr<skygfx::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas, std::shared_ptr<Graphics::Animation> animation)

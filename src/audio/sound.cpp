@@ -6,6 +6,7 @@ using namespace Audio;
 
 Sound::Sound(const Platform::Asset& asset, bool loop)
 {
+#ifndef PLATFORM_MAC // TODO: fix for mac
 	FMOD_CREATESOUNDEXINFO exinfo;
 	memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
@@ -19,9 +20,12 @@ Sound::Sound(const Platform::Asset& asset, bool loop)
 		mode |= FMOD_LOOP_OFF;
 
 	Audio::System::Fmod->createSound((const char*)asset.getMemory(), mode, &exinfo, &sound);
+#endif
 }
 
 Sound::~Sound()
 {
-	//sound->release();
+#ifndef PLATFORM_MAC // TODO: fix for mac
+	sound->release();
+#endif
 }

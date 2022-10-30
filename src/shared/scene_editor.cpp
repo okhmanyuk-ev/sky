@@ -186,10 +186,10 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		if (direct_tex_coords.has_value())
 		{
 			auto direct_tex_coords_nn = direct_tex_coords.value();
-			ImGui::Text(fmt::format("top left x: {}, y: {}", direct_tex_coords_nn.top_left_uv.x, direct_tex_coords_nn.top_left_uv.y).c_str());
-			ImGui::Text(fmt::format("top right x: {}, y: {}", direct_tex_coords_nn.top_right_uv.x, direct_tex_coords_nn.top_right_uv.y).c_str());
-			ImGui::Text(fmt::format("bottom left x: {}, y: {}", direct_tex_coords_nn.bottom_left_uv.x, direct_tex_coords_nn.bottom_left_uv.y).c_str());
-			ImGui::Text(fmt::format("bottom right x: {}, y: {}", direct_tex_coords_nn.bottom_right_uv.x, direct_tex_coords_nn.bottom_right_uv.y).c_str());
+			ImGui::Text("%s", fmt::format("top left x: {}, y: {}", direct_tex_coords_nn.top_left_uv.x, direct_tex_coords_nn.top_left_uv.y).c_str());
+			ImGui::Text("%s", fmt::format("top right x: {}, y: {}", direct_tex_coords_nn.top_right_uv.x, direct_tex_coords_nn.top_right_uv.y).c_str());
+			ImGui::Text("%s", fmt::format("bottom left x: {}, y: {}", direct_tex_coords_nn.bottom_left_uv.x, direct_tex_coords_nn.bottom_left_uv.y).c_str());
+			ImGui::Text("%s", fmt::format("bottom right x: {}, y: {}", direct_tex_coords_nn.bottom_right_uv.x, direct_tex_coords_nn.bottom_right_uv.y).c_str());
 		}
 		ImGui::Separator();
 	}
