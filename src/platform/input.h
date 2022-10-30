@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Platform::Input
 {
 	namespace Keyboard
@@ -198,7 +200,11 @@ namespace Platform::Input
 
 			Type type;              ///< The event type
 			Key  key;               ///< The last key that was pressed/released
-			char asciiChar;         ///< The matching ASCII char, or zero if the key type doesn't have one
+		};
+		
+		struct CharEvent
+		{
+			uint32_t codepoint;
 		};
 	}
 

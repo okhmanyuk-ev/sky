@@ -162,9 +162,12 @@ void ImguiSystem::onEvent(const Platform::Input::Keyboard::Event& e)
 		io.KeysDown[key] = true;
 	else
 		mReleasedKeyboardKeys.insert(key);
+}
 
-	if (e.asciiChar != 0 && e.type == Platform::Input::Keyboard::Event::Type::Pressed)
-		io.AddInputCharacter(e.asciiChar);
+void ImguiSystem::onEvent(const Platform::Input::Keyboard::CharEvent& e)
+{
+	auto& io = ImGui::GetIO();
+	io.AddInputCharacter(e.codepoint);
 }
 
 void ImguiSystem::onEvent(const Platform::Input::Mouse::Event& e)

@@ -21,6 +21,7 @@ namespace Shared
 {
 	class ImguiSystem :
 		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
+		public Common::Event::Listenable<Platform::Input::Keyboard::CharEvent>,
 		public Common::Event::Listenable<Platform::Input::Mouse::Event>,
 		public Common::Event::Listenable<Platform::Input::Touch::Event>
 	{
@@ -62,6 +63,7 @@ namespace Shared
 
 	private:	
 		void onEvent(const Platform::Input::Keyboard::Event& e) override;
+		void onEvent(const Platform::Input::Keyboard::CharEvent& e) override;
 		void onEvent(const Platform::Input::Mouse::Event& e) override;
 		void onEvent(const Platform::Input::Touch::Event& e) override;
 

@@ -9,6 +9,8 @@
 
 using namespace Platform;
 
+static SystemMac* gContext = nullptr;
+
 int main(int argc, char* argv[])
 {
 	sky_main();
@@ -48,6 +50,7 @@ SystemMac::SystemMac(const std::string& appname) : mAppName(appname)
 	
 	glfwSetMouseButtonCallback(mWindow, MouseButtonCallback);
 	glfwSetKeyCallback(mWindow, KeyCallback);
+	glfwSetCharCallback(mWindow, CharCallback);
 	glfwSetScrollCallback(mWindow, ScrollCallback);
 	glfwSetWindowSizeCallback(mWindow, WindowSizeCallback);
 	
@@ -58,6 +61,8 @@ SystemMac::SystemMac(const std::string& appname) : mAppName(appname)
 	
 	mPrevMouseX = (int)mouse_x;
 	mPrevMouseY = (int)mouse_y;
+	
+	gContext = this;
 }
 
 SystemMac::~SystemMac()
@@ -114,9 +119,9 @@ bool SystemMac::isKeyPressed(Input::Mouse::Button key) const
 
 void SystemMac::resize(int width, int height)
 {
-//	glfwSetWindowSize(mWindow, width, height);
-//	mWidth = width;
-//	mHeight = height;
+	glfwSetWindowSize(mWindow, width, height);
+	mWidth = width;
+	mHeight = height;
 }
 
 void SystemMac::setTitle(const std::string& text)
@@ -190,16 +195,114 @@ void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, 
 
 void SystemMac::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	/*Input::Keyboard::Event e;
-	
+	static const std::unordered_map<int, Input::Keyboard::Key> KeyMap = {
+		{ GLFW_KEY_BACKSPACE, Input::Keyboard::Key::Backspace },
+		{ GLFW_KEY_TAB, Input::Keyboard::Key::Tab },
+		{ GLFW_KEY_ENTER, Input::Keyboard::Key::Enter },
+		{ GLFW_KEY_LEFT_SHIFT, Input::Keyboard::Key::Shift },
+		{ GLFW_KEY_RIGHT_SHIFT, Input::Keyboard::Key::Shift },
+		{ GLFW_KEY_LEFT_CONTROL, Input::Keyboard::Key::Ctrl },
+		{ GLFW_KEY_RIGHT_CONTROL, Input::Keyboard::Key::Ctrl },
+		{ GLFW_KEY_LEFT_ALT, Input::Keyboard::Key::Alt },
+		{ GLFW_KEY_RIGHT_ALT, Input::Keyboard::Key::Alt },
+		{ GLFW_KEY_PAUSE, Input::Keyboard::Key::Pause },
+		{ GLFW_KEY_CAPS_LOCK, Input::Keyboard::Key::CapsLock },
+		{ GLFW_KEY_ESCAPE, Input::Keyboard::Key::Escape },
+		{ GLFW_KEY_SPACE, Input::Keyboard::Key::Space },
+		{ GLFW_KEY_PAGE_UP, Input::Keyboard::Key::PageUp },
+		{ GLFW_KEY_PAGE_DOWN, Input::Keyboard::Key::PageDown },
+		{ GLFW_KEY_END, Input::Keyboard::Key::End },
+		{ GLFW_KEY_HOME, Input::Keyboard::Key::Home },
+		{ GLFW_KEY_LEFT, Input::Keyboard::Key::Left },
+		{ GLFW_KEY_UP, Input::Keyboard::Key::Up },
+		{ GLFW_KEY_RIGHT, Input::Keyboard::Key::Right },
+		{ GLFW_KEY_DOWN, Input::Keyboard::Key::Down },
+		{ GLFW_KEY_PRINT_SCREEN, Input::Keyboard::Key::PrintScreen },
+		{ GLFW_KEY_INSERT, Input::Keyboard::Key::Insert },
+		{ GLFW_KEY_DELETE, Input::Keyboard::Key::Delete },
+		
+		{ GLFW_KEY_A, Input::Keyboard::Key::A },
+		{ GLFW_KEY_B, Input::Keyboard::Key::B },
+		{ GLFW_KEY_C, Input::Keyboard::Key::C },
+		{ GLFW_KEY_D, Input::Keyboard::Key::D },
+		{ GLFW_KEY_E, Input::Keyboard::Key::E },
+		{ GLFW_KEY_F, Input::Keyboard::Key::F },
+		{ GLFW_KEY_G, Input::Keyboard::Key::G },
+		{ GLFW_KEY_H, Input::Keyboard::Key::H },
+		{ GLFW_KEY_I, Input::Keyboard::Key::I },
+		{ GLFW_KEY_J, Input::Keyboard::Key::J },
+		{ GLFW_KEY_K, Input::Keyboard::Key::K },
+		{ GLFW_KEY_L, Input::Keyboard::Key::L },
+		{ GLFW_KEY_M, Input::Keyboard::Key::M },
+		{ GLFW_KEY_N, Input::Keyboard::Key::N },
+		{ GLFW_KEY_O, Input::Keyboard::Key::O },
+		{ GLFW_KEY_P, Input::Keyboard::Key::P },
+		{ GLFW_KEY_Q, Input::Keyboard::Key::Q },
+		{ GLFW_KEY_R, Input::Keyboard::Key::R },
+		{ GLFW_KEY_S, Input::Keyboard::Key::S },
+		{ GLFW_KEY_T, Input::Keyboard::Key::T },
+		{ GLFW_KEY_U, Input::Keyboard::Key::U },
+		{ GLFW_KEY_V, Input::Keyboard::Key::V },
+		{ GLFW_KEY_W, Input::Keyboard::Key::W },
+		{ GLFW_KEY_X, Input::Keyboard::Key::X },
+		{ GLFW_KEY_Y, Input::Keyboard::Key::Y },
+		{ GLFW_KEY_Z, Input::Keyboard::Key::Z },
+
+		{ GLFW_KEY_KP_0, Input::Keyboard::Key::NumPad0 },
+		{ GLFW_KEY_KP_1, Input::Keyboard::Key::NumPad1 },
+		{ GLFW_KEY_KP_2, Input::Keyboard::Key::NumPad2 },
+		{ GLFW_KEY_KP_3, Input::Keyboard::Key::NumPad3 },
+		{ GLFW_KEY_KP_4, Input::Keyboard::Key::NumPad4 },
+		{ GLFW_KEY_KP_5, Input::Keyboard::Key::NumPad5 },
+		{ GLFW_KEY_KP_6, Input::Keyboard::Key::NumPad6 },
+		{ GLFW_KEY_KP_7, Input::Keyboard::Key::NumPad7 },
+		{ GLFW_KEY_KP_8, Input::Keyboard::Key::NumPad8 },
+		{ GLFW_KEY_KP_9, Input::Keyboard::Key::NumPad9 },
+
+		{ GLFW_KEY_KP_MULTIPLY, Input::Keyboard::Key::Multiply },
+		{ GLFW_KEY_KP_ADD, Input::Keyboard::Key::Add },
+		{ GLFW_KEY_KP_SUBTRACT, Input::Keyboard::Key::Subtract },
+		{ GLFW_KEY_KP_DECIMAL, Input::Keyboard::Key::Decimal },
+		{ GLFW_KEY_KP_DIVIDE, Input::Keyboard::Key::Divide },
+
+		{ GLFW_KEY_F1, Input::Keyboard::Key::F1 },
+		{ GLFW_KEY_F2, Input::Keyboard::Key::F2 },
+		{ GLFW_KEY_F3, Input::Keyboard::Key::F3 },
+		{ GLFW_KEY_F4, Input::Keyboard::Key::F4 },
+		{ GLFW_KEY_F5, Input::Keyboard::Key::F5 },
+		{ GLFW_KEY_F6, Input::Keyboard::Key::F6 },
+		{ GLFW_KEY_F7, Input::Keyboard::Key::F7 },
+		{ GLFW_KEY_F8, Input::Keyboard::Key::F8 },
+		{ GLFW_KEY_F9, Input::Keyboard::Key::F9 },
+		{ GLFW_KEY_F10, Input::Keyboard::Key::F10 },
+		{ GLFW_KEY_F11, Input::Keyboard::Key::F11 },
+		{ GLFW_KEY_F12, Input::Keyboard::Key::F12 },
+
+		{ GLFW_KEY_GRAVE_ACCENT, Input::Keyboard::Key::Tilde },
+	};
+
 	static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {
 		{ GLFW_PRESS, Input::Keyboard::Event::Type::Pressed },
 		{ GLFW_RELEASE, Input::Keyboard::Event::Type::Released },
 	};
 
-	e.type = TypeMap.at(action);
+	if (!TypeMap.contains(action))
+		return;
 
-	EVENT->emit(e);*/
+	if (!KeyMap.contains(key))
+		return;
+
+	Input::Keyboard::Event e;
+	
+	e.type = TypeMap.at(action);
+	e.key = KeyMap.at(key);
+	
+	EVENT->emit(e);
+}
+
+void SystemMac::CharCallback(GLFWwindow* window, unsigned int codepoint)
+{
+	EVENT->emit(Input::Keyboard::CharEvent{ codepoint });
 }
 
 void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
@@ -221,9 +324,9 @@ void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffse
 
 void SystemMac::WindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	//mWidth = width;
-	//mHeight = height;
-	//EVENT->emit(ResizeEvent({ width, height }));
+	gContext->mWidth = width;
+	gContext->mHeight = height;
+	EVENT->emit(ResizeEvent({ width, height }));
 }
 
 #endif
