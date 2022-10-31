@@ -109,19 +109,128 @@ bool SystemMac::isFinished() const
 
 bool SystemMac::isKeyPressed(Input::Keyboard::Key key) const
 {
-	return false;
+	static const std::unordered_map<Input::Keyboard::Key, int> KeyMap = {
+		{ Input::Keyboard::Key::Backspace, GLFW_KEY_BACKSPACE },
+		{ Input::Keyboard::Key::Tab, GLFW_KEY_TAB },
+		{ Input::Keyboard::Key::Enter, GLFW_KEY_ENTER },
+		{ Input::Keyboard::Key::Shift, GLFW_KEY_LEFT_SHIFT },
+		{ Input::Keyboard::Key::Shift, GLFW_KEY_RIGHT_SHIFT },
+		{ Input::Keyboard::Key::Ctrl, GLFW_KEY_LEFT_CONTROL },
+		{ Input::Keyboard::Key::Ctrl, GLFW_KEY_RIGHT_CONTROL },
+		{ Input::Keyboard::Key::Alt, GLFW_KEY_LEFT_ALT },
+		{ Input::Keyboard::Key::Alt, GLFW_KEY_RIGHT_ALT },
+		{ Input::Keyboard::Key::Pause, GLFW_KEY_PAUSE },
+		{ Input::Keyboard::Key::CapsLock, GLFW_KEY_CAPS_LOCK },
+		{ Input::Keyboard::Key::Escape, GLFW_KEY_ESCAPE },
+		{ Input::Keyboard::Key::Space, GLFW_KEY_SPACE },
+		{ Input::Keyboard::Key::PageUp, GLFW_KEY_PAGE_UP },
+		{ Input::Keyboard::Key::PageDown, GLFW_KEY_PAGE_DOWN },
+		{ Input::Keyboard::Key::End, GLFW_KEY_END },
+		{ Input::Keyboard::Key::Home, GLFW_KEY_HOME },
+		{ Input::Keyboard::Key::Left, GLFW_KEY_LEFT },
+		{ Input::Keyboard::Key::Up, GLFW_KEY_UP },
+		{ Input::Keyboard::Key::Right, GLFW_KEY_RIGHT },
+		{ Input::Keyboard::Key::Down, GLFW_KEY_DOWN },
+		{ Input::Keyboard::Key::PrintScreen, GLFW_KEY_PRINT_SCREEN },
+		{ Input::Keyboard::Key::Insert, GLFW_KEY_INSERT },
+		{ Input::Keyboard::Key::Delete, GLFW_KEY_DELETE },
+		
+		{ Input::Keyboard::Key::A, GLFW_KEY_A },
+		{ Input::Keyboard::Key::B, GLFW_KEY_B },
+		{ Input::Keyboard::Key::C, GLFW_KEY_C },
+		{ Input::Keyboard::Key::D, GLFW_KEY_D },
+		{ Input::Keyboard::Key::E, GLFW_KEY_E },
+		{ Input::Keyboard::Key::F, GLFW_KEY_F },
+		{ Input::Keyboard::Key::G, GLFW_KEY_G },
+		{ Input::Keyboard::Key::H, GLFW_KEY_H },
+		{ Input::Keyboard::Key::I, GLFW_KEY_I },
+		{ Input::Keyboard::Key::J, GLFW_KEY_J },
+		{ Input::Keyboard::Key::K, GLFW_KEY_K },
+		{ Input::Keyboard::Key::L, GLFW_KEY_L },
+		{ Input::Keyboard::Key::M, GLFW_KEY_M },
+		{ Input::Keyboard::Key::N, GLFW_KEY_N },
+		{ Input::Keyboard::Key::O, GLFW_KEY_O },
+		{ Input::Keyboard::Key::P, GLFW_KEY_P },
+		{ Input::Keyboard::Key::Q, GLFW_KEY_Q },
+		{ Input::Keyboard::Key::R, GLFW_KEY_R },
+		{ Input::Keyboard::Key::S, GLFW_KEY_S },
+		{ Input::Keyboard::Key::T, GLFW_KEY_T },
+		{ Input::Keyboard::Key::U, GLFW_KEY_U },
+		{ Input::Keyboard::Key::V, GLFW_KEY_V },
+		{ Input::Keyboard::Key::W, GLFW_KEY_W },
+		{ Input::Keyboard::Key::X, GLFW_KEY_X },
+		{ Input::Keyboard::Key::Y, GLFW_KEY_Y },
+		{ Input::Keyboard::Key::Z, GLFW_KEY_Z },
+
+		{ Input::Keyboard::Key::NumPad0, GLFW_KEY_KP_0 },
+		{ Input::Keyboard::Key::NumPad1, GLFW_KEY_KP_1 },
+		{ Input::Keyboard::Key::NumPad2, GLFW_KEY_KP_2 },
+		{ Input::Keyboard::Key::NumPad3, GLFW_KEY_KP_3 },
+		{ Input::Keyboard::Key::NumPad4, GLFW_KEY_KP_4 },
+		{ Input::Keyboard::Key::NumPad5, GLFW_KEY_KP_5 },
+		{ Input::Keyboard::Key::NumPad6, GLFW_KEY_KP_6 },
+		{ Input::Keyboard::Key::NumPad7, GLFW_KEY_KP_7 },
+		{ Input::Keyboard::Key::NumPad8, GLFW_KEY_KP_8 },
+		{ Input::Keyboard::Key::NumPad9, GLFW_KEY_KP_9 },
+
+		{ Input::Keyboard::Key::Multiply, GLFW_KEY_KP_MULTIPLY },
+		{ Input::Keyboard::Key::Add, GLFW_KEY_KP_ADD },
+		{ Input::Keyboard::Key::Subtract, GLFW_KEY_KP_SUBTRACT },
+		{ Input::Keyboard::Key::Decimal, GLFW_KEY_KP_DECIMAL },
+		{ Input::Keyboard::Key::Divide, GLFW_KEY_KP_DIVIDE },
+
+		{ Input::Keyboard::Key::F1, GLFW_KEY_F1 },
+		{ Input::Keyboard::Key::F2, GLFW_KEY_F2 },
+		{ Input::Keyboard::Key::F3, GLFW_KEY_F3 },
+		{ Input::Keyboard::Key::F4, GLFW_KEY_F4 },
+		{ Input::Keyboard::Key::F5, GLFW_KEY_F5 },
+		{ Input::Keyboard::Key::F6, GLFW_KEY_F6 },
+		{ Input::Keyboard::Key::F7, GLFW_KEY_F7 },
+		{ Input::Keyboard::Key::F8, GLFW_KEY_F8 },
+		{ Input::Keyboard::Key::F9, GLFW_KEY_F9 },
+		{ Input::Keyboard::Key::F10, GLFW_KEY_F10 },
+		{ Input::Keyboard::Key::F11, GLFW_KEY_F11 },
+		{ Input::Keyboard::Key::F12, GLFW_KEY_F12 },
+
+		{ Input::Keyboard::Key::Tilde, GLFW_KEY_GRAVE_ACCENT },
+	};
+
+	auto button = KeyMap.at(key);
+	auto state = glfwGetKey(mWindow, button);
+
+	return state == GLFW_PRESS;
 }
 
 bool SystemMac::isKeyPressed(Input::Mouse::Button key) const
 {
-	return false;
+	static const std::unordered_map<Input::Mouse::Button, int> ButtonMap = {
+		{ Input::Mouse::Button::Left, GLFW_MOUSE_BUTTON_LEFT },
+		{ Input::Mouse::Button::Middle, GLFW_MOUSE_BUTTON_MIDDLE },
+		{ Input::Mouse::Button::Right, GLFW_MOUSE_BUTTON_RIGHT },
+	};
+
+	auto button = ButtonMap.at(key);
+	auto state = glfwGetMouseButton(mWindow, button);
+
+	return state == GLFW_PRESS;
 }
 
 void SystemMac::resize(int width, int height)
 {
+	int pos_x;
+	int pos_y;
+	
+	glfwGetWindowPos(mWindow, &pos_x, &pos_y);
+	
+	auto w_delta = mWidth - width;
+	auto h_delta = mHeight - height;
+	
+	auto x_offset = w_delta / 2;
+	auto y_offset = h_delta / 2;
+	
+	glfwSetWindowPos(mWindow, pos_x + x_offset, pos_y + y_offset);
+
 	glfwSetWindowSize(mWindow, width, height);
-	mWidth = width;
-	mHeight = height;
 }
 
 void SystemMac::setTitle(const std::string& text)
@@ -183,6 +292,7 @@ void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, 
 
 	double x;
 	double y;
+	
 	glfwGetCursorPos(window, &x, &y);
 
 	e.type = TypeMap.at(action);
