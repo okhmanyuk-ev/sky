@@ -204,7 +204,7 @@ namespace Platform::Input
 		
 		struct CharEvent
 		{
-			uint32_t codepoint;
+			char32_t codepoint;
 		};
 	}
 

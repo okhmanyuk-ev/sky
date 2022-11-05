@@ -281,6 +281,7 @@ void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, 
 
 	static const std::unordered_map<int, Input::Mouse::Event::Type> TypeMap = {
 		{ GLFW_PRESS, Input::Mouse::Event::Type::ButtonDown },
+		{ GLFW_REPEAT, Input::Mouse::Event::Type::ButtonDown },
 		{ GLFW_RELEASE, Input::Mouse::Event::Type::ButtonUp },
 	};
 	
@@ -393,6 +394,7 @@ void SystemMac::KeyCallback(GLFWwindow* window, int key, int scancode, int actio
 
 	static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {
 		{ GLFW_PRESS, Input::Keyboard::Event::Type::Pressed },
+		{ GLFW_REPEAT, Input::Keyboard::Event::Type::Pressed },
 		{ GLFW_RELEASE, Input::Keyboard::Event::Type::Released },
 	};
 
