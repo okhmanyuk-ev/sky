@@ -69,6 +69,7 @@ namespace Renderer
 
 	public:
 		int getDrawcalls() const { return mDrawcallsPublic; }
+		auto getBackendType() const { return mDevice->getBackendType(); }
 
 	private:
 		bool mVsync = false;

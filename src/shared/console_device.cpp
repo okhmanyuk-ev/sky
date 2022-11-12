@@ -7,6 +7,7 @@
 #include <platform/defines.h>
 #include <platform/system_android.h>
 #include <shared/imgui_system.h>
+#include <magic_enum.hpp>
 
 using namespace Shared;
 
@@ -120,8 +121,13 @@ void ConsoleDevice::onFrame()
 	auto height = ImGui::GetWindowHeight();
 	auto top = ImGui::GetWindowPos().y;
 
-	auto engineName = std::string("Sky Engine");
-	auto buildName = std::string(__DATE__) + " " + std::string(__TIME__);
+	std::vector<std::string> strings = {
+		"Sky Engine",
+		std::string(__DATE__) + " " + std::string(__TIME__)
+	};
+	
+	auto backend_name = magic_enum::enum_name(RENDERER->getBackendType());
+	strings.push_back(std::string(backend_name));
 	
 	const float margin = 17.0f;
 
@@ -131,15 +137,12 @@ void ConsoleDevice::onFrame()
 	
 	float base_x = ImGui::GetWindowWidth() - margin;
 
-	ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(engineName.c_str()).x);
-	ImGui::TextDisabled("%s", engineName.c_str());
-
-	// ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(apiName.c_str()).x);
-	// ImGui::TextDisabled("%s", apiName.c_str());
+	for (const auto& str : strings)
+	{
+		ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(str.c_str()).x);
+		ImGui::TextDisabled("%s", str.c_str());
+	}
 	
-	ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(buildName.c_str()).x);
-	ImGui::TextDisabled("%s", buildName.c_str());
-
 	ImGui::SetCursorPos(savedCursor);
 
 	ImGui::BeginChild("ScrollingRegion", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), false);
