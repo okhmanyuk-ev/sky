@@ -210,7 +210,7 @@ void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
 void System::drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
 	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 	std::optional<std::shared_ptr<skygfx::Texture>> texture,
-	std::optional<size_t> count, size_t start)
+	std::optional<uint32_t> count, uint32_t start)
 {
 	draw(topology, vertices, indices, shader, [&] {
 		if (texture.has_value())
@@ -221,7 +221,7 @@ void System::drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vert
 }
 
 void System::draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
-	std::optional<size_t> count, size_t start)
+	std::optional<uint32_t> count, uint32_t start)
 {
 	auto indices = std::vector<uint32_t>(count.value_or(vertices.size() - start));
 	std::iota(indices.begin(), indices.end(), start);
@@ -256,7 +256,7 @@ void System::draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::P
 		{
 			auto& dst_vertex = mBatch.vertices.at(start_vertex);
 			dst_vertex.pos = project(src_vertex.pos);
-			dst_vertex.col = src_vertex.col;
+			dst_vertex.color = src_vertex.color;
 			start_vertex += 1;
 		}
 
@@ -312,7 +312,7 @@ void System::draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> te
 		{
 			auto& dst_vertex = mBatch.vertices.at(start_vertex);
 			dst_vertex.pos = project(src_vertex.pos);
-			dst_vertex.col = src_vertex.col;
+			dst_vertex.color = src_vertex.color;
 			dst_vertex.texcoord = src_vertex.texcoord;
 			start_vertex += 1;
 		}

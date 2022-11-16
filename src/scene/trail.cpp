@@ -101,7 +101,7 @@ void Trail::draw()
 
 	auto vertices = std::vector<skygfx::Vertex::PositionColor>();
 
-	for (int i = mSegments.size() - 1; i >= 0; i--)
+	for (int i = (int)mSegments.size() - 1; i >= 0; i--)
 	{
 		bool last = i == mSegments.size() - 1;
 

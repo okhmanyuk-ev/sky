@@ -28,7 +28,7 @@ void Model::draw(Renderer::Technique& technique)
 	{
 		auto texture = std::get<std::shared_ptr<skygfx::Texture>>(mTexturesMap);
 		auto index_range = Renderer::Technique::IndexRange();
-		index_range.count = mIndices.size();
+		index_range.count = (uint32_t)mIndices.size();
 		technique.draw(mVertices.value(), mIndices, Vertex::Layout, { { texture, index_range } });
 	}
 }
@@ -51,7 +51,7 @@ std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>>
 		vertex.pos = mPositionAttribs.at(i);
 
 		if (has_col)
-			vertex.col = mColorAttribs.at(i);
+			vertex.color = mColorAttribs.at(i);
 		
 		if (has_tex)
 			vertex.texcoord = mTexCoordAttribs.at(i);
@@ -82,7 +82,7 @@ void Model::setVertices(const std::vector<skygfx::Vertex::PositionColorNormal>& 
 	for (const auto& vertex : vertices)
 	{
 		mPositionAttribs.push_back(vertex.pos);
-		mColorAttribs.push_back(vertex.col);
+		mColorAttribs.push_back(vertex.color);
 		mNormalAttribs.push_back(vertex.normal);
 	}
 }
@@ -113,7 +113,7 @@ void Model::setVertices(const std::vector<skygfx::Vertex::PositionColorTextureNo
 		mPositionAttribs.push_back(vertex.pos);
 		mTexCoordAttribs.push_back(vertex.texcoord);
 		mNormalAttribs.push_back(vertex.normal);
-		mColorAttribs.push_back(vertex.col);
+		mColorAttribs.push_back(vertex.color);
 	}
 }
 

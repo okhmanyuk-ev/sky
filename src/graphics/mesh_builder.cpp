@@ -24,7 +24,7 @@ void MeshBuilder::vertex(const glm::vec3& value)
 	auto& vertex = mVertices[mVertexCount];
 
 	vertex.pos = value;
-	vertex.col = mColor;
+	vertex.color = mColor;
 
 	mVertexCount += 1;
 }

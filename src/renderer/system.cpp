@@ -23,51 +23,52 @@ System::System()
 
 	assert(window != nullptr);
 
-	mDevice = std::make_shared<skygfx::Device>(window, width, height);
+	skygfx::Initialize(window, width, height);
 }
 
 System::~System()
 {
+	skygfx::Finalize();
 }
 
 void System::onEvent(const Platform::System::ResizeEvent& e)
 {
-	mDevice->resize(e.width, e.height);
+	skygfx::Resize(e.width, e.height);
 }
 
 void System::setTopology(skygfx::Topology value)
 {
-	mDevice->setTopology(value);
+	skygfx::SetTopology(value);
 }
 
 void System::setViewport(std::optional<skygfx::Viewport> value)
 {
-	mDevice->setViewport(value);
+	skygfx::SetViewport(value);
 }
 
 void System::setScissor(std::optional<skygfx::Scissor> value)
 {
-	mDevice->setScissor(value);
+	skygfx::SetScissor(value);
 }
 
 void System::setVertexBuffer(const Buffer& value)
 {
-	mDevice->setDynamicVertexBuffer(value.data, value.size, value.stride);
+	skygfx::SetDynamicVertexBuffer(value.data, value.size, value.stride);
 }
 
 void System::setIndexBuffer(const Buffer& value)
 {
-	mDevice->setDynamicIndexBuffer(value.data, value.size, value.stride);
+	skygfx::SetDynamicIndexBuffer(value.data, value.size, value.stride);
 }
 
 void System::setUniformBuffer(uint32_t binding, void* memory, size_t size)
 {
-	mDevice->setDynamicUniformBuffer(binding, memory, size);
+	skygfx::SetDynamicUniformBuffer(binding, memory, size);
 }
 
 void System::setTexture(uint32_t binding, const skygfx::Texture& value)
 {
-	mDevice->setTexture(binding, value);
+	skygfx::SetTexture(binding, value);
 }
 
 void System::setTexture(const skygfx::Texture& value)
@@ -78,72 +79,72 @@ void System::setTexture(const skygfx::Texture& value)
 void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 {
 	if (value == nullptr)
-		mDevice->setRenderTarget(nullptr);
+		skygfx::SetRenderTarget(nullptr);
 	else
-		mDevice->setRenderTarget(*value);
+		skygfx::SetRenderTarget(*value);
 }
 
 void System::setShader(std::shared_ptr<Shader> value)
 {
-	mDevice->setShader(*value->mShader);
+	skygfx::SetShader(*value->mShader);
 	value->update();
 }
 
 void System::setSampler(skygfx::Sampler value)
 {
-	mDevice->setSampler(value);
+	skygfx::SetSampler(value);
 }
 
 void System::setDepthMode(std::optional<skygfx::DepthMode> value)
 {
-	mDevice->setDepthMode(value);
+	skygfx::SetDepthMode(value);
 }
 
 void System::setStencilMode(std::optional<skygfx::StencilMode> value)
 {
-	mDevice->setStencilMode(value);
+	skygfx::SetStencilMode(value);
 }
 
 void System::setCullMode(skygfx::CullMode value)
 {
-	mDevice->setCullMode(value);
+	skygfx::SetCullMode(value);
 }
 
 void System::setBlendMode(const skygfx::BlendMode& value)
 {
-	mDevice->setBlendMode(value);
+	skygfx::SetBlendMode(value);
 }
 
 void System::setTextureAddressMode(skygfx::TextureAddress value)
 {
-	mDevice->setTextureAddress(value);
+	skygfx::SetTextureAddress(value);
 }
 
 void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
-	mDevice->clear(color, depth, stencil);
+	skygfx::Clear(color, depth, stencil);
 }
 
-void System::draw(size_t vertexCount, size_t vertexOffset)
+void System::draw(uint32_t vertexCount, uint32_t vertexOffset)
 {
 	mDrawcalls += 1;
-	mDevice->draw(vertexCount, vertexOffset);
+	skygfx::Draw(vertexCount, vertexOffset);
 }
 
-void System::drawIndexed(size_t indexCount, size_t indexOffset, size_t vertexOffset)
+void System::drawIndexed(uint32_t indexCount, uint32_t indexOffset, uint32_t vertexOffset)
 {
 	mDrawcalls += 1;
-	mDevice->drawIndexed(indexCount, indexOffset);
+	skygfx::DrawIndexed(indexCount, indexOffset);
 }
 
 void System::readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<skygfx::Texture> dst_texture)
 {
-	mDevice->readPixels(pos, size, *dst_texture);
+	skygfx::ReadPixels(pos, size, *dst_texture);
 }
 
 void System::present()
 {
 	mDrawcallsPublic = mDrawcalls;
 	mDrawcalls = 0;
-	mDevice->present();
+	skygfx::Present();
 }

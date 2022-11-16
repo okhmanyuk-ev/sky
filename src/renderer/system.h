@@ -54,8 +54,8 @@ namespace Renderer
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }, 
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
-		void draw(size_t vertexCount, size_t vertexOffset = 0);
-		void drawIndexed(size_t indexCount, size_t indexOffset = 0, size_t vertexOffset = 0);
+		void draw(uint32_t vertexCount, uint32_t vertexOffset = 0);
+		void drawIndexed(uint32_t indexCount, uint32_t indexOffset = 0, uint32_t vertexOffset = 0);
 
 		void readPixels(const glm::ivec2& pos, const glm::ivec2& size, std::shared_ptr<skygfx::Texture> dst_texture);
 
@@ -69,12 +69,11 @@ namespace Renderer
 
 	public:
 		int getDrawcalls() const { return mDrawcallsPublic; }
-		auto getBackendType() const { return mDevice->getBackendType(); }
+		auto getBackendType() const { return skygfx::GetBackendType(); }
 
 	private:
 		bool mVsync = false;
 		int mDrawcalls = 0;
 		int mDrawcallsPublic = 0;
-		std::shared_ptr<skygfx::Device> mDevice;
 	};
 }

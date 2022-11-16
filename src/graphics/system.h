@@ -50,11 +50,11 @@ namespace Graphics
 		void drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
 			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 			std::optional<std::shared_ptr<skygfx::Texture>> texture = std::nullopt,
-			std::optional<size_t> count = std::nullopt, size_t start = 0);
+			std::optional<uint32_t> count = std::nullopt, uint32_t start = 0);
 
 		// draw colored vertices
 		void draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
-			std::optional<size_t> count = std::nullopt, size_t start = 0);
+			std::optional<uint32_t> count = std::nullopt, uint32_t start = 0);
 
 		// draw indexed colored vertices
 		void draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
@@ -222,8 +222,8 @@ namespace Graphics
 			std::optional<std::shared_ptr<skygfx::Texture>> texture;
 			std::optional<skygfx::Topology> topology;
 			
-			size_t verticesCount = 0;
-			size_t indicesCount = 0;
+			uint32_t verticesCount = 0;
+			uint32_t indicesCount = 0;
 
 			std::vector<uint32_t> indices;
 			std::vector<skygfx::Vertex::PositionColorTexture> vertices;
