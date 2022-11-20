@@ -7,8 +7,5 @@
 - Batching 2D objects to reduce drawcalls
 
 # Showcase
-
-<img src="https://github.com/okhmanyuk-ev/idle-phone-inc/blob/master/gif/1.gif" width=180 height=320>
-<img src="https://github.com/okhmanyuk-ev/idle-phone-inc/blob/master/gif/2.gif" width=180 height=320>
-
-![image](https://user-images.githubusercontent.com/3295141/202926069-eb9fd51e-97ab-44dc-bcab-7a63548b20a2.png)
+![](https://user-images.githubusercontent.com/3295141/202926762-9cd637a9-a271-4220-9f7b-f1b9d8b03fcd.png)
+![](https://user-images.githubusercontent.com/3295141/202926069-eb9fd51e-97ab-44dc-bcab-7a63548b20a2.png)
