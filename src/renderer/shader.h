@@ -24,9 +24,6 @@ namespace Renderer
 
 	private:
 		std::shared_ptr<skygfx::Shader> mShader;
-
-	protected:
-		static void checkRequiredAttribs(const std::set<skygfx::Vertex::Attribute::Type>& requiredAttribs, const skygfx::Vertex::Layout& layout);
 	};
 
 	class ShaderMatrices

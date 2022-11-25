@@ -11,11 +11,3 @@ Shader::Shader(const skygfx::Vertex::Layout& layout, const std::string& vertex_c
 Shader::~Shader()
 {
 }
-
-void Shader::checkRequiredAttribs(const std::set<skygfx::Vertex::Attribute::Type>& requiredAttribs, const skygfx::Vertex::Layout& layout)
-{
-	for (auto& attrib : requiredAttribs)
-	{
-		assert(layout.hasAttribute(attrib));
-	}
-}

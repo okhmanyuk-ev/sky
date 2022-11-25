@@ -152,11 +152,11 @@ std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>
 {
 	auto result = defines;
 
-	const static std::unordered_map<skygfx::Vertex::Attribute::Type, std::string> AttribsDefines = {
-		{ skygfx::Vertex::Attribute::Type::Position, "HAS_POSITION_ATTRIB" },
-		{ skygfx::Vertex::Attribute::Type::Color, "HAS_COLOR_ATTRIB" },
-		{ skygfx::Vertex::Attribute::Type::TexCoord, "HAS_TEXCOORD_ATTRIB" },
-		{ skygfx::Vertex::Attribute::Type::Normal, "HAS_NORMAL_ATTRIB" },
+	const static std::unordered_map<std::string, std::string> AttribsDefines = {
+		{ skygfx::Vertex::Location::Position, "HAS_POSITION_ATTRIB" },
+		{ skygfx::Vertex::Location::Color, "HAS_COLOR_ATTRIB" },
+		{ skygfx::Vertex::Location::TexCoord, "HAS_TEXCOORD_ATTRIB" },
+		{ skygfx::Vertex::Location::Normal, "HAS_NORMAL_ATTRIB" },
 	};
 
 	const static std::unordered_map<Flag, std::string> FeatureDefines = {
@@ -166,7 +166,7 @@ std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>
 
 	for (const auto& attrib : layout.attributes)
 	{
-		result.push_back(AttribsDefines.at(attrib.type));
+		result.push_back(AttribsDefines.at(attrib.location_define.value()));
 	}
 
 	for (auto flag : flags)
@@ -184,10 +184,25 @@ std::set<Generic::Flag> Generic::MakeFlagsFromLayout(const skygfx::Vertex::Layou
 {
 	std::set<Flag> result = { };
 
-	if (layout.hasAttribute(skygfx::Vertex::Attribute::Type::Color))
+	auto hasAttribute = [&](const auto& name) {
+		for (const auto& attrib : layout.attributes)
+		{
+			if (!attrib.location_define.has_value())
+				continue;
+				
+			if (attrib.location_define.value() != name)
+				continue;
+				
+			return true;
+		}
+		
+		return false;
+	};
+
+	if (hasAttribute(skygfx::Vertex::Location::Color))
 		result.insert(Flag::Colored);
 
-	if (layout.hasAttribute(skygfx::Vertex::Attribute::Type::TexCoord))
+	if (hasAttribute(skygfx::Vertex::Location::TexCoord))
 		result.insert(Flag::Textured);
 
 	return result;

@@ -36,9 +36,9 @@ namespace Shared
 
 	private:
 		const skygfx::Vertex::Layout ImguiLayout = { sizeof(ImDrawVert), {
-			{ skygfx::Vertex::Attribute::Type::Position, skygfx::Vertex::Attribute::Format::R32G32F, offsetof(ImDrawVert, pos) },
-			{ skygfx::Vertex::Attribute::Type::Color, skygfx::Vertex::Attribute::Format::R8G8B8A8UN, offsetof(ImDrawVert, col) },
-			{ skygfx::Vertex::Attribute::Type::TexCoord, skygfx::Vertex::Attribute::Format::R32G32F, offsetof(ImDrawVert, uv) } }
+			{ skygfx::Vertex::Location::Position, skygfx::Vertex::Attribute::Format::Float2, offsetof(ImDrawVert, pos) },
+			{ skygfx::Vertex::Location::Color, skygfx::Vertex::Attribute::Format::Byte4, offsetof(ImDrawVert, col) },
+			{ skygfx::Vertex::Location::TexCoord, skygfx::Vertex::Attribute::Format::Float2, offsetof(ImDrawVert, uv) } }
 		};
 
 		std::shared_ptr<Renderer::Shaders::Generic> mShader = std::make_shared<Renderer::Shaders::Generic>(ImguiLayout);
