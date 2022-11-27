@@ -29,16 +29,6 @@ SystemMac::SystemMac(const std::string& appname) : mAppName(appname)
 
 	mWindow = glfwCreateWindow(mWidth, mHeight, appname.c_str(), NULL, NULL);
 
-	int count = 0;
-	auto monitors = glfwGetMonitors(&count);
-
-	auto video_mode = glfwGetVideoMode(monitors[0]);
-
-	auto window_pos_x = (video_mode->width / 2) - (mWidth / 2);
-	auto window_pos_y = (video_mode->height / 2) - (mHeight / 2);
-
-	glfwSetWindowPos(mWindow, window_pos_x, window_pos_y);
-
 	Window = glfwGetCocoaWindow(mWindow);
 	
 	float x_scale;
@@ -47,20 +37,31 @@ SystemMac::SystemMac(const std::string& appname) : mAppName(appname)
 	glfwGetWindowContentScale(mWindow, &x_scale, &y_scale);
 	
 	mScale = std::fmaxf(x_scale, y_scale);
-	
+
+	auto monitor = glfwGetPrimaryMonitor();
+	auto video_mode = glfwGetVideoMode(monitor);
+
+	auto window_pos_x = (video_mode->width / 2 ) - (mWidth / 2) / mScale;
+	auto window_pos_y = (video_mode->height / 2) - (mHeight / 2) / mScale;
+
+	glfwSetWindowPos(mWindow, window_pos_x, window_pos_y);
+
+	resize(mWidth, mHeight);
+
 	glfwSetMouseButtonCallback(mWindow, MouseButtonCallback);
 	glfwSetKeyCallback(mWindow, KeyCallback);
 	glfwSetCharCallback(mWindow, CharCallback);
 	glfwSetScrollCallback(mWindow, ScrollCallback);
 	glfwSetWindowSizeCallback(mWindow, WindowSizeCallback);
-	
+	glfwSetFramebufferSizeCallback(mWindow, FramebufferSizeCallback);
+
 	double mouse_x;
 	double mouse_y;
 	
 	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
 	
-	mPrevMouseX = (int)mouse_x;
-	mPrevMouseY = (int)mouse_y;
+	mPrevMouseX = (int)(mouse_x * mScale);
+	mPrevMouseY = (int)(mouse_y * mScale);
 	
 	gContext = this;
 }
@@ -79,8 +80,8 @@ void SystemMac::process()
 
 	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
 
-	auto mouse_x_i = (int)mouse_x;
-	auto mouse_y_i = (int)mouse_y;
+	auto mouse_x_i = (int)(mouse_x * mScale);
+	auto mouse_y_i = (int)(mouse_y * mScale);
 
 	if (mouse_x_i != mPrevMouseX || mouse_y_i != mPrevMouseY)
 	{
@@ -225,10 +226,13 @@ void SystemMac::resize(int width, int height)
 	auto w_delta = mWidth - width;
 	auto h_delta = mHeight - height;
 	
-	auto x_offset = w_delta / 2;
-	auto y_offset = h_delta / 2;
+	auto x_offset = w_delta / 2 / mScale;
+	auto y_offset = h_delta / 2 / mScale;
 	
 	glfwSetWindowPos(mWindow, pos_x + x_offset, pos_y + y_offset);
+
+	width /= mScale;
+	height /= mScale;
 
 	glfwSetWindowSize(mWindow, width, height);
 }
@@ -298,8 +302,8 @@ void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, 
 
 	e.type = TypeMap.at(action);
 	e.button = ButtonMap.at(button);
-	e.x = (int)x;
-	e.y = (int)y;
+	e.x = (int)(x * gContext->mScale);
+	e.y = (int)(y * gContext->mScale);
 
 	EVENT->emit(e);
 }
@@ -426,8 +430,8 @@ void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffse
 	glfwGetCursorPos(window, &x, &y);
 
 	e.type = Input::Mouse::Event::Type::Wheel;
-	e.x = (int)x;
-	e.y = (int)y;
+	e.x = (int)(x * gContext->mScale);
+	e.y = (int)(y * gContext->mScale);
 	e.wheelX = (float)xoffset;
 	e.wheelY = (float)yoffset;
 
@@ -435,6 +439,10 @@ void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffse
 }
 
 void SystemMac::WindowSizeCallback(GLFWwindow* window, int width, int height)
+{
+}
+
+void SystemMac::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	gContext->mWidth = width;
 	gContext->mHeight = height;

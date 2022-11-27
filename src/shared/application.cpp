@@ -54,7 +54,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		PLATFORM->quit();
 	});
 
-#if !defined(PLATFORM_MOBILE)
+#if defined(PLATFORM_WINDOWS)
 	IMGUI_SYSTEM->setScaleIndependence(true);
 #endif
 

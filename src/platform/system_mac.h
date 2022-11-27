@@ -80,6 +80,7 @@ namespace Platform
 		static void CharCallback(GLFWwindow* window, unsigned int codepoint);
 		static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 		static void WindowSizeCallback(GLFWwindow* window, int width, int height);
+		static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 	};
 }
 #endif
