@@ -42,9 +42,9 @@ namespace Shared
 		{
 			None,
 			Text, // enter from keyboard
-			Candidates, // choosing between candidates
+			Hints, // choosing between hints
 			History, // choosing between history
-			Completion // just completed from candidates
+			Completion // just completed from hints
 		};
 
 	private:
@@ -80,7 +80,7 @@ namespace Shared
 
 	private:
 		void onFrame() override;
-		void showCandidates(float height, float top);
+		void showHints(float height, float top);
 		void showFastLogs();
 		void showCloseButton(float pos_y);
 		void drawText(const Text& text, glm::vec4 colorMultiplier = { 1.0f, 1.0f, 1.0f, 1.0f });
@@ -107,7 +107,7 @@ namespace Shared
 		bool mHiddenButtonEnabled = true;
 		
 	private:
-		struct Candidate
+		struct Hint
 		{
 			enum class Type
 			{
@@ -125,15 +125,15 @@ namespace Shared
 		};
 
 	private:
-		std::vector<Candidate> getCandidates(const std::string& match) const;
+		std::vector<Hint> getHints(const std::string& match) const;
 
 	private:
-		std::vector<Candidate> mCandidates;
-		int mSelectedCandidate = 0;
+		std::vector<Hint> mHints;
+		int mSelectedHint = 0;
 		bool mNeedToComplete = false;
-		bool mCheckMouseForCandidates = false;
+		bool mCheckMouseForHints = false;
 		bool mCheckMouseForClose = false;
-		bool mCheckScrollForCandidates = false;
+		bool mCheckScrollForHints = false;
 		InputState mInputState = InputState::None;
 		bool mEnabled = true;
 		Common::Timer mButtonTimer;

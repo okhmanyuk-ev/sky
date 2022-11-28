@@ -230,7 +230,7 @@ void ConsoleDevice::onFrame()
 	auto closeButtonY = ImGui::GetWindowHeight();
 
 	ImGui::End();
-	showCandidates(height, top);
+	showHints(height, top);
 	ImGui::PopStyleVar(2);
 
 	showCloseButton(closeButtonY);
@@ -238,74 +238,74 @@ void ConsoleDevice::onFrame()
 	style.ScrollbarSize = prevscrollsize;
 }
 
-void ConsoleDevice::showCandidates(float height, float top)
+void ConsoleDevice::showHints(float height, float top)
 {
-	if (mInputState != InputState::Candidates)
-		mSelectedCandidate = -1;
+	if (mInputState != InputState::Hints)
+		mSelectedHint = -1;
 
-	if (!(mInputText[0] != 0x00 && mInputState != InputState::Completion && mInputState != InputState::History))
+	if (mInputText[0] == 0x00 || mInputState == InputState::History)
 	{
-		mCandidates.clear();
+		mHints.clear();
 		return;
 	}
 
-	mCandidates = getCandidates(mInputText);
+	mHints = getHints(mInputText);
 
-	if (mCandidates.empty())
+	if (mHints.empty())
 		return;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
 	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, IMGUI_SYSTEM->getLogicalHeight() - height - top - 10));
 	
-	ImGui::Begin("ConsoleCandidates", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel & ~ImGuiWindowFlags_NoBringToFrontOnFocus);
+	ImGui::Begin("ConsoleHints", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel & ~ImGuiWindowFlags_NoBringToFrontOnFocus);
 	ImGui::SetWindowPos(ImVec2(8 + PLATFORM->getSafeAreaLeftMargin(), 4 + top + height));
 
-	if (mSelectedCandidate == -1)
+	if (mSelectedHint == -1)
 		ImGui::SetScrollHere();
 
-	if (mSelectedCandidate > static_cast<int>(mCandidates.size()) - 1)
-		mSelectedCandidate = static_cast<int>(mCandidates.size()) - 1;
+	if (mSelectedHint > static_cast<int>(mHints.size()) - 1)
+		mSelectedHint = static_cast<int>(mHints.size()) - 1;
 
-	for (int i = 0; i < static_cast<int>(mCandidates.size()); i++)
+	for (int i = 0; i < static_cast<int>(mHints.size()); i++)
 	{
-		bool selected = mSelectedCandidate == i && mInputState == InputState::Candidates;
+		bool selected = mSelectedHint == i && mInputState == InputState::Hints;
 
-		auto& candidate = mCandidates[i];
+		auto& hint = mHints[i];
 
-		ImGui::Selectable(candidate.name.c_str(), selected);
+		ImGui::Selectable(hint.name.c_str(), selected);
 
-		if (mCheckScrollForCandidates && selected)
+		if (mCheckScrollForHints && selected)
 		{
 			ImGui::SetScrollHere();
-			mCheckScrollForCandidates = false;
+			mCheckScrollForHints = false;
 		}
 
-		if (mCheckMouseForCandidates && ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
+		if (mCheckMouseForHints && ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 		{
 		#if defined(PLATFORM_MOBILE)
-			PLATFORM->setVirtualKeyboardText(candidate.name);
+			PLATFORM->setVirtualKeyboardText(hint.name);
 			mInputState = InputState::Completion;
 		#else
-			mInputState = InputState::Candidates;
-			mSelectedCandidate = i;
+			mInputState = InputState::Hints;
+			mSelectedHint = i;
 			mNeedToComplete = true;
 		#endif
 		}
 
-		if (auto args = candidate.args; !args.empty())
+		if (auto args = hint.args; !args.empty())
 		{
 			ImGui::SameLine();
 			ImGui::TextDisabled("%s", args.c_str());
 		}
 
-		if (candidate.description.has_value())
+		if (hint.description.has_value())
 		{
 			ImGui::SameLine();
-			ImGui::TextDisabled("%s", ("- " + candidate.description.value()).c_str());
+			ImGui::TextDisabled("%s", ("- " + hint.description.value()).c_str());
 		}
 	}
 
-	mCheckMouseForCandidates = false;
+	mCheckMouseForHints = false;
 
 	ImGui::End();
 	ImGui::PopStyleVar();
@@ -445,7 +445,7 @@ void ConsoleDevice::drawText(const Text& text, glm::vec4 colorMultiplier)
 
 void ConsoleDevice::enterInput()
 {
-	if (mInputState == InputState::Candidates)
+	if (mInputState == InputState::Hints)
 	{
 		mNeedToComplete = true;
 	}
@@ -497,7 +497,7 @@ void ConsoleDevice::onEvent(const TouchEmulator::Event& e)
 
 	if (e.type == TouchEmulator::Event::Type::End)
 	{
-		mCheckMouseForCandidates = true;
+		mCheckMouseForHints = true;
 		mCheckMouseForClose = true;
 	}
 }
@@ -521,43 +521,50 @@ void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardEnterPressed&
 
 void ConsoleDevice::handleInputCompletion(ImGuiTextEditCallbackData* data)
 {
-	if (mInputState != InputState::Candidates)
+	if (mInputState != InputState::Hints)
 		return;
 
-	auto s = mCandidates[mSelectedCandidate].name;
+	auto hint_str = mHints[mSelectedHint].name;
+	auto written_str = std::string(data->Buf, data->BufTextLen);
 
-	strcpy(data->Buf, s.c_str());
-	data->CursorPos = data->SelectionStart = data->SelectionEnd = data->BufTextLen = static_cast<int>(s.size());
+	if (written_str.length() >= hint_str.length() && written_str.substr(0, hint_str.length()) == hint_str)
+	{
+		mInputState = InputState::Text;
+		return; // whole string is already written, do not replace it
+	}
+	
+	strcpy(data->Buf, hint_str.c_str());
+	data->CursorPos = data->SelectionStart = data->SelectionEnd = data->BufTextLen = static_cast<int>(hint_str.size());
 	data->BufDirty = true;
 	mInputState = InputState::Completion;
 }
 
 void ConsoleDevice::handleInputHistory(ImGuiTextEditCallbackData* data)
 {
-	if (mCandidates.size() > 0 && mInputState != InputState::History)
+	if (mHints.size() > 0 && mInputState != InputState::History)
 	{
-		if (mInputState != InputState::Candidates)
+		if (mInputState != InputState::Hints)
 		{
 			if (data->EventKey == ImGuiKey_::ImGuiKey_UpArrow)
-				mSelectedCandidate = static_cast<int>(mCandidates.size()) - 1;
+				mSelectedHint = static_cast<int>(mHints.size()) - 1;
 			else if (data->EventKey == ImGuiKey_::ImGuiKey_DownArrow)
-				mSelectedCandidate = 0;
+				mSelectedHint = 0;
 		}
 		else
 		{
 			if (data->EventKey == ImGuiKey_::ImGuiKey_UpArrow)
-				mSelectedCandidate--;
+				mSelectedHint--;
 			else if (data->EventKey == ImGuiKey_::ImGuiKey_DownArrow)
-				mSelectedCandidate++;
+				mSelectedHint++;
 
-			if (mSelectedCandidate < 0)
-				mSelectedCandidate = static_cast<int>(mCandidates.size()) - 1;
-			else if (mSelectedCandidate > static_cast<int>(mCandidates.size()) - 1)
-				mSelectedCandidate = 0;
+			if (mSelectedHint < 0)
+				mSelectedHint = static_cast<int>(mHints.size()) - 1;
+			else if (mSelectedHint > static_cast<int>(mHints.size()) - 1)
+				mSelectedHint = 0;
 		}
 
-		mCheckScrollForCandidates = true;
-		mInputState = InputState::Candidates;
+		mCheckScrollForHints = true;
+		mInputState = InputState::Hints;
 
 		return;
 	}
@@ -601,25 +608,30 @@ void ConsoleDevice::handleInputHistory(ImGuiTextEditCallbackData* data)
 	data->BufDirty = true;
 }
 
-std::vector<ConsoleDevice::Candidate> ConsoleDevice::getCandidates(const std::string& match) const
+std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& match) const
 {
+	if (match.empty())
+		return {};
+		
 	auto lowercase_match = match;
 
 	std::transform(lowercase_match.begin(), lowercase_match.end(), lowercase_match.begin(), tolower);
 
-	std::vector<Candidate> result = {};
+	std::vector<Hint> result = {};
 
 	for (auto& [name, cvar] : CONSOLE->getCVars())
 	{
 		if (name.find(lowercase_match) == std::string::npos)
 			continue;
 
-		Candidate candidate;
-		candidate.name = name;
-		candidate.description = cvar.getDescription();
-		candidate.args = cvar.getArgsAsString();
-		candidate.type = Candidate::Type::CVar;
-		result.push_back(candidate);
+		auto hint = Hint{
+			.name = name,
+			.description = cvar.getDescription(),
+			.args = cvar.getArgsAsString(),
+			.type = Hint::Type::CVar
+		};
+		
+		result.push_back(hint);
 	}
 
 	for (auto& [name, command] : CONSOLE->getCommands())
@@ -627,12 +639,14 @@ std::vector<ConsoleDevice::Candidate> ConsoleDevice::getCandidates(const std::st
 		if (name.find(lowercase_match) == std::string::npos)
 			continue;
 
-		Candidate candidate;
-		candidate.name = name;
-		candidate.description = command.getDescription();
-		candidate.type = Candidate::Type::Command;
-		candidate.args = command.getArgsAsString();
-		result.push_back(candidate);
+		auto hint = Hint{
+			.name = name,
+			.description = command.getDescription(),
+			.args = command.getArgsAsString(),
+			.type = Hint::Type::Command
+		};
+		
+		result.push_back(hint);
 	}
 
 	for (auto& [name, value] : CONSOLE->getAliases())
@@ -640,18 +654,24 @@ std::vector<ConsoleDevice::Candidate> ConsoleDevice::getCandidates(const std::st
 		if (name.find(lowercase_match) == std::string::npos)
 			continue;
 
-		Candidate candidate;
-		candidate.type = Candidate::Type::Alias;
-		candidate.name = name;
-		candidate.description = "alias";
-		candidate.alias_value = value;
-		candidate.args = Console::System::MakeStringFromTokens(value);
-		result.push_back(candidate);
+		auto hint = Hint{
+			.name = name,
+			.description = "alias",
+			.args = Console::System::MakeStringFromTokens(value),
+			.type = Hint::Type::Alias
+		};
+		
+		result.push_back(hint);
 	}
 
-	std::sort(result.begin(), result.end(), [](const Candidate& left, const Candidate& right) {
+	std::sort(result.begin(), result.end(), [](const Hint& left, const Hint& right) {
 		return left.name < right.name;
 	});
+	
+	if (result.empty())
+	{
+		return getHints(match.substr(0, match.length() - 1));
+	}
 
 	return result;
 }
