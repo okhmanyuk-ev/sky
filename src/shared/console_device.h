@@ -102,6 +102,7 @@ namespace Shared
 		int mInputHistoryPos = 0;
 		std::deque<Text> mBuffer;
 		bool mScrollToBack = false;
+		bool mScrollToBackForce = false;
 		Common::Interpolator mInterpolator;
 		bool mHiddenButtonEnabled = true;
 		

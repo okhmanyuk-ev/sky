@@ -160,12 +160,12 @@ void ConsoleDevice::onFrame()
 
 	ImGui::PopStyleVar();
 
-	if (mScrollToBack)
-	{
-		ImGui::SetScrollHere();
-		mScrollToBack = false;
-	}
-
+	if ((mScrollToBack && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) || mScrollToBackForce)
+		ImGui::SetScrollHereY(1.0f);
+	
+	mScrollToBack = false;
+	mScrollToBackForce = false;
+	
 	ImGui::EndChild();
 
 	static auto filterLetters = [](ImGuiTextEditCallbackData* data) {
@@ -473,6 +473,7 @@ void ConsoleDevice::enterInput()
 			mInputHistoryPos = static_cast<int>(mInputHistory.size());
 		}
 		writeLine("] " + line);
+		mScrollToBackForce = true;
 		EVENT->emit(ReadEvent({ line }));
 	}
 }
