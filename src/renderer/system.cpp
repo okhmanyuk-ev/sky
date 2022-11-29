@@ -86,7 +86,7 @@ void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 
 void System::setShader(std::shared_ptr<Shader> value)
 {
-	skygfx::SetShader(*value->mShader);
+	skygfx::SetShader(*value);
 	value->update();
 }
 

@@ -10,20 +10,13 @@
 
 namespace Renderer
 {
-	class Shader
+	class Shader : public skygfx::Shader
 	{
-		friend class System;
-	
 	public:
-		Shader(const skygfx::Vertex::Layout& layout, const std::string& vertex_code,
-			const std::string& fragment_code, const std::vector<std::string>& defines = {});
-		virtual ~Shader();
+		using skygfx::Shader::Shader;
 
 	public:
 		virtual void update() {};
-
-	private:
-		std::shared_ptr<skygfx::Shader> mShader;
 	};
 
 	class ShaderMatrices
