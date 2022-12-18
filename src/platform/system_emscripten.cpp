@@ -19,11 +19,11 @@ std::shared_ptr<System> System::create(const std::string& appname)
 	return std::make_shared<SystemEmscripten>(appname);
 }
 
-std::function<void(int, int)> resize_func;
+std::function<void(uint32_t, uint32_t)> resize_func;
 EM_BOOL ResizeCallback(int eventType, const EmscriptenUiEvent *e, void *userData)
 {
-	int w = (int) e->windowInnerWidth;
-	int h = (int) e->windowInnerHeight;
+	auto w = (uint32_t)e->windowInnerWidth;
+	auto h = (uint32_t)e->windowInnerHeight;
 	//w *= emscripten_get_device_pixel_ratio();
 	//h *= emscripten_get_device_pixel_ratio();
 	resize_func(w, h);
@@ -34,6 +34,12 @@ SystemEmscripten::SystemEmscripten(const std::string& appname) : mAppName(appnam
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+	double canvas_w, canvas_h;
+	emscripten_get_element_css_size("#canvas", &canvas_w, &canvas_h);
+
+	mWidth = static_cast<uint32_t>(canvas_w);
+	mHeight = static_cast<uint32_t>(canvas_h);
 
 	mWindow = glfwCreateWindow(mWidth, mHeight, appname.c_str(), NULL, NULL);
 
@@ -49,10 +55,6 @@ SystemEmscripten::SystemEmscripten(const std::string& appname) : mAppName(appnam
 	resize_func = [&](int w, int h) {
 		glfwSetWindowSize(mWindow, w, h);
 	};
-
-	double canvas_w, canvas_h;
-	emscripten_get_element_css_size("#canvas", &canvas_w, &canvas_h);
-	glfwSetWindowSize(mWindow, (int)canvas_w, (int)canvas_h);
 	emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, NULL, false, ResizeCallback);
 
 	double mouse_x;
@@ -218,9 +220,7 @@ bool SystemEmscripten::isKeyPressed(Input::Mouse::Button key) const
 
 void SystemEmscripten::resize(int width, int height)
 {
-	return;
-
-	int pos_x;
+	/*int pos_x;
 	int pos_y;
 	
 	glfwGetWindowPos(mWindow, &pos_x, &pos_y);
@@ -236,7 +236,7 @@ void SystemEmscripten::resize(int width, int height)
 	width /= mScale;
 	height /= mScale;
 
-	glfwSetWindowSize(mWindow, width, height);
+	glfwSetWindowSize(mWindow, width, height);*/
 }
 
 void SystemEmscripten::setTitle(const std::string& text)
