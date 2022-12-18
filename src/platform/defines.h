@@ -4,6 +4,8 @@
 	#define PLATFORM_WINDOWS
 #elif __ANDROID__
 	#define PLATFORM_ANDROID
+#elif EMSCRIPTEN
+	#define PLATFORM_EMSCRIPTEN
 #endif
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
@@ -18,4 +20,6 @@
 	#define PLATFORM_NAME "iOS"
 #elif defined(PLATFORM_MAC)
 	#define PLATFORM_NAME "Mac"
+#elif defined(PLATFORM_EMSCRIPTEN)
+	#define PLATFORM_NAME "Emscripten"
 #endif

@@ -54,7 +54,11 @@ void Profile::clear()
 
 void Profile::saveAsync()
 {
+#ifndef EMSCRIPTEN
 	TASK->addTask([this] {
 		save();
 	});
+#else
+	save();
+#endif
 }

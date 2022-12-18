@@ -3,6 +3,7 @@
 #include <platform/system_windows.h>
 #include <platform/system_ios.h>
 #include <platform/system_mac.h>
+#include <platform/system_emscripten.h>
 
 using namespace Renderer;
 
@@ -19,6 +20,8 @@ System::System()
 	window = Platform::SystemIos::Window;
 #elif defined(PLATFORM_MAC)
 	window = Platform::SystemMac::Window;
+#elif defined(PLATFORM_EMSCRIPTEN)
+	window = Platform::SystemEmscripten::Window;
 #endif
 
 	assert(window != nullptr);
@@ -79,7 +82,7 @@ void System::setTexture(const skygfx::Texture& value)
 void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 {
 	if (value == nullptr)
-		skygfx::SetRenderTarget(nullptr);
+		skygfx::SetRenderTarget(std::nullopt);
 	else
 		skygfx::SetRenderTarget(*value);
 }

@@ -7,6 +7,10 @@
 #include <shared/scene_manager.h>
 #include <shared/scene_helpers.h>
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 using namespace Shared;
 
 Application::Application(const std::string& appname, const Flags& flags) : mFlags(flags)
@@ -14,7 +18,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	std::srand((unsigned int)std::time(nullptr));
 
 	ENGINE->addSystem<Common::Event::System>(std::make_shared<Common::Event::System>());
+#ifndef EMSCRIPTEN
 	ENGINE->addSystem<Common::TaskSystem>(std::make_shared<Common::TaskSystem>());
+#endif
 	ENGINE->addSystem<Common::FrameSystem>(std::make_shared<Common::FrameSystem>());
 	ENGINE->addSystem<Common::ProfilerSystem>(std::make_shared<Common::ProfilerSystem>());
 	ENGINE->addSystem<Platform::System>(Platform::System::create(appname));
@@ -24,7 +30,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	ENGINE->addSystem<Graphics::System>(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
 	{
+#ifndef EMSCRIPTEN
 		ENGINE->addSystem<Network::System>(std::make_shared<Network::System>());
+#endif
 	}
 	ENGINE->addSystem<Shared::LocalizationSystem>(std::make_shared<Shared::LocalizationSystem>());
 	ENGINE->addSystem<Shared::StatsSystem>(std::make_shared<Shared::StatsSystem>());
@@ -194,7 +202,9 @@ Application::~Application()
 	ENGINE->removeSystem<Shared::LocalizationSystem>();
 	if (mFlags.count(Flag::Network))
 	{
+#ifndef EMSCRIPTEN
 		ENGINE->removeSystem<Network::System>();
+#endif
 	}
 	ENGINE->removeSystem<Graphics::System>();
 	ENGINE->removeSystem<Console::System>();
@@ -207,14 +217,16 @@ Application::~Application()
 	//	ENGINE->removeSystem<Common::EventSystem>(); // should be removed later
 }
 
+std::function<bool()> frame_func;
+void frame() { frame_func(); }
+
 void Application::run()
 {
-	while (true)
-	{
+	frame_func = [&]{
 		PLATFORM->process();
 
 		if (PLATFORM->isFinished())
-			break;
+			return false;
 
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
@@ -226,5 +238,17 @@ void Application::run()
 		FRAME->frame();
 		IMGUI_SYSTEM->end();
 		RENDERER->present();
+
+		return true;
+	};
+
+#ifdef EMSCRIPTEN
+	emscripten_set_main_loop(frame, 0, 1);
+#else
+	while (true)
+	{
+		if (!frame_func())
+			break;
 	}
+#endif
 }

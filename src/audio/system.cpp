@@ -9,7 +9,7 @@ using namespace Audio;
 
 System::System()
 {
-#ifndef PLATFORM_MAC // TODO: fix for mac
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	FMOD::Studio::System::create(&FmodStudio);
 	FmodStudio->getCoreSystem(&Fmod);
 #if defined(PLATFORM_ANDROID)
@@ -32,14 +32,14 @@ void System::play(std::shared_ptr<Sound> sound)
 	if (sound == nullptr)
 		return;
 
-#ifndef PLATFORM_MAC // TODO: fix for mac
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	Fmod->playSound(sound->sound, nullptr, false, &channel);
 #endif
 }
 
 System::~System()
 {
-#ifndef PLATFORM_MAC // TODO: fix for mac
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	FmodStudio->release();
 #endif
 }

@@ -6,7 +6,7 @@ using namespace Audio;
 
 Sound::Sound(const Platform::Asset& asset, bool loop)
 {
-#ifndef PLATFORM_MAC // TODO: fix for mac
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	FMOD_CREATESOUNDEXINFO exinfo;
 	memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
@@ -25,7 +25,7 @@ Sound::Sound(const Platform::Asset& asset, bool loop)
 
 Sound::~Sound()
 {
-#ifndef PLATFORM_MAC // TODO: fix for mac
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	sound->release();
 #endif
 }

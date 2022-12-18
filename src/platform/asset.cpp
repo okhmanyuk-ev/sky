@@ -32,7 +32,7 @@ Asset::Asset(const std::string& path, Storage storage)
 		file.read((char*)mMemory, mSize);
 		file.close();
 	}
-#elif defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC)
+#elif defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
 	auto p = StoragePathToAbsolute(path, storage);
 	std::ifstream file(p, std::ios::in | std::ios::binary);
 	file.seekg(0, file.end);
@@ -58,7 +58,7 @@ Asset::~Asset()
 
 void Asset::Write(const std::string& path, void* memory, size_t size, Storage storage)
 {
-#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_IOS) | defined(PLATFORM_MAC)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
 #if defined(PLATFORM_IOS)
     assert(storage != Storage::Assets);
     if (storage == Storage::Assets)
@@ -89,7 +89,7 @@ void Asset::Write(const std::string& path, void* memory, size_t size, Storage st
 
 bool Asset::Exists(const std::string& path, Storage storage)
 {
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
 	auto status = std::filesystem::status(StoragePathToAbsolute(path, storage));
 	return status.type() == std::filesystem::file_type::regular;
 #elif defined(PLATFORM_ANDROID)
@@ -118,7 +118,7 @@ std::string Asset::StoragePathToAbsolute(const std::string& path, Storage storag
 {
 	if (storage == Storage::Assets)
 	{
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
 		return "assets/" + path;
 #elif defined(PLATFORM_IOS)
 		return std::string([[[NSBundle mainBundle]bundlePath] UTF8String]) + "/assets/" + path;

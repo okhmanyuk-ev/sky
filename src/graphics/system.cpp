@@ -1,7 +1,6 @@
 #include "system.h"
 #include <vector>
 #include <numeric>
-#include <vulkan/vulkan.hpp>
 
 using namespace Graphics;
 

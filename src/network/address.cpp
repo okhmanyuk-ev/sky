@@ -1,5 +1,7 @@
 #include "address.h"
+#ifndef EMSCRIPTEN
 #include <asio.hpp>
+#endif
 #include "system.h"
 
 using namespace Network;
@@ -11,6 +13,7 @@ Address::Address()
 
 Address::Address(const std::string& adr)
 {
+#ifndef EMSCRIPTEN
 	auto ip_s = adr;
 	
 	auto p = adr.find(":");
@@ -49,6 +52,7 @@ Address::Address(const std::string& adr)
 			break;
 		}
 	}
+#endif
 }
 
 std::string Address::toString() const

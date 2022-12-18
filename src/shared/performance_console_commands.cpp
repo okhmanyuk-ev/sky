@@ -66,9 +66,11 @@ void PerformanceConsoleCommands::onFrame()
 	else if (mWantShowTasks > 0)
 		ENGINE_STATS("tasks", TASK->getTasksCount());
 
+#ifndef EMSCRIPTEN
 	if (mWantShowNetSpeed)
 		STATS_INDICATE_GROUP("net", "net speed", Common::Helpers::BytesToNiceString(NETWORK->getBytesPerSecond()) + "/s");
 
 	if (mWantShowNetPps)
 		STATS_INDICATE_GROUP("net", "net pps", std::to_string(NETWORK->getPacketsPerSecond()));
+#endif
 }

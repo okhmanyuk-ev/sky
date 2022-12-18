@@ -1,4 +1,7 @@
 #include "networking_ws.h"
+
+#ifndef EMSCRIPTEN
+
 #include <console/device.h>
 #include <common/buffer_helpers.h>
 
@@ -305,3 +308,4 @@ RegularMessaging::Client::Client()
 		send();
 	});
 }
+#endif

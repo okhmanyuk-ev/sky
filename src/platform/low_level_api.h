@@ -16,4 +16,7 @@
     #import <Foundation/Foundation.h>
     #import <UIKit/UIKit.h>
     #import <StoreKit/StoreKit.h>
+#elif defined(PLATFORM_EMSCRIPTEN)
+    #include <emscripten.h>
+    #include <emscripten/html5.h>
 #endif
