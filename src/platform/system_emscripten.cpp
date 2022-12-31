@@ -24,8 +24,8 @@ EM_BOOL ResizeCallback(int eventType, const EmscriptenUiEvent *e, void *userData
 {
 	auto w = (uint32_t)e->windowInnerWidth;
 	auto h = (uint32_t)e->windowInnerHeight;
-	//w *= emscripten_get_device_pixel_ratio();
-	//h *= emscripten_get_device_pixel_ratio();
+	w *= emscripten_get_device_pixel_ratio();
+	h *= emscripten_get_device_pixel_ratio();
 	resize_func(w, h);
 	return 0;
 }
@@ -37,9 +37,11 @@ SystemEmscripten::SystemEmscripten(const std::string& appname) : mAppName(appnam
 
 	double canvas_w, canvas_h;
 	emscripten_get_element_css_size("#canvas", &canvas_w, &canvas_h);
+	
+	mScale = emscripten_get_device_pixel_ratio();
 
-	mWidth = static_cast<uint32_t>(canvas_w);
-	mHeight = static_cast<uint32_t>(canvas_h);
+	mWidth = static_cast<uint32_t>(canvas_w) * mScale;
+	mHeight = static_cast<uint32_t>(canvas_h) * mScale;
 
 	mWindow = glfwCreateWindow(mWidth, mHeight, appname.c_str(), NULL, NULL);
 
@@ -62,8 +64,8 @@ SystemEmscripten::SystemEmscripten(const std::string& appname) : mAppName(appnam
 	
 	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
 	
-	mPrevMouseX = (int)(mouse_x * mScale);
-	mPrevMouseY = (int)(mouse_y * mScale);
+	mPrevMouseX = (int)mouse_x;
+	mPrevMouseY = (int)mouse_y;
 	
 	gContext = this;
 }
@@ -82,8 +84,8 @@ void SystemEmscripten::process()
 
 	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
 
-	auto mouse_x_i = (int)(mouse_x * mScale);
-	auto mouse_y_i = (int)(mouse_y * mScale);
+	auto mouse_x_i = (int)mouse_x;
+	auto mouse_y_i = (int)mouse_y;
 
 	if (mouse_x_i != mPrevMouseX || mouse_y_i != mPrevMouseY)
 	{
@@ -220,23 +222,6 @@ bool SystemEmscripten::isKeyPressed(Input::Mouse::Button key) const
 
 void SystemEmscripten::resize(int width, int height)
 {
-	/*int pos_x;
-	int pos_y;
-	
-	glfwGetWindowPos(mWindow, &pos_x, &pos_y);
-	
-	auto w_delta = mWidth - width;
-	auto h_delta = mHeight - height;
-	
-	auto x_offset = w_delta / 2 / mScale;
-	auto y_offset = h_delta / 2 / mScale;
-	
-	glfwSetWindowPos(mWindow, pos_x + x_offset, pos_y + y_offset);
-
-	width /= mScale;
-	height /= mScale;
-
-	glfwSetWindowSize(mWindow, width, height);*/
 }
 
 void SystemEmscripten::setTitle(const std::string& text)
@@ -304,8 +289,8 @@ void SystemEmscripten::MouseButtonCallback(GLFWwindow* window, int button, int a
 
 	e.type = TypeMap.at(action);
 	e.button = ButtonMap.at(button);
-	e.x = (int)(x * gContext->mScale);
-	e.y = (int)(y * gContext->mScale);
+	e.x = (int)x;
+	e.y = (int)y;
 
 	EVENT->emit(e);
 }
@@ -432,8 +417,8 @@ void SystemEmscripten::ScrollCallback(GLFWwindow* window, double xoffset, double
 	glfwGetCursorPos(window, &x, &y);
 
 	e.type = Input::Mouse::Event::Type::Wheel;
-	e.x = (int)(x * gContext->mScale);
-	e.y = (int)(y * gContext->mScale);
+	e.x = (int)x;
+	e.y = (int)y;
 	e.wheelX = (float)xoffset;
 	e.wheelY = (float)yoffset;
 
