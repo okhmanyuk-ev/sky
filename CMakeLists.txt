@@ -159,6 +159,21 @@ elseif(ANDROID)
 		log
 		m
 	)
+elseif(EMSCRIPTEN)
+	target_link_options(${PROJECT_NAME} PUBLIC -sUSE_GLFW=3)
+	target_link_options(${PROJECT_NAME} PUBLIC -sNO_DISABLE_EXCEPTION_CATCHING=1)
+	target_link_options(${PROJECT_NAME} PUBLIC -sDISABLE_EXCEPTION_THROWING=0)
+	target_link_options(${PROJECT_NAME} PUBLIC -sALLOW_MEMORY_GROWTH)
+	target_link_options(${PROJECT_NAME} PUBLIC --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/platform/emscripten/shell.html)
+	target_link_options(${PROJECT_NAME} PUBLIC --use-preload-cache)
+
+	target_compile_options(${PROJECT_NAME} PUBLIC -sNO_DISABLE_EXCEPTION_CATCHING)
+	target_compile_options(${PROJECT_NAME} PUBLIC -sDISABLE_EXCEPTION_THROWING=0)
+
+	set(SKY_EMSCRIPTEN_DEBUG_COMPILE_OPTIONS "${SKY_EMSCRIPTEN_DEBUG_COMPILE_OPTIONS} -g")
+	set(SKY_EMSCRIPTEN_DEBUG_COMPILE_OPTIONS "${SKY_EMSCRIPTEN_DEBUG_COMPILE_OPTIONS} -gsource-map")
+
+	target_compile_options(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:${SKY_EMSCRIPTEN_DEBUG_COMPILE_OPTIONS}>")
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)
