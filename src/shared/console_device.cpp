@@ -625,12 +625,12 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 			continue;
 
 		auto hint = Hint{
+			.type = Hint::Type::CVar,
 			.name = name,
 			.description = cvar.getDescription(),
-			.args = cvar.getArgsAsString(),
-			.type = Hint::Type::CVar
+			.args = cvar.getArgsAsString()
 		};
-		
+
 		result.push_back(hint);
 	}
 
@@ -640,10 +640,10 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 			continue;
 
 		auto hint = Hint{
+			.type = Hint::Type::Command,
 			.name = name,
 			.description = command.getDescription(),
-			.args = command.getArgsAsString(),
-			.type = Hint::Type::Command
+			.args = command.getArgsAsString()
 		};
 		
 		result.push_back(hint);
@@ -655,10 +655,10 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 			continue;
 
 		auto hint = Hint{
+			.type = Hint::Type::Alias,
 			.name = name,
 			.description = "alias",
-			.args = Console::System::MakeStringFromTokens(value),
-			.type = Hint::Type::Alias
+			.args = Console::System::MakeStringFromTokens(value)
 		};
 		
 		result.push_back(hint);
