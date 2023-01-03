@@ -472,7 +472,7 @@ void ConsoleDevice::enterInput()
 			mInputHistory.push_back(line);
 			mInputHistoryPos = static_cast<int>(mInputHistory.size());
 		}
-		writeLine("] " + line);
+		writeLine("] " + line, Console::Color::Gray);
 		mScrollToBackForce = true;
 		EVENT->emit(ReadEvent({ line }));
 	}
