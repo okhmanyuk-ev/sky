@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef EMSCRIPTEN
-
 #include <map>
 #include <set>
 #include <optional>
@@ -208,5 +206,3 @@ namespace Shared::NetworkingUDP
 		bool mShowEventLogs = false;
 	};
 }
-
-#endif

@@ -1,7 +1,4 @@
 #include "system.h"
-
-#ifndef EMSCRIPTEN
-
 #include <console/device.h>
 
 using namespace Network;
@@ -133,4 +130,3 @@ uint16_t UdpSocket::getPort() const
 {
 	return NETWORK->getUdpSocketPort(mHandle);
 }
-#endif

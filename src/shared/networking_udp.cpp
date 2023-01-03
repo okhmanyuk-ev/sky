@@ -1,7 +1,5 @@
 #include "networking_udp.h"
 
-#ifndef EMSCRIPTEN
-
 #include <console/device.h>
 #include <common/buffer_helpers.h>
 #include <common/helpers.h>
@@ -520,5 +518,3 @@ void SimpleChannel::addEventCallback(const std::string& name, EventCallback call
 	assert(mEvents.count(name) == 0);
 	mEvents[name] = callback;
 }
-
-#endif

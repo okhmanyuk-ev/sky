@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef EMSCRIPTEN
-
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
 #endif
@@ -111,4 +109,3 @@ namespace Network
 		System::UdpSocketHandle mHandle = 0;
 	};
 }
-#endif

@@ -30,9 +30,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	ENGINE->addSystem<Graphics::System>(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
 	{
-#ifndef EMSCRIPTEN
 		ENGINE->addSystem<Network::System>(std::make_shared<Network::System>());
-#endif
 	}
 	ENGINE->addSystem<Shared::LocalizationSystem>(std::make_shared<Shared::LocalizationSystem>());
 	ENGINE->addSystem<Shared::StatsSystem>(std::make_shared<Shared::StatsSystem>());
@@ -202,9 +200,7 @@ Application::~Application()
 	ENGINE->removeSystem<Shared::LocalizationSystem>();
 	if (mFlags.count(Flag::Network))
 	{
-#ifndef EMSCRIPTEN
 		ENGINE->removeSystem<Network::System>();
-#endif
 	}
 	ENGINE->removeSystem<Graphics::System>();
 	ENGINE->removeSystem<Console::System>();
