@@ -3,10 +3,12 @@
 #ifdef PLATFORM_EMSCRIPTEN
 
 #include <common/event_system.h>
+#include <SDL.h>
 
 using namespace Platform;
 
 static SystemEmscripten* gContext = nullptr;
+SDL_Window* gWindow = nullptr;
 
 int main(int argc, char* argv[])
 {
@@ -19,205 +21,321 @@ std::shared_ptr<System> System::create(const std::string& appname)
 	return std::make_shared<SystemEmscripten>(appname);
 }
 
-std::function<void(uint32_t, uint32_t)> resize_func;
-EM_BOOL ResizeCallback(int eventType, const EmscriptenUiEvent *e, void *userData)
-{
-	auto w = (uint32_t)e->windowInnerWidth;
-	auto h = (uint32_t)e->windowInnerHeight;
-	w *= emscripten_get_device_pixel_ratio();
-	h *= emscripten_get_device_pixel_ratio();
-	resize_func(w, h);
-	return 0;
-}
-
 SystemEmscripten::SystemEmscripten(const std::string& appname) : mAppName(appname)
 {
-	glfwInit();
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	SDL_Init(SDL_INIT_VIDEO);
 
-	double canvas_w, canvas_h;
-	emscripten_get_element_css_size("#canvas", &canvas_w, &canvas_h);
-	
-	mScale = emscripten_get_device_pixel_ratio();
+	auto window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    gWindow = SDL_CreateWindow(appname.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWidth, mHeight, window_flags);
 
-	mWidth = static_cast<uint32_t>(canvas_w) * mScale;
-	mHeight = static_cast<uint32_t>(canvas_h) * mScale;
-
-	mWindow = glfwCreateWindow(mWidth, mHeight, appname.c_str(), NULL, NULL);
-
-	Window = mWindow;
-
-	glfwSetMouseButtonCallback(mWindow, MouseButtonCallback);
-	glfwSetKeyCallback(mWindow, KeyCallback);
-	glfwSetCharCallback(mWindow, CharCallback);
-	glfwSetScrollCallback(mWindow, ScrollCallback);
-	glfwSetWindowSizeCallback(mWindow, WindowSizeCallback);
-	glfwSetFramebufferSizeCallback(mWindow, FramebufferSizeCallback);
-
-	resize_func = [&](int w, int h) {
-		glfwSetWindowSize(mWindow, w, h);
-	};
-	emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, NULL, false, ResizeCallback);
-
-	double mouse_x;
-	double mouse_y;
-	
-	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
-	
-	mPrevMouseX = (int)mouse_x;
-	mPrevMouseY = (int)mouse_y;
-	
+    Window = gWindow;
 	gContext = this;
+
+	float w_scale;
+	float h_scale;
+	SDL_GetDisplayDPI(0, NULL, &w_scale, &h_scale);
+
+	mScale = w_scale / 96.0f;
 }
 
 SystemEmscripten::~SystemEmscripten()
 {
-	glfwTerminate();
 }
 
 void SystemEmscripten::process()
 {
-	glfwPollEvents();
+	SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+		if (event.type == SDL_MOUSEMOTION)
+		{
+			EVENT->emit(Input::Mouse::Event{
+				.type = Input::Mouse::Event::Type::Move,
+				.x = (int)((float)event.motion.x * mScale),
+				.y = (int)((float)event.motion.y * mScale)
+			});
+		}
+		else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
+		{
+			static const std::unordered_map<uint8_t, Input::Mouse::Button> ButtonMap = {
+				{ SDL_BUTTON_LEFT, Input::Mouse::Button::Left },
+				{ SDL_BUTTON_MIDDLE, Input::Mouse::Button::Middle },
+				{ SDL_BUTTON_RIGHT, Input::Mouse::Button::Right },
+			};
 
-	double mouse_x;
-	double mouse_y;
+			static const std::unordered_map<uint32_t, Input::Mouse::Event::Type> TypeMap = {
+				{ SDL_MOUSEBUTTONDOWN, Input::Mouse::Event::Type::ButtonDown },
+				{ SDL_MOUSEBUTTONUP, Input::Mouse::Event::Type::ButtonUp }
+			};
 
-	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
+			if (!ButtonMap.contains(event.button.button))
+				continue;
 
-	auto mouse_x_i = (int)mouse_x;
-	auto mouse_y_i = (int)mouse_y;
+			EVENT->emit(Input::Mouse::Event{
+				.type = TypeMap.at(event.type),
+				.button = ButtonMap.at(event.button.button),
+				.x = (int)((float)event.button.x * mScale),
+				.y = (int)((float)event.button.y * mScale)
+			});
+		}
+		else if (event.type == SDL_MOUSEWHEEL)
+		{
+			int x = 0;
+			int y = 0;
 
-	if (mouse_x_i != mPrevMouseX || mouse_y_i != mPrevMouseY)
+			SDL_GetMouseState(&x, &y);
+
+			EVENT->emit(Input::Mouse::Event{
+				.type = Input::Mouse::Event::Type::Wheel,
+				.x = (int)((float)x * mScale),
+				.y = (int)((float)y * mScale),
+				.wheelX = (float)event.wheel.x,
+				.wheelY = (float)event.wheel.y
+			});
+		}
+		else if (event.type == SDL_TEXTINPUT)
+		{
+			EVENT->emit(Input::Keyboard::CharEvent{
+				.codepoint = *(char32_t*)&event.text.text
+			});
+		}
+		else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
+		{
+			static const std::unordered_map<SDL_Keycode, Input::Keyboard::Key> KeyMap = {
+				{ SDLK_BACKSPACE, Input::Keyboard::Key::Backspace },
+				{ SDLK_TAB, Input::Keyboard::Key::Tab },
+				{ SDLK_RETURN, Input::Keyboard::Key::Enter },
+				{ SDLK_LSHIFT, Input::Keyboard::Key::Shift },
+				{ SDLK_RSHIFT, Input::Keyboard::Key::Shift },
+				{ SDLK_LCTRL, Input::Keyboard::Key::Ctrl },
+				{ SDLK_RCTRL, Input::Keyboard::Key::Ctrl },
+				{ SDLK_LALT, Input::Keyboard::Key::Alt },
+				{ SDLK_RALT, Input::Keyboard::Key::Alt },
+				{ SDLK_PAUSE, Input::Keyboard::Key::Pause },
+				{ SDLK_CAPSLOCK, Input::Keyboard::Key::CapsLock },
+				{ SDLK_ESCAPE, Input::Keyboard::Key::Escape },
+				{ SDLK_SPACE, Input::Keyboard::Key::Space },
+				{ SDLK_PAGEUP, Input::Keyboard::Key::PageUp },
+				{ SDLK_PAGEDOWN, Input::Keyboard::Key::PageDown },
+				{ SDLK_END, Input::Keyboard::Key::End },
+				{ SDLK_HOME, Input::Keyboard::Key::Home },
+				{ SDLK_LEFT, Input::Keyboard::Key::Left },
+				{ SDLK_UP, Input::Keyboard::Key::Up },
+				{ SDLK_RIGHT, Input::Keyboard::Key::Right },
+				{ SDLK_DOWN, Input::Keyboard::Key::Down },
+				{ SDLK_PRINTSCREEN, Input::Keyboard::Key::PrintScreen },
+				{ SDLK_INSERT, Input::Keyboard::Key::Insert },
+				{ SDLK_DELETE, Input::Keyboard::Key::Delete },
+				
+				{ SDLK_a, Input::Keyboard::Key::A },
+				{ SDLK_b, Input::Keyboard::Key::B },
+				{ SDLK_c, Input::Keyboard::Key::C },
+				{ SDLK_d, Input::Keyboard::Key::D },
+				{ SDLK_e, Input::Keyboard::Key::E },
+				{ SDLK_f, Input::Keyboard::Key::F },
+				{ SDLK_g, Input::Keyboard::Key::G },
+				{ SDLK_h, Input::Keyboard::Key::H },
+				{ SDLK_i, Input::Keyboard::Key::I },
+				{ SDLK_j, Input::Keyboard::Key::J },
+				{ SDLK_k, Input::Keyboard::Key::K },
+				{ SDLK_l, Input::Keyboard::Key::L },
+				{ SDLK_m, Input::Keyboard::Key::M },
+				{ SDLK_n, Input::Keyboard::Key::N },
+				{ SDLK_o, Input::Keyboard::Key::O },
+				{ SDLK_p, Input::Keyboard::Key::P },
+				{ SDLK_q, Input::Keyboard::Key::Q },
+				{ SDLK_r, Input::Keyboard::Key::R },
+				{ SDLK_s, Input::Keyboard::Key::S },
+				{ SDLK_t, Input::Keyboard::Key::T },
+				{ SDLK_u, Input::Keyboard::Key::U },
+				{ SDLK_v, Input::Keyboard::Key::V },
+				{ SDLK_w, Input::Keyboard::Key::W },
+				{ SDLK_x, Input::Keyboard::Key::X },
+				{ SDLK_y, Input::Keyboard::Key::Y },
+				{ SDLK_z, Input::Keyboard::Key::Z },
+
+				{ SDLK_KP_0, Input::Keyboard::Key::NumPad0 },
+				{ SDLK_KP_1, Input::Keyboard::Key::NumPad1 },
+				{ SDLK_KP_2, Input::Keyboard::Key::NumPad2 },
+				{ SDLK_KP_3, Input::Keyboard::Key::NumPad3 },
+				{ SDLK_KP_4, Input::Keyboard::Key::NumPad4 },
+				{ SDLK_KP_5, Input::Keyboard::Key::NumPad5 },
+				{ SDLK_KP_6, Input::Keyboard::Key::NumPad6 },
+				{ SDLK_KP_7, Input::Keyboard::Key::NumPad7 },
+				{ SDLK_KP_8, Input::Keyboard::Key::NumPad8 },
+				{ SDLK_KP_9, Input::Keyboard::Key::NumPad9 },
+
+				{ SDLK_KP_MULTIPLY, Input::Keyboard::Key::Multiply },
+				{ SDLK_KP_PLUS, Input::Keyboard::Key::Add },
+				{ SDLK_KP_MINUS, Input::Keyboard::Key::Subtract },
+				{ SDLK_KP_DECIMAL, Input::Keyboard::Key::Decimal },
+				{ SDLK_KP_DIVIDE, Input::Keyboard::Key::Divide },
+
+				{ SDLK_F1, Input::Keyboard::Key::F1 },
+				{ SDLK_F2, Input::Keyboard::Key::F2 },
+				{ SDLK_F3, Input::Keyboard::Key::F3 },
+				{ SDLK_F4, Input::Keyboard::Key::F4 },
+				{ SDLK_F5, Input::Keyboard::Key::F5 },
+				{ SDLK_F6, Input::Keyboard::Key::F6 },
+				{ SDLK_F7, Input::Keyboard::Key::F7 },
+				{ SDLK_F8, Input::Keyboard::Key::F8 },
+				{ SDLK_F9, Input::Keyboard::Key::F9 },
+				{ SDLK_F10, Input::Keyboard::Key::F10 },
+				{ SDLK_F11, Input::Keyboard::Key::F11 },
+				{ SDLK_F12, Input::Keyboard::Key::F12 },
+
+				{ SDLK_BACKQUOTE, Input::Keyboard::Key::Tilde },
+			};
+
+			static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {
+				{ SDL_KEYDOWN, Input::Keyboard::Event::Type::Pressed },
+				{ SDL_KEYUP, Input::Keyboard::Event::Type::Released }
+			};
+
+			if (!KeyMap.contains(event.key.keysym.sym))
+				continue;
+
+			EVENT->emit(Input::Keyboard::Event{
+				.type = TypeMap.at(event.type),
+				.key = KeyMap.at(event.key.keysym.sym)
+			});
+		}
+	}
+
+    int width;
+	int height;
+    SDL_GetWindowSize(gWindow, &width, &height);
+
+	width *= mScale;
+	height *= mScale;
+
+	if (mWidth != width || mHeight != height)
 	{
-		mPrevMouseX = mouse_x_i;
-		mPrevMouseY = mouse_y_i;
-		
-		Input::Mouse::Event e;
-
-		e.type = Input::Mouse::Event::Type::Move;
-		e.x = mouse_x_i;
-		e.y = mouse_y_i;
-
-		EVENT->emit(e);
+		mWidth = width;
+		mHeight = height;
+		EVENT->emit(ResizeEvent({ width, height }));
 	}
 }
 
 void SystemEmscripten::quit()
 {
-	glfwSetWindowShouldClose((GLFWwindow*)mWindow, true);
 }
 
 bool SystemEmscripten::isFinished() const
 {
-	return glfwWindowShouldClose((GLFWwindow*)mWindow);
+	return false;
 }
 
 bool SystemEmscripten::isKeyPressed(Input::Keyboard::Key key) const
 {
-	static const std::unordered_map<Input::Keyboard::Key, int> KeyMap = {
-		{ Input::Keyboard::Key::Backspace, GLFW_KEY_BACKSPACE },
-		{ Input::Keyboard::Key::Tab, GLFW_KEY_TAB },
-		{ Input::Keyboard::Key::Enter, GLFW_KEY_ENTER },
-		{ Input::Keyboard::Key::Shift, GLFW_KEY_LEFT_SHIFT },
-		{ Input::Keyboard::Key::Shift, GLFW_KEY_RIGHT_SHIFT },
-		{ Input::Keyboard::Key::Ctrl, GLFW_KEY_LEFT_CONTROL },
-		{ Input::Keyboard::Key::Ctrl, GLFW_KEY_RIGHT_CONTROL },
-		{ Input::Keyboard::Key::Alt, GLFW_KEY_LEFT_ALT },
-		{ Input::Keyboard::Key::Alt, GLFW_KEY_RIGHT_ALT },
-		{ Input::Keyboard::Key::Pause, GLFW_KEY_PAUSE },
-		{ Input::Keyboard::Key::CapsLock, GLFW_KEY_CAPS_LOCK },
-		{ Input::Keyboard::Key::Escape, GLFW_KEY_ESCAPE },
-		{ Input::Keyboard::Key::Space, GLFW_KEY_SPACE },
-		{ Input::Keyboard::Key::PageUp, GLFW_KEY_PAGE_UP },
-		{ Input::Keyboard::Key::PageDown, GLFW_KEY_PAGE_DOWN },
-		{ Input::Keyboard::Key::End, GLFW_KEY_END },
-		{ Input::Keyboard::Key::Home, GLFW_KEY_HOME },
-		{ Input::Keyboard::Key::Left, GLFW_KEY_LEFT },
-		{ Input::Keyboard::Key::Up, GLFW_KEY_UP },
-		{ Input::Keyboard::Key::Right, GLFW_KEY_RIGHT },
-		{ Input::Keyboard::Key::Down, GLFW_KEY_DOWN },
-		{ Input::Keyboard::Key::PrintScreen, GLFW_KEY_PRINT_SCREEN },
-		{ Input::Keyboard::Key::Insert, GLFW_KEY_INSERT },
-		{ Input::Keyboard::Key::Delete, GLFW_KEY_DELETE },
+	static const std::unordered_map<Input::Keyboard::Key, SDL_Keycode> KeyMap = {
+		{ Input::Keyboard::Key::Backspace, SDLK_BACKSPACE },
+		{ Input::Keyboard::Key::Tab, SDLK_TAB },
+		{ Input::Keyboard::Key::Enter, SDLK_RETURN },
+		{ Input::Keyboard::Key::Shift, SDLK_LSHIFT },
+		{ Input::Keyboard::Key::Shift, SDLK_RSHIFT },
+		{ Input::Keyboard::Key::Ctrl, SDLK_LCTRL },
+		{ Input::Keyboard::Key::Ctrl, SDLK_RCTRL },
+		{ Input::Keyboard::Key::Alt, SDLK_LALT },
+		{ Input::Keyboard::Key::Alt, SDLK_RALT },
+		{ Input::Keyboard::Key::Pause, SDLK_PAUSE },
+		{ Input::Keyboard::Key::CapsLock, SDLK_CAPSLOCK },
+		{ Input::Keyboard::Key::Escape, SDLK_ESCAPE },
+		{ Input::Keyboard::Key::Space, SDLK_SPACE },
+		{ Input::Keyboard::Key::PageUp, SDLK_PAGEUP },
+		{ Input::Keyboard::Key::PageDown, SDLK_PAGEDOWN },
+		{ Input::Keyboard::Key::End, SDLK_END },
+		{ Input::Keyboard::Key::Home, SDLK_HOME },
+		{ Input::Keyboard::Key::Left, SDLK_LEFT },
+		{ Input::Keyboard::Key::Up, SDLK_UP },
+		{ Input::Keyboard::Key::Right, SDLK_RIGHT },
+		{ Input::Keyboard::Key::Down, SDLK_DOWN },
+		{ Input::Keyboard::Key::PrintScreen, SDLK_PRINTSCREEN },
+		{ Input::Keyboard::Key::Insert, SDLK_INSERT },
+		{ Input::Keyboard::Key::Delete, SDLK_DELETE },
 		
-		{ Input::Keyboard::Key::A, GLFW_KEY_A },
-		{ Input::Keyboard::Key::B, GLFW_KEY_B },
-		{ Input::Keyboard::Key::C, GLFW_KEY_C },
-		{ Input::Keyboard::Key::D, GLFW_KEY_D },
-		{ Input::Keyboard::Key::E, GLFW_KEY_E },
-		{ Input::Keyboard::Key::F, GLFW_KEY_F },
-		{ Input::Keyboard::Key::G, GLFW_KEY_G },
-		{ Input::Keyboard::Key::H, GLFW_KEY_H },
-		{ Input::Keyboard::Key::I, GLFW_KEY_I },
-		{ Input::Keyboard::Key::J, GLFW_KEY_J },
-		{ Input::Keyboard::Key::K, GLFW_KEY_K },
-		{ Input::Keyboard::Key::L, GLFW_KEY_L },
-		{ Input::Keyboard::Key::M, GLFW_KEY_M },
-		{ Input::Keyboard::Key::N, GLFW_KEY_N },
-		{ Input::Keyboard::Key::O, GLFW_KEY_O },
-		{ Input::Keyboard::Key::P, GLFW_KEY_P },
-		{ Input::Keyboard::Key::Q, GLFW_KEY_Q },
-		{ Input::Keyboard::Key::R, GLFW_KEY_R },
-		{ Input::Keyboard::Key::S, GLFW_KEY_S },
-		{ Input::Keyboard::Key::T, GLFW_KEY_T },
-		{ Input::Keyboard::Key::U, GLFW_KEY_U },
-		{ Input::Keyboard::Key::V, GLFW_KEY_V },
-		{ Input::Keyboard::Key::W, GLFW_KEY_W },
-		{ Input::Keyboard::Key::X, GLFW_KEY_X },
-		{ Input::Keyboard::Key::Y, GLFW_KEY_Y },
-		{ Input::Keyboard::Key::Z, GLFW_KEY_Z },
+		{ Input::Keyboard::Key::A, SDLK_a },
+		{ Input::Keyboard::Key::B, SDLK_b },
+		{ Input::Keyboard::Key::C, SDLK_c },
+		{ Input::Keyboard::Key::D, SDLK_d },
+		{ Input::Keyboard::Key::E, SDLK_e },
+		{ Input::Keyboard::Key::F, SDLK_f },
+		{ Input::Keyboard::Key::G, SDLK_g },
+		{ Input::Keyboard::Key::H, SDLK_h },
+		{ Input::Keyboard::Key::I, SDLK_i },
+		{ Input::Keyboard::Key::J, SDLK_j },
+		{ Input::Keyboard::Key::K, SDLK_k },
+		{ Input::Keyboard::Key::L, SDLK_l },
+		{ Input::Keyboard::Key::M, SDLK_m },
+		{ Input::Keyboard::Key::N, SDLK_n },
+		{ Input::Keyboard::Key::O, SDLK_o },
+		{ Input::Keyboard::Key::P, SDLK_p },
+		{ Input::Keyboard::Key::Q, SDLK_q },
+		{ Input::Keyboard::Key::R, SDLK_r },
+		{ Input::Keyboard::Key::S, SDLK_s },
+		{ Input::Keyboard::Key::T, SDLK_t },
+		{ Input::Keyboard::Key::U, SDLK_u },
+		{ Input::Keyboard::Key::V, SDLK_v },
+		{ Input::Keyboard::Key::W, SDLK_w },
+		{ Input::Keyboard::Key::X, SDLK_x },
+		{ Input::Keyboard::Key::Y, SDLK_y },
+		{ Input::Keyboard::Key::Z, SDLK_z },
 
-		{ Input::Keyboard::Key::NumPad0, GLFW_KEY_KP_0 },
-		{ Input::Keyboard::Key::NumPad1, GLFW_KEY_KP_1 },
-		{ Input::Keyboard::Key::NumPad2, GLFW_KEY_KP_2 },
-		{ Input::Keyboard::Key::NumPad3, GLFW_KEY_KP_3 },
-		{ Input::Keyboard::Key::NumPad4, GLFW_KEY_KP_4 },
-		{ Input::Keyboard::Key::NumPad5, GLFW_KEY_KP_5 },
-		{ Input::Keyboard::Key::NumPad6, GLFW_KEY_KP_6 },
-		{ Input::Keyboard::Key::NumPad7, GLFW_KEY_KP_7 },
-		{ Input::Keyboard::Key::NumPad8, GLFW_KEY_KP_8 },
-		{ Input::Keyboard::Key::NumPad9, GLFW_KEY_KP_9 },
+		{ Input::Keyboard::Key::NumPad0, SDLK_KP_0 },
+		{ Input::Keyboard::Key::NumPad1, SDLK_KP_1 },
+		{ Input::Keyboard::Key::NumPad2, SDLK_KP_2 },
+		{ Input::Keyboard::Key::NumPad3, SDLK_KP_3 },
+		{ Input::Keyboard::Key::NumPad4, SDLK_KP_4 },
+		{ Input::Keyboard::Key::NumPad5, SDLK_KP_5 },
+		{ Input::Keyboard::Key::NumPad6, SDLK_KP_6 },
+		{ Input::Keyboard::Key::NumPad7, SDLK_KP_7 },
+		{ Input::Keyboard::Key::NumPad8, SDLK_KP_8 },
+		{ Input::Keyboard::Key::NumPad9, SDLK_KP_9 },
 
-		{ Input::Keyboard::Key::Multiply, GLFW_KEY_KP_MULTIPLY },
-		{ Input::Keyboard::Key::Add, GLFW_KEY_KP_ADD },
-		{ Input::Keyboard::Key::Subtract, GLFW_KEY_KP_SUBTRACT },
-		{ Input::Keyboard::Key::Decimal, GLFW_KEY_KP_DECIMAL },
-		{ Input::Keyboard::Key::Divide, GLFW_KEY_KP_DIVIDE },
+		{ Input::Keyboard::Key::Multiply, SDLK_KP_MULTIPLY },
+		{ Input::Keyboard::Key::Add, SDLK_KP_PLUS },
+		{ Input::Keyboard::Key::Subtract, SDLK_KP_MINUS },
+		{ Input::Keyboard::Key::Decimal, SDLK_KP_DECIMAL },
+		{ Input::Keyboard::Key::Divide, SDLK_KP_DIVIDE },
 
-		{ Input::Keyboard::Key::F1, GLFW_KEY_F1 },
-		{ Input::Keyboard::Key::F2, GLFW_KEY_F2 },
-		{ Input::Keyboard::Key::F3, GLFW_KEY_F3 },
-		{ Input::Keyboard::Key::F4, GLFW_KEY_F4 },
-		{ Input::Keyboard::Key::F5, GLFW_KEY_F5 },
-		{ Input::Keyboard::Key::F6, GLFW_KEY_F6 },
-		{ Input::Keyboard::Key::F7, GLFW_KEY_F7 },
-		{ Input::Keyboard::Key::F8, GLFW_KEY_F8 },
-		{ Input::Keyboard::Key::F9, GLFW_KEY_F9 },
-		{ Input::Keyboard::Key::F10, GLFW_KEY_F10 },
-		{ Input::Keyboard::Key::F11, GLFW_KEY_F11 },
-		{ Input::Keyboard::Key::F12, GLFW_KEY_F12 },
+		{ Input::Keyboard::Key::F1, SDLK_F1 },
+		{ Input::Keyboard::Key::F2, SDLK_F2 },
+		{ Input::Keyboard::Key::F3, SDLK_F3 },
+		{ Input::Keyboard::Key::F4, SDLK_F4 },
+		{ Input::Keyboard::Key::F5, SDLK_F5 },
+		{ Input::Keyboard::Key::F6, SDLK_F6 },
+		{ Input::Keyboard::Key::F7, SDLK_F7 },
+		{ Input::Keyboard::Key::F8, SDLK_F8 },
+		{ Input::Keyboard::Key::F9, SDLK_F9 },
+		{ Input::Keyboard::Key::F10, SDLK_F10 },
+		{ Input::Keyboard::Key::F11, SDLK_F11 },
+		{ Input::Keyboard::Key::F12, SDLK_F12 },
 
-		{ Input::Keyboard::Key::Tilde, GLFW_KEY_GRAVE_ACCENT },
+		{ Input::Keyboard::Key::Tilde, SDLK_BACKQUOTE },
 	};
 
-	auto button = KeyMap.at(key);
-	auto state = glfwGetKey(mWindow, button);
+	if (!KeyMap.contains(key))
+		return false;
 
-	return state == GLFW_PRESS;
+	auto* state = SDL_GetKeyboardState(NULL);
+
+	return state[SDL_GetScancodeFromKey(KeyMap.at(key))] > 0;
 }
 
 bool SystemEmscripten::isKeyPressed(Input::Mouse::Button key) const
 {
 	static const std::unordered_map<Input::Mouse::Button, int> ButtonMap = {
-		{ Input::Mouse::Button::Left, GLFW_MOUSE_BUTTON_LEFT },
-		{ Input::Mouse::Button::Middle, GLFW_MOUSE_BUTTON_MIDDLE },
-		{ Input::Mouse::Button::Right, GLFW_MOUSE_BUTTON_RIGHT },
+		{ Input::Mouse::Button::Left, SDL_BUTTON_LEFT },
+		{ Input::Mouse::Button::Middle, SDL_BUTTON_MIDDLE },
+		{ Input::Mouse::Button::Right, SDL_BUTTON_RIGHT },
 	};
 
-	auto button = ButtonMap.at(key);
-	auto state = glfwGetMouseButton(mWindow, button);
+	if (!ButtonMap.contains(key))
+		return false;
 
-	return state == GLFW_PRESS;
+	auto state = SDL_GetMouseState(NULL, NULL);
+
+	return state & SDL_BUTTON(ButtonMap.at(key));
 }
 
 void SystemEmscripten::resize(int width, int height)
@@ -226,22 +344,18 @@ void SystemEmscripten::resize(int width, int height)
 
 void SystemEmscripten::setTitle(const std::string& text)
 {
-	glfwSetWindowTitle(mWindow, text.c_str());
 }
 
 void SystemEmscripten::hideCursor()
 {
-	glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void SystemEmscripten::showCursor()
 {
-	glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void SystemEmscripten::setCursorPos(int x, int y)
 {
-	glfwSetCursorPos(mWindow, (double)x, (double)y);
 }
 
 std::string SystemEmscripten::getAppName() const
@@ -264,176 +378,6 @@ void SystemEmscripten::purchase(const std::string& product)
 
 void SystemEmscripten::alert(const std::string& text)
 {
-}
-
-void SystemEmscripten::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
-{
-	Input::Mouse::Event e;
-
-	static const std::unordered_map<int, Input::Mouse::Event::Type> TypeMap = {
-		{ GLFW_PRESS, Input::Mouse::Event::Type::ButtonDown },
-		{ GLFW_REPEAT, Input::Mouse::Event::Type::ButtonDown },
-		{ GLFW_RELEASE, Input::Mouse::Event::Type::ButtonUp },
-	};
-	
-	static const std::unordered_map<int, Input::Mouse::Button> ButtonMap = {
-		{ GLFW_MOUSE_BUTTON_LEFT, Input::Mouse::Button::Left },
-		{ GLFW_MOUSE_BUTTON_MIDDLE, Input::Mouse::Button::Middle },
-		{ GLFW_MOUSE_BUTTON_RIGHT, Input::Mouse::Button::Right },
-	};
-
-	double x;
-	double y;
-	
-	glfwGetCursorPos(window, &x, &y);
-
-	e.type = TypeMap.at(action);
-	e.button = ButtonMap.at(button);
-	e.x = (int)x;
-	e.y = (int)y;
-
-	EVENT->emit(e);
-}
-
-void SystemEmscripten::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	static const std::unordered_map<int, Input::Keyboard::Key> KeyMap = {
-		{ GLFW_KEY_BACKSPACE, Input::Keyboard::Key::Backspace },
-		{ GLFW_KEY_TAB, Input::Keyboard::Key::Tab },
-		{ GLFW_KEY_ENTER, Input::Keyboard::Key::Enter },
-		{ GLFW_KEY_LEFT_SHIFT, Input::Keyboard::Key::Shift },
-		{ GLFW_KEY_RIGHT_SHIFT, Input::Keyboard::Key::Shift },
-		{ GLFW_KEY_LEFT_CONTROL, Input::Keyboard::Key::Ctrl },
-		{ GLFW_KEY_RIGHT_CONTROL, Input::Keyboard::Key::Ctrl },
-		{ GLFW_KEY_LEFT_ALT, Input::Keyboard::Key::Alt },
-		{ GLFW_KEY_RIGHT_ALT, Input::Keyboard::Key::Alt },
-		{ GLFW_KEY_PAUSE, Input::Keyboard::Key::Pause },
-		{ GLFW_KEY_CAPS_LOCK, Input::Keyboard::Key::CapsLock },
-		{ GLFW_KEY_ESCAPE, Input::Keyboard::Key::Escape },
-		{ GLFW_KEY_SPACE, Input::Keyboard::Key::Space },
-		{ GLFW_KEY_PAGE_UP, Input::Keyboard::Key::PageUp },
-		{ GLFW_KEY_PAGE_DOWN, Input::Keyboard::Key::PageDown },
-		{ GLFW_KEY_END, Input::Keyboard::Key::End },
-		{ GLFW_KEY_HOME, Input::Keyboard::Key::Home },
-		{ GLFW_KEY_LEFT, Input::Keyboard::Key::Left },
-		{ GLFW_KEY_UP, Input::Keyboard::Key::Up },
-		{ GLFW_KEY_RIGHT, Input::Keyboard::Key::Right },
-		{ GLFW_KEY_DOWN, Input::Keyboard::Key::Down },
-		{ GLFW_KEY_PRINT_SCREEN, Input::Keyboard::Key::PrintScreen },
-		{ GLFW_KEY_INSERT, Input::Keyboard::Key::Insert },
-		{ GLFW_KEY_DELETE, Input::Keyboard::Key::Delete },
-		
-		{ GLFW_KEY_A, Input::Keyboard::Key::A },
-		{ GLFW_KEY_B, Input::Keyboard::Key::B },
-		{ GLFW_KEY_C, Input::Keyboard::Key::C },
-		{ GLFW_KEY_D, Input::Keyboard::Key::D },
-		{ GLFW_KEY_E, Input::Keyboard::Key::E },
-		{ GLFW_KEY_F, Input::Keyboard::Key::F },
-		{ GLFW_KEY_G, Input::Keyboard::Key::G },
-		{ GLFW_KEY_H, Input::Keyboard::Key::H },
-		{ GLFW_KEY_I, Input::Keyboard::Key::I },
-		{ GLFW_KEY_J, Input::Keyboard::Key::J },
-		{ GLFW_KEY_K, Input::Keyboard::Key::K },
-		{ GLFW_KEY_L, Input::Keyboard::Key::L },
-		{ GLFW_KEY_M, Input::Keyboard::Key::M },
-		{ GLFW_KEY_N, Input::Keyboard::Key::N },
-		{ GLFW_KEY_O, Input::Keyboard::Key::O },
-		{ GLFW_KEY_P, Input::Keyboard::Key::P },
-		{ GLFW_KEY_Q, Input::Keyboard::Key::Q },
-		{ GLFW_KEY_R, Input::Keyboard::Key::R },
-		{ GLFW_KEY_S, Input::Keyboard::Key::S },
-		{ GLFW_KEY_T, Input::Keyboard::Key::T },
-		{ GLFW_KEY_U, Input::Keyboard::Key::U },
-		{ GLFW_KEY_V, Input::Keyboard::Key::V },
-		{ GLFW_KEY_W, Input::Keyboard::Key::W },
-		{ GLFW_KEY_X, Input::Keyboard::Key::X },
-		{ GLFW_KEY_Y, Input::Keyboard::Key::Y },
-		{ GLFW_KEY_Z, Input::Keyboard::Key::Z },
-
-		{ GLFW_KEY_KP_0, Input::Keyboard::Key::NumPad0 },
-		{ GLFW_KEY_KP_1, Input::Keyboard::Key::NumPad1 },
-		{ GLFW_KEY_KP_2, Input::Keyboard::Key::NumPad2 },
-		{ GLFW_KEY_KP_3, Input::Keyboard::Key::NumPad3 },
-		{ GLFW_KEY_KP_4, Input::Keyboard::Key::NumPad4 },
-		{ GLFW_KEY_KP_5, Input::Keyboard::Key::NumPad5 },
-		{ GLFW_KEY_KP_6, Input::Keyboard::Key::NumPad6 },
-		{ GLFW_KEY_KP_7, Input::Keyboard::Key::NumPad7 },
-		{ GLFW_KEY_KP_8, Input::Keyboard::Key::NumPad8 },
-		{ GLFW_KEY_KP_9, Input::Keyboard::Key::NumPad9 },
-
-		{ GLFW_KEY_KP_MULTIPLY, Input::Keyboard::Key::Multiply },
-		{ GLFW_KEY_KP_ADD, Input::Keyboard::Key::Add },
-		{ GLFW_KEY_KP_SUBTRACT, Input::Keyboard::Key::Subtract },
-		{ GLFW_KEY_KP_DECIMAL, Input::Keyboard::Key::Decimal },
-		{ GLFW_KEY_KP_DIVIDE, Input::Keyboard::Key::Divide },
-
-		{ GLFW_KEY_F1, Input::Keyboard::Key::F1 },
-		{ GLFW_KEY_F2, Input::Keyboard::Key::F2 },
-		{ GLFW_KEY_F3, Input::Keyboard::Key::F3 },
-		{ GLFW_KEY_F4, Input::Keyboard::Key::F4 },
-		{ GLFW_KEY_F5, Input::Keyboard::Key::F5 },
-		{ GLFW_KEY_F6, Input::Keyboard::Key::F6 },
-		{ GLFW_KEY_F7, Input::Keyboard::Key::F7 },
-		{ GLFW_KEY_F8, Input::Keyboard::Key::F8 },
-		{ GLFW_KEY_F9, Input::Keyboard::Key::F9 },
-		{ GLFW_KEY_F10, Input::Keyboard::Key::F10 },
-		{ GLFW_KEY_F11, Input::Keyboard::Key::F11 },
-		{ GLFW_KEY_F12, Input::Keyboard::Key::F12 },
-
-		{ GLFW_KEY_GRAVE_ACCENT, Input::Keyboard::Key::Tilde },
-	};
-
-	static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {
-		{ GLFW_PRESS, Input::Keyboard::Event::Type::Pressed },
-		{ GLFW_REPEAT, Input::Keyboard::Event::Type::Pressed },
-		{ GLFW_RELEASE, Input::Keyboard::Event::Type::Released },
-	};
-
-	if (!TypeMap.contains(action))
-		return;
-
-	if (!KeyMap.contains(key))
-		return;
-
-	Input::Keyboard::Event e;
-	
-	e.type = TypeMap.at(action);
-	e.key = KeyMap.at(key);
-	
-	EVENT->emit(e);
-}
-
-void SystemEmscripten::CharCallback(GLFWwindow* window, unsigned int codepoint)
-{
-	EVENT->emit(Input::Keyboard::CharEvent{ codepoint });
-}
-
-void SystemEmscripten::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	Input::Mouse::Event e;
-
-	double x;
-	double y;
-	glfwGetCursorPos(window, &x, &y);
-
-	e.type = Input::Mouse::Event::Type::Wheel;
-	e.x = (int)x;
-	e.y = (int)y;
-	e.wheelX = (float)xoffset;
-	e.wheelY = (float)yoffset;
-
- 	EVENT->emit(e);
-}
-
-void SystemEmscripten::WindowSizeCallback(GLFWwindow* window, int width, int height)
-{
-}
-
-void SystemEmscripten::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-	gContext->mWidth = width;
-	gContext->mHeight = height;
-	EVENT->emit(ResizeEvent({ width, height }));
 }
 
 #endif

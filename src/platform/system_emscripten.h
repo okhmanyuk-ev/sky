@@ -9,8 +9,6 @@
 #include <cassert>
 #include <set>
 
-#include <GLFW/glfw3.h>
-
 namespace Platform
 {
 	class SystemEmscripten : public System
@@ -67,20 +65,11 @@ namespace Platform
 		float mScale = 1.0f;
 		int mWidth = 800;
 		int mHeight = 600;
-		GLFWwindow* mWindow = nullptr;
 		int mPrevMouseX = 0;
 		int mPrevMouseY = 0;
 		
 	public:
 		inline static void* Window = nullptr;
-		
-	private:
-		static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-		static void CharCallback(GLFWwindow* window, unsigned int codepoint);
-		static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-		static void WindowSizeCallback(GLFWwindow* window, int width, int height);
-		static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 	};
 }
 #endif
