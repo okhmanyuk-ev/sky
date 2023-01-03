@@ -1,10 +1,7 @@
 #include "networking_ws.h"
 
-#ifndef EMSCRIPTEN
-
 #include <console/device.h>
 #include <common/buffer_helpers.h>
-
 using namespace Shared::NetworkingWS;
 
 // channel
@@ -128,7 +125,9 @@ void Client::connect(const std::string& url)
 		return;
 	}
 
+#ifndef EMSCRIPTEN // TODO: this code hurts everything when using emscripten
 	mWSClient.connect(con);
+#endif
 	LOG("connecting");
 }
 
@@ -308,4 +307,3 @@ RegularMessaging::Client::Client()
 		send();
 	});
 }
-#endif

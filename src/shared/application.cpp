@@ -209,7 +209,9 @@ Application::~Application()
 	ENGINE->removeSystem<Platform::System>();
 	ENGINE->removeSystem<Common::ProfilerSystem>();
 	ENGINE->removeSystem<Common::FrameSystem>();
+#ifndef EMSCRIPTEN
 	ENGINE->removeSystem<Common::TaskSystem>();
+#endif
 	//	ENGINE->removeSystem<Common::EventSystem>(); // should be removed later
 }
 

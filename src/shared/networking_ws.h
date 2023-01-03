@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef EMSCRIPTEN
-
 #include <map>
 #include <common/frame_system.h>
 #include <common/bitbuffer.h>
@@ -202,5 +200,3 @@ namespace Shared::NetworkingWS
 		class Server : public Base { };
 	}
 }
-
-#endif
