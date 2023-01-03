@@ -89,8 +89,8 @@ void SystemEmscripten::process()
 				.type = Input::Mouse::Event::Type::Wheel,
 				.x = (int)((float)x * mScale),
 				.y = (int)((float)y * mScale),
-				.wheelX = (float)event.wheel.x,
-				.wheelY = (float)event.wheel.y
+				.wheelX = event.wheel.preciseX,
+				.wheelY = event.wheel.preciseY
 			});
 		}
 		else if (event.type == SDL_TEXTINPUT)
