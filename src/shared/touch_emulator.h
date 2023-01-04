@@ -5,8 +5,9 @@
 
 namespace Shared 
 {
-	class TouchEmulator : 
-		public Common::Event::Listenable<Platform::Input::Mouse::Event>,
+	class TouchEmulator :
+		public Common::Event::Listenable<Platform::Input::Mouse::ButtonEvent>,
+		public Common::Event::Listenable<Platform::Input::Mouse::MoveEvent>,
 		public Common::Event::Listenable<Platform::Input::Touch::Event>
 	{
 	public:
@@ -26,7 +27,8 @@ namespace Shared
 		};
 
 	private:
-		void onEvent(const Platform::Input::Mouse::Event& e) override;
+		void onEvent(const Platform::Input::Mouse::ButtonEvent& e) override;
+		void onEvent(const Platform::Input::Mouse::MoveEvent& e) override;
 		void onEvent(const Platform::Input::Touch::Event& e) override;
 
 	private:

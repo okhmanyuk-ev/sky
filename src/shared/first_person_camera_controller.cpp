@@ -141,40 +141,41 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Keyboard::Event
 		mKeyCtrl = value;
 }
 
-void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::Event& e)
+void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 {
-	using namespace Platform::Input::Mouse;
-
-	if (e.button == Button::Left)
+	if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Pressed && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 	{
-		if (e.type == Event::Type::ButtonDown && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
-		{
-			mLookAround = true;
-			PLATFORM->hideCursor();
-			mStartAngles = { e.x, e.y };
-			mCurrentAngles = mStartAngles;
-			mPrevAngles = mStartAngles;
-		}
-
-		if (e.type == Event::Type::ButtonUp)
-		{
-			mLookAround = false;
-			PLATFORM->showCursor();
-		}
-	}
-
-	if (e.type == Event::Type::Move && mLookAround && !mMouseCaptured)
-	{
-		mMouseCaptured = true;
-		mCurrentAngles = { e.x, e.y };
-		PLATFORM->setCursorPos(static_cast<int>(mStartAngles.x), static_cast<int>(mStartAngles.y));
+		mLookAround = true;
+		PLATFORM->hideCursor();
+		mStartAngles = e.pos;
+		mCurrentAngles = mStartAngles;
 		mPrevAngles = mStartAngles;
 	}
 
-	if (e.type == Event::Type::Wheel)
+	if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Released)
 	{
-		mCamera->setFieldOfView(mCamera->getFieldOfView() - e.wheelY * 0.05f);
+		mLookAround = false;
+		PLATFORM->showCursor();
 	}
+}
+
+void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::MoveEvent& e)
+{
+	if (!(mLookAround && !mMouseCaptured))
+		return;
+
+	mMouseCaptured = true;
+	mCurrentAngles = e.pos;
+	PLATFORM->setCursorPos(static_cast<int>(mStartAngles.x), static_cast<int>(mStartAngles.y));
+	mPrevAngles = mStartAngles;
+}
+
+void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::ScrollEvent& e)
+{
+	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+		return;
+
+	mCamera->setFieldOfView(mCamera->getFieldOfView() - e.scroll.y * 0.05f);
 }
 
 void FirstPersonCameraController::onEvent(const Platform::Input::Touch::Event& e)

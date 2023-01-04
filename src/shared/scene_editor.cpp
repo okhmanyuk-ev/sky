@@ -17,24 +17,32 @@ SceneEditor::~SceneEditor()
 	CONSOLE->removeCVar("g_editor");
 }
 
-void SceneEditor::onEvent(const Platform::Input::Mouse::Event& e)
+void SceneEditor::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 {
-	mMousePos = { e.x, e.y };
+	mMousePos = e.pos;
 
-	if (mNodeSelectingMode)
+	if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Released && e.button == Platform::Input::Mouse::Button::Right)
 	{
-		if (e.type == Platform::Input::Mouse::Event::Type::Wheel)
-		{
-			if (e.wheelY < 0.0f)
-				mSelectedNode += 1;
-			else
-				mSelectedNode -= 1;
-		}
-		if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp && e.button == Platform::Input::Mouse::Button::Right)
-		{
-			mWantOpenNodeEditor = true;
-		}
+		mWantOpenNodeEditor = true;
 	}
+}
+
+void SceneEditor::onEvent(const Platform::Input::Mouse::MoveEvent& e)
+{
+	mMousePos = e.pos;
+}
+
+void SceneEditor::onEvent(const Platform::Input::Mouse::ScrollEvent& e)
+{
+	mMousePos = e.pos;
+
+	if (!mNodeSelectingMode)
+		return;
+
+	if (e.scroll.y < 0.0f)
+		mSelectedNode += 1;
+	else
+		mSelectedNode -= 1;
 }
 
 void SceneEditor::onFrame()

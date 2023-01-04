@@ -170,37 +170,34 @@ void ImguiSystem::onEvent(const Platform::Input::Keyboard::CharEvent& e)
 	io.AddInputCharacter(e.codepoint);
 }
 
-void ImguiSystem::onEvent(const Platform::Input::Mouse::Event& e)
+void ImguiSystem::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 {
 	auto& io = ImGui::GetIO();
 
-	if (e.type == Platform::Input::Mouse::Event::Type::Move)
+	const static std::unordered_map<Platform::Input::Mouse::Button, int> ButtonIndexMap = {
+		{ Platform::Input::Mouse::Button::Left, 0 },
+		{ Platform::Input::Mouse::Button::Middle, 1 },
+		{ Platform::Input::Mouse::Button::Right, 2 }
+	};
+
+	if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Pressed)
 	{
-		mMousePos = { static_cast<float>(e.x), static_cast<float>(e.y) };
+		io.MouseDown[ButtonIndexMap.at(e.button)] = true;
 	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::Wheel)
+	else if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Released)
 	{
-		mMouseWheel.x += e.wheelX;
-		mMouseWheel.y += e.wheelY;
+		mReleasedMouseButtons.insert(ButtonIndexMap.at(e.button));
 	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonDown)
-	{
-		if (e.button == Platform::Input::Mouse::Button::Left)
-			io.MouseDown[0] = true;
-		else if (e.button == Platform::Input::Mouse::Button::Right)
-			io.MouseDown[1] = true;
-		else if (e.button == Platform::Input::Mouse::Button::Middle)
-			io.MouseDown[2] = true;
-	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp)
-	{
-		if (e.button == Platform::Input::Mouse::Button::Left)
-			mReleasedMouseButtons.insert(0);
-		else if (e.button == Platform::Input::Mouse::Button::Right)
-			mReleasedMouseButtons.insert(1);
-		else if (e.button == Platform::Input::Mouse::Button::Middle)
-			mReleasedMouseButtons.insert(2);
-	}
+}
+
+void ImguiSystem::onEvent(const Platform::Input::Mouse::MoveEvent& e)
+{
+	mMousePos = e.pos;
+}
+
+void ImguiSystem::onEvent(const Platform::Input::Mouse::ScrollEvent& e)
+{
+	mMouseWheel += e.scroll;
 }
 
 float ImguiSystem::getScale() const

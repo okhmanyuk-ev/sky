@@ -233,33 +233,45 @@ size_t Scene::Scene::getNodesCount(std::shared_ptr<Node> node) const
 	return result;
 }
 
-void Scene::Scene::onEvent(const Platform::Input::Mouse::Event& e)
+void Scene::Scene::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 {
-	if (e.type == Platform::Input::Mouse::Event::Type::ButtonDown && e.button == Platform::Input::Mouse::Button::Left)
+	if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Pressed && e.button == Platform::Input::Mouse::Button::Left)
 	{
-		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Begin, e.x, e.y }));
+		onEvent(Platform::Input::Touch::Event({
+			.type = Platform::Input::Touch::Event::Type::Begin,
+			.x = e.pos.x,
+			.y = e.pos.y
+		}));
 	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::Move)
+	else if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Released && e.button == Platform::Input::Mouse::Button::Left)
 	{
-		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::Continue, e.x, e.y }));
+		onEvent(Platform::Input::Touch::Event({
+			.type = Platform::Input::Touch::Event::Type::End,
+			.x = e.pos.x,
+			.y = e.pos.y
+		}));
 	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp && e.button == Platform::Input::Mouse::Button::Left)
+}
+
+void Scene::Scene::onEvent(const Platform::Input::Mouse::MoveEvent& e)
+{
+	onEvent(Platform::Input::Touch::Event({
+		.type = Platform::Input::Touch::Event::Type::Continue,
+		.x = e.pos.x,
+		.y = e.pos.y
+	}));
+}
+
+void Scene::Scene::onEvent(const Platform::Input::Mouse::ScrollEvent& e)
+{
+	if (!interactTest(e.pos))
+		return;
+
+	auto nodes = getTouchableNodes(e.pos);
+
+	for (auto node : nodes)
 	{
-		onEvent(Platform::Input::Touch::Event({ Platform::Input::Touch::Event::Type::End, e.x, e.y }));
-	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::Wheel) 
-	{
-		auto pos = glm::vec2(static_cast<float>(e.x), static_cast<float>(e.y));
-
-		if (!interactTest(pos)) 
-			return;
-
-		auto nodes = getTouchableNodes(pos);
-
-		for (auto node : nodes) 
-		{
-			node->scroll(e.wheelX, e.wheelY);
-		}
+		node->scroll(e.scroll.x, e.scroll.y);
 	}
 }
 

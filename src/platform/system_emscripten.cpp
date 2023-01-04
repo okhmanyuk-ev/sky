@@ -49,10 +49,11 @@ void SystemEmscripten::process()
     {
 		if (event.type == SDL_MOUSEMOTION)
 		{
-			EVENT->emit(Input::Mouse::Event{
-				.type = Input::Mouse::Event::Type::Move,
-				.x = (int)((float)event.motion.x * mScale),
-				.y = (int)((float)event.motion.y * mScale)
+			EVENT->emit(Input::Mouse::MoveEvent{
+				.pos = {
+					(int)((float)event.motion.x * mScale),
+					(int)((float)event.motion.y * mScale)
+				}
 			});
 		}
 		else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
@@ -63,19 +64,21 @@ void SystemEmscripten::process()
 				{ SDL_BUTTON_RIGHT, Input::Mouse::Button::Right },
 			};
 
-			static const std::unordered_map<uint32_t, Input::Mouse::Event::Type> TypeMap = {
-				{ SDL_MOUSEBUTTONDOWN, Input::Mouse::Event::Type::ButtonDown },
-				{ SDL_MOUSEBUTTONUP, Input::Mouse::Event::Type::ButtonUp }
+			static const std::unordered_map<uint32_t, Input::Mouse::ButtonEvent::Type> TypeMap = {
+				{ SDL_MOUSEBUTTONDOWN, Input::Mouse::ButtonEvent::Type::Pressed },
+				{ SDL_MOUSEBUTTONUP, Input::Mouse::ButtonEvent::Type::Released }
 			};
 
 			if (!ButtonMap.contains(event.button.button))
 				continue;
 
-			EVENT->emit(Input::Mouse::Event{
+			EVENT->emit(Input::Mouse::ButtonEvent{
 				.type = TypeMap.at(event.type),
 				.button = ButtonMap.at(event.button.button),
-				.x = (int)((float)event.button.x * mScale),
-				.y = (int)((float)event.button.y * mScale)
+				.pos = {
+					(int)((float)event.button.x * mScale),
+					(int)((float)event.button.y * mScale)
+				}
 			});
 		}
 		else if (event.type == SDL_MOUSEWHEEL)
@@ -85,12 +88,15 @@ void SystemEmscripten::process()
 
 			SDL_GetMouseState(&x, &y);
 
-			EVENT->emit(Input::Mouse::Event{
-				.type = Input::Mouse::Event::Type::Wheel,
-				.x = (int)((float)x * mScale),
-				.y = (int)((float)y * mScale),
-				.wheelX = event.wheel.preciseX,
-				.wheelY = event.wheel.preciseY
+			EVENT->emit(Input::Mouse::ScrollEvent{
+				.pos = {
+					(int)((float)x * mScale),
+					(int)((float)y * mScale)
+				},
+				.scroll = {
+					event.wheel.preciseX,
+					event.wheel.preciseY
+				}
 			});
 		}
 		else if (event.type == SDL_TEXTINPUT)

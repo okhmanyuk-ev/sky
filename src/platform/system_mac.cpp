@@ -87,14 +87,10 @@ void SystemMac::process()
 	{
 		mPrevMouseX = mouse_x_i;
 		mPrevMouseY = mouse_y_i;
-		
-		Input::Mouse::Event e;
 
-		e.type = Input::Mouse::Event::Type::Move;
-		e.x = mouse_x_i;
-		e.y = mouse_y_i;
-
-		EVENT->emit(e);
+		EVENT->emit(Input::Mouse::MoveEvent{
+			.pos = { mouse_x_i, mouse_y_i }
+		});
 	}
 }
 
@@ -281,12 +277,10 @@ void SystemMac::alert(const std::string& text)
 
 void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	Input::Mouse::Event e;
-
-	static const std::unordered_map<int, Input::Mouse::Event::Type> TypeMap = {
-		{ GLFW_PRESS, Input::Mouse::Event::Type::ButtonDown },
-		{ GLFW_REPEAT, Input::Mouse::Event::Type::ButtonDown },
-		{ GLFW_RELEASE, Input::Mouse::Event::Type::ButtonUp },
+	static const std::unordered_map<int, Input::Mouse::ButtonEvent::Type> TypeMap = {
+		{ GLFW_PRESS, Input::Mouse::ButtonEvent::Type::Pressed },
+		{ GLFW_REPEAT, Input::Mouse::ButtonEvent::Type::Pressed },
+		{ GLFW_RELEASE, Input::Mouse::ButtonEvent::Type::Released },
 	};
 	
 	static const std::unordered_map<int, Input::Mouse::Button> ButtonMap = {
@@ -297,15 +291,16 @@ void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, 
 
 	double x;
 	double y;
-	
 	glfwGetCursorPos(window, &x, &y);
 
-	e.type = TypeMap.at(action);
-	e.button = ButtonMap.at(button);
-	e.x = (int)(x * gContext->mScale);
-	e.y = (int)(y * gContext->mScale);
+	x *= gContext->mScale;
+	y *= gContext->mScale;
 
-	EVENT->emit(e);
+	EVENT->emit(Input::Mouse::ButtonEvent{
+		.type = TypeMap.at(action),
+		.button = ButtonMap.at(button),
+		.pos = { x, y }
+	});
 }
 
 void SystemMac::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -423,19 +418,17 @@ void SystemMac::CharCallback(GLFWwindow* window, unsigned int codepoint)
 
 void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	Input::Mouse::Event e;
-
 	double x;
 	double y;
 	glfwGetCursorPos(window, &x, &y);
 
-	e.type = Input::Mouse::Event::Type::Wheel;
-	e.x = (int)(x * gContext->mScale);
-	e.y = (int)(y * gContext->mScale);
-	e.wheelX = (float)xoffset;
-	e.wheelY = (float)yoffset;
+	x *= gContext->mScale;
+	y *= gContext->mScale;
 
- 	EVENT->emit(e);
+ 	EVENT->emit(Input::Mouse::ScrollEvent{
+ 		.pos = { x, y },
+ 		.scroll = { xoffset, yoffset }
+	});
 }
 
 void SystemMac::WindowSizeCallback(GLFWwindow* window, int width, int height)

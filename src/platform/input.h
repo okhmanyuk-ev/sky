@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <glm/glm.hpp>
 
 namespace Platform::Input
 {
@@ -217,24 +217,28 @@ namespace Platform::Input
 			Right
 		};
 
-		struct Event
+		struct ButtonEvent
 		{
 			enum class Type
 			{
-				ButtonDown,
-				ButtonUp,
-				Move,
-				Wheel
+				Pressed,
+				Released
 			};
 
 			Type type;
 			Button button;
+			glm::ivec2 pos;
+		};
 
-			int x = 0;
-			int y = 0;
+		struct MoveEvent
+		{
+			glm::ivec2 pos;
+		};
 
-			float wheelX = 0.0f;
-			float wheelY = 0.0f;
+		struct ScrollEvent
+		{
+			glm::ivec2 pos;
+			glm::vec2 scroll;
 		};
 	}
 

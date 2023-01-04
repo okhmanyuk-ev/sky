@@ -2,32 +2,38 @@
 
 using namespace Shared;
 
-void TouchEmulator::onEvent(const Platform::Input::Mouse::Event& e)
+void TouchEmulator::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 {
-	if (e.type == Platform::Input::Mouse::Event::Type::Wheel)
+	if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Pressed && !mMouseDown)
+	{
+		mMouseDown = true;
+		EVENT->emit(Event{
+			.type = Event::Type::Begin,
+			.x = e.pos.x,
+			.y = e.pos.y
+		});
+	}
+	else if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Released && mMouseDown)
+	{
+		mMouseDown = false;
+		EVENT->emit(Event{
+			.type = Event::Type::End,
+			.x = e.pos.x,
+			.y = e.pos.y
+		});
+	}
+}
+
+void TouchEmulator::onEvent(const Platform::Input::Mouse::MoveEvent& e)
+{
+	if (!mMouseDown)
 		return;
 
-	auto fwd = Event();
-	fwd.x = e.x;
-	fwd.y = e.y;
-
-	if (e.type == Platform::Input::Mouse::Event::Type::ButtonDown && !mMouseDown)
-	{
-		fwd.type = Event::Type::Begin;
-		mMouseDown = true;
-		EVENT->emit(fwd);
-	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::Move && mMouseDown)
-	{
-		fwd.type = Event::Type::Continue;
-		EVENT->emit(fwd);
-	}
-	else if (e.type == Platform::Input::Mouse::Event::Type::ButtonUp && mMouseDown)
-	{
-		fwd.type = Event::Type::End;
-		mMouseDown = false;
-		EVENT->emit(fwd);
-	}
+	EVENT->emit(Event{
+		.type = Event::Type::Continue,
+		.x = e.pos.x,
+		.y = e.pos.y
+	});
 }
 
 void TouchEmulator::onEvent(const Platform::Input::Touch::Event& e)
