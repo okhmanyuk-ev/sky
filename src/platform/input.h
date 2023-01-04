@@ -254,9 +254,7 @@ namespace Platform::Input
 			};
 
 			Type type;
-
-			int x;
-			int y;
+			glm::ivec2 pos;
 		};
 	}
 }

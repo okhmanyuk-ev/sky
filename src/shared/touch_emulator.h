@@ -21,9 +21,7 @@ namespace Shared
 			};
 
 			Type type;
-
-			int x;
-			int y;
+			glm::ivec2 pos;
 		};
 
 	private:

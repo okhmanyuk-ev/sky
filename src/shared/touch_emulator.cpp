@@ -9,8 +9,7 @@ void TouchEmulator::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 		mMouseDown = true;
 		EVENT->emit(Event{
 			.type = Event::Type::Begin,
-			.x = e.pos.x,
-			.y = e.pos.y
+			.pos = e.pos
 		});
 	}
 	else if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Released && mMouseDown)
@@ -18,8 +17,7 @@ void TouchEmulator::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 		mMouseDown = false;
 		EVENT->emit(Event{
 			.type = Event::Type::End,
-			.x = e.pos.x,
-			.y = e.pos.y
+			.pos = e.pos
 		});
 	}
 }
@@ -31,23 +29,20 @@ void TouchEmulator::onEvent(const Platform::Input::Mouse::MoveEvent& e)
 
 	EVENT->emit(Event{
 		.type = Event::Type::Continue,
-		.x = e.pos.x,
-		.y = e.pos.y
+		.pos = e.pos
 	});
 }
 
 void TouchEmulator::onEvent(const Platform::Input::Touch::Event& e)
 {
-	auto fwd = Event();
-	fwd.x = e.x;
-	fwd.y = e.y;
-	
-	if (e.type == Platform::Input::Touch::Event::Type::Begin)
-		fwd.type = Event::Type::Begin;
-	else if (e.type == Platform::Input::Touch::Event::Type::Continue)
-		fwd.type = Event::Type::Continue;
-	else
-		fwd.type = Event::Type::End;
+	const static std::unordered_map<Platform::Input::Touch::Event::Type, Event::Type> TypeMap = {
+		{ Platform::Input::Touch::Event::Type::Begin, Event::Type::Begin },
+		{ Platform::Input::Touch::Event::Type::Continue, Event::Type::Continue },
+		{ Platform::Input::Touch::Event::Type::End, Event::Type::End }
+	};
 
-	EVENT->emit(fwd);
+	EVENT->emit(Event{
+		.type = TypeMap.at(e.type),
+		.pos = e.pos
+	});
 }

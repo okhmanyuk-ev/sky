@@ -142,7 +142,7 @@ void ImguiSystem::ensureFont()
 
 void ImguiSystem::onEvent(const Platform::Input::Touch::Event& e)
 {
-	mMousePos = { static_cast<float>(e.x), static_cast<float>(e.y) };
+	mMousePos = e.pos;
 
 	auto& io = ImGui::GetIO();
 

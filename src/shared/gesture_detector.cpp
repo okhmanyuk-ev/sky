@@ -32,7 +32,7 @@ void GestureDetector::onEvent(const TouchEmulator::Event& e)
 		mPositions.erase(time);
 	}
 
-	auto newest = glm::vec2(static_cast<float>(e.x), static_cast<float>(e.y));
+	auto newest = glm::vec2(e.pos);
 
 	mPositions[now] = newest;
 	

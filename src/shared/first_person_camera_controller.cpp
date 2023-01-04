@@ -183,16 +183,16 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Touch::Event& e
 	if (e.type == Platform::Input::Touch::Event::Type::Begin && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 	{
 		mLookAround = true;
-		mCurrentAngles = { e.x, e.y };
+		mCurrentAngles = e.pos;
 		mPrevAngles = mCurrentAngles;
 
-		if (e.y <= PLATFORM->getHeight() * 0.15f)
+		if (e.pos.y <= PLATFORM->getHeight() * 0.15f)
 			mKeyW = true;
-		else if (e.y >= PLATFORM->getHeight() * 0.85f)
+		else if (e.pos.y >= PLATFORM->getHeight() * 0.85f)
 			mKeyS = true;
-		else if (e.x <= PLATFORM->getWidth() * 0.15f)
+		else if (e.pos.x <= PLATFORM->getWidth() * 0.15f)
 			mKeyA = true;
-		else if (e.x >= PLATFORM->getWidth() * 0.85f)
+		else if (e.pos.x >= PLATFORM->getWidth() * 0.85f)
 			mKeyD = true;
 	}
 
@@ -208,6 +208,6 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Touch::Event& e
 
 	if (e.type == Platform::Input::Touch::Event::Type::Continue)
 	{
-		mCurrentAngles = { e.x, e.y };
+		mCurrentAngles = e.pos;
 	}
 }

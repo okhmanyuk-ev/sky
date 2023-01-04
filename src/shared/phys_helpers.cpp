@@ -129,7 +129,7 @@ void World::onEvent(const Shared::TouchEmulator::Event& e)
 		b2Fixture* fixture = nullptr;
 	};
 
-	auto unprojected_pos = unproject({ e.x, e.y });
+	auto unprojected_pos = unproject(e.pos);
 	auto world_pos = unprojected_pos / Scale;
 
 	if (e.type == Shared::TouchEmulator::Event::Type::Begin)
@@ -137,7 +137,7 @@ void World::onEvent(const Shared::TouchEmulator::Event& e)
 		if (!isDebug())
 			return;
 
-		if (!getScene()->interactTest({ e.x, e.y }))
+		if (!getScene()->interactTest(e.pos))
 			return;
 
 		auto p = b2Vec2(world_pos.x, world_pos.y);

@@ -239,16 +239,14 @@ void Scene::Scene::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 	{
 		onEvent(Platform::Input::Touch::Event({
 			.type = Platform::Input::Touch::Event::Type::Begin,
-			.x = e.pos.x,
-			.y = e.pos.y
+			.pos = e.pos,
 		}));
 	}
 	else if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Released && e.button == Platform::Input::Mouse::Button::Left)
 	{
 		onEvent(Platform::Input::Touch::Event({
 			.type = Platform::Input::Touch::Event::Type::End,
-			.x = e.pos.x,
-			.y = e.pos.y
+			.pos = e.pos
 		}));
 	}
 }
@@ -257,8 +255,7 @@ void Scene::Scene::onEvent(const Platform::Input::Mouse::MoveEvent& e)
 {
 	onEvent(Platform::Input::Touch::Event({
 		.type = Platform::Input::Touch::Event::Type::Continue,
-		.x = e.pos.x,
-		.y = e.pos.y
+		.pos = e.pos
 	}));
 }
 
@@ -277,7 +274,7 @@ void Scene::Scene::onEvent(const Platform::Input::Mouse::ScrollEvent& e)
 
 void Scene::Scene::onEvent(const Platform::Input::Touch::Event& e)
 {
-	auto pos = glm::vec2(static_cast<float>(e.x), static_cast<float>(e.y));
+	auto pos = glm::vec2(e.pos);
 
 	auto executeTouchedNodes = [this](auto type, auto pos) {
 		for (auto node : mTouchedNodes)
