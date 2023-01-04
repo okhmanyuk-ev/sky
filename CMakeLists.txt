@@ -175,6 +175,7 @@ elseif(EMSCRIPTEN)
 	)
 	target_link_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
 		-g
+		-sEXIT_RUNTIME
 	,>)
 	target_compile_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
 		-g
