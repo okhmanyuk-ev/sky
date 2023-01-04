@@ -46,11 +46,12 @@ using namespace Platform;
 	for (UITouch* touch in touches)
 	{
 		auto location = [touch locationInView:SystemIos::Window];
-		auto e = Input::Touch::Event();
-		e.type = type;
-		e.x = location.x * PLATFORM->getScale();
-		e.y = location.y * PLATFORM->getScale();
-		EVENT->emit(e);
+		auto x = location.x * PLATFORM->getScale();
+		auto y = location.y * PLATFORM->getScale();
+		EVENT->emit(Input::Touch::Event{
+			.type = type,
+			.pos = { x, y }
+		});
 		break;
 	}
 }
