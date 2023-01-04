@@ -400,7 +400,7 @@ void ConsoleDevice::drawText(const Text& text, glm::vec4 colorMultiplier)
 		color = Graphics::Color::DarkMagenta;
 		break;
 	case Console::Color::DarkYellow:
-		//color = Graphics::Color::DarkYellow;
+		color = Graphics::Color::DarkYellow;
 		break;
 	case Console::Color::Gray:
 		color = Graphics::Color::Gray;

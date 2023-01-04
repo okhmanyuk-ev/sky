@@ -26,6 +26,7 @@ namespace Graphics::Color
 	const glm::vec3 Cyan = { 0.000000f, 1.000000f, 1.000000f };
 	const glm::vec3 DarkBlue = { 0.000000f, 0.000000f, 0.545098f };
 	const glm::vec3 DarkCyan = { 0.000000f, 0.545098f, 0.545098f };
+	const glm::vec3 DarkYellow = { 0.545098f, 0.545098f, 0.000000f };
 	const glm::vec3 DarkGoldenRod = { 0.721569f, 0.525490f, 0.043137f };
 	const glm::vec3 DarkGray = { 0.662745f, 0.662745f, 0.662745f };
 	const glm::vec3 DarkGreen = { 0.000000f, 0.392157f, 0.000000f };
