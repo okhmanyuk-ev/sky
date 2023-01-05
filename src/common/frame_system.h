@@ -57,6 +57,8 @@ namespace Common
 		auto getTimeDeltaLimit() const { return mTimeDeltaLimit; }
 		void setTimeDeltaLimit(std::optional<Clock::Duration> value) { mTimeDeltaLimit = value; }
 
+		auto isChoked() const { return mChoked; }
+
 	private:
 		std::list<StatusCallback> mFramers;
 		std::list<Callback> mThreadsafeCallbacks;
@@ -69,6 +71,7 @@ namespace Common
 		std::optional<Clock::Duration> mTimeDeltaLimit; // this can save from animation breaks
 		uint64_t mFrameCount = 0;
 		std::mutex mMutex;
+		bool mChoked = false;
 	};
 
 	class FrameSystem::Frameable

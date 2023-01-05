@@ -54,7 +54,14 @@ void FrameSystem::frame()
 	mTimeDelta = Clock::FromSeconds(Clock::ToSeconds<double>(now - mLastTime) * mTimeScale);
 
 	if (mTimeDeltaLimit.has_value() && mTimeDelta > mTimeDeltaLimit.value())
+	{
 		mTimeDelta = mTimeDeltaLimit.value();
+		mChoked = true;
+	}
+	else
+	{
+		mChoked = false;
+	}
 
 	mLastTime = now;
 
