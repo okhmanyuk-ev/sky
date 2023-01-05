@@ -54,15 +54,30 @@ void PerformanceConsoleCommands::onFrame()
 		auto time_scale = FRAME->getTimeScale();
 
 		if (time_scale != 1.0f)
-			str = fmt::format("[x{}] {}", time_scale, str);
+			str = fmt::format("(x{}) {}", time_scale, str);
+
+		auto now = Clock::Now();
+
+		static bool choked = false;
+		static auto choke_time = now;
 
 		if (FRAME->isChoked())
-			str = "[!] " + str;
+		{
+			choked = true;
+			choke_time = now;
+		}
+		else if (now - choke_time > Clock::FromSeconds(2.0f))
+		{
+			choked = false;
+		}
+
+		if (choked)
+			str = "(!) " + str;
 
 		if (mWantShowFps > 1)
 		{
 			auto avg_framerate = mFramerateCounter.getAverageFramerate();
-			str += fmt::format("{} ({} avg)", str, avg_framerate);
+			str = fmt::format("{} ({} avg)", str, avg_framerate);
 		}
 
 		ENGINE_STATS("fps", str);

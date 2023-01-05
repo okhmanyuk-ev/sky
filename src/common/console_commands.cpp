@@ -28,7 +28,7 @@ ConsoleCommands::ConsoleCommands()
 		return { std::to_string(fps) };
 	};
 
-	auto setter = [this](CON_ARGS) {
+	auto setter = [](CON_ARGS) {
 		if (CON_ARG(0) == "null")
 		{
 			FRAME->setTimeDeltaLimit(std::nullopt);
@@ -39,7 +39,7 @@ ConsoleCommands::ConsoleCommands()
 		FRAME->setTimeDeltaLimit(Clock::FromSeconds(1.0f / sec));
 	};
 
-	CONSOLE->registerCVar("sys_time_delta_limit", { "null/float" }, getter, setter);
+	CONSOLE->registerCVar("sys_time_delta_limit_fps", { "null/float" }, getter, setter);
 
 	CONSOLE->registerCommand("cmdlist", "show list of commands", {}, { "filter" },
 		CMD_METHOD(onCmdList));
