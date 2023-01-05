@@ -19,6 +19,28 @@ ConsoleCommands::ConsoleCommands()
 		CVAR_GETTER_DOUBLE_FUNC(FRAME->getTimeScale),
 		CVAR_SETTER_DOUBLE_FUNC(FRAME->setTimeScale));
 		
+	auto getter = []() -> std::vector<std::string> {
+		auto delta_limit = FRAME->getTimeDeltaLimit();
+		if (!delta_limit.has_value())
+			return { "null" };
+		
+		auto fps = 1.0f / Clock::ToSeconds(delta_limit.value());
+		return { std::to_string(fps) };
+	};
+
+	auto setter = [this](CON_ARGS) {
+		if (CON_ARG(0) == "null")
+		{
+			FRAME->setTimeDeltaLimit(std::nullopt);
+			return;
+		}
+
+		auto sec = std::stof(CON_ARG(0));
+		FRAME->setTimeDeltaLimit(Clock::FromSeconds(1.0f / sec));
+	};
+
+	CONSOLE->registerCVar("sys_time_delta_limit", { "null/float" }, getter, setter);
+
 	CONSOLE->registerCommand("cmdlist", "show list of commands", {}, { "filter" },
 		CMD_METHOD(onCmdList));
 
