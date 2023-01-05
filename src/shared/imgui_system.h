@@ -9,6 +9,7 @@
 #include <platform/input.h>
 
 #include <imgui.h>
+#include <imgui_stdlib.h>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>

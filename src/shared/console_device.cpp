@@ -8,6 +8,9 @@
 #include <platform/system_android.h>
 #include <shared/imgui_system.h>
 #include <magic_enum.hpp>
+#include <shared/stats_system.h>
+
+#define CONSOLE_STATS(KEY, VALUE) STATS_INDICATE_GROUP("console", KEY, VALUE)
 
 using namespace Shared;
 
@@ -169,14 +172,14 @@ void ConsoleDevice::onFrame()
 	ImGui::EndChild();
 
 	static auto filterLetters = [](ImGuiTextEditCallbackData* data) {
-	    auto thiz = (ConsoleDevice*)data->UserData;
+		auto thiz = (ConsoleDevice*)data->UserData;
 		if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackCompletion)
 		{
-            thiz->handleInputCompletion(data);
+			thiz->handleInputCompletion(data);
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackHistory)
 		{
-            thiz->handleInputHistory(data);
+			thiz->handleInputHistory(data);
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackCharFilter)
 		{
@@ -189,14 +192,14 @@ void ConsoleDevice::onFrame()
 			if (data->EventChar == '~')
 				return 1;
 
-            thiz->mInputState = InputState::Text;
+			thiz->mInputState = InputState::Text;
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackAlways)
 		{
 			if (thiz->mNeedToComplete)
 			{
-                thiz->handleInputCompletion(data);
-                thiz->mNeedToComplete = false;
+				thiz->handleInputCompletion(data);
+				thiz->mNeedToComplete = false;
 			}
 		}
 
@@ -216,7 +219,7 @@ void ConsoleDevice::onFrame()
 	input_flags |= ImGuiInputTextFlags_ReadOnly;
 #endif
 
-	if (ImGui::InputText("Input", mInputText, sizeof(mInputText), input_flags, filterLetters, this))
+	if (ImGui::InputText("Input", &mInputText, input_flags, filterLetters, this))
 	{
 		enterInput();
 	}
@@ -236,6 +239,13 @@ void ConsoleDevice::onFrame()
 	showCloseButton(closeButtonY);
 
 	style.ScrollbarSize = prevscrollsize;
+
+	if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)) && mInputState == InputState::History)
+	{
+		mInputState = InputState::Text;
+	}
+
+	CONSOLE_STATS("state", magic_enum::enum_name(mInputState));
 }
 
 void ConsoleDevice::showHints(float height, float top)
@@ -507,7 +517,7 @@ void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardTextChanged& 
 	if (!isOpened())
 		return;
 	
-	strcpy(mInputText, e.text.c_str());
+	mInputText = e.text;
 	mInputState = InputState::Text;
 }
 
@@ -698,7 +708,7 @@ void ConsoleDevice::close()
 
 void ConsoleDevice::open()
 {
-    PLATFORM->setVirtualKeyboardText("");
+	PLATFORM->setVirtualKeyboardText("");
 	PLATFORM->showVirtualKeyboard();
 
 	mState = State::Opening;
