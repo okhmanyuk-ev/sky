@@ -13,7 +13,7 @@ using namespace Shared;
 
 PerformanceConsoleCommands::PerformanceConsoleCommands()
 {
-	CONSOLE->registerCVar("hud_show_fps", "show fps on screen", { "int" },
+	CONSOLE->registerCVar("hud_show_fps", "show fps on screen", { "int (1/2)" },
 		CVAR_GETTER_INT(mWantShowFps),
 		CVAR_SETTER_INT(mWantShowFps));
 
@@ -47,10 +47,26 @@ PerformanceConsoleCommands::~PerformanceConsoleCommands()
 
 void PerformanceConsoleCommands::onFrame()
 {
-	if (mWantShowFps > 1)
-		ENGINE_STATS("fps", std::to_string(mFramerateCounter.getFramerate()) + " (" + std::to_string(mFramerateCounter.getAverageFramerate()) + " avg)");
-	else if (mWantShowFps > 0)
-		ENGINE_STATS("fps", mFramerateCounter.getFramerate());
+	if (mWantShowFps > 0)
+	{
+		auto str = std::to_string(mFramerateCounter.getFramerate());
+
+		auto time_scale = FRAME->getTimeScale();
+
+		if (time_scale != 1.0f)
+			str = fmt::format("[x{}] {}", time_scale, str);
+
+		if (FRAME->isChoked())
+			str = "[!] " + str;
+
+		if (mWantShowFps > 1)
+		{
+			auto avg_framerate = mFramerateCounter.getAverageFramerate();
+			str += fmt::format("{} ({} avg)", str, avg_framerate);
+		}
+
+		ENGINE_STATS("fps", str);
+	}
 
 	if (mWantShowDrawcalls > 0)
 		ENGINE_STATS("drawcalls", RENDERER->getDrawcalls());
