@@ -135,9 +135,9 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Keyboard::Event
 	else if (e.key == Key::D)
 		mKeyD = value;
 
-	if (e.key == Key::Shift)
+	if (e.key == Key::LeftShift || e.key == Key::RightShift)
 		mKeyShift = value;
-	else if (e.key == Key::Ctrl)
+	else if (e.key == Key::LeftCtrl || e.key == Key::RightCtrl)
 		mKeyCtrl = value;
 }
 

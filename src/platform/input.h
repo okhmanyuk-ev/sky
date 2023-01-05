@@ -15,9 +15,9 @@ namespace Platform::Input
 
 			Enter = 0xd,
 
-			Shift = 16,
-			Ctrl = 17,
-			Alt = 18,
+		//	Shift = 16,
+		//	Ctrl = 17,
+		//	Alt = 18,
 
 			Pause = 0x13,
 			CapsLock = 0x14,
@@ -130,15 +130,15 @@ namespace Platform::Input
 			F24 = 0x87,
 
 			NumLock = 0x90,
-			Scroll = 0x91,
+			Scroll = 0x91,*/
 
 			LeftShift = 0xa0,
 			RightShift = 0xa1,
-			LeftControl = 0xa2,
-			RightControl = 0xa3,
+			LeftCtrl = 0xa2,
+			RightCtrl = 0xa3,
 			LeftAlt = 0xa4,
 			RightAlt = 0xa5,
-			BrowserBack = 0xa6,
+		/*	BrowserBack = 0xa6,
 			BrowserForward = 0xa7,
 			BrowserRefresh = 0xa8,
 			BrowserStop = 0xa9,

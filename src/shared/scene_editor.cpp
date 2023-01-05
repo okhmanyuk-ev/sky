@@ -50,7 +50,8 @@ void SceneEditor::onFrame()
 	if (!mEnabled)
 		return;
 
-	mNodeSelectingMode = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::Ctrl) && !ImGui::IsPopupOpen("NodeEditor");
+	mNodeSelectingMode = (PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::LeftCtrl) || PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::RightCtrl))
+		&& !ImGui::IsPopupOpen("NodeEditor");
 
 	showNodeTreeWindow();
 

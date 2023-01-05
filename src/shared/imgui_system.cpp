@@ -65,9 +65,14 @@ void ImguiSystem::begin()
 
 	io.MouseWheel += mMouseWheel.y;
 
-	io.KeyCtrl = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::Ctrl);
-	io.KeyShift = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::Shift);
-	io.KeyAlt = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::Alt);
+	io.KeyCtrl = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::LeftCtrl) ||
+		PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::RightCtrl);
+
+	io.KeyShift = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::LeftShift) ||
+		PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::RightShift);
+
+	io.KeyAlt = PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::LeftAlt) ||
+		PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::RightAlt);
 
 	mMouseWheel = { 0.0f, 0.0f };
 	
