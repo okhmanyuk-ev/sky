@@ -45,7 +45,7 @@ void GraphicalConsoleCommands::onFrame()
 		{
 			ImGui::Text("%s", name.c_str());
 			ImGui::Text("%dx%d", target->getWidth(), target->getHeight());
-			auto width = ImGui::GetContentRegionAvailWidth();
+			auto width = ImGui::GetContentRegionAvail().x;
 			SceneEditor::drawImage(target, std::nullopt, width);
 			ImGui::Separator();
 		}

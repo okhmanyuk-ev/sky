@@ -322,9 +322,12 @@ endfunction()
 file(GLOB IMGUI_SRC 
 	lib/imgui/*.cpp 
 	lib/imgui/*.h
+	lib/imgui/misc/cpp/*.cpp 
+	lib/imgui/misc/cpp/*.h
 )	
-target_include_directories(${PROJECT_NAME} PUBLIC lib/imgui)
 add_library(imgui STATIC ${IMGUI_SRC})
+target_include_directories(imgui PUBLIC lib/imgui)
+target_include_directories(imgui PUBLIC lib/imgui/misc/cpp)
 target_link_libraries(${PROJECT_NAME} imgui)
 set_property(TARGET imgui PROPERTY FOLDER ${LIBS_FOLDER})
 

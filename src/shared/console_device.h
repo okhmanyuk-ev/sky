@@ -78,6 +78,8 @@ namespace Shared
 		auto isHiddenButtonEnabled() const { return mHiddenButtonEnabled; }
 		void setHiddenButtonEnabled(bool value) { mHiddenButtonEnabled = value; }
 
+		void scrollToBottom();
+
 	private:
 		void onFrame() override;
 		void showHints(float height, float top);
@@ -91,8 +93,8 @@ namespace Shared
 		void onEvent(const Platform::System::VirtualKeyboardTextChanged& e) override;
 		void onEvent(const Platform::System::VirtualKeyboardEnterPressed& e) override;
 		
-		void handleInputCompletion(ImGuiTextEditCallbackData* data);
-		void handleInputHistory(ImGuiTextEditCallbackData* data);
+		void handleInputCompletion(ImGuiInputTextCallbackData* data);
+		void handleInputHistory(ImGuiInputTextCallbackData* data);
 	
 	private:
 		State mState = State::Closed;
@@ -100,10 +102,10 @@ namespace Shared
 		std::vector<std::string> mInputHistory;
 		int mInputHistoryPos = 0;
 		std::deque<Text> mBuffer;
-		bool mScrollToBack = false;
-		bool mScrollToBackForce = false;
+		bool mNeedScrollToBottom = false;
 		Common::Interpolator mInterpolator;
 		bool mHiddenButtonEnabled = true;
+		bool mAtBottom = false;
 		
 	private:
 		struct Hint

@@ -425,9 +425,12 @@ void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffse
 	x *= gContext->mScale;
 	y *= gContext->mScale;
 
+	auto scroll_x = xoffset / gContext->mScale;
+	auto scroll_y = yoffset / gContext->mScale;
+
  	EVENT->emit(Input::Mouse::ScrollEvent{
  		.pos = { x, y },
- 		.scroll = { xoffset, yoffset }
+ 		.scroll = { scroll_x, scroll_y }
 	});
 }
 

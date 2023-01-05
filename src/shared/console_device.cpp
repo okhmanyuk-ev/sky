@@ -52,7 +52,9 @@ void ConsoleDevice::writeLine(const std::string& s, Console::Color color)
 	text.text = s;
 	text.time = Clock::Now();
 	mBuffer.push_back(text);
-	mScrollToBack = true;
+
+	if (mAtBottom)
+		scrollToBottom();
 }
 
 void ConsoleDevice::clear()
@@ -162,15 +164,17 @@ void ConsoleDevice::onFrame()
 
 	ImGui::PopStyleVar();
 
-	if ((mScrollToBack && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) || mScrollToBackForce)
+	mAtBottom = ImGui::GetScrollY() >= ImGui::GetScrollMaxY();
+
+	if (mNeedScrollToBottom)
 		ImGui::SetScrollHereY(1.0f);
-	
-	mScrollToBack = false;
-	mScrollToBackForce = false;
-	
+
+	if (mAtBottom)
+		mNeedScrollToBottom = false;
+
 	ImGui::EndChild();
 
-	static auto filterLetters = [](ImGuiTextEditCallbackData* data) {
+	static auto filterLetters = [](ImGuiInputTextCallbackData* data) {
 		auto thiz = (ConsoleDevice*)data->UserData;
 		if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackCompletion)
 		{
@@ -218,6 +222,8 @@ void ConsoleDevice::onFrame()
 	input_flags |= ImGuiInputTextFlags_ReadOnly;
 #endif
 
+	ImGui::SetKeyboardFocusHere();
+
 	if (ImGui::InputText("Input", &mInputText, input_flags, filterLetters, this))
 	{
 		enterInput();
@@ -227,7 +233,6 @@ void ConsoleDevice::onFrame()
 		PLATFORM->showVirtualKeyboard();
 
 	ImGui::PopItemWidth();
-	ImGui::SetKeyboardFocusHere();
 
 	auto closeButtonY = ImGui::GetWindowHeight();
 
@@ -270,7 +275,7 @@ void ConsoleDevice::showHints(float height, float top)
 	ImGui::SetWindowPos(ImVec2(8 + PLATFORM->getSafeAreaLeftMargin(), 4 + top + height));
 
 	if (mSelectedHint == -1)
-		ImGui::SetScrollHere();
+		ImGui::SetScrollHereY();
 
 	if (mSelectedHint > static_cast<int>(mHints.size()) - 1)
 		mSelectedHint = static_cast<int>(mHints.size()) - 1;
@@ -285,7 +290,7 @@ void ConsoleDevice::showHints(float height, float top)
 
 		if (mCheckScrollForHints && selected)
 		{
-			ImGui::SetScrollHere();
+			ImGui::SetScrollHereY();
 			mCheckScrollForHints = false;
 		}
 
@@ -482,7 +487,7 @@ void ConsoleDevice::enterInput()
 			mInputHistoryPos = static_cast<int>(mInputHistory.size());
 		}
 		writeLine("] " + line, Console::Color::Gray);
-		mScrollToBackForce = true;
+		scrollToBottom();
 		EVENT->emit(ReadEvent({ line }));
 	}
 }
@@ -528,7 +533,7 @@ void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardEnterPressed&
 	enterInput();
 }
 
-void ConsoleDevice::handleInputCompletion(ImGuiTextEditCallbackData* data)
+void ConsoleDevice::handleInputCompletion(ImGuiInputTextCallbackData* data)
 {
 	if (mInputState != InputState::Hints)
 		return;
@@ -548,22 +553,22 @@ void ConsoleDevice::handleInputCompletion(ImGuiTextEditCallbackData* data)
 	mInputState = InputState::Completion;
 }
 
-void ConsoleDevice::handleInputHistory(ImGuiTextEditCallbackData* data)
+void ConsoleDevice::handleInputHistory(ImGuiInputTextCallbackData* data)
 {
 	if (mHints.size() > 0 && mInputState != InputState::History)
 	{
 		if (mInputState != InputState::Hints)
 		{
-			if (data->EventKey == ImGuiKey_::ImGuiKey_UpArrow)
+			if (data->EventKey == ImGuiKey::ImGuiKey_UpArrow)
 				mSelectedHint = static_cast<int>(mHints.size()) - 1;
-			else if (data->EventKey == ImGuiKey_::ImGuiKey_DownArrow)
+			else if (data->EventKey == ImGuiKey::ImGuiKey_DownArrow)
 				mSelectedHint = 0;
 		}
 		else
 		{
-			if (data->EventKey == ImGuiKey_::ImGuiKey_UpArrow)
+			if (data->EventKey == ImGuiKey::ImGuiKey_UpArrow)
 				mSelectedHint--;
-			else if (data->EventKey == ImGuiKey_::ImGuiKey_DownArrow)
+			else if (data->EventKey == ImGuiKey::ImGuiKey_DownArrow)
 				mSelectedHint++;
 
 			if (mSelectedHint < 0)
@@ -589,9 +594,9 @@ void ConsoleDevice::handleInputHistory(ImGuiTextEditCallbackData* data)
 	{
 		int lastPos = mInputHistoryPos;
 
-		if (data->EventKey == ImGuiKey_::ImGuiKey_UpArrow)
+		if (data->EventKey == ImGuiKey::ImGuiKey_UpArrow)
 			mInputHistoryPos--;
-		else if (data->EventKey == ImGuiKey_::ImGuiKey_DownArrow)
+		else if (data->EventKey == ImGuiKey::ImGuiKey_DownArrow)
 			mInputHistoryPos++;
 
 		if (mInputHistoryPos < 0)
@@ -702,7 +707,9 @@ void ConsoleDevice::close()
 	mInterpolator.setDestinationValue(1.0f);
 	mInterpolator.setPassed(mInterpolator.getDuration() - mInterpolator.getPassed());
 	mInterpolator.setEasingFunction(Easing::ExponentialIn);
-	mInterpolator.setFinishCallback([&] { mState = State::Closed; });
+	mInterpolator.setFinishCallback([&] {
+		mState = State::Closed;
+	});
 }
 
 void ConsoleDevice::open()
@@ -716,4 +723,11 @@ void ConsoleDevice::open()
 	mInterpolator.setPassed(mInterpolator.getDuration() - mInterpolator.getPassed());
 	mInterpolator.setEasingFunction(Easing::ExponentialOut);
 	mInterpolator.setFinishCallback([&] { mState = State::Opened; });
+	scrollToBottom();
+}
+
+void ConsoleDevice::scrollToBottom()
+{
+	mNeedScrollToBottom = true;
+	mAtBottom = false;
 }
