@@ -19,7 +19,6 @@ ConsoleDevice::ConsoleDevice()
 	mInterpolator.setDuration(Clock::FromMilliseconds(500));
 	close();
 	mInterpolator.setPassed(mInterpolator.getDuration());
-	mInputText[0] = 0x00;
 
 	mButtonTimer.setCallback([this] {
 		if (mButtonAttempts < 0)
@@ -253,7 +252,7 @@ void ConsoleDevice::showHints(float height, float top)
 	if (mInputState != InputState::Hints)
 		mSelectedHint = -1;
 
-	if (mInputText[0] == 0x00 || mInputState == InputState::History)
+	if (mInputText.empty() || mInputState == InputState::History)
 	{
 		mHints.clear();
 		return;
@@ -476,7 +475,7 @@ void ConsoleDevice::enterInput()
 		line = trim(line);
 
 		PLATFORM->setVirtualKeyboardText("");
-		mInputText[0] = 0x00;
+		mInputText.clear();
 		if (!line.empty())
 		{
 			mInputHistory.push_back(line);
