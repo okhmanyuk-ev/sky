@@ -73,7 +73,7 @@ namespace Common
 		void onCmdList(CON_ARGS);
 		void onCVarList(CON_ARGS);
 		void onEcho(CON_ARGS);
-		void onDelay(CON_ARGS);
+		void onLater(CON_ARGS);
 		void onExec(CON_ARGS);
 		void onClear(CON_ARGS);
 		void onAlias(CON_ARGS);

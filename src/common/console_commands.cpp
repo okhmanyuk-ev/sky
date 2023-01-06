@@ -50,8 +50,8 @@ ConsoleCommands::ConsoleCommands()
 	CONSOLE->registerCommand("echo", "print to console", { "text" }, { "text.." },
 		CMD_METHOD(onEcho));
 
-	CONSOLE->registerCommand("delay", "delayed execution", { "time", "command" },
-		CMD_METHOD(onDelay));
+	CONSOLE->registerCommand("later", "delayed execution", { "time", "command" },
+		CMD_METHOD(onLater));
 
 	CONSOLE->registerCommand("exec", "execute console commands from file", { "path" }, { "path.." },
 		CMD_METHOD(onExec));
@@ -131,7 +131,7 @@ void ConsoleCommands::onEcho(CON_ARGS)
 	CONSOLE_DEVICE->writeLine(CON_ARGS_ACCUMULATED_STRING);
 }
 
-void ConsoleCommands::onDelay(CON_ARGS)
+void ConsoleCommands::onLater(CON_ARGS)
 {
 	float seconds = 0.0f;
 
@@ -187,16 +187,18 @@ void ConsoleCommands::onAlias(CON_ARGS)
 		if (aliases.empty())
 		{
 			CONSOLE_DEVICE->writeLine("alias list is empty");
-			return;
 		}
-
-		for (auto& [name, value] : aliases)
+		else
 		{
-			if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
-				continue;
+			for (auto& [name, value] : aliases)
+			{
+				if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
+					continue;
 
-			CONSOLE_DEVICE->writeLine(" - " + name + " = " + Console::System::MakeStringFromTokens(value));
+				CONSOLE_DEVICE->writeLine(" - " + name + " = " + Console::System::MakeStringFromTokens(value));
+			}
 		}
+		CONSOLE_DEVICE->writeLine("aliases can be invoked by adding 'sharp' prefix, example: #alias_name");
 
 		return;
 	}
