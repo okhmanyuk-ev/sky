@@ -76,6 +76,9 @@ World::World()
 
 	CONSOLE->registerCVar("phys_debug", { "bool" }, CVAR_GETTER_BOOL_FUNC(isDebug), CVAR_SETTER_BOOL_FUNC(setDebug));
 	CONSOLE->registerCVar("phys_stats", { "bool" }, CVAR_GETTER_BOOL_FUNC(getShowStats), CVAR_SETTER_BOOL_FUNC(setShowStats));
+	CONSOLE->registerCVar("phys_allow_sleep", { "bool" }, CVAR_GETTER_BOOL_FUNC(mB2World.GetAllowSleeping), CVAR_SETTER_BOOL_FUNC(mB2World.SetAllowSleeping));
+	CONSOLE->registerCVar("phys_velocity_iterations", { "int" }, CVAR_GETTER_INT(mVelocityIterations), CVAR_SETTER_INT(mVelocityIterations));
+	CONSOLE->registerCVar("phys_position_iterations", { "int" }, CVAR_GETTER_INT(mPositionIterations), CVAR_SETTER_INT(mPositionIterations));
 
 	auto getter = [this] {
 		auto fps = 1.0f / Clock::ToSeconds(mTimestepFixer.getTimestep());
@@ -102,6 +105,9 @@ World::~World()
 {
 	CONSOLE->removeCVar("phys_debug");
 	CONSOLE->removeCVar("phys_stats");
+	CONSOLE->removeCVar("phys_allow_sleep");
+	CONSOLE->removeCVar("phys_velocity_iterations");
+	CONSOLE->removeCVar("phys_position_iterations");
 	CONSOLE->removeCVar("phys_timestep_fps");
 	CONSOLE->removeCVar("phys_timestep_enabled");
 	CONSOLE->removeCVar("phys_timestep_force_time_completion");
@@ -231,8 +237,8 @@ void World::update(Clock::Duration delta)
 		body->SetBullet(entity->isBullet());
 	}
 
-	mTimestepFixer.execute(delta, [this](auto delta) {
-		mB2World.Step(Clock::ToSeconds(delta), 6, 2);
+	mTimestepFixer.execute(delta, [&](auto delta) {
+		mB2World.Step(Clock::ToSeconds(delta), mVelocityIterations, mPositionIterations);
 	});
 
 	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())

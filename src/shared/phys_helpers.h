@@ -117,6 +117,8 @@ namespace Shared::PhysHelpers
 		Common::TimestepFixer mTimestepFixer;
 		bool mDebug = false;
 		bool mShowStats = false;
+		int mVelocityIterations = 6;
+		int mPositionIterations = 2;
 
 	private:
 		class Draw : public b2Draw
