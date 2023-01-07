@@ -9,12 +9,12 @@ using namespace Shared;
 
 SceneEditor::SceneEditor(Scene::Scene& scene) : mScene(scene)
 {
-	CONSOLE->registerCVar("g_editor", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
+	CONSOLE->registerCVar("scene_editor", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
 }
 
 SceneEditor::~SceneEditor()
 {
-	CONSOLE->removeCVar("g_editor");
+	CONSOLE->removeCVar("scene_editor");
 }
 
 void SceneEditor::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
