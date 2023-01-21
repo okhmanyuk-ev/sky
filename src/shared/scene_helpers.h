@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tinyutf8.hpp>
+#include <tinyutf8/tinyutf8.h>
 #include <scene/all.h>
 #include <scene3d/all.h>
 #include <audio/system.h>

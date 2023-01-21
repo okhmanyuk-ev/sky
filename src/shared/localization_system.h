@@ -2,7 +2,7 @@
 
 #include <core/engine.h>
 #include <map>
-#include <tinyutf8.hpp>
+#include <tinyutf8/tinyutf8.h>
 #include <fmt/format.h>
 
 #define LOCALIZATION ENGINE->getSystem<Shared::LocalizationSystem>()

@@ -13,7 +13,7 @@
 #include <glm/ext.hpp>
 #include <optional>
 #include <stack>
-#include <tinyutf8.hpp>
+#include <tinyutf8/tinyutf8.h>
 #include "text_mesh.h"
 
 #define GRAPHICS ENGINE->getSystem<Graphics::System>()

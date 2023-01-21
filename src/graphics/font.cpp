@@ -152,7 +152,7 @@ const Font::Glyph& Font::getGlyph(utf8_string::value_type symbol) const
 	return mGlyphs.at(symbol);
 }
 
-float Font::getStringWidth(utf8_string::iterator begin, utf8_string::iterator end, float size) const
+float Font::getStringWidth(utf8_string::const_iterator begin, utf8_string::const_iterator end, float size) const
 {
 	float result = 0.0f;
 

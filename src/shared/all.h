@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tinyutf8.hpp>
+#include <tinyutf8/tinyutf8.h>
 
 #include <fmt/format.h>
 #include <fmt/chrono.h>

@@ -3,7 +3,8 @@
 
 using namespace Graphics;
 
-TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::iterator begin, utf8_string::iterator end)
+TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::const_iterator begin,
+	utf8_string::const_iterator end)
 {
 	TextMesh mesh;
 
@@ -95,7 +96,7 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 
 	TextMesh result;
 
-	auto appendTextMesh = [&font, scaledMaxWidth, &height, &result, align](utf8_string::iterator begin, utf8_string::iterator end) {
+	auto appendTextMesh = [&font, scaledMaxWidth, &height, &result, align](utf8_string::const_iterator begin, utf8_string::const_iterator end) {
 		auto mesh = createTextMesh(font, begin, end);
 		for (auto index : mesh.indices)
 		{
