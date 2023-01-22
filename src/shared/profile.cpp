@@ -6,11 +6,13 @@
 #include <common/event_system.h>
 #include <common/frame_system.h>
 #include <common/helpers.h>
+#include <emscripten.h>
 
 using namespace Shared;
 
 void Profile::load()
 {
+#ifndef EMSCRIPTEN
 	auto path = "save.bson";
 
 	if (!Platform::Asset::Exists(path, Platform::Asset::Storage::Bundle))
@@ -31,16 +33,38 @@ void Profile::load()
 		makeDefault();
 		return;
 	}
+#else
+	auto str = emscripten_run_script_string("localStorage.getItem('profile');");
+	try
+	{
+		auto json = nlohmann::json::parse(str);
+		read(json);
+	}
+	catch (const std::exception& e)
+	{
+		LOGC(e.what(), Console::Color::Red);
+		LOGC("making new profile", Console::Color::Green);
+		makeDefault();
+		return;
+	}
+#endif
 }
 
 void Profile::save()
 {
+#ifndef EMSCRIPTEN
 	mSaveMutex.lock();
 	auto json = nlohmann::json();
 	write(json);
 	auto bson = nlohmann::json::to_bson(json);
 	Platform::Asset::Write("save.bson", bson.data(), bson.size(), Platform::Asset::Storage::Bundle);
 	mSaveMutex.unlock();
+#else
+	auto json = nlohmann::json();
+	write(json);
+	auto str = json.dump();
+	emscripten_run_script(fmt::format("localStorage.setItem('profile', '{}');", str).c_str());
+#endif
 	FRAME->addOneThreadsafe([] {
 		EVENT->emit(ProfileSavedEvent());
 	});
