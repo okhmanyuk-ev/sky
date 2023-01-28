@@ -13,7 +13,7 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 # Declare dependencies
 
 include(GNUInstallDirs)
-include(CTest)
+#include(CTest)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(IS_TOPLEVEL_PROJECT TRUE)
@@ -54,14 +54,14 @@ target_compile_features(
 ## Add test
 
 if(BUILD_TESTING AND TINYUTF8_BUILD_TESTING)
-  add_subdirectory(test)
+#  add_subdirectory(test)
 endif()
 
 ##############################################
 ## Add documentation
 
 if(TINYUTF8_BUILD_DOC)
-  add_subdirectory(docs)
+ # add_subdirectory(docs)
 endif()
 
 ##############################################
