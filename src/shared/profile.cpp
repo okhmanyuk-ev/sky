@@ -6,7 +6,9 @@
 #include <common/event_system.h>
 #include <common/frame_system.h>
 #include <common/helpers.h>
+#ifdef EMSCRIPTEN
 #include <emscripten.h>
+#endif
 
 using namespace Shared;
 
