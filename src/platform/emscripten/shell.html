@@ -4,31 +4,97 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
     <style>
-        body { margin: 0; background-color: black }
+        body {
+          margin: 0;
+          background-color: black
+        }
         .emscripten {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            margin: 0px;
-            border: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            display: block;
-            image-rendering: optimizeSpeed;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -o-crisp-edges;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: optimize-contrast;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
-            -ms-interpolation-mode: nearest-neighbor;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          margin: 0px;
+          border: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          display: block;
+          image-rendering: optimizeSpeed;
+          image-rendering: -moz-crisp-edges;
+          image-rendering: -o-crisp-edges;
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: optimize-contrast;
+          image-rendering: crisp-edges;
+          image-rendering: pixelated;
+          -ms-interpolation-mode: nearest-neighbor;
+        }
+        .spinner {
+          height: 30px;
+          width: 30px;
+          margin: 0;
+          margin-top: 20px;
+          margin-left: 20px;
+          display: inline-block;
+          vertical-align: top;
+
+          -webkit-animation: rotation .8s linear infinite;
+          -moz-animation: rotation .8s linear infinite;
+          -o-animation: rotation .8s linear infinite;
+          animation: rotation 0.8s linear infinite;
+
+          border-left: 5px solid rgb(0 0 0 / 0%);
+          border-right: 5px solid rgb(0 0 0 / 0%);
+          border-bottom: 5px solid rgb(0 0 0 / 0%);
+          border-top: 5px solid rgb(255, 255, 192);
+          
+          border-radius: 100%;
+          background-color: rgb(0 0 0 / 0%);
+        }
+        
+        @-webkit-keyframes rotation {
+          from {-webkit-transform: rotate(0deg);}
+          to {-webkit-transform: rotate(360deg);}
+        }
+        @-moz-keyframes rotation {
+          from {-moz-transform: rotate(0deg);}
+          to {-moz-transform: rotate(360deg);}
+        }
+        @-o-keyframes rotation {
+          from {-o-transform: rotate(0deg);}
+          to {-o-transform: rotate(360deg);}
+        }
+        @keyframes rotation {
+          from {transform: rotate(0deg);}
+          to {transform: rotate(360deg);}
+        }
+
+        #status {
+          display: inline-block;
+          vertical-align: top;
+          font-weight: bold;
+          color: rgb(192, 192, 192);
+        }
+
+        #progress {
+          position: absolute;
+          height: 20px;
+          width: 75%;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%);
         }
     </style>
   </head>
   <body>
+    <div class="spinner" id='spinner'></div>
+    <div class="emscripten" id="status">Downloading...</div>
+    <div class="emscripten">
+      <progress value="0" max="100" id="progress" hidden=1></progress>
+    </div>
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
     <script type='text/javascript'>
+      var statusElement = document.getElementById("status");
+      var progressElement = document.getElementById("progress");
+      var spinnerElement = document.getElementById('spinner');
       var Module = {
         preRun: [],
         postRun: [],
@@ -42,20 +108,62 @@
             text = Array.prototype.slice.call(arguments).join(' ');
             console.error(text);
         },
-        canvas: (function() {
-            var canvas = document.getElementById('canvas');
-            //canvas.addEventListener("webglcontextlost", function(e) { alert('FIXME: WebGL context lost, please reload the page'); e.preventDefault(); }, false);
-            return canvas;
-        })(),
+        canvas: function() {
+          var canvas = document.getElementById('canvas');
+
+          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+          // application robust, you may want to override this behavior before shipping!
+          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+          canvas.addEventListener("webglcontextlost", function(e) {
+            alert('WebGL context lost. You will need to reload the page.'); e.preventDefault();
+          }, false);
+
+          return canvas;
+        }(),
         setStatus: function(text) {
-            console.log("status: " + text);
+          if (!Module.setStatus.last)
+            Module.setStatus.last = { time: Date.now(), text: '' };
+          
+          if (text === Module.setStatus.last.text)
+            return;
+          
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          
+          if (m && now - Module.setStatus.last.time < 30)
+            return; // if this is a progress update, skip it if too soon
+          
+          Module.setStatus.last.time = now;
+          Module.setStatus.last.text = text;
+          if (m) {
+            text = m[1];
+            progressElement.value = parseInt(m[2])*100;
+            progressElement.max = parseInt(m[4])*100;
+            progressElement.hidden = false;
+            spinnerElement.hidden = false;
+          } 
+          else {
+            progressElement.value = progressElement.max;
+            if (!text) {
+              progressElement.hidden = true;
+              spinnerElement.style.display = 'none';
+            }
+          }
+          statusElement.innerHTML = text;
         },
-        monitorRunDependencies: function(left) {
-            // no run dependencies to log
+        totalDependencies: 0,
+        monitorRunDependencies: function(e) {
+            this.totalDependencies = Math.max(this.totalDependencies, e), Module.setStatus(e ? "Preparing... (" + (this.totalDependencies - e) + "/" + this.totalDependencies + ")" : "All downloads complete.")
         }
       };
+      Module.setStatus('Downloading...');
       window.onerror = function() {
-        console.log("onerror: " + event);
+        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        Module.setStatus('Exception thrown, see JavaScript console');
+        spinnerElement.style.display = 'none';
+        Module.setStatus = function(text) {
+          if (text) console.error('[post-exception status] ' + text);
+        };
       };
       Module['arguments'] = window.location.search.substr(1).trim().split('&');      
       for (let i = 0; i < Module['arguments'].length; ++i) {
