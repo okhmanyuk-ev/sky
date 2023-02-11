@@ -592,6 +592,21 @@ namespace Shared::SceneHelpers
 		ChangeCallback mChangeCallback = nullptr;
 	};
 
+	class Editbox : public RectangleButton
+	{
+	private:
+		class Window;
+
+	public:
+		Editbox();
+	};
+
+	class Editbox::Window : public StandardWindow
+	{
+	public:
+		Window();
+	};
+
 	// 3d
 
 	std::vector<std::shared_ptr<Scene3D::Model>> MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension);

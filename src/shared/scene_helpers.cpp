@@ -883,6 +883,28 @@ SceneHelpers::Checkbox::Checkbox()
 	setChooseEndCallback([this] { mOuterRectangle->setAlpha(0.33f); });
 }
 
+// editbox
+
+SceneHelpers::Editbox::Editbox()
+{
+	setColor({ 0.25f, 0.25f, 0.25f, 1.0f });
+	getLabel()->setFontSize(16.0f);
+
+	setClickCallback([]{
+		auto window = std::make_shared<Window>();
+		SCENE_MANAGER->pushWindow(window);
+	});
+}
+
+SceneHelpers::Editbox::Window::Window()
+{
+	auto label = std::make_shared<Scene::Label>();
+	label->setAnchor(0.5f);
+	label->setPivot(0.5f);
+	label->setText("test test test");
+	getContent()->attach(label);
+}
+
 // 3d
 
 std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)
