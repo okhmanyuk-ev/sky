@@ -147,7 +147,8 @@ namespace Graphics::Color
 
 	glm::vec4 ToNormalized(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
 	glm::vec4 ToNormalized(uint32_t value);
-	uint32_t ToUInt32(glm::vec4 color);
+	uint32_t ToUInt32(const glm::vec4& color);
+	uint32_t ToUInt32(const glm::vec3& color);
 
 	namespace Hsv
 	{
