@@ -183,77 +183,99 @@ LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 
 void SystemWindows::dispatchMouseEvent(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	Input::Mouse::Event evt;
-		
+	auto pos_x = GET_X_LPARAM(lParam);
+	auto pos_y = GET_Y_LPARAM(lParam);
+
 	switch (msg)
 	{
 	case WM_MOUSEMOVE:
-		evt.type = Input::Mouse::Event::Type::Move;
+		EVENT->emit(Input::Mouse::MoveEvent{
+			.pos = { pos_x, pos_y }
+		});
 		break;
 
 	case WM_LBUTTONDOWN:
-		evt.type = Input::Mouse::Event::Type::ButtonDown;
-		evt.button = Input::Mouse::Button::Left;
+		EVENT->emit(Input::Mouse::ButtonEvent{
+			.type = Input::Mouse::ButtonEvent::Type::Pressed,
+			.button = Input::Mouse::Button::Left,
+			.pos = { pos_x, pos_y }
+		});
+		mMouseButtons.insert(Input::Mouse::Button::Left);
 		break;
 
 	case WM_MBUTTONDOWN:
-		evt.type = Input::Mouse::Event::Type::ButtonDown;
-		evt.button = Input::Mouse::Button::Middle;
+		EVENT->emit(Input::Mouse::ButtonEvent{
+			.type = Input::Mouse::ButtonEvent::Type::Pressed,
+			.button = Input::Mouse::Button::Middle,
+			.pos = { pos_x, pos_y }
+		});
+		mMouseButtons.insert(Input::Mouse::Button::Middle);
 		break;
 
 	case WM_RBUTTONDOWN:
-		evt.type = Input::Mouse::Event::Type::ButtonDown;
-		evt.button = Input::Mouse::Button::Right;
+		EVENT->emit(Input::Mouse::ButtonEvent{
+			.type = Input::Mouse::ButtonEvent::Type::Pressed,
+			.button = Input::Mouse::Button::Right,
+			.pos = { pos_x, pos_y }
+		});
+		mMouseButtons.insert(Input::Mouse::Button::Right);
 		break;
 
 	case WM_LBUTTONUP:
-		evt.type = Input::Mouse::Event::Type::ButtonUp;
-		evt.button = Input::Mouse::Button::Left;
+		EVENT->emit(Input::Mouse::ButtonEvent{
+			.type = Input::Mouse::ButtonEvent::Type::Released,
+			.button = Input::Mouse::Button::Left,
+			.pos = { pos_x, pos_y }
+		});
+		mMouseButtons.erase(Input::Mouse::Button::Left);
 		break;
 
 	case WM_MBUTTONUP:
-		evt.type = Input::Mouse::Event::Type::ButtonUp;
-		evt.button = Input::Mouse::Button::Middle;
+		EVENT->emit(Input::Mouse::ButtonEvent{
+			.type = Input::Mouse::ButtonEvent::Type::Released,
+			.button = Input::Mouse::Button::Middle,
+			.pos = { pos_x, pos_y }
+		});
+		mMouseButtons.erase(Input::Mouse::Button::Middle);
 		break;
 
 	case WM_RBUTTONUP:
-		evt.type = Input::Mouse::Event::Type::ButtonUp;
-		evt.button = Input::Mouse::Button::Right;
+		EVENT->emit(Input::Mouse::ButtonEvent{
+			.type = Input::Mouse::ButtonEvent::Type::Released,
+			.button = Input::Mouse::Button::Right,
+			.pos = { pos_x, pos_y }
+		});
+		mMouseButtons.erase(Input::Mouse::Button::Right);
 		break;
 
 	case WM_MOUSEWHEEL:
-		evt.type = Input::Mouse::Event::Type::Wheel;
-		evt.wheelY = ((float)GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA;
-		break;
-
-	case WM_MOUSEHWHEEL:
-		evt.type = Input::Mouse::Event::Type::Wheel;
-		evt.wheelX = ((float)GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA;
-		break;
-	}
-
-	evt.x = GET_X_LPARAM(lParam);
-	evt.y = GET_Y_LPARAM(lParam);
-
-	if (evt.type == Input::Mouse::Event::Type::Wheel)
 	{
-		POINT pt = { evt.x, evt.y };
+		POINT pt = { pos_x, pos_y };
 		ScreenToClient(Window, &pt);
-		evt.x = pt.x;
-		evt.y = pt.y;
+
+		EVENT->emit(Input::Mouse::ScrollEvent{
+			.pos = { pt.x, pt.y },
+			.scroll = { 0.0f, ((float)GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA }
+		});
+		break;
 	}
+	case WM_MOUSEHWHEEL: 
+	{
+		POINT pt = { pos_x, pos_y };
+		ScreenToClient(Window, &pt);
 
-	if (evt.type == Input::Mouse::Event::Type::ButtonDown)
-		mMouseButtons.insert(evt.button);
-	else if (evt.type == Input::Mouse::Event::Type::ButtonUp)
-		mMouseButtons.erase(evt.button);
-
-	EVENT->emit(evt);
+		EVENT->emit(Input::Mouse::ScrollEvent{
+			.pos = { pt.x, pt.y },
+			.scroll = { ((float)GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA, 0.0f }
+		});
+		break;	
+	}
+	};
 }
 
 void SystemWindows::dispatchKeyboardEvent(WPARAM keyCode, bool isKeyDown)
 {
-	Input::Keyboard::Event evt;
+	/*Input::Keyboard::Event evt;
 
 	evt.type = isKeyDown ? Input::Keyboard::Event::Type::Pressed : Input::Keyboard::Event::Type::Released;
 	evt.key = (Input::Keyboard::Key)keyCode;
@@ -273,7 +295,7 @@ void SystemWindows::dispatchKeyboardEvent(WPARAM keyCode, bool isKeyDown)
 	else
 		mKeyboardKeys.erase(evt.key);
 
-	EVENT->emit(evt);
+	EVENT->emit(evt);*/
 }
 
 void SystemWindows::initializeBilling(const ProductsMap& products)
