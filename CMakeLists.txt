@@ -400,7 +400,7 @@ target_link_libraries(${PROJECT_NAME} skygfx)
 
 # glfw
 
-if(APPLE AND NOT IOS)
+if(WIN32 OR APPLE AND NOT IOS)
 	set(GLFW_INSTALL OFF)
 	set(GLFW_BUILD_DOCS OFF)
 	add_subdirectory(lib/glfw)

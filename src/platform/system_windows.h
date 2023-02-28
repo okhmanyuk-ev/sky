@@ -9,9 +9,7 @@
 #include <cassert>
 #include <set>
 
-#include <common/frame_system.h>
-#include <common/event_system.h>
-#include <common/actions.h>
+#include <GLFW/glfw3.h>
 
 namespace Platform
 {
@@ -25,19 +23,19 @@ namespace Platform
 		void process() override;
 		void quit() override;
 
-		bool isFinished() const override { return mFinished; };
+		bool isFinished() const override;
 
 		int getWidth() const override { return mWidth; }
 		int getHeight() const override { return mHeight; }
 
 		float getScale() const override { return mScale; }
 		void setScale(float value) override { mScale = value; }
-        
-        float getSafeAreaTopMargin() const override { return 0.0f; }
-        float getSafeAreaBottomMargin() const override { return 0.0f; }
-        float getSafeAreaLeftMargin() const override { return 0.0f; }
-        float getSafeAreaRightMargin() const override { return 0.0f; }
-        
+
+		float getSafeAreaTopMargin() const override { return 0.0f; }
+		float getSafeAreaBottomMargin() const override { return 0.0f; }
+		float getSafeAreaLeftMargin() const override { return 0.0f; }
+		float getSafeAreaRightMargin() const override { return 0.0f; }
+
 		bool isKeyPressed(Input::Keyboard::Key key) const override;
 		bool isKeyPressed(Input::Mouse::Button key) const override;
 
@@ -65,30 +63,24 @@ namespace Platform
 		void alert(const std::string& text) override;
 
 	private:
-		bool mCursorHidden = false;
 		std::string mAppName;
 		float mScale = 1.0f;
 		int mWidth = 800;
 		int mHeight = 600;
-		bool mFinished = false;
-		std::set<Input::Keyboard::Key> mKeyboardKeys;
-		std::set<Input::Mouse::Button> mMouseButtons;
-		ProductsMap mProducts;
-
+		GLFWwindow* mWindow = nullptr;
+		int mPrevMouseX = 0;
+		int mPrevMouseY = 0;
+		
 	public:
-		inline static HWND Window;
-		inline static HMODULE Instance;
-
+		inline static void* Window = nullptr;
+		
 	private:
-		static LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-	private:
-		void dispatchMouseEvent(UINT msg, WPARAM wParam, LPARAM lParam);
-		void dispatchKeyboardEvent(WPARAM keyCode, bool isKeyDown);
-
-	public:
-		void makeWindow();
-		void destroyWindow();
+		static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static void CharCallback(GLFWwindow* window, unsigned int codepoint);
+		static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+		static void WindowSizeCallback(GLFWwindow* window, int width, int height);
+		static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 	};
 }
 #endif

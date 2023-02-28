@@ -1,10 +1,15 @@
 #include "system_windows.h"
+
 #ifdef PLATFORM_WINDOWS
 
-#pragma comment(lib, "rpcrt4.lib") 
-#include <rpc.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+
+#include <common/event_system.h>
 
 using namespace Platform;
+
+static SystemWindows* gContext = nullptr;
 
 int main(int argc, char* argv[])
 {
@@ -19,91 +24,233 @@ std::shared_ptr<System> System::create(const std::string& appname)
 
 SystemWindows::SystemWindows(const std::string& appname) : mAppName(appname)
 {
-	Instance = GetModuleHandle(nullptr);
-	makeWindow();
+	glfwInit();
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+	mWindow = glfwCreateWindow(mWidth, mHeight, appname.c_str(), NULL, NULL);
+
+	Window = glfwGetWin32Window(mWindow);
+	
+	float x_scale;
+	float y_scale;
+	
+	glfwGetWindowContentScale(mWindow, &x_scale, &y_scale);
+	
+	mScale = std::fmaxf(x_scale, y_scale);
+
+	auto monitor = glfwGetPrimaryMonitor();
+	auto video_mode = glfwGetVideoMode(monitor);
+
+	auto window_pos_x = (video_mode->width / 2 ) - (mWidth / 2) / mScale;
+	auto window_pos_y = (video_mode->height / 2) - (mHeight / 2) / mScale;
+
+	glfwSetWindowPos(mWindow, window_pos_x, window_pos_y);
+
+	resize(mWidth, mHeight);
+
+	glfwSetMouseButtonCallback(mWindow, MouseButtonCallback);
+	glfwSetKeyCallback(mWindow, KeyCallback);
+	glfwSetCharCallback(mWindow, CharCallback);
+	glfwSetScrollCallback(mWindow, ScrollCallback);
+	glfwSetWindowSizeCallback(mWindow, WindowSizeCallback);
+	glfwSetFramebufferSizeCallback(mWindow, FramebufferSizeCallback);
+
+	double mouse_x;
+	double mouse_y;
+	
+	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
+	
+	mPrevMouseX = (int)(mouse_x * mScale);
+	mPrevMouseY = (int)(mouse_y * mScale);
+	
+	gContext = this;
 }
 
 SystemWindows::~SystemWindows()
 {
-	destroyWindow();
+	glfwTerminate();
 }
 
 void SystemWindows::process()
 {
-	MSG msg = {};
-	while (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+	glfwPollEvents();
+
+	double mouse_x;
+	double mouse_y;
+
+	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
+
+	auto mouse_x_i = (int)(mouse_x * mScale);
+	auto mouse_y_i = (int)(mouse_y * mScale);
+
+	if (mouse_x_i != mPrevMouseX || mouse_y_i != mPrevMouseY)
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		mPrevMouseX = mouse_x_i;
+		mPrevMouseY = mouse_y_i;
+
+		EVENT->emit(Input::Mouse::MoveEvent{
+			.pos = { mouse_x_i, mouse_y_i }
+		});
 	}
 }
 
-void SystemWindows::quit() 
+void SystemWindows::quit()
 {
-	mFinished = true;
+	glfwSetWindowShouldClose((GLFWwindow*)mWindow, true);
+}
+
+bool SystemWindows::isFinished() const
+{
+	return glfwWindowShouldClose((GLFWwindow*)mWindow);
 }
 
 bool SystemWindows::isKeyPressed(Input::Keyboard::Key key) const
 {
-	return mKeyboardKeys.count(key) > 0;
+	static const std::unordered_map<Input::Keyboard::Key, int> KeyMap = {
+		{ Input::Keyboard::Key::Backspace, GLFW_KEY_BACKSPACE },
+		{ Input::Keyboard::Key::Tab, GLFW_KEY_TAB },
+		{ Input::Keyboard::Key::Enter, GLFW_KEY_ENTER },
+		{ Input::Keyboard::Key::LeftShift, GLFW_KEY_LEFT_SHIFT },
+		{ Input::Keyboard::Key::RightShift, GLFW_KEY_RIGHT_SHIFT },
+		{ Input::Keyboard::Key::LeftCtrl, GLFW_KEY_LEFT_CONTROL },
+		{ Input::Keyboard::Key::RightCtrl, GLFW_KEY_RIGHT_CONTROL },
+		{ Input::Keyboard::Key::LeftAlt, GLFW_KEY_LEFT_ALT },
+		{ Input::Keyboard::Key::RightAlt, GLFW_KEY_RIGHT_ALT },
+		{ Input::Keyboard::Key::Pause, GLFW_KEY_PAUSE },
+		{ Input::Keyboard::Key::CapsLock, GLFW_KEY_CAPS_LOCK },
+		{ Input::Keyboard::Key::Escape, GLFW_KEY_ESCAPE },
+		{ Input::Keyboard::Key::Space, GLFW_KEY_SPACE },
+		{ Input::Keyboard::Key::PageUp, GLFW_KEY_PAGE_UP },
+		{ Input::Keyboard::Key::PageDown, GLFW_KEY_PAGE_DOWN },
+		{ Input::Keyboard::Key::End, GLFW_KEY_END },
+		{ Input::Keyboard::Key::Home, GLFW_KEY_HOME },
+		{ Input::Keyboard::Key::Left, GLFW_KEY_LEFT },
+		{ Input::Keyboard::Key::Up, GLFW_KEY_UP },
+		{ Input::Keyboard::Key::Right, GLFW_KEY_RIGHT },
+		{ Input::Keyboard::Key::Down, GLFW_KEY_DOWN },
+		{ Input::Keyboard::Key::PrintScreen, GLFW_KEY_PRINT_SCREEN },
+		{ Input::Keyboard::Key::Insert, GLFW_KEY_INSERT },
+		{ Input::Keyboard::Key::Delete, GLFW_KEY_DELETE },
+		
+		{ Input::Keyboard::Key::A, GLFW_KEY_A },
+		{ Input::Keyboard::Key::B, GLFW_KEY_B },
+		{ Input::Keyboard::Key::C, GLFW_KEY_C },
+		{ Input::Keyboard::Key::D, GLFW_KEY_D },
+		{ Input::Keyboard::Key::E, GLFW_KEY_E },
+		{ Input::Keyboard::Key::F, GLFW_KEY_F },
+		{ Input::Keyboard::Key::G, GLFW_KEY_G },
+		{ Input::Keyboard::Key::H, GLFW_KEY_H },
+		{ Input::Keyboard::Key::I, GLFW_KEY_I },
+		{ Input::Keyboard::Key::J, GLFW_KEY_J },
+		{ Input::Keyboard::Key::K, GLFW_KEY_K },
+		{ Input::Keyboard::Key::L, GLFW_KEY_L },
+		{ Input::Keyboard::Key::M, GLFW_KEY_M },
+		{ Input::Keyboard::Key::N, GLFW_KEY_N },
+		{ Input::Keyboard::Key::O, GLFW_KEY_O },
+		{ Input::Keyboard::Key::P, GLFW_KEY_P },
+		{ Input::Keyboard::Key::Q, GLFW_KEY_Q },
+		{ Input::Keyboard::Key::R, GLFW_KEY_R },
+		{ Input::Keyboard::Key::S, GLFW_KEY_S },
+		{ Input::Keyboard::Key::T, GLFW_KEY_T },
+		{ Input::Keyboard::Key::U, GLFW_KEY_U },
+		{ Input::Keyboard::Key::V, GLFW_KEY_V },
+		{ Input::Keyboard::Key::W, GLFW_KEY_W },
+		{ Input::Keyboard::Key::X, GLFW_KEY_X },
+		{ Input::Keyboard::Key::Y, GLFW_KEY_Y },
+		{ Input::Keyboard::Key::Z, GLFW_KEY_Z },
+
+		{ Input::Keyboard::Key::NumPad0, GLFW_KEY_KP_0 },
+		{ Input::Keyboard::Key::NumPad1, GLFW_KEY_KP_1 },
+		{ Input::Keyboard::Key::NumPad2, GLFW_KEY_KP_2 },
+		{ Input::Keyboard::Key::NumPad3, GLFW_KEY_KP_3 },
+		{ Input::Keyboard::Key::NumPad4, GLFW_KEY_KP_4 },
+		{ Input::Keyboard::Key::NumPad5, GLFW_KEY_KP_5 },
+		{ Input::Keyboard::Key::NumPad6, GLFW_KEY_KP_6 },
+		{ Input::Keyboard::Key::NumPad7, GLFW_KEY_KP_7 },
+		{ Input::Keyboard::Key::NumPad8, GLFW_KEY_KP_8 },
+		{ Input::Keyboard::Key::NumPad9, GLFW_KEY_KP_9 },
+
+		{ Input::Keyboard::Key::Multiply, GLFW_KEY_KP_MULTIPLY },
+		{ Input::Keyboard::Key::Add, GLFW_KEY_KP_ADD },
+		{ Input::Keyboard::Key::Subtract, GLFW_KEY_KP_SUBTRACT },
+		{ Input::Keyboard::Key::Decimal, GLFW_KEY_KP_DECIMAL },
+		{ Input::Keyboard::Key::Divide, GLFW_KEY_KP_DIVIDE },
+
+		{ Input::Keyboard::Key::F1, GLFW_KEY_F1 },
+		{ Input::Keyboard::Key::F2, GLFW_KEY_F2 },
+		{ Input::Keyboard::Key::F3, GLFW_KEY_F3 },
+		{ Input::Keyboard::Key::F4, GLFW_KEY_F4 },
+		{ Input::Keyboard::Key::F5, GLFW_KEY_F5 },
+		{ Input::Keyboard::Key::F6, GLFW_KEY_F6 },
+		{ Input::Keyboard::Key::F7, GLFW_KEY_F7 },
+		{ Input::Keyboard::Key::F8, GLFW_KEY_F8 },
+		{ Input::Keyboard::Key::F9, GLFW_KEY_F9 },
+		{ Input::Keyboard::Key::F10, GLFW_KEY_F10 },
+		{ Input::Keyboard::Key::F11, GLFW_KEY_F11 },
+		{ Input::Keyboard::Key::F12, GLFW_KEY_F12 },
+
+		{ Input::Keyboard::Key::Tilde, GLFW_KEY_GRAVE_ACCENT },
+	};
+
+	auto button = KeyMap.at(key);
+	auto state = glfwGetKey(mWindow, button);
+
+	return state == GLFW_PRESS;
 }
 
 bool SystemWindows::isKeyPressed(Input::Mouse::Button key) const
 {
-	return mMouseButtons.count(key) > 0;
+	static const std::unordered_map<Input::Mouse::Button, int> ButtonMap = {
+		{ Input::Mouse::Button::Left, GLFW_MOUSE_BUTTON_LEFT },
+		{ Input::Mouse::Button::Middle, GLFW_MOUSE_BUTTON_MIDDLE },
+		{ Input::Mouse::Button::Right, GLFW_MOUSE_BUTTON_RIGHT },
+	};
+
+	auto button = ButtonMap.at(key);
+	auto state = glfwGetMouseButton(mWindow, button);
+
+	return state == GLFW_PRESS;
 }
 
 void SystemWindows::resize(int width, int height)
 {
-	RECT cur_rect = { };
-	GetWindowRect(Window, &cur_rect);
+	int pos_x;
+	int pos_y;
+	
+	glfwGetWindowPos(mWindow, &pos_x, &pos_y);
+	
+	auto w_delta = mWidth - width;
+	auto h_delta = mHeight - height;
+	
+	auto x_offset = w_delta / 2 / mScale;
+	auto y_offset = h_delta / 2 / mScale;
+	
+	glfwSetWindowPos(mWindow, pos_x + x_offset, pos_y + y_offset);
 
-	int cur_w = cur_rect.right - cur_rect.left;
-	int cur_h = cur_rect.bottom - cur_rect.top;
+	width /= mScale;
+	height /= mScale;
 
-	int center_x = (cur_w / 2) + cur_rect.left;
-	int center_y = (cur_h / 2) + cur_rect.top;
-
-	RECT dst_rect = { 0, 0, width, height };
-	AdjustWindowRect(&dst_rect, WS_OVERLAPPEDWINDOW, FALSE);
-
-	int dst_w = dst_rect.right - dst_rect.left;
-	int dst_h = dst_rect.bottom - dst_rect.top;
-
-	int dst_left = center_x - (dst_w / 2);
-	int dst_top = center_y - (dst_h / 2);
-
-	SetWindowPos(Window, nullptr, dst_left, dst_top, dst_w, dst_h, 0);
+	glfwSetWindowSize(mWindow, width, height);
 }
 
 void SystemWindows::setTitle(const std::string& text)
 {
-	SetWindowText(Window, text.c_str());
+	glfwSetWindowTitle(mWindow, text.c_str());
 }
 
 void SystemWindows::hideCursor()
 {
-	if (mCursorHidden)
-		return;
-
-	mCursorHidden = true;
-	ShowCursor(false);
+	glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void SystemWindows::showCursor()
 {
-	if (!mCursorHidden)
-		return;
-
-	mCursorHidden = false;
-	ShowCursor(true);
+	glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void SystemWindows::setCursorPos(int x, int y)
 {
-	POINT p = { x, y };
-	ClientToScreen(Window, &p);
-	SetCursorPos(p.x, p.y);
+	glfwSetCursorPos(mWindow, (double)x, (double)y);
 }
 
 std::string SystemWindows::getAppName() const
@@ -111,247 +258,191 @@ std::string SystemWindows::getAppName() const
 	return mAppName;
 }
 
-
 std::string SystemWindows::getUUID() const
 {
-	UUID uuid;
-	UuidCreateSequential(&uuid);
-	uuid.Data1 = 0;
-	uuid.Data2 = 0;
-	char* str;
-	UuidToStringA(&uuid, (RPC_CSTR*)&str);
-	auto result = std::string(str);
-	RpcStringFreeA((RPC_CSTR*)&str);
-	return result;
-}
-
-LRESULT WINAPI SystemWindows::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	auto thiz = (SystemWindows*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-
-	switch (msg)
-	{
-	case WM_CREATE: {
-		CREATESTRUCT* pCreateStruct = (CREATESTRUCT*)lParam;
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pCreateStruct->lpCreateParams);
-		return DefWindowProc(hWnd, msg, wParam, lParam);
-	}
-
-	//case WM_SYSCOMMAND:
-	//if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
-	//	break;
-
-	//	return DefWindowProc(hWnd, msg, wParam, lParam);
-
-	case WM_KEYDOWN:
-	case WM_SYSKEYDOWN:
-	case WM_KEYUP:
-	case WM_SYSKEYUP:
-		thiz->dispatchKeyboardEvent(wParam, msg == WM_KEYDOWN);
-		break;
-
-	case WM_MOUSEMOVE:
-	case WM_LBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_MBUTTONDOWN:
-	case WM_MBUTTONUP:
-	case WM_RBUTTONDOWN:
-	case WM_RBUTTONUP:
-	case WM_MOUSEWHEEL:
-		thiz->dispatchMouseEvent(msg, wParam, lParam);
-		break;
-
-	case WM_SIZE:
-		if (wParam != SIZE_MINIMIZED)
-		{
-			thiz->mWidth = GET_X_LPARAM(lParam);
-			thiz->mHeight = GET_Y_LPARAM(lParam);
-			EVENT->emit(ResizeEvent({ thiz->mWidth, thiz->mHeight }));
-		}
-		break;
-
-	case WM_DESTROY:
-		thiz->quit();
-		break;
-
-	default:
-		return DefWindowProc(hWnd, msg, wParam, lParam);
-	}
-
-	return 0;
-}
-
-void SystemWindows::dispatchMouseEvent(UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	auto pos_x = GET_X_LPARAM(lParam);
-	auto pos_y = GET_Y_LPARAM(lParam);
-
-	switch (msg)
-	{
-	case WM_MOUSEMOVE:
-		EVENT->emit(Input::Mouse::MoveEvent{
-			.pos = { pos_x, pos_y }
-		});
-		break;
-
-	case WM_LBUTTONDOWN:
-		EVENT->emit(Input::Mouse::ButtonEvent{
-			.type = Input::Mouse::ButtonEvent::Type::Pressed,
-			.button = Input::Mouse::Button::Left,
-			.pos = { pos_x, pos_y }
-		});
-		mMouseButtons.insert(Input::Mouse::Button::Left);
-		break;
-
-	case WM_MBUTTONDOWN:
-		EVENT->emit(Input::Mouse::ButtonEvent{
-			.type = Input::Mouse::ButtonEvent::Type::Pressed,
-			.button = Input::Mouse::Button::Middle,
-			.pos = { pos_x, pos_y }
-		});
-		mMouseButtons.insert(Input::Mouse::Button::Middle);
-		break;
-
-	case WM_RBUTTONDOWN:
-		EVENT->emit(Input::Mouse::ButtonEvent{
-			.type = Input::Mouse::ButtonEvent::Type::Pressed,
-			.button = Input::Mouse::Button::Right,
-			.pos = { pos_x, pos_y }
-		});
-		mMouseButtons.insert(Input::Mouse::Button::Right);
-		break;
-
-	case WM_LBUTTONUP:
-		EVENT->emit(Input::Mouse::ButtonEvent{
-			.type = Input::Mouse::ButtonEvent::Type::Released,
-			.button = Input::Mouse::Button::Left,
-			.pos = { pos_x, pos_y }
-		});
-		mMouseButtons.erase(Input::Mouse::Button::Left);
-		break;
-
-	case WM_MBUTTONUP:
-		EVENT->emit(Input::Mouse::ButtonEvent{
-			.type = Input::Mouse::ButtonEvent::Type::Released,
-			.button = Input::Mouse::Button::Middle,
-			.pos = { pos_x, pos_y }
-		});
-		mMouseButtons.erase(Input::Mouse::Button::Middle);
-		break;
-
-	case WM_RBUTTONUP:
-		EVENT->emit(Input::Mouse::ButtonEvent{
-			.type = Input::Mouse::ButtonEvent::Type::Released,
-			.button = Input::Mouse::Button::Right,
-			.pos = { pos_x, pos_y }
-		});
-		mMouseButtons.erase(Input::Mouse::Button::Right);
-		break;
-
-	case WM_MOUSEWHEEL:
-	{
-		POINT pt = { pos_x, pos_y };
-		ScreenToClient(Window, &pt);
-
-		EVENT->emit(Input::Mouse::ScrollEvent{
-			.pos = { pt.x, pt.y },
-			.scroll = { 0.0f, ((float)GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA }
-		});
-		break;
-	}
-	case WM_MOUSEHWHEEL: 
-	{
-		POINT pt = { pos_x, pos_y };
-		ScreenToClient(Window, &pt);
-
-		EVENT->emit(Input::Mouse::ScrollEvent{
-			.pos = { pt.x, pt.y },
-			.scroll = { ((float)GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA, 0.0f }
-		});
-		break;	
-	}
-	};
-}
-
-void SystemWindows::dispatchKeyboardEvent(WPARAM keyCode, bool isKeyDown)
-{
-	/*Input::Keyboard::Event evt;
-
-	evt.type = isKeyDown ? Input::Keyboard::Event::Type::Pressed : Input::Keyboard::Event::Type::Released;
-	evt.key = (Input::Keyboard::Key)keyCode;
-	evt.asciiChar = 0;
-
-	BYTE keyboardState[256];
-
-	GetKeyboardState(keyboardState);
-	
-	char c[2];
-
-	if (ToAscii((UINT)keyCode, 0, keyboardState, (WORD*)c, 0) != 0)
-		evt.asciiChar = c[0];
-
-	if (evt.type == Input::Keyboard::Event::Type::Pressed)
-		mKeyboardKeys.insert(evt.key);
-	else
-		mKeyboardKeys.erase(evt.key);
-
-	EVENT->emit(evt);*/
+	return ""; // TODO
 }
 
 void SystemWindows::initializeBilling(const ProductsMap& products)
 {
-	mProducts = products;
 }
 
 void SystemWindows::purchase(const std::string& product)
 {
-	Actions::Run(Actions::Collection::Delayed(3.0f,
-		Actions::Collection::Execute([this, product] {
-			if (mProducts.count(product) == 0)
-				return;
-
-			mProducts.at(product)();
-		})
-	));
 }
 
 void SystemWindows::alert(const std::string& text)
 {
-	MessageBox(Window, text.c_str(), "Alert", MB_OK | MB_ICONEXCLAMATION);
 }
 
-void SystemWindows::makeWindow()
+void SystemWindows::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	WNDCLASSEX windowClass = { };
-	windowClass.cbSize = sizeof(WNDCLASSEX);
-	windowClass.style = CS_HREDRAW | CS_VREDRAW;
-	windowClass.lpfnWndProc = WndProc;
-	windowClass.hInstance = GetModuleHandle(nullptr);
-	windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	windowClass.lpszClassName = mAppName.c_str();
+	static const std::unordered_map<int, Input::Mouse::ButtonEvent::Type> TypeMap = {
+		{ GLFW_PRESS, Input::Mouse::ButtonEvent::Type::Pressed },
+		{ GLFW_REPEAT, Input::Mouse::ButtonEvent::Type::Pressed },
+		{ GLFW_RELEASE, Input::Mouse::ButtonEvent::Type::Released },
+	};
+	
+	static const std::unordered_map<int, Input::Mouse::Button> ButtonMap = {
+		{ GLFW_MOUSE_BUTTON_LEFT, Input::Mouse::Button::Left },
+		{ GLFW_MOUSE_BUTTON_MIDDLE, Input::Mouse::Button::Middle },
+		{ GLFW_MOUSE_BUTTON_RIGHT, Input::Mouse::Button::Right },
+	};
 
-	RegisterClassEx(&windowClass);
+	double x;
+	double y;
+	glfwGetCursorPos(window, &x, &y);
 
-	RECT windowRect = { 0, 0, mWidth, mHeight };
-	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+	x *= gContext->mScale;
+	y *= gContext->mScale;
 
-	int realWidth = windowRect.right - windowRect.left;
-	int realHeight = windowRect.bottom - windowRect.top;
-
-	int windowLeft = (GetSystemMetrics(SM_CXSCREEN) - realWidth) / 2;
-	int windowTop = (GetSystemMetrics(SM_CYSCREEN) - realHeight) / 2;
-
-	Window = CreateWindow(windowClass.lpszClassName, mAppName.c_str(), WS_OVERLAPPEDWINDOW,
-		windowLeft, windowTop, realWidth, realHeight, nullptr, nullptr, windowClass.hInstance, this);
-
-	ShowWindow(Window, SW_SHOWDEFAULT);
-
-	mFinished = false;
+	EVENT->emit(Input::Mouse::ButtonEvent{
+		.type = TypeMap.at(action),
+		.button = ButtonMap.at(button),
+		.pos = { x, y }
+	});
 }
 
-void SystemWindows::destroyWindow()
+void SystemWindows::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	ReleaseDC(Window, GetDC(Window));
-	DestroyWindow(Window);
+	static const std::unordered_map<int, Input::Keyboard::Key> KeyMap = {
+		{ GLFW_KEY_BACKSPACE, Input::Keyboard::Key::Backspace },
+		{ GLFW_KEY_TAB, Input::Keyboard::Key::Tab },
+		{ GLFW_KEY_ENTER, Input::Keyboard::Key::Enter },
+		{ GLFW_KEY_LEFT_SHIFT, Input::Keyboard::Key::LeftShift },
+		{ GLFW_KEY_RIGHT_SHIFT, Input::Keyboard::Key::RightShift },
+		{ GLFW_KEY_LEFT_CONTROL, Input::Keyboard::Key::LeftCtrl },
+		{ GLFW_KEY_RIGHT_CONTROL, Input::Keyboard::Key::RightCtrl },
+		{ GLFW_KEY_LEFT_ALT, Input::Keyboard::Key::LeftAlt },
+		{ GLFW_KEY_RIGHT_ALT, Input::Keyboard::Key::RightAlt },
+		{ GLFW_KEY_PAUSE, Input::Keyboard::Key::Pause },
+		{ GLFW_KEY_CAPS_LOCK, Input::Keyboard::Key::CapsLock },
+		{ GLFW_KEY_ESCAPE, Input::Keyboard::Key::Escape },
+		{ GLFW_KEY_SPACE, Input::Keyboard::Key::Space },
+		{ GLFW_KEY_PAGE_UP, Input::Keyboard::Key::PageUp },
+		{ GLFW_KEY_PAGE_DOWN, Input::Keyboard::Key::PageDown },
+		{ GLFW_KEY_END, Input::Keyboard::Key::End },
+		{ GLFW_KEY_HOME, Input::Keyboard::Key::Home },
+		{ GLFW_KEY_LEFT, Input::Keyboard::Key::Left },
+		{ GLFW_KEY_UP, Input::Keyboard::Key::Up },
+		{ GLFW_KEY_RIGHT, Input::Keyboard::Key::Right },
+		{ GLFW_KEY_DOWN, Input::Keyboard::Key::Down },
+		{ GLFW_KEY_PRINT_SCREEN, Input::Keyboard::Key::PrintScreen },
+		{ GLFW_KEY_INSERT, Input::Keyboard::Key::Insert },
+		{ GLFW_KEY_DELETE, Input::Keyboard::Key::Delete },
+		
+		{ GLFW_KEY_A, Input::Keyboard::Key::A },
+		{ GLFW_KEY_B, Input::Keyboard::Key::B },
+		{ GLFW_KEY_C, Input::Keyboard::Key::C },
+		{ GLFW_KEY_D, Input::Keyboard::Key::D },
+		{ GLFW_KEY_E, Input::Keyboard::Key::E },
+		{ GLFW_KEY_F, Input::Keyboard::Key::F },
+		{ GLFW_KEY_G, Input::Keyboard::Key::G },
+		{ GLFW_KEY_H, Input::Keyboard::Key::H },
+		{ GLFW_KEY_I, Input::Keyboard::Key::I },
+		{ GLFW_KEY_J, Input::Keyboard::Key::J },
+		{ GLFW_KEY_K, Input::Keyboard::Key::K },
+		{ GLFW_KEY_L, Input::Keyboard::Key::L },
+		{ GLFW_KEY_M, Input::Keyboard::Key::M },
+		{ GLFW_KEY_N, Input::Keyboard::Key::N },
+		{ GLFW_KEY_O, Input::Keyboard::Key::O },
+		{ GLFW_KEY_P, Input::Keyboard::Key::P },
+		{ GLFW_KEY_Q, Input::Keyboard::Key::Q },
+		{ GLFW_KEY_R, Input::Keyboard::Key::R },
+		{ GLFW_KEY_S, Input::Keyboard::Key::S },
+		{ GLFW_KEY_T, Input::Keyboard::Key::T },
+		{ GLFW_KEY_U, Input::Keyboard::Key::U },
+		{ GLFW_KEY_V, Input::Keyboard::Key::V },
+		{ GLFW_KEY_W, Input::Keyboard::Key::W },
+		{ GLFW_KEY_X, Input::Keyboard::Key::X },
+		{ GLFW_KEY_Y, Input::Keyboard::Key::Y },
+		{ GLFW_KEY_Z, Input::Keyboard::Key::Z },
+
+		{ GLFW_KEY_KP_0, Input::Keyboard::Key::NumPad0 },
+		{ GLFW_KEY_KP_1, Input::Keyboard::Key::NumPad1 },
+		{ GLFW_KEY_KP_2, Input::Keyboard::Key::NumPad2 },
+		{ GLFW_KEY_KP_3, Input::Keyboard::Key::NumPad3 },
+		{ GLFW_KEY_KP_4, Input::Keyboard::Key::NumPad4 },
+		{ GLFW_KEY_KP_5, Input::Keyboard::Key::NumPad5 },
+		{ GLFW_KEY_KP_6, Input::Keyboard::Key::NumPad6 },
+		{ GLFW_KEY_KP_7, Input::Keyboard::Key::NumPad7 },
+		{ GLFW_KEY_KP_8, Input::Keyboard::Key::NumPad8 },
+		{ GLFW_KEY_KP_9, Input::Keyboard::Key::NumPad9 },
+
+		{ GLFW_KEY_KP_MULTIPLY, Input::Keyboard::Key::Multiply },
+		{ GLFW_KEY_KP_ADD, Input::Keyboard::Key::Add },
+		{ GLFW_KEY_KP_SUBTRACT, Input::Keyboard::Key::Subtract },
+		{ GLFW_KEY_KP_DECIMAL, Input::Keyboard::Key::Decimal },
+		{ GLFW_KEY_KP_DIVIDE, Input::Keyboard::Key::Divide },
+
+		{ GLFW_KEY_F1, Input::Keyboard::Key::F1 },
+		{ GLFW_KEY_F2, Input::Keyboard::Key::F2 },
+		{ GLFW_KEY_F3, Input::Keyboard::Key::F3 },
+		{ GLFW_KEY_F4, Input::Keyboard::Key::F4 },
+		{ GLFW_KEY_F5, Input::Keyboard::Key::F5 },
+		{ GLFW_KEY_F6, Input::Keyboard::Key::F6 },
+		{ GLFW_KEY_F7, Input::Keyboard::Key::F7 },
+		{ GLFW_KEY_F8, Input::Keyboard::Key::F8 },
+		{ GLFW_KEY_F9, Input::Keyboard::Key::F9 },
+		{ GLFW_KEY_F10, Input::Keyboard::Key::F10 },
+		{ GLFW_KEY_F11, Input::Keyboard::Key::F11 },
+		{ GLFW_KEY_F12, Input::Keyboard::Key::F12 },
+
+		{ GLFW_KEY_GRAVE_ACCENT, Input::Keyboard::Key::Tilde },
+	};
+
+	static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {
+		{ GLFW_PRESS, Input::Keyboard::Event::Type::Pressed },
+		{ GLFW_REPEAT, Input::Keyboard::Event::Type::Pressed },
+		{ GLFW_RELEASE, Input::Keyboard::Event::Type::Released },
+	};
+
+	if (!TypeMap.contains(action))
+		return;
+
+	if (!KeyMap.contains(key))
+		return;
+
+	Input::Keyboard::Event e;
+	
+	e.type = TypeMap.at(action);
+	e.key = KeyMap.at(key);
+	
+	EVENT->emit(e);
 }
+
+void SystemWindows::CharCallback(GLFWwindow* window, unsigned int codepoint)
+{
+	EVENT->emit(Input::Keyboard::CharEvent{ codepoint });
+}
+
+void SystemWindows::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	double x;
+	double y;
+	glfwGetCursorPos(window, &x, &y);
+
+	x *= gContext->mScale;
+	y *= gContext->mScale;
+
+	auto scroll_x = xoffset / gContext->mScale;
+	auto scroll_y = yoffset / gContext->mScale;
+
+ 	EVENT->emit(Input::Mouse::ScrollEvent{
+ 		.pos = { x, y },
+ 		.scroll = { scroll_x, scroll_y }
+	});
+}
+
+void SystemWindows::WindowSizeCallback(GLFWwindow* window, int width, int height)
+{
+}
+
+void SystemWindows::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+	gContext->mWidth = width;
+	gContext->mHeight = height;
+	EVENT->emit(ResizeEvent({ width, height }));
+}
+
 #endif
