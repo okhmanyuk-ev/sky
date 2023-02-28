@@ -2,7 +2,8 @@
 
 #include <platform/system.h>
 
-#if defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)
+
 #include <platform/low_level_api.h>
 #include <platform/input.h>
 
@@ -13,11 +14,11 @@
 
 namespace Platform
 {
-	class SystemWindows : public System
+	class SystemGlfw : public System
 	{
 	public:
-		SystemWindows(const std::string& appname);
-		~SystemWindows();
+		SystemGlfw(const std::string& appname);
+		~SystemGlfw();
 
 	public:
 		void process() override;
@@ -82,5 +83,11 @@ namespace Platform
 		static void WindowSizeCallback(GLFWwindow* window, int width, int height);
 		static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 	};
+
+#if defined(PLATFORM_WINDOWS)
+	using SystemWindows = SystemGlfw;
+#elif defined(PLATFORM_MAC)
+	using SystemMac = SystemGlfw;
+#endif
 }
 #endif

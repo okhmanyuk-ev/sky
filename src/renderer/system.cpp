@@ -1,8 +1,7 @@
 #include "system.h"
 
-#include <platform/system_windows.h>
+#include <platform/system_glfw.h>
 #include <platform/system_ios.h>
-#include <platform/system_mac.h>
 #include <platform/system_emscripten.h>
 
 using namespace Renderer;

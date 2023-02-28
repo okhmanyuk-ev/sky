@@ -29,13 +29,7 @@
 #include <audio/system.h>
 #include <audio/sound.h>
 
-#include <platform/defines.h>
-#include <platform/input.h>
-
-#if defined(PLATFORM_WINDOWS)
-#include <platform/system_windows.h>
-#endif
-
+#include <platform/all.h>
 #include <renderer/all.h>
 #include <scene/all.h>
 #include <scene3d/all.h>

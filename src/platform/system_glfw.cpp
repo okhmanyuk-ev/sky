@@ -1,15 +1,19 @@
-#include "system_mac.h"
+#include "system_glfw.h"
 
-#ifdef PLATFORM_MAC
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)
 
+#if defined(PLATFORM_WINDOWS)
+#define GLFW_EXPOSE_NATIVE_WIN32
+#elif defined(PLATFORM_MAC)
 #define GLFW_EXPOSE_NATIVE_COCOA
+#endif
 #include <GLFW/glfw3native.h>
 
 #include <common/event_system.h>
 
 using namespace Platform;
 
-static SystemMac* gContext = nullptr;
+static SystemGlfw* gContext = nullptr;
 
 int main(int argc, char* argv[])
 {
@@ -19,18 +23,26 @@ int main(int argc, char* argv[])
 
 std::shared_ptr<System> System::create(const std::string& appname)
 {
+#if defined(PLATFORM_WINDOWS)
+	return std::make_shared<SystemWindows>(appname);
+#elif defined(PLATFORM_MAC)
 	return std::make_shared<SystemMac>(appname);
+#endif
 }
 
-SystemMac::SystemMac(const std::string& appname) : mAppName(appname)
+SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 	mWindow = glfwCreateWindow(mWidth, mHeight, appname.c_str(), NULL, NULL);
 
+#if defined(PLATFORM_WINDOWS)
+	Window = glfwGetWin32Window(mWindow);
+#elif defined(PLATFORM_MAC)
 	Window = glfwGetCocoaWindow(mWindow);
-	
+#endif
+
 	float x_scale;
 	float y_scale;
 	
@@ -44,7 +56,7 @@ SystemMac::SystemMac(const std::string& appname) : mAppName(appname)
 	auto window_pos_x = (video_mode->width / 2 ) - (mWidth / 2) / mScale;
 	auto window_pos_y = (video_mode->height / 2) - (mHeight / 2) / mScale;
 
-	glfwSetWindowPos(mWindow, window_pos_x, window_pos_y);
+	glfwSetWindowPos(mWindow, (int)window_pos_x, (int)window_pos_y);
 
 	resize(mWidth, mHeight);
 
@@ -66,12 +78,12 @@ SystemMac::SystemMac(const std::string& appname) : mAppName(appname)
 	gContext = this;
 }
 
-SystemMac::~SystemMac()
+SystemGlfw::~SystemGlfw()
 {
 	glfwTerminate();
 }
 
-void SystemMac::process()
+void SystemGlfw::process()
 {
 	glfwPollEvents();
 
@@ -80,8 +92,13 @@ void SystemMac::process()
 
 	glfwGetCursorPos(mWindow, &mouse_x, &mouse_y);
 
+#if defined(PLATFORM_MAC)
 	auto mouse_x_i = (int)(mouse_x * mScale);
 	auto mouse_y_i = (int)(mouse_y * mScale);
+#elif defined(PLATFORM_WINDOWS)
+	auto mouse_x_i = (int)mouse_x;
+	auto mouse_y_i = (int)mouse_y;
+#endif
 
 	if (mouse_x_i != mPrevMouseX || mouse_y_i != mPrevMouseY)
 	{
@@ -94,17 +111,17 @@ void SystemMac::process()
 	}
 }
 
-void SystemMac::quit()
+void SystemGlfw::quit()
 {
 	glfwSetWindowShouldClose((GLFWwindow*)mWindow, true);
 }
 
-bool SystemMac::isFinished() const
+bool SystemGlfw::isFinished() const
 {
 	return glfwWindowShouldClose((GLFWwindow*)mWindow);
 }
 
-bool SystemMac::isKeyPressed(Input::Keyboard::Key key) const
+bool SystemGlfw::isKeyPressed(Input::Keyboard::Key key) const
 {
 	static const std::unordered_map<Input::Keyboard::Key, int> KeyMap = {
 		{ Input::Keyboard::Key::Backspace, GLFW_KEY_BACKSPACE },
@@ -198,7 +215,7 @@ bool SystemMac::isKeyPressed(Input::Keyboard::Key key) const
 	return state == GLFW_PRESS;
 }
 
-bool SystemMac::isKeyPressed(Input::Mouse::Button key) const
+bool SystemGlfw::isKeyPressed(Input::Mouse::Button key) const
 {
 	static const std::unordered_map<Input::Mouse::Button, int> ButtonMap = {
 		{ Input::Mouse::Button::Left, GLFW_MOUSE_BUTTON_LEFT },
@@ -212,7 +229,7 @@ bool SystemMac::isKeyPressed(Input::Mouse::Button key) const
 	return state == GLFW_PRESS;
 }
 
-void SystemMac::resize(int width, int height)
+void SystemGlfw::resize(int width, int height)
 {
 	int pos_x;
 	int pos_y;
@@ -225,57 +242,57 @@ void SystemMac::resize(int width, int height)
 	auto x_offset = w_delta / 2 / mScale;
 	auto y_offset = h_delta / 2 / mScale;
 	
-	glfwSetWindowPos(mWindow, pos_x + x_offset, pos_y + y_offset);
+	glfwSetWindowPos(mWindow, int(pos_x + x_offset), int(pos_y + y_offset));
 
-	width /= mScale;
-	height /= mScale;
+	width = int(width / mScale);
+	height = int(height / mScale);
 
 	glfwSetWindowSize(mWindow, width, height);
 }
 
-void SystemMac::setTitle(const std::string& text)
+void SystemGlfw::setTitle(const std::string& text)
 {
 	glfwSetWindowTitle(mWindow, text.c_str());
 }
 
-void SystemMac::hideCursor()
+void SystemGlfw::hideCursor()
 {
 	glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
-void SystemMac::showCursor()
+void SystemGlfw::showCursor()
 {
 	glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-void SystemMac::setCursorPos(int x, int y)
+void SystemGlfw::setCursorPos(int x, int y)
 {
 	glfwSetCursorPos(mWindow, (double)x, (double)y);
 }
 
-std::string SystemMac::getAppName() const
+std::string SystemGlfw::getAppName() const
 {
 	return mAppName;
 }
 
-std::string SystemMac::getUUID() const
+std::string SystemGlfw::getUUID() const
 {
 	return ""; // TODO
 }
 
-void SystemMac::initializeBilling(const ProductsMap& products)
+void SystemGlfw::initializeBilling(const ProductsMap& products)
 {
 }
 
-void SystemMac::purchase(const std::string& product)
+void SystemGlfw::purchase(const std::string& product)
 {
 }
 
-void SystemMac::alert(const std::string& text)
+void SystemGlfw::alert(const std::string& text)
 {
 }
 
-void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+void SystemGlfw::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	static const std::unordered_map<int, Input::Mouse::ButtonEvent::Type> TypeMap = {
 		{ GLFW_PRESS, Input::Mouse::ButtonEvent::Type::Pressed },
@@ -293,8 +310,10 @@ void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, 
 	double y;
 	glfwGetCursorPos(window, &x, &y);
 
+#if defined(PLATFORM_MAC)
 	x *= gContext->mScale;
 	y *= gContext->mScale;
+#endif
 
 	EVENT->emit(Input::Mouse::ButtonEvent{
 		.type = TypeMap.at(action),
@@ -303,7 +322,7 @@ void SystemMac::MouseButtonCallback(GLFWwindow* window, int button, int action, 
 	});
 }
 
-void SystemMac::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void SystemGlfw::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	static const std::unordered_map<int, Input::Keyboard::Key> KeyMap = {
 		{ GLFW_KEY_BACKSPACE, Input::Keyboard::Key::Backspace },
@@ -411,12 +430,12 @@ void SystemMac::KeyCallback(GLFWwindow* window, int key, int scancode, int actio
 	EVENT->emit(e);
 }
 
-void SystemMac::CharCallback(GLFWwindow* window, unsigned int codepoint)
+void SystemGlfw::CharCallback(GLFWwindow* window, unsigned int codepoint)
 {
 	EVENT->emit(Input::Keyboard::CharEvent{ codepoint });
 }
 
-void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void SystemGlfw::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	double x;
 	double y;
@@ -434,11 +453,11 @@ void SystemMac::ScrollCallback(GLFWwindow* window, double xoffset, double yoffse
 	});
 }
 
-void SystemMac::WindowSizeCallback(GLFWwindow* window, int width, int height)
+void SystemGlfw::WindowSizeCallback(GLFWwindow* window, int width, int height)
 {
 }
 
-void SystemMac::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+void SystemGlfw::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	gContext->mWidth = width;
 	gContext->mHeight = height;
