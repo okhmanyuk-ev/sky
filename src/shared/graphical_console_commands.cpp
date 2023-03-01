@@ -1,5 +1,4 @@
 #include "graphical_console_commands.h"
-#include "platform/system_windows.h"
 #include <shared/imgui_system.h>
 #include <shared/scene_editor.h>
 
