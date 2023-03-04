@@ -441,11 +441,16 @@ void SystemGlfw::ScrollCallback(GLFWwindow* window, double xoffset, double yoffs
 	double y;
 	glfwGetCursorPos(window, &x, &y);
 
+#if defined(PLATFORM_MAC)
 	x *= gContext->mScale;
 	y *= gContext->mScale;
 
 	auto scroll_x = xoffset / gContext->mScale;
 	auto scroll_y = yoffset / gContext->mScale;
+#elif defined(PLATFORM_WINDOWS)
+	auto scroll_x = xoffset;
+	auto scroll_y = yoffset;
+#endif
 
  	EVENT->emit(Input::Mouse::ScrollEvent{
  		.pos = { x, y },
