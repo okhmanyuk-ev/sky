@@ -133,7 +133,7 @@ void System::draw(uint32_t vertexCount, uint32_t vertexOffset)
 	skygfx::Draw(vertexCount, vertexOffset);
 }
 
-void System::drawIndexed(uint32_t indexCount, uint32_t indexOffset, uint32_t vertexOffset)
+void System::drawIndexed(uint32_t indexCount, uint32_t indexOffset)
 {
 	mDrawcalls += 1;
 	skygfx::DrawIndexed(indexCount, indexOffset);
