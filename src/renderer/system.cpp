@@ -55,17 +55,17 @@ void System::setScissor(std::optional<skygfx::Scissor> value)
 
 void System::setVertexBuffer(const Buffer& value)
 {
-	skygfx::SetDynamicVertexBuffer(value.data, value.size, value.stride);
+	skygfx::SetVertexBuffer(value.data, value.size, value.stride);
 }
 
 void System::setIndexBuffer(const Buffer& value)
 {
-	skygfx::SetDynamicIndexBuffer(value.data, value.size, value.stride);
+	skygfx::SetIndexBuffer(value.data, value.size, value.stride);
 }
 
 void System::setUniformBuffer(uint32_t binding, void* memory, size_t size)
 {
-	skygfx::SetDynamicUniformBuffer(binding, memory, size);
+	skygfx::SetUniformBuffer(binding, memory, size);
 }
 
 void System::setTexture(uint32_t binding, const skygfx::Texture& value)
