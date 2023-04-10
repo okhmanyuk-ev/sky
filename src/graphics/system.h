@@ -230,7 +230,7 @@ namespace Graphics
 		} mBatch;
 
 	public:
-		std::shared_ptr<skygfx::RenderTarget> getRenderTarget(const std::string& name, int width, int height);
+		std::shared_ptr<skygfx::RenderTarget> getRenderTarget(const std::string& name, uint32_t width, uint32_t height);
 		std::shared_ptr<skygfx::RenderTarget> getRenderTarget(const std::string& name);
 
 		const auto& getRenderTargets() const { return mRenderTargets; }

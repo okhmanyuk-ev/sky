@@ -4,8 +4,6 @@
 #include "system.h"
 #include "techniques.h"
 
-#include "shaders/blur.h"
-#include "shaders/bright_filter.h"
 #include "shaders/circle.h"
 #include "shaders/generic.h"
 #include "shaders/grayscale.h"

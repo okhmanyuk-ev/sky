@@ -873,7 +873,7 @@ void System::setBatching(bool value)
 	mBatching = value; 
 }
 
-std::shared_ptr<skygfx::RenderTarget> System::getRenderTarget(const std::string& name, int width, int height)
+std::shared_ptr<skygfx::RenderTarget> System::getRenderTarget(const std::string& name, uint32_t width, uint32_t height)
 {
 	if (mRenderTargets.contains(name))
 	{
