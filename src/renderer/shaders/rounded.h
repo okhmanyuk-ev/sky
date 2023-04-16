@@ -15,7 +15,7 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Rounded(const skygfx::Vertex::Layout& layout);
+		Rounded(const skygfx::VertexLayout& layout);
 
 	protected:
 		void update() override;

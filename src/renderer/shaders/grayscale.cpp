@@ -17,7 +17,7 @@ vec4 fragment(vec4 result)
 	return result;
 })";
 
-Grayscale::Grayscale(const skygfx::Vertex::Layout& layout) : Generic(layout, src_fragment)
+Grayscale::Grayscale(const skygfx::VertexLayout& layout) : Generic(layout, src_fragment)
 {
 }
 

@@ -4,7 +4,7 @@
 using namespace Renderer;
 using namespace Renderer::Shaders;
 
-Generic::Generic(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags,
+Generic::Generic(const skygfx::VertexLayout& layout, const std::set<Flag>& flags,
 	std::optional<std::string> additional_fragment_func, const std::vector<std::string>& defines) :
 	Shader(layout, 
 		GenerateVertexCode(layout, flags), 
@@ -13,7 +13,7 @@ Generic::Generic(const skygfx::Vertex::Layout& layout, const std::set<Flag>& fla
 {
 }
 
-Generic::Generic(const skygfx::Vertex::Layout& layout, std::optional<std::string> additional_fragment_func,
+Generic::Generic(const skygfx::VertexLayout& layout, std::optional<std::string> additional_fragment_func,
 	const std::vector<std::string>& defines) :
 	Generic(layout, MakeFlagsFromLayout(layout), additional_fragment_func, defines)
 {
@@ -25,7 +25,7 @@ void Generic::update()
 	RENDERER->setUniformBuffer(1, mConstantBuffer);
 }
 
-std::string Generic::GenerateVertexCode(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags)
+std::string Generic::GenerateVertexCode(const skygfx::VertexLayout& layout, const std::set<Flag>& flags)
 {
 	return R"(
 #version 450 core
@@ -87,7 +87,7 @@ void main()
 })";
 }
 
-std::string Generic::GenerateFragmentCode(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags,
+std::string Generic::GenerateFragmentCode(const skygfx::VertexLayout& layout, const std::set<Flag>& flags,
 	std::optional<std::string> additional_fragment_func)
 {
 	std::string result = R"(
@@ -147,7 +147,7 @@ void main()
 	return result;
 }
 
-std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>& defines, const skygfx::Vertex::Layout& layout,
+std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>& defines, const skygfx::VertexLayout& layout,
 	const std::set<Flag>& flags, bool custom_fragment_func)
 {
 	auto result = defines;
@@ -180,7 +180,7 @@ std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>
 	return result;
 }
 
-std::set<Generic::Flag> Generic::MakeFlagsFromLayout(const skygfx::Vertex::Layout& layout)
+std::set<Generic::Flag> Generic::MakeFlagsFromLayout(const skygfx::VertexLayout& layout)
 {
 	std::set<Flag> result = { };
 

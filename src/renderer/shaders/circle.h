@@ -17,7 +17,7 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Circle(const skygfx::Vertex::Layout& layout);
+		Circle(const skygfx::VertexLayout& layout);
 
 	protected:
 		void update() override;

@@ -4,8 +4,8 @@
 
 using namespace Renderer;
 
-void ForwardLightTechnique::draw(const Renderer::Buffer& vertex_buffer, const Renderer::Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
-	const TexturesMap& textures_map)
+void ForwardLightTechnique::draw(const Renderer::Buffer& vertex_buffer, const Renderer::Buffer& index_buffer,
+	const skygfx::VertexLayout& layout, const TexturesMap& textures_map)
 {
 	static auto Shader = std::make_shared<Renderer::Shaders::Light>(layout, std::set{ Renderer::Shaders::Light::Flag::Textured });
 	

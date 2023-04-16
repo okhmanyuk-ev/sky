@@ -114,7 +114,8 @@ Font::Font(void* data, size_t size)
 		}
 	}
 
-	mTexture = std::make_shared<skygfx::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory());
+	mTexture = std::make_shared<skygfx::Texture>(image.getWidth(), image.getHeight(), skygfx::Format::Byte4,
+		image.getMemory());
 
 	int ascent = 0;
 	int descent = 0;

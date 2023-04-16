@@ -47,8 +47,8 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Light(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags);
-		Light(const skygfx::Vertex::Layout& layout);
+		Light(const skygfx::VertexLayout& layout, const std::set<Flag>& flags);
+		Light(const skygfx::VertexLayout& layout);
 
 	protected:
 		void update() override;

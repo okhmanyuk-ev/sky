@@ -142,7 +142,7 @@ void ImguiSystem::ensureFont()
 	int32_t height;
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
-	io.Fonts->TexID = ImGui::User::GetImTextureID(std::make_shared<skygfx::Texture>(width, height, 4, data));
+	io.Fonts->TexID = ImGui::User::GetImTextureID(std::make_shared<skygfx::Texture>(width, height, skygfx::Format::Byte4, data));
 }
 
 void ImguiSystem::onEvent(const Platform::Input::Touch::Event& e)

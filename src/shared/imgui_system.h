@@ -38,10 +38,10 @@ namespace Shared
 		void ensureFont();
 
 	private:
-		const skygfx::Vertex::Layout ImguiLayout = { sizeof(ImDrawVert), {
-			{ skygfx::Vertex::Location::Position, skygfx::Vertex::Attribute::Format::Float2, offsetof(ImDrawVert, pos) },
-			{ skygfx::Vertex::Location::Color, skygfx::Vertex::Attribute::Format::Byte4, offsetof(ImDrawVert, col) },
-			{ skygfx::Vertex::Location::TexCoord, skygfx::Vertex::Attribute::Format::Float2, offsetof(ImDrawVert, uv) } }
+		const skygfx::VertexLayout ImguiLayout = { sizeof(ImDrawVert), {
+			{ skygfx::Vertex::Location::Position, skygfx::Format::Float2, offsetof(ImDrawVert, pos) },
+			{ skygfx::Vertex::Location::Color, skygfx::Format::Byte4, offsetof(ImDrawVert, col) },
+			{ skygfx::Vertex::Location::TexCoord, skygfx::Format::Float2, offsetof(ImDrawVert, uv) } }
 		};
 
 		std::shared_ptr<Renderer::Shaders::Generic> mShader = std::make_shared<Renderer::Shaders::Generic>(ImguiLayout);

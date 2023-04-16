@@ -65,7 +65,10 @@ void CacheSystem::loadTexture(std::shared_ptr<Graphics::Image> image, const std:
 	if (mTextures.count(name) > 0)
 		return;
 
-	auto texture = std::make_shared<skygfx::Texture>(image->getWidth(), image->getHeight(), image->getChannels(), image->getMemory());
+	assert(image->getChannels() == 4); // TODO: skygfx::Format::Byte(1/2/3)
+	
+	auto texture = std::make_shared<skygfx::Texture>(image->getWidth(), image->getHeight(),
+		skygfx::Format::Byte4, image->getMemory());
 
 	loadTexture(texture, name);
 }

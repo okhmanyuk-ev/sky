@@ -19,7 +19,7 @@ void Glass::draw()
 
 	if (size != mPrevSize)
 	{
-		setTexture(std::make_shared<skygfx::Texture>(w, h, 4, nullptr, mGenerateMipmaps));
+		setTexture(std::make_shared<skygfx::Texture>(w, h, skygfx::Format::Byte4, nullptr, mGenerateMipmaps));
 		mPrevSize = size;
 	}
 

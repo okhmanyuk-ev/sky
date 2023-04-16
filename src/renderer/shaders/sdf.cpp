@@ -33,7 +33,7 @@ vec4 fragment(vec4 result)
 	return result;
 })";
 
-Sdf::Sdf(const skygfx::Vertex::Layout& layout) : Generic(layout, src_fragment)
+Sdf::Sdf(const skygfx::VertexLayout& layout) : Generic(layout, src_fragment)
 {
 }
 

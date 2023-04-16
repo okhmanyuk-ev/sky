@@ -24,10 +24,10 @@ namespace Renderer::Shaders
 		};
 
 	public:
-		Generic(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags,
+		Generic(const skygfx::VertexLayout& layout, const std::set<Flag>& flags,
 			std::optional<std::string> additional_fragment_func = std::nullopt,
 			const std::vector<std::string>& defines = {});
-		Generic(const skygfx::Vertex::Layout& layout,
+		Generic(const skygfx::VertexLayout& layout,
 			std::optional<std::string> additional_fragment_func = std::nullopt,
 			const std::vector<std::string>& defines = {});
 
@@ -50,13 +50,13 @@ namespace Renderer::Shaders
 		Matrices mConstantBuffer;
 
 	private:
-		static std::string GenerateVertexCode(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags);
+		static std::string GenerateVertexCode(const skygfx::VertexLayout& layout, const std::set<Flag>& flags);
 		
-		static std::string GenerateFragmentCode(const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags,
+		static std::string GenerateFragmentCode(const skygfx::VertexLayout& layout, const std::set<Flag>& flags,
 			std::optional<std::string> additional_fragment_func = std::nullopt);
 
 		static std::vector<std::string> GenerateDefines(const std::vector<std::string>& defines, 
-			const skygfx::Vertex::Layout& layout, const std::set<Flag>& flags, bool custom_fragment_func);
-		static std::set<Flag> MakeFlagsFromLayout(const skygfx::Vertex::Layout& layout);
+			const skygfx::VertexLayout& layout, const std::set<Flag>& flags, bool custom_fragment_func);
+		static std::set<Flag> MakeFlagsFromLayout(const skygfx::VertexLayout& layout);
 	};
 }

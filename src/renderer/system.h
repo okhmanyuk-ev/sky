@@ -6,6 +6,7 @@
 #include <optional>
 
 #include <skygfx/skygfx.h>
+#include <skygfx/vertex.h>
 #include <common/event_system.h>
 #include <platform/all.h>
 

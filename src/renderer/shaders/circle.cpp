@@ -50,7 +50,7 @@ vec4 fragment(vec4 result)
 	return result;
 })";
 
-Circle::Circle(const skygfx::Vertex::Layout& layout) : Generic(layout, src_fragment)
+Circle::Circle(const skygfx::VertexLayout& layout) : Generic(layout, src_fragment)
 {
 };
 

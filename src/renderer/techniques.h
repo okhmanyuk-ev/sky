@@ -21,8 +21,8 @@ namespace Renderer
 		using TexturesMap = std::unordered_map<std::shared_ptr<skygfx::Texture>, IndexRange>;
 
 	public:
-		virtual void draw(const Renderer::Buffer& vertex_buffer, const Renderer::Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
-			const TexturesMap& textures_map) = 0;
+		virtual void draw(const Renderer::Buffer& vertex_buffer, const Renderer::Buffer& index_buffer,
+			const skygfx::VertexLayout& layout, const TexturesMap& textures_map) = 0;
 
 	public:
 		const auto& getProjectionMatrix() const { return mProjectionMatrix; }
@@ -47,7 +47,7 @@ namespace Renderer
 	class ForwardLightTechnique : public Technique
 	{
 	public:
-		void draw(const Renderer::Buffer& vertex_buffer, const Renderer::Buffer& index_buffer, const skygfx::Vertex::Layout& layout,
+		void draw(const Renderer::Buffer& vertex_buffer, const Renderer::Buffer& index_buffer, const skygfx::VertexLayout& layout,
 			const TexturesMap& textures_map) override;
 
 	public:
