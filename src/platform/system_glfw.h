@@ -63,6 +63,7 @@ namespace Platform
 		void haptic(HapticType hapticType) override { /*nothing*/ }
 		void alert(const std::string& text) override;
 
+		void* getWindow() const override;
 	private:
 		std::string mAppName;
 		float mScale = 1.0f;
@@ -71,9 +72,7 @@ namespace Platform
 		GLFWwindow* mWindow = nullptr;
 		int mPrevMouseX = 0;
 		int mPrevMouseY = 0;
-		
-	public:
-		inline static void* Window = nullptr;
+		void* mNativeWindow = nullptr;
 		
 	private:
 		static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);

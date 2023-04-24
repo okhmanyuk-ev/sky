@@ -10,21 +10,7 @@ System::System()
 {
 	auto width = PLATFORM->getWidth();
 	auto height = PLATFORM->getHeight();
-
-	void* window = nullptr;
-
-#if defined(PLATFORM_WINDOWS)
-	window = Platform::SystemWindows::Window;
-#elif defined(PLATFORM_IOS)
-	window = Platform::SystemIos::Window;
-#elif defined(PLATFORM_MAC)
-	window = Platform::SystemMac::Window;
-#elif defined(PLATFORM_EMSCRIPTEN)
-	window = Platform::SystemEmscripten::Window;
-#endif
-
-	assert(window != nullptr);
-
+	auto window = PLATFORM->getWindow();
 	skygfx::Initialize(window, width, height);
 }
 

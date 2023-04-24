@@ -71,6 +71,8 @@ namespace Platform
 
 		virtual void alert(const std::string& text) { };
 
+		virtual void* getWindow() const = 0;
+
 	public:
 		enum class HapticType
 		{

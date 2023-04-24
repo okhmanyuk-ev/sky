@@ -38,9 +38,9 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	mWindow = glfwCreateWindow(mWidth, mHeight, appname.c_str(), NULL, NULL);
 
 #if defined(PLATFORM_WINDOWS)
-	Window = glfwGetWin32Window(mWindow);
+	mNativeWindow = glfwGetWin32Window(mWindow);
 #elif defined(PLATFORM_MAC)
-	Window = glfwGetCocoaWindow(mWindow);
+	mNativeWindow = glfwGetCocoaWindow(mWindow);
 #endif
 
 	float x_scale;
@@ -290,6 +290,11 @@ void SystemGlfw::purchase(const std::string& product)
 
 void SystemGlfw::alert(const std::string& text)
 {
+}
+
+void* SystemGlfw::getWindow() const
+{
+	return mNativeWindow;
 }
 
 void SystemGlfw::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
