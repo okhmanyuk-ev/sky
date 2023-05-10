@@ -17,10 +17,13 @@ void Glass::draw()
 	auto w = (int)glm::round(size.x);
 	auto h = (int)glm::round(size.y);
 
-	if (size != mPrevSize)
+	auto format = skygfx::GetBackbufferFormat();
+
+	if (size != mPrevSize || !mBackbufferFormat.has_value() || mBackbufferFormat.value() != format)
 	{
-		setTexture(std::make_shared<skygfx::Texture>(w, h, skygfx::Format::Float4, nullptr, mGenerateMipmaps));
+		setTexture(std::make_shared<skygfx::Texture>(w, h, format, nullptr, mGenerateMipmaps));
 		mPrevSize = size;
+		mBackbufferFormat = format;
 	}
 
 	GRAPHICS->flush();

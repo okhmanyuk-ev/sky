@@ -11,6 +11,7 @@ namespace Scene
 
 	private:
 		glm::vec2 mPrevSize = { 0.0f, 0.0f };
+		std::optional<skygfx::Format> mBackbufferFormat;
 
 	public:
 		auto getGenerateMipmaps() const { return mGenerateMipmaps; }
