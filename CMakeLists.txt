@@ -358,8 +358,9 @@ set_property(TARGET tinyobjloader PROPERTY FOLDER ${LIBS_FOLDER})
 add_library(asio INTERFACE)
 target_include_directories(asio INTERFACE lib/asio/include)
 target_link_libraries(${PROJECT_NAME} asio)
-
-if(WIN32)
+if(EMSCRIPTEN)
+	target_compile_definitions(asio INTERFACE -DASIO_HAS_PTHREADS)
+elseif(WIN32)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DWIN32_LEAN_AND_MEAN)
 endif()
 

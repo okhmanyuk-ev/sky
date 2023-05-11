@@ -59,7 +59,9 @@ namespace Platform
 
 		void haptic(HapticType hapticType) override { /*nothing*/ }
 		void alert(const std::string& text) override;
-		
+
+		void* getWindow() const override;
+
 	private:
 		std::string mAppName;
 		float mScale = 1.0f;
@@ -67,9 +69,6 @@ namespace Platform
 		int mHeight = 600;
 		int mPrevMouseX = 0;
 		int mPrevMouseY = 0;
-		
-	public:
-		inline static void* Window = nullptr;
 	};
 }
 #endif

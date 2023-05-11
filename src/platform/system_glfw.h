@@ -64,6 +64,7 @@ namespace Platform
 		void alert(const std::string& text) override;
 
 		void* getWindow() const override;
+
 	private:
 		std::string mAppName;
 		float mScale = 1.0f;

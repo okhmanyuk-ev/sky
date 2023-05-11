@@ -28,7 +28,6 @@ SystemEmscripten::SystemEmscripten(const std::string& appname) : mAppName(appnam
 	auto window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     gWindow = SDL_CreateWindow(appname.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWidth, mHeight, window_flags);
 
-    Window = gWindow;
 	gContext = this;
 
 	float w_scale;
@@ -384,6 +383,11 @@ void SystemEmscripten::purchase(const std::string& product)
 
 void SystemEmscripten::alert(const std::string& text)
 {
+}
+
+void* SystemEmscripten::getWindow() const
+{
+	return gWindow;
 }
 
 #endif
