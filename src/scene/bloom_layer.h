@@ -7,6 +7,9 @@ namespace Scene
 {
 	class BloomLayer : public RenderLayer<Node>
 	{
+	public:
+		BloomLayer();
+
 	protected:
 		std::shared_ptr<skygfx::RenderTarget> postprocess(std::shared_ptr<skygfx::RenderTarget> render_texture) override;
 

@@ -3,6 +3,11 @@
 
 using namespace Scene;
 
+BloomLayer::BloomLayer()
+{
+	setBlendMode(skygfx::BlendStates::Additive);
+}
+
 std::shared_ptr<skygfx::RenderTarget> BloomLayer::postprocess(std::shared_ptr<skygfx::RenderTarget> render_texture)
 {
 	render_texture = RenderLayer<Node>::postprocess(render_texture);

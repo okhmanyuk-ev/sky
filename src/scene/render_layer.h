@@ -2,16 +2,23 @@
 
 #include <scene/node.h>
 #include <scene/color.h>
+#include <scene/blend.h>
 #include <common/event_system.h>
 #include <stack>
 #include <fmt/format.h>
 
 namespace Scene
 {
-	template <typename T> class RenderLayer : public T
+	template <typename T> class RenderLayer : public T, public Blend
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 		
+	public:
+		RenderLayer()
+		{
+			setBlendMode(skygfx::BlendStates::AlphaBlend);
+		}
+
 	protected:
 		void enterDraw() override
 		{
@@ -58,7 +65,7 @@ namespace Scene
 			auto color = getRenderLayerColor()->getColor() * glm::vec4({ glm::vec3(getRenderLayerColor()->getAlpha()), 1.0f });
 			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
 
-			GRAPHICS->pushBlendMode(skygfx::BlendStates::AlphaBlend);
+			GRAPHICS->pushBlendMode(getBlendMode());
 			GRAPHICS->pushModelMatrix(model);
 			GRAPHICS->drawSprite(target, { }, color);
 			GRAPHICS->pop(2);
