@@ -129,7 +129,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		});
 
 		CONSOLE->registerCommand("spawn_gray_glass", std::nullopt, {}, { "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
-			float intensity = 0.5f;
+			float intensity = 1.0f;
 
 			if (CON_ARG_EXIST(0))
 				intensity = CON_ARG_FLOAT(0);
