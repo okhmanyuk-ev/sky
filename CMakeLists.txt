@@ -362,6 +362,7 @@ if(EMSCRIPTEN)
 	target_compile_definitions(asio INTERFACE -DASIO_HAS_PTHREADS)
 elseif(WIN32)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DWIN32_LEAN_AND_MEAN)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC -D_WIN32_WINNT=0x0601)
 endif()
 
 # websocketpp

@@ -2,6 +2,7 @@
 
 #include <console/device.h>
 #include <common/buffer_helpers.h>
+
 using namespace Shared::NetworkingWS;
 
 // channel
