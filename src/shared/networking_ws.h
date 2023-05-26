@@ -3,21 +3,40 @@
 #include <map>
 #include <common/frame_system.h>
 #include <common/bitbuffer.h>
-#include <websocketpp/server.hpp>
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/config/asio_no_tls_client.hpp>
-#include <websocketpp/client.hpp>
 #include <nlohmann/json.hpp>
+
+#ifdef EMSCRIPTEN
+	#include <emscripten/websocket.h>
+#else
+	#include <websocketpp/server.hpp>
+	#include <websocketpp/config/asio_no_tls.hpp>
+	#include <websocketpp/config/asio_no_tls_client.hpp>
+	#include <websocketpp/client.hpp>
+#endif
 
 namespace Shared::NetworkingWS
 {
+	class NetCommands
+	{
+	public:
+		static bool inline LogEvents = false;
+
+	public:
+		NetCommands();
+		~NetCommands();
+	};
+
 	class Client;
+#ifndef EMSCRIPTEN
 	class Server;
+#endif
 
 	class Channel
 	{
 		friend Client;
+#ifndef EMSCRIPTEN
 		friend Server;
+#endif
 
 	public:
 		using ReadCallback = std::function<void(BitBuffer&)>;
@@ -33,17 +52,21 @@ namespace Shared::NetworkingWS
 
 	public:
 		void setSendCallback(SendCallback value) { mSendCallback = value; }
+#ifndef EMSCRIPTEN
 		auto getHdl() const { return mHdl; }
 
 	private:
 		void setHdl(websocketpp::connection_hdl value) { mHdl = value; }
-
+#endif
 	private:
 		SendCallback mSendCallback = nullptr;
 		std::map<std::string, ReadCallback> mMessageReaders;
+#ifndef EMSCRIPTEN
 		websocketpp::connection_hdl mHdl;
+#endif
 	};
 
+#ifndef EMSCRIPTEN
 	class Server : public Common::FrameSystem::Frameable
 	{
 	private:
@@ -65,17 +88,20 @@ namespace Shared::NetworkingWS
 		WSServer mWSServer;
 		std::map<websocketpp::connection_hdl, std::shared_ptr<Channel>, std::owner_less<websocketpp::connection_hdl>> mChannels;
 	};
+#endif
 
 	class Client : public Common::FrameSystem::Frameable
 	{
+#ifndef EMSCRIPTEN
 	private:
 		using WSClient = websocketpp::client<websocketpp::config::asio_client>;
+#endif
 
 	public:
 		Client(const std::string& url);
 
 	private:
-		void connect(const std::string& url);
+		void connect();
 
 	public:
 		virtual std::shared_ptr<Channel> createChannel() = 0;
@@ -88,8 +114,13 @@ namespace Shared::NetworkingWS
 		bool isConnected() const { return mChannel != nullptr; }
 
 	private:
-		WSClient mWSClient;
 		std::shared_ptr<Channel> mChannel = nullptr;
+		std::string mUrl;
+#ifdef EMSCRIPTEN
+		EMSCRIPTEN_WEBSOCKET_T handle = -1;
+#else
+		WSClient mWSClient;
+#endif
 	};
 
 	class SimpleChannel : public Channel
@@ -112,13 +143,6 @@ namespace Shared::NetworkingWS
 
 	private:
 		std::map<std::string, EventCallback> mEvents;
-
-	public:
-		auto isShowEventLogs() const { return mShowEventLogs; }
-		void setShowEventLogs(bool value) { mShowEventLogs = value; }
-
-	private:
-		bool mShowEventLogs = false;
 
 	public:
 		void addPlugin(std::shared_ptr<Plugin> plugin);
@@ -149,7 +173,7 @@ namespace Shared::NetworkingWS
 	class Userbase
 	{
 	public:
-		using UID = int;
+		using UID = uint32_t;
 		using Profile = nlohmann::json;
 
 	public:

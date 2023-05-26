@@ -167,6 +167,7 @@ elseif(EMSCRIPTEN)
 		-sALLOW_MEMORY_GROWTH
 		--shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/platform/emscripten/shell.html
 		--use-preload-cache
+		-lwebsocket.js
 	)
 	target_compile_options(${PROJECT_NAME} PUBLIC
 		-sUSE_SDL=2
@@ -176,6 +177,7 @@ elseif(EMSCRIPTEN)
 	target_link_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
 		-g
 		-sEXIT_RUNTIME
+		-sWEBSOCKET_DEBUG=1
 	,>)
 	target_compile_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
 		-g

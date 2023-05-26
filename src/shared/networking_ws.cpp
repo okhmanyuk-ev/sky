@@ -2,8 +2,22 @@
 
 #include <console/device.h>
 #include <common/buffer_helpers.h>
+#include <common/console_commands.h>
 
 using namespace Shared::NetworkingWS;
+
+// socket base
+
+NetCommands::NetCommands()
+{
+	CONSOLE->registerCVar("net_log_events", { "bool" },
+		CVAR_GETTER_BOOL(NetCommands::LogEvents), CVAR_SETTER_BOOL(NetCommands::LogEvents));
+}
+
+NetCommands::~NetCommands()
+{
+	CONSOLE->removeCVar("net_log_events");
+}
 
 // channel
 
@@ -33,6 +47,7 @@ void Channel::addMessageReader(const std::string& name, ReadCallback callback)
 
 // server
 
+#ifndef EMSCRIPTEN
 Server::Server(uint16_t port)
 {
 	mWSServer.set_access_channels(websocketpp::log::alevel::none);
@@ -77,11 +92,16 @@ void Server::onFrame()
 {
 	mWSServer.poll();
 }
+#endif
 
 // client
 
-Client::Client(const std::string& url)
+Client::Client(const std::string& url) :
+	mUrl(url)
 {
+#ifdef EMSCRIPTEN
+	// nothing here for emscripten
+#else
 	mWSClient.set_access_channels(websocketpp::log::alevel::none);
 	mWSClient.set_error_channels(websocketpp::log::alevel::none);
 
@@ -99,11 +119,11 @@ Client::Client(const std::string& url)
 	mWSClient.set_close_handler([this, url](websocketpp::connection_hdl hdl) {
 		LOG("disconnected");
 		mChannel = nullptr;
-		connect(url);
+		connect();
 	});
 	mWSClient.set_fail_handler([this, url](websocketpp::connection_hdl hdl) {
 		LOG("failed");
-		connect(url);
+		connect();
 	});
 
 	mWSClient.set_message_handler([this](websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg) {
@@ -113,20 +133,60 @@ Client::Client(const std::string& url)
 		buf.toStart();
 		mChannel->read(buf);
 	});
-
-	connect(url);
+#endif
+	connect();
 }
 
-void Client::connect(const std::string& url)
+void Client::connect()
 {
+#ifdef EMSCRIPTEN
+	EmscriptenWebSocketCreateAttributes attributes;
+	emscripten_websocket_init_create_attributes(&attributes);
+	attributes.url = mUrl.c_str();
+	handle = emscripten_websocket_new(&attributes);
+
+	emscripten_websocket_set_onopen_callback(handle, this, [](int eventType, const EmscriptenWebSocketOpenEvent *websocketEvent, void *userData) -> int {
+		LOG("connected");
+		auto self = static_cast<Client*>(userData);
+		auto channel = self->createChannel();
+		channel->setSendCallback([self](const auto& buf) {
+			emscripten_websocket_send_binary(self->handle, buf.getMemory(), buf.getSize());
+		});
+		self->mChannel = channel;
+		return eventType;
+	});
+
+	emscripten_websocket_set_onclose_callback(handle, this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> int{
+		LOG("disconnected");
+		auto self = static_cast<Client*>(userData);
+		self->mChannel = nullptr;
+		self->connect();
+		return eventType;
+	});
+
+	emscripten_websocket_set_onmessage_callback(handle, this, [] (int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> int {
+		auto self = static_cast<Client*>(userData);
+		auto buf = BitBuffer();
+		buf.write(websocketEvent->data, websocketEvent->numBytes);
+		buf.toStart();
+		self->mChannel->read(buf);
+		return eventType;
+	});
+
+	emscripten_websocket_set_onerror_callback(handle, this, [] (int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> int {
+		LOG("failed");
+		auto self = static_cast<Client*>(userData);
+		self->connect();
+		return eventType;
+	});
+#else
 	websocketpp::lib::error_code ec;
-	auto con = mWSClient.get_connection(url, ec);
+	auto con = mWSClient.get_connection(mUrl, ec);
 	if (ec) {
 		LOG("could not create connection because: " + ec.message());
 		return;
 	}
 
-#ifndef EMSCRIPTEN // TODO: this code hurts everything when using emscripten
 	mWSClient.connect(con);
 #endif
 	LOG("connecting");
@@ -134,7 +194,10 @@ void Client::connect(const std::string& url)
 
 void Client::onFrame()
 {
+#ifdef EMSCRIPTEN
+#else
 	mWSClient.poll();
+#endif
 }
 
 // simplechannel
@@ -178,7 +241,7 @@ void SimpleChannel::onEventMessage(BitBuffer& buf)
 		json = nlohmann::json::from_bson(bson);
 	}
 
-	if (mShowEventLogs || mEvents.count(name) == 0)
+	if (NetCommands::LogEvents || mEvents.count(name) == 0)
 	{
 		LOGF("event: \"{}\", dump: \"{}\"", name, json.dump());
 	}
