@@ -8,8 +8,9 @@
 #define GLFW_EXPOSE_NATIVE_COCOA
 #endif
 #include <GLFW/glfw3native.h>
-
 #include <common/event_system.h>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 using namespace Platform;
 
@@ -277,7 +278,7 @@ std::string SystemGlfw::getAppName() const
 
 std::string SystemGlfw::getUUID() const
 {
-	return ""; // TODO
+	return std::to_string(glm::linearRand(1, 10000000)); // TODO
 }
 
 void SystemGlfw::initializeBilling(const ProductsMap& products)
