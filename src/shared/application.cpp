@@ -9,6 +9,7 @@
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
+#include <emscripten/fetch.h>
 #endif
 
 using namespace Shared;
@@ -167,6 +168,56 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			shockwave->setScale(4.0f);
 			getScene()->getRoot()->attach(shockwave);
 		});
+
+		CONSOLE->registerCommand("spawn_sprite_from_url", std::nullopt, {}, { "url" }, [this](CON_ARGS) {
+#ifndef EMSCRIPTEN
+			LOG("this is for emscripten");
+#else
+			static auto spawn_sprite = [this](const std::string& url){
+				auto sprite = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Sprite>>>>();
+				sprite->setSize(256.0f);
+				sprite->setAnchor(0.5f);
+				sprite->setPivot(0.5f);
+				sprite->setTexture(TEXTURE(url));
+				getScene()->getRoot()->attach(sprite);
+			};
+
+			auto download_succeeded = [](emscripten_fetch_t* fetch) {
+				LOG("download succeeded");
+
+				auto data = fetch->data;
+				auto size = fetch->numBytes;
+				auto url = fetch->url;
+				auto image = Graphics::Image((void*)data, (size_t)size);
+
+				CACHE->loadTexture(image, url);
+				spawn_sprite(url);
+				emscripten_fetch_close(fetch);
+			};
+
+			auto download_failed = [](emscripten_fetch_t* fetch) {
+				LOG("download failed");
+				emscripten_fetch_close(fetch);
+			};
+
+			auto download_progress = [](emscripten_fetch_t* fetch) {
+				LOGF("download progress {} of {}", fetch->dataOffset, fetch->totalBytes);
+			};
+
+			auto url = CON_ARG_EXIST(0) ? CON_ARG(0) : std::string("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
+
+			emscripten_fetch_attr_t attr;
+			emscripten_fetch_attr_init(&attr);
+			strcpy(attr.requestMethod, "GET");
+			attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+			attr.onsuccess = download_succeeded;
+			attr.onerror = download_failed;
+			attr.onprogress = download_progress;
+			emscripten_fetch(&attr, url.c_str());
+
+			LOGF("fetching {}", url);
+#endif
+		});		
 	}
 
 #if defined(BUILD_DEVELOPER)
