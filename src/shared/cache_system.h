@@ -39,7 +39,7 @@ namespace Shared
 
 	public:
 		void loadTexture(std::shared_ptr<skygfx::Texture> texture, const std::string& name);
-		void loadTexture(std::shared_ptr<Graphics::Image> image, const std::string& name);
+		void loadTexture(const Graphics::Image& image, const std::string& name);
 		void loadTexture(const std::string& path, const std::string& name);
 		void loadTexture(const std::string& path);
 

@@ -60,15 +60,15 @@ void CacheSystem::loadTexture(std::shared_ptr<skygfx::Texture> texture, const st
 	mTextures[name] = texture;
 }
 
-void CacheSystem::loadTexture(std::shared_ptr<Graphics::Image> image, const std::string& name)
+void CacheSystem::loadTexture(const Graphics::Image& image, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
 		return;
 
-	assert(image->getChannels() == 4); // TODO: skygfx::Format::Byte(1/2/3)
+	assert(image.getChannels() == 4); // TODO: skygfx::Format::Byte(1/2/3)
 	
-	auto texture = std::make_shared<skygfx::Texture>(image->getWidth(), image->getHeight(),
-		skygfx::Format::Byte4, image->getMemory());
+	auto texture = std::make_shared<skygfx::Texture>(image.getWidth(), image.getHeight(),
+		skygfx::Format::Byte4, image.getMemory());
 
 	loadTexture(texture, name);
 }
@@ -84,7 +84,7 @@ void CacheSystem::loadTexture(const std::string& path, const std::string& name)
 		return;
 	}
 
-	auto image = std::make_shared<Graphics::Image>(path);
+	auto image = Graphics::Image(path);
 
 	loadTexture(image, name);
 }
@@ -188,8 +188,8 @@ void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>
 	}
 
 	auto [image, regions] = Graphics::Atlas::MakeFromImages(images);
-
-	loadTexture(std::make_shared<Graphics::Image>(image), name);
+	auto _image = Graphics::Image(image);
+	loadTexture(_image, name);
 
 	auto texture = getTexture(name);
 
