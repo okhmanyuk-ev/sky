@@ -221,6 +221,11 @@ target_compile_definitions(tinyutf8 INTERFACE -DTINY_UTF8_GLOBAL_NAMESPACE)
 if(MSVC)
 #	target_compile_options(tinyutf8 PRIVATE /wd4267)
 endif()
+if(WIN32)
+	target_compile_definitions(tinyutf8 INTERFACE
+		-DNOMINMAX
+	)
+endif()
 set_property(TARGET tinyutf8 PROPERTY FOLDER ${LIBS_FOLDER})
 
 # fmod
