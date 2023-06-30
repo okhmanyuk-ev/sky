@@ -15,8 +15,10 @@ public:
 
 public:
 	BitBuffer();
-	BitBuffer(const BitBuffer& bitbuffer);
+	BitBuffer(const BitBuffer& other);
 	~BitBuffer();
+
+	BitBuffer& operator=(const BitBuffer& other);
 
 public:
 	void clear();

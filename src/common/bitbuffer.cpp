@@ -9,17 +9,29 @@ BitBuffer::BitBuffer()
 	//
 }
 
-BitBuffer::BitBuffer(const BitBuffer& bitbuffer) : BitBuffer()
+BitBuffer::BitBuffer(const BitBuffer& other) : BitBuffer()
 {
-	write(bitbuffer.getMemory(), bitbuffer.getSize());
-	setPosition(bitbuffer.getPosition());
-	setBitPosition(bitbuffer.getBitPosition());
+	write(other.getMemory(), other.getSize());
+	setPosition(other.getPosition());
+	setBitPosition(other.getBitPosition());
 }
 
 BitBuffer::~BitBuffer()
 {
 	if (mMemory != nullptr)
 		free(mMemory);
+}
+
+BitBuffer& BitBuffer::operator=(const BitBuffer& other)
+{
+	if (this == &other)
+		return *this;
+
+	clear();
+	write(other.getMemory(), other.getSize());
+	setPosition(other.getPosition());
+	setBitPosition(other.getBitPosition());
+	return *this;
 }
 
 void BitBuffer::clear()
