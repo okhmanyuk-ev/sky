@@ -1,5 +1,6 @@
-#ifdef _WIN32
 #pragma once
+
+#ifdef _WIN32
 
 #include <console/device.h>
 #include <common/event_system.h>

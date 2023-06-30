@@ -5,10 +5,10 @@
 #include <core/engine.h>
 #include <fmt/format.h>
 
-#define LOG(S) CONSOLE_DEVICE->writeLine(S)
-#define LOGF(S, ...) LOG(fmt::format(S, __VA_ARGS__))
-#define LOGC(S, C) CONSOLE_DEVICE->writeLine(S, C)
-#define LOGCF(S, C, ...) LOGC(fmt::format(S, __VA_ARGS__), C)
+#define LOG(TEXT) sky::console::Log(TEXT)
+#define LOGF(TEXT, ...) sky::console::Log(TEXT, __VA_ARGS__)
+#define LOGC(TEXT, COLOR) sky::console::Log(COLOR, TEXT)
+#define LOGCF(TEXT, COLOR, ...) sky::console::Log(TEXT, COLOR, __VA_ARGS__)
 
 #define CONSOLE_DEVICE ENGINE->getSystem<Console::Device>()
 
@@ -53,4 +53,22 @@ namespace Console
 		virtual bool isEnabled() const = 0;
 		virtual void setEnabled(bool value) = 0;
 	};
+}
+
+namespace sky::console
+{
+	void Log(const std::string& text);
+	void Log(Console::Color color, const std::string& text);
+
+	template<typename... Args>
+	void Log(const std::string& text, Args&&... args)
+	{
+		Log(fmt::format(text, args...));
+	}
+
+	template<typename... Args>
+	void Log(Console::Color color, const std::string& text, Args&&... args)
+	{
+		Log(color, fmt::format(text, args...));
+	}
 }
