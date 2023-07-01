@@ -62,8 +62,8 @@ namespace Renderer
 
 		void present();
 
-		bool isVsync() const { return mVsync; }
-		void setVsync(bool value) { mVsync = value; }
+		bool isVsync() const { return skygfx::IsVsyncEnabled(); }
+		void setVsync(bool value) { skygfx::SetVsync(value); }
 
 		template <class T>
 		void setUniformBuffer(int slot, const T& buffer) { setUniformBuffer(slot, &const_cast<T&>(buffer), sizeof(T)); }
@@ -73,7 +73,6 @@ namespace Renderer
 		auto getBackendType() const { return skygfx::GetBackendType(); }
 
 	private:
-		bool mVsync = false;
 		int mDrawcalls = 0;
 		int mDrawcallsPublic = 0;
 	};
