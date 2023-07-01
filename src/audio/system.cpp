@@ -4,6 +4,7 @@
 #include <platform/system_android.h>
 #endif
 #include <cassert>
+#include <console/device.h>
 
 using namespace Audio;
 
@@ -42,4 +43,15 @@ System::~System()
 #if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	FmodStudio->release();
 #endif
+}
+
+void sky::PlaySound(std::shared_ptr<Audio::Sound> sound)
+{
+	if (!ENGINE->hasSystem<Audio::System>())
+	{
+		Log("PlaySound: cannot find audio system");
+		return;
+	}
+
+	AUDIO->play(sound);
 }

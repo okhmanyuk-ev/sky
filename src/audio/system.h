@@ -26,4 +26,8 @@ namespace Audio
 		static inline FMOD::Studio::System* FmodStudio = nullptr;
 		FMOD::Channel* channel = nullptr;
 	};
+
+namespace sky
+{
+	void PlaySound(std::shared_ptr<Audio::Sound> sound);
 }

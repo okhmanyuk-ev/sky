@@ -75,13 +75,13 @@ namespace Shared::SceneHelpers
 			if (isActive())
 			{
 				executeCallback(mActiveCallback);
-				AUDIO->play(mActiveSound);
+				sky::PlaySound(mActiveSound);				
 				PLATFORM->haptic(Platform::System::HapticType::Medium);
 			}
 			else
 			{
 				executeCallback(mInactiveCallback);
-				AUDIO->play(mInactiveSound);
+				sky::PlaySound(mInactiveSound);
 			}
 		}
 
