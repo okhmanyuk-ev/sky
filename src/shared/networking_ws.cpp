@@ -146,7 +146,7 @@ void Client::connect()
 	handle = emscripten_websocket_new(&attributes);
 
 	emscripten_websocket_set_onopen_callback(handle, this, [](int eventType, const EmscriptenWebSocketOpenEvent *websocketEvent, void *userData) -> int {
-		LOG("connected");
+		sky::Log("connected");
 		auto self = static_cast<Client*>(userData);
 		auto channel = self->createChannel();
 		channel->setSendCallback([self](const auto& buf) {
@@ -157,7 +157,7 @@ void Client::connect()
 	});
 
 	emscripten_websocket_set_onclose_callback(handle, this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> int{
-		LOG("disconnected");
+		sky::Log("disconnected");
 		auto self = static_cast<Client*>(userData);
 		self->mChannel = nullptr;
 		self->connect();
@@ -174,7 +174,7 @@ void Client::connect()
 	});
 
 	emscripten_websocket_set_onerror_callback(handle, this, [] (int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> int {
-		LOG("failed");
+		sky::Log("failed");
 		auto self = static_cast<Client*>(userData);
 		self->connect();
 		return eventType;
