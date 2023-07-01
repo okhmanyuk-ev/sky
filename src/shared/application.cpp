@@ -171,7 +171,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 		CONSOLE->registerCommand("spawn_sprite_from_url", std::nullopt, {}, { "url" }, [this](CON_ARGS) {
 #ifndef EMSCRIPTEN
-			LOG("this is for emscripten");
+			sky::Log("this is for emscripten");
 #else
 			static auto spawn_sprite = [this](const std::string& url){
 				auto sprite = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Sprite>>>>();
@@ -183,7 +183,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			};
 
 			auto download_succeeded = [](emscripten_fetch_t* fetch) {
-				LOG("download succeeded");
+				sky::Log("download succeeded");
 
 				auto data = fetch->data;
 				auto size = fetch->numBytes;
@@ -196,12 +196,12 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			};
 
 			auto download_failed = [](emscripten_fetch_t* fetch) {
-				LOG("download failed");
+				sky::Log("download failed");
 				emscripten_fetch_close(fetch);
 			};
 
 			auto download_progress = [](emscripten_fetch_t* fetch) {
-				LOGF("download progress {} of {}", fetch->dataOffset, fetch->totalBytes);
+				sky::Log("download progress {} of {}", fetch->dataOffset, fetch->totalBytes);
 			};
 
 			auto url = CON_ARG_EXIST(0) ? CON_ARG(0) : std::string("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
@@ -215,7 +215,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			attr.onprogress = download_progress;
 			emscripten_fetch(&attr, url.c_str());
 
-			LOGF("fetching {}", url);
+			sky::Log("fetching {}", url);
 #endif
 		});		
 	}

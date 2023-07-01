@@ -88,7 +88,7 @@ void Channel::transmit()
 		mOutgoingReliableMessages.erase(index);
 
 		if (Networking::NetLogRel)
-			LOGF("write reliable {}", index);
+			sky::Log("write reliable {}", index);
 	}
 
 	buf.writeBit(false);
@@ -97,7 +97,7 @@ void Channel::transmit()
 
 	if (Networking::NetLogPackets)
 	{
-		LOGF("[OUT] seq: {}, ack: {}, size: {}", mOutgoingSequence, mIncomingSequence, 
+		sky::Log("[OUT] seq: {}, ack: {}, size: {}", mOutgoingSequence, mIncomingSequence,
 			Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
@@ -118,7 +118,7 @@ void Channel::readReliableMessages()
 		auto [name, rel_buf] = mIncomingReliableMessages.at(mIncomingReliableIndex);
 
 		if (Networking::NetLogRel)
-			LOGF("read reliable {}", mIncomingReliableIndex);
+			sky::Log("read reliable {}", mIncomingReliableIndex);
 
 		if (mMessageReaders.count(name) == 0)
 			throw std::runtime_error(("unknown message type in channel: " + name).c_str());
@@ -139,7 +139,7 @@ void Channel::resendReliableMessages(uint32_t ack)
 		mPendingOutgoingReliableMessages.erase(index);
 
 		if (Networking::NetLogRel)
-			LOGF("resend reliable {}", index);
+			sky::Log("resend reliable {}", index);
 		
 		resendReliableMessages(ack);
 		return;
@@ -154,7 +154,7 @@ void Channel::read(BitBuffer& buf)
 	if (seq <= mIncomingSequence)
 	{
 		if (Networking::NetLogLoss)
-			LOGF("out of order {} packet", seq);
+			sky::Log("out of order {} packet", seq);
 		
 		return;
 	}
@@ -162,7 +162,7 @@ void Channel::read(BitBuffer& buf)
 	if (seq - mIncomingSequence > 1)
 	{
 		if (Networking::NetLogLoss)
-			LOGF("dropped {} packet(s)", seq - mIncomingSequence - 1);
+			sky::Log("dropped {} packet(s)", seq - mIncomingSequence - 1);
 	}
 
 	mIncomingSequence = seq;
@@ -173,7 +173,7 @@ void Channel::read(BitBuffer& buf)
 		mPendingOutgoingReliableMessages.erase(index);
 		
 		if (Networking::NetLogRel)
-			LOGF("reliable {} delivered", index);
+			sky::Log("reliable {} delivered", index);
 	}
 
 	while (buf.readBit())
@@ -196,7 +196,7 @@ void Channel::read(BitBuffer& buf)
 		if (mIncomingReliableIndex >= index)
 		{
 			if (Networking::NetLogRel)
-				LOGF("reliable {} was already received and readed", index);
+				sky::Log("reliable {} was already received and readed", index);
 
 			continue;
 		}
@@ -204,14 +204,14 @@ void Channel::read(BitBuffer& buf)
 		if (mIncomingReliableMessages.count(index) > 0)
 		{
 			if (Networking::NetLogRel)
-				LOGF("reliable {} was already received but not yet readed", index);
+				sky::Log("reliable {} was already received but not yet readed", index);
 
 			continue;
 		}
 		mIncomingReliableMessages.insert({ index, msg });
 
 		if (Networking::NetLogRel)
-			LOGF("reliable {} received", index);
+			sky::Log("reliable {} received", index);
 	}
 
 	readReliableMessages();
@@ -219,7 +219,7 @@ void Channel::read(BitBuffer& buf)
 
 	if (Networking::NetLogPackets)
 	{
-		LOGF("[IN ] seq: {}, ack: {}, size: {}", seq, ack,
+		sky::Log("[IN ] seq: {}, ack: {}, size: {}", seq, ack,
 			Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
@@ -232,7 +232,7 @@ void Channel::sendReliable(const std::string& msg, BitBuffer& buf)
 	mOutgoingReliableMessages.insert({ mOutgoingReliableIndex, { msg, std::make_shared<BitBuffer>(buf) } });
 	
 	if (Networking::NetLogRel)
-		LOGF("send reliable {}", mOutgoingReliableIndex);
+		sky::Log("send reliable {}", mOutgoingReliableIndex);
 }
 
 void Channel::addMessageReader(const std::string& msg, ReadCallback callback)
@@ -337,11 +337,11 @@ Server::Server(uint16_t port) : Networking(port)
 		if (mChannels.count(adr) > 0)
 		{
 			mChannels.at(adr)->disconnect("reconnect");
-			LOG(adr.toString() + " reconnected");
+			sky::Log(adr.toString() + " reconnected");
 		}
 		else
 		{
-			LOG(adr.toString() + " connected");
+			sky::Log(adr.toString() + " connected");
 		}
 
 		assert(mChannels.count(adr) == 0);
@@ -352,7 +352,7 @@ Server::Server(uint16_t port) : Networking(port)
 		});
 		channel->setDisconnectCallback([this, adr](const auto& reason) {
 			sendDisconnect(adr, reason);
-			LOGF("{} disconnected ({})", adr.toString(), reason);
+			sky::Log("{} disconnected ({})", adr.toString(), reason);
 			mChannels.erase(adr);
 		});
 		mChannels[adr] = channel;
@@ -378,7 +378,7 @@ Server::Server(uint16_t port) : Networking(port)
 
 		auto reason = Common::BufferHelpers::ReadString(packet.buf);
 		
-		LOGF("{} disconnected ({})", packet.adr.toString(), reason);
+		sky::Log("{} disconnected ({})", packet.adr.toString(), reason);
 		mChannels.erase(packet.adr);
 	});
 }
@@ -392,7 +392,7 @@ Client::Client(const Network::Address& server_address) :
 		if (mChannel)
 			return; // already connected
 
-		LOG("connected");
+		sky::Log("connected");
 
 		mChannel = createChannel();
 		mChannel->setSendCallback([this](auto& buf) {
@@ -400,7 +400,7 @@ Client::Client(const Network::Address& server_address) :
 		});
 		mChannel->setDisconnectCallback([this](const auto& reason) {
 			sendDisconnect(mServerAddress, reason);
-			LOGF("disconnected ({})", reason);
+			sky::Log("disconnected ({})", reason);
 			mChannel = nullptr;
 		});
 	});
@@ -430,7 +430,7 @@ Client::Client(const Network::Address& server_address) :
 		auto reason = Common::BufferHelpers::ReadString(packet.buf);
 		
 		mChannel = nullptr;
-		LOGF("disconnected ({})", reason);
+		sky::Log("disconnected ({})", reason);
 	});
 	addMessage((uint32_t)Message::Redirect, [this](auto& packet) {
 		if (packet.adr != mServerAddress)
@@ -438,7 +438,7 @@ Client::Client(const Network::Address& server_address) :
 		
 		auto redirect_address = Common::BufferHelpers::ReadString(packet.buf);
 		
-		LOGF("redirected to {}", redirect_address);
+		sky::Log("redirected to {}", redirect_address);
 		mServerAddress = redirect_address;
 		connect();
 	});
@@ -464,7 +464,7 @@ void Client::connect()
 	auto buf = BitBuffer();
 	buf.writeBitsVar(ProtocolVersion);
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
-	LOG("connecting to " + mServerAddress.toString());
+	sky::Log("connecting to " + mServerAddress.toString());
 	mConnectTime = Clock::Now();
 }
 
@@ -501,10 +501,10 @@ void SimpleChannel::onEventMessage(BitBuffer& buf)
 	}
 	if (mShowEventLogs || mEvents.count(name) == 0)
 	{
-		LOG("event: \"" + name + "\"");
+		sky::Log("event: \"" + name + "\"");
 		for (const auto& [key, value] : params)
 		{
-			LOGF(" - {} : {}", key, value);
+			sky::Log(" - {} : {}", key, value);
 		}
 	}
 	if (mEvents.count(name) > 0)

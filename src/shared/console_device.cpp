@@ -29,7 +29,7 @@ ConsoleDevice::ConsoleDevice()
 
 		mButtonAttempts -= 1;
 		
-		LOGF("console open attempt {}/{}", mButtonAttempts, MaxButtonAttempts);
+		sky::Log("console open attempt {}/{}", mButtonAttempts, MaxButtonAttempts);
 	});
 	mButtonTimer.setInterval(Clock::FromSeconds(1.0f));
 }
@@ -83,7 +83,7 @@ void ConsoleDevice::onFrame()
 				mButtonAttempts += 1;
 				mButtonTimer.setPassed(Clock::Duration::zero());
 
-				LOGF("console open attempt {}/{}", mButtonAttempts, MaxButtonAttempts);
+				sky::Log("console open attempt {}/{}", mButtonAttempts, MaxButtonAttempts);
 		
 				if (mButtonAttempts >= MaxButtonAttempts)
 				{

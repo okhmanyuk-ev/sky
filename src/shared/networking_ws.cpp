@@ -55,7 +55,7 @@ Server::Server(uint16_t port)
 
 	mWSServer.set_open_handler([this](websocketpp::connection_hdl hdl) {
 		auto connection = mWSServer.get_con_from_hdl(hdl);
-		LOGF("{} connected", connection->get_remote_endpoint());
+		sky::Log("{} connected", connection->get_remote_endpoint());
 
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
@@ -67,7 +67,7 @@ Server::Server(uint16_t port)
 
 	mWSServer.set_close_handler([this](websocketpp::connection_hdl hdl) {
 		auto connection = mWSServer.get_con_from_hdl(hdl);
-		LOGF("{} disconnected", connection->get_remote_endpoint());
+		sky::Log("{} disconnected", connection->get_remote_endpoint());
 
 		mChannels.erase(hdl);
 	});
@@ -100,7 +100,7 @@ Client::Client(const std::string& url) :
 	mUrl(url)
 {
 #ifdef EMSCRIPTEN
-	// nothing here for emscripten
+	// nothing for emscripten
 #else
 	mWSClient.set_access_channels(websocketpp::log::alevel::none);
 	mWSClient.set_error_channels(websocketpp::log::alevel::none);
@@ -108,7 +108,7 @@ Client::Client(const std::string& url) :
 	mWSClient.init_asio();
 
 	mWSClient.set_open_handler([this](websocketpp::connection_hdl hdl) {
-		LOG("connected");
+		sky::Log("connected");
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
 			mWSClient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
@@ -117,12 +117,12 @@ Client::Client(const std::string& url) :
 		mChannel = channel;
 	});
 	mWSClient.set_close_handler([this, url](websocketpp::connection_hdl hdl) {
-		LOG("disconnected");
+		sky::Log("disconnected");
 		mChannel = nullptr;
 		connect();
 	});
 	mWSClient.set_fail_handler([this, url](websocketpp::connection_hdl hdl) {
-		LOG("failed");
+		sky::Log("failed");
 		connect();
 	});
 
@@ -183,13 +183,13 @@ void Client::connect()
 	websocketpp::lib::error_code ec;
 	auto con = mWSClient.get_connection(mUrl, ec);
 	if (ec) {
-		LOG("could not create connection because: " + ec.message());
+		sky::Log("could not create connection because: " + ec.message());
 		return;
 	}
 
 	mWSClient.connect(con);
 #endif
-	LOG("connecting");
+	sky::Log("connecting");
 }
 
 void Client::onFrame()
@@ -243,7 +243,7 @@ void SimpleChannel::onEventMessage(BitBuffer& buf)
 
 	if (NetCommands::LogEvents || mEvents.count(name) == 0)
 	{
-		LOGF("event: \"{}\", dump: \"{}\"", name, json.dump());
+		sky::Log("event: \"{}\", dump: \"{}\"", name, json.dump());
 	}
 
 	if (mEvents.count(name) > 0)

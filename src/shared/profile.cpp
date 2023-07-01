@@ -30,8 +30,8 @@ void Profile::load()
 	}
 	catch (const std::exception& e)
 	{
-		LOGC(e.what(), Console::Color::Red);
-		LOGC("making new profile", Console::Color::Green);
+		sky::Log(Console::Color::Red, e.what());
+		sky::Log(Console::Color::Green, "making new profile");
 		makeDefault();
 		return;
 	}

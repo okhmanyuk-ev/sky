@@ -5,11 +5,6 @@
 #include <core/engine.h>
 #include <fmt/format.h>
 
-#define LOG(TEXT) sky::Log(TEXT)
-#define LOGF(TEXT, ...) sky::Log(TEXT, __VA_ARGS__)
-#define LOGC(TEXT, COLOR) sky::Log(COLOR, TEXT)
-#define LOGCF(TEXT, COLOR, ...) sky::Log(TEXT, COLOR, __VA_ARGS__)
-
 #define CONSOLE_DEVICE ENGINE->getSystem<Console::Device>()
 
 namespace Console

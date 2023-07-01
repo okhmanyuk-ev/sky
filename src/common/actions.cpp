@@ -341,7 +341,7 @@ Collection::UAction Collection::Interpolate(const glm::vec3& destValue, float du
 Collection::UAction Collection::Log(const std::string& text)
 {
 	return Execute([text] {
-		LOG(text);
+		sky::Log(text);
 	});
 }
 

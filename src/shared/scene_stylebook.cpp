@@ -28,7 +28,7 @@ void Stylebook::apply(std::shared_ptr<Scene::Node> node, const std::string& name
 {
 	if (!mJson.contains(name))
 	{
-		LOGC("style \"" + name + "\" not found", Console::Color::Red);
+		sky::Log(Console::Color::Red, "style \"" + name + "\" not found");
 		return;
 	}
 
