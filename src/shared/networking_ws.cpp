@@ -3,6 +3,7 @@
 #include <console/device.h>
 #include <common/buffer_helpers.h>
 #include <common/console_commands.h>
+#include <platform/asset.h>
 
 using namespace Shared::NetworkingWS;
 
@@ -48,10 +49,65 @@ void Channel::addMessageReader(const std::string& name, ReadCallback callback)
 // server
 
 #ifndef EMSCRIPTEN
+void http_handler(Shared::NetworkingWS::Server::WSServer* s, websocketpp::connection_hdl hdl) {
+	auto con = s->get_con_from_hdl(hdl);
+	con->set_body("Hello World!");
+	con->set_status(websocketpp::http::status_code::ok);
+}
+
+websocketpp::transport::asio::tls_socket::connection::context_ptr tls_init_handler_server(websocketpp::connection_hdl hdl)
+{
+	auto ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
+
+	ctx->set_options(asio::ssl::context::default_workarounds |
+		asio::ssl::context::no_sslv2 |
+		asio::ssl::context::no_sslv3 |
+		asio::ssl::context::no_tlsv1 |
+		asio::ssl::context::single_dh_use
+	);
+
+	auto cert = Platform::Asset("cert.pem", Platform::Asset::Storage::Absolute);
+	auto key = Platform::Asset("key.pem", Platform::Asset::Storage::Absolute);
+	
+	ctx->use_certificate(asio::const_buffer(cert.getMemory(), cert.getSize()), asio::ssl::context::pem);
+	ctx->use_private_key(asio::const_buffer(key.getMemory(), key.getSize()), asio::ssl::context::pem);
+
+	auto dh = Platform::Asset("dh.pem", Platform::Asset::Storage::Absolute);
+
+	ctx->use_tmp_dh(asio::const_buffer(dh.getMemory(), dh.getSize()));
+
+	auto ciphers = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK";
+
+	if (SSL_CTX_set_cipher_list(ctx->native_handle(), ciphers) != 1)
+	{
+		sky::Log("Error setting cipher list");
+	}
+
+	return ctx;
+}
+
+websocketpp::transport::asio::tls_socket::connection::context_ptr tls_init_handler_client(websocketpp::connection_hdl hdl)
+{
+	auto ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
+
+	ctx->set_options(asio::ssl::context::default_workarounds |
+		asio::ssl::context::no_sslv2 |
+		asio::ssl::context::no_sslv3 |
+		asio::ssl::context::no_tlsv1 |
+		asio::ssl::context::single_dh_use
+	);
+
+	return ctx;
+}
+
 Server::Server(uint16_t port)
 {
-	mWSServer.set_access_channels(websocketpp::log::alevel::none);
-	mWSServer.set_error_channels(websocketpp::log::alevel::none);
+	mWSServer.set_tls_init_handler(tls_init_handler_server);
+	mWSServer.set_http_handler(websocketpp::lib::bind(&http_handler, &mWSServer, websocketpp::lib::placeholders::_1));
+	mWSServer.set_access_channels(websocketpp::log::alevel::all);
+	mWSServer.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+	mWSServer.set_error_channels(websocketpp::log::alevel::all);
 
 	mWSServer.set_open_handler([this](websocketpp::connection_hdl hdl) {
 		auto connection = mWSServer.get_con_from_hdl(hdl);
@@ -105,8 +161,12 @@ Client::Client(const std::string& url) :
 #ifdef EMSCRIPTEN
 	// nothing for emscripten
 #else
-	mWSClient.set_access_channels(websocketpp::log::alevel::none);
-	mWSClient.set_error_channels(websocketpp::log::alevel::none);
+	mWSClient.set_tls_init_handler(tls_init_handler_client);
+
+	mWSClient.set_access_channels(websocketpp::log::alevel::all);
+	mWSClient.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+	mWSClient.set_error_channels(websocketpp::log::alevel::all);
 
 	mWSClient.init_asio();
 
@@ -163,7 +223,7 @@ void Client::connect()
 		sky::Log("disconnected");
 		auto self = static_cast<Client*>(userData);
 		self->mChannel = nullptr;
-		self->connect();
+	//	self->connect();
 		return eventType;
 	});
 
@@ -177,9 +237,9 @@ void Client::connect()
 	});
 
 	emscripten_websocket_set_onerror_callback(handle, this, [] (int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> int {
-		sky::Log("failed");
+		sky::Log("error");
 		auto self = static_cast<Client*>(userData);
-		self->connect();
+	//	self->connect();
 		return eventType;
 	});
 #else

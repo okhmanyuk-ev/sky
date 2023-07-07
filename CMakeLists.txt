@@ -177,8 +177,8 @@ elseif(EMSCRIPTEN)
 	)
 	target_link_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
 		-g
-		-sEXIT_RUNTIME
-		-sWEBSOCKET_DEBUG=1
+		-sEXIT_RUNTIME=1
+		-sRUNTIME_DEBUG=1
 	,>)
 	target_compile_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
 		-g
@@ -417,4 +417,17 @@ if(WIN32 OR APPLE AND NOT IOS)
 	set_property(TARGET glfw PROPERTY FOLDER ${LIBS_FOLDER}/glfw)
 	set_property(TARGET update_mappings PROPERTY FOLDER ${LIBS_FOLDER}/glfw)
 	target_link_libraries(${PROJECT_NAME} glfw)
+endif()
+
+# openssl
+
+if(NOT EMSCRIPTEN)
+	set(WITH_APPS OFF)
+	add_subdirectory(lib/openssl)
+	target_link_libraries(${PROJECT_NAME}
+		crypto
+		ssl
+	)
+	set_property(TARGET crypto PROPERTY FOLDER ${LIBS_FOLDER}/openssl)
+	set_property(TARGET ssl PROPERTY FOLDER ${LIBS_FOLDER}/openssl)
 endif()

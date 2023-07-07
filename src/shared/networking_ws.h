@@ -1,18 +1,18 @@
 #pragma once
 
-#include <map>
-#include <common/frame_system.h>
-#include <common/bitbuffer.h>
-#include <nlohmann/json.hpp>
-
 #ifdef EMSCRIPTEN
 	#include <emscripten/websocket.h>
 #else
 	#include <websocketpp/server.hpp>
-	#include <websocketpp/config/asio_no_tls.hpp>
-	#include <websocketpp/config/asio_no_tls_client.hpp>
+	#include <websocketpp/config/asio.hpp>
+	#include <websocketpp/config/asio_client.hpp>
 	#include <websocketpp/client.hpp>
 #endif
+
+#include <map>
+#include <common/frame_system.h>
+#include <common/bitbuffer.h>
+#include <nlohmann/json.hpp>
 
 namespace Shared::NetworkingWS
 {
@@ -72,8 +72,8 @@ namespace Shared::NetworkingWS
 #ifndef EMSCRIPTEN
 	class Server : public Common::FrameSystem::Frameable
 	{
-	private:
-		using WSServer = websocketpp::server<websocketpp::config::asio>;
+	public:
+		using WSServer = websocketpp::server<websocketpp::config::asio_tls>;
 
 	public:
 		Server(uint16_t port);
@@ -97,7 +97,7 @@ namespace Shared::NetworkingWS
 	{
 #ifndef EMSCRIPTEN
 	private:
-		using WSClient = websocketpp::client<websocketpp::config::asio_client>;
+		using WSClient = websocketpp::client<websocketpp::config::asio_tls_client>;
 #endif
 
 	public:
