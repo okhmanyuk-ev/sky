@@ -6,12 +6,12 @@
 
 using namespace Renderer;
 
-System::System()
+System::System(std::optional<skygfx::BackendType> type, skygfx::Adapter adapter)
 {
 	auto width = PLATFORM->getWidth();
 	auto height = PLATFORM->getHeight();
 	auto window = PLATFORM->getWindow();
-	skygfx::Initialize(window, width, height);
+	skygfx::Initialize(window, width, height, type, adapter);
 }
 
 System::~System()

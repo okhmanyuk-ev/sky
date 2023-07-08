@@ -28,7 +28,8 @@ namespace Renderer
 	class System : public Common::Event::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
-		System();
+		System(std::optional<skygfx::BackendType> type = std::nullopt,
+			skygfx::Adapter adapter = skygfx::Adapter::HighPerformance);
 		~System();
 
 	private:
