@@ -10,8 +10,6 @@
 #include <cassert>
 #include <set>
 
-#include <GLFW/glfw3.h>
-
 namespace Platform
 {
 	class SystemGlfw : public System
@@ -26,8 +24,8 @@ namespace Platform
 
 		bool isFinished() const override;
 
-		int getWidth() const override { return mWidth; }
-		int getHeight() const override { return mHeight; }
+		int getWidth() const override;
+		int getHeight() const override;
 
 		float getScale() const override { return mScale; }
 		void setScale(float value) override { mScale = value; }
@@ -68,20 +66,10 @@ namespace Platform
 	private:
 		std::string mAppName;
 		float mScale = 1.0f;
-		int mWidth = 800;
-		int mHeight = 600;
-		GLFWwindow* mWindow = nullptr;
+		void* mWindow = nullptr;
 		int mPrevMouseX = 0;
 		int mPrevMouseY = 0;
 		void* mNativeWindow = nullptr;
-		
-	private:
-		static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-		static void CharCallback(GLFWwindow* window, unsigned int codepoint);
-		static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-		static void WindowSizeCallback(GLFWwindow* window, int width, int height);
-		static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 	};
 
 #if defined(PLATFORM_WINDOWS)
