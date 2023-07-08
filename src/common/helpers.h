@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 #include <platform/asset.h>
 #include <core/clock.h>
+#include <common/frame_system.h>
 
 namespace Common::Helpers
 {
@@ -41,11 +42,17 @@ namespace Common::Helpers
 	inline const float DefaultFriction = 0.1f;
 
 	template<class T>
-	T SmoothValueAssign(T src, T dst, Clock::Duration dTime, float friction = DefaultFriction)
+	T SmoothValueAssign(T src, T dst, Clock::Duration dTime, float friction = DefaultFriction) // TODO: rename to SmoothValue (same steps for SmoothRotation)
 	{
 		auto distance = dst - src;
 		auto delta = Clock::ToSeconds(dTime) * 100.0f;
 		return src + (distance * delta * friction);
+	}
+
+	template<class T>
+	T SmoothValue(T src, T dst, float friction = DefaultFriction)
+	{
+		return SmoothValueAssign(src, dst, FRAME->getTimeDelta(), friction);
 	}
 
 	float SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction);
