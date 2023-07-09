@@ -315,7 +315,7 @@ SceneHelpers::Progressbar::Progressbar()
 
 void SceneHelpers::Progressbar::setProgress(float value)
 {
-	mProgressContent->setHorizontalStretch(value);
+	mProgressContent->setHorizontalStretch(glm::clamp(value, 0.0f, 1.0f));
 }
 
 float SceneHelpers::Progressbar::getProgress() const
