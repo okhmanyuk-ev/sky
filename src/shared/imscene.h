@@ -53,6 +53,7 @@ namespace Shared
 		void dontKill();
 		void dontKillUntilHaveChilds();
 		void showAndHideWithScale();
+		void showWithAlpha(float duration);
 		void hideWithAlpha();
 
 	private:

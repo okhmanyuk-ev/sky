@@ -76,6 +76,20 @@ void ImScene::showAndHideWithScale()
 	IMSCENE->destroyAction(Actions::Collection::ChangeScale(mLastSpawn, { 0.0f, 0.0f }, 0.25f, Easing::SinusoidalIn));
 }
 
+void ImScene::showWithAlpha(float duration)
+{
+	auto color = std::dynamic_pointer_cast<Scene::Color>(mLastSpawn);
+
+	if (color == nullptr)
+		return;
+
+	if (IMSCENE->justAllocated())
+	{
+		color->setAlpha(0.0f);
+		mLastSpawn->runAction(Actions::Collection::Show(color, duration, Easing::SinusoidalOut));
+	}
+}
+
 void ImScene::hideWithAlpha()
 {
 	auto color = std::dynamic_pointer_cast<Scene::Color>(mLastSpawn);
@@ -83,5 +97,5 @@ void ImScene::hideWithAlpha()
 	if (color == nullptr)
 		return;
 
-	IMSCENE->destroyAction(Actions::Collection::ChangeAlpha(color, 0.0f, 0.25f, Easing::SinusoidalIn));
+	IMSCENE->destroyAction(Actions::Collection::Hide(color, 0.25f, Easing::SinusoidalIn));
 }
