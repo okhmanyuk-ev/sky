@@ -68,6 +68,9 @@ Server::Server(uint16_t port)
 	mWSServer.set_close_handler([this](websocketpp::connection_hdl hdl) {
 		auto connection = mWSServer.get_con_from_hdl(hdl);
 		sky::Log("{} disconnected", connection->get_remote_endpoint());
+		auto channel = mChannels.at(hdl);
+		if (channel->mDisconnectCallback)
+			channel->mDisconnectCallback();
 
 		mChannels.erase(hdl);
 	});

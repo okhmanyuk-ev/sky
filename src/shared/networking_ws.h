@@ -41,6 +41,7 @@ namespace Shared::NetworkingWS
 	public:
 		using ReadCallback = std::function<void(BitBuffer&)>;
 		using SendCallback = std::function<void(BitBuffer&)>;
+		using DisconnectCallback = std::function<void()>;
 
 	public:
 		virtual ~Channel() {}
@@ -52,6 +53,7 @@ namespace Shared::NetworkingWS
 
 	public:
 		void setSendCallback(SendCallback value) { mSendCallback = value; }
+		void setDisconnectCallback(DisconnectCallback value) { mDisconnectCallback = value; }
 #ifndef EMSCRIPTEN
 		auto getHdl() const { return mHdl; }
 
@@ -60,6 +62,7 @@ namespace Shared::NetworkingWS
 #endif
 	private:
 		SendCallback mSendCallback = nullptr;
+		DisconnectCallback mDisconnectCallback = nullptr;
 		std::map<std::string, ReadCallback> mMessageReaders;
 #ifndef EMSCRIPTEN
 		websocketpp::connection_hdl mHdl;
