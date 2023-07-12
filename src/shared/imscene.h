@@ -53,8 +53,8 @@ namespace Shared
 		void dontKill();
 		void dontKillUntilHaveChilds();
 		void showAndHideWithScale();
-		void showWithAlpha(float duration);
-		void hideWithAlpha();
+		void showWithAlpha(float duration = 0.25f);
+		void hideWithAlpha(float duration = 0.25f);
 
 	private:
 		std::unordered_map<std::string, int> mTypesCount;

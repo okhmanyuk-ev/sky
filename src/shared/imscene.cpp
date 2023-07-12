@@ -90,7 +90,7 @@ void ImScene::showWithAlpha(float duration)
 	}
 }
 
-void ImScene::hideWithAlpha()
+void ImScene::hideWithAlpha(float duration)
 {
 	auto color = std::dynamic_pointer_cast<Scene::Color>(mLastSpawn);
 	
