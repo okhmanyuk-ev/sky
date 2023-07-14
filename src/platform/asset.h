@@ -30,7 +30,7 @@ namespace Platform
 		auto getSize() const { return mSize; }
 
 	private:
-		void* mMemory;
-		size_t mSize;
+		void* mMemory = nullptr;
+		size_t mSize = 0;
 	};
 }
