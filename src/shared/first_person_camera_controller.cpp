@@ -96,7 +96,7 @@ void FirstPersonCameraController::update(Clock::Duration dTime)
 			direction *= speed;
 		}
 
-		mSmoothDirection = Common::Helpers::SmoothValueAssign(mSmoothDirection, direction, dTime, 0.075f);
+		mSmoothDirection = Common::Helpers::SmoothValue(mSmoothDirection, direction, dTime, 0.075f);
 		
 		if (glm::length(mSmoothDirection) > 0.0f)
 		{

@@ -530,7 +530,7 @@ namespace Shared::SceneHelpers
 			{
 				auto dTime = now - mPrevTransformTimepoint.value();
 				auto new_transform = T::getTransform();
-				T::setTransform(Common::Helpers::SmoothValueAssign(prev_transform, new_transform, dTime));
+				T::setTransform(Common::Helpers::SmoothValue(prev_transform, new_transform, dTime));
 			}
 			mPrevTransformTimepoint = now;
 		}
@@ -548,7 +548,7 @@ namespace Shared::SceneHelpers
 			{
 				auto dTime = now - mPrevSizeTimepoint.value();
 				auto new_size = T::getAbsoluteSize();
-				T::setAbsoluteSize(Common::Helpers::SmoothValueAssign(prev_size, new_size, dTime));
+				T::setAbsoluteSize(Common::Helpers::SmoothValue(prev_size, new_size, dTime));
 			}
 			mPrevSizeTimepoint = now;
 		}

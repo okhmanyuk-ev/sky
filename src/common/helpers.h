@@ -39,23 +39,25 @@ namespace Common::Helpers
 	nlohmann::json LoadJsonFromAsset(const Platform::Asset& asset);
 	nlohmann::json LoadBsonFromAsset(const Platform::Asset& asset);
 
-	inline const float DefaultFriction = 0.1f;
+	constexpr float DefaultFriction = 0.1f;
+	constexpr float DefaultDeltaLimit = 1.0f / 30.0f;
 
 	template<class T>
-	T SmoothValueAssign(T src, T dst, Clock::Duration dTime, float friction = DefaultFriction) // TODO: rename to SmoothValue (same steps for SmoothRotation)
+	T SmoothValue(T src, T dst, Clock::Duration dTime, float friction = DefaultFriction, float delta_limit = DefaultDeltaLimit)
 	{
 		auto distance = dst - src;
-		auto delta = Clock::ToSeconds(dTime) * 100.0f;
+		auto delta = glm::min(delta_limit, Clock::ToSeconds(dTime)) * 100.0f;
 		return src + (distance * delta * friction);
 	}
 
 	template<class T>
-	T SmoothValue(T src, T dst, float friction = DefaultFriction)
+	T SmoothValue(T src, T dst, float friction = DefaultFriction, float delta_limit = DefaultDeltaLimit)
 	{
-		return SmoothValueAssign(src, dst, FRAME->getTimeDelta(), friction);
+		return SmoothValue(src, dst, FRAME->getTimeDelta(), friction, delta_limit);
 	}
 
-	float SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction);
+	float SmoothRotation(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction,
+		float delta_limit = DefaultDeltaLimit);
 
 	// TODO: find identical function in glm
 	// TODO: it seems every smoothstep function call should be changed to this

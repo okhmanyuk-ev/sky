@@ -138,7 +138,7 @@ nlohmann::json Helpers::LoadBsonFromAsset(const Platform::Asset& asset)
 	return nlohmann::json::from_bson(std::string((char*)asset.getMemory(), asset.getSize()));
 }
 
-float Helpers::SmoothRotationAssign(float src_radians, float dst_radians, Clock::Duration dTime, float friction)
+float Helpers::SmoothRotation(float src_radians, float dst_radians, Clock::Duration dTime, float friction, float delta_limit)
 {
 	auto src_deg = glm::degrees(src_radians);
 	auto dst_deg = glm::degrees(dst_radians);
@@ -152,5 +152,5 @@ float Helpers::SmoothRotationAssign(float src_radians, float dst_radians, Clock:
 
 	src_radians = glm::radians(src_deg);
 
-	return SmoothValueAssign(src_radians, dst_radians, dTime, friction);
+	return SmoothValue(src_radians, dst_radians, dTime, friction, delta_limit);
 }

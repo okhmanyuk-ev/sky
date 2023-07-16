@@ -47,7 +47,7 @@ void Scrollbox::update(Clock::Duration dTime)
 		mScrollPosition.y = mScrollOrigin.y;
 
 	if (mInertiaEnabled && !isTouching())
-		mSpeed = Common::Helpers::SmoothValueAssign(mSpeed, { 0.0f, 0.0f }, dTime, mInertiaFriction);
+		mSpeed = Common::Helpers::SmoothValue(mSpeed, { 0.0f, 0.0f }, dTime, mInertiaFriction);
 	else
 		mSpeed = { 0.0f, 0.0f };
 
@@ -56,7 +56,7 @@ void Scrollbox::update(Clock::Duration dTime)
 	if (!mOverscrollEnabled)
 		mScrollPosition = clamped_pos;
 	else if (!isTouching())
-		mScrollPosition = Common::Helpers::SmoothValueAssign(mScrollPosition, clamped_pos, dTime);
+		mScrollPosition = Common::Helpers::SmoothValue(mScrollPosition, clamped_pos, dTime);
 
 	mOverscrollDistance = (mScrollPosition - clamped_pos) * scroll_space;
 
