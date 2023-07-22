@@ -26,6 +26,7 @@ namespace Audio
 		static inline FMOD::Studio::System* FmodStudio = nullptr;
 		FMOD::Channel* channel = nullptr;
 	};
+}
 
 namespace sky
 {
