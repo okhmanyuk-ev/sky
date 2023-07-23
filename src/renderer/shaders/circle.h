@@ -20,7 +20,7 @@ namespace Renderer::Shaders
 		Circle(const skygfx::VertexLayout& layout);
 
 	protected:
-		void update() override;
+		void setupUniforms() override;
 
 	public:
 		auto getColor() const { return mSettings.color; }

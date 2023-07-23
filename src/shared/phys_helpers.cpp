@@ -478,7 +478,7 @@ void World::Draw::DrawTransform(const b2Transform& xf)
 void World::Draw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
 	auto _color = glm::vec4(color.r, color.g, color.b, color.a);
-	auto model = GRAPHICS->getCurrentState().modelMatrix;
+	auto model = GRAPHICS->getCurrentState().model_matrix;
 
 	auto unscaled_size = size / Scale;
 	auto half_size = unscaled_size * 0.5f;

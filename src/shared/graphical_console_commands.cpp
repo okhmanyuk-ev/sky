@@ -19,8 +19,8 @@ GraphicalConsoleCommands::GraphicalConsoleCommands()
 		CVAR_SETTER_BOOL_FUNC(GRAPHICS->setBatching));
 
 	CONSOLE->registerCVar("r_vsync", { "bool" },
-		CVAR_GETTER_BOOL_FUNC(RENDERER->isVsync),
-		CVAR_SETTER_BOOL_FUNC(RENDERER->setVsync));
+		CVAR_GETTER_BOOL_FUNC(skygfx::IsVsyncEnabled),
+		CVAR_SETTER_BOOL_FUNC(skygfx::SetVsync));
 
 	CONSOLE->registerCommand("rescale", "smart scaling", { "float" }, [](CON_ARGS) {
 		PLATFORM->rescale(CON_ARG_FLOAT(0));

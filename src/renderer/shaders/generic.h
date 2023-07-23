@@ -44,7 +44,7 @@ namespace Renderer::Shaders
 		void setLodBias(float value) { mConstantBuffer.lod_bias = value; }
 
 	protected:
-		void update() override;
+		void setupUniforms() override;
 
 	protected:
 		Matrices mConstantBuffer;

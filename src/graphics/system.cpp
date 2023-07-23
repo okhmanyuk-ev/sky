@@ -77,42 +77,42 @@ void System::applyState()
 		else if (!applied_state.scissor.has_value() && !state.scissor.has_value())
 			scissorChanged = false;
 
-		renderTargetChanged = applied_state.renderTarget != state.renderTarget;
+		renderTargetChanged = applied_state.render_target != state.render_target;
 		viewportChanged = applied_state.viewport != state.viewport;
 		depthModeChanged = applied_state.depth_mode != state.depth_mode;
-		cullModeChanged = applied_state.cullMode != state.cullMode;
-		blendModeChanged = applied_state.blendMode != state.blendMode;
+		cullModeChanged = applied_state.cull_mode != state.cull_mode;
+		blendModeChanged = applied_state.blend_mode != state.blend_mode;
 		samplerChanged = applied_state.sampler != state.sampler;
-		textureAddressChanged = applied_state.textureAddress != state.textureAddress;
+		textureAddressChanged = applied_state.texture_address != state.texture_address;
 		stencilChanged = applied_state.stencil_mode != state.stencil_mode;
 	}
 
 	if (scissorChanged)
-		RENDERER->setScissor(state.scissor);
+		skygfx::SetScissor(state.scissor);
 	
 	if (renderTargetChanged)
-		RENDERER->setRenderTarget(state.renderTarget);
+		RENDERER->setRenderTarget(state.render_target);
 
 	if (depthModeChanged)
-		RENDERER->setDepthMode(state.depth_mode);
+		skygfx::SetDepthMode(state.depth_mode);
 	
 	if (cullModeChanged)
-		RENDERER->setCullMode(state.cullMode);
+		skygfx::SetCullMode(state.cull_mode);
 	
 	if (viewportChanged)
-		RENDERER->setViewport(state.viewport);
+		skygfx::SetViewport(state.viewport);
 	
 	if (blendModeChanged)
-		RENDERER->setBlendMode(state.blendMode);
+		skygfx::SetBlendMode(state.blend_mode);
 
 	if (samplerChanged)
-		RENDERER->setSampler(state.sampler);
+		skygfx::SetSampler(state.sampler);
 	
 	if (textureAddressChanged)
-		RENDERER->setTextureAddressMode(state.textureAddress);
+		skygfx::SetTextureAddress(state.texture_address);
 	
 	if (stencilChanged)
-		RENDERER->setStencilMode(state.stencil_mode);
+		skygfx::SetStencilMode(state.stencil_mode);
 
 	mAppliedState = state;
 }
@@ -140,10 +140,10 @@ void System::flush()
 	}
 	else
 	{
-		if (state.renderTarget)
+		if (state.render_target)
 		{
-			width = static_cast<float>(state.renderTarget->getWidth());
-			height = static_cast<float>(state.renderTarget->getHeight());
+			width = static_cast<float>(state.render_target->getWidth());
+			height = static_cast<float>(state.render_target->getHeight());
 		}
 		else
 		{
@@ -164,7 +164,7 @@ void System::flush()
 		RENDERER->setTexture(*mBatch.texture.value());
 
 	RENDERER->setShader(mBatch.shader);
-	RENDERER->setTopology(mBatch.topology.value());
+	skygfx::SetTopology(mBatch.topology.value());
 	RENDERER->setIndexBuffer(mBatch.indices);
 	RENDERER->setVertexBuffer(mBatch.vertices);
 
@@ -195,11 +195,11 @@ void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
 
 	const auto& state = mStates.top();
 
-	shader->setProjectionMatrix(state.projectionMatrix);
-	shader->setViewMatrix(state.viewMatrix);
-	shader->setModelMatrix(state.modelMatrix);
+	shader->setProjectionMatrix(state.projection_matrix);
+	shader->setViewMatrix(state.view_matrix);
+	shader->setModelMatrix(state.model_matrix);
 
-	RENDERER->setTopology(topology);
+	skygfx::SetTopology(topology);
 	RENDERER->setIndexBuffer(indices);
 	RENDERER->setVertexBuffer(vertices);
 	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
@@ -701,10 +701,10 @@ glm::vec3 System::project(const glm::vec3& pos)
 	}
 	else
 	{
-		if (state.renderTarget)
+		if (state.render_target)
 		{
-			width = static_cast<float>(state.renderTarget->getWidth());
-			height = static_cast<float>(state.renderTarget->getHeight());
+			width = static_cast<float>(state.render_target->getWidth());
+			height = static_cast<float>(state.render_target->getHeight());
 		}
 		else
 		{
@@ -716,7 +716,7 @@ glm::vec3 System::project(const glm::vec3& pos)
 	width /= scale;
 	height /= scale;
 
-	auto projected_pos = state.projectionMatrix * state.viewMatrix * state.modelMatrix * glm::vec4(pos, 1.0f);
+	auto projected_pos = state.projection_matrix * state.view_matrix * state.model_matrix * glm::vec4(pos, 1.0f);
 
 	projected_pos.x += 1.0f;
 	projected_pos.y -= 1.0f;
@@ -778,7 +778,7 @@ void System::pushSampler(skygfx::Sampler value)
 void System::pushBlendMode(skygfx::BlendMode value)
 {
 	auto state = mStates.top();
-	state.blendMode = value;
+	state.blend_mode = value;
 	push(state);
 }
 
@@ -792,7 +792,7 @@ void System::pushDepthMode(std::optional<skygfx::DepthMode> value)
 void System::pushCullMode(skygfx::CullMode value)
 {
 	auto state = mStates.top();
-	state.cullMode = value;
+	state.cull_mode = value;
 	push(state);
 }
 
@@ -806,7 +806,7 @@ void System::pushViewport(std::optional<skygfx::Viewport> value)
 void System::pushRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 {
 	auto state = mStates.top();
-	state.renderTarget = value;
+	state.render_target = value;
 	push(state);
 }
 
@@ -820,28 +820,28 @@ void System::pushScissor(std::optional<skygfx::Scissor> value)
 void System::pushViewMatrix(const glm::mat4& value)
 {
 	auto state = mStates.top();
-	state.viewMatrix = value;
+	state.view_matrix = value;
 	push(state);
 }
 
 void System::pushProjectionMatrix(const glm::mat4& value)
 {
 	auto state = mStates.top();
-	state.projectionMatrix = value;
+	state.projection_matrix = value;
 	push(state);
 }
 
 void System::pushModelMatrix(const glm::mat4& value)
 {
 	auto state = mStates.top();
-	state.modelMatrix = value;
+	state.model_matrix = value;
 	push(state);
 }
 
 void System::pushTextureAddress(skygfx::TextureAddress value)
 {
 	auto state = mStates.top();
-	state.textureAddress = value;
+	state.texture_address = value;
 	push(state);
 }
 

@@ -135,7 +135,7 @@ void ConsoleDevice::onFrame()
 		std::string(__DATE__) + " " + std::string(__TIME__)
 	};
 	
-	auto backend_name = magic_enum::enum_name(RENDERER->getBackendType());
+	auto backend_name = magic_enum::enum_name(skygfx::GetBackendType());
 	strings.push_back(std::string(backend_name));
 	
 	const float margin = 17.0f;

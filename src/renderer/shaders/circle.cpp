@@ -54,8 +54,8 @@ Circle::Circle(const skygfx::VertexLayout& layout) : Generic(layout, src_fragmen
 {
 };
 
-void Circle::update()
+void Circle::setupUniforms()
 {
-	Generic::update();
-	RENDERER->setUniformBuffer(2, mSettings);
+	Generic::setupUniforms();
+	skygfx::SetUniformBuffer(2, mSettings);
 }

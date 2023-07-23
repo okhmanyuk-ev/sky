@@ -98,8 +98,8 @@ Light::Light(const skygfx::VertexLayout& layout) : Generic(layout, src_fragment)
 {
 }
 
-void Light::update()
+void Light::setupUniforms()
 {
-	Generic::update();
-	RENDERER->setUniformBuffer(2, mSettings);
+	Generic::setupUniforms();
+	skygfx::SetUniformBuffer(2, mSettings);
 }

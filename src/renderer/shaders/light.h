@@ -51,7 +51,7 @@ namespace Renderer::Shaders
 		Light(const skygfx::VertexLayout& layout);
 
 	protected:
-		void update() override;
+		void setupUniforms() override;
 
 	public:
 		void setEyePosition(const glm::vec3& value) { mSettings.eyePosition = value; }

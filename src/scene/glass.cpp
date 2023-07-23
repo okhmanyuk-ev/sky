@@ -27,7 +27,7 @@ void Glass::draw()
 	}
 
 	GRAPHICS->flush();
-	RENDERER->readPixels({ x, y }, { w, h }, getTexture());
+	skygfx::ReadPixels({ x, y }, { w, h }, *getTexture());
 
 	auto tl = project({ 0.0f, 0.0f });
 	auto tr = project({ getAbsoluteWidth(), 0.0f });

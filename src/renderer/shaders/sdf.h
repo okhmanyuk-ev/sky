@@ -19,7 +19,7 @@ namespace Renderer::Shaders
 		Sdf(const skygfx::VertexLayout& layout);
 
 	protected:
-		void update() override;
+		void setupUniforms() override;
 
 	public:
 		auto getMinValue() const { return mSettings.minValue; }

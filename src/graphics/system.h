@@ -164,17 +164,17 @@ namespace Graphics
 	public:
 		struct State
 		{
-			glm::mat4 projectionMatrix = glm::mat4(1.0f);
-			glm::mat4 viewMatrix = glm::mat4(1.0f);
-			glm::mat4 modelMatrix = glm::mat4(1.0f);
-			std::shared_ptr<skygfx::RenderTarget> renderTarget = nullptr;
+			glm::mat4 projection_matrix = glm::mat4(1.0f);
+			glm::mat4 view_matrix = glm::mat4(1.0f);
+			glm::mat4 model_matrix = glm::mat4(1.0f);
+			std::shared_ptr<skygfx::RenderTarget> render_target = nullptr;
 			std::optional<skygfx::Scissor> scissor = std::nullopt;
 			std::optional<skygfx::Viewport> viewport = std::nullopt;
 			std::optional<skygfx::DepthMode> depth_mode = std::nullopt;
-			skygfx::CullMode cullMode = skygfx::CullMode::None;
-			skygfx::BlendMode blendMode = skygfx::BlendStates::NonPremultiplied;
+			skygfx::CullMode cull_mode = skygfx::CullMode::None;
+			skygfx::BlendMode blend_mode = skygfx::BlendStates::NonPremultiplied;
 			skygfx::Sampler sampler = skygfx::Sampler::Nearest;
-			skygfx::TextureAddress textureAddress = skygfx::TextureAddress::Clamp;
+			skygfx::TextureAddress texture_address = skygfx::TextureAddress::Clamp;
 			std::optional<skygfx::StencilMode> stencil_mode = std::nullopt;
 		};
 
@@ -249,17 +249,17 @@ namespace Graphics
 	inline bool operator==(const System::State& left, const System::State& right)
 	{
 		return
-			left.projectionMatrix == right.projectionMatrix &&
-			left.viewMatrix == right.viewMatrix &&
-		//	left.modelMatrix == right.modelMatrix && // we should not compare model matrix for fine batching
-			left.renderTarget == right.renderTarget &&
+			left.projection_matrix == right.projection_matrix &&
+			left.view_matrix == right.view_matrix &&
+		//	left.model_matrix == right.model_matrix && // we should not compare model matrix for fine batching
+			left.render_target == right.render_target &&
 			left.scissor == right.scissor &&
 			left.viewport == right.viewport &&
 			left.depth_mode == right.depth_mode &&
-			left.cullMode == right.cullMode &&
-			left.blendMode == right.blendMode &&
+			left.cull_mode == right.cull_mode &&
+			left.blend_mode == right.blend_mode &&
 			left.sampler == right.sampler &&
-			left.textureAddress == right.textureAddress &&
+			left.texture_address == right.texture_address &&
 			left.stencil_mode == right.stencil_mode;
 	}
 

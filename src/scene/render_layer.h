@@ -55,7 +55,7 @@ namespace Scene
 				return;
 			}
 
-			auto target = GRAPHICS->getCurrentState().renderTarget;
+			auto target = GRAPHICS->getCurrentState().render_target;
 			
 			GRAPHICS->pop(4);
 

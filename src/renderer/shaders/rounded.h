@@ -18,7 +18,7 @@ namespace Renderer::Shaders
 		Rounded(const skygfx::VertexLayout& layout);
 
 	protected:
-		void update() override;
+		void setupUniforms() override;
 
 	public:
 		auto getSize() const { return mSettings.size; }

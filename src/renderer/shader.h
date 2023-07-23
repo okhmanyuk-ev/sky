@@ -16,7 +16,7 @@ namespace Renderer
 		using skygfx::Shader::Shader;
 
 	public:
-		virtual void update() {};
+		virtual void setupUniforms() {};
 	};
 
 	class ShaderMatrices

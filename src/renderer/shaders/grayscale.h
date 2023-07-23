@@ -16,7 +16,7 @@ namespace Renderer::Shaders
 		Grayscale(const skygfx::VertexLayout& layout);
 
 	protected:
-		void update() override;
+		void setupUniforms() override;
 
 	public:
 		auto getIntensity() const { return mSettings.intensity; }

@@ -34,8 +34,8 @@ Shockwave::Shockwave(const skygfx::VertexLayout& layout) : Generic(layout, src_f
 {
 }
 
-void Shockwave::update()
+void Shockwave::setupUniforms()
 {
-	Generic::update();
-	RENDERER->setUniformBuffer(2, mSettings);
+	Generic::setupUniforms();
+	skygfx::SetUniformBuffer(2, mSettings);
 }

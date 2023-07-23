@@ -19,10 +19,10 @@ Generic::Generic(const skygfx::VertexLayout& layout, std::optional<std::string> 
 {
 }
 
-void Generic::update()
+void Generic::setupUniforms()
 {
-	Shader::update();
-	RENDERER->setUniformBuffer(1, mConstantBuffer);
+	Shader::setupUniforms();
+	skygfx::SetUniformBuffer(1, mConstantBuffer);
 }
 
 std::string Generic::GenerateVertexCode(const skygfx::VertexLayout& layout, const std::set<Flag>& flags)
