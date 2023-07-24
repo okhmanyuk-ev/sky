@@ -14,13 +14,14 @@ namespace Scene
 		std::shared_ptr<skygfx::RenderTarget> postprocess(std::shared_ptr<skygfx::RenderTarget> render_texture) override;
 
 	public:
-		auto getIntensity() const { return mBloom.getIntensity(); }
-		void setIntensity(float value) { mBloom.setIntensity(value); }
+		auto getIntensity() const { return mIntensity; }
+		void setIntensity(float value) { mIntensity = value; }
 
-		auto getBrightThreshold() const { return mBloom.getBrightThreshold(); }
-		void setBrightThreshold(float value) { mBloom.setBrightThreshold(value); }
+		auto getBrightThreshold() const { return mBrightThreshold; }
+		void setBrightThreshold(float value) { mBrightThreshold = value; }
 
 	private:
-		skygfx::utils::passes::Bloom mBloom;
+		float mBrightThreshold = 1.0f;
+		float mIntensity = 2.0f;
 	};
 }
