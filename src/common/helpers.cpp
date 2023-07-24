@@ -154,3 +154,8 @@ float Helpers::SmoothRotation(float src_radians, float dst_radians, Clock::Durat
 
 	return SmoothValue(src_radians, dst_radians, dTime, friction, delta_limit);
 }
+
+float Helpers::SmoothRotation(float src_radians, float dst_radians, float friction, float delta_limit)
+{
+	return SmoothRotation(src_radians, dst_radians, FRAME->getTimeDelta(), friction, delta_limit);
+}

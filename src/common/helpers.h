@@ -59,6 +59,9 @@ namespace Common::Helpers
 	float SmoothRotation(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction,
 		float delta_limit = DefaultDeltaLimit);
 
+	float SmoothRotation(float src_radians, float dst_radians, float friction = DefaultFriction,
+		float delta_limit = DefaultDeltaLimit);
+
 	// TODO: find identical function in glm
 	// TODO: it seems every smoothstep function call should be changed to this
 	template<typename T>
