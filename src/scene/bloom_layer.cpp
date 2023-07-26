@@ -15,7 +15,7 @@ std::shared_ptr<skygfx::RenderTarget> BloomLayer::postprocess(std::shared_ptr<sk
 	GRAPHICS->pushCleanState();
 	GRAPHICS->pushRenderTarget(result);
 	GRAPHICS->clear();
-	skygfx::utils::passes::Bloom(*render_texture, *result, mBrightThreshold, mIntensity);
+	skygfx::utils::passes::Bloom(render_texture.get(), result.get(), mBrightThreshold, mIntensity);
 	GRAPHICS->pop(2);
 	return result;
 }
