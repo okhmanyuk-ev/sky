@@ -27,8 +27,8 @@ namespace Platform
 		int getWidth() const override;
 		int getHeight() const override;
 
-		float getScale() const override { return mScale; }
-		void setScale(float value) override { mScale = value; }
+		float getScale() const override;
+		void setScale(float value) override;
 
 		float getSafeAreaTopMargin() const override { return 0.0f; }
 		float getSafeAreaBottomMargin() const override { return 0.0f; }
@@ -65,7 +65,6 @@ namespace Platform
 
 	private:
 		std::string mAppName;
-		float mScale = 1.0f;
 		void* mWindow = nullptr;
 		int mPrevMouseX = 0;
 		int mPrevMouseY = 0;

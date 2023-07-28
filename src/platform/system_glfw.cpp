@@ -18,6 +18,7 @@ using namespace Platform;
 static SystemGlfw* gContext = nullptr;
 static int gWidth = 800;
 static int gHeight = 600;
+static float gScale = 1.0f;
 
 static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -51,7 +52,7 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 #if defined(PLATFORM_WINDOWS)
 	mNativeWindow = glfwGetWin32Window((GLFWwindow*)mWindow);
 #elif defined(PLATFORM_MAC)
-	mNativeWindow = glfwGetCocoaWindow(mWindow);
+	mNativeWindow = glfwGetCocoaWindow((GLFWwindow*)mWindow);
 #endif
 
 	float x_scale;
@@ -59,13 +60,13 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	
 	glfwGetWindowContentScale((GLFWwindow*)mWindow, &x_scale, &y_scale);
 	
-	mScale = std::fmaxf(x_scale, y_scale);
+	gScale = std::fmaxf(x_scale, y_scale);
 
 	auto monitor = glfwGetPrimaryMonitor();
 	auto video_mode = glfwGetVideoMode(monitor);
 
-	auto window_pos_x = (video_mode->width / 2 ) - (gWidth / 2) / mScale;
-	auto window_pos_y = (video_mode->height / 2) - (gHeight / 2) / mScale;
+	auto window_pos_x = (video_mode->width / 2 ) - (gWidth / 2) / gScale;
+	auto window_pos_y = (video_mode->height / 2) - (gHeight / 2) / gScale;
 
 	glfwSetWindowPos((GLFWwindow*)mWindow, (int)window_pos_x, (int)window_pos_y);
 
@@ -83,8 +84,8 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	
 	glfwGetCursorPos((GLFWwindow*)mWindow, &mouse_x, &mouse_y);
 	
-	mPrevMouseX = (int)(mouse_x * mScale);
-	mPrevMouseY = (int)(mouse_y * mScale);
+	mPrevMouseX = (int)(mouse_x * gScale);
+	mPrevMouseY = (int)(mouse_y * gScale);
 	
 	gContext = this;
 }
@@ -104,8 +105,8 @@ void SystemGlfw::process()
 	glfwGetCursorPos((GLFWwindow*)mWindow, &mouse_x, &mouse_y);
 
 #if defined(PLATFORM_MAC)
-	auto mouse_x_i = (int)(mouse_x * mScale);
-	auto mouse_y_i = (int)(mouse_y * mScale);
+	auto mouse_x_i = (int)(mouse_x * gScale);
+	auto mouse_y_i = (int)(mouse_y * gScale);
 #elif defined(PLATFORM_WINDOWS)
 	auto mouse_x_i = (int)mouse_x;
 	auto mouse_y_i = (int)mouse_y;
@@ -140,6 +141,16 @@ int SystemGlfw::getWidth() const
 int SystemGlfw::getHeight() const
 {
 	return gHeight;
+}
+
+float SystemGlfw::getScale() const
+{
+	return gScale;
+}
+
+void SystemGlfw::setScale(float value)
+{
+	gScale = value;
 }
 
 bool SystemGlfw::isKeyPressed(Input::Keyboard::Key key) const
@@ -260,13 +271,13 @@ void SystemGlfw::resize(int width, int height)
 	auto w_delta = gWidth - width;
 	auto h_delta = gHeight - height;
 	
-	auto x_offset = w_delta / 2 / mScale;
-	auto y_offset = h_delta / 2 / mScale;
+	auto x_offset = w_delta / 2 / gScale;
+	auto y_offset = h_delta / 2 / gScale;
 	
 	glfwSetWindowPos((GLFWwindow*)mWindow, int(pos_x + x_offset), int(pos_y + y_offset));
 
-	width = int(width / mScale);
-	height = int(height / mScale);
+	width = int(width / gScale);
+	height = int(height / gScale);
 
 	glfwSetWindowSize((GLFWwindow*)mWindow, width, height);
 }
@@ -337,8 +348,8 @@ static void MouseButtonCallback(GLFWwindow* window, int button, int action, int 
 	glfwGetCursorPos(window, &x, &y);
 
 #if defined(PLATFORM_MAC)
-	x *= gContext->mScale;
-	y *= gContext->mScale;
+	x *= gScale;
+	y *= gScale;
 #endif
 
 	EVENT->emit(Input::Mouse::ButtonEvent{
@@ -468,11 +479,11 @@ static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	glfwGetCursorPos(window, &x, &y);
 
 #if defined(PLATFORM_MAC)
-	x *= gContext->mScale;
-	y *= gContext->mScale;
+	x *= gScale;
+	y *= gScale;
 
-	auto scroll_x = xoffset / gContext->mScale;
-	auto scroll_y = yoffset / gContext->mScale;
+	auto scroll_x = xoffset / gScale;
+	auto scroll_y = yoffset / gScale;
 #elif defined(PLATFORM_WINDOWS)
 	auto scroll_x = xoffset;
 	auto scroll_y = yoffset;
