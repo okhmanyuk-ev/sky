@@ -31,8 +31,13 @@ namespace Scene
 			// http://www.shawnhargreaves.com/blog/premultiplied-alpha-and-image-composition.html
 
 			auto [pos, size] = T::getGlobalBounds();
+
+			assert(!glm::isnan(size.x));
+			assert(!glm::isnan(size.y));
+
 			auto width = static_cast<int>(glm::floor(size.x));
 			auto height = static_cast<int>(glm::floor(size.y));
+
 			auto target = GRAPHICS->getRenderTarget(fmt::format("renderlayer_{}", (void*)this), width, height);
 
 			auto view = glm::mat4(1.0f);

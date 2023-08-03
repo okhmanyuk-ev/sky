@@ -501,6 +501,9 @@ static void WindowSizeCallback(GLFWwindow* window, int width, int height)
 
 static void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
+	if (width <= 0 || height <= 0)
+		return;
+
 	gWidth = width;
 	gHeight = height;
 	EVENT->emit(Platform::System::ResizeEvent({ width, height }));
