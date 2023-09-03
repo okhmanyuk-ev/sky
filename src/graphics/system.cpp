@@ -182,6 +182,42 @@ void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, s
 	RENDERER->clear(color, depth, stencil);
 }
 
+void System::draw(skygfx::Texture* texture,
+	std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func)
+{
+	applyState();
+	flush();
+
+	const auto& state = mStates.top();
+
+	static skygfx::utils::Mesh mesh;
+	static skygfx::utils::MeshBuilder mesh_builder;
+
+	mesh_builder.reset();
+	draw_func(mesh_builder);
+	assert(!mesh_builder.isBegan());
+	mesh_builder.setToMesh(mesh);
+
+	//RENDERER->setRenderTarget(state.render_target); 
+	//skygfx::SetStencilMode(state.stencil_mode);
+
+	skygfx::utils::ExecuteCommands({
+		skygfx::utils::commands::SetViewport(state.viewport),
+		skygfx::utils::commands::SetScissor(state.scissor),
+		skygfx::utils::commands::SetDepthMode(state.depth_mode),
+		skygfx::utils::commands::SetCullMode(state.cull_mode),
+		skygfx::utils::commands::SetBlendMode(state.blend_mode),
+		skygfx::utils::commands::SetSampler(state.sampler),
+		skygfx::utils::commands::SetTextureAddress(state.texture_address),
+		skygfx::utils::commands::SetProjectionMatrix(state.projection_matrix),
+		skygfx::utils::commands::SetViewMatrix(state.view_matrix),
+		skygfx::utils::commands::SetModelMatrix(state.model_matrix),
+		skygfx::utils::commands::SetMesh(&mesh),
+		skygfx::utils::commands::SetColorTexture(texture),
+		skygfx::utils::commands::Draw()
+	});
+}
+
 void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
 	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 	std::function<void()> draw_func)

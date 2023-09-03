@@ -104,10 +104,7 @@ void ImguiSystem::end()
 	{
 		const auto cmds = drawData->CmdLists[i];
 
-		auto vertex_buffer = Renderer::Buffer{ cmds->VtxBuffer.Data, static_cast<size_t>(cmds->VtxBuffer.size()) };
-		auto index_buffer = Renderer::Buffer{ cmds->IdxBuffer.Data, static_cast<size_t>(cmds->IdxBuffer.size()) };
-
-		int indexOffset = 0;
+		uint32_t index_offset = 0;
 
 		for (auto& cmd : cmds->CmdBuffer)
 		{
@@ -119,10 +116,24 @@ void ImguiSystem::end()
 			{
 				auto texture = *(std::shared_ptr<skygfx::Texture>*)cmd.TextureId;
 				GRAPHICS->pushScissor(skygfx::Scissor{ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });
-				GRAPHICS->drawGeneric(skygfx::Topology::TriangleList, vertex_buffer, index_buffer, mShader, texture, cmd.ElemCount, indexOffset);
+				GRAPHICS->draw(texture.get(), [&](skygfx::utils::MeshBuilder& mesh_builder) {
+					mesh_builder.begin(skygfx::utils::MeshBuilder::Mode::Triangles);
+
+					for (uint32_t i = index_offset; i < index_offset + cmd.ElemCount; i++)
+					{
+						const auto& v = cmds->VtxBuffer[cmds->IdxBuffer[i]];						
+						mesh_builder.vertex(skygfx::Vertex::PositionColorTexture{
+							.pos = { v.pos.x, v.pos.y, 0.0f },
+							.color = glm::unpackUnorm4x8(v.col),
+							.texcoord = { v.uv.x, v.uv.y }
+						});
+					}
+
+					mesh_builder.end();
+				});
 				GRAPHICS->pop();
 			}
-			indexOffset += cmd.ElemCount;
+			index_offset += cmd.ElemCount;
 		}
 	}
 	

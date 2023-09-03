@@ -40,6 +40,9 @@ namespace Graphics
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
+		void draw(skygfx::Texture* texture,
+			std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func);
+
 		void draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
 			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
 			std::function<void()> draw_func);
