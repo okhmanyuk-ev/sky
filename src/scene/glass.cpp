@@ -21,13 +21,16 @@ void Glass::draw()
 
 	if (size != mPrevSize || !mBackbufferFormat.has_value() || mBackbufferFormat.value() != format)
 	{
-		setTexture(std::make_shared<skygfx::Texture>(w, h, format, nullptr, mGenerateMipmaps));
+		setTexture(std::make_shared<skygfx::Texture>(w, h, format, skygfx::GetMipCount(w, h)));
 		mPrevSize = size;
 		mBackbufferFormat = format;
 	}
 
 	GRAPHICS->flush();
 	skygfx::ReadPixels({ x, y }, { w, h }, *getTexture());
+
+	if (mGenerateMipmaps)
+		getTexture()->generateMips();
 
 	auto tl = project({ 0.0f, 0.0f });
 	auto tr = project({ getAbsoluteWidth(), 0.0f });
