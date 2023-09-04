@@ -10,3 +10,4 @@
 #include <graphics/tex_cell.h>
 #include <graphics/tex_region.h>
 #include <graphics/text_mesh.h>
+#include <graphics/effects.h>

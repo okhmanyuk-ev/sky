@@ -1,6 +1,7 @@
 #include "system.h"
 #include <vector>
 #include <numeric>
+#include <graphics/effects.h>
 
 using namespace Graphics;
 
@@ -182,7 +183,7 @@ void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, s
 	RENDERER->clear(color, depth, stencil);
 }
 
-void System::draw(skygfx::Texture* texture,
+void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
 	std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func)
 {
 	applyState();
@@ -202,6 +203,7 @@ void System::draw(skygfx::Texture* texture,
 	//skygfx::SetStencilMode(state.stencil_mode);
 
 	skygfx::utils::ExecuteCommands({
+		skygfx::utils::commands::SetEffect(shader, uniform_data, uniform_size),
 		skygfx::utils::commands::SetViewport(state.viewport),
 		skygfx::utils::commands::SetScissor(state.scissor),
 		skygfx::utils::commands::SetDepthMode(state.depth_mode),
@@ -216,6 +218,12 @@ void System::draw(skygfx::Texture* texture,
 		skygfx::utils::commands::SetColorTexture(texture),
 		skygfx::utils::commands::Draw()
 	});
+}
+
+void System::draw(skygfx::Texture* texture,
+	std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func)
+{
+	draw(nullptr, nullptr, 0, texture, draw_func);
 }
 
 void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
@@ -672,14 +680,23 @@ void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture>
 {
 	assert(!vertices.empty());
 	assert(!indices.empty());
+	assert(topology == skygfx::Topology::TriangleList);
 
-	static auto shader = std::make_shared<Renderer::Shaders::Sdf>(skygfx::Vertex::PositionColorTexture::Layout);
-	shader->setMinValue(minValue);
-	shader->setMaxValue(maxValue);
-	shader->setSmoothFactor(smoothFactor);
-	shader->setColor(color);
+	static auto shader = skygfx::utils::MakeEffectShader(sky::effects::Sdf::Shader);
+	static auto settings = sky::effects::Sdf();
+	settings.min_value = minValue;
+	settings.max_value = maxValue;
+	settings.smooth_factor = smoothFactor;
+	settings.color = color;
 
-	draw(topology, texture, vertices, indices, shader);
+	draw(&shader, &settings, sizeof(settings), texture.get(), [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::Triangles);
+		for (auto index : indices)
+		{
+			mesh.vertex(vertices.at(index));
+		}
+		mesh.end();
+	});
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 
