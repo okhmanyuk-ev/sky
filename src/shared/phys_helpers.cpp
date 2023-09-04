@@ -325,80 +325,73 @@ void World::detach(std::shared_ptr<Node> node)
 
 void World::Draw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	static auto builder = Graphics::MeshBuilder();
-	builder.begin();
-	builder.color({ color.r, color.g, color.b });
-	for (int i = 0; i < vertexCount; i++)
-	{
-		builder.vertex({ vertices[i].x, vertices[i].y, 0.0f });
-	}
-	builder.vertex({ vertices[0].x, vertices[0].y, 0.0f });
-	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(skygfx::Topology::LineStrip, b_vertices, count);
+	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineStrip);
+		mesh.color({ color.r, color.g, color.b });
+		for (int i = 0; i < vertexCount; i++)
+		{
+			mesh.vertex({ vertices[i].x, vertices[i].y });
+		}
+		mesh.vertex({ vertices[0].x, vertices[0].y });
+		mesh.end();
+	});
 }
 
 void World::Draw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	static auto builder = Graphics::MeshBuilder();
-	{
-		builder.begin();
-		builder.color({ color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 0.5f });
-		for (int i = 1; i < vertexCount - 1; i++)
-		{
-			builder.vertex({ vertices[0].x, vertices[0].y, 0.0f });
-			builder.vertex({ vertices[i].x, vertices[i].y, 0.0f });
-			builder.vertex({ vertices[i + 1].x, vertices[i + 1].y, 0.0f });
-		}
-		auto [b_vertices, count] = builder.end();
-		GRAPHICS->draw(skygfx::Topology::TriangleList, b_vertices, count);
-	}
-	{
-		builder.begin();
-		builder.color({ color.r, color.g, color.b });
+	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleFan);
+		mesh.color({ color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 0.5f });
 		for (int i = 0; i < vertexCount; i++)
 		{
-			builder.vertex({ vertices[i].x, vertices[i].y, 0.0f });
+			mesh.vertex({ vertices[i].x, vertices[i].y });
 		}
-		builder.vertex({ vertices[0].x, vertices[0].y, 0.0f });
-		auto [b_vertices, count] = builder.end();
-		GRAPHICS->draw(skygfx::Topology::LineStrip, b_vertices, count);
-	}
+		mesh.end();
+	});
+	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineLoop);
+		mesh.color({ color.r, color.g, color.b, color.a });
+		for (int i = 0; i < vertexCount; i++)
+		{
+			mesh.vertex({ vertices[i].x, vertices[i].y });
+		}
+		mesh.end();
+	});
 }
 
 void World::Draw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
-	const float segments = 16.0f;
-	const float increment = 2.0f * glm::pi<float>() / segments;
+	float segments = 16.0f;
+	float increment = 2.0f * glm::pi<float>() / segments;
 
 	float sinInc = glm::sin(increment);
 	float cosInc = glm::cos(increment);
 
-	static auto builder = Graphics::MeshBuilder();
-	builder.begin();
-	builder.color({ color.r, color.g, color.b, color.a });
+	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
+		mesh.color({ color.r, color.g, color.b, color.a });
 
-	auto v0 = glm::vec2({ center.x, center.y });
-	auto r1 = glm::vec2({ 1.0f, 0.0f });
-	auto v1 = v0 + radius * r1;
+		auto v0 = glm::vec2({ center.x, center.y });
+		auto r1 = glm::vec2({ 1.0f, 0.0f });
+		auto v1 = v0 + radius * r1;
 
-	for (int i = 0; i < segments; ++i)
-	{
-		auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
-		auto v2 = v0 + radius * r2;
-		builder.vertex(v1);
-		builder.vertex(v2);
-		r1 = r2;
-		v1 = v2;
-	}
-
-	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(skygfx::Topology::LineList, b_vertices, count);
+		for (int i = 0; i < segments; ++i)
+		{
+			auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
+			auto v2 = v0 + radius * r2;
+			mesh.vertex(v1);
+			mesh.vertex(v2);
+			r1 = r2;
+			v1 = v2;
+		}
+		mesh.end();
+	});
 }
 
 void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
-	const float segments = 16.0f;
-	const float increment = 2.0f * glm::pi<float>() / segments;
+	float segments = 16.0f;
+	float increment = 2.0f * glm::pi<float>() / segments;
 
 	float sinInc = glm::sin(increment);
 	float cosInc = glm::cos(increment);
@@ -407,53 +400,49 @@ void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 	auto r1 = glm::vec2({ cosInc, sinInc });
 	auto v1 = v0 + radius * r1;
 
-	static auto builder = Graphics::MeshBuilder();
-	
-	{
-		builder.begin();
-		builder.color({ 0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f });
+	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleFan);
+		mesh.color({ 0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f });
+		mesh.vertex(v0);
+		mesh.vertex(v1);
 		for (int i = 0; i < segments; i++)
 		{
 			auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
 			auto v2 = v0 + radius * r2;
-			builder.vertex(v0);
-			builder.vertex(v1);
-			builder.vertex(v2);
+			mesh.vertex(v2);
+			r1 = r2;
+		}
+		mesh.end();
+	});
+	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
+		mesh.color({ color.r, color.g, color.b, color.a });
+		r1 = { 1.0f, 0.0f };
+		v1 = v0 + radius * r1;
+		for (int i = 0; i < segments; ++i)
+		{
+			auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
+			auto v2 = v0 + radius * r2;
+			mesh.vertex(v1);
+			mesh.vertex(v2);
 			r1 = r2;
 			v1 = v2;
 		}
-		auto [b_vertices, count] = builder.end();
-		GRAPHICS->draw(skygfx::Topology::TriangleList, b_vertices, count);
-	}
-
-	builder.begin();
-	builder.color({ color.r, color.g, color.b, color.a });
-	r1 = { 1.0f, 0.0f };
-	v1 = v0 + radius * r1;
-	for (int i = 0; i < segments; ++i)
-	{
-		auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
-		auto v2 = v0 + radius * r2;
-		builder.vertex(v1);
-		builder.vertex(v2);
-		r1 = r2;
-		v1 = v2;
-	}
-	builder.vertex(v0);
-	builder.vertex(v0 + radius * glm::vec2({ axis.x, axis.y }));
-	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(skygfx::Topology::LineList, b_vertices, count);
+		mesh.vertex(v0);
+		mesh.vertex(v0 + radius * glm::vec2({ axis.x, axis.y }));
+		mesh.end();
+	});
 }
 
 void World::Draw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-	static auto builder = Graphics::MeshBuilder();
-	builder.begin();
-	builder.color({ color.r, color.g, color.b, color.a });
-	builder.vertex({ p1.x, p1.y });
-	builder.vertex({ p2.x, p2.y });
-	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(skygfx::Topology::LineList, b_vertices, count);
+	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
+		mesh.color({ color.r, color.g, color.b, color.a });
+		mesh.vertex({ p1.x, p1.y });
+		mesh.vertex({ p2.x, p2.y });
+		mesh.end();
+	});
 }
 
 void World::Draw::DrawTransform(const b2Transform& xf)
@@ -463,16 +452,16 @@ void World::Draw::DrawTransform(const b2Transform& xf)
 	b2Vec2 px = p + AxisScale * xf.q.GetXAxis();
 	b2Vec2 py = p + AxisScale * xf.q.GetYAxis();
 
-	static auto builder = Graphics::MeshBuilder();
-	builder.begin();
-	builder.color(Graphics::Color::Red);
-	builder.vertex({ p.x, p.y });
-	builder.vertex({ px.x, px.y });
-	builder.color(Graphics::Color::Lime);
-	builder.vertex({ p.x, p.y });
-	builder.vertex({ py.x, py.y });
-	auto [b_vertices, count] = builder.end();
-	GRAPHICS->draw(skygfx::Topology::LineList, b_vertices, count);
+	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
+		mesh.color(Graphics::Color::Red);
+		mesh.vertex({ p.x, p.y });
+		mesh.vertex({ px.x, px.y });
+		mesh.color(Graphics::Color::Lime);
+		mesh.vertex({ p.x, p.y });
+		mesh.vertex({ py.x, py.y });
+		mesh.end();
+	});
 }
 
 void World::Draw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
