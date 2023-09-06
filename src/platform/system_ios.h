@@ -52,7 +52,9 @@ namespace Platform
 		void setVirtualKeyboardText(const std::string& text) override;
 		
 		std::string getUUID() const override;
-		
+
+		void* getWindow() const override;
+
 		void initializeBilling(const ProductsMap& products) override;
 		void purchase(const std::string& product) override;
 
@@ -60,9 +62,6 @@ namespace Platform
 
 	public:
 		void setSize(int w, int h) { mWidth = w; mHeight = h; }
-		
-	public:
-		static inline UIWindow* Window = nullptr;
 
 	private:
 		UITextField* mTextField = nullptr;

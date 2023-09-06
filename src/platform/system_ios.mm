@@ -6,6 +6,8 @@
 
 using namespace Platform;
 
+static UIWindow* gWindow = nullptr;
+
 // SkyDelegate
 
 @implementation SkyDelegate
@@ -45,7 +47,7 @@ using namespace Platform;
 {
 	for (UITouch* touch in touches)
 	{
-		auto location = [touch locationInView:SystemIos::Window];
+		auto location = [touch locationInView:gWindow];
 		auto x = location.x * PLATFORM->getScale();
 		auto y = location.y * PLATFORM->getScale();
 		EVENT->emit(Input::Touch::Event{
@@ -137,10 +139,10 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
 	auto screen = [UIScreen mainScreen];
 	auto bounds = [screen bounds];
 
-	Window = [[UIWindow alloc]initWithFrame:bounds];
-	[Window makeKeyAndVisible];
+	gWindow = [[UIWindow alloc]initWithFrame:bounds];
+	[gWindow makeKeyAndVisible];
 
-	for (UIGestureRecognizer* recognizer in Window.gestureRecognizers)
+	for (UIGestureRecognizer* recognizer in gWindow.gestureRecognizers)
 	{
 		recognizer.delaysTouchesBegan = false;
 		recognizer.delaysTouchesEnded = false;
@@ -149,9 +151,9 @@ SystemIos::SystemIos(const std::string& appname) : mAppName(appname)
 	}
 	
 	auto rootViewController = [[ViewController alloc] init];
-	[Window setRootViewController: rootViewController];
+	[gWindow setRootViewController: rootViewController];
 	
-	auto rootView = [[UIView alloc] initWithFrame:Window.frame];
+	auto rootView = [[UIView alloc] initWithFrame:gWindow.frame];
 	[rootView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
 	[rootViewController setView:rootView];
 	
@@ -212,6 +214,11 @@ std::string SystemIos::getUUID() const
 	return UIDevice.currentDevice.identifierForVendor.UUIDString.UTF8String;
 }
 
+void* SystemIos::getWindow() const
+{
+	return gWindow;
+}
+
 void SystemIos::refreshDimensions()
 {
 	auto screen = [UIScreen mainScreen];
@@ -227,7 +234,7 @@ void SystemIos::refreshDimensions()
 	mWidth *= mScale;
 	mHeight *= mScale;
 
-	auto safeArea = [Window safeAreaInsets];
+	auto safeArea = [gWindow safeAreaInsets];
 	
 	mSafeAreaTopMargin = safeArea.top * mScale;
 	mSafeAreaBottomMargin = safeArea.bottom * mScale;
@@ -244,7 +251,7 @@ void SystemIos::initializeBilling(const ProductsMap& _products)
 {
 	products = _products;
 	
-	auto viewController = (ViewController*)[Window rootViewController];
+	auto viewController = (ViewController*)[gWindow rootViewController];
 	auto names = [[NSMutableSet alloc] init];
 	
 	for (auto [_name, callback] : products)
