@@ -13,7 +13,7 @@ TextMesh TextMesh::createTextMesh(const Font& font, utf8_string::const_iterator 
 	const auto texture = font.getTexture();
 
 	glm::vec2 tex_size = { static_cast<float>(texture->getWidth()), static_cast<float>(texture->getHeight()) };
-	
+
 	auto length = std::distance(begin, end);
 
 	mesh.vertices.resize(length * 4);

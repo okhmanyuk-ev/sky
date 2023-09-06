@@ -41,14 +41,16 @@ namespace Graphics
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
 		void draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
+			const skygfx::utils::Mesh& mesh);
+
+		void draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
+			skygfx::Topology topology, const skygfx::utils::Mesh::Vertices& vertices, const skygfx::utils::Mesh::Indices& indices);
+
+		void draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
 			std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func);
 
 		void draw(skygfx::Texture* texture,
 			std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func);
-
-		void draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
-			const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-			std::function<void()> draw_func);
 
 		// generic
 		// TODO: hidden overload conflict when name "draw"
@@ -124,9 +126,9 @@ namespace Graphics
 
 		// sdf mesh
 		void drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
-			const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
-			const std::vector<uint32_t>& indices, float minValue, float maxValue, 
-			float smoothFactor, const glm::vec4& color = { Graphics::Color::White, 1.0f });
+			const skygfx::utils::Mesh::Vertices& vertices, const skygfx::utils::Mesh::Indices& indices,
+			float minValue, float maxValue, float smoothFactor,
+			const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
 		// text
 		void drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 

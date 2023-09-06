@@ -184,20 +184,12 @@ void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, s
 }
 
 void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
-	std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func)
+	const skygfx::utils::Mesh& mesh)
 {
 	applyState();
 	flush();
 
 	const auto& state = mStates.top();
-
-	static skygfx::utils::Mesh mesh;
-	static skygfx::utils::MeshBuilder mesh_builder;
-
-	mesh_builder.reset();
-	draw_func(mesh_builder);
-	assert(!mesh_builder.isBegan());
-	mesh_builder.setToMesh(mesh);
 
 	//RENDERER->setRenderTarget(state.render_target); 
 	//skygfx::SetStencilMode(state.stencil_mode);
@@ -220,15 +212,40 @@ void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_siz
 	});
 }
 
+void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
+	skygfx::Topology topology, const skygfx::utils::Mesh::Vertices& vertices, const skygfx::utils::Mesh::Indices& indices)
+{
+	static skygfx::utils::Mesh mesh;
+	mesh.setTopology(topology);
+	mesh.setVertices(vertices);
+	mesh.setIndices(indices);
+	draw(shader, uniform_data, uniform_size, texture, mesh);
+}
+
+void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
+	std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func)
+{
+	static skygfx::utils::MeshBuilder mesh_builder;
+	mesh_builder.reset();
+	draw_func(mesh_builder);
+	assert(!mesh_builder.isBegan());
+
+	static skygfx::utils::Mesh mesh;
+	mesh_builder.setToMesh(mesh);
+
+	draw(shader, uniform_data, uniform_size, texture, mesh);
+}
+
 void System::draw(skygfx::Texture* texture,
 	std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func)
 {
 	draw(nullptr, nullptr, 0, texture, draw_func);
 }
 
-void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
+void System::drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
 	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-	std::function<void()> draw_func)
+	std::optional<std::shared_ptr<skygfx::Texture>> texture,
+	std::optional<uint32_t> count, uint32_t start)
 {
 	assert(shader);
 	assert(vertices.size > 0);
@@ -247,20 +264,11 @@ void System::draw(skygfx::Topology topology, const Renderer::Buffer& vertices,
 	RENDERER->setIndexBuffer(indices);
 	RENDERER->setVertexBuffer(vertices);
 	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
-	draw_func();
-}
 
-void System::drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
-	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-	std::optional<std::shared_ptr<skygfx::Texture>> texture,
-	std::optional<uint32_t> count, uint32_t start)
-{
-	draw(topology, vertices, indices, shader, [&] {
-		if (texture.has_value())
-			RENDERER->setTexture(*texture.value());
+	if (texture.has_value())
+		RENDERER->setTexture(*texture.value());
 		
-		RENDERER->drawIndexed(count.value_or(indices.size / indices.stride), start);
-	});
+	RENDERER->drawIndexed(count.value_or(indices.size / indices.stride), start);
 }
 
 void System::draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
@@ -674,13 +682,11 @@ void System::drawSlicedSprite(std::shared_ptr<skygfx::Texture> texture,
 }
 
 void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
-	const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
-	const std::vector<uint32_t>& indices, float minValue, float maxValue,
-	float smoothFactor, const glm::vec4& color)
+	const skygfx::utils::Mesh::Vertices& vertices, const skygfx::utils::Mesh::Indices& indices,
+	float minValue, float maxValue, float smoothFactor, const glm::vec4& color)
 {
 	assert(!vertices.empty());
 	assert(!indices.empty());
-	assert(topology == skygfx::Topology::TriangleList);
 
 	static auto shader = skygfx::utils::MakeEffectShader(sky::effects::Sdf::Shader);
 	static auto settings = sky::effects::Sdf();
@@ -689,14 +695,7 @@ void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture>
 	settings.smooth_factor = smoothFactor;
 	settings.color = color;
 
-	draw(&shader, &settings, sizeof(settings), texture.get(), [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::Triangles);
-		for (auto index : indices)
-		{
-			mesh.vertex(vertices.at(index));
-		}
-		mesh.end();
-	});
+	draw(&shader, &settings, sizeof(settings), texture.get(), topology, vertices, indices);
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 
