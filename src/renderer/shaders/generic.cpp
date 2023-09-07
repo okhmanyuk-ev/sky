@@ -122,7 +122,7 @@ layout(location = 0) in struct
 } In;
 
 #ifdef HAS_ADDITIONAL_FRAGMENT_FUNC_FEATURE
-vec4 fragment(vec4 result);
+void effect(inout vec4);
 #endif
 
 void main()
@@ -135,7 +135,7 @@ void main()
 	result *= texture(sTexture, In.TexCoord, ubo.lod_bias);
 #endif
 #ifdef HAS_ADDITIONAL_FRAGMENT_FUNC_FEATURE
-	result = fragment(result);
+	effect(result);
 #endif
 })";
 

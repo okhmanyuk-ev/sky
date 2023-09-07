@@ -99,7 +99,7 @@ void Trail::draw()
 	if (mSegments.size() < 2)
 		return;
 
-	auto vertices = std::vector<skygfx::Vertex::PositionColor>();
+	auto vertices = skygfx::utils::Mesh::Vertices();
 
 	for (int i = (int)mSegments.size() - 1; i >= 0; i--)
 	{
@@ -142,7 +142,7 @@ void Trail::draw()
 
 	GRAPHICS->pushStencilMode(stencil);
 	GRAPHICS->pushModelMatrix(holder->getTransform());
-	GRAPHICS->draw(skygfx::Topology::TriangleStrip, vertices);
+	GRAPHICS->draw(skygfx::Topology::TriangleStrip, nullptr, vertices);
 	GRAPHICS->pop(2);
 }
 

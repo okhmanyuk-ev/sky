@@ -7,6 +7,9 @@ using namespace Graphics;
 
 System::System()
 {
+	uint32_t white_pixel = 0xFFFFFFFF;
+	mWhitePixelTexture = std::make_shared<skygfx::Texture>(1, 1, skygfx::Format::Byte4, &white_pixel);
+
 	mWhiteCircleTexture = makeGenericTexture({ 256, 256 }, [this] {
 		drawCircle();
 	});
@@ -120,16 +123,13 @@ void System::applyState()
 
 void System::flush()
 {
-	if (mBatch.mode == BatchMode::None)
+	if (mBatch.verticesCount == 0)
 		return;
 
 	assert(mAppliedState.has_value());
 
 	const auto& state = mAppliedState.value();
 	auto scale = PLATFORM->getScale();
-	
-	auto shader_matrices = std::dynamic_pointer_cast<Renderer::ShaderMatrices>(mBatch.shader);
-	assert(shader_matrices);
 
 	float width;
 	float height;
@@ -157,22 +157,18 @@ void System::flush()
 	auto projection = glm::orthoLH(0.0f, width / scale, height / scale, 0.0f, -1.0f, 1.0f);
 	auto model = glm::mat4(1.0f);
 
-	shader_matrices->setProjectionMatrix(projection);
-	shader_matrices->setViewMatrix(view);
-	shader_matrices->setModelMatrix(model);
+	mShader->setProjectionMatrix(projection);
+	mShader->setViewMatrix(view);
+	mShader->setModelMatrix(model);
 
-	if (mBatch.texture.has_value())
-		RENDERER->setTexture(*mBatch.texture.value());
-
-	RENDERER->setShader(mBatch.shader);
+	RENDERER->setTexture(mBatch.texture ? *mBatch.texture : *mWhitePixelTexture);
+	RENDERER->setShader(mShader);
 	skygfx::SetTopology(mBatch.topology.value());
 	RENDERER->setIndexBuffer(mBatch.indices);
 	RENDERER->setVertexBuffer(mBatch.vertices);
 
 	RENDERER->drawIndexed(mBatch.indicesCount);
 
-	mBatch.mode = BatchMode::None;
-	mBatch.shader = nullptr;
 	mBatch.verticesCount = 0;
 	mBatch.indicesCount = 0;
 }
@@ -212,178 +208,180 @@ void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_siz
 	});
 }
 
-void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
-	skygfx::Topology topology, const skygfx::utils::Mesh::Vertices& vertices, const skygfx::utils::Mesh::Indices& indices)
+void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
+	std::shared_ptr<skygfx::Texture> texture, skygfx::Topology topology,
+	skygfx::utils::Mesh::Vertex* vertices, uint32_t vertex_count,
+	skygfx::utils::Mesh::Index* indices, uint32_t index_count)
 {
+	if (shader == nullptr)
+	{
+		// try to batch it
+		draw(topology, texture, vertices, vertex_count, indices, index_count);
+		return;
+	}
+
 	static skygfx::utils::Mesh mesh;
 	mesh.setTopology(topology);
-	mesh.setVertices(vertices);
-	mesh.setIndices(indices);
-	draw(shader, uniform_data, uniform_size, texture, mesh);
+	mesh.setVertices(vertices, vertex_count);
+	mesh.setIndices(indices, index_count);
+
+	draw(shader, uniform_data, uniform_size, texture ? texture.get() : nullptr, mesh);
 }
 
-void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size, skygfx::Texture* texture,
-	std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func)
+void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
+	std::shared_ptr<skygfx::Texture> texture, skygfx::Topology topology,
+	const skygfx::utils::Mesh::Vertices& _vertices, const skygfx::utils::Mesh::Indices& _indices)
+{
+	auto vertices = (skygfx::utils::Mesh::Vertex*)_vertices.data();
+	auto vertex_count = (uint32_t)_vertices.size();
+	auto indices = (skygfx::utils::Mesh::Index*)_indices.data();
+	auto index_count = (uint32_t)_indices.size();
+
+	draw(shader, uniform_data, uniform_size, texture, topology, vertices, vertex_count,
+		indices, index_count);
+}
+
+void System::draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
+	std::shared_ptr<skygfx::Texture> texture, std::function<void(skygfx::utils::MeshBuilder&)> draw_func)
 {
 	static skygfx::utils::MeshBuilder mesh_builder;
 	mesh_builder.reset();
 	draw_func(mesh_builder);
 	assert(!mesh_builder.isBegan());
 
-	static skygfx::utils::Mesh mesh;
-	mesh_builder.setToMesh(mesh);
+	auto topology = mesh_builder.getTopology().value();
+	auto vertices = (skygfx::utils::Mesh::Vertex*)mesh_builder.getVertices().data();
+	auto vertex_count = mesh_builder.getVertexCount();
+	auto indices = (skygfx::utils::Mesh::Index*)mesh_builder.getIndices().data();
+	auto index_count = mesh_builder.getIndexCount();
 
-	draw(shader, uniform_data, uniform_size, texture, mesh);
+	draw(shader, uniform_data, uniform_size, texture, topology, vertices, vertex_count,
+		indices, index_count);
 }
 
-void System::draw(skygfx::Texture* texture,
-	std::function<void(skygfx::utils::MeshBuilder& mesh_builder)> draw_func)
+void System::draw(std::shared_ptr<skygfx::Texture> texture,
+	std::function<void(skygfx::utils::MeshBuilder&)> draw_func)
 {
 	draw(nullptr, nullptr, 0, texture, draw_func);
 }
 
-void System::drawGeneric(skygfx::Topology topology, const Renderer::Buffer& vertices,
-	const Renderer::Buffer& indices, std::shared_ptr<Renderer::ShaderMatrices> shader,
-	std::optional<std::shared_ptr<skygfx::Texture>> texture,
-	std::optional<uint32_t> count, uint32_t start)
-{
-	assert(shader);
-	assert(vertices.size > 0);
-	assert(indices.size > 0);
-
-	applyState();
-	flush();
-
-	const auto& state = mStates.top();
-
-	shader->setProjectionMatrix(state.projection_matrix);
-	shader->setViewMatrix(state.view_matrix);
-	shader->setModelMatrix(state.model_matrix);
-
-	skygfx::SetTopology(topology);
-	RENDERER->setIndexBuffer(indices);
-	RENDERER->setVertexBuffer(vertices);
-	RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
-
-	if (texture.has_value())
-		RENDERER->setTexture(*texture.value());
-		
-	RENDERER->drawIndexed(count.value_or(indices.size / indices.stride), start);
-}
-
-void System::draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
-	std::optional<uint32_t> count, uint32_t start)
-{
-	auto indices = std::vector<uint32_t>(count.value_or(vertices.size() - start));
-	std::iota(indices.begin(), indices.end(), start);
-	draw(topology, vertices, indices);
-}
-
-void System::draw(skygfx::Topology topology, const std::vector<skygfx::Vertex::PositionColor>& vertices,
-	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
+void System::draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
+	skygfx::utils::Mesh::Vertex* vertices, uint32_t vertex_count,
+	skygfx::utils::Mesh::Index* indices, uint32_t index_count,
+	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	assert(mWorking);
-	
+	assert(vertex_count > 0);
+	assert(index_count > 0);
+
 	applyState();
 
-	if (mBatching && vertices.size() <= 40 && !shader)
+	if (mBatching && vertex_count <= 40 && !shader)
 	{
-		if (mBatch.topology != topology || mBatch.mode != BatchMode::Colored)
+		if (mBatch.topology != topology || mBatch.texture != texture)
 			flush();
 		else
 			mBatchesCount += 1;
 
-		mBatch.mode = BatchMode::Colored;
-		mBatch.shader = mBatchColorShader;
+		mBatch.texture = texture;
 		mBatch.topology = topology;
-		mBatch.verticesCount += vertices.size();
+		mBatch.verticesCount += vertex_count;
 
 		if (mBatch.verticesCount > mBatch.vertices.size())
 			mBatch.vertices.resize(mBatch.verticesCount);
 
-		auto start_vertex = mBatch.verticesCount - vertices.size();
+		auto start_vertex = mBatch.verticesCount - vertex_count;
 
-		for (const auto& src_vertex : vertices)
+		for (uint32_t i = 0; i < vertex_count; i++)
 		{
-			auto& dst_vertex = mBatch.vertices.at(start_vertex);
+			const auto& src_vertex = vertices[i];
+			auto& dst_vertex = mBatch.vertices.at(start_vertex + i);
 			dst_vertex.pos = project(src_vertex.pos);
 			dst_vertex.color = src_vertex.color;
-			start_vertex += 1;
+			dst_vertex.texcoord = src_vertex.texcoord;
 		}
 
-		pushBatchIndices(indices, vertices.size());
+		mBatch.indicesCount += index_count;
+
+		if (mBatch.indicesCount > mBatch.indices.size())
+			mBatch.indices.resize(mBatch.indicesCount);
+
+		auto start_index = mBatch.indicesCount - index_count;
+
+		for (uint32_t i = 0; i < index_count; i++)
+		{
+			auto src_index = indices[i];
+			auto& dst_index = mBatch.indices.at(start_index + i);
+			dst_index = static_cast<uint32_t>(mBatch.verticesCount - vertex_count) + src_index;
+		}
 	}
 	else
 	{
-		if (!shader)
-			shader = mColoredShader;
+		flush();
 
-		drawGeneric(topology, vertices, indices, shader);
+		const auto& state = mStates.top();
+
+		if (!shader)
+			shader = mShader;
+
+		shader->setProjectionMatrix(state.projection_matrix);
+		shader->setViewMatrix(state.view_matrix);
+		shader->setModelMatrix(state.model_matrix);
+
+		skygfx::SetTopology(topology);
+		RENDERER->setIndexBuffer({ indices, index_count });
+		RENDERER->setVertexBuffer({ vertices, vertex_count });
+		RENDERER->setShader(std::dynamic_pointer_cast<Renderer::Shader>(shader));
+		RENDERER->setTexture(texture ? *texture : *mWhitePixelTexture);
+		RENDERER->drawIndexed(index_count);
 	}
 }
 
 void System::draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
-	const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
-	std::shared_ptr<Renderer::ShaderMatrices> shader)
+	const skygfx::utils::Mesh::Vertices& vertices, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
 	auto indices = std::vector<uint32_t>(vertices.size());
 	std::iota(indices.begin(), indices.end(), 0);
 	draw(topology, texture, vertices, indices, shader);
 }
 
-void System::draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture, const std::vector<skygfx::Vertex::PositionColorTexture>& vertices,
-	const std::vector<uint32_t>& indices, std::shared_ptr<Renderer::ShaderMatrices> shader)
+void System::draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
+	const skygfx::utils::Mesh::Vertices& _vertices, const skygfx::utils::Mesh::Indices& _indices,
+	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	assert(mWorking);
-	assert(texture);
-	assert(!vertices.empty());
-	assert(!indices.empty());
+	auto vertices = (skygfx::utils::Mesh::Vertex*)_vertices.data();
+	auto vertex_count = (uint32_t)_vertices.size();
+	auto indices = (skygfx::utils::Mesh::Index*)_indices.data();
+	auto index_count = (uint32_t)_indices.size();
 
-	applyState();
-	
-	if (mBatching && vertices.size() <= 40 && !shader)
-	{
-		if (mBatch.topology != topology || mBatch.texture != texture || mBatch.mode != BatchMode::Textured)
-			flush();
-		else
-			mBatchesCount += 1;
+	draw(topology, texture, vertices, vertex_count, indices, index_count, shader);
+}
 
-		mBatch.mode = BatchMode::Textured;
-		mBatch.shader = mTexturedShader;
-		mBatch.texture = texture;
-		mBatch.topology = topology;
-		mBatch.verticesCount += vertices.size();
+void System::drawRectangle(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
+	const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color)
+{
+	draw(shader, uniform_data, uniform_size, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleStrip);
+		mesh.vertex(skygfx::Vertex::PositionColor{ { 0.0f, 0.0f, 0.0f }, top_left_color });
+		mesh.vertex(skygfx::Vertex::PositionColor{ { 0.0f, 1.0f, 0.0f }, bottom_left_color });
+		mesh.vertex(skygfx::Vertex::PositionColor{ { 1.0f, 0.0f, 0.0f }, top_right_color });
+		mesh.vertex(skygfx::Vertex::PositionColor{ { 1.0f, 1.0f, 0.0f }, bottom_right_color });
+		mesh.end();
+	});
+}
 
-		if (mBatch.verticesCount > mBatch.vertices.size())
-			mBatch.vertices.resize(mBatch.verticesCount);
-
-		auto start_vertex = mBatch.verticesCount - vertices.size();
-
-		for (const auto& src_vertex : vertices)
-		{
-			auto& dst_vertex = mBatch.vertices.at(start_vertex);
-			dst_vertex.pos = project(src_vertex.pos);
-			dst_vertex.color = src_vertex.color;
-			dst_vertex.texcoord = src_vertex.texcoord;
-			start_vertex += 1;
-		}
-
-		pushBatchIndices(indices, vertices.size());
-	}
-	else
-	{
-		if (!shader)
-			shader = mTexturedShader;
-
-		drawGeneric(topology, vertices, indices, shader, texture);
-	}
+void System::drawRectangle(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
+	const glm::vec4& color)
+{
+	drawRectangle(shader, uniform_data, uniform_size, color, color, color, color);
 }
 
 void System::drawRectangle(const glm::vec4& top_left_color,
 	const glm::vec4& top_right_color, const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, 
 	std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	static auto vertices = std::vector<skygfx::Vertex::PositionColor>(4);
+	static auto vertices = skygfx::utils::Mesh::Vertices(4);
 
 	vertices[0] = { { 0.0f, 0.0f, 0.0f }, top_left_color };
 	vertices[1] = { { 0.0f, 1.0f, 0.0f }, bottom_left_color };
@@ -392,7 +390,7 @@ void System::drawRectangle(const glm::vec4& top_left_color,
 
 	static const std::vector<uint32_t> indices = { 0, 1, 2, 0, 2, 3 };
 
-	draw(skygfx::Topology::TriangleList, vertices, indices, shader);
+	draw(skygfx::Topology::TriangleList, nullptr, vertices, indices, shader);
 }
 
 void System::drawRectangle(const glm::vec4& color,
@@ -409,17 +407,21 @@ void System::drawRectangle(std::shared_ptr<Renderer::ShaderMatrices> shader)
 void System::drawRoundedRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding)
 {
-	static auto shader = std::make_shared<Renderer::Shaders::Rounded>(skygfx::Vertex::PositionColor::Layout);
-	shader->setSize(size);
+	static auto shader = skygfx::utils::MakeEffectShader(sky::effects::Rounded::Shader);
+	static auto settings = sky::effects::Rounded();
+	settings.size = size;
+	
 	if (absolute_rounding)
 	{
-		shader->setRadius(glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f));
+		settings.radius = glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f);
 	}
 	else
 	{
-		shader->setRadius((glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f);
+		settings.radius = (glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;
 	}
-	drawRectangle(top_left_color, top_right_color, bottom_left_color, bottom_right_color, shader);
+
+	drawRectangle(&shader, &settings, sizeof(settings), top_left_color, top_right_color, bottom_left_color,
+		bottom_right_color);
 }
 
 void System::drawRoundedRectangle(const glm::vec4& color,
@@ -431,14 +433,14 @@ void System::drawRoundedRectangle(const glm::vec4& color,
 void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 	const glm::vec2& size, float rounding, bool absolute_rounding)
 {
-	static Graphics::TexRegion center_region = { 
-		{ 
+	static Graphics::TexRegion center_region = {
+		{
 			(mWhiteCircleTexture->getWidth() / 2.0f) - 1.0f,
 			(mWhiteCircleTexture->getHeight() / 2.0f) - 1.0f
-		}, 
-		{ 
-			2.0f, 2.0f 
-		} 
+		},
+		{
+			2.0f, 2.0f
+		}
 	};
 
 	float edge_size = 0.0f;
@@ -459,7 +461,7 @@ void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 
 void System::drawLineRectangle(const glm::vec4& color)
 {
-	static auto vertices = std::vector<skygfx::Vertex::PositionColor>(4);
+	static auto vertices = skygfx::utils::Mesh::Vertices(4);
 
 	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color };
 	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color };
@@ -468,18 +470,19 @@ void System::drawLineRectangle(const glm::vec4& color)
 	
 	static const std::vector<uint32_t> indices = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
-	draw(skygfx::Topology::LineList, vertices, indices);
+	draw(skygfx::Topology::LineList, nullptr, vertices, indices);
 }
 
 void System::drawCircle(const glm::vec4& inner_color, const glm::vec4& outer_color, 
 	float fill, float pie)
 {
-	static auto shader = std::make_shared<Renderer::Shaders::Circle>(skygfx::Vertex::PositionColor::Layout);
-	shader->setFill(fill);
-	shader->setPie(pie);
-	shader->setInnerColor(inner_color);
-	shader->setOuterColor(outer_color);
-	drawRectangle(shader);
+	static auto shader = skygfx::utils::MakeEffectShader(sky::effects::Circle::Shader);
+	static auto settings = sky::effects::Circle();
+	settings.fill = fill;
+	settings.pie = pie;
+	settings.inner_color = inner_color;
+	settings.outer_color = outer_color;
+	drawRectangle(&shader, &settings, sizeof(settings));
 }
 
 void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
@@ -494,7 +497,7 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 	float cosInc = glm::cos(increment);
 
 	auto r1 = glm::vec2({ sinInc, -cosInc });
-	auto vertices = std::vector<skygfx::Vertex::PositionColor>();
+	auto vertices = skygfx::utils::Mesh::Vertices();
 
 	auto radius_inner = Radius * (1.0f - fill);
 	auto radius_outer = Radius;
@@ -533,7 +536,7 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 		v1_inner = v2_inner;
 	}
 
-	draw(skygfx::Topology::TriangleList, vertices);
+	draw(skygfx::Topology::TriangleList, nullptr, vertices);
 }
 
 void System::drawCircleTexture(const glm::vec4& color)
@@ -547,7 +550,7 @@ void System::drawSprite(std::shared_ptr<skygfx::Texture> texture, const glm::vec
 	const glm::vec2& top_right_uv, const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
 	const glm::vec4& color, std::shared_ptr<Renderer::ShaderMatrices> shader)
 {
-	static auto vertices = std::vector<skygfx::Vertex::PositionColorTexture>(4);
+	static auto vertices = skygfx::utils::Mesh::Vertices(4);
 
 	vertices[0] = { { 0.0f, 0.0f, 0.0f }, color, top_left_uv };
 	vertices[1] = { { 0.0f, 1.0f, 0.0f }, color, bottom_left_uv };
@@ -601,7 +604,7 @@ void System::drawSlicedSprite(std::shared_ptr<skygfx::Texture> texture,
 		p2 = (size - edge_size.value()) / size;
 	}
 
-	static auto vertices = std::vector<skygfx::Vertex::PositionColorTexture>(36);
+	static auto vertices = skygfx::utils::Mesh::Vertices(36);
 
 	// top left
 
@@ -695,7 +698,7 @@ void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture>
 	settings.smooth_factor = smoothFactor;
 	settings.color = color;
 
-	draw(&shader, &settings, sizeof(settings), texture.get(), topology, vertices, indices);
+	draw(&shader, &settings, sizeof(settings), texture, topology, vertices, indices);
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 
@@ -779,23 +782,6 @@ glm::vec3 System::project(const glm::vec3& pos)
 	projected_pos *= 0.5f;
 
 	return projected_pos;
-}
-
-void System::pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size)
-{
-	mBatch.indicesCount += indices.size();
-
-	if (mBatch.indicesCount > mBatch.indices.size())
-		mBatch.indices.resize(mBatch.indicesCount);
-
-	auto start_index = mBatch.indicesCount - indices.size();
-
-	for (auto src_index : indices)
-	{
-		auto& dst_index = mBatch.indices.at(start_index);
-		dst_index = static_cast<uint32_t>(mBatch.verticesCount - vertices_size) + src_index;
-		start_index += 1;
-	}
 }
 
 void System::push(const State& value)

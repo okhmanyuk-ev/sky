@@ -74,8 +74,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDirection, vec3 pos)
 
 	return CalcLight(normal, viewDirection, lightDir, light.ambient, light.diffuse, light.specular) * attenuation;
 }
-
-vec4 fragment(vec4 result)
+void effect(inout vec4 result)
 {
 	vec3 pos = vec3(ubo.model * vec4(In.Position, 1.0));
 
@@ -86,8 +85,6 @@ vec4 fragment(vec4 result)
 	intensity += CalcPointLight(settings.pointLight, normal, viewDirection, pos);
 		
 	result *= vec4(intensity, 1.0);
-
-	return result;
 })";
 
 Light::Light(const skygfx::VertexLayout& layout, const std::set<Flag>& flags) : Generic(layout, flags, src_fragment)

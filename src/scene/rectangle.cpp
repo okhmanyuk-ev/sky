@@ -1,5 +1,4 @@
 #include "rectangle.h"
-#include <renderer/shaders/rounded.h>
 
 using namespace Scene;
 

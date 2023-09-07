@@ -12,7 +12,7 @@ layout(binding = 2) uniform _settings
 	float force;
 } settings;
 
-vec4 fragment(vec4 result)
+void effect(inout vec4 result)
 {
 	const vec2 center = vec2(0.5, 0.5);
 	float d = distance(In.TexCoord, center);
@@ -26,8 +26,6 @@ vec4 fragment(vec4 result)
 	vec2 disp = (In.TexCoord - center) * mask * settings.force;
 
 	result = texture(sTexture, In.TexCoord - disp);
-
-	return result;
 })";
 
 Shockwave::Shockwave(const skygfx::VertexLayout& layout) : Generic(layout, src_fragment)
