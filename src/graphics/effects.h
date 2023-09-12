@@ -2,9 +2,37 @@
 
 #include <string>
 #include <glm/glm.hpp>
+#include <skygfx/skygfx.h>
+#include <skygfx/utils.h>
 
 namespace sky::effects
 {
+	class IEffect
+	{
+	public:
+		virtual skygfx::Shader* getShader() const = 0;
+		virtual void* getUniformData() const = 0;
+		virtual size_t getUniformSize() const = 0;
+	};
+
+	template<class T>
+	class Effect : public IEffect
+	{
+	public:
+		Effect() : mShader(skygfx::utils::MakeEffectShader(T::Shader))
+		{
+		}
+
+		skygfx::Shader* getShader() const override { return (skygfx::Shader*)&mShader; }
+		void* getUniformData() const override { return (void*)&uniform; }
+		size_t getUniformSize() const override { return sizeof(T); }
+
+		T uniform;
+
+	private:
+		skygfx::Shader mShader;
+	};
+
 	struct alignas(16) Sdf
 	{
 		glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -31,6 +59,22 @@ namespace sky::effects
 		glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glm::vec2 size;
 		float radius;
+
+		static const std::string Shader;
+	};
+
+	struct alignas(16) MipmapBias // TODO: remove this effect and use skygfx::utils::commands::SetMipmapBias()
+	{
+		float bias;
+
+		static const std::string Shader;
+	};
+
+	struct alignas(16) Shockwave
+	{
+		float size = 1.0f;
+		float thickness = 1.0f;
+		float force = 1.0f;
 
 		static const std::string Shader;
 	};

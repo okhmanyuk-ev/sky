@@ -68,9 +68,9 @@ void BlurredGlass::draw()
 	// ...
 	// GRAPHICS->pop();
 
-	auto static shader = std::make_shared<Renderer::Shaders::Generic>(skygfx::utils::Mesh::Vertex::Layout);
-	shader->setLodBias(mBlurIntensity * 8.0f);
-	setShader(shader);
+	static auto effect = sky::effects::Effect<sky::effects::MipmapBias>();
+	effect.uniform.bias = mBlurIntensity * 8.0f;
+	setEffect(&effect);
 
 	if (mBlurPasses < 1)
 		mBlurPasses = 1;
@@ -88,8 +88,9 @@ void GrayscaledGlass::draw()
 	if (mGrayscaleIntensity <= 0.0f)
 		return;
 
-	auto static shader = std::make_shared<Renderer::Shaders::Grayscale>(skygfx::utils::Mesh::Vertex::Layout);
-	shader->setIntensity(mGrayscaleIntensity);
-	setShader(shader);
+	auto static effect = sky::effects::Effect<skygfx::utils::effects::Grayscale>();
+	effect.uniform.intensity = mGrayscaleIntensity;
+	setEffect(&effect);
+
 	Glass::draw();
 }

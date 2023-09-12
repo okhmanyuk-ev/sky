@@ -38,14 +38,8 @@ namespace Shared::SceneHelpers
 
 	class GrayscaleSprite : public Scene::Sprite
 	{
-	public:
-		GrayscaleSprite();
-
 	protected:
 		void draw() override;
-
-	private:
-		static inline std::shared_ptr<Renderer::Shaders::Grayscale> Shader = nullptr;
 
 	public:
 		auto getGrayIntensity() const { return mGrayIntensity; }
@@ -250,7 +244,7 @@ namespace Shared::SceneHelpers
 				return;
 
 			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
-			GRAPHICS->drawRectangle(mBackshadeColor->getColor());
+			GRAPHICS->drawRectangle(nullptr, mBackshadeColor->getColor());
 			GRAPHICS->pop();
 		}
 
@@ -274,7 +268,7 @@ namespace Shared::SceneHelpers
 				return;
 
 			GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
-			GRAPHICS->drawRectangle(mFrontshadeColor->getColor());
+			GRAPHICS->drawRectangle(nullptr, mFrontshadeColor->getColor());
 			GRAPHICS->pop();
 		}
 

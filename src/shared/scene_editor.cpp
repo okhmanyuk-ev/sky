@@ -433,7 +433,7 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::ve
 	GRAPHICS->pushModelMatrix(model);
 	if (filled)
 	{
-		GRAPHICS->drawRectangle({ color, 0.25f });
+		GRAPHICS->drawRectangle(nullptr, { color, 0.25f });
 	}
 	GRAPHICS->drawLineRectangle({ color, 1.0f });
 	GRAPHICS->pop(2);

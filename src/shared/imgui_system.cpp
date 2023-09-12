@@ -116,7 +116,7 @@ void ImguiSystem::end()
 			{
 				auto texture = *(std::shared_ptr<skygfx::Texture>*)cmd.TextureId;
 				GRAPHICS->pushScissor(skygfx::Scissor{ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });
-				GRAPHICS->draw(texture, [&](skygfx::utils::MeshBuilder& mesh_builder) {
+				GRAPHICS->draw(nullptr, texture, [&](skygfx::utils::MeshBuilder& mesh_builder) {
 					mesh_builder.begin(skygfx::utils::MeshBuilder::Mode::Triangles);
 
 					for (uint32_t i = index_offset; i < index_offset + cmd.ElemCount; i++)

@@ -101,3 +101,38 @@ void effect(inout vec4 result)
 	if (length(p - vec2(rounded.size.x - rounded.radius, rounded.size.y - rounded.radius)) > rounded.radius && length(p - vec2(rounded.size.x, rounded.size.y)) < rounded.radius)
 		discard;
 })";
+
+const std::string MipmapBias::Shader = R"(
+layout(binding = EFFECT_UNIFORM_BINDING) uniform _bias
+{
+	float bias;
+} bias;
+
+void effect(inout vec4 result)
+{
+	result = texture(sColorTexture, In.tex_coord, bias.bias);
+})";
+
+const std::string Shockwave::Shader = R"(
+layout(binding = EFFECT_UNIFORM_BINDING) uniform _shockwave
+{
+	float size;
+	float thickness;
+	float force;
+} shockwave;
+
+void effect(inout vec4 result)
+{
+	const vec2 center = vec2(0.5, 0.5);
+	float d = distance(In.tex_coord, center);
+
+	float scaled_size = shockwave.size * 0.5;
+	float scaled_thickness = shockwave.thickness * 0.25;
+
+	float mask = (1.0 - smoothstep(scaled_size - scaled_thickness, scaled_size, d));
+	mask *= smoothstep(scaled_size - scaled_thickness - scaled_thickness, scaled_size - scaled_thickness, d);
+
+	vec2 disp = (In.tex_coord - center) * mask * shockwave.force;
+
+	result = texture(sColorTexture, In.tex_coord - disp);
+})";

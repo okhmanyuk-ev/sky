@@ -36,14 +36,14 @@ namespace Scene
 		auto getTextureAddress() const { return mTextureAddress; }
 		void setTextureAddress(skygfx::TextureAddress value) { mTextureAddress = value; }
 
-		auto getShader() const { return mShader; }
-		void setShader(std::shared_ptr<Renderer::ShaderMatrices> value) { mShader = value; }
+		auto getEffect() const { return mEffect; }
+		void setEffect(sky::effects::IEffect* value) { mEffect = value; }
 
 	private:
 		std::shared_ptr<skygfx::Texture> mTexture = DefaultTexture;
 		Graphics::TexRegion mTexRegion = {};
 		skygfx::TextureAddress mTextureAddress = DefaultTextureAddress;
-		std::shared_ptr<Renderer::ShaderMatrices> mShader = nullptr;
+		sky::effects::IEffect* mEffect = nullptr;
 
 	public:
 		struct DirectTexCoords

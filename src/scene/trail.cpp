@@ -99,37 +99,6 @@ void Trail::draw()
 	if (mSegments.size() < 2)
 		return;
 
-	auto vertices = skygfx::utils::Mesh::Vertices();
-
-	for (int i = (int)mSegments.size() - 1; i >= 0; i--)
-	{
-		bool last = i == mSegments.size() - 1;
-
-		const auto& s1 = mSegments.at(i);
-		const auto& s2 = mSegments.at(last ? i - 1 : i + 1);
-
-		auto perp = glm::normalize(s1.pos - s2.pos); // perpendicular
-		perp = { -perp.y, perp.x };
-
-		float thickness = (getAbsoluteSize().x + getAbsoluteSize().y) / 4.0f; // TODO: bad size effect when parent node was scaled
-
-		perp *= thickness;
-		
-		auto interp = Easing::Linear((float)i / (float)mSegments.size());
-		
-		if (mNarrowing)
-			perp *= interp;
-		
-		auto v1 = s1.pos + perp;
-		auto v2 = s1.pos - perp;
-
-		auto color = glm::lerp(mEndColor, mBeginColor, interp);
-		color *= getColor();
-		
-		vertices.push_back({ { last ? v2 : v1, 0.0f }, color });
-		vertices.push_back({ { last ? v1 : v2, 0.0f }, color });
-	}
-
 	auto holder = mHolder.lock();
 
 	auto stencil = skygfx::StencilMode();
@@ -142,7 +111,41 @@ void Trail::draw()
 
 	GRAPHICS->pushStencilMode(stencil);
 	GRAPHICS->pushModelMatrix(holder->getTransform());
-	GRAPHICS->draw(skygfx::Topology::TriangleStrip, nullptr, vertices);
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleStrip);
+
+		for (int i = (int)mSegments.size() - 1; i >= 0; i--)
+		{
+			bool last = i == mSegments.size() - 1;
+
+			const auto& s1 = mSegments.at(i);
+			const auto& s2 = mSegments.at(last ? i - 1 : i + 1);
+
+			auto perp = glm::normalize(s1.pos - s2.pos); // perpendicular
+			perp = { -perp.y, perp.x };
+
+			float thickness = (getAbsoluteSize().x + getAbsoluteSize().y) / 4.0f; // TODO: bad size effect when parent node was scaled
+
+			perp *= thickness;
+
+			auto interp = Easing::Linear((float)i / (float)mSegments.size());
+
+			if (mNarrowing)
+				perp *= interp;
+
+			auto v1 = s1.pos + perp;
+			auto v2 = s1.pos - perp;
+
+			auto color = glm::lerp(mEndColor, mBeginColor, interp);
+			color *= getColor();
+
+			mesh.vertex(skygfx::Vertex::PositionColor{ { last ? v2 : v1, 0.0f }, color });
+			mesh.vertex(skygfx::Vertex::PositionColor{ { last ? v1 : v2, 0.0f }, color });
+		}
+
+		mesh.end();
+	});
+
 	GRAPHICS->pop(2);
 }
 

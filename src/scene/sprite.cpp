@@ -15,21 +15,24 @@ void Sprite::draw()
 		return;
 	
 	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
-	
+
 	GRAPHICS->pushSampler(getSampler());
 	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->pushTextureAddress(mTextureAddress);
 	GRAPHICS->pushModelMatrix(model);
+
+	auto color = getColor();
+
 	if (mDirectTexCoords.has_value())
 	{
 		auto coords = mDirectTexCoords.value();
 
-		GRAPHICS->drawSprite(mTexture, coords.top_left_uv, coords.top_right_uv, coords.bottom_left_uv, 
-			coords.bottom_right_uv, getColor(), mShader);
+		GRAPHICS->drawTexturedRectangle(mEffect, mTexture, coords.top_left_uv, coords.top_right_uv,
+			coords.bottom_left_uv, coords.bottom_right_uv, color, color, color, color);
 	}
 	else
 	{
-		GRAPHICS->drawSprite(mTexture, mTexRegion, getColor(), mShader);
+		GRAPHICS->drawTexturedRectangle(mEffect, mTexture, mTexRegion, color, color, color, color);
 	}
 	GRAPHICS->pop(4);
 }

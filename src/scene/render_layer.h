@@ -90,7 +90,7 @@ namespace Scene
 			}
 
 			GRAPHICS->pushBlendMode(getBlendMode());
-			GRAPHICS->drawSprite(target, { }, color);
+			GRAPHICS->drawTexturedRectangle(nullptr, target, {}, color, color, color, color);
 			GRAPHICS->pop(2);
 
 			T::leaveDraw();

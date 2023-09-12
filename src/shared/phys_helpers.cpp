@@ -325,7 +325,7 @@ void World::detach(std::shared_ptr<Node> node)
 
 void World::Draw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineStrip);
 		mesh.color({ color.r, color.g, color.b });
 		for (int i = 0; i < vertexCount; i++)
@@ -339,7 +339,7 @@ void World::Draw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b
 
 void World::Draw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleFan);
 		mesh.color({ color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 0.5f });
 		for (int i = 0; i < vertexCount; i++)
@@ -348,7 +348,7 @@ void World::Draw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, co
 		}
 		mesh.end();
 	});
-	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineLoop);
 		mesh.color({ color.r, color.g, color.b, color.a });
 		for (int i = 0; i < vertexCount; i++)
@@ -367,7 +367,7 @@ void World::Draw::DrawCircle(const b2Vec2& center, float radius, const b2Color& 
 	float sinInc = glm::sin(increment);
 	float cosInc = glm::cos(increment);
 
-	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
 		mesh.color({ color.r, color.g, color.b, color.a });
 
@@ -400,7 +400,7 @@ void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 	auto r1 = glm::vec2({ cosInc, sinInc });
 	auto v1 = v0 + radius * r1;
 
-	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleFan);
 		mesh.color({ 0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f });
 		mesh.vertex(v0);
@@ -414,7 +414,7 @@ void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 		}
 		mesh.end();
 	});
-	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
 		mesh.color({ color.r, color.g, color.b, color.a });
 		r1 = { 1.0f, 0.0f };
@@ -436,7 +436,7 @@ void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 
 void World::Draw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
 		mesh.color({ color.r, color.g, color.b, color.a });
 		mesh.vertex({ p1.x, p1.y });
@@ -452,7 +452,7 @@ void World::Draw::DrawTransform(const b2Transform& xf)
 	b2Vec2 px = p + AxisScale * xf.q.GetXAxis();
 	b2Vec2 py = p + AxisScale * xf.q.GetYAxis();
 
-	GRAPHICS->draw(nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
+	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
 		mesh.color(Graphics::Color::Red);
 		mesh.vertex({ p.x, p.y });

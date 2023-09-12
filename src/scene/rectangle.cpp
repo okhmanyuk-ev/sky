@@ -67,7 +67,7 @@ void Rectangle::draw()
 	}
 	else
 	{
-		GRAPHICS->drawRectangle(top_left_color, top_right_color, bottom_left_color, bottom_right_color);
+		GRAPHICS->drawRectangle(nullptr, top_left_color, top_right_color, bottom_left_color, bottom_right_color);
 	}
 
 	GRAPHICS->pop();

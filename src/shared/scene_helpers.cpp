@@ -237,17 +237,11 @@ void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const gl
 	color_node->setColor(color);
 }
 
-SceneHelpers::GrayscaleSprite::GrayscaleSprite()
-{
-	if (!Shader)
-		Shader = std::make_shared<Renderer::Shaders::Grayscale>(skygfx::utils::Mesh::Vertex::Layout);
-
-	setShader(Shader);
-}
-
 void SceneHelpers::GrayscaleSprite::draw()
 {
-	Shader->setIntensity(mGrayIntensity);
+	static auto effect = sky::effects::Effect<skygfx::utils::effects::Grayscale>();
+	effect.uniform.intensity = mGrayIntensity;
+	setEffect(&effect);
 	Sprite::draw();
 }
 
@@ -828,12 +822,12 @@ SceneHelpers::Shockwave::Shockwave()
 
 void SceneHelpers::Shockwave::draw()
 {
-	static auto shader = std::make_shared<Renderer::Shaders::Shockwave>(skygfx::utils::Mesh::Vertex::Layout);
-	shader->setSize(mShockwaveSize);
-	shader->setThickness(mShockwaveThickness);
-	shader->setForce(mShockwaveForce);
+	static auto effect = sky::effects::Effect<sky::effects::Shockwave>();
+	effect.uniform.size = mShockwaveSize;
+	effect.uniform.thickness = mShockwaveThickness;
+	effect.uniform.force = mShockwaveForce;
 
-	setShader(shader);
+	setEffect(&effect);
 
 	Glass::draw();
 }

@@ -8,6 +8,7 @@
 #include <graphics/font.h>
 #include <graphics/camera.h>
 #include <graphics/tex_region.h>
+#include <graphics/effects.h>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -40,56 +41,35 @@ namespace Graphics
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
-		void draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
-			skygfx::Texture* texture, const skygfx::utils::Mesh& mesh);
+		void draw(sky::effects::IEffect* effect, skygfx::Texture* texture, const skygfx::utils::Mesh& mesh);
 
-		void draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
-			std::shared_ptr<skygfx::Texture> texture, skygfx::Topology topology,
-			skygfx::utils::Mesh::Vertex* vertices, uint32_t vertex_count,
+		void draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
+			skygfx::Topology topology, skygfx::utils::Mesh::Vertex* vertices, uint32_t vertex_count,
 			skygfx::utils::Mesh::Index* indices, uint32_t index_count);
 
-		void draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
-			std::shared_ptr<skygfx::Texture> texture, skygfx::Topology topology,
-			const skygfx::utils::Mesh::Vertices& vertices,
+		void draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
+			skygfx::Topology topology, const skygfx::utils::Mesh::Vertices& vertices,
 			const skygfx::utils::Mesh::Indices& indices);
 
-		void draw(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
-			std::shared_ptr<skygfx::Texture> texture, std::function<void(skygfx::utils::MeshBuilder&)> draw_func);
-
-		void draw(std::shared_ptr<skygfx::Texture> texture,
+		void draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
 			std::function<void(skygfx::utils::MeshBuilder&)> draw_func);
 
-		// draw indexed colored and textured vertices
-		void draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
-			skygfx::utils::Mesh::Vertex* vertices, uint32_t vertex_count,
-			skygfx::utils::Mesh::Index* indices, uint32_t index_count,
-			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
-
-		// draw colored and textured vertices
-		void draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
-			const skygfx::utils::Mesh::Vertices& vertices, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
-
-		// draw indexed colored and textured vertices
-		void draw(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
-			const skygfx::utils::Mesh::Vertices& vertices, const skygfx::utils::Mesh::Indices& indices,
-			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
-
 		// colored rectangle
-		void drawRectangle(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
+		void drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture, 
+			const glm::vec2& top_left_uv, const glm::vec2& top_right_uv,
+			const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
 			const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color);
 
-		void drawRectangle(skygfx::Shader* shader, void* uniform_data, size_t uniform_size,
-			const glm::vec4& color = { Color::White, 1.0f });
+		void drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
+			const TexRegion& region, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color);
 
-		void drawRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
-			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color,
-			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+		void drawRectangle(sky::effects::IEffect* effect,
+			const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color);
 
-		void drawRectangle(const glm::vec4& color = { Color::White, 1.0f },
-			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
-
-		void drawRectangle(std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+		void drawRectangle(sky::effects::IEffect* effect, const glm::vec4& color = { Color::White, 1.0f });
 
 		// rounded rectangle
 		void drawRoundedRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
@@ -111,21 +91,10 @@ namespace Graphics
 
 		void drawCircleTexture(const glm::vec4& color = { Color::White, 1.0f });
 
-		// sprite
-		void drawSprite(std::shared_ptr<skygfx::Texture> texture, const glm::vec2& top_left_uv,
-			const glm::vec2& top_right_uv, const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
-			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
-
-		void drawSprite(std::shared_ptr<skygfx::Texture> texture,
-			const TexRegion& tex_region = { }, const glm::vec4& color = { Color::White, 1.0f }, 
-			std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
-
-		void drawSprite(std::shared_ptr<skygfx::Texture> texture, std::shared_ptr<Renderer::ShaderMatrices> shader);
-
 		// sliced sprite
-		void drawSlicedSprite(std::shared_ptr<skygfx::Texture> texture, const TexRegion& center_region,
+		void drawSlicedSprite(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture, const TexRegion& center_region,
 			const glm::vec2& size, std::optional<float> edge_size = std::nullopt,
-			const glm::vec4& color = { Color::White, 1.0f }, std::shared_ptr<Renderer::ShaderMatrices> shader = nullptr);
+			const glm::vec4& color = { Color::White, 1.0f });
 
 		// sdf mesh
 		void drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
@@ -212,9 +181,6 @@ namespace Graphics
 		int mBatchesCountPublic = 0;
 
 	private:
-		std::shared_ptr<Renderer::Shaders::Generic> mShader = std::make_shared<Renderer::Shaders::Generic>(skygfx::utils::Mesh::Vertex::Layout);
-
-	private:
 		struct
 		{
 			std::shared_ptr<skygfx::Texture> texture;
@@ -241,7 +207,6 @@ namespace Graphics
 		std::shared_ptr<skygfx::Texture> makeGenericTexture(const glm::ivec2& size, std::function<void()> callback);
 		
 	private:
-		std::shared_ptr<skygfx::Texture> mWhitePixelTexture = nullptr;
 		std::shared_ptr<skygfx::Texture> mWhiteCircleTexture = nullptr;
 	};
 
