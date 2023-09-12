@@ -37,7 +37,6 @@ namespace Scene
 
 		virtual void onTap()
 		{
-			//
 		}
 
 	public:
