@@ -3,7 +3,7 @@
 using namespace sky::effects;
 
 const std::string Sdf::Shader = R"(
-layout(binding = EFFECT_UNIFORM_BINDING) uniform _grayscale
+layout(binding = EFFECT_UNIFORM_BINDING) uniform _sdf
 {
 	vec4 color;
 	float min_value;
@@ -13,7 +13,7 @@ layout(binding = EFFECT_UNIFORM_BINDING) uniform _grayscale
 
 void effect(inout vec4 result)
 {
-	float distance = result.a;
+	float distance = texture(sColorTexture, In.tex_coord, settings.mipmap_bias).a;
 	float min_alpha = smoothstep(sdf.min_value - sdf.smooth_factor, sdf.min_value + sdf.smooth_factor, distance);
 	float max_alpha = smoothstep(sdf.max_value + sdf.smooth_factor, sdf.max_value - sdf.smooth_factor, distance);
 	result = vec4(0.0, 0.0, 0.0, 0.0);
@@ -42,6 +42,10 @@ layout(binding = EFFECT_UNIFORM_BINDING) uniform _circle
 
 void effect(inout vec4 result)
 {
+	result = In.color;
+	result *= settings.color;
+	result *= texture(sColorTexture, In.tex_coord, settings.mipmap_bias);
+
 	const float Pi = 3.14159265;
 
 	vec2 vertex_pos = In.frag_position.xy;
@@ -85,6 +89,10 @@ layout(binding = EFFECT_UNIFORM_BINDING) uniform _rounded
 
 void effect(inout vec4 result)
 {
+	result = In.color;
+	result *= settings.color;
+	result *= texture(sColorTexture, In.tex_coord, settings.mipmap_bias);
+
 	vec2 vertex_pos = (inverse(settings.model) * vec4(In.frag_position, 1.0)).xy;
 
 	vec2 p = vertex_pos * rounded.size;
