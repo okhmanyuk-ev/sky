@@ -19,18 +19,25 @@ namespace sky::effects
 	class Effect : public IEffect
 	{
 	public:
-		Effect() : mShader(skygfx::utils::MakeEffectShader(T::Shader))
+		Effect()
 		{
+			auto type_index = std::type_index(typeid(T));
+			auto& context = skygfx::utils::GetContext();
+
+			if (!context.shaders.contains(type_index))
+				context.shaders.insert({ type_index, skygfx::utils::MakeEffectShader(T::Shader) });
+
+			mShader = &context.shaders.at(type_index);
 		}
 
-		skygfx::Shader* getShader() const override { return (skygfx::Shader*)&mShader; }
+		skygfx::Shader* getShader() const override { return mShader; }
 		void* getUniformData() const override { return (void*)&uniform; }
 		size_t getUniformSize() const override { return sizeof(T); }
 
 		T uniform;
 
 	private:
-		skygfx::Shader mShader;
+		skygfx::Shader* mShader;
 	};
 
 	struct alignas(16) Sdf
