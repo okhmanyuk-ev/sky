@@ -107,7 +107,7 @@ void System::flush()
 	width /= scale;
 	height /= scale;
 
-	auto [proj, view, eye_pos] = skygfx::utils::MakeCameraMatrices(skygfx::utils::OrthogonalCamera{}, width, height);
+	auto [proj, view] = skygfx::utils::MakeOrthogonalCameraMatrices(skygfx::utils::OrthogonalCamera{}, width, height);
 
 	static skygfx::utils::Mesh mesh;
 	mesh.setTopology(mBatch.topology.value());
