@@ -151,16 +151,15 @@ void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, const
 
 	//RENDERER->setRenderTarget(state.render_target); 
 
-	auto cmds = skygfx::utils::Commands();
+	std::vector<skygfx::utils::Command> cmds;
 
 	if (effect != nullptr)
 	{
-		skygfx::utils::AddCommands(cmds, {
-			skygfx::utils::commands::SetEffect(effect->getShader(), effect->getUniformData(), effect->getUniformSize()),
-		});
+		cmds.push_back(skygfx::utils::commands::SetEffect(effect->getShader(), effect->getUniformData(),
+			effect->getUniformSize()));
 	}
 
-	skygfx::utils::AddCommands(cmds, {
+	cmds.insert(cmds.end(), {
 		skygfx::utils::commands::SetViewport(state.viewport),
 		skygfx::utils::commands::SetScissor(state.scissor),
 		skygfx::utils::commands::SetDepthMode(state.depth_mode),
