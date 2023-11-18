@@ -122,7 +122,7 @@ void ImguiSystem::end()
 					for (uint32_t i = index_offset; i < index_offset + cmd.ElemCount; i++)
 					{
 						const auto& v = cmds->VtxBuffer[cmds->IdxBuffer[i]];						
-						mesh_builder.vertex(skygfx::Vertex::PositionColorTexture{
+						mesh_builder.vertex(skygfx::vertex::PositionColorTexture{
 							.pos = { v.pos.x, v.pos.y, 0.0f },
 							.color = glm::unpackUnorm4x8(v.col),
 							.texcoord = { v.uv.x, v.uv.y }

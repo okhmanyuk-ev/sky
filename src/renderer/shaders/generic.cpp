@@ -153,10 +153,10 @@ std::vector<std::string> Generic::GenerateDefines(const std::vector<std::string>
 	auto result = defines;
 
 	const static std::unordered_map<std::string, std::string> AttribsDefines = {
-		{ skygfx::Vertex::Location::Position, "HAS_POSITION_ATTRIB" },
-		{ skygfx::Vertex::Location::Color, "HAS_COLOR_ATTRIB" },
-		{ skygfx::Vertex::Location::TexCoord, "HAS_TEXCOORD_ATTRIB" },
-		{ skygfx::Vertex::Location::Normal, "HAS_NORMAL_ATTRIB" },
+		{ skygfx::vertex::location::Position, "HAS_POSITION_ATTRIB" },
+		{ skygfx::vertex::location::Color, "HAS_COLOR_ATTRIB" },
+		{ skygfx::vertex::location::TexCoord, "HAS_TEXCOORD_ATTRIB" },
+		{ skygfx::vertex::location::Normal, "HAS_NORMAL_ATTRIB" },
 	};
 
 	const static std::unordered_map<Flag, std::string> FeatureDefines = {
@@ -199,10 +199,10 @@ std::set<Generic::Flag> Generic::MakeFlagsFromLayout(const skygfx::VertexLayout&
 		return false;
 	};
 
-	if (hasAttribute(skygfx::Vertex::Location::Color))
+	if (hasAttribute(skygfx::vertex::location::Color))
 		result.insert(Flag::Colored);
 
-	if (hasAttribute(skygfx::Vertex::Location::TexCoord))
+	if (hasAttribute(skygfx::vertex::location::TexCoord))
 		result.insert(Flag::Textured);
 
 	return result;

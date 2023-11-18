@@ -139,8 +139,8 @@ void Trail::draw()
 			auto color = glm::lerp(mEndColor, mBeginColor, interp);
 			color *= getColor();
 
-			mesh.vertex(skygfx::Vertex::PositionColor{ { last ? v2 : v1, 0.0f }, color });
-			mesh.vertex(skygfx::Vertex::PositionColor{ { last ? v1 : v2, 0.0f }, color });
+			mesh.vertex(skygfx::vertex::PositionColor{ { last ? v2 : v1, 0.0f }, color });
+			mesh.vertex(skygfx::vertex::PositionColor{ { last ? v1 : v2, 0.0f }, color });
 		}
 
 		mesh.end();

@@ -48,7 +48,7 @@ void effect(inout vec4 result)
 
 	const float Pi = 3.14159265;
 
-	vec2 vertex_pos = In.frag_position.xy;
+	vec2 vertex_pos = In.world_position.xy;
 	vec2 center = vec2(0.5, 0.5);
 
 	vec2 p = vertex_pos - center;
@@ -93,7 +93,7 @@ void effect(inout vec4 result)
 	result *= settings.color;
 	result *= texture(sColorTexture, In.tex_coord, settings.mipmap_bias);
 
-	vec2 vertex_pos = (inverse(settings.model) * vec4(In.frag_position, 1.0)).xy;
+	vec2 vertex_pos = (inverse(settings.model) * vec4(In.world_position, 1.0)).xy;
 
 	vec2 p = vertex_pos * rounded.size;
 

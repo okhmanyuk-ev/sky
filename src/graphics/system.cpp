@@ -273,10 +273,10 @@ void System::drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_pt
 {
 	draw(effect, texture, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleStrip);
-		mesh.vertex(skygfx::Vertex::PositionColorTexture{ { 0.0f, 0.0f, 0.0f }, top_left_color, top_left_uv });
-		mesh.vertex(skygfx::Vertex::PositionColorTexture{ { 0.0f, 1.0f, 0.0f }, bottom_left_color, bottom_left_uv });
-		mesh.vertex(skygfx::Vertex::PositionColorTexture{ { 1.0f, 0.0f, 0.0f }, top_right_color, top_right_uv });
-		mesh.vertex(skygfx::Vertex::PositionColorTexture{ { 1.0f, 1.0f, 0.0f }, bottom_right_color, bottom_right_uv });
+		mesh.vertex(skygfx::vertex::PositionColorTexture{ { 0.0f, 0.0f, 0.0f }, top_left_color, top_left_uv });
+		mesh.vertex(skygfx::vertex::PositionColorTexture{ { 0.0f, 1.0f, 0.0f }, bottom_left_color, bottom_left_uv });
+		mesh.vertex(skygfx::vertex::PositionColorTexture{ { 1.0f, 0.0f, 0.0f }, top_right_color, top_right_uv });
+		mesh.vertex(skygfx::vertex::PositionColorTexture{ { 1.0f, 1.0f, 0.0f }, bottom_right_color, bottom_right_uv });
 		mesh.end();
 	});
 }
@@ -372,10 +372,10 @@ void System::drawLineRectangle(const glm::vec4& color)
 {
 	draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
 		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineLoop);
-		mesh.vertex(skygfx::Vertex::PositionColor{ { 0.0f, 0.0f, 0.0f }, color });
-		mesh.vertex(skygfx::Vertex::PositionColor{ { 0.0f, 1.0f, 0.0f }, color });
-		mesh.vertex(skygfx::Vertex::PositionColor{ { 1.0f, 1.0f, 0.0f }, color });
-		mesh.vertex(skygfx::Vertex::PositionColor{ { 1.0f, 0.0f, 0.0f }, color });
+		mesh.vertex(skygfx::vertex::PositionColor{ { 0.0f, 0.0f, 0.0f }, color });
+		mesh.vertex(skygfx::vertex::PositionColor{ { 0.0f, 1.0f, 0.0f }, color });
+		mesh.vertex(skygfx::vertex::PositionColor{ { 1.0f, 1.0f, 0.0f }, color });
+		mesh.vertex(skygfx::vertex::PositionColor{ { 1.0f, 0.0f, 0.0f }, color });
 		mesh.end();
 	});
 }
@@ -431,13 +431,13 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 			auto p3 = glm::vec3({ v1_inner + radius_inner + delta_inner, 0.0f });
 			auto p4 = glm::vec3({ v2_inner + radius_inner + delta_inner, 0.0f });
 
-			mesh.vertex(skygfx::Vertex::PositionColor{ p1, outer_color });
-			mesh.vertex(skygfx::Vertex::PositionColor{ p2, outer_color });
-			mesh.vertex(skygfx::Vertex::PositionColor{ p3, inner_color });
+			mesh.vertex(skygfx::vertex::PositionColor{ p1, outer_color });
+			mesh.vertex(skygfx::vertex::PositionColor{ p2, outer_color });
+			mesh.vertex(skygfx::vertex::PositionColor{ p3, inner_color });
 
-			mesh.vertex(skygfx::Vertex::PositionColor{ p3, inner_color });
-			mesh.vertex(skygfx::Vertex::PositionColor{ p2, outer_color });
-			mesh.vertex(skygfx::Vertex::PositionColor{ p4, inner_color });
+			mesh.vertex(skygfx::vertex::PositionColor{ p3, inner_color });
+			mesh.vertex(skygfx::vertex::PositionColor{ p2, outer_color });
+			mesh.vertex(skygfx::vertex::PositionColor{ p4, inner_color });
 
 			r1 = r2;
 			v1_outer = v2_outer;

@@ -73,7 +73,7 @@ std::tuple<std::vector<Model::Vertex>, std::set<Renderer::Shaders::Light::Flag>>
 	return { result, flags };
 }
 
-void Model::setVertices(const std::vector<skygfx::Vertex::PositionColorNormal>& vertices)
+void Model::setVertices(const std::vector<skygfx::vertex::PositionColorNormal>& vertices)
 {
 	mPositionAttribs.clear();
 	mColorAttribs.clear();
@@ -87,7 +87,7 @@ void Model::setVertices(const std::vector<skygfx::Vertex::PositionColorNormal>& 
 	}
 }
 
-void Model::setVertices(const std::vector<skygfx::Vertex::PositionTextureNormal>& vertices)
+void Model::setVertices(const std::vector<skygfx::vertex::PositionTextureNormal>& vertices)
 {
 	mPositionAttribs.clear();
 	mTexCoordAttribs.clear();
@@ -101,7 +101,7 @@ void Model::setVertices(const std::vector<skygfx::Vertex::PositionTextureNormal>
 	}
 }
 
-void Model::setVertices(const std::vector<skygfx::Vertex::PositionColorTextureNormal>& vertices)
+void Model::setVertices(const std::vector<skygfx::vertex::PositionColorTextureNormal>& vertices)
 {
 	mPositionAttribs.clear();
 	mTexCoordAttribs.clear();
