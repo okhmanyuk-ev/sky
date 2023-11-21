@@ -90,24 +90,24 @@ void System::flush()
 		width = state.viewport->size.x;
 		height = state.viewport->size.y;
 	}
+	else if (state.render_target)
+	{
+		width = static_cast<float>(state.render_target->getWidth());
+		height = static_cast<float>(state.render_target->getHeight());
+	}
 	else
 	{
-		if (state.render_target)
-		{
-			width = static_cast<float>(state.render_target->getWidth());
-			height = static_cast<float>(state.render_target->getHeight());
-		}
-		else
-		{
-			width = static_cast<float>(PLATFORM->getWidth());
-			height = static_cast<float>(PLATFORM->getHeight());
-		}
+		width = static_cast<float>(PLATFORM->getWidth());
+		height = static_cast<float>(PLATFORM->getHeight());
 	}
 
 	width /= scale;
 	height /= scale;
 
-	auto [proj, view] = skygfx::utils::MakeOrthogonalCameraMatrices(skygfx::utils::OrthogonalCamera{}, width, height);
+	auto [proj, view] = skygfx::utils::MakeCameraMatrices(skygfx::utils::OrthogonalCamera{
+		.width = width,
+		.height = height
+	});
 
 	static skygfx::utils::Mesh mesh;
 	mesh.setTopology(mBatch.topology.value());
@@ -622,18 +622,15 @@ glm::vec3 System::project(const glm::vec3& pos)
 		width = state.viewport->size.x;
 		height = state.viewport->size.y;
 	}
+	else if (state.render_target)
+	{
+		width = static_cast<float>(state.render_target->getWidth());
+		height = static_cast<float>(state.render_target->getHeight());
+	}
 	else
 	{
-		if (state.render_target)
-		{
-			width = static_cast<float>(state.render_target->getWidth());
-			height = static_cast<float>(state.render_target->getHeight());
-		}
-		else
-		{
-			width = static_cast<float>(PLATFORM->getWidth());
-			height = static_cast<float>(PLATFORM->getHeight());
-		}
+		width = static_cast<float>(PLATFORM->getWidth());
+		height = static_cast<float>(PLATFORM->getHeight());
 	}
 
 	width /= scale;
