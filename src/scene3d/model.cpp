@@ -3,7 +3,7 @@
 
 using namespace Scene3D;
 
-void Model::draw(Renderer::Technique& technique)
+/*void Model::draw(Renderer::Technique& technique)
 {
 	Node::draw(technique);
 
@@ -148,3 +148,4 @@ void Model::setTexCoordAttribs(const TexCoordAttribs& value)
 
 	mTexCoordAttribs = value;
 }
+*/

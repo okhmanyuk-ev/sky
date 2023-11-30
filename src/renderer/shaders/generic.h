@@ -3,7 +3,7 @@
 #include <renderer/shader.h>
 #include <optional>
 
-namespace Renderer::Shaders
+/*namespace Renderer::Shaders
 {
 	class Generic : public Shader, public ShaderMatrices
 	{
@@ -59,4 +59,4 @@ namespace Renderer::Shaders
 			const skygfx::VertexLayout& layout, const std::set<Flag>& flags, bool custom_fragment_func);
 		static std::set<Flag> MakeFlagsFromLayout(const skygfx::VertexLayout& layout);
 	};
-}
+}*/

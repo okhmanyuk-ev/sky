@@ -4,7 +4,7 @@
 
 using namespace Scene3D;
 
-Node::Node()
+/*Node::Node()
 {
 }
 
@@ -66,3 +66,4 @@ void Node::updateTransform()
 
 	mTransformReady = true;
 }
+*/

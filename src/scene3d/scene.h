@@ -9,7 +9,7 @@
 
 namespace Scene3D
 {
-	class Model;
+	/*class Model;
 
 	class Scene
 	{
@@ -37,7 +37,7 @@ namespace Scene3D
 		void recursiveNodeUpdateTransform(std::shared_ptr<Node> node);
 		void recursiveNodeUpdate(std::shared_ptr<Node> node, Clock::Duration delta);
 		void recursiveNodeDraw(std::shared_ptr<Node> node);
-	};
+	};*/
 }
 
 	

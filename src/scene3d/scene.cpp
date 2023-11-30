@@ -2,7 +2,7 @@
 
 using namespace Scene3D;
 
-Scene::Scene()
+/*Scene::Scene()
 {
 	mRoot = std::make_shared<Node>();
 
@@ -85,4 +85,4 @@ void Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
 		recursiveNodeDraw(_node);
 
 	node->leaveDraw(mForwardLightTechnique);
-}
+}*/

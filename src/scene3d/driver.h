@@ -4,7 +4,7 @@
 
 namespace Scene3D
 {
-	class Driver // TODO: driver isnt a good name for it, maybe State/DrawState?
+	/*class Driver // TODO: driver isnt a good name for it, maybe State/DrawState?
 	{
 	public:
 		void prepareShader(Renderer::Shaders::Light& shader, Renderer::Shaders::Light::Material material);
@@ -21,5 +21,5 @@ namespace Scene3D
 		glm::vec3 mCameraPosition;
 		Renderer::Shaders::Light::PointLight mPointLight;
 		Renderer::Shaders::Light::DirectionalLight mDirectionalLight;
-	};
+	};*/
 }

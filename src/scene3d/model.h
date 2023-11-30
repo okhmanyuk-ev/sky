@@ -7,7 +7,7 @@
 
 namespace Scene3D
 {
-	class Model : public Node
+	/*class Model : public Node
 	{
 	public:
 		using Indices = std::vector<uint32_t>;
@@ -69,5 +69,5 @@ namespace Scene3D
 		TexCoordAttribs mTexCoordAttribs;
 		Renderer::Shaders::Light::Material mMaterial;
 		std::variant<Renderer::Technique::TexturesMap, std::shared_ptr<skygfx::Texture>> mTexturesMap;
-	};
+	};*/
 }

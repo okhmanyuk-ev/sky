@@ -1,7 +1,7 @@
 #include "light.h"
 #include <renderer/system.h>
 
-using namespace Renderer;
+/*using namespace Renderer;
 using namespace Renderer::Shaders;
 
 static std::string src_fragment = R"(
@@ -100,3 +100,4 @@ void Light::setupUniforms()
 	Generic::setupUniforms();
 	skygfx::SetUniformBuffer(2, mSettings);
 }
+*/

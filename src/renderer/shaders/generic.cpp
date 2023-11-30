@@ -1,7 +1,7 @@
 #include "generic.h"
 #include <renderer/system.h>
 
-using namespace Renderer;
+/*using namespace Renderer;
 using namespace Renderer::Shaders;
 
 Generic::Generic(const skygfx::VertexLayout& layout, const std::set<Flag>& flags,
@@ -207,3 +207,4 @@ std::set<Generic::Flag> Generic::MakeFlagsFromLayout(const skygfx::VertexLayout&
 
 	return result;
 }
+*/

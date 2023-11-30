@@ -8,7 +8,7 @@
 
 namespace Scene3D
 {
-	class Node : public Transform
+	/*class Node : public Transform
 	{
 	public:
 		Node();
@@ -49,5 +49,5 @@ namespace Scene3D
 		bool mEnabled = true;
 		bool mVisible = true;
 		bool mTransformReady = false;
-	};
+	};*/
 }

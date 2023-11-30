@@ -4,9 +4,9 @@
 
 namespace Scene3D
 {
-	class Cube : public Model
+	/*class Cube : public Model
 	{
 	public:
 		Cube();
-	};
+	};*/
 }

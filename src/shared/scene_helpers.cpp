@@ -901,7 +901,7 @@ SceneHelpers::Editbox::Window::Window()
 
 // 3d
 
-std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)
+/*std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension)
 {
 	std::vector<std::shared_ptr<Scene3D::Model>> result;
 
@@ -969,3 +969,4 @@ std::vector<std::shared_ptr<Scene3D::Model>> SceneHelpers::MakeModelsFromObj(con
 
 	return result;
 }
+*/

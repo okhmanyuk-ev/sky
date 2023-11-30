@@ -9,7 +9,7 @@
 
 namespace Renderer
 {
-	class Technique
+	/*class Technique
 	{
 	public:
 		struct IndexRange
@@ -63,5 +63,5 @@ namespace Renderer
 		glm::vec3 mEyePosition = { 0.0f, 0.0f, 0.0f };
 		Renderer::Shaders::Light::DirectionalLight mDirectionalLight;
 		Renderer::Shaders::Light::PointLight mPointLight;
-	};
+	};*/
 }
