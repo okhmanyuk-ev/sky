@@ -80,16 +80,15 @@ namespace Shared::NetworkingWS
 
 	public:
 		virtual std::shared_ptr<Channel> createChannel() = 0;
-
-	public:
 		void onFrame() override;
-
-	public:
 		auto& getChannels() const { return mChannels; }
+		std::tuple<std::string/*ip*/, uint16_t/*port*/> getV4AddressFromHdl(websocketpp::connection_hdl hdl);
+		auto getPort() const { return mPort; }
 
 	private:
 		WSServer mWSServer;
 		std::map<websocketpp::connection_hdl, std::shared_ptr<Channel>, std::owner_less<websocketpp::connection_hdl>> mChannels;
+		uint16_t mPort;
 	};
 #endif
 

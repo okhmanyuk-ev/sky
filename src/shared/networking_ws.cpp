@@ -36,6 +36,10 @@ void Channel::sendReliable(const std::string& name, BitBuffer& buf)
 	auto msg = BitBuffer();
 	Common::BufferHelpers::WriteString(msg, name);
 	msg.write(buf.getMemory(), buf.getSize());
+
+	if (mSendCallback == nullptr)
+		throw std::runtime_error("Channel: send callback is empty");
+
 	mSendCallback(msg);
 }
 
@@ -48,14 +52,15 @@ void Channel::addMessageReader(const std::string& name, ReadCallback callback)
 // server
 
 #ifndef EMSCRIPTEN
-Server::Server(uint16_t port)
+Server::Server(uint16_t port) :
+	mPort(port)
 {
 	mWSServer.set_access_channels(websocketpp::log::alevel::none);
 	mWSServer.set_error_channels(websocketpp::log::alevel::none);
 
 	mWSServer.set_open_handler([this](websocketpp::connection_hdl hdl) {
-		auto connection = mWSServer.get_con_from_hdl(hdl);
-		sky::Log("{} connected", connection->get_remote_endpoint());
+		auto [ip, port] = getV4AddressFromHdl(hdl);
+		sky::Log("{}:{} connected", ip, port);
 
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
@@ -66,8 +71,9 @@ Server::Server(uint16_t port)
 	});
 
 	mWSServer.set_close_handler([this](websocketpp::connection_hdl hdl) {
-		auto connection = mWSServer.get_con_from_hdl(hdl);
-		sky::Log("{} disconnected", connection->get_remote_endpoint());
+		auto [ip, port] = getV4AddressFromHdl(hdl);
+		sky::Log("{}:{} disconnected", ip, port);
+
 		auto channel = mChannels.at(hdl);
 		if (channel->mDisconnectCallback)
 			channel->mDisconnectCallback();
@@ -94,6 +100,16 @@ Server::Server(uint16_t port)
 void Server::onFrame()
 {
 	mWSServer.poll();
+}
+
+std::tuple<std::string/*ip*/, uint16_t/*port*/> Server::getV4AddressFromHdl(websocketpp::connection_hdl hdl)
+{
+	auto connection = mWSServer.get_con_from_hdl(hdl);
+	auto endpoint = connection->get_raw_socket().remote_endpoint();
+	auto address = endpoint.address().to_v6().to_v4();
+	auto ip = address.to_string();
+	auto port = endpoint.port();
+	return { ip, port };
 }
 #endif
 
