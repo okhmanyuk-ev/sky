@@ -201,12 +201,15 @@ namespace Shared::SceneHelpers
 
 		auto getActiveColor() const { return mActiveColor; }
 		void setActiveColor(const glm::vec4& value) { mActiveColor = value; }
+		void setActiveColor(const glm::vec3& value) { setActiveColor({ value.x, value.y, value.z, mActiveColor.a }); }
 
 		auto getInactiveColor() const { return mInactiveColor; }
 		void setInactiveColor(const glm::vec4& value) { mInactiveColor = value; }
+		void setInactiveColor(const glm::vec3& value) { setInactiveColor({ value.x, value.y, value.z, mInactiveColor.a }); }
 
 		auto getHighlightColor() const { return mHighlightColor; }
 		void setHighlightColor(const glm::vec4& value) { mHighlightColor = value; }
+		void setHighlightColor(const glm::vec3& value) { setHighlightColor({ value.x, value.y, value.z, mHighlightColor.a }); }
 
 	private:
 		std::shared_ptr<Scene::Label> mLabel;
