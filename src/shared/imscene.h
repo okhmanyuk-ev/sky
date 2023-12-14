@@ -54,6 +54,7 @@ namespace Shared
 		void dontKillUntilHaveChilds();
 		void showAndHideWithScale();
 		void showWithAlpha(float duration = 0.25f, float dst_alpha = 1.0f);
+		void hideWithAlpha(std::shared_ptr<Scene::Color> color, float duration = 0.25f);
 		void hideWithAlpha(float duration = 0.25f);
 
 	private:

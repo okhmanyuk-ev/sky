@@ -90,12 +90,17 @@ void ImScene::showWithAlpha(float duration, float dst_alpha)
 	mLastSpawn->runAction(Actions::Collection::ChangeAlpha(color, dst_alpha, duration, Easing::SinusoidalOut));
 }
 
+void ImScene::hideWithAlpha(std::shared_ptr<Scene::Color> color, float duration)
+{
+	destroyAction(Actions::Collection::Hide(color, duration, Easing::SinusoidalIn));
+}
+
 void ImScene::hideWithAlpha(float duration)
 {
 	auto color = std::dynamic_pointer_cast<Scene::Color>(mLastSpawn);
 
 	if (color == nullptr)
-		return;
+		throw std::runtime_error("hideWithAlpha: last spawned node doesnt have 'Color'");
 
-	destroyAction(Actions::Collection::Hide(color, 0.25f, Easing::SinusoidalIn));
+	hideWithAlpha(color, duration);
 }
