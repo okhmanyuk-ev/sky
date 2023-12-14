@@ -5,7 +5,7 @@ using namespace Scene;
 
 BloomLayer::BloomLayer()
 {
-	setBlendMode(skygfx::BlendStates::Additive);
+	getRenderLayerBlend()->setBlendMode(skygfx::BlendStates::Additive);
 }
 
 std::shared_ptr<skygfx::RenderTarget> BloomLayer::postprocess(std::shared_ptr<skygfx::RenderTarget> render_texture)

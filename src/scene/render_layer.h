@@ -9,14 +9,14 @@
 
 namespace Scene
 {
-	template <typename T> class RenderLayer : public T, public Blend
+	template <typename T> class RenderLayer : public T
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 		
 	public:
 		RenderLayer()
 		{
-			setBlendMode(skygfx::BlendStates::AlphaBlend);
+			mRenderLayerBlend->setBlendMode(skygfx::BlendStates::AlphaBlend);
 		}
 
 	protected:
@@ -89,7 +89,7 @@ namespace Scene
 				GRAPHICS->pushOrthoMatrix(1.0f, 1.0f);
 			}
 
-			GRAPHICS->pushBlendMode(getBlendMode());
+			GRAPHICS->pushBlendMode(mRenderLayerBlend->getBlendMode());
 			GRAPHICS->drawTexturedRectangle(nullptr, target, {}, color, color, color, color);
 			GRAPHICS->pop(2);
 
@@ -115,6 +115,7 @@ namespace Scene
 		void setPostprocessEnabled(bool value) { mPostprocessEnabled = value; }
 
 		auto getRenderLayerColor() const { return mRenderLayerColor; }
+		auto getRenderLayerBlend() const { return mRenderLayerBlend; }
 
 		void setPostprocessFunc(PostprocessFunc value) { mPostprocessFunc = value; }
 
@@ -125,6 +126,7 @@ namespace Scene
 		bool mRenderLayerEnabled = true;
 		bool mPostprocessEnabled = true;
 		std::shared_ptr<Color> mRenderLayerColor = std::make_shared<Color>();
+		std::shared_ptr<Blend> mRenderLayerBlend = std::make_shared<Blend>();
 		PostprocessFunc mPostprocessFunc = nullptr;
 		bool mUseLocalTargetSize = true;
 	};
