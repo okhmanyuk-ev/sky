@@ -80,6 +80,7 @@ namespace Shared::NetworkingWS
 
 	public:
 		virtual std::shared_ptr<Channel> createChannel() = 0;
+		virtual void onChannelCreated(std::shared_ptr<Channel> channel);
 		void onFrame() override;
 		auto& getChannels() const { return mChannels; }
 		std::tuple<std::string/*ip*/, uint16_t/*port*/> getV4AddressFromHdl(websocketpp::connection_hdl hdl);

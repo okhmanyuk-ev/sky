@@ -68,6 +68,7 @@ Server::Server(uint16_t port) :
 		});
 		channel->setHdl(hdl);
 		mChannels.insert({ hdl, channel });
+		onChannelCreated(channel);
 	});
 
 	mWSServer.set_close_handler([this](websocketpp::connection_hdl hdl) {
@@ -95,6 +96,10 @@ Server::Server(uint16_t port) :
 	mWSServer.init_asio();
 	mWSServer.listen(port);
 	mWSServer.start_accept();
+}
+
+void Server::onChannelCreated(std::shared_ptr<Channel> channel)
+{
 }
 
 void Server::onFrame()
