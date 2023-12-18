@@ -108,6 +108,7 @@ namespace Shared::NetworkingWS
 
 	public:
 		virtual std::shared_ptr<Channel> createChannel() = 0;
+		virtual void onChannelCreated(std::shared_ptr<Channel> channel);
 
 	public:
 		void onFrame() override;

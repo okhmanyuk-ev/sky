@@ -139,6 +139,7 @@ Client::Client(const std::string& url) :
 		});
 		channel->setHdl(hdl);
 		mChannel = channel;
+		onChannelCreated(mChannel);
 	});
 	mWSClient.set_close_handler([this, url](websocketpp::connection_hdl hdl) {
 		sky::Log("disconnected");
@@ -177,6 +178,7 @@ void Client::connect()
 			emscripten_websocket_send_binary(self->handle, buf.getMemory(), buf.getSize());
 		});
 		self->mChannel = channel;
+		self->onChannelCreated(self->mChannel);
 		return eventType;
 	});
 
@@ -214,6 +216,10 @@ void Client::connect()
 	mWSClient.connect(con);
 #endif
 	sky::Log("connecting");
+}
+
+void Client::onChannelCreated(std::shared_ptr<Channel> channel)
+{
 }
 
 void Client::onFrame()
