@@ -176,21 +176,41 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const glm::vec2& cel
 	return MakeVerticalGrid(cell_size.x, items_height);
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items)
+std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<GridPart>& items)
 {
 	auto holder = std::make_shared<Scene::Node>();
-	float stretch_x = 1.0f / (float)items.size();
+	
+	float all = 0.0f;
+	for (const auto& item : items)
+	{
+		all += item.part;
+	}
+
 	float anchor_x = 0.0f;
-	for (auto item : items)
+	for (const auto& item : items)
 	{
 		auto cell = std::make_shared<Scene::Node>();
+		auto stretch_x = item.part / all;
 		cell->setStretch({ stretch_x, 1.0f });
 		cell->setHorizontalAnchor(anchor_x);
 		holder->attach(cell);
-		cell->attach(item);
+		cell->attach(item.node);
 		anchor_x += stretch_x;
 	}
 	return holder;
+}
+
+std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items)
+{
+	std::vector<GridPart> grid_parts;
+	for (auto item : items)
+	{
+		grid_parts.push_back(GridPart{
+			.part = 1.0f,
+			.node = item
+		});
+	}
+	return MakeHorizontalGrid(grid_parts);
 }
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items)
