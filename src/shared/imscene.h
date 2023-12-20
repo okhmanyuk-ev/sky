@@ -14,8 +14,8 @@ namespace Shared
 		void onFrame() override;
 
 	public:
-		template<class T = Scene::Node>
-		std::shared_ptr<T> spawn(Scene::Node& target, std::optional<std::string> key = std::nullopt)
+		template<class T = Scene::Node, typename... Args>
+		std::shared_ptr<T> spawn(Scene::Node& target, std::optional<std::string> key = std::nullopt, Args&&... args)
 		{
 			std::shared_ptr<T> result = nullptr;
 			auto type_index = std::type_index(typeid(T)).hash_code();
@@ -31,7 +31,7 @@ namespace Shared
 			mNodeJustSpawned = result == nullptr;
 			if (result == nullptr)
 			{
-				result = std::make_shared<T>();
+				result = std::make_shared<T>(args...);
 				target.attach(result);
 				assert(!mNodes.contains(final_key));
 				mNodes.insert({ final_key, result });
