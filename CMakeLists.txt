@@ -166,7 +166,7 @@ elseif(EMSCRIPTEN)
 		-sNO_DISABLE_EXCEPTION_CATCHING=1
 		-sDISABLE_EXCEPTION_THROWING=0
 		-sALLOW_MEMORY_GROWTH
-		--shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/platform/emscripten/shell.html
+	#	--shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/platform/emscripten/shell.html
 		--use-preload-cache
 		-lwebsocket.js
 	)
