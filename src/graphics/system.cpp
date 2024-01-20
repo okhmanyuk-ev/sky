@@ -601,7 +601,7 @@ void System::drawString(const Font& font, const TextMesh& mesh, float size,
 	drawString(font, mesh, mid, max, smoothFactor, color);
 }
 
-void System::drawString(const Font& font, const utf8_string& text, float size,
+void System::drawString(const Font& font, const tiny_utf8::string& text, float size,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
 	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, color, outlineThickness, outlineColor);

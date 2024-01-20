@@ -30,18 +30,18 @@ namespace Shared
 	public:
 		void loadDicrionaries(const std::string& path);
 
-		utf8_string getString(const std::string& key) const;
+		tiny_utf8::string getString(const std::string& key) const;
 		
 		auto getLanguage() const { return mLanguage; }
 		void setLanguage(Language value) { mLanguage = value; }
 
 	private:
-		std::map<Language, std::map<std::string, utf8_string>> mDictionaries;
+		std::map<Language, std::map<std::string, tiny_utf8::string>> mDictionaries;
 		Language mLanguage = Language::English;
 
 	public:
 		template <typename... Args> 
-		utf8_string getStringFmt(const std::string& key, Args&&... args)
+		tiny_utf8::string getStringFmt(const std::string& key, Args&&... args)
 		{
 			return fmt::format(getString(key).cpp_str(), args...);
 		}

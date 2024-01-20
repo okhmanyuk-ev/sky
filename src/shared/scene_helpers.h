@@ -10,12 +10,12 @@
 namespace Shared::SceneHelpers
 {
 	std::shared_ptr<Scene::Label> MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder,
-		std::shared_ptr<Scene::Node> target, const utf8_string& text, float text_size, float move_duration = 0.5f);
+		std::shared_ptr<Scene::Node> target, const tiny_utf8::string& text, float text_size, float move_duration = 0.5f);
 
 	std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> MakeFastCheckbox(
-		const utf8_string& title, float title_size, bool checked, std::function<void(bool)> changeCallback = nullptr);
+		const tiny_utf8::string& title, float title_size, bool checked, std::function<void(bool)> changeCallback = nullptr);
 
-	std::vector<std::shared_ptr<Scene::Node>> MakeFastRadioButtons(std::vector<utf8_string> titles,
+	std::vector<std::shared_ptr<Scene::Node>> MakeFastRadioButtons(std::vector<tiny_utf8::string> titles,
 		float title_size, int choosed, std::function<void(int)> changeCallback = nullptr);
 
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(float height, const std::vector<std::pair<float/*width*/,

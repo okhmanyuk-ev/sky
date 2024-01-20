@@ -24,13 +24,13 @@ namespace Graphics
 		std::vector<glm::vec2> symbol_sizes;
 		std::vector<float> symbol_line_y;
 	
-		static TextMesh createTextMesh(const Font& font, utf8_string::const_iterator begin,
-			utf8_string::const_iterator end);
+		static TextMesh createTextMesh(const Font& font, tiny_utf8::string::const_iterator begin,
+			tiny_utf8::string::const_iterator end);
 
-		static TextMesh createSinglelineTextMesh(const Font& font, const utf8_string& text,
+		static TextMesh createSinglelineTextMesh(const Font& font, const tiny_utf8::string& text,
 			float vertical_offset = 0.0f);
 
-		static std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const utf8_string& text,
+		static std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const tiny_utf8::string& text,
 			float maxWidth, float size, Align align = Align::Left);
 	};
 }

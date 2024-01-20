@@ -6,7 +6,7 @@
 using namespace Shared;
 
 std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder,
-	std::shared_ptr<Scene::Node> target, const utf8_string& text, float text_size, float move_duration)
+	std::shared_ptr<Scene::Node> target, const tiny_utf8::string& text, float text_size, float move_duration)
 {
 	auto label = std::make_shared<Scene::Label>();
 	label->setFontSize(text_size);
@@ -25,7 +25,7 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 }
 
 std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers::MakeFastCheckbox(
-	const utf8_string& title, float title_size, bool checked, std::function<void(bool)> changeCallback)
+	const tiny_utf8::string& title, float title_size, bool checked, std::function<void(bool)> changeCallback)
 {
 	auto holder = std::make_shared<Scene::Clickable<Scene::Node>>();
 
@@ -71,7 +71,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	return { holder, setter };
 }
 
-std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std::vector<utf8_string> titles,
+std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std::vector<tiny_utf8::string> titles,
 	float title_size, int choosed, std::function<void(int)> changeCallback)
 {
 	std::vector<std::shared_ptr<Scene::Node>> result;

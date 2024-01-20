@@ -31,15 +31,15 @@ namespace Graphics
 		~Font();
 
 		auto getTexture() const { return mTexture; }
-		const Glyph& getGlyph(utf8_string::value_type symbol) const;
+		const Glyph& getGlyph(tiny_utf8::string::value_type symbol) const;
 
 		static float getScaleFactorForSize(float size);
 
-		float getStringWidth(utf8_string::const_iterator begin, utf8_string::const_iterator end,
+		float getStringWidth(tiny_utf8::string::const_iterator begin, tiny_utf8::string::const_iterator end,
 			float size = GlyphSize) const;
-		float getStringWidth(const utf8_string& text, float size = GlyphSize) const;
+		float getStringWidth(const tiny_utf8::string& text, float size = GlyphSize) const;
 
-		float getKerning(utf8_string::value_type left, utf8_string::value_type right) const;
+		float getKerning(tiny_utf8::string::value_type left, tiny_utf8::string::value_type right) const;
 
 		float getAscent() const { return mAscent; }
 		float getDescent() const { return mDescent; }
@@ -50,8 +50,8 @@ namespace Graphics
 
 	private:
 		std::shared_ptr<skygfx::Texture> mTexture = nullptr;
-		std::unordered_map<utf8_string::value_type, Glyph> mGlyphs;
-		std::unordered_map<utf8_string::value_type, std::unordered_map<utf8_string::value_type, float>> mKernings;
+		std::unordered_map<tiny_utf8::string::value_type, Glyph> mGlyphs;
+		std::unordered_map<tiny_utf8::string::value_type, std::unordered_map<tiny_utf8::string::value_type, float>> mKernings;
 		float mAscent = 0.0f;
 		float mDescent = 0.0f;
 		float mLinegap = 0.0f;

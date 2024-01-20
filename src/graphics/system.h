@@ -110,7 +110,7 @@ namespace Graphics
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
 		
-		void drawString(const Font& font, const utf8_string& text, float size,
+		void drawString(const Font& font, const tiny_utf8::string& text, float size,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
 
