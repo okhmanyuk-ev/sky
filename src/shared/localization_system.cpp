@@ -6,9 +6,9 @@
 
 using namespace Shared;
 
-LocalizationSystem::LocalizationSystem()
+LocalizationSystem::LocalizationSystem(const std::string& path)
 {
-	loadDicrionaries("localization");
+	loadDicrionaries(path);
 	setLanguage(Shared::LocalizationSystem::Language::English);
 }
 

@@ -25,7 +25,7 @@ namespace Shared
 		static std::string getLanguageName(Language language);
 
 	public:
-		LocalizationSystem();
+		LocalizationSystem(const std::string& path = "localization");
 
 	public:
 		void loadDicrionaries(const std::string& path);
