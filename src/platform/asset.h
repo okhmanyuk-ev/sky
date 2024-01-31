@@ -8,6 +8,9 @@ namespace Platform
 	class Asset 
 	{
 	public:
+		inline static std::string AssetsFolder = "assets";
+
+	public:
 		enum class Storage
 		{
 			Assets,

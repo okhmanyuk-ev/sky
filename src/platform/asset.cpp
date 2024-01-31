@@ -120,7 +120,7 @@ std::string Asset::StoragePathToAbsolute(const std::string& path, Storage storag
 	if (storage == Storage::Assets)
 	{
 #if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
-		return "assets/" + path;
+		return AssetsFolder + "/" + path;
 #elif defined(PLATFORM_IOS)
 		return std::string([[[NSBundle mainBundle]bundlePath] UTF8String]) + "/assets/" + path;
 #elif defined(PLATFORM_ANDROID)
