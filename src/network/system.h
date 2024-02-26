@@ -1,23 +1,49 @@
 #pragma once
 
-#include <core/engine.h>
-
-#include "packet.h"
 #include <functional>
-
-#include <platform/defines.h>
-#include <asio.hpp>
-
-#include <common/frame_system.h>
 #include <unordered_set>
+#include <core/engine.h>
+#include <common/bitbuffer.h>
+#include <platform/defines.h>
+#include <common/frame_system.h>
 #include <common/timer.h>
 
 #define NETWORK ENGINE->getSystem<Network::System>()
 
 namespace Network
 {
+	struct Address
+	{
+	public:
+		Address();
+		Address(const std::string& adr);
+
+	public:
+		std::string toString() const;
+
+	public:
+		union
+		{
+			uint8_t b[4];
+			uint32_t l;
+		} ip;
+
+		uint16_t port;
+
+	public:
+		inline bool operator==(const Address& a) const { return ip.l == a.ip.l && port == a.port; }
+		inline bool operator!=(const Address& a) const { return !(*this == a); }
+	};
+
+	struct Packet
+	{
+		Address adr;
+		BitBuffer buf;
+	};
+
 	class System : public Common::FrameSystem::Frameable
 	{
+		friend Address;
 	public:
 		System();
 		~System();
@@ -37,19 +63,8 @@ namespace Network
 		uint16_t getUdpSocketPort(UdpSocketHandle handle) const;
 
 	private:
-		struct UdpSocketData
-		{
-			UdpSocketData(asio::io_service& service, const asio::ip::udp::endpoint& endpoint) : socket(service, endpoint) {}
-			ReadCallback readCallback = nullptr;
-			asio::ip::udp::socket socket;
-		};
-
-	private:
-		std::unordered_set<UdpSocketData*> mUdpSockets;
-		asio::io_service mService;
-
-	public:
-		auto& getIoService() { return mService; }
+		struct Impl;
+		std::unique_ptr<Impl> mImpl;
 
 	public:
 		auto getIncomingPacketsCount() const { return mIncomingPacketsCount; }
