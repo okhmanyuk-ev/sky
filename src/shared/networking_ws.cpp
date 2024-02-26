@@ -1,8 +1,16 @@
 #include "networking_ws.h"
-
 #include <console/device.h>
 #include <common/buffer_helpers.h>
 #include <common/console_commands.h>
+
+#ifdef EMSCRIPTEN
+#include <emscripten/websocket.h>
+#else
+#include <websocketpp/server.hpp>
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/config/asio_no_tls_client.hpp>
+#include <websocketpp/client.hpp>
+#endif
 
 using namespace Shared::NetworkingWS;
 
@@ -52,26 +60,32 @@ void Channel::addMessageReader(const std::string& name, ReadCallback callback)
 // server
 
 #ifndef EMSCRIPTEN
-Server::Server(uint16_t port) :
-	mPort(port)
+struct Server::Impl
 {
-	mWSServer.set_access_channels(websocketpp::log::alevel::none);
-	mWSServer.set_error_channels(websocketpp::log::alevel::none);
+	websocketpp::server<websocketpp::config::asio> server;
+};
 
-	mWSServer.set_open_handler([this](websocketpp::connection_hdl hdl) {
+Server::Server(uint16_t port) :
+	mPort(port),
+	mImpl(std::make_unique<Impl>())
+{
+	mImpl->server.set_access_channels(websocketpp::log::alevel::none);
+	mImpl->server.set_error_channels(websocketpp::log::alevel::none);
+
+	mImpl->server.set_open_handler([this](websocketpp::connection_hdl hdl) {
 		auto [ip, port] = getV4AddressFromHdl(hdl);
 		sky::Log("{}:{} connected", ip, port);
 
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
-			mWSServer.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
+			mImpl->server.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
 		});
 		channel->setHdl(hdl);
 		mChannels.insert({ hdl, channel });
 		onChannelCreated(channel);
 	});
 
-	mWSServer.set_close_handler([this](websocketpp::connection_hdl hdl) {
+	mImpl->server.set_close_handler([this](websocketpp::connection_hdl hdl) {
 		auto [ip, port] = getV4AddressFromHdl(hdl);
 		sky::Log("{}:{} disconnected", ip, port);
 
@@ -82,7 +96,7 @@ Server::Server(uint16_t port) :
 		mChannels.erase(hdl);
 	});
 
-	mWSServer.set_message_handler([this](websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg) {
+	mImpl->server.set_message_handler([this](websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg) {
 		if (mChannels.count(hdl) == 0)
 			return;
 
@@ -93,9 +107,13 @@ Server::Server(uint16_t port) :
 		mChannels.at(hdl)->read(buf);
 	});
 
-	mWSServer.init_asio();
-	mWSServer.listen(port);
-	mWSServer.start_accept();
+	mImpl->server.init_asio();
+	mImpl->server.listen(port);
+	mImpl->server.start_accept();
+}
+
+Server::~Server()
+{
 }
 
 void Server::onChannelCreated(std::shared_ptr<Channel> channel)
@@ -104,12 +122,12 @@ void Server::onChannelCreated(std::shared_ptr<Channel> channel)
 
 void Server::onFrame()
 {
-	mWSServer.poll();
+	mImpl->server.poll();
 }
 
 std::tuple<std::string/*ip*/, uint16_t/*port*/> Server::getV4AddressFromHdl(websocketpp::connection_hdl hdl)
 {
-	auto connection = mWSServer.get_con_from_hdl(hdl);
+	auto connection = mImpl->server.get_con_from_hdl(hdl);
 	auto endpoint = connection->get_raw_socket().remote_endpoint();
 	auto address = endpoint.address().to_v6().to_v4();
 	auto ip = address.to_string();
@@ -120,38 +138,48 @@ std::tuple<std::string/*ip*/, uint16_t/*port*/> Server::getV4AddressFromHdl(webs
 
 // client
 
+struct Client::Impl
+{
+#ifdef EMSCRIPTEN
+	EMSCRIPTEN_WEBSOCKET_T handle = -1;
+#else
+	websocketpp::client<websocketpp::config::asio_client> wsclient;
+#endif
+};
+
 Client::Client(const std::string& url) :
-	mUrl(url)
+	mUrl(url),
+	mImpl(std::make_unique<Impl>())
 {
 #ifdef EMSCRIPTEN
 	// nothing for emscripten
 #else
-	mWSClient.set_access_channels(websocketpp::log::alevel::none);
-	mWSClient.set_error_channels(websocketpp::log::alevel::none);
+	mImpl->wsclient.set_access_channels(websocketpp::log::alevel::none);
+	mImpl->wsclient.set_error_channels(websocketpp::log::alevel::none);
 
-	mWSClient.init_asio();
+	mImpl->wsclient.init_asio();
 
-	mWSClient.set_open_handler([this](websocketpp::connection_hdl hdl) {
+	mImpl->wsclient.set_open_handler([this](websocketpp::connection_hdl hdl) {
 		sky::Log("connected");
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
-			mWSClient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
+			mImpl->wsclient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
 		});
 		channel->setHdl(hdl);
 		mChannel = channel;
 		onChannelCreated(mChannel);
 	});
-	mWSClient.set_close_handler([this, url](websocketpp::connection_hdl hdl) {
+	mImpl->wsclient.set_close_handler([this, url](websocketpp::connection_hdl hdl) {
 		sky::Log("disconnected");
 		mChannel = nullptr;
 		connect();
 	});
-	mWSClient.set_fail_handler([this, url](websocketpp::connection_hdl hdl) {
+	mImpl->wsclient.set_fail_handler([this, url](websocketpp::connection_hdl hdl) {
 		sky::Log("failed");
 		connect();
 	});
 
-	mWSClient.set_message_handler([this](websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg) {
+	mImpl->wsclient.set_message_handler([this](websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg) {
 		auto& payload = msg->get_raw_payload();
 		auto buf = BitBuffer();
 		buf.write(payload.data(), payload.size());
@@ -162,27 +190,31 @@ Client::Client(const std::string& url) :
 	connect();
 }
 
+Client::~Client()
+{
+}
+
 void Client::connect()
 {
 #ifdef EMSCRIPTEN
 	EmscriptenWebSocketCreateAttributes attributes;
 	emscripten_websocket_init_create_attributes(&attributes);
 	attributes.url = mUrl.c_str();
-	handle = emscripten_websocket_new(&attributes);
+	mImpl->handle = emscripten_websocket_new(&attributes);
 
-	emscripten_websocket_set_onopen_callback(handle, this, [](int eventType, const EmscriptenWebSocketOpenEvent *websocketEvent, void *userData) -> int {
+	emscripten_websocket_set_onopen_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketOpenEvent *websocketEvent, void *userData) -> int {
 		sky::Log("connected");
 		auto self = static_cast<Client*>(userData);
 		auto channel = self->createChannel();
 		channel->setSendCallback([self](const auto& buf) {
-			emscripten_websocket_send_binary(self->handle, buf.getMemory(), buf.getSize());
+			emscripten_websocket_send_binary(self->mImpl->handle, buf.getMemory(), buf.getSize());
 		});
 		self->mChannel = channel;
 		self->onChannelCreated(self->mChannel);
 		return eventType;
 	});
 
-	emscripten_websocket_set_onclose_callback(handle, this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> int{
+	emscripten_websocket_set_onclose_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> int{
 		sky::Log("disconnected");
 		auto self = static_cast<Client*>(userData);
 		self->mChannel = nullptr;
@@ -190,7 +222,7 @@ void Client::connect()
 		return eventType;
 	});
 
-	emscripten_websocket_set_onmessage_callback(handle, this, [] (int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> int {
+	emscripten_websocket_set_onmessage_callback(mImpl->handle, this, [] (int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> int {
 		auto self = static_cast<Client*>(userData);
 		auto buf = BitBuffer();
 		buf.write(websocketEvent->data, websocketEvent->numBytes);
@@ -199,7 +231,7 @@ void Client::connect()
 		return eventType;
 	});
 
-	emscripten_websocket_set_onerror_callback(handle, this, [] (int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> int {
+	emscripten_websocket_set_onerror_callback(mImpl->handle, this, [] (int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> int {
 		sky::Log("failed");
 		auto self = static_cast<Client*>(userData);
 		self->connect();
@@ -207,13 +239,13 @@ void Client::connect()
 	});
 #else
 	websocketpp::lib::error_code ec;
-	auto con = mWSClient.get_connection(mUrl, ec);
+	auto con = mImpl->wsclient.get_connection(mUrl, ec);
 	if (ec) {
 		sky::Log("could not create connection because: " + ec.message());
 		return;
 	}
 
-	mWSClient.connect(con);
+	mImpl->wsclient.connect(con);
 #endif
 	sky::Log("connecting");
 }
@@ -226,7 +258,7 @@ void Client::onFrame()
 {
 #ifdef EMSCRIPTEN
 #else
-	mWSClient.poll();
+	mImpl->wsclient.poll();
 #endif
 }
 

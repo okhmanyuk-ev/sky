@@ -5,15 +5,6 @@
 #include <common/bitbuffer.h>
 #include <nlohmann/json.hpp>
 
-#ifdef EMSCRIPTEN
-	#include <emscripten/websocket.h>
-#else
-	#include <websocketpp/server.hpp>
-	#include <websocketpp/config/asio_no_tls.hpp>
-	#include <websocketpp/config/asio_no_tls_client.hpp>
-	#include <websocketpp/client.hpp>
-#endif
-
 namespace Shared::NetworkingWS
 {
 	class NetCommands
@@ -30,6 +21,10 @@ namespace Shared::NetworkingWS
 #ifndef EMSCRIPTEN
 	class Server;
 #endif
+
+	using connection_hdl =
+		//websocketpp::connection_hdl
+		std::weak_ptr<void>;
 
 	class Channel
 	{
@@ -58,50 +53,45 @@ namespace Shared::NetworkingWS
 		auto getHdl() const { return mHdl; }
 
 	private:
-		void setHdl(websocketpp::connection_hdl value) { mHdl = value; }
+		void setHdl(connection_hdl value) { mHdl = value; }
 #endif
 	private:
 		SendCallback mSendCallback = nullptr;
 		DisconnectCallback mDisconnectCallback = nullptr;
 		std::map<std::string, ReadCallback> mMessageReaders;
 #ifndef EMSCRIPTEN
-		websocketpp::connection_hdl mHdl;
+		connection_hdl mHdl;
 #endif
 	};
 
 #ifndef EMSCRIPTEN
 	class Server : public Common::FrameSystem::Frameable
 	{
-	private:
-		using WSServer = websocketpp::server<websocketpp::config::asio>;
-
 	public:
 		Server(uint16_t port);
+		~Server();
 
 	public:
 		virtual std::shared_ptr<Channel> createChannel() = 0;
 		virtual void onChannelCreated(std::shared_ptr<Channel> channel);
 		void onFrame() override;
 		auto& getChannels() const { return mChannels; }
-		std::tuple<std::string/*ip*/, uint16_t/*port*/> getV4AddressFromHdl(websocketpp::connection_hdl hdl);
+		std::tuple<std::string/*ip*/, uint16_t/*port*/> getV4AddressFromHdl(connection_hdl hdl);
 		auto getPort() const { return mPort; }
 
 	private:
-		WSServer mWSServer;
-		std::map<websocketpp::connection_hdl, std::shared_ptr<Channel>, std::owner_less<websocketpp::connection_hdl>> mChannels;
+		struct Impl;
+		std::unique_ptr<Impl> mImpl;
+		std::map<connection_hdl, std::shared_ptr<Channel>, std::owner_less<connection_hdl>> mChannels;
 		uint16_t mPort;
 	};
 #endif
 
 	class Client : public Common::FrameSystem::Frameable
 	{
-#ifndef EMSCRIPTEN
-	private:
-		using WSClient = websocketpp::client<websocketpp::config::asio_client>;
-#endif
-
 	public:
 		Client(const std::string& url);
+		~Client();
 
 	private:
 		void connect();
@@ -120,11 +110,9 @@ namespace Shared::NetworkingWS
 	private:
 		std::shared_ptr<Channel> mChannel = nullptr;
 		std::string mUrl;
-#ifdef EMSCRIPTEN
-		EMSCRIPTEN_WEBSOCKET_T handle = -1;
-#else
-		WSClient mWSClient;
-#endif
+
+		struct Impl;
+		std::unique_ptr<Impl> mImpl;
 	};
 
 	class SimpleChannel : public Channel
