@@ -7,7 +7,6 @@
 #include <common/frame_system.h>
 
 #include <thread>
-#include <Windows.h>
 
 #define NATIVE_CONSOLE_DEVICE std::static_pointer_cast<Common::NativeConsoleDevice>(CONSOLE_DEVICE)
 
@@ -33,7 +32,7 @@ namespace Common
 
 	private:
 		std::thread mReadThread;
-		HANDLE mConsoleHandle;
+		void* mConsoleHandle;
 	};
 }
 #endif
