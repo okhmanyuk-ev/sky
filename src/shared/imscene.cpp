@@ -3,36 +3,36 @@
 
 using namespace Shared;
 
+ImScene::NodeItem::NodeItem(std::shared_ptr<Scene::Node> _node, std::function<void()> _destroy_func) :
+	node(_node), destroy_func(_destroy_func)
+{
+}
+
 void ImScene::onFrame()
 {
-	if (!mNodes.empty())
-		STATS_INDICATE_GROUP("scene", "im nodes", mNodes.size());
+	if (!mNodeItems.empty())
+		STATS_INDICATE_GROUP("scene", "im nodes", mNodeItems.size());
 
 	for (const auto& name : mUnusedNodes)
 	{
-		auto node = mNodes.at(name);
-		mDestroyCallbacks.at(node)();
-		mDestroyCallbacks.erase(node);
-		mNodes.erase(name);
+		const auto& item = mNodeItems.at(name);
+		item.destroy_func();
+		mNodeItems.erase(name);
 	}
 
 	mUnusedNodes.clear();
 
-	for (const auto& [name, node] : mNodes)
+	for (const auto& [name, item] : mNodeItems)
 	{
 		mUnusedNodes.insert(name);
 	}
 
 	mTypesCount.clear();
-	mLastSpawn = nullptr;
 }
 
 void ImScene::destroyCallback(std::function<void()> func)
-{
-	if (mDestroyCallbacks.contains(mLastSpawn))
-		mDestroyCallbacks.erase(mLastSpawn);
-
-	mDestroyCallbacks.insert({ mLastSpawn, func });
+{	
+	mNodeItems.at(mLastSpawnedKey).destroy_func = func;
 }
 
 void ImScene::destroyAction(Actions::Collection::UAction action)
@@ -43,7 +43,9 @@ void ImScene::destroyAction(Actions::Collection::UAction action)
 		};
 	};
 
-	auto func = make_shared_function([node = mLastSpawn, action = std::move(action)] () mutable {
+	const auto& item = mNodeItems.at(mLastSpawnedKey);
+
+	auto func = make_shared_function([node = item.node, action = std::move(action)] () mutable {
 		node->runAction(Actions::Collection::MakeSequence(
 			std::move(action),
 			Actions::Collection::Kill(node)
@@ -58,22 +60,26 @@ void ImScene::dontKill()
 	destroyCallback([] {});
 }
 
-void ImScene::dontKillUntilHaveChilds()
+void ImScene::dontKillWhileHaveChilds()
 {
-	destroyAction(Actions::Collection::Wait([node = mLastSpawn] {
+	const auto& item = mNodeItems.at(mLastSpawnedKey);
+
+	destroyAction(Actions::Collection::Wait([node = item.node] {
 		return node->hasNodes();
 	}));
 }
 
 void ImScene::showAndHideWithScale()
 {
+	const auto& item = mNodeItems.at(mLastSpawnedKey);
+
 	if (justAllocated())
 	{
-		mLastSpawn->setScale(0.0f);
-		mLastSpawn->runAction(Actions::Collection::ChangeScale(mLastSpawn, { 1.0f, 1.0f }, 0.25f, Easing::SinusoidalOut));
+		item.node->setScale(0.0f);
+		item.node->runAction(Actions::Collection::ChangeScale(item.node, { 1.0f, 1.0f }, 0.25f, Easing::SinusoidalOut));
 	}
 
-	destroyAction(Actions::Collection::ChangeScale(mLastSpawn, { 0.0f, 0.0f }, 0.25f, Easing::SinusoidalIn));
+	destroyAction(Actions::Collection::ChangeScale(item.node, { 0.0f, 0.0f }, 0.25f, Easing::SinusoidalIn));
 }
 
 void ImScene::showWithAlpha(float duration, float dst_alpha)
@@ -81,13 +87,15 @@ void ImScene::showWithAlpha(float duration, float dst_alpha)
 	if (!justAllocated())
 		return;
 
-	auto color = std::dynamic_pointer_cast<Scene::Color>(mLastSpawn);
+	const auto& item = mNodeItems.at(mLastSpawnedKey);
+
+	auto color = std::dynamic_pointer_cast<Scene::Color>(item.node);
 
 	if (color == nullptr)
 		return;
 
 	color->setAlpha(0.0f);
-	mLastSpawn->runAction(Actions::Collection::ChangeAlpha(color, dst_alpha, duration, Easing::SinusoidalOut));
+	item.node->runAction(Actions::Collection::ChangeAlpha(color, dst_alpha, duration, Easing::SinusoidalOut));
 }
 
 void ImScene::hideWithAlpha(std::shared_ptr<Scene::Color> color, float duration)
@@ -97,7 +105,9 @@ void ImScene::hideWithAlpha(std::shared_ptr<Scene::Color> color, float duration)
 
 void ImScene::hideWithAlpha(float duration)
 {
-	auto color = std::dynamic_pointer_cast<Scene::Color>(mLastSpawn);
+	const auto& item = mNodeItems.at(mLastSpawnedKey);
+
+	auto color = std::dynamic_pointer_cast<Scene::Color>(item.node);
 
 	if (color == nullptr)
 		throw std::runtime_error("hideWithAlpha: last spawned node doesnt have 'Color'");
