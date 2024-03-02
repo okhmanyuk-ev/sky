@@ -36,7 +36,7 @@ namespace Shared
 				const auto& item = mNodeItems.at(final_key);
 				result = std::dynamic_pointer_cast<T>(item.node);
 			}
-			mNodeJustSpawned = result == nullptr;
+			mFirstCall = result == nullptr;
 			if (result == nullptr)
 			{
 				result = std::make_shared<T>(args...);
@@ -52,7 +52,8 @@ namespace Shared
 			return result;
 		}
 
-		bool justAllocated() const { return mNodeJustSpawned; }
+		bool justAllocated() const { return mFirstCall; } // TODO: remove
+		bool isFirstCall() const { return mFirstCall; }
 		void destroyCallback(std::function<void()> func);
 		void destroyAction(Actions::Collection::UAction action);
 		void dontKill();
@@ -66,7 +67,7 @@ namespace Shared
 		std::unordered_map<std::string, int> mTypesCount;
 		std::unordered_map<std::string, NodeItem> mNodeItems;
 		std::set<std::string> mUnusedNodes;
-		bool mNodeJustSpawned = false;
+		bool mFirstCall = false;
 		std::string mLastSpawnedKey;
 	};
 }
