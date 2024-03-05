@@ -613,4 +613,15 @@ namespace Shared::SceneHelpers
 	// 3d
 
 	//std::vector<std::shared_ptr<Scene3D::Model>> MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension);
+
+	class CursorIndicator : public Scene::Rectangle, public std::enable_shared_from_this<CursorIndicator>
+	{
+	public:
+		CursorIndicator(std::shared_ptr<Scene::Label> label);
+
+		void setCursorPos(std::optional<int> value) { mCursorPos = value; }
+
+	private:
+		std::optional<int> mCursorPos;
+	};
 }

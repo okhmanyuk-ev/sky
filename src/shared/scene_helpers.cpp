@@ -990,3 +990,55 @@ SceneHelpers::Editbox::Window::Window()
 	return result;
 }
 */
+
+SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> label)
+{
+	setAlpha(0.0f);
+	setWidth(2.0f);
+	setRounding(1.0f);
+	runAction(Actions::Collection::ExecuteInfinite([this, label] {
+		auto font = label->getFont();
+		
+		auto font_scale = font->getScaleFactorForSize(label->getFontSize());
+		auto height = font->getAscent() * font_scale;
+		height -= font->getDescent() * font_scale;
+
+		setHeight(height);
+
+		if (label->getText().empty())
+		{
+			setPosition({ 0.0f, 0.0f });
+			setAnchor(0.5f);
+			setPivot(0.5f);
+			return;
+		}
+
+		setAnchor(0.0f);
+		setPivot({ 0.5f, 0.0f });
+
+		auto index = mCursorPos.value_or(label->getText().length() - 1);
+
+		if (index > label->getText().length() - 1)
+			index = label->getText().length() - 1;
+
+		auto [pos, size] = label->getSymbolBounds(index);
+		auto line_y = label->getSymbolLineY(index);
+		
+		setX(pos.x + size.x);
+		setY(line_y);
+	}));
+
+	runAction(Actions::Collection::MakeSequence(
+		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::Execute([this] {
+			runAction(Actions::Collection::RepeatInfinite([this] {
+				return Actions::Collection::MakeSequence(
+					Actions::Collection::ChangeAlpha(shared_from_this(), 1.0f, 0.125f),
+					Actions::Collection::Wait(0.25f),
+					Actions::Collection::ChangeAlpha(shared_from_this(), 0.0f, 0.125f),
+					Actions::Collection::Wait(0.25f)
+				);
+			}));
+		})
+	));
+}
