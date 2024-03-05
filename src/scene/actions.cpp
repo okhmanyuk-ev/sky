@@ -67,6 +67,27 @@ Collection::UAction Collection::Show(SceneColor node, float duration, EasingFunc
 	return ChangeAlpha(node, 1.0f, duration, easingFunction);
 }
 
+Collection::UAction Collection::HideRecursive(SceneNode node, float duration, EasingFunction easingFunction)
+{
+	auto parallel = MakeParallel();
+	std::function<void(std::shared_ptr<Scene::Node> node)> recursive_fill_func;
+	recursive_fill_func = [&](std::shared_ptr<Scene::Node> node){
+		for (auto child : node->getNodes())
+		{
+			recursive_fill_func(child);
+		}
+
+		auto color_node = std::dynamic_pointer_cast<Scene::Color>(node);
+
+		if (!color_node)
+			return;
+
+		parallel->add(Hide(color_node, duration, easingFunction));
+	};
+	recursive_fill_func(node);
+	return parallel;
+}
+
 // other
 
 Collection::UAction Collection::Shake(SceneTransform node, float radius, float duration)

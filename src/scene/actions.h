@@ -27,6 +27,8 @@ namespace Actions::Collection
 	UAction Hide(SceneColor node, float duration, EasingFunction easingFunction = Easing::Linear);
 	UAction Show(SceneColor node, float duration, EasingFunction easingFunction = Easing::Linear);
 
+	UAction HideRecursive(SceneNode node, float duration, EasingFunction easingFunction = Easing::Linear);
+
 	UAction Shake(SceneTransform node, float radius, float duration);
 	UAction Kill(std::shared_ptr<Scene::Node> node);
 
