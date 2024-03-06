@@ -52,7 +52,6 @@ namespace Shared
 			return result;
 		}
 
-		bool justAllocated() const { return mFirstCall; } // TODO: remove
 		bool isFirstCall() const { return mFirstCall; }
 		void destroyCallback(std::function<void()> func);
 		void destroyAction(Actions::Collection::UAction action);

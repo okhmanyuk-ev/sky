@@ -73,7 +73,7 @@ void ImScene::showAndHideWithScale()
 {
 	const auto& item = mNodeItems.at(mLastSpawnedKey);
 
-	if (justAllocated())
+	if (isFirstCall())
 	{
 		item.node->setScale(0.0f);
 		item.node->runAction(Actions::Collection::ChangeScale(item.node, { 1.0f, 1.0f }, 0.25f, Easing::SinusoidalOut));
@@ -84,7 +84,7 @@ void ImScene::showAndHideWithScale()
 
 void ImScene::showWithAlpha(float duration, float dst_alpha)
 {
-	if (!justAllocated())
+	if (!isFirstCall())
 		return;
 
 	const auto& item = mNodeItems.at(mLastSpawnedKey);
