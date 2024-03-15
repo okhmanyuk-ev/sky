@@ -256,13 +256,10 @@ void System::draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture
 	assert(!mesh_builder.isBegan());
 
 	auto topology = mesh_builder.getTopology().value();
-	auto vertices = (skygfx::utils::Mesh::Vertex*)mesh_builder.getVertices().data();
-	auto vertex_count = mesh_builder.getVertexCount();
-	auto indices = (skygfx::utils::Mesh::Index*)mesh_builder.getIndices().data();
-	auto index_count = mesh_builder.getIndexCount();
+	const auto& vertices = mesh_builder.getVertices();
+	const auto& indices = mesh_builder.getIndices();
 
-	draw(effect, texture, topology, vertices, vertex_count,
-		indices, index_count);
+	draw(effect, texture, topology, vertices, indices);
 }
 
 void System::drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
@@ -272,11 +269,11 @@ void System::drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_pt
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color)
 {
 	draw(effect, texture, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleStrip);
-		mesh.vertex(skygfx::vertex::PositionColorTexture{ { 0.0f, 0.0f, 0.0f }, top_left_color, top_left_uv });
-		mesh.vertex(skygfx::vertex::PositionColorTexture{ { 0.0f, 1.0f, 0.0f }, bottom_left_color, bottom_left_uv });
-		mesh.vertex(skygfx::vertex::PositionColorTexture{ { 1.0f, 0.0f, 0.0f }, top_right_color, top_right_uv });
-		mesh.vertex(skygfx::vertex::PositionColorTexture{ { 1.0f, 1.0f, 0.0f }, bottom_right_color, bottom_right_uv });
+		mesh.begin(skygfx::utils::Mode::TriangleStrip);
+		mesh.vertex({ .pos = { 0.0f, 0.0f, 0.0f }, .color = top_left_color, .texcoord = top_left_uv });
+		mesh.vertex({ .pos = { 0.0f, 1.0f, 0.0f }, .color = bottom_left_color, .texcoord = bottom_left_uv });
+		mesh.vertex({ .pos = { 1.0f, 0.0f, 0.0f }, .color = top_right_color, .texcoord = top_right_uv });
+		mesh.vertex({ .pos = { 1.0f, 1.0f, 0.0f }, .color = bottom_right_color, .texcoord = bottom_right_uv });
 		mesh.end();
 	});
 }
@@ -371,11 +368,11 @@ void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 void System::drawLineRectangle(const glm::vec4& color)
 {
 	draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineLoop);
-		mesh.vertex(skygfx::vertex::PositionColor{ { 0.0f, 0.0f, 0.0f }, color });
-		mesh.vertex(skygfx::vertex::PositionColor{ { 0.0f, 1.0f, 0.0f }, color });
-		mesh.vertex(skygfx::vertex::PositionColor{ { 1.0f, 1.0f, 0.0f }, color });
-		mesh.vertex(skygfx::vertex::PositionColor{ { 1.0f, 0.0f, 0.0f }, color });
+		mesh.begin(skygfx::utils::Mode::LineLoop);
+		mesh.vertex({ .pos = { 0.0f, 0.0f, 0.0f }, .color = color });
+		mesh.vertex({ .pos = { 0.0f, 1.0f, 0.0f }, .color = color });
+		mesh.vertex({ .pos = { 1.0f, 1.0f, 0.0f }, .color = color });
+		mesh.vertex({ .pos = { 1.0f, 0.0f, 0.0f }, .color = color });
 		mesh.end();
 	});
 }
@@ -414,7 +411,7 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 	auto v1_inner = radius_inner * r1;
 
 	draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::Triangles);
+		mesh.begin(skygfx::utils::Mode::Triangles);
 
 		for (int i = 0; i < segments; i++)
 		{
@@ -431,13 +428,13 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 			auto p3 = glm::vec3({ v1_inner + radius_inner + delta_inner, 0.0f });
 			auto p4 = glm::vec3({ v2_inner + radius_inner + delta_inner, 0.0f });
 
-			mesh.vertex(skygfx::vertex::PositionColor{ p1, outer_color });
-			mesh.vertex(skygfx::vertex::PositionColor{ p2, outer_color });
-			mesh.vertex(skygfx::vertex::PositionColor{ p3, inner_color });
+			mesh.vertex({ .pos = p1, .color = outer_color });
+			mesh.vertex({ .pos = p2, .color = outer_color });
+			mesh.vertex({ .pos = p3, .color = inner_color });
 
-			mesh.vertex(skygfx::vertex::PositionColor{ p3, inner_color });
-			mesh.vertex(skygfx::vertex::PositionColor{ p2, outer_color });
-			mesh.vertex(skygfx::vertex::PositionColor{ p4, inner_color });
+			mesh.vertex({ .pos = p3, .color = inner_color });
+			mesh.vertex({ .pos = p2, .color = outer_color });
+			mesh.vertex({ .pos = p4, .color = inner_color });
 
 			r1 = r2;
 			v1_outer = v2_outer;

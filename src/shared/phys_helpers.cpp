@@ -326,13 +326,14 @@ void World::detach(std::shared_ptr<Node> node)
 void World::Draw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineStrip);
-		mesh.color({ color.r, color.g, color.b });
+		mesh.begin(skygfx::utils::Mode::LineLoop);
 		for (int i = 0; i < vertexCount; i++)
 		{
-			mesh.vertex({ vertices[i].x, vertices[i].y });
+			mesh.vertex({
+				.pos = { vertices[i].x, vertices[i].y, 0.0f },
+				.color = *(glm::vec4*)&color
+			});
 		}
-		mesh.vertex({ vertices[0].x, vertices[0].y });
 		mesh.end();
 	});
 }
@@ -340,20 +341,24 @@ void World::Draw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b
 void World::Draw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleFan);
-		mesh.color({ color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 0.5f });
+		mesh.begin(skygfx::utils::Mode::TriangleFan);
 		for (int i = 0; i < vertexCount; i++)
 		{
-			mesh.vertex({ vertices[i].x, vertices[i].y });
+			mesh.vertex({
+				.pos = { vertices[i].x, vertices[i].y, 0.0f },
+				.color = *(glm::vec4*)&color * 0.5f
+			});
 		}
 		mesh.end();
 	});
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineLoop);
-		mesh.color({ color.r, color.g, color.b, color.a });
+		mesh.begin(skygfx::utils::Mode::LineLoop);
 		for (int i = 0; i < vertexCount; i++)
 		{
-			mesh.vertex({ vertices[i].x, vertices[i].y });
+			mesh.vertex({
+				.pos = { vertices[i].x, vertices[i].y, 0.0f },
+				.color = *(glm::vec4*)&color
+			});
 		}
 		mesh.end();
 	});
@@ -368,8 +373,7 @@ void World::Draw::DrawCircle(const b2Vec2& center, float radius, const b2Color& 
 	float cosInc = glm::cos(increment);
 
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
-		mesh.color({ color.r, color.g, color.b, color.a });
+		mesh.begin(skygfx::utils::Mode::Lines);
 
 		auto v0 = glm::vec2({ center.x, center.y });
 		auto r1 = glm::vec2({ 1.0f, 0.0f });
@@ -379,8 +383,8 @@ void World::Draw::DrawCircle(const b2Vec2& center, float radius, const b2Color& 
 		{
 			auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
 			auto v2 = v0 + radius * r2;
-			mesh.vertex(v1);
-			mesh.vertex(v2);
+			mesh.vertex({ .pos = { v1.x, v1.y, 0.0f }, .color = *(glm::vec4*)&color });
+			mesh.vertex({ .pos = { v2.x, v2.y, 0.0f }, .color = *(glm::vec4*)&color });
 			r1 = r2;
 			v1 = v2;
 		}
@@ -401,35 +405,38 @@ void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 	auto v1 = v0 + radius * r1;
 
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleFan);
-		mesh.color({ 0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f });
-		mesh.vertex(v0);
-		mesh.vertex(v1);
+		auto _color = *(glm::vec4*)&color * 0.5f;
+
+		mesh.begin(skygfx::utils::Mode::TriangleFan);
+		mesh.vertex({ .pos = { v0.x, v0.y, 0.0f }, .color = _color });
+		mesh.vertex({ .pos = { v1.x, v1.y, 0.0f }, .color = _color });
 		for (int i = 0; i < segments; i++)
 		{
 			auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
 			auto v2 = v0 + radius * r2;
-			mesh.vertex(v2);
+			mesh.vertex({ .pos = { v2.x, v2.y, 0.0f }, .color = _color });
 			r1 = r2;
 		}
 		mesh.end();
 	});
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
-		mesh.color({ color.r, color.g, color.b, color.a });
+		auto _color = *(glm::vec4*)&color;
+
+		mesh.begin(skygfx::utils::Mode::Lines);
 		r1 = { 1.0f, 0.0f };
 		v1 = v0 + radius * r1;
 		for (int i = 0; i < segments; ++i)
 		{
 			auto r2 = glm::vec2({ cosInc * r1.x - sinInc * r1.y, sinInc * r1.x + cosInc * r1.y });
 			auto v2 = v0 + radius * r2;
-			mesh.vertex(v1);
-			mesh.vertex(v2);
+			mesh.vertex({ .pos = { v1.x, v1.y, 0.0f }, .color = _color });
+			mesh.vertex({ .pos = { v2.x, v2.y, 0.0f }, .color = _color });
 			r1 = r2;
 			v1 = v2;
 		}
-		mesh.vertex(v0);
-		mesh.vertex(v0 + radius * glm::vec2({ axis.x, axis.y }));
+		mesh.vertex({ .pos = { v0.x, v0.y, 0.0f }, .color = _color });
+		auto v3 = v0 + radius * glm::vec2({ axis.x, axis.y });
+		mesh.vertex({ .pos = { v3.x, v3.y, 0.0f }, .color = _color });
 		mesh.end();
 	});
 }
@@ -437,10 +444,9 @@ void World::Draw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 void World::Draw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
-		mesh.color({ color.r, color.g, color.b, color.a });
-		mesh.vertex({ p1.x, p1.y });
-		mesh.vertex({ p2.x, p2.y });
+		mesh.begin(skygfx::utils::Mode::Lines);
+		mesh.vertex({ .pos = { p1.x, p1.y, 0.0f }, .color = *(glm::vec4*)&color });
+		mesh.vertex({ .pos = { p2.x, p2.y, 0.0f }, .color = *(glm::vec4*)&color });
 		mesh.end();
 	});
 }
@@ -452,14 +458,15 @@ void World::Draw::DrawTransform(const b2Transform& xf)
 	b2Vec2 px = p + AxisScale * xf.q.GetXAxis();
 	b2Vec2 py = p + AxisScale * xf.q.GetYAxis();
 
+	glm::vec4 color1 = { Graphics::Color::Red, 1.0f };
+	glm::vec4 color2 = { Graphics::Color::Lime, 1.0f };
+
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::Lines);
-		mesh.color(Graphics::Color::Red);
-		mesh.vertex({ p.x, p.y });
-		mesh.vertex({ px.x, px.y });
-		mesh.color(Graphics::Color::Lime);
-		mesh.vertex({ p.x, p.y });
-		mesh.vertex({ py.x, py.y });
+		mesh.begin(skygfx::utils::Mode::Lines);
+		mesh.vertex({ .pos = { p.x, p.y, 0.0f }, .color = color1 });
+		mesh.vertex({ .pos = { px.x, px.y, 0.0f }, .color = color1 });
+		mesh.vertex({ .pos = { p.x, p.y, 0.0f }, .color = color2 });
+		mesh.vertex({ .pos = { py.x, py.y, 0.0f }, .color = color2 });
 		mesh.end();
 	});
 }
