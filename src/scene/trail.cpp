@@ -112,7 +112,7 @@ void Trail::draw()
 	GRAPHICS->pushStencilMode(stencil);
 	GRAPHICS->pushModelMatrix(holder->getTransform());
 	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::Mode::TriangleStrip);
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleStrip);
 
 		for (int i = (int)mSegments.size() - 1; i >= 0; i--)
 		{

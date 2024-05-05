@@ -269,7 +269,7 @@ void System::drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_pt
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color)
 {
 	draw(effect, texture, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::Mode::TriangleStrip);
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleStrip);
 		mesh.vertex({ .pos = { 0.0f, 0.0f, 0.0f }, .color = top_left_color, .texcoord = top_left_uv });
 		mesh.vertex({ .pos = { 0.0f, 1.0f, 0.0f }, .color = bottom_left_color, .texcoord = bottom_left_uv });
 		mesh.vertex({ .pos = { 1.0f, 0.0f, 0.0f }, .color = top_right_color, .texcoord = top_right_uv });
@@ -368,7 +368,7 @@ void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 void System::drawLineRectangle(const glm::vec4& color)
 {
 	draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::Mode::LineLoop);
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::LineLoop);
 		mesh.vertex({ .pos = { 0.0f, 0.0f, 0.0f }, .color = color });
 		mesh.vertex({ .pos = { 0.0f, 1.0f, 0.0f }, .color = color });
 		mesh.vertex({ .pos = { 1.0f, 1.0f, 0.0f }, .color = color });
@@ -411,7 +411,7 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 	auto v1_inner = radius_inner * r1;
 
 	draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::Mode::Triangles);
+		mesh.begin(skygfx::utils::MeshBuilder::Mode::Triangles);
 
 		for (int i = 0; i < segments; i++)
 		{
