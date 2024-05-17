@@ -70,13 +70,6 @@ namespace sky::effects
 		static const std::string Shader;
 	};
 
-	struct alignas(16) MipmapBias // TODO: remove this effect and use skygfx::utils::commands::SetMipmapBias()
-	{
-		float bias;
-
-		static const std::string Shader;
-	};
-
 	struct alignas(16) Shockwave
 	{
 		float size = 1.0f;

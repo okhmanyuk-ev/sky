@@ -63,14 +63,7 @@ void BlurredGlass::draw()
 	if (mBlurIntensity <= 0.0f)
 		return;
 
-	// TODO: add lod bias feature to graphics system
-	// GRAPHICS->pushLodBias(...);
-	// ...
-	// GRAPHICS->pop();
-
-	static auto effect = sky::effects::Effect<sky::effects::MipmapBias>();
-	effect.uniform.bias = mBlurIntensity * 8.0f;
-	setEffect(&effect);
+	GRAPHICS->pushMipmapBias(mBlurIntensity * 8.0f);
 
 	if (mBlurPasses < 1)
 		mBlurPasses = 1;
@@ -79,6 +72,8 @@ void BlurredGlass::draw()
 	{
 		Glass::draw();
 	}
+
+	GRAPHICS->pop();
 }
 
 // grayscaled glass

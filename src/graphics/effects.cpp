@@ -110,17 +110,6 @@ void effect(inout vec4 result)
 		discard;
 })";
 
-const std::string MipmapBias::Shader = R"(
-layout(binding = EFFECT_UNIFORM_BINDING) uniform _bias
-{
-	float bias;
-} bias;
-
-void effect(inout vec4 result)
-{
-	result = texture(sColorTexture, In.tex_coord, bias.bias);
-})";
-
 const std::string Shockwave::Shader = R"(
 layout(binding = EFFECT_UNIFORM_BINDING) uniform _shockwave
 {

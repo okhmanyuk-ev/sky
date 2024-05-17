@@ -127,6 +127,7 @@ void System::flush()
 		skygfx::utils::commands::SetBlendMode(state.blend_mode),
 		skygfx::utils::commands::SetSampler(state.sampler),
 		skygfx::utils::commands::SetTextureAddress(state.texture_address),
+		skygfx::utils::commands::SetMipmapBias(state.mipmap_bias),
 		skygfx::utils::commands::SetMesh(&mesh),
 		skygfx::utils::commands::SetColorTexture(texture),
 		skygfx::utils::commands::Draw()
@@ -762,6 +763,13 @@ void System::pushStencilMode(std::optional<skygfx::StencilMode> value)
 {
 	auto state = mStates.top();
 	state.stencil_mode = value;
+	push(state);
+}
+
+void System::pushMipmapBias(float bias)
+{
+	auto state = mStates.top();
+	state.mipmap_bias = bias;
 	push(state);
 }
 

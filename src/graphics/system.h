@@ -138,6 +138,7 @@ namespace Graphics
 		void pushOrthoMatrix(float width, float height);
 		void pushOrthoMatrix(std::shared_ptr<skygfx::RenderTarget> target = nullptr);
 		void pushStencilMode(std::optional<skygfx::StencilMode> value);
+		void pushMipmapBias(float bias);
 
 		const auto& getCurrentState() const { return mStates.top(); }
 		
@@ -156,6 +157,7 @@ namespace Graphics
 			skygfx::Sampler sampler = skygfx::Sampler::Nearest;
 			skygfx::TextureAddress texture_address = skygfx::TextureAddress::Clamp;
 			std::optional<skygfx::StencilMode> stencil_mode = std::nullopt;
+			float mipmap_bias = 0.0f;
 		};
 
 	private:
@@ -224,7 +226,8 @@ namespace Graphics
 			left.blend_mode == right.blend_mode &&
 			left.sampler == right.sampler &&
 			left.texture_address == right.texture_address &&
-			left.stencil_mode == right.stencil_mode;
+			left.stencil_mode == right.stencil_mode &&
+			left.mipmap_bias == right.mipmap_bias;
 	}
 
 	inline bool operator!=(const System::State& left, const System::State& right)
