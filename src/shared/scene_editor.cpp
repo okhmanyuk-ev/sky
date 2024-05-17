@@ -93,13 +93,21 @@ void SceneEditor::showNodeTreeWindow()
 
 void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
 {
-	int flags = ImGuiTreeNodeFlags_DefaultOpen;
+	int flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanFullWidth;
 
 	if (node->getNodes().size() == 0)
 		flags |= ImGuiTreeNodeFlags_Leaf;
 
 	if (node == mHoveredNode)
 		flags |= ImGuiTreeNodeFlags_Selected;
+
+	bool color_pushed = false;
+
+	if (!node->isVisible() || !node->isEnabled())
+	{
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+		color_pushed = true;
+	}
 
 	auto& n = *node.get();
 	auto name = typeid(n).name();
@@ -118,9 +126,16 @@ void SceneEditor::showRecursiveNodeTree(std::shared_ptr<Scene::Node> node)
 	if (opened)
 	{
 		for (auto _node : node->getNodes())
+		{
 			showRecursiveNodeTree(_node);
+		}
 
 		ImGui::TreePop();
+	}
+
+	if (color_pushed)
+	{
+		ImGui::PopStyleColor();
 	}
 }
 
