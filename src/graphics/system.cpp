@@ -47,13 +47,31 @@ void System::end()
 	mWorking = false;
 }
 
+bool System::isSameBatch(const State& left, const State& right)
+{
+	return
+		left.projection_matrix == right.projection_matrix &&
+		left.view_matrix == right.view_matrix &&
+		//	left.model_matrix == right.model_matrix && // we should not compare model matrix for fine batching
+		left.render_target == right.render_target &&
+		left.scissor == right.scissor &&
+		left.viewport == right.viewport &&
+		left.depth_mode == right.depth_mode &&
+		left.cull_mode == right.cull_mode &&
+		left.blend_mode == right.blend_mode &&
+		left.sampler == right.sampler &&
+		left.texture_address == right.texture_address &&
+		left.stencil_mode == right.stencil_mode &&
+		left.mipmap_bias == right.mipmap_bias;
+}
+
 void System::applyState()
 {
 	assert(!mStates.empty());
 
 	const auto& state = mStates.top();
 
-	if (mAppliedState.has_value() && mAppliedState.value() == state)
+	if (mAppliedState.has_value() && isSameBatch(mAppliedState.value(), state))
 		return;
 
 	flush();
@@ -608,7 +626,6 @@ void System::drawString(const Font& font, const tiny_utf8::string& text, float s
 glm::vec3 System::project(const glm::vec3& pos)
 {
 	const auto& state = getCurrentState();
-	assert(state == mAppliedState.value());
 
 	auto scale = PLATFORM->getScale();
 

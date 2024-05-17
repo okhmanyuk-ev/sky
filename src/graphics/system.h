@@ -114,11 +114,9 @@ namespace Graphics
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
 
-	private:
-		glm::vec3 project(const glm::vec3& pos);
-		void pushBatchIndices(const std::vector<uint32_t>& indices, size_t vertices_size);
-		
 	public:
+		glm::vec3 project(const glm::vec3& pos);
+		bool isSameBatch(const State& left, const State& right);
 		void applyState();
 		void push(const State& value);
 		void pop(int count = 1);
@@ -211,27 +209,4 @@ namespace Graphics
 	private:
 		std::shared_ptr<skygfx::Texture> mWhiteCircleTexture = nullptr;
 	};
-
-	inline bool operator==(const System::State& left, const System::State& right)
-	{
-		return
-			left.projection_matrix == right.projection_matrix &&
-			left.view_matrix == right.view_matrix &&
-		//	left.model_matrix == right.model_matrix && // we should not compare model matrix for fine batching
-			left.render_target == right.render_target &&
-			left.scissor == right.scissor &&
-			left.viewport == right.viewport &&
-			left.depth_mode == right.depth_mode &&
-			left.cull_mode == right.cull_mode &&
-			left.blend_mode == right.blend_mode &&
-			left.sampler == right.sampler &&
-			left.texture_address == right.texture_address &&
-			left.stencil_mode == right.stencil_mode &&
-			left.mipmap_bias == right.mipmap_bias;
-	}
-
-	inline bool operator!=(const System::State& left, const System::State& right)
-	{
-		return !(left == right);
-	}
 }
