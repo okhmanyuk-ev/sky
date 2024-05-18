@@ -62,19 +62,16 @@ void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, s
 
 void System::draw(uint32_t vertexCount, uint32_t vertexOffset)
 {
-	mDrawcalls += 1;
 	skygfx::Draw(vertexCount, vertexOffset);
 }
 
 void System::drawIndexed(uint32_t indexCount, uint32_t indexOffset)
 {
-	mDrawcalls += 1;
 	skygfx::DrawIndexed(indexCount, indexOffset);
 }
 
 void System::present()
 {
-	mDrawcallsPublic = mDrawcalls;
-	mDrawcalls = 0;
-	skygfx::Present();
+	auto result = skygfx::Present();
+	mDrawcalls = result.drawcalls;
 }

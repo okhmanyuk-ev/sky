@@ -52,10 +52,9 @@ namespace Renderer
 		void present();
 
 	public:
-		int getDrawcalls() const { return mDrawcallsPublic; }
+		int getDrawcalls() const { return mDrawcalls; }
 
 	private:
 		int mDrawcalls = 0;
-		int mDrawcallsPublic = 0;
 	};
 }
