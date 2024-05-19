@@ -15,54 +15,54 @@ Scene::Scene::~Scene()
 	//
 }
 
-void Scene::Scene::recursiveNodeUpdateTransform(std::shared_ptr<Node> node)
+void Scene::Scene::recursiveNodeUpdateTransform(Node& node)
 {
-	if (!node->isEnabled())
+	if (!node.isEnabled())
 		return;
 
-	node->updateTransform();
+	node.updateTransform();
 
-	for (auto _node : node->getNodes())
-		recursiveNodeUpdateTransform(_node);
+	for (auto _node : node.getNodes())
+		recursiveNodeUpdateTransform(*_node);
 }
 
-void Scene::Scene::recursiveNodeUpdate(std::shared_ptr<Node> node, Clock::Duration delta)
+void Scene::Scene::recursiveNodeUpdate(Node& node, Clock::Duration delta)
 {
-	if (!node->isEnabled())
+	if (!node.isEnabled())
 		return;
 
-	node->update(delta);
+	node.update(delta);
 
-	for (auto _node : node->getNodes())
-		recursiveNodeUpdate(_node, delta);
+	for (auto _node : node.getNodes())
+		recursiveNodeUpdate(*_node, delta);
 }
 
-void Scene::Scene::recursiveNodeDraw(std::shared_ptr<Node> node)
+void Scene::Scene::recursiveNodeDraw(Node& node)
 {
-	if (!node->isEnabled())
+	if (!node.isEnabled())
 		return;
 
-	if (!node->isVisible())
+	if (!node.isVisible())
 		return;
 
-	if (!node->isTransformReady())
+	if (!node.isTransformReady())
 		return;
 
-	node->enterDraw();
+	node.enterDraw();
 
-	if (node->hasBatchGroup() && mBatchGroupsEnabled)
+	if (node.hasBatchGroup() && mBatchGroupsEnabled)
 	{
-		drawBatchGroup(node->getBatchGroup());
+		drawBatchGroup(node.getBatchGroup());
 	}
 	else
 	{
-		node->draw();
+		node.draw();
 	}
 
-	for (auto _node : node->getNodes())
-		recursiveNodeDraw(_node);
+	for (auto _node : node.getNodes())
+		recursiveNodeDraw(*_node);
 
-	node->leaveDraw();
+	node.leaveDraw();
 }
 
 void Scene::Scene::drawBatchGroup(const std::string& name)
@@ -199,9 +199,9 @@ void Scene::Scene::frame()
 		mViewport.size /= PLATFORM->getScale();
 	}
 
-	mTimestepFixer.execute([this](auto delta) {
-		recursiveNodeUpdate(mRoot, delta);
-		recursiveNodeUpdateTransform(mRoot);
+	mTimestepFixer.execute([&](auto delta) {
+		recursiveNodeUpdate(*mRoot, delta);
+		recursiveNodeUpdateTransform(*mRoot);
 	});
 
 	if (mBatchGroupsEnabled)
@@ -213,7 +213,7 @@ void Scene::Scene::frame()
 	GRAPHICS->begin();
 	GRAPHICS->pushRenderTarget(mRenderTarget);
 	GRAPHICS->pushOrthoMatrix(mRenderTarget);
-	recursiveNodeDraw(mRoot);
+	recursiveNodeDraw(*mRoot);
 	GRAPHICS->pop(2);
 	GRAPHICS->end();
 }

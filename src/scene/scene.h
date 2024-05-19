@@ -39,9 +39,9 @@ namespace Scene
 		void onEvent(const Platform::Input::Touch::Event& e) override;
 
 	private:
-		void recursiveNodeUpdateTransform(std::shared_ptr<Node> node);
-		void recursiveNodeUpdate(std::shared_ptr<Node> node, Clock::Duration delta);
-		void recursiveNodeDraw(std::shared_ptr<Node> node);
+		void recursiveNodeUpdateTransform(Node& node);
+		void recursiveNodeUpdate(Node& node, Clock::Duration delta);
+		void recursiveNodeDraw(Node& node);
 		void drawBatchGroup(const std::string& name);
 
 	public:
