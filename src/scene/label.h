@@ -44,6 +44,8 @@ namespace Scene
 		std::tuple<glm::vec2, glm::vec2> getSymbolBounds(int index);
 		float getSymbolLineY(int index);
 
+		void setSymbolColor(size_t index, const glm::vec4& color);
+
 	private:
 		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
 		float mFontSize = DefaultFontSize;

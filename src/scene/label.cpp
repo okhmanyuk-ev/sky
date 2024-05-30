@@ -121,3 +121,12 @@ float Label::getSymbolLineY(int index)
 
 	return mMesh.symbol_line_y.at(index) * scale;
 }
+
+void Label::setSymbolColor(size_t index, const glm::vec4& color)
+{
+	assert(!mText.empty());
+	assert(index >= 0);
+	assert(index < mText.length());
+
+	mMesh.setSymbolColor(index, color);
+}

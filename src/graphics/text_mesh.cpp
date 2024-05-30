@@ -188,3 +188,13 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 
 	return { height * scale, result };
 }
+
+void TextMesh::setSymbolColor(size_t index, const glm::vec4& color)
+{
+	size_t base_vtx = index * 4;
+
+	for (size_t i = base_vtx; i < base_vtx + 4; i++)
+	{
+		vertices[i].color = color;
+	}
+}

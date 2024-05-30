@@ -23,6 +23,8 @@ namespace Graphics
 		std::vector<glm::vec2> symbol_positions;
 		std::vector<glm::vec2> symbol_sizes;
 		std::vector<float> symbol_line_y;
+
+		void setSymbolColor(size_t index, const glm::vec4& color);
 	
 		static TextMesh createTextMesh(const Font& font, tiny_utf8::string::const_iterator begin,
 			tiny_utf8::string::const_iterator end);
