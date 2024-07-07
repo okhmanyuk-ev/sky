@@ -41,7 +41,8 @@ namespace Graphics
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
-		void draw(sky::effects::IEffect* effect, skygfx::Texture* texture, const skygfx::utils::Mesh& mesh);
+		void draw(sky::effects::IEffect* effect, skygfx::Texture* texture, skygfx::Topology topology,
+			const skygfx::utils::Mesh& mesh);
 
 		void draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
 			skygfx::Topology topology, skygfx::utils::Mesh::Vertex* vertices, uint32_t vertex_count,

@@ -128,13 +128,13 @@ void System::flush()
 	});
 
 	static skygfx::utils::Mesh mesh;
-	mesh.setTopology(mBatch.topology.value());
 	mesh.setVertices(mBatch.vertices.data(), mBatch.verticesCount);
 	mesh.setIndices(mBatch.indices.data(), mBatch.indicesCount);
 
 	auto texture = mBatch.texture ? mBatch.texture.get() : nullptr;
 
 	skygfx::utils::ExecuteCommands({
+		skygfx::utils::commands::SetTopology(mBatch.topology.value()),
 		skygfx::utils::commands::SetProjectionMatrix(proj),
 		skygfx::utils::commands::SetViewMatrix(view),
 		skygfx::utils::commands::SetViewport(state.viewport),
@@ -161,7 +161,8 @@ void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, s
 	RENDERER->clear(color, depth, stencil);
 }
 
-void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, const skygfx::utils::Mesh& mesh)
+void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, skygfx::Topology topology,
+	const skygfx::utils::Mesh& mesh)
 {
 	applyState();
 	flush();
@@ -179,6 +180,7 @@ void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, const
 	}
 
 	cmds.insert(cmds.end(), {
+		skygfx::utils::commands::SetTopology(topology),
 		skygfx::utils::commands::SetViewport(state.viewport),
 		skygfx::utils::commands::SetScissor(state.scissor),
 		skygfx::utils::commands::SetDepthMode(state.depth_mode),
@@ -246,11 +248,10 @@ void System::draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture
 	else
 	{
 		static skygfx::utils::Mesh mesh;
-		mesh.setTopology(topology);
 		mesh.setVertices(vertices, vertex_count);
 		mesh.setIndices(indices, index_count);
 
-		draw(effect, texture ? texture.get() : nullptr, mesh);
+		draw(effect, texture ? texture.get() : nullptr, topology, mesh);
 	}
 }
 
