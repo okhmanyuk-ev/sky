@@ -10,124 +10,196 @@
 
 namespace Actions::Collection
 {
-    using SceneTransform = std::shared_ptr<Scene::Transform>;
-	using SceneColor = std::shared_ptr<Scene::Color>;
-	using SceneNode = std::shared_ptr<Scene::Node>;
+	std::unique_ptr<Action> ChangePositionByDirection(std::shared_ptr<Scene::Transform> node,
+		const glm::vec2& direction, float speed);
+	std::unique_ptr<Action> ChangePositionByDirection(std::shared_ptr<Scene::Transform> node,
+		const glm::vec2& direction, float speed, float duration);
 
-	UAction ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed);
-	UAction ChangePositionByDirection(SceneTransform node, const glm::vec2& direction, float speed, float duration);
+	std::unique_ptr<Action> ChangeColor(std::shared_ptr<Scene::Color> node, const glm::vec3& start,
+		const glm::vec3& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeColor(std::shared_ptr<Scene::Color> node, const glm::vec3& dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeColorRecursive(std::shared_ptr<Scene::Node> node, const glm::vec4& start,
+		const glm::vec4& dest, float duration, EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeColor(SceneColor node, const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeColor(SceneColor node, const glm::vec3& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeColorRecursive(SceneNode node, const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeAlpha(std::shared_ptr<Scene::Color> node, float start, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeAlpha(std::shared_ptr<Scene::Color> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeAlpha(SceneColor node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeAlpha(SceneColor node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> Hide(std::shared_ptr<Scene::Color> node, float duration,
+		EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> Show(std::shared_ptr<Scene::Color> node, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction Hide(SceneColor node, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction Show(SceneColor node, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction HideRecursive(SceneNode node, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> Shake(std::shared_ptr<Scene::Transform> node, float radius, float duration);
+	std::unique_ptr<Action> Kill(std::shared_ptr<Scene::Node> node);
 
-	UAction Shake(SceneTransform node, float radius, float duration);
-	UAction Kill(std::shared_ptr<Scene::Node> node);
+	std::unique_ptr<Action> ChangeRotation(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeRotation(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeRotation(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeRotation(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalAnchor(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalAnchor(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeHorizontalAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeHorizontalAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalAnchor(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalAnchor(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeVerticalAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeVerticalAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeAnchor(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
+		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeAnchor(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeAnchor(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeAnchor(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalPivot(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalPivot(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeHorizontalPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeHorizontalPivot(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalPivot(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalPivot(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeVerticalPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeVerticalPivot(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangePivot(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
+		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangePivot(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangePivot(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangePivot(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-
-	UAction ChangeHorizontalPosition(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeHorizontalPosition(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalPosition(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalPosition(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 	
-	UAction ChangeVerticalPosition(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeVerticalPosition(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalPosition(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalPosition(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangePosition(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangePosition(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangePosition(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
+		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangePosition(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeHorizontalOrigin(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeHorizontalOrigin(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalOrigin(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalOrigin(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeVerticalOrigin(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeVerticalOrigin(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalOrigin(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalOrigin(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeOrigin(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeOrigin(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeOrigin(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
+		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeOrigin(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeHorizontalSize(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeHorizontalSize(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalSize(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalSize(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 	
-	UAction ChangeVerticalSize(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeVerticalSize(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalSize(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalSize(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeSize(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeSize(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeSize(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
+		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeSize(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeHorizontalStretch(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeHorizontalStretch(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalStretch(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalStretch(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeVerticalStretch(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeVerticalStretch(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalStretch(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalStretch(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeStretch(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeStretch(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeStretch(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
+		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeStretch(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeHorizontalScale(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeHorizontalScale(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalScale(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalScale(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeVerticalScale(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeVerticalScale(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalScale(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalScale(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeScale(SceneTransform node, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeScale(SceneTransform node, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeScale(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
+		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeScale(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start,
+		float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start,
+		float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& start,
+		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeRadialAnchor(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeRadialAnchor(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeRadialAnchor(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeRadialAnchor(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeRadialPivot(SceneTransform node, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeRadialPivot(SceneTransform node, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeRadialPivot(std::shared_ptr<Scene::Transform> node, float start, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeRadialPivot(std::shared_ptr<Scene::Transform> node, float dest, float duration,
+		EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float start,
+		float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float dest,
+		float duration, EasingFunction easingFunction = Easing::Linear);
 
-	UAction ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass, float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	UAction ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass,
+		float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
+	std::unique_ptr<Action> ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass,
+		float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 }

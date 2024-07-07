@@ -557,7 +557,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createEnterAction
 	}
 
 	return Actions::Collection::MakeSequence(
-		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::WaitGlobalFrame(),
 		std::move(parallel)
 	);
 };
@@ -584,7 +584,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction
 	}
 
 	return Actions::Collection::MakeSequence(
-		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::WaitGlobalFrame(),
 		std::move(parallel)
 	);
 };
@@ -715,7 +715,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction(
 	}
 
 	return Actions::Collection::MakeSequence(
-		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::WaitGlobalFrame(),
 		std::move(parallel)
 	);
 };
@@ -763,7 +763,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 	}
 
 	return Actions::Collection::MakeSequence(
-		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::WaitGlobalFrame(),
 		std::move(parallel)
 	);
 };
@@ -1029,7 +1029,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 	}));
 
 	runAction(Actions::Collection::MakeSequence(
-		Actions::Collection::WaitOneFrame(),
+		Actions::Collection::WaitGlobalFrame(),
 		Actions::Collection::Execute([this] {
 			runAction(Actions::Collection::RepeatInfinite([this] {
 				return Actions::Collection::MakeSequence(

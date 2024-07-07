@@ -9,7 +9,7 @@ using namespace Scene;
 
 Emitter::Emitter()
 {
-	runAction(Actions::Collection::RepeatInfinite([this]()->Actions::Collection::UAction {
+	runAction(Actions::Collection::RepeatInfinite([this]()->std::unique_ptr<Actions::Action> {
 		if (!mRunning)
 			return nullptr;
 

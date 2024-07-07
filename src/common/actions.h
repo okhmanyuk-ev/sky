@@ -141,53 +141,60 @@ namespace Actions
 
 	namespace Collection
 	{
-		using UAction = std::unique_ptr<Action>;
+		std::unique_ptr<Action> Insert(std::function<std::unique_ptr<Action>()> action);
+		std::unique_ptr<Action> RepeatInfinite(std::function<std::unique_ptr<Action>()> action);
 
-		UAction Insert(std::function<UAction()> action);
-		UAction RepeatInfinite(std::function<UAction()> action);
+		std::unique_ptr<Action> Execute(std::function<void()> callback);
+		std::unique_ptr<Action> ExecuteInfinite(std::function<void(Clock::Duration delta)> callback);
+		std::unique_ptr<Action> ExecuteInfinite(std::function<void()> callback);
+		std::unique_ptr<Action> ExecuteInfiniteGlobal(std::function<void()> callback);
 
-		UAction Execute(std::function<void()> callback);
-		UAction ExecuteInfinite(std::function<void(Clock::Duration delta)> callback);
-		UAction ExecuteInfinite(std::function<void()> callback);
-
-		UAction Wait();
-		UAction Wait(float duration);
+		std::unique_ptr<Action> Wait();
+		std::unique_ptr<Action> Wait(float duration);
 
 		// will wait while returning true
-		UAction Wait(std::function<bool(Clock::Duration delta)> while_callback);
-		UAction Wait(std::function<bool()> while_callback);
+		std::unique_ptr<Action> Wait(std::function<bool(Clock::Duration delta)> while_callback);
+		std::unique_ptr<Action> Wait(std::function<bool()> while_callback);
 		
 		// will wait while flag is true
-		UAction Wait(bool& while_flag);
-		UAction WaitOneFrame();
+		std::unique_ptr<Action> Wait(bool& while_flag);
+		std::unique_ptr<Action> WaitGlobalFrame();
 
-		UAction Delayed(float duration, UAction action);
+		std::unique_ptr<Action> Delayed(float duration, std::unique_ptr<Action> action);
 		
 		// will wait while returning true
-		UAction Delayed(std::function<bool()> while_callback, UAction action);
+		std::unique_ptr<Action> Delayed(std::function<bool()> while_callback, std::unique_ptr<Action> action);
 
 		// will wait while flag is true
-		UAction Delayed(bool& while_flag, UAction action);
+		std::unique_ptr<Action> Delayed(bool& while_flag, std::unique_ptr<Action> action);
 
-		UAction Breakable(float duration, UAction action);
-		UAction Breakable(std::function<bool()> while_callback, UAction action);
+		std::unique_ptr<Action> Breakable(float duration, std::unique_ptr<Action> action);
+		std::unique_ptr<Action> Breakable(std::function<bool()> while_callback, std::unique_ptr<Action> action);
 
-		UAction Pausable(std::function<bool()> run_callback, UAction action);
+		std::unique_ptr<Action> Pausable(std::function<bool()> run_callback, std::unique_ptr<Action> action);
 
 		using EasingFunction = std::function<float(float)>;
 
-		UAction Interpolate(float start, float dest, float duration, EasingFunction easingFunction, std::function<void(float)> callback);
-		UAction Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback);
-		UAction Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback);
-		UAction Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback);
+		std::unique_ptr<Action> Interpolate(float start, float dest, float duration, EasingFunction easingFunction,
+			std::function<void(float)> callback);
+		std::unique_ptr<Action> Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration,
+			EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback);
+		std::unique_ptr<Action> Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration,
+			EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback);
+		std::unique_ptr<Action> Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration,
+			EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback);
 
-		UAction Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction = Easing::Linear);
-		UAction Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction = Easing::Linear);
+		std::unique_ptr<Action> Interpolate(float startValue, float destValue, float duration, float& value,
+			EasingFunction easingFunction = Easing::Linear);
+		std::unique_ptr<Action> Interpolate(float destValue, float duration, float& value,
+			EasingFunction easingFunction = Easing::Linear);
 
-		UAction Interpolate(const glm::vec3& startValue, const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction = Easing::Linear);
-		UAction Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction = Easing::Linear);
+		std::unique_ptr<Action> Interpolate(const glm::vec3& startValue, const glm::vec3& destValue,
+			float duration, glm::vec3& value, EasingFunction easingFunction = Easing::Linear);
+		std::unique_ptr<Action> Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value,
+			EasingFunction easingFunction = Easing::Linear);
 
-		UAction Log(const std::string& text);
+		std::unique_ptr<Action> Log(const std::string& text);
 
 		template<class...Args> std::unique_ptr<Sequence> MakeSequence(Args&&...args)
 		{
@@ -208,8 +215,7 @@ namespace Actions
 			return MakeParallel(Parallel::Awaiting::All, std::forward<Args>(args)...);
 		}
 
-		// will wait forever
-		template<class T> UAction WaitEvent(Common::Event::System::ListenerCallback<T> onEvent)
+		template<class T> std::unique_ptr<Action> WaitEvent(Common::Event::System::ListenerCallback<T> onEvent)
 		{
 			auto event_holder = std::make_shared<std::optional<T>>();
 
