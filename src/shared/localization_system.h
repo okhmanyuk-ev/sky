@@ -6,9 +6,7 @@
 #include <fmt/format.h>
 
 #define LOCALIZATION ENGINE->getSystem<Shared::LocalizationSystem>()
-
 #define LOCALIZE(KEY) LOCALIZATION->getString(KEY)
-#define LOCALIZE_FMT(KEY, ...) LOCALIZATION->getStringFmt(KEY, __VA_ARGS__)
 
 namespace Shared
 {
@@ -38,12 +36,5 @@ namespace Shared
 	private:
 		std::map<Language, std::map<std::string, tiny_utf8::string>> mDictionaries;
 		Language mLanguage = Language::English;
-
-	public:
-		template <typename... Args> 
-		tiny_utf8::string getStringFmt(const std::string& key, Args&&... args)
-		{
-			return fmt::format(getString(key).cpp_str(), args...);
-		}
 	};
 }
