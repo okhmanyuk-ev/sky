@@ -107,7 +107,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 	assert(window->getState() == Window::State::Closed);
 	assert(!isWindowsBusy());
 
-	if (mWindows.empty())
+	if (mWindows.empty() && mCurrentScreen)
 		mCurrentScreen->onWindowAppearingBegin();
 
 	mWindows.push(window);
@@ -122,7 +122,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 			window->onOpenEnd();
 			window->mState = Window::State::Opened;
 			
-			if (mWindows.size() == 1)
+			if (mWindows.size() == 1 && mCurrentScreen)
 				mCurrentScreen->onWindowAppearingEnd();
 
 			if (finishCallback)
@@ -154,7 +154,7 @@ void SceneManager::popWindow(size_t count, Callback finishCallback)
 
 	runAction(Actions::Collection::MakeSequence(
 		Actions::Collection::Execute([this, window, count, finishCallback] {
-			if (mWindows.size() == 1)
+			if (mWindows.size() == 1 && mCurrentScreen)
 				mCurrentScreen->onWindowDisappearingBegin();
 		}),
 		window->createCloseAction(),
@@ -164,7 +164,7 @@ void SceneManager::popWindow(size_t count, Callback finishCallback)
 			mWindowHolder->detach(window);
 			mWindows.pop();
 			
-			if (mWindows.empty())
+			if (mWindows.empty() && mCurrentScreen)
 				mCurrentScreen->onWindowDisappearingEnd();
 
 			popWindow(count - 1, finishCallback);
