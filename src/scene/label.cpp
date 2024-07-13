@@ -1,4 +1,5 @@
 #include "label.h"
+#include <regex>
 
 using namespace Scene;
 
@@ -76,6 +77,12 @@ void Label::refresh()
 		mesh_dirty = true;
 	}
 
+	if (mPrevReplaceEscapedNewLines != mReplaceEscapedNewLines)
+	{
+		mPrevReplaceEscapedNewLines = mReplaceEscapedNewLines;
+		mesh_dirty = true;
+	}
+
 	if (!mesh_dirty)
 		return;
 
@@ -89,7 +96,12 @@ void Label::refresh()
 	}
 	else 
 	{
-		std::tie(height, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, mText, width, mFontSize, mAlign);
+		auto replaceEscapedNewlines = [](const std::string& input) {
+			std::regex pattern(R"(\\n)");
+			return std::regex_replace(input, pattern, "\n");
+		};
+		auto text = mReplaceEscapedNewLines ? replaceEscapedNewlines(mText.cpp_str()) : mText;
+		std::tie(height, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, text, width, mFontSize, mAlign);
 	}
 
 	setHeight(height);

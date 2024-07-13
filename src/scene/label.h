@@ -46,6 +46,9 @@ namespace Scene
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
 
+		bool isReplaceEscapedNewLinesEnabled() const { return mReplaceEscapedNewLines; }
+		void setReplaceEscapedNewLinesEnabled(bool value) { mReplaceEscapedNewLines = value; }
+
 	private:
 		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
 		float mFontSize = DefaultFontSize;
@@ -61,5 +64,7 @@ namespace Scene
 		Graphics::TextMesh::Align mPrevAlign = Graphics::TextMesh::Align::Left;
 		bool mMultiline = false;
 		bool mPrevMultiline = false;
+		bool mReplaceEscapedNewLines = true;
+		bool mPrevReplaceEscapedNewLines = true;
 	};
 }
