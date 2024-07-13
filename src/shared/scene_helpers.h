@@ -24,10 +24,10 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const glm::vec2& cell_size,
 		const std::vector<std::shared_ptr<Scene::Node>>& items); 
 
-	std::shared_ptr<Scene::Node> MakeVerticalGrid(float width, const std::vector<std::pair<float/*height*/,
+	std::shared_ptr<Scene::Node> MakeVerticalGrid(std::optional<float> width, const std::vector<std::pair<float/*height*/,
 		std::shared_ptr<Scene::Node>>>& items);
 
-	std::shared_ptr<Scene::Node> MakeVerticalGrid(const glm::vec2& cell_size,
+	std::shared_ptr<Scene::Node> MakeVerticalGrid(std::optional<float> width, float height,
 		const std::vector<std::shared_ptr<Scene::Node>>& items); 
 
 	struct GridPart

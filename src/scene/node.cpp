@@ -8,7 +8,6 @@ using namespace Scene;
 
 Node::Node()
 {
-	//
 }
 
 Node::~Node()
@@ -150,12 +149,10 @@ void Node::updateAbsoluteSize()
 
 void Node::enterDraw()
 {
-	//
 }
 
 void Node::leaveDraw()
 {
-	//
 }
 
 void Node::update(Clock::Duration dTime)
@@ -166,7 +163,6 @@ void Node::update(Clock::Duration dTime)
 
 void Node::draw()
 {
-	//
 }
 
 void Node::touch(Touch type, const glm::vec2& pos)
@@ -179,5 +175,4 @@ void Node::touch(Touch type, const glm::vec2& pos)
 
 void Node::scroll(float x, float y)
 {
-	//
 }
