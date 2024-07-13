@@ -149,6 +149,13 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 	{
 		std::advance(it, 1);
 
+		if (it != text.end() && *it == '\n')
+		{
+			appendTextMesh(begin, it);
+			begin = it + 1;
+			continue;
+		}
+
 		auto length = std::distance(begin, it);
 
 		if (length <= 1)
