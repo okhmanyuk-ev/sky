@@ -49,6 +49,9 @@ namespace Scene
 		bool isReplaceEscapedNewLinesEnabled() const { return mReplaceEscapedNewLines; }
 		void setReplaceEscapedNewLinesEnabled(bool value) { mReplaceEscapedNewLines = value; }
 
+		bool isParseColorTagsEnabled() const { return mParseColorTags; }
+		void setParseColorTagsEnabled(bool value) { mParseColorTags = value; }
+
 	private:
 		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
 		float mFontSize = DefaultFontSize;
@@ -64,7 +67,9 @@ namespace Scene
 		Graphics::TextMesh::Align mPrevAlign = Graphics::TextMesh::Align::Left;
 		bool mMultiline = false;
 		bool mPrevMultiline = false;
-		bool mReplaceEscapedNewLines = true;
-		bool mPrevReplaceEscapedNewLines = true;
+		bool mReplaceEscapedNewLines = false;
+		bool mPrevReplaceEscapedNewLines = false;
+		bool mParseColorTags = false;
+		bool mPrevParseColorTags = false;
 	};
 }

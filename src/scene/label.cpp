@@ -38,70 +38,158 @@ void Label::refresh()
 	if (mFont == nullptr || mFontSize <= 0.0f)
 		return;
 
-	auto mesh_dirty = false;
+	auto dirty = false;
 	auto width = getAbsoluteWidth();
 
 	if (mPrevWidth != width && mMultiline)
 	{
 		mPrevWidth = width;
-		mesh_dirty = true;
+		dirty = true;
 	}
 
 	if (mPrevText != mText)
 	{
 		mPrevText = mText;
-		mesh_dirty = true;
+		dirty = true;
 	}
 
 	if (mPrevFontSize != mFontSize)
 	{
 		mPrevFontSize = mFontSize;
-		mesh_dirty = true;
+		dirty = true;
 	}
 
 	if (mPrevFont != mFont)
 	{
 		mPrevFont = mFont;
-		mesh_dirty = true;
+		dirty = true;
 	}
 
 	if (mPrevAlign != mAlign)
 	{
 		mPrevAlign = mAlign;
-		mesh_dirty = true;
+		dirty = true;
 	}
 
 	if (mPrevMultiline != mMultiline) 
 	{
 		mPrevMultiline = mMultiline;
-		mesh_dirty = true;
+		dirty = true;
 	}
 
 	if (mPrevReplaceEscapedNewLines != mReplaceEscapedNewLines)
 	{
 		mPrevReplaceEscapedNewLines = mReplaceEscapedNewLines;
-		mesh_dirty = true;
+		dirty = true;
 	}
 
-	if (!mesh_dirty)
+	if (mPrevParseColorTags != mParseColorTags)
+	{
+		mPrevParseColorTags = mParseColorTags;
+		dirty = true;
+	}
+
+	if (!dirty)
 		return;
 
 	float height = 0.0f;
+	
+	auto replaceEscapedNewlines = [](const std::string& input) {
+		std::regex pattern(R"(\\n)");
+		return std::regex_replace(input, pattern, "\n");
+	};
+	
+	auto parseColorTags = [](tiny_utf8::string str) {
+		std::vector<glm::vec4> colormap;
+		tiny_utf8::string sublimed_text;
+
+		std::regex color_open_rgba_tag(R"(^<color=rgba\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
+		std::regex color_open_rgb_tag(R"(^<color=rgb\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
+		std::regex color_open_hex_rgba_tag(R"(^<color=hex\([ ]*([0-9A-Fa-f]{8})[ ]*\)>)");
+		std::regex color_open_hex_rgb_tag(R"(^<color=hex\([ ]*([0-9A-Fa-f]{6})[ ]*\)>)");
+		std::regex color_close_tag(R"(^</color>)");
+		std::smatch match;
+
+		const glm::vec4 default_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		glm::vec4 color = default_color;
+
+		while (!str.empty()) {
+			const auto search_str = str.cpp_str();
+			if (std::regex_search(search_str, match, color_open_rgba_tag))
+			{
+				uint8_t r = std::stoi(match[1]);
+				uint8_t g = std::stoi(match[2]);
+				uint8_t b = std::stoi(match[3]);
+				uint8_t a = std::stoi(match[4]);
+
+				color = Graphics::Color::ToNormalized(r, g, b, a);
+				str.erase(0, match.length());
+			}
+			else if (std::regex_search(search_str, match, color_open_rgb_tag))
+			{
+				uint8_t r = std::stoi(match[1]);
+				uint8_t g = std::stoi(match[2]);
+				uint8_t b = std::stoi(match[3]);
+
+				color = Graphics::Color::ToNormalized(r, g, b, 255);
+				str.erase(0, match.length());
+			}
+			else if (std::regex_search(search_str, match, color_open_hex_rgba_tag))
+			{
+				std::string hex_color = match[1];
+				uint32_t rgba = std::stoul(hex_color, nullptr, 16);
+				color = Graphics::Color::ToNormalized((rgba >> 24) & 0xFF, (rgba >> 16) & 0xFF,
+					(rgba >> 8) & 0xFF, rgba & 0xFF);
+				str.erase(0, match.length());
+			}
+			else if (std::regex_search(search_str, match, color_open_hex_rgb_tag))
+			{
+				std::string hex_color = match[1];
+				uint32_t rgb = std::stoul(hex_color, nullptr, 16) << 8;
+				color = Graphics::Color::ToNormalized((rgb >> 24) & 0xFF, (rgb >> 16) & 0xFF,
+					(rgb >> 8) & 0xFF, 255);
+				str.erase(0, match.length());
+			}
+			else if (std::regex_search(search_str, match, color_close_tag))
+			{
+				color = default_color;
+				str.erase(0, match.length());
+			}
+			else {
+				sublimed_text.push_back(str.front());
+				str.erase(0, 1);
+				colormap.push_back(color);
+			}
+		}
+
+		return std::make_tuple(colormap, tiny_utf8::string(sublimed_text));
+	};
+
+	auto text = mText;
+
+	if (mReplaceEscapedNewLines)
+		text = replaceEscapedNewlines(text.cpp_str());
+
+	std::vector<glm::vec4> colormap;
+
+	if (mParseColorTags)
+		std::tie(colormap, text) = parseColorTags(text.cpp_str());
 
 	if (!mMultiline)
 	{
 		height = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
-		mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, mText, -mFont->getDescent() + mFont->getCustomVerticalOffset());
-		setWidth(mFont->getStringWidth(mText, mFontSize));
+		mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, text, -mFont->getDescent() + mFont->getCustomVerticalOffset());
+		setWidth(mFont->getStringWidth(text, mFontSize));
 	}
 	else 
 	{
-		auto replaceEscapedNewlines = [](const std::string& input) {
-			std::regex pattern(R"(\\n)");
-			return std::regex_replace(input, pattern, "\n");
-		};
-		auto text = mReplaceEscapedNewLines ? replaceEscapedNewlines(mText.cpp_str()) : mText;
 		std::tie(height, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, text, width, mFontSize, mAlign);
+	}
+
+	for (size_t i = 0; i < colormap.size(); i++)
+	{
+		setSymbolColor(i, colormap.at(i));
 	}
 
 	setHeight(height);
@@ -111,10 +199,6 @@ void Label::refresh()
 
 std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 {
-	assert(!mText.empty());
-	assert(index >= 0);
-	assert(index < mText.length());
-
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	
 	auto pos = mMesh.symbol_positions.at(index) * scale;
@@ -125,10 +209,6 @@ std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 
 float Label::getSymbolLineY(int index)
 {
-	assert(!mText.empty());
-	assert(index >= 0);
-	assert(index < mText.length());
-
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 
 	return mMesh.symbol_line_y.at(index) * scale;
@@ -136,9 +216,5 @@ float Label::getSymbolLineY(int index)
 
 void Label::setSymbolColor(size_t index, const glm::vec4& color)
 {
-	assert(!mText.empty());
-	assert(index >= 0);
-	assert(index < mText.length());
-
 	mMesh.setSymbolColor(index, color);
 }
