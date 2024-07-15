@@ -183,10 +183,15 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(std::optional<float>
 	return MakeVerticalGrid(width, items_height);
 }
 
+std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(glm::vec2 size, const std::vector<std::shared_ptr<Scene::Node>>& items)
+{
+	return MakeVerticalGrid(size.x, size.y, items);
+}
+
 std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<GridPart>& items)
 {
 	auto holder = std::make_shared<Scene::Node>();
-	
+
 	float all = 0.0f;
 	for (const auto& item : items)
 	{
