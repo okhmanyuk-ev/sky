@@ -14,7 +14,7 @@ namespace Scene
 	class Node : public Transform
 	{
 		friend Scene;
-	
+
 	protected:
 		enum class Touch
 		{
@@ -42,7 +42,7 @@ namespace Scene
 	public:
 		glm::vec2 project(const glm::vec2& value) const;
 		glm::vec2 unproject(const glm::vec2& value) const;
-		
+
 		// returning [pos, size]
 		std::tuple<glm::vec2, glm::vec2> getGlobalBounds() const; 
 

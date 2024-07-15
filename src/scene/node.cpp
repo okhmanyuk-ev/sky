@@ -12,10 +12,10 @@ Node::Node()
 
 Node::~Node()
 {
-	// we should setup parent to nullptr for every child, 
+	// we should setup parent to nullptr for every child,
 	// because they can be stored locally somewhere
 
-	for (auto node : mNodes) 
+	for (auto node : mNodes)
 	{
 		node->mParent = nullptr;
 	}
@@ -64,14 +64,14 @@ glm::vec2 Node::project(const glm::vec2& value) const
 	glm::mat4 projection = glm::orthoLH(0.0f, scaled_size.x, scaled_size.y, 0.0f, -1.0f, 1.0f);
 	glm::vec4 viewport = { 0.0f, vp.size.y, vp.size.x, -vp.size.y };
 	glm::vec3 result = glm::project(original, getTransform(), projection, viewport);
-	
+
 	return { result.x, result.y };
 }
 
 glm::vec2 Node::unproject(const glm::vec2& value) const
 {
 	assert(mTransformReady);
-	
+
 	auto scene = getScene();
 	assert(scene != nullptr);
 

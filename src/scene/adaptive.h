@@ -23,7 +23,7 @@ namespace Scene
 			mAdaptScale = glm::min(scale.x, scale.y);
 
 			auto offset = T::getPivot() * T::getAbsoluteSize();
-			
+
 			auto transform = T::getTransform();
 			transform = glm::translate(transform, { offset, 0.0f });
 			transform = glm::scale(transform, { mAdaptScale, mAdaptScale, 1.0f });

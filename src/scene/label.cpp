@@ -71,7 +71,7 @@ void Label::refresh()
 		dirty = true;
 	}
 
-	if (mPrevMultiline != mMultiline) 
+	if (mPrevMultiline != mMultiline)
 	{
 		mPrevMultiline = mMultiline;
 		dirty = true;
@@ -93,12 +93,12 @@ void Label::refresh()
 		return;
 
 	float height = 0.0f;
-	
+
 	auto replaceEscapedNewlines = [](const std::string& input) {
 		std::regex pattern(R"(\\n)");
 		return std::regex_replace(input, pattern, "\n");
 	};
-	
+
 	auto parseColorTags = [](tiny_utf8::string str) {
 		std::vector<glm::vec4> colormap;
 		tiny_utf8::string sublimed_text;
@@ -182,7 +182,7 @@ void Label::refresh()
 		mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, text, -mFont->getDescent() + mFont->getCustomVerticalOffset());
 		setWidth(mFont->getStringWidth(text, mFontSize));
 	}
-	else 
+	else
 	{
 		std::tie(height, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, text, width, mFontSize, mAlign);
 	}
@@ -194,13 +194,13 @@ void Label::refresh()
 
 	setHeight(height);
 
-	Node::updateAbsoluteSize();
+	updateAbsoluteSize();
 }
 
 std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 {
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
-	
+
 	auto pos = mMesh.symbol_positions.at(index) * scale;
 	auto size = mMesh.symbol_sizes.at(index) * scale;
 
