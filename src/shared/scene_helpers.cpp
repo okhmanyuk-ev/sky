@@ -289,6 +289,13 @@ SceneHelpers::RectangleButton::RectangleButton()
 	mLabel->setPivot(0.5f);
 	attach(mLabel);
 
+	runAction(Actions::Collection::ExecuteInfinite([this] {
+		if (!mAdaptiveFontSize)
+			return;
+
+		getLabel()->setFontSize(getAbsoluteHeight() * (18.0f / 28.0f));
+	}));
+
 	refresh();
 }
 
