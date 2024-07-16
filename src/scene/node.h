@@ -52,6 +52,7 @@ namespace Scene
 
 		virtual void updateTransform();
 		virtual void updateAbsoluteSize();
+		virtual void updateAbsoluteScale();
 
 	protected:
 		virtual void enterDraw();
@@ -103,6 +104,7 @@ namespace Scene
 
 	protected:
 		void setAbsoluteSize(const glm::vec2& value) { mAbsoluteSize = value; }
+		void setAbsoluteScale(const glm::vec2& value) { mAbsoluteScale = value; }
 
 	private:
 		Node* mParent = nullptr;

@@ -147,6 +147,12 @@ void Node::updateAbsoluteSize()
 	mAbsoluteSize += getStretch() * parent_size;
 }
 
+void Node::updateAbsoluteScale()
+{
+	auto parent_scale = hasParent() ? getParent()->getAbsoluteScale() : glm::vec2{ 1.0f, 1.0f };
+	mAbsoluteScale = getScale() * parent_scale;
+}
+
 void Node::enterDraw()
 {
 }
@@ -159,9 +165,7 @@ void Node::update(Clock::Duration dTime)
 {
 	mActions.update(dTime);
 	updateAbsoluteSize();
-
-	auto parent_scale = hasParent() ? getParent()->getAbsoluteScale() : glm::vec2{ 1.0f, 1.0f };
-	mAbsoluteScale = parent_scale * getScale();
+	updateAbsoluteScale();
 }
 
 void Node::draw()

@@ -220,16 +220,12 @@ namespace Shared::SceneHelpers
 		void setHighlightColor(const glm::vec4& value) { mHighlightColor = value; }
 		void setHighlightColor(const glm::vec3& value) { setHighlightColor({ value.x, value.y, value.z, mHighlightColor.a }); }
 
-		auto isAdaptiveFontSize() const { return mAdaptiveFontSize; }
-		void setAdaptiveFontSize(bool value) { mAdaptiveFontSize = value; }
-
 	private:
-		std::shared_ptr<Scene::Label> mLabel;
+		std::shared_ptr<Scene::Adaptive<Scene::Label>> mLabel;
 		bool mHighlightEnabled = true;
 		glm::vec4 mActiveColor = { 1.0f, 1.0f, 1.0f, 0.33f };
 		glm::vec4 mInactiveColor = { 1.0f, 1.0f, 1.0f, 0.125f };
 		glm::vec4 mHighlightColor = { 1.0f, 1.0f, 1.0f, 0.66f };
-		bool mAdaptiveFontSize = true;
 	};
 
 	class Progressbar : public Scene::Rectangle

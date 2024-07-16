@@ -289,18 +289,11 @@ void SceneHelpers::SpriteButton::refresh()
 
 SceneHelpers::RectangleButton::RectangleButton()
 {
-	mLabel = std::make_shared<Scene::Label>();
+	mLabel = std::make_shared<Scene::Adaptive<Scene::Label>>();
 	mLabel->setAnchor(0.5f);
 	mLabel->setPivot(0.5f);
+	mLabel->setAdaptStretch(0.7f);
 	attach(mLabel);
-
-	runAction(Actions::Collection::ExecuteInfinite([this] {
-		if (!mAdaptiveFontSize)
-			return;
-
-		getLabel()->setFontSize(getAbsoluteHeight() * (18.0f / 28.0f));
-	}));
-
 	refresh();
 }
 
