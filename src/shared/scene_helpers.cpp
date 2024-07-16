@@ -258,19 +258,26 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
 	const std::vector<std::shared_ptr<Scene::Node>>& items)
 {
 	auto grid = std::make_shared<Scene::Node>();
+	std::vector<std::shared_ptr<StretchedToContent<Scene::Node>>> cells;
 	for (auto item : items)
 	{
 		auto cell = std::make_shared<StretchedToContent<Scene::Node>>();
+		cell->setStretchToContentWidth(false);
 		cell->attach(item);
 		grid->attach(cell);
+		cells.push_back(cell);
 	}
-	grid->runAction(Actions::Collection::ExecuteInfinite([grid] {
+	grid->runAction(Actions::Collection::ExecuteInfinite([grid, cells] {
 		glm::vec2 size = { 0.0f, 0.0f };
-		for (const auto& node : grid->getNodes())
+		for (const auto& cell : cells)
 		{
-			node->setY(size.y);
-			size.y += node->getHeight();
-			size.x = glm::max(size.x, node->getWidth());
+			size.x = glm::max(size.x, cell->getStretchToContentSize().x);
+		}
+		for (const auto& cell : cells)
+		{
+			cell->setY(size.y);
+			cell->setWidth(size.x);
+			size.y += cell->getHeight();
 		}
 		grid->setSize(size);
 	}));

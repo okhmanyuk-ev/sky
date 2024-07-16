@@ -640,15 +640,33 @@ namespace Shared::SceneHelpers
 		{
 			T::update(delta);
 
-			glm::vec2 max_size = { 0.0f, 0.0f };
+			mStretchToContentSize = { 0.0f, 0.0f };
 
 			for (const auto& node : T::getNodes())
 			{
-				max_size.x = glm::max(max_size.x, node->getWidth());
-				max_size.y = glm::max(max_size.y, node->getHeight());
+				mStretchToContentSize.x = glm::max(mStretchToContentSize.x, node->getWidth());
+				mStretchToContentSize.y = glm::max(mStretchToContentSize.y, node->getHeight());
 			}
 
-			T::setSize(max_size);
+			if (mStretchToContentWidth)
+				T::setWidth(mStretchToContentSize.x);
+
+			if (mStretchToContentHeight)
+				T::setHeight(mStretchToContentSize.y);
 		}
+
+	public:
+		auto getStretchToContentSize() const { return mStretchToContentSize; }
+
+		bool isStretchToContentWidth() const { return mStretchToContentWidth; }
+		void setStretchToContentWidth(bool value) { mStretchToContentWidth = value; }
+
+		bool isStretchToContentHeight() const { return mStretchToContentHeight; }
+		void setStretchToContentHeight(bool value) { mStretchToContentHeight = value; }
+
+	private:
+		glm::vec2 mStretchToContentSize = { 0.0f, 0.0f };
+		bool mStretchToContentWidth = true;
+		bool mStretchToContentHeight = true;
 	};
 }
