@@ -159,6 +159,9 @@ void Node::update(Clock::Duration dTime)
 {
 	mActions.update(dTime);
 	updateAbsoluteSize();
+
+	auto parent_scale = hasParent() ? getParent()->getAbsoluteScale() : glm::vec2{ 1.0f, 1.0f };
+	mAbsoluteScale = parent_scale * getScale();
 }
 
 void Node::draw()

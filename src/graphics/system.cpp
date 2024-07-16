@@ -586,7 +586,7 @@ void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture>
 	draw(&effect, texture, topology, vertices, indices);
 }
 
-void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 
+void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue,
 	float smoothFactor, const glm::vec4& color)
 {
 	assert(!mesh.vertices.empty());
@@ -596,8 +596,8 @@ void System::drawString(const Font& font, const TextMesh& mesh, float minValue, 
 		maxValue, smoothFactor, color);
 }
 
-void System::drawString(const Font& font, const TextMesh& mesh, float size,
-	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
+void System::drawString(const Font& font, const TextMesh& mesh, float size, const glm::vec4& color,
+	float outlineThickness, const glm::vec4& outlineColor, float smoothFactorScale)
 {
 	assert(!mesh.vertices.empty());
 	assert(!mesh.indices.empty());
@@ -611,6 +611,7 @@ void System::drawString(const Font& font, const TextMesh& mesh, float size,
 	float smoothFactor = 2.0f / size / PLATFORM->getScale();
 
 	smoothFactor *= mSdfSmoothFactor;
+	smoothFactor *= smoothFactorScale;
 
 	if (fixedOutlineThickness > 0.0f)
 		drawString(font, mesh, outline, mid + (smoothFactor / 2.0f), smoothFactor, outlineColor);
@@ -618,10 +619,11 @@ void System::drawString(const Font& font, const TextMesh& mesh, float size,
 	drawString(font, mesh, mid, max, smoothFactor, color);
 }
 
-void System::drawString(const Font& font, const tiny_utf8::string& text, float size,
-	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
+void System::drawString(const Font& font, const tiny_utf8::string& text, float size, const glm::vec4& color,
+	float outlineThickness, const glm::vec4& outlineColor, float smoothFactorScale)
 {
-	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, color, outlineThickness, outlineColor);
+	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, color, outlineThickness, outlineColor,
+		smoothFactorScale);
 }
 
 glm::vec3 System::project(const glm::vec3& pos)

@@ -104,16 +104,16 @@ namespace Graphics
 			const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
 		// text
-		void drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue, 
+		void drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue,
 			float smoothFactor, const glm::vec4& color = { Graphics::Color::White, 1.0f });
 
-		void drawString(const Font& font, const TextMesh& mesh, float size, 
+		void drawString(const Font& font, const TextMesh& mesh, float size,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
-			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
-		
+			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f }, float smoothFactorScale = 1.0f);
+
 		void drawString(const Font& font, const tiny_utf8::string& text, float size,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
-			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f });
+			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f }, float smoothFactorScale = 1.0f);
 
 	public:
 		glm::vec3 project(const glm::vec3& pos);
@@ -140,7 +140,7 @@ namespace Graphics
 		void pushMipmapBias(float bias);
 
 		const auto& getCurrentState() const { return mStates.top(); }
-		
+
 	public:
 		struct State
 		{

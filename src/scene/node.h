@@ -99,6 +99,8 @@ namespace Scene
 		auto getAbsoluteWidth() const { return mAbsoluteSize.x; }
 		auto getAbsoluteHeight() const { return mAbsoluteSize.y; }
 
+		auto getAbsoluteScale() const { return mAbsoluteScale; }
+
 	protected:
 		void setAbsoluteSize(const glm::vec2& value) { mAbsoluteSize = value; }
 
@@ -115,6 +117,7 @@ namespace Scene
 		bool mTransformReady = false;
 		std::string mBatchGroup = "";
 		glm::vec2 mAbsoluteSize = { 0.0f, 0.0f };
+		glm::vec2 mAbsoluteScale = { 1.0f, 1.0f };
 
 	public:
 		void runAction(std::unique_ptr<Actions::Action> action) { mActions.add(std::move(action)); }
