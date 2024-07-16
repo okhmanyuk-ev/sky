@@ -627,4 +627,25 @@ namespace Shared::SceneHelpers
 	private:
 		std::optional<int> mCursorPos;
 	};
+
+	template <class T> class StretchedToContent : public T
+	{
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
+
+	public:
+		void update(Clock::Duration delta) override
+		{
+			T::update(delta);
+
+			glm::vec2 max_size = { 0.0f, 0.0f };
+
+			for (const auto& node : T::getNodes())
+			{
+				max_size.x = glm::max(max_size.x, node->getWidth());
+				max_size.y = glm::max(max_size.y, node->getHeight());
+			}
+
+			T::setSize(max_size);
+		}
+	};
 }
