@@ -46,13 +46,14 @@ namespace Scene
 
 	public:
 		bool interactTest(const glm::vec2& pos);
+		std::list<std::weak_ptr<Node>> getTouchedNodes(const glm::vec2& pos) const;
 
 	public:
 		static void MakeBatchLists(BatchGroups& batchGroups, std::shared_ptr<Node> node);
 	
 	private:
-		std::list<std::shared_ptr<Node>> getTouchableNodes(std::shared_ptr<Node> node, const glm::vec2& pos);
-		std::list<std::shared_ptr<Node>> getTouchableNodes(const glm::vec2& pos);
+		std::list<std::shared_ptr<Node>> getTouchableNodes(std::shared_ptr<Node> node, const glm::vec2& pos) const;
+		std::list<std::shared_ptr<Node>> getTouchableNodes(const glm::vec2& pos) const;
 
 	public:
 		std::list<std::shared_ptr<Node>> getNodes(std::shared_ptr<Node> node, const glm::vec2& pos);

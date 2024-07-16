@@ -12,7 +12,6 @@ Scene::Scene::Scene()
 
 Scene::Scene::~Scene()
 {
-	//
 }
 
 void Scene::Scene::recursiveNodeUpdateTransform(Node& node)
@@ -89,6 +88,24 @@ bool Scene::Scene::interactTest(const glm::vec2& pos)
 	return mInteractTestCallback(pos);
 }
 
+std::list<std::weak_ptr<Scene::Node>> Scene::Scene::getTouchedNodes(const glm::vec2& pos) const
+{
+	std::list<std::weak_ptr<Node>> result;
+	int mask = 0;
+
+	for (auto node : getTouchableNodes(pos))
+	{
+		if ((mask & node->getTouchMask()) > 0)
+			continue;
+
+		mask |= node->getTouchMask();
+
+		result.push_back(node);
+	}
+
+	return result;
+}
+
 void Scene::Scene::MakeBatchLists(BatchGroups& batchGroups, std::shared_ptr<Node> node)
 {
 	if (!node->isEnabled())
@@ -107,7 +124,7 @@ void Scene::Scene::MakeBatchLists(BatchGroups& batchGroups, std::shared_ptr<Node
 		MakeBatchLists(batchGroups, _node);
 }
 
-std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(std::shared_ptr<Node> node, const glm::vec2& pos)
+std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(std::shared_ptr<Node> node, const glm::vec2& pos) const
 {
 	if (!node->isEnabled())
 		return { };
@@ -144,7 +161,7 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(std::sha
 	return result;
 }
 
-std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(const glm::vec2& pos)
+std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getTouchableNodes(const glm::vec2& pos) const
 {
 	return getTouchableNodes(mRoot, pos);
 }
@@ -288,18 +305,7 @@ void Scene::Scene::onEvent(const Platform::Input::Touch::Event& e)
 
 	if (e.type == Platform::Input::Touch::Event::Type::Begin && mTouchedNodes.empty() && interactTest(pos))
 	{
-		int mask = 0;
-
-		for (auto node : getTouchableNodes(pos))
-		{
-			if ((mask & node->getTouchMask()) > 0)
-				continue;
-
-			mask |= node->getTouchMask();
-
-			mTouchedNodes.push_back(node);
-		}
-
+		mTouchedNodes = getTouchedNodes(pos);
 		executeTouchedNodes(Node::Touch::Begin, pos);
 	}
 	else if (e.type == Platform::Input::Touch::Event::Type::Continue && !mTouchedNodes.empty())
