@@ -254,6 +254,29 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeGrid(const std::vector<std::vecto
 	return MakeVerticalGrid(horz_grids);
 }
 
+std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
+	const std::vector<std::shared_ptr<Scene::Node>>& items)
+{
+	auto grid = std::make_shared<Scene::Node>();
+	for (auto item : items)
+	{
+		auto cell = std::make_shared<StretchedToContent<Scene::Node>>();
+		cell->attach(item);
+		grid->attach(cell);
+	}
+	grid->runAction(Actions::Collection::ExecuteInfinite([grid] {
+		glm::vec2 size = { 0.0f, 0.0f };
+		for (const auto& node : grid->getNodes())
+		{
+			node->setY(size.y);
+			size.y += node->getHeight();
+			size.x = glm::max(size.x, node->getWidth());
+		}
+		grid->setSize(size);
+	}));
+	return grid;
+}
+
 void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color)
 {
 	for (auto child : node->getNodes())
