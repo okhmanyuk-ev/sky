@@ -684,4 +684,25 @@ namespace Shared::SceneHelpers
 		bool mStretchToContentWidth = true;
 		bool mStretchToContentHeight = true;
 	};
+
+	class RichLabel : public StretchedToContent<Scene::Node>
+	{
+	public:
+		void update(Clock::Duration dTime) override;
+		void refresh();
+
+	public:
+		const auto& getText() const { return mState.text; }
+		void setText(tiny_utf8::string text) { mState.text = std::move(text); }
+
+	private:
+		struct State
+		{
+			tiny_utf8::string text;
+			bool operator==(const State& other) const = default;
+		};
+		State mState;
+		State mPrevState;
+		std::shared_ptr<Scene::Node> mContent;
+	};
 }

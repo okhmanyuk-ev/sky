@@ -1217,3 +1217,25 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 		})
 	));
 }
+
+void SceneHelpers::RichLabel::update(Clock::Duration dTime)
+{
+	StretchedToContent<Scene::Node>::update(dTime);
+	refresh();
+}
+
+void SceneHelpers::RichLabel::refresh()
+{
+	if (mState == mPrevState)
+		return;
+
+	mPrevState = mState;
+
+	if (mContent)
+		detach(mContent);
+
+	mContent = MakeRichLabel(mState.text);
+	mContent->setAnchor(0.5f);
+	mContent->setPivot(0.5f);
+	attach(mContent);
+}
