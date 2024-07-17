@@ -40,7 +40,7 @@ namespace Scene
 		void setEffect(sky::effects::IEffect* value) { mEffect = value; }
 
 	private:
-		std::shared_ptr<skygfx::Texture> mTexture = DefaultTexture;
+		std::shared_ptr<skygfx::Texture> mTexture;
 		Graphics::TexRegion mTexRegion = {};
 		skygfx::TextureAddress mTextureAddress = DefaultTextureAddress;
 		sky::effects::IEffect* mEffect = nullptr;

@@ -6,10 +6,8 @@ void Sprite::draw()
 {
 	Node::draw();
 
-	assert(mTexture); // you should setup Sprite::DefaultTexture
-	
 	if (mTexture == nullptr)
-		return;
+		mTexture = DefaultTexture;
 	
 	if (getAlpha() <= 0.0f)
 		return;
