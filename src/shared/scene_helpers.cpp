@@ -358,65 +358,6 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<
 	return grid;
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeRichLabel(tiny_utf8::string text)
-{
-	std::vector<HorizontalGridCell> cells;
-
-	auto pushLabel = [&](const tiny_utf8::string& str) {
-		auto label = std::make_shared<Scene::Label>();
-		label->setText(str);
-		label->setParseColorTagsEnabled(true);
-		label->setAnchor(0.5f);
-		label->setPivot(0.5f);
-
-		HorizontalGridCell cell;
-		cell.cell_parent_vertically_stretches_to_grid = false;
-		cell.node = label;
-
-		cells.push_back(cell);
-	};
-
-	auto pushSprite = [&](const std::string& path) {
-		auto sprite = std::make_shared<Scene::Adaptive<Scene::Sprite>>();
-		sprite->setTexture(TEXTURE(path));
-		sprite->setAnchor(0.5f);
-		sprite->setPivot(0.5f);
-		sprite->setAdaptStretch(1.0f);
-		sprite->setBakingAdaption(true);
-
-		HorizontalGridCell cell;
-		cell.cell_parent_vertically_stretches_to_grid = true;
-		cell.node = sprite;
-		
-		cells.push_back(cell);
-	};
-
-	std::regex icon_tag(R"(^<icon=([^>]+)>)");
-
-	tiny_utf8::string sublimed_text;
-	std::smatch match;
-
-	while (!text.empty()) {
-		const auto search_str = text.cpp_str();
-		if (std::regex_search(search_str, match, icon_tag))
-		{
-			pushLabel(sublimed_text);
-			sublimed_text.clear();
-			pushSprite(match[1]);
-			text.erase(0, match.length());
-		}
-		else {
-			sublimed_text.push_back(text.front());
-			text.erase(0, 1);
-		}
-	}
-
-	if (!sublimed_text.empty())
-		pushLabel(sublimed_text);
-
-	return MakeHorizontalGrid(cells);
-}
-
 void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color)
 {
 	for (auto child : node->getNodes())
@@ -1234,7 +1175,64 @@ void SceneHelpers::RichLabel::refresh()
 	if (mContent)
 		detach(mContent);
 
-	mContent = MakeRichLabel(mState.text);
+	std::vector<HorizontalGridCell> cells;
+
+	auto createLabelCell = [](const tiny_utf8::string& str) {
+		auto label = std::make_shared<Scene::Label>();
+		label->setText(str);
+		label->setParseColorTagsEnabled(true);
+		label->setAnchor(0.5f);
+		label->setPivot(0.5f);
+
+		HorizontalGridCell cell;
+		cell.cell_parent_vertically_stretches_to_grid = false;
+		cell.node = label;
+
+		return cell;
+	};
+
+	auto createSpriteCell = [this_index = size_t(this)](const std::string& path) {
+		auto sprite = std::make_shared<Scene::Adaptive<Scene::Sprite>>();
+		sprite->setTexture(TEXTURE(path));
+		sprite->setAnchor(0.5f);
+		sprite->setPivot(0.5f);
+		sprite->setAdaptStretch(1.0f);
+		sprite->setBakingAdaption(true);
+		sprite->setBatchGroup(fmt::format("rich_label_icon_{}", this_index));
+
+		HorizontalGridCell cell;
+		cell.cell_parent_vertically_stretches_to_grid = true;
+		cell.node = sprite;
+		
+		return cell;
+	};
+
+	std::regex icon_tag(R"(^<icon=([^>]+)>)");
+
+	tiny_utf8::string sublimed_text;
+	std::smatch match;
+
+	auto text = mState.text;
+
+	while (!text.empty()) {
+		const auto search_str = text.cpp_str();
+		if (std::regex_search(search_str, match, icon_tag))
+		{
+			cells.push_back(createLabelCell(sublimed_text));
+			sublimed_text.clear();
+			cells.push_back(createSpriteCell(match[1]));
+			text.erase(0, match.length());
+		}
+		else {
+			sublimed_text.push_back(text.front());
+			text.erase(0, 1);
+		}
+	}
+
+	if (!sublimed_text.empty())
+		cells.push_back(createLabelCell(sublimed_text));
+
+	mContent = MakeHorizontalGrid(cells);
 	mContent->setAnchor(0.5f);
 	mContent->setPivot(0.5f);
 	attach(mContent);

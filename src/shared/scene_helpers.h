@@ -57,8 +57,6 @@ namespace Shared::SceneHelpers
 
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const std::vector<HorizontalGridCell>& cells);
 
-	std::shared_ptr<Scene::Node> MakeRichLabel(tiny_utf8::string text);
-
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 
 	class GrayscaleSprite : public Scene::Sprite
