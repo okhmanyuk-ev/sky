@@ -320,7 +320,7 @@ namespace Shared::SceneHelpers
 			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
 			
 			GRAPHICS->pushModelMatrix(model);
-			GRAPHICS->drawLineRectangle();
+			GRAPHICS->drawLineRectangle(mOutlineColor->getColor());
 			GRAPHICS->pop();
 		}
 
@@ -328,8 +328,11 @@ namespace Shared::SceneHelpers
 		bool isOutlined() const { return mOutlined; }
 		void setOutlined(bool value) { mOutlined = value; }
 
+		auto getOutlineColor() const { return mOutlineColor; }
+
 	private:
 		bool mOutlined = true;
+		std::shared_ptr<Scene::Color> mOutlineColor = std::make_shared<Scene::Color>();
 	};
 
 	template <typename T> class MovableByHand : public T
