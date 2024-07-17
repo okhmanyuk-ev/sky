@@ -382,16 +382,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeRichLabel(tiny_utf8::string text)
 		sprite->setAnchor(0.5f);
 		sprite->setPivot(0.5f);
 		sprite->setAdaptStretch(1.0f);
-		sprite->runAction(Actions::Collection::ExecuteInfinite([sprite] {
-			if (sprite->getAdaptScale() == 0.0f)
-				return;
-
-			if (glm::isnan(sprite->getAdaptScale()))
-				return;
-
-			if (sprite->getAdaptScale() != 1.0f)
-				sprite->bakeAdaption();
-		}));
+		sprite->setBakingAdaption(true);
 
 		HorizontalGridCell cell;
 		cell.cell_parent_vertically_stretches_to_grid = true;

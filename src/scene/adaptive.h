@@ -26,6 +26,12 @@ namespace Scene
 			auto scale = size / T::getAbsoluteSize();
 			mAdaptScale = glm::min(scale.x, scale.y);
 
+			if (mBakingAdaption)
+			{
+				bakeAdaption();
+				return;
+			}
+
 			auto offset = T::getPivot() * T::getAbsoluteSize();
 
 			auto transform = T::getTransform();
@@ -46,6 +52,12 @@ namespace Scene
 	public:
 		void bakeAdaption()
 		{
+			if (mAdaptScale == 0.0f)
+				return;
+
+			if (glm::isnan(mAdaptScale))
+				return;
+
 			T::setSize(T::getSize() * mAdaptScale);
 			mAdaptScale = 1.0f;
 		}
@@ -68,11 +80,15 @@ namespace Scene
 
 		auto getAdaptScale() const { return mAdaptScale; }
 
+		auto isBakingAdaption() const { return mBakingAdaption; }
+		void setBakingAdaption(bool value) { mBakingAdaption = value; }
+
 	private:
 		bool mAdaptingEnabled = true;
 		glm::vec2 mAdaptSize = { 0.0f, 0.0f };
 		glm::vec2 mAdaptMargin = { 0.0f, 0.0f };
 		glm::vec2 mAdaptStretch = { 0.0f, 0.0f };
 		float mAdaptScale = 1.0f;
+		bool mBakingAdaption = false;
 	};
 }
