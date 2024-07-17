@@ -2,6 +2,7 @@
 #include <shared/cache_system.h>
 #include <tiny_obj_loader.h>
 #include <sstream>
+#include <regex>
 
 using namespace Shared;
 
@@ -254,7 +255,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeGrid(const std::vector<std::vecto
 	return MakeVerticalGrid(horz_grids);
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
+std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentHorizontalGrid(
 	const std::vector<std::shared_ptr<Scene::Node>>& items)
 {
 	auto grid = std::make_shared<Scene::Node>();
@@ -262,7 +263,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
 	for (auto item : items)
 	{
 		auto cell = std::make_shared<StretchedToContent<Scene::Node>>();
-		cell->setStretchToContentWidth(false);
+		cell->setStretchToContentHeightEnabled(false);
 		cell->attach(item);
 		grid->attach(cell);
 		cells.push_back(cell);
@@ -271,7 +272,37 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
 		glm::vec2 size = { 0.0f, 0.0f };
 		for (const auto& cell : cells)
 		{
-			size.x = glm::max(size.x, cell->getStretchToContentSize().x);
+			size.y = glm::max(size.y, cell->getStretchToContentHeight());
+		}
+		for (const auto& cell : cells)
+		{
+			cell->setX(size.x);
+			cell->setHeight(size.y);
+			size.x += cell->getWidth();
+		}
+		grid->setSize(size);
+	}));
+	return grid;
+}
+
+std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
+	const std::vector<std::shared_ptr<Scene::Node>>& items)
+{
+	auto grid = std::make_shared<Scene::Node>();
+	std::vector<std::shared_ptr<StretchedToContent<Scene::Node>>> cells;
+	for (auto item : items)
+	{
+		auto cell = std::make_shared<StretchedToContent<Scene::Node>>();
+		cell->setStretchToContentWidthEnabled(false);
+		cell->attach(item);
+		grid->attach(cell);
+		cells.push_back(cell);
+	}
+	grid->runAction(Actions::Collection::ExecuteInfinite([grid, cells] {
+		glm::vec2 size = { 0.0f, 0.0f };
+		for (const auto& cell : cells)
+		{
+			size.x = glm::max(size.x, cell->getStretchToContentWidth());
 		}
 		for (const auto& cell : cells)
 		{
@@ -282,6 +313,117 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
 		grid->setSize(size);
 	}));
 	return grid;
+}
+
+std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<HorizontalGridCell>& cells)
+{
+	auto grid = std::make_shared<Scene::Node>();
+
+	struct HolderData
+	{
+		std::shared_ptr<StretchedToContent<Scene::Node>> cell_parent;
+		HorizontalGridCell cell;
+	};
+
+	std::vector<HolderData> holder_datas;
+	for (auto cell : cells)
+	{
+		auto cell_holder = std::make_shared<StretchedToContent<Scene::Node>>();
+		cell_holder->setStretchToContentHeightEnabled(false);
+		cell_holder->attach(cell.node);
+		grid->attach(cell_holder);
+
+		HolderData holder_data;
+		holder_data.cell = cell;
+		holder_data.cell_parent = cell_holder;
+		holder_datas.push_back(holder_data);
+	}
+	grid->runAction(Actions::Collection::ExecuteInfinite([grid, holder_datas] {
+		glm::vec2 size = { 0.0f, 0.0f };
+		for (const auto& holder_data : holder_datas)
+		{
+			if (holder_data.cell.cell_parent_vertically_stretches_to_grid)
+				continue;
+
+			size.y = glm::max(size.y, holder_data.cell_parent->getStretchToContentHeight());
+		}
+		for (const auto& holder_data : holder_datas)
+		{			
+			holder_data.cell_parent->setX(size.x);
+			holder_data.cell_parent->setHeight(size.y);
+			size.x += holder_data.cell_parent->getWidth();
+		}
+		grid->setSize(size);
+	}));
+	return grid;
+}
+
+std::shared_ptr<Scene::Node> SceneHelpers::MakeRichLabel(tiny_utf8::string text)
+{
+	std::vector<HorizontalGridCell> cells;
+
+	auto pushLabel = [&](const tiny_utf8::string& str) {
+		auto label = std::make_shared<Scene::Label>();
+		label->setText(str);
+		label->setParseColorTagsEnabled(true);
+		label->setAnchor(0.5f);
+		label->setPivot(0.5f);
+
+		HorizontalGridCell cell;
+		cell.cell_parent_vertically_stretches_to_grid = false;
+		cell.node = label;
+
+		cells.push_back(cell);
+	};
+
+	auto pushSprite = [&](const std::string& path) {
+		auto sprite = std::make_shared<Scene::Adaptive<Scene::Sprite>>();
+		sprite->setTexture(TEXTURE(path));
+		sprite->setAnchor(0.5f);
+		sprite->setPivot(0.5f);
+		sprite->setAdaptStretch(1.0f);
+		sprite->runAction(Actions::Collection::ExecuteInfinite([sprite] {
+			if (sprite->getAdaptScale() == 0.0f)
+				return;
+
+			if (glm::isnan(sprite->getAdaptScale()))
+				return;
+
+			if (sprite->getAdaptScale() != 1.0f)
+				sprite->bakeAdaption();
+		}));
+
+		HorizontalGridCell cell;
+		cell.cell_parent_vertically_stretches_to_grid = true;
+		cell.node = sprite;
+		
+		cells.push_back(cell);
+	};
+
+	std::regex icon_tag(R"(^<icon=([^>]+)>)");
+
+	tiny_utf8::string sublimed_text;
+	std::smatch match;
+
+	while (!text.empty()) {
+		const auto search_str = text.cpp_str();
+		if (std::regex_search(search_str, match, icon_tag))
+		{
+			pushLabel(sublimed_text);
+			sublimed_text.clear();
+			pushSprite(match[1]);
+			text.erase(0, match.length());
+		}
+		else {
+			sublimed_text.push_back(text.front());
+			text.erase(0, 1);
+		}
+	}
+
+	if (!sublimed_text.empty())
+		pushLabel(sublimed_text);
+
+	return MakeHorizontalGrid(cells);
 }
 
 void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color)

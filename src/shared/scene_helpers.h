@@ -43,8 +43,21 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items);
 	std::shared_ptr<Scene::Node> MakeGrid(const std::vector<std::vector<std::shared_ptr<Scene::Node>>>& items);
 
+	std::shared_ptr<Scene::Node> MakeStretchedToContentHorizontalGrid(
+		const std::vector<std::shared_ptr<Scene::Node>>& items);
+
 	std::shared_ptr<Scene::Node> MakeStretchedToContentVerticalGrid(
 		const std::vector<std::shared_ptr<Scene::Node>>& items);
+
+	struct HorizontalGridCell
+	{
+		bool cell_parent_vertically_stretches_to_grid = false;
+		std::shared_ptr<Scene::Node> node;
+	};
+
+	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const std::vector<HorizontalGridCell>& cells);
+
+	std::shared_ptr<Scene::Node> MakeRichLabel(tiny_utf8::string text);
 
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 
@@ -657,12 +670,14 @@ namespace Shared::SceneHelpers
 
 	public:
 		auto getStretchToContentSize() const { return mStretchToContentSize; }
+		auto getStretchToContentWidth() const { return mStretchToContentSize.x; }
+		auto getStretchToContentHeight() const { return mStretchToContentSize.y; }
 
-		bool isStretchToContentWidth() const { return mStretchToContentWidth; }
-		void setStretchToContentWidth(bool value) { mStretchToContentWidth = value; }
+		bool isStretchToContentWidthEnabled() const { return mStretchToContentWidth; }
+		void setStretchToContentWidthEnabled(bool value) { mStretchToContentWidth = value; }
 
-		bool isStretchToContentHeight() const { return mStretchToContentHeight; }
-		void setStretchToContentHeight(bool value) { mStretchToContentHeight = value; }
+		bool isStretchToContentHeightEnabled() const { return mStretchToContentHeight; }
+		void setStretchToContentHeightEnabled(bool value) { mStretchToContentHeight = value; }
 
 	private:
 		glm::vec2 mStretchToContentSize = { 0.0f, 0.0f };

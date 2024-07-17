@@ -66,6 +66,8 @@ namespace Scene
 		bool isAdaptingEnabled() const { return mAdaptingEnabled; }
 		void setAdaptingEnabled(bool value) { mAdaptingEnabled = value; }
 
+		auto getAdaptScale() const { return mAdaptScale; }
+
 	private:
 		bool mAdaptingEnabled = true;
 		glm::vec2 mAdaptSize = { 0.0f, 0.0f };
