@@ -3,6 +3,8 @@
 #include <tiny_obj_loader.h>
 #include <sstream>
 #include <regex>
+#include <ranges>
+#include "imscene.h"
 
 using namespace Shared;
 
@@ -1236,4 +1238,98 @@ void SceneHelpers::RichLabel::refresh()
 	mContent->setAnchor(0.5f);
 	mContent->setPivot(0.5f);
 	attach(mContent);
+}
+
+bool SceneHelpers::ImScene::IsMouseHovered(const Scene::Scene& scene, Scene::Node& node)
+{
+	if (!node.isTransformReady())
+		return false;
+
+	auto cursor_pos = PLATFORM->getCursorPos();
+
+	if (!cursor_pos.has_value())
+		return false;
+
+	static std::unordered_set<Scene::Node*> touched_nodes_set;
+	static std::optional<uint64_t> prev_frame;
+
+	auto current_frame = FRAME->getFrameCount();
+
+	if (prev_frame != current_frame)
+	{
+		// do it one time per frame, because it is very heavyweight function
+		auto touched_nodes = scene.getTouchedNodes(cursor_pos.value());
+		touched_nodes_set.clear();
+		std::ranges::transform(touched_nodes, std::inserter(touched_nodes_set, touched_nodes_set.begin()), [](const auto& node) {
+			return node.lock().get();
+		});
+		prev_frame = current_frame;
+	}
+
+	return touched_nodes_set.contains(&node);
+}
+
+void SceneHelpers::ImScene::Tooltip(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
+	std::function<std::shared_ptr<Scene::Node>()> createContentCallback)
+{
+	if (!IsMouseHovered(scene, node))
+		return;
+
+	auto cursor_pos = PLATFORM->getCursorPos();
+
+	if (!cursor_pos.has_value())
+		return;
+
+	auto pos = holder.unproject(cursor_pos.value());
+
+	auto rect = IMSCENE->spawn<Shared::SceneHelpers::Smoother<Shared::SceneHelpers::StretchedToContent<
+		Scene::ClippableScissor<Scene::Rectangle>>>>(holder, std::to_string((size_t)&node));
+	if (IMSCENE->isFirstCall())
+	{
+		rect->setAbsoluteRounding(true);
+		rect->setRounding(16.0f);
+		rect->setColor(Graphics::Color::Black);
+		rect->setAlpha(0.5f);
+		rect->setPivot({ 0.0f, 1.0f });
+		rect->setOrigin({ -16.0f, 16.0f });
+		rect->setMargin(-24.0f);
+		rect->setPosition(pos);
+		rect->attach(createContentCallback());
+	}
+
+	rect->setPosition(pos);
+}
+
+void SceneHelpers::ImScene::TooltipLabel(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
+	const tiny_utf8::string& text)
+{
+	Tooltip(scene, holder, node, [&] {
+		auto label = std::make_shared<Scene::Label>();
+		label->setAnchor(0.5f);
+		label->setPivot(0.5f);
+		label->setFontSize(26.0f);
+		label->setText(text);
+		return label;
+	});
+}
+
+void SceneHelpers::ImScene::Highlight(const Scene::Scene& scene, Scene::Node& holder,
+	Scene::Node& node)
+{
+	if (!IsMouseHovered(scene, node))
+		return;
+
+	auto [pos, size] = node.getGlobalBounds();
+
+	const auto color = Graphics::Color::Yellow;
+
+	auto rect = IMSCENE->spawn<Shared::SceneHelpers::Smoother<Shared::SceneHelpers::Outlined<Scene::Rectangle>>>(holder);
+	if (IMSCENE->isFirstCall())
+	{
+		rect->setColor({ color, 0.25f });
+		rect->getOutlineColor()->setColor({ color, 0.5f });
+		rect->setAlpha(0.25f);
+	}
+	rect->setPosition(holder.unproject(pos));
+	rect->setSize(holder.unproject(size));
 }

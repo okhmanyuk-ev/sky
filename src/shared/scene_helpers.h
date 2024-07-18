@@ -706,4 +706,14 @@ namespace Shared::SceneHelpers
 		State mPrevState;
 		std::shared_ptr<Scene::Node> mContent;
 	};
+
+	namespace ImScene
+	{
+		bool IsMouseHovered(const Scene::Scene& scene, Scene::Node& node);
+		void Tooltip(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
+			std::function<std::shared_ptr<Scene::Node>()> createContentCallback);
+		void TooltipLabel(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
+			const tiny_utf8::string& text);
+		void Highlight(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node);
+	}
 }
