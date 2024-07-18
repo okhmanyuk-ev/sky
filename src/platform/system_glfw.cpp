@@ -84,8 +84,7 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	
 	glfwGetCursorPos((GLFWwindow*)mWindow, &mouse_x, &mouse_y);
 	
-	mPrevMouseX = (int)(mouse_x * gScale);
-	mPrevMouseY = (int)(mouse_y * gScale);
+	mCursorPos = { (int)(mouse_x * gScale), (int)(mouse_y * gScale) };
 	
 	gContext = this;
 }
@@ -112,13 +111,12 @@ void SystemGlfw::process()
 	auto mouse_y_i = (int)mouse_y;
 #endif
 
-	if (mouse_x_i != mPrevMouseX || mouse_y_i != mPrevMouseY)
+	if (mouse_x_i != mCursorPos.x || mouse_y_i != mCursorPos.y)
 	{
-		mPrevMouseX = mouse_x_i;
-		mPrevMouseY = mouse_y_i;
+		mCursorPos = { mouse_x_i, mouse_y_i };
 
 		EVENT->emit(Input::Mouse::MoveEvent{
-			.pos = { mouse_x_i, mouse_y_i }
+			.pos = mCursorPos
 		});
 	}
 }
@@ -300,6 +298,11 @@ void SystemGlfw::showCursor()
 void SystemGlfw::setCursorPos(int x, int y)
 {
 	glfwSetCursorPos((GLFWwindow*)mWindow, (double)x, (double)y);
+}
+
+std::optional<glm::ivec2> SystemGlfw::getCursorPos() const
+{
+	return mCursorPos;
 }
 
 std::string SystemGlfw::getAppName() const

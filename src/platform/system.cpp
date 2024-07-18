@@ -21,3 +21,8 @@ void System::rescale(float value)
 	resize(int(width * scale_delta), int(height * scale_delta));
 	setScale(value);
 }
+
+std::optional<glm::ivec2> System::getCursorPos() const
+{
+	return std::nullopt;
+}

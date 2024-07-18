@@ -9,6 +9,7 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include <optional>
 
 #define PLATFORM ENGINE->getSystem<Platform::System>()
 
@@ -57,6 +58,8 @@ namespace Platform
 		virtual void hideCursor() = 0;
 		virtual void showCursor() = 0;
 		virtual void setCursorPos(int x, int y) = 0;
+
+		virtual std::optional<glm::ivec2> getCursorPos() const;
 
 		virtual std::string getAppName() const = 0;
 

@@ -44,6 +44,8 @@ namespace Platform
 		void showCursor() override;
 		void setCursorPos(int x, int y) override;
 
+		std::optional<glm::ivec2> getCursorPos() const override;
+
 		std::string getAppName() const override;
 
 		void showVirtualKeyboard() override { /*nothing*/ };
@@ -66,8 +68,7 @@ namespace Platform
 	private:
 		std::string mAppName;
 		void* mWindow = nullptr;
-		int mPrevMouseX = 0;
-		int mPrevMouseY = 0;
+		glm::ivec2 mCursorPos = { 0, 0 };
 		void* mNativeWindow = nullptr;
 	};
 
