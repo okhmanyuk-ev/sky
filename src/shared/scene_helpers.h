@@ -402,6 +402,9 @@ namespace Shared::SceneHelpers
 
 	public:
 		void setScrollbox(std::weak_ptr<Scene::Scrollbox> value) { mScrollbox = value; }
+		
+		auto isHidingEnabled() const { return mHidingEnabled; }
+		void setHidingEnabled(bool value) { mHidingEnabled = value; }
 
 	private:
 		std::weak_ptr<Scene::Scrollbox> mScrollbox;
@@ -410,6 +413,7 @@ namespace Shared::SceneHelpers
 		Clock::TimePoint mScrollMoveTime = Clock::Now();
 		bool mAlphaAnimating = false;
 		bool mHidden = false;
+		bool mHidingEnabled = false;
 	};
 
 	class StandardScreen : public Scene::RenderLayer<SceneManager::Screen>

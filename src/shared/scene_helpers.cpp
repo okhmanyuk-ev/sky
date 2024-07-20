@@ -490,7 +490,6 @@ SceneHelpers::VerticalScrollbar::VerticalScrollbar()
 	setRounding(1.0f);
 
 	mIndicator = std::make_shared<Scene::Rectangle>();
-	mIndicator->setSize({ 0.0f, 32.0f });
 	mIndicator->setStretch({ 1.0f, 0.0f });
 	mIndicator->setAnchor({ 0.5f, 0.0f });
 	mIndicator->setPivot({ 0.5f, 0.0f });
@@ -503,19 +502,23 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 {
 	Scene::Rectangle::update(dTime);
 
-	if (mScrollbox.expired())
-	{
-		setVisible(false);
-		return;
-	}
+	setVisible(false);
 
-	setVisible(true);
+	if (mScrollbox.expired())
+		return;
 
 	auto scrollbox = mScrollbox.lock();
 	auto v_scroll_pos = scrollbox->getVerticalScrollPosition();
 
 	mIndicator->setVerticalAnchor(v_scroll_pos);
 	mIndicator->setVerticalPivot(v_scroll_pos);
+	mIndicator->setVerticalStretch(scrollbox->getBounding()->getAbsoluteHeight() /
+		scrollbox->getContent()->getAbsoluteHeight());
+
+	if (mIndicator->getVerticalStretch() >= 1.0f)
+		return;
+
+	setVisible(true);
 
 	auto now = Clock::Now();
 
@@ -523,6 +526,9 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 		mScrollMoveTime = now;
 
 	mPrevScrollPosition = v_scroll_pos;
+
+	if (!mHidingEnabled)
+		return;
 
 	if (mAlphaAnimating)
 		return;
@@ -1313,8 +1319,7 @@ void SceneHelpers::ImScene::TooltipLabel(const Scene::Scene& scene, Scene::Node&
 	});
 }
 
-void SceneHelpers::ImScene::Highlight(const Scene::Scene& scene, Scene::Node& holder,
-	Scene::Node& node)
+void SceneHelpers::ImScene::Highlight(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node)
 {
 	if (!IsMouseHovered(scene, node))
 		return;
