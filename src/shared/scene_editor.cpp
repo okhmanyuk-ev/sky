@@ -143,7 +143,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 {
 	auto enabled = node->isEnabled();
 	auto visible = node->isVisible();
-	auto batch_group = node->getBatchGroup();
+	auto batch_group = node->getBatchGroup().value_or("");
 
 	ImGui::Checkbox("Enabled", &enabled);
 	ImGui::Checkbox("Visible", &visible);

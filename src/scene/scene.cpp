@@ -49,9 +49,11 @@ void Scene::Scene::recursiveNodeDraw(Node& node)
 
 	node.enterDraw();
 
-	if (node.hasBatchGroup() && mBatchGroupsEnabled)
+	const auto& batch_group = node.getBatchGroup();
+
+	if (mBatchGroupsEnabled && batch_group.has_value())
 	{
-		drawBatchGroup(node.getBatchGroup());
+		drawBatchGroup(batch_group.value());
 	}
 	else
 	{
@@ -66,7 +68,7 @@ void Scene::Scene::recursiveNodeDraw(Node& node)
 
 void Scene::Scene::drawBatchGroup(const std::string& name)
 {
-	if (mBatchGroups.count(name) == 0)
+	if (!mBatchGroups.contains(name))
 		return;
 
 	for (auto node : mBatchGroups.at(name))
@@ -117,8 +119,10 @@ void Scene::Scene::MakeBatchLists(BatchGroups& batchGroups, std::shared_ptr<Node
 	if (!node->isTransformReady())
 		return;
 
-	if (node->hasBatchGroup())
-		batchGroups[node->getBatchGroup()].push_back(node);
+	const auto& batch_group = node->getBatchGroup();
+
+	if (batch_group.has_value())
+		batchGroups[batch_group.value()].push_back(node);
 
 	for (auto _node : node->getNodes())
 		MakeBatchLists(batchGroups, _node);

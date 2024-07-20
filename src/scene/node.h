@@ -91,10 +91,8 @@ namespace Scene
 
 		auto isTransformReady() const { return mTransformReady; }
 
-		bool hasBatchGroup() const { return !mBatchGroup.empty(); }
-
 		const auto& getBatchGroup() const { return mBatchGroup; }
-		void setBatchGroup(const std::string& value) { mBatchGroup = value; }
+		void setBatchGroup(std::optional<std::string> value) { mBatchGroup = value; }
 
 		auto getAbsoluteSize() const { return mAbsoluteSize; }
 		auto getAbsoluteWidth() const { return mAbsoluteSize.x; }
@@ -117,7 +115,7 @@ namespace Scene
 		int mTouchMask = 1 << 0;
 		bool mTouching = false;
 		bool mTransformReady = false;
-		std::string mBatchGroup = "";
+		std::optional<std::string> mBatchGroup;
 		glm::vec2 mAbsoluteSize = { 0.0f, 0.0f };
 		glm::vec2 mAbsoluteScale = { 1.0f, 1.0f };
 
