@@ -129,7 +129,7 @@ namespace Graphics
 		void pushCullMode(skygfx::CullMode value);
 		void pushViewport(std::optional<skygfx::Viewport> value);
 		void pushRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
-		void pushScissor(std::optional<skygfx::Scissor> value);
+		void pushScissor(std::optional<skygfx::Scissor> value, bool inherit_prev_scissor = false);
 		void pushViewMatrix(const glm::mat4& value);
 		void pushProjectionMatrix(const glm::mat4& value);
 		void pushModelMatrix(const glm::mat4& value);

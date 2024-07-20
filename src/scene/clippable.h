@@ -116,7 +116,7 @@ namespace Scene
 			scissor.position = pos;
 			scissor.size = size;
 
-			GRAPHICS->pushScissor(scissor);
+			GRAPHICS->pushScissor(scissor, true);
 		}
 
 		void leaveDraw() override

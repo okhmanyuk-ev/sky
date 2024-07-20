@@ -731,10 +731,32 @@ void System::pushRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 	push(state);
 }
 
-void System::pushScissor(std::optional<skygfx::Scissor> value)
+void System::pushScissor(std::optional<skygfx::Scissor> value, bool inherit_prev_scissor)
 {
 	auto state = mStates.top();
-	state.scissor = value;
+	if (inherit_prev_scissor && state.scissor.has_value())
+	{
+		if (value.has_value())
+		{
+			auto max_pos_prev_scissor = state.scissor->position + state.scissor->size;
+			auto max_pos_new_scissor = value->position + value->size;
+
+			glm::vec2 max_pos_final = {
+				glm::min(max_pos_prev_scissor.x, max_pos_new_scissor.x),
+				glm::min(max_pos_prev_scissor.y, max_pos_new_scissor.y),
+			};
+
+			state.scissor->position.x = glm::max(value->position.x, state.scissor->position.x);
+			state.scissor->position.y = glm::max(value->position.y, state.scissor->position.y);
+
+			state.scissor->size.x = max_pos_final.x - state.scissor->position.x;
+			state.scissor->size.y = max_pos_final.y - state.scissor->position.y;
+		}
+	}
+	else
+	{
+		state.scissor = value;
+	}
 	push(state);
 }
 
