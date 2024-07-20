@@ -161,11 +161,16 @@ std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void()> callba
 
 std::unique_ptr<Action> Collection::ExecuteInfiniteGlobal(std::function<void()> callback)
 {
-	return RepeatInfinite([callback] {
-		return MakeSequence(
-			WaitGlobalFrame(),
-			Execute(callback)
-		);
+	auto prev_frame_count = FRAME->getFrameCount();
+
+	return ExecuteInfinite([prev_frame_count, callback]() mutable {
+		auto frame_count = FRAME->getFrameCount();
+
+		if (prev_frame_count == frame_count)
+			return;
+
+		prev_frame_count = frame_count;
+		callback();
 	});
 }
 
