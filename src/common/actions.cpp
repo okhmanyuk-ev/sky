@@ -208,18 +208,11 @@ std::unique_ptr<Action> Collection::Wait(bool& while_flag)
 
 std::unique_ptr<Action> Collection::WaitGlobalFrame()
 {
-	auto flag = std::make_shared<bool>(false);
+	auto frame_count = FRAME->getFrameCount();
 
-	return MakeSequence(
-		Execute([flag] {
-			FRAME->addOne([flag] {
-				*flag = true;
-			});
-		}),
-		Wait([flag] {
-			return !*flag;
-		})
-	);
+	return Wait([frame_count] {
+		return frame_count == FRAME->getFrameCount();
+	});
 }
 
 std::unique_ptr<Action> Collection::Delayed(float duration, std::unique_ptr<Action> action)
