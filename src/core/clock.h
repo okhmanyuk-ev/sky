@@ -41,4 +41,9 @@ namespace Clock
 	{
 		return std::chrono::duration_cast<Duration>(std::chrono::duration<T, std::chrono::seconds::period>(value));
 	}
+
+	template <typename T> Duration FromDays(T value)
+	{
+		return std::chrono::duration_cast<Duration>(std::chrono::duration<T, std::chrono::days::period>(value));
+	}
 }
