@@ -2337,24 +2337,6 @@ namespace tiny_utf8
 			for( const_iterator it = cbegin(), end = cend() ; *str && it != end && *str == *it ; ++str, ++it );
 			return !*str;
 		}
-		/**
-		 * Check, whether this string ends with the supplied codepoint sequence.
-		 *
-		 * @param	str		Pointer to a string literal with possibly embedded zeros, interpreted as UTF-32. The pointer is expected to be valid
-		 * @return	true, if this string ends with the sequence 'str', false otherwise.
-		 */
-		template<size_type LITLEN>
-		bool starts_with( const value_type (&str)[LITLEN] ) const noexcept {
-			size_type		str_len = str[LITLEN-1] ? LITLEN : LITLEN-1;
-			const_iterator	it = cbegin(), end = cend();
-			while( it != end && str_len ){
-				if( *it != *str )
-					return false;
-				++it, ++str, --str_len;
-			}
-			return !str_len;
-		}
-
 
 		/**
 		 * Check, whether this string ends with the supplied character sequence

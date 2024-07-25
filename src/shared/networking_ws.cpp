@@ -202,7 +202,7 @@ void Client::connect()
 	attributes.url = mUrl.c_str();
 	mImpl->handle = emscripten_websocket_new(&attributes);
 
-	emscripten_websocket_set_onopen_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketOpenEvent *websocketEvent, void *userData) -> int {
+	emscripten_websocket_set_onopen_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketOpenEvent *websocketEvent, void *userData) -> EM_BOOL {
 		sky::Log("connected");
 		auto self = static_cast<Client*>(userData);
 		auto channel = self->createChannel();
@@ -214,7 +214,7 @@ void Client::connect()
 		return eventType;
 	});
 
-	emscripten_websocket_set_onclose_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> int{
+	emscripten_websocket_set_onclose_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> EM_BOOL {
 		sky::Log("disconnected");
 		auto self = static_cast<Client*>(userData);
 		self->mChannel = nullptr;
@@ -222,7 +222,7 @@ void Client::connect()
 		return eventType;
 	});
 
-	emscripten_websocket_set_onmessage_callback(mImpl->handle, this, [] (int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> int {
+	emscripten_websocket_set_onmessage_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> EM_BOOL {
 		auto self = static_cast<Client*>(userData);
 		auto buf = BitBuffer();
 		buf.write(websocketEvent->data, websocketEvent->numBytes);
@@ -231,7 +231,7 @@ void Client::connect()
 		return eventType;
 	});
 
-	emscripten_websocket_set_onerror_callback(mImpl->handle, this, [] (int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> int {
+	emscripten_websocket_set_onerror_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> EM_BOOL {
 		sky::Log("failed");
 		auto self = static_cast<Client*>(userData);
 		self->connect();
