@@ -1,8 +1,9 @@
 #include "helpers.h"
-
 #include <cstddef>
 #include <cstdint>
 #include <common/bitbuffer.h>
+#include <locale>
+#include <codecvt>
 
 using namespace Common;
 
@@ -158,4 +159,16 @@ float Helpers::SmoothRotation(float src_radians, float dst_radians, Clock::Durat
 float Helpers::SmoothRotation(float src_radians, float dst_radians, float friction, float delta_limit)
 {
 	return SmoothRotation(src_radians, dst_radians, FRAME->getTimeDelta(), friction, delta_limit);
+}
+
+std::string sky::WstringToString(const std::wstring& wstr)
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.to_bytes(wstr);
+}
+
+std::wstring sky::StringToWstring(const std::string& str)
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.from_bytes(str);
 }

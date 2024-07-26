@@ -1,10 +1,7 @@
 #pragma once
-
 #include <fmt/format.h>
-
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-
 #include <nlohmann/json.hpp>
 #include <platform/asset.h>
 #include <core/clock.h>
@@ -69,4 +66,10 @@ namespace Common::Helpers
 	{
 		return (x - edge0) / (edge1 - edge0);
 	};
+}
+
+namespace sky
+{
+	std::string WstringToString(const std::wstring& wstr);
+	std::wstring StringToWstring(const std::string& str);
 }

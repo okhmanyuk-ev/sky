@@ -177,8 +177,9 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		label->setFontSize(fontSize);
 
 		auto text = label->getText();
-		ImGui::InputTextWithHint("Text", "No text", text.data(), text.size(), ImGuiInputTextFlags_ReadOnly);
-		
+		auto narrow_text = std::string(text.begin(), text.end());
+		ImGui::InputTextWithHint("Text", "No text", narrow_text.data(), narrow_text.size(), ImGuiInputTextFlags_ReadOnly);
+
 		ImGui::Separator();
 
 		if (auto texture = label->getFont()->getTexture(); texture != nullptr)
@@ -375,7 +376,7 @@ void SceneEditor::showTooltip(std::shared_ptr<Scene::Node> node)
 	}
 	else if (auto label = std::dynamic_pointer_cast<Scene::Label>(node); label != nullptr)
 	{
-		auto str = label->getText().cpp_str();
+		auto str = label->getText();
 		ImGui::BeginTooltip();
 		ImGui::Text("Label: %s", str.c_str());
 		ImGui::EndTooltip();

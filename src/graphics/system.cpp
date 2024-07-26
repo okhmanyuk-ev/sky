@@ -619,7 +619,7 @@ void System::drawString(const Font& font, const TextMesh& mesh, float size, cons
 	drawString(font, mesh, mid, max, smoothFactor, color);
 }
 
-void System::drawString(const Font& font, const tiny_utf8::string& text, float size, const glm::vec4& color,
+void System::drawString(const Font& font, const std::wstring& text, float size, const glm::vec4& color,
 	float outlineThickness, const glm::vec4& outlineColor, float smoothFactorScale)
 {
 	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, color, outlineThickness, outlineColor,

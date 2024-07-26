@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <renderer/all.h>
-#include <tinyutf8/tinyutf8.h>
 #include "font.h"
 
 namespace Graphics
@@ -26,13 +25,13 @@ namespace Graphics
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
 	
-		static TextMesh createTextMesh(const Font& font, tiny_utf8::string::const_iterator begin,
-			tiny_utf8::string::const_iterator end);
+		static TextMesh createTextMesh(const Font& font, std::wstring::const_iterator begin,
+			std::wstring::const_iterator end);
 
-		static TextMesh createSinglelineTextMesh(const Font& font, const tiny_utf8::string& text,
+		static TextMesh createSinglelineTextMesh(const Font& font, const std::wstring& text,
 			float vertical_offset = 0.0f);
 
-		static std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const tiny_utf8::string& text,
+		static std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const std::wstring& text,
 			float maxWidth, float size, Align align = Align::Left);
 	};
 }

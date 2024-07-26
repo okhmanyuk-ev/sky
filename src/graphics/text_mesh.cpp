@@ -3,8 +3,8 @@
 
 using namespace Graphics;
 
-TextMesh TextMesh::createTextMesh(const Font& font, tiny_utf8::string::const_iterator begin,
-	tiny_utf8::string::const_iterator end)
+TextMesh TextMesh::createTextMesh(const Font& font, std::wstring::const_iterator begin,
+	std::wstring::const_iterator end)
 {
 	TextMesh mesh;
 
@@ -74,7 +74,7 @@ TextMesh TextMesh::createTextMesh(const Font& font, tiny_utf8::string::const_ite
 	return mesh;
 }
 
-TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const tiny_utf8::string& text, float vertical_offset)
+TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const std::wstring& text, float vertical_offset)
 {
 	auto mesh = createTextMesh(font, text.begin(), text.end());
 
@@ -86,7 +86,7 @@ TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const tiny_utf8::s
 	return mesh;
 }
 
-std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, const tiny_utf8::string& text,
+std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, const std::wstring& text,
 	float maxWidth, float size, Align align)
 {
 	auto scale = font.getScaleFactorForSize(size);
@@ -96,7 +96,7 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, 
 
 	TextMesh result;
 
-	auto appendTextMesh = [&font, scaledMaxWidth, &height, &result, align](tiny_utf8::string::const_iterator begin, tiny_utf8::string::const_iterator end) {
+	auto appendTextMesh = [&font, scaledMaxWidth, &height, &result, align](std::wstring::const_iterator begin, std::wstring::const_iterator end) {
 		auto mesh = createTextMesh(font, begin, end);
 		for (auto index : mesh.indices)
 		{

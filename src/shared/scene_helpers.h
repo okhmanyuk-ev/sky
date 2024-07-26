@@ -1,6 +1,4 @@
 #pragma once
-
-#include <tinyutf8/tinyutf8.h>
 #include <scene/all.h>
 #include <scene3d/all.h>
 #include <audio/system.h>
@@ -10,12 +8,12 @@
 namespace Shared::SceneHelpers
 {
 	std::shared_ptr<Scene::Label> MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder,
-		std::shared_ptr<Scene::Node> target, const tiny_utf8::string& text, float text_size, float move_duration = 0.5f);
+		std::shared_ptr<Scene::Node> target, const std::wstring& text, float text_size, float move_duration = 0.5f);
 
 	std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> MakeFastCheckbox(
-		const tiny_utf8::string& title, float title_size, bool checked, std::function<void(bool)> changeCallback = nullptr);
+		const std::wstring& title, float title_size, bool checked, std::function<void(bool)> changeCallback = nullptr);
 
-	std::vector<std::shared_ptr<Scene::Node>> MakeFastRadioButtons(std::vector<tiny_utf8::string> titles,
+	std::vector<std::shared_ptr<Scene::Node>> MakeFastRadioButtons(std::vector<std::wstring> titles,
 		float title_size, int choosed, std::function<void(int)> changeCallback = nullptr);
 
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(float height, const std::vector<std::pair<float/*width*/,
@@ -698,12 +696,12 @@ namespace Shared::SceneHelpers
 
 	public:
 		const auto& getText() const { return mState.text; }
-		void setText(tiny_utf8::string text) { mState.text = std::move(text); }
+		void setText(std::wstring text) { mState.text = std::move(text); }
 
 	private:
 		struct State
 		{
-			tiny_utf8::string text;
+			std::wstring text;
 			bool operator==(const State& other) const = default;
 		};
 		State mState;
@@ -716,8 +714,7 @@ namespace Shared::SceneHelpers
 		bool IsMouseHovered(const Scene::Scene& scene, Scene::Node& node);
 		void Tooltip(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
 			std::function<std::shared_ptr<Scene::Node>()> createContentCallback);
-		void TooltipLabel(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
-			const tiny_utf8::string& text);
+		void TooltipLabel(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node, const std::wstring& text);
 		void Highlight(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node);
 	}
 }

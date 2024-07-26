@@ -14,7 +14,6 @@
 #include <glm/ext.hpp>
 #include <optional>
 #include <stack>
-#include <tinyutf8/tinyutf8.h>
 #include "text_mesh.h"
 
 #define GRAPHICS ENGINE->getSystem<Graphics::System>()
@@ -111,7 +110,7 @@ namespace Graphics
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f }, float smoothFactorScale = 1.0f);
 
-		void drawString(const Font& font, const tiny_utf8::string& text, float size,
+		void drawString(const Font& font, const std::wstring& text, float size,
 			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f }, float smoothFactorScale = 1.0f);
 

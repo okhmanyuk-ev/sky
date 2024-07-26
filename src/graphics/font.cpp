@@ -132,12 +132,10 @@ Font::Font(void* data, size_t size)
 
 Font::Font(const Platform::Asset& asset) : Font(asset.getMemory(), asset.getSize())
 {
-	//
 }
 
 Font::~Font()
 {
-	//
 }
 
 float Font::getScaleFactorForSize(float size)
@@ -145,7 +143,7 @@ float Font::getScaleFactorForSize(float size)
 	return size / GlyphSize;
 }
 
-const Font::Glyph& Font::getGlyph(tiny_utf8::string::value_type symbol) const
+const Font::Glyph& Font::getGlyph(wchar_t symbol) const
 {
 	if (mGlyphs.count(symbol) == 0)
 		return mGlyphs.at(0);
@@ -153,7 +151,7 @@ const Font::Glyph& Font::getGlyph(tiny_utf8::string::value_type symbol) const
 	return mGlyphs.at(symbol);
 }
 
-float Font::getStringWidth(tiny_utf8::string::const_iterator begin, tiny_utf8::string::const_iterator end, float size) const
+float Font::getStringWidth(std::wstring::const_iterator begin, std::wstring::const_iterator end, float size) const
 {
 	float result = 0.0f;
 
@@ -169,12 +167,12 @@ float Font::getStringWidth(tiny_utf8::string::const_iterator begin, tiny_utf8::s
 	return result * Font::getScaleFactorForSize(size);
 }
 
-float Font::getStringWidth(const tiny_utf8::string& text, float size) const
+float Font::getStringWidth(const std::wstring& text, float size) const
 {
 	return getStringWidth(text.begin(), text.end(), size);
 }
 
-float Font::getKerning(tiny_utf8::string::value_type left, tiny_utf8::string::value_type right) const
+float Font::getKerning(wchar_t left, wchar_t right) const
 {
 	if (mKernings.count(left) == 0)
 		return 0.0f;

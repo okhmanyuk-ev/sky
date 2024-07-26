@@ -3,6 +3,7 @@
 #include <cassert>
 #include <platform/asset.h>
 #include <console/device.h>
+#include <common/helpers.h>
 
 using namespace Shared;
 
@@ -23,18 +24,18 @@ void LocalizationSystem::loadDicrionaries(const std::string& path)
 
 		auto asset = Platform::Asset(_path);
 
-		auto s = std::string((char*)asset.getMemory(), asset.getSize());
-		auto ss = std::stringstream(s);
+		auto s = sky::StringToWstring(std::string((char*)asset.getMemory(), asset.getSize()));
+		auto ss = std::wstringstream(s);
 
-		auto trim = [](std::string& s) {
-			const char* ws = " \t\n\r\f\v";
+		auto trim = [](std::wstring& s) {
+			auto ws = L" \t\n\r\f\v";
 			s.erase(s.find_last_not_of(ws) + 1);
 			s.erase(0, s.find_first_not_of(ws));
 		};
 
 		while (std::getline(ss, s))
 		{
-			auto separator_pos = s.find(":");
+			auto separator_pos = s.find(L":");
 
 			if (separator_pos == std::string::npos)
 				continue;
@@ -48,7 +49,7 @@ void LocalizationSystem::loadDicrionaries(const std::string& path)
 			if (key.empty() || value.empty())
 				continue;
 
-			dictionary[key] = value;
+			dictionary[sky::WstringToString(key)] = value;
 		}
 	};
 
@@ -67,14 +68,14 @@ std::string LocalizationSystem::getLanguageName(Language language)
 	return "";
 }
 
-tiny_utf8::string LocalizationSystem::getString(const std::string& key) const
+std::wstring LocalizationSystem::getString(const std::string& key) const
 {
 	auto& dictionary = mDictionaries.at(mLanguage);
 
 	if (dictionary.count(key) == 0)
 	{
 		CONSOLE_DEVICE->writeLine("cannot find locale: " + key, Console::Color::Red);
-		return key;
+		return sky::StringToWstring(key);
 	}
 
 	return dictionary.at(key);

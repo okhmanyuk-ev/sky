@@ -2,7 +2,6 @@
 
 #include <core/engine.h>
 #include <map>
-#include <tinyutf8/tinyutf8.h>
 #include <fmt/format.h>
 
 #define LOCALIZATION ENGINE->getSystem<Shared::LocalizationSystem>()
@@ -28,13 +27,13 @@ namespace Shared
 	public:
 		void loadDicrionaries(const std::string& path);
 
-		tiny_utf8::string getString(const std::string& key) const;
+		std::wstring getString(const std::string& key) const;
 		
 		auto getLanguage() const { return mLanguage; }
 		void setLanguage(Language value) { mLanguage = value; }
 
 	private:
-		std::map<Language, std::map<std::string, tiny_utf8::string>> mDictionaries;
+		std::map<Language, std::map<std::string, std::wstring>> mDictionaries;
 		Language mLanguage = Language::English;
 	};
 }

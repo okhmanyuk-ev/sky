@@ -9,7 +9,7 @@
 using namespace Shared;
 
 std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder,
-	std::shared_ptr<Scene::Node> target, const tiny_utf8::string& text, float text_size, float move_duration)
+	std::shared_ptr<Scene::Node> target, const std::wstring& text, float text_size, float move_duration)
 {
 	auto label = std::make_shared<Scene::Label>();
 	label->setFontSize(text_size);
@@ -28,7 +28,7 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<S
 }
 
 std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers::MakeFastCheckbox(
-	const tiny_utf8::string& title, float title_size, bool checked, std::function<void(bool)> changeCallback)
+	const std::wstring& title, float title_size, bool checked, std::function<void(bool)> changeCallback)
 {
 	auto holder = std::make_shared<Scene::Clickable<Scene::Node>>();
 
@@ -74,7 +74,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	return { holder, setter };
 }
 
-std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std::vector<tiny_utf8::string> titles,
+std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std::vector<std::wstring> titles,
 	float title_size, int choosed, std::function<void(int)> changeCallback)
 {
 	std::vector<std::shared_ptr<Scene::Node>> result;
@@ -933,7 +933,7 @@ SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 		auto h_pos = scrollbox->getHorizontalScrollPosition();
 		setBlurIntensity(1.0f - h_pos);
 		slider->setHorizontalPivot(1.0f - h_pos);
-		label->setText(fmt::format("{:.{}f}", getBlurIntensity(), 2));
+		label->setText(fmt::format(L"{:.{}f}", getBlurIntensity(), 2));
 	}));
 }
 
@@ -1006,7 +1006,7 @@ SceneHelpers::Checkbox::Checkbox()
 
 	mLabel = std::make_shared<Scene::Label>();
 	mLabel->setFontSize(12.0f);
-	mLabel->setText("label");
+	mLabel->setText(L"label");
 	mLabel->setAnchor({ 1.0f, 0.5f });
 	mLabel->setPivot({ 0.0f, 0.5f });
 	mLabel->setX(8.0f);
@@ -1039,7 +1039,7 @@ SceneHelpers::Editbox::Window::Window()
 	auto label = std::make_shared<Scene::Label>();
 	label->setAnchor(0.5f);
 	label->setPivot(0.5f);
-	label->setText("test test test");
+	label->setText(L"test test test");
 	getContent()->attach(label);
 }
 
@@ -1185,7 +1185,7 @@ void SceneHelpers::RichLabel::refresh()
 
 	std::vector<HorizontalGridCell> cells;
 
-	auto createLabelCell = [](const tiny_utf8::string& str) {
+	auto createLabelCell = [](const std::wstring& str) {
 		auto label = std::make_shared<Scene::Label>();
 		label->setText(str);
 		label->setParseColorTagsEnabled(true);
@@ -1215,20 +1215,20 @@ void SceneHelpers::RichLabel::refresh()
 		return cell;
 	};
 
-	std::regex icon_tag(R"(^<icon=([^>]+)>)");
+	std::wregex icon_tag(LR"(^<icon=([^>]+)>)");
 
-	tiny_utf8::string sublimed_text;
-	std::smatch match;
+	std::wstring sublimed_text;
+	std::wsmatch match;
 
 	auto text = mState.text;
 
 	while (!text.empty()) {
-		const auto search_str = text.cpp_str();
-		if (std::regex_search(search_str, match, icon_tag))
+		if (std::regex_search(text, match, icon_tag))
 		{
 			cells.push_back(createLabelCell(sublimed_text));
 			sublimed_text.clear();
-			cells.push_back(createSpriteCell(match[1]));
+			auto path = sky::WstringToString(match[1]);
+			cells.push_back(createSpriteCell(path));
 			text.erase(0, match.length());
 		}
 		else {
@@ -1307,7 +1307,7 @@ void SceneHelpers::ImScene::Tooltip(const Scene::Scene& scene, Scene::Node& hold
 }
 
 void SceneHelpers::ImScene::TooltipLabel(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
-	const tiny_utf8::string& text)
+	const std::wstring& text)
 {
 	Tooltip(scene, holder, node, [&] {
 		auto label = std::make_shared<Scene::Label>();

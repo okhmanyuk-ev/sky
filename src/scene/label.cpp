@@ -98,29 +98,29 @@ void Label::refresh()
 
 	float height = 0.0f;
 
-	auto replaceEscapedNewlines = [](const std::string& input) {
-		std::regex pattern(R"(\\n)");
-		return std::regex_replace(input, pattern, "\n");
+	auto replaceEscapedNewlines = [](const std::wstring& input) {
+		std::wregex pattern(LR"(\\n)");
+		return std::regex_replace(input, pattern, L"\n");
 	};
 
-	auto parseColorTags = [](tiny_utf8::string str) {
+	auto parseColorTags = [](std::wstring str) {
 		std::vector<glm::vec4> colormap;
-		tiny_utf8::string sublimed_text;
+		std::wstring sublimed_text;
 
-		std::regex color_open_rgba_tag(R"(^<color=rgba\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
-		std::regex color_open_rgb_tag(R"(^<color=rgb\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
-		std::regex color_open_hex_rgba_tag(R"(^<color=hex\([ ]*([0-9A-Fa-f]{8})[ ]*\)>)");
-		std::regex color_open_hex_rgb_tag(R"(^<color=hex\([ ]*([0-9A-Fa-f]{6})[ ]*\)>)");
-		std::regex color_close_tag(R"(^</color>)");
-		std::smatch match;
+		std::wregex color_open_rgba_tag(LR"(^<color=rgba\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
+		std::wregex color_open_rgb_tag(LR"(^<color=rgb\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
+		std::wregex color_open_hex_rgba_tag(LR"(^<color=hex\([ ]*([0-9A-Fa-f]{8})[ ]*\)>)");
+		std::wregex color_open_hex_rgb_tag(LR"(^<color=hex\([ ]*([0-9A-Fa-f]{6})[ ]*\)>)");
+		std::wregex color_close_tag(LR"(^</color>)");
+		std::wsmatch match;
 
 		const glm::vec4 default_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		glm::vec4 color = default_color;
 
-		while (!str.empty()) {
-			const auto search_str = str.cpp_str();
-			if (std::regex_search(search_str, match, color_open_rgba_tag))
+		while (!str.empty())
+		{
+			if (std::regex_search(str, match, color_open_rgba_tag))
 			{
 				uint8_t r = std::stoi(match[1]);
 				uint8_t g = std::stoi(match[2]);
@@ -130,7 +130,7 @@ void Label::refresh()
 				color = Graphics::Color::ToNormalized(r, g, b, a);
 				str.erase(0, match.length());
 			}
-			else if (std::regex_search(search_str, match, color_open_rgb_tag))
+			else if (std::regex_search(str, match, color_open_rgb_tag))
 			{
 				uint8_t r = std::stoi(match[1]);
 				uint8_t g = std::stoi(match[2]);
@@ -139,46 +139,47 @@ void Label::refresh()
 				color = Graphics::Color::ToNormalized(r, g, b, 255);
 				str.erase(0, match.length());
 			}
-			else if (std::regex_search(search_str, match, color_open_hex_rgba_tag))
+			else if (std::regex_search(str, match, color_open_hex_rgba_tag))
 			{
-				std::string hex_color = match[1];
-				uint32_t rgba = std::stoul(hex_color, nullptr, 16);
+				auto hex_color = match[1];
+				auto rgba = std::stoul(hex_color, nullptr, 16);
 				color = Graphics::Color::ToNormalized((rgba >> 24) & 0xFF, (rgba >> 16) & 0xFF,
 					(rgba >> 8) & 0xFF, rgba & 0xFF);
 				str.erase(0, match.length());
 			}
-			else if (std::regex_search(search_str, match, color_open_hex_rgb_tag))
+			else if (std::regex_search(str, match, color_open_hex_rgb_tag))
 			{
-				std::string hex_color = match[1];
-				uint32_t rgb = std::stoul(hex_color, nullptr, 16) << 8;
+				auto hex_color = match[1];
+				auto rgb = std::stoul(hex_color, nullptr, 16) << 8;
 				color = Graphics::Color::ToNormalized((rgb >> 24) & 0xFF, (rgb >> 16) & 0xFF,
 					(rgb >> 8) & 0xFF, 255);
 				str.erase(0, match.length());
 			}
-			else if (std::regex_search(search_str, match, color_close_tag))
+			else if (std::regex_search(str, match, color_close_tag))
 			{
 				color = default_color;
 				str.erase(0, match.length());
 			}
-			else {
+			else
+			{
 				sublimed_text.push_back(str.front());
 				str.erase(0, 1);
 				colormap.push_back(color);
 			}
 		}
 
-		return std::make_tuple(colormap, tiny_utf8::string(sublimed_text));
+		return std::make_tuple(colormap, sublimed_text);
 	};
 
 	auto text = mText;
 
 	if (mReplaceEscapedNewLines)
-		text = replaceEscapedNewlines(text.cpp_str());
+		text = replaceEscapedNewlines(text);
 
 	std::vector<glm::vec4> colormap;
 
 	if (mParseColorTags)
-		std::tie(colormap, text) = parseColorTags(text.cpp_str());
+		std::tie(colormap, text) = parseColorTags(text);
 
 	if (!mMultiline)
 	{

@@ -27,7 +27,7 @@ namespace Scene
 		void setFontSize(float value) { mFontSize = value; }
 
 		const auto& getText() const { return mText; }
-		void setText(const tiny_utf8::string& value) { mText = value; }
+		void setText(const std::wstring& value) { mText = value; }
 
 		auto getOutlineThickness() const { return mOutlineThickness; }
 		void setOutlineThickness(float value) { mOutlineThickness = value; }
@@ -55,10 +55,10 @@ namespace Scene
 	private:
 		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
 		float mFontSize = DefaultFontSize;
-		tiny_utf8::string mText = "";
+		std::wstring mText;
 		Graphics::TextMesh::Align mAlign = Graphics::TextMesh::Align::Left;
 		Graphics::TextMesh mMesh;
-		tiny_utf8::string mPrevText;
+		std::wstring mPrevText;
 		float mPrevWidth = 0.0f;
 		float mPrevFontSize = 0.0f;
 		std::shared_ptr<Graphics::Font> mPrevFont;
