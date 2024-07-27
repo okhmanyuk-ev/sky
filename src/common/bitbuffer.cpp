@@ -1,12 +1,12 @@
 #include "bitbuffer.h"
-
 #include <cassert>
 #include <string>
 #include <stdexcept>
 
+using namespace sky;
+
 BitBuffer::BitBuffer()
 {
-	//
 }
 
 BitBuffer::BitBuffer(const BitBuffer& other) : BitBuffer()

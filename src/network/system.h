@@ -38,7 +38,7 @@ namespace Network
 	struct Packet
 	{
 		Address adr;
-		BitBuffer buf;
+		sky::BitBuffer buf;
 	};
 
 	class System : public Common::FrameSystem::Frameable

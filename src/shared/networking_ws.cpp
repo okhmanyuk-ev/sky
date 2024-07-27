@@ -29,9 +29,9 @@ NetCommands::~NetCommands()
 
 // channel
 
-void Channel::read(BitBuffer& buf)
+void Channel::read(sky::BitBuffer& buf)
 {
-	auto name = Common::BufferHelpers::ReadString(buf);
+	auto name = sky::bitbuffer_helpers::ReadString(buf);
 	
 	if (mMessageReaders.count(name) == 0)
 		throw std::runtime_error(("unknown message type in channel: " + name).c_str());
@@ -39,10 +39,10 @@ void Channel::read(BitBuffer& buf)
 	mMessageReaders.at(name)(buf);
 }
 
-void Channel::sendReliable(const std::string& name, BitBuffer& buf)
+void Channel::sendReliable(const std::string& name, sky::BitBuffer& buf)
 {
-	auto msg = BitBuffer();
-	Common::BufferHelpers::WriteString(msg, name);
+	auto msg = sky::BitBuffer();
+	sky::bitbuffer_helpers::WriteString(msg, name);
 	msg.write(buf.getMemory(), buf.getSize());
 
 	if (mSendCallback == nullptr)
@@ -101,7 +101,7 @@ Server::Server(uint16_t port) :
 			return;
 
 		auto& payload = msg->get_raw_payload();
-		auto buf = BitBuffer();
+		auto buf = sky::BitBuffer();
 		buf.write(payload.data(), payload.size());
 		buf.toStart();
 		mChannels.at(hdl)->read(buf);
@@ -181,7 +181,7 @@ Client::Client(const std::string& url) :
 
 	mImpl->wsclient.set_message_handler([this](websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg) {
 		auto& payload = msg->get_raw_payload();
-		auto buf = BitBuffer();
+		auto buf = sky::BitBuffer();
 		buf.write(payload.data(), payload.size());
 		buf.toStart();
 		mChannel->read(buf);
@@ -224,7 +224,7 @@ void Client::connect()
 
 	emscripten_websocket_set_onmessage_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> EM_BOOL {
 		auto self = static_cast<Client*>(userData);
-		auto buf = BitBuffer();
+		auto buf = sky::BitBuffer();
 		buf.write(websocketEvent->data, websocketEvent->numBytes);
 		buf.toStart();
 		self->mChannel->read(buf);
@@ -271,8 +271,8 @@ SimpleChannel::SimpleChannel()
 
 void SimpleChannel::sendEvent(const std::string& name, const nlohmann::json& json)
 {
-	auto buf = BitBuffer();
-	Common::BufferHelpers::WriteString(buf, name);
+	auto buf = sky::BitBuffer();
+	sky::bitbuffer_helpers::WriteString(buf, name);
 
 	if (!json.empty())
 	{
@@ -288,9 +288,9 @@ void SimpleChannel::sendEvent(const std::string& name, const nlohmann::json& jso
 	sendReliable("event", buf);
 }
 
-void SimpleChannel::onEventMessage(BitBuffer& buf)
+void SimpleChannel::onEventMessage(sky::BitBuffer& buf)
 {
-	auto name = Common::BufferHelpers::ReadString(buf);
+	auto name = sky::bitbuffer_helpers::ReadString(buf);
 
 	nlohmann::json json = {};
 

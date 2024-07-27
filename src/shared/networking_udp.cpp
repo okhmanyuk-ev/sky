@@ -51,7 +51,7 @@ void Channel::transmit()
 {
 	mOutgoingSequence += 1;
 	
-	auto buf = BitBuffer();
+	auto buf = sky::BitBuffer();
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
@@ -78,7 +78,7 @@ void Channel::transmit()
 
 		buf.writeBit(true);
 		buf.writeBitsVar(index);
-		Common::BufferHelpers::WriteString(buf, rel_msg.name);
+		sky::bitbuffer_helpers::WriteString(buf, rel_msg.name);
 
 		auto size = rel_msg.buf->getSize(); // TODO: use bit corrected size
 		buf.writeBitsVar(size);
@@ -146,7 +146,7 @@ void Channel::resendReliableMessages(uint32_t ack)
 	}
 }
 
-void Channel::read(BitBuffer& buf)
+void Channel::read(sky::BitBuffer& buf)
 {
 	auto seq = buf.readBitsVar();
 	auto ack = buf.readBitsVar();
@@ -183,8 +183,8 @@ void Channel::read(BitBuffer& buf)
 		mReliableAcknowledgements.insert(index);
 
 		auto msg = ReliableMessage();
-		msg.name = Common::BufferHelpers::ReadString(buf);
-		msg.buf = std::make_shared<BitBuffer>();
+		msg.name = sky::bitbuffer_helpers::ReadString(buf);
+		msg.buf = std::make_shared<sky::BitBuffer>();
 
 		auto size = buf.readBitsVar(); // TODO: use bit corrected size
 
@@ -226,10 +226,10 @@ void Channel::read(BitBuffer& buf)
 	mIncomingTime = Clock::Now();
 }
 
-void Channel::sendReliable(const std::string& msg, BitBuffer& buf)
+void Channel::sendReliable(const std::string& msg, sky::BitBuffer& buf)
 {
 	mOutgoingReliableIndex += 1;
-	mOutgoingReliableMessages.insert({ mOutgoingReliableIndex, { msg, std::make_shared<BitBuffer>(buf) } });
+	mOutgoingReliableMessages.insert({ mOutgoingReliableIndex, { msg, std::make_shared<sky::BitBuffer>(buf) } });
 	
 	if (Networking::NetLogRel)
 		sky::Log("send reliable {}", mOutgoingReliableIndex);
@@ -298,9 +298,9 @@ void Networking::addMessage(uint32_t msg, ReadCallback callback)
 	mMessages.insert({ msg, callback });
 }
 
-void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const BitBuffer& _buf)
+void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const sky::BitBuffer& _buf)
 {
-	auto buf = BitBuffer();
+	auto buf = sky::BitBuffer();
 	buf.writeBitsVar(msg);
 	buf.write(_buf.getMemory(), _buf.getSize());
 	mSocket.sendPacket({ adr, buf });
@@ -308,15 +308,15 @@ void Networking::sendMessage(uint32_t msg, const Network::Address& adr, const Bi
 
 void Networking::sendDisconnect(const Network::Address& address, const std::string& reason)
 {
-	auto buf = BitBuffer();
-	Common::BufferHelpers::WriteString(buf, reason);
+	auto buf = sky::BitBuffer();
+	sky::bitbuffer_helpers::WriteString(buf, reason);
 	sendMessage((uint32_t)Message::Disconnect, address, buf);
 }
 
 void Networking::sendRedirect(const Network::Address& address, const std::string& redirect_address)
 {
-	auto buf = BitBuffer();
-	Common::BufferHelpers::WriteString(buf, redirect_address);
+	auto buf = sky::BitBuffer();
+	sky::bitbuffer_helpers::WriteString(buf, redirect_address);
 	sendMessage((uint32_t)Message::Redirect, address, buf);
 }
 
@@ -376,7 +376,7 @@ Server::Server(uint16_t port) : Networking(port)
 		if (mChannels.count(packet.adr) == 0)
 			return;
 
-		auto reason = Common::BufferHelpers::ReadString(packet.buf);
+		auto reason = sky::bitbuffer_helpers::ReadString(packet.buf);
 		
 		sky::Log("{} disconnected ({})", packet.adr.toString(), reason);
 		mChannels.erase(packet.adr);
@@ -427,7 +427,7 @@ Client::Client(const Network::Address& server_address) :
 		if (!mChannel)
 			return;
 
-		auto reason = Common::BufferHelpers::ReadString(packet.buf);
+		auto reason = sky::bitbuffer_helpers::ReadString(packet.buf);
 		
 		mChannel = nullptr;
 		sky::Log("disconnected ({})", reason);
@@ -436,7 +436,7 @@ Client::Client(const Network::Address& server_address) :
 		if (packet.adr != mServerAddress)
 			return; 
 		
-		auto redirect_address = Common::BufferHelpers::ReadString(packet.buf);
+		auto redirect_address = sky::bitbuffer_helpers::ReadString(packet.buf);
 		
 		sky::Log("redirected to {}", redirect_address);
 		mServerAddress = redirect_address;
@@ -461,7 +461,7 @@ void Client::onFrame()
 
 void Client::connect()
 {
-	auto buf = BitBuffer();
+	auto buf = sky::BitBuffer();
 	buf.writeBitsVar(ProtocolVersion);
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
 	sky::Log("connecting to " + mServerAddress.toString());
@@ -477,26 +477,26 @@ SimpleChannel::SimpleChannel()
 
 void SimpleChannel::sendEvent(const std::string& name, const std::map<std::string, std::string>& params)
 {
-	auto buf = BitBuffer();
-	Common::BufferHelpers::WriteString(buf, name);
+	auto buf = sky::BitBuffer();
+	sky::bitbuffer_helpers::WriteString(buf, name);
 	for (auto& [key, value] : params)
 	{
 		buf.writeBit(true);
-		Common::BufferHelpers::WriteString(buf, key);
-		Common::BufferHelpers::WriteString(buf, value);
+		sky::bitbuffer_helpers::WriteString(buf, key);
+		sky::bitbuffer_helpers::WriteString(buf, value);
 	}
 	buf.writeBit(false);
 	sendReliable("event", buf);
 }
 
-void SimpleChannel::onEventMessage(BitBuffer& buf)
+void SimpleChannel::onEventMessage(sky::BitBuffer& buf)
 {
-	auto name = Common::BufferHelpers::ReadString(buf);
+	auto name = sky::bitbuffer_helpers::ReadString(buf);
 	auto params = std::map<std::string, std::string>();
 	while (buf.readBit())
 	{
-		auto key = Common::BufferHelpers::ReadString(buf);
-		auto value = Common::BufferHelpers::ReadString(buf);
+		auto key = sky::bitbuffer_helpers::ReadString(buf);
+		auto value = sky::bitbuffer_helpers::ReadString(buf);
 		params.insert({ key, value });
 	}
 	if (mShowEventLogs || mEvents.count(name) == 0)

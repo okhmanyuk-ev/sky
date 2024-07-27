@@ -34,16 +34,16 @@ namespace Shared::NetworkingWS
 #endif
 
 	public:
-		using ReadCallback = std::function<void(BitBuffer&)>;
-		using SendCallback = std::function<void(BitBuffer&)>;
+		using ReadCallback = std::function<void(sky::BitBuffer&)>;
+		using SendCallback = std::function<void(sky::BitBuffer&)>;
 		using DisconnectCallback = std::function<void()>;
 
 	public:
 		virtual ~Channel() {}
 
 	public:
-		void read(BitBuffer& buf);
-		void sendReliable(const std::string& name, BitBuffer& buf);
+		void read(sky::BitBuffer& buf);
+		void sendReliable(const std::string& name, sky::BitBuffer& buf);
 		void addMessageReader(const std::string& name, ReadCallback callback);
 
 	public:
@@ -128,7 +128,7 @@ namespace Shared::NetworkingWS
 		void sendEvent(const std::string& name, const nlohmann::json& json = {});
 
 	private:
-		void onEventMessage(BitBuffer& buf);
+		void onEventMessage(sky::BitBuffer& buf);
 
 	public:
 		void addEventCallback(const std::string& name, EventCallback callback);

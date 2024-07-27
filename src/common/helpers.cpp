@@ -70,7 +70,7 @@ std::string Helpers::BytesToNiceString(uint64_t value) // we need uint128_t here
 
 std::string Helpers::BytesArrayToNiceString(void* mem, size_t size)
 {
-	BitBuffer buf;
+	sky::BitBuffer buf;
 	buf.write(mem, size);
 	buf.toStart();
 	std::string result;

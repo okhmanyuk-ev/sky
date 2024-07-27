@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-namespace Common::BufferHelpers
+namespace sky::bitbuffer_helpers
 {
 	void WriteString(BitBuffer& msg, std::string_view value);
 	std::string ReadString(BitBuffer& msg);
