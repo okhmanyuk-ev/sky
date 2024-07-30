@@ -1206,7 +1206,7 @@ void SceneHelpers::RichLabel::refresh()
 		sprite->setPivot(0.5f);
 		sprite->setAdaptStretch(1.0f);
 		sprite->setBakingAdaption(true);
-		sprite->setBatchGroup(fmt::format("rich_label_icon_{}", this_index));
+		sprite->setBatchGroup(fmt::format("rich_label_icon_{}_{}", this_index, path));
 
 		HorizontalGridCell cell;
 		cell.cell_parent_vertically_stretches_to_grid = true;
