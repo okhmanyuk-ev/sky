@@ -109,6 +109,8 @@ void Label::refresh()
 
 		std::wregex color_open_rgba_tag(LR"(^<color=rgba\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
 		std::wregex color_open_rgb_tag(LR"(^<color=rgb\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
+		std::wregex color_open_frgba_tag(LR"(^<color=frgba\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\)>)");
+		std::wregex color_open_frgb_tag(LR"(^<color=frgb\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\)>)");
 		std::wregex color_open_hex_rgba_tag(LR"(^<color=hex\([ ]*([0-9A-Fa-f]{8})[ ]*\)>)");
 		std::wregex color_open_hex_rgb_tag(LR"(^<color=hex\([ ]*([0-9A-Fa-f]{6})[ ]*\)>)");
 		std::wregex color_close_tag(LR"(^</color>)");
@@ -137,6 +139,22 @@ void Label::refresh()
 				uint8_t b = std::stoi(match[3]);
 
 				color = Graphics::Color::ToNormalized(r, g, b, 255);
+				str.erase(0, match.length());
+			}
+			if (std::regex_search(str, match, color_open_frgba_tag))
+			{
+				color.r = std::stof(match[1]);
+				color.g = std::stof(match[2]);
+				color.b = std::stof(match[3]);
+				color.a = std::stof(match[4]);
+				str.erase(0, match.length());
+			}
+			else if (std::regex_search(str, match, color_open_frgb_tag))
+			{
+				color.r = std::stof(match[1]);
+				color.g = std::stof(match[2]);
+				color.b = std::stof(match[3]);
+				color.a = 1.0f;
 				str.erase(0, match.length());
 			}
 			else if (std::regex_search(str, match, color_open_hex_rgba_tag))
