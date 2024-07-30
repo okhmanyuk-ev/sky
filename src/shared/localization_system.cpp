@@ -24,7 +24,7 @@ void LocalizationSystem::loadDicrionaries(const std::string& path)
 
 		auto asset = Platform::Asset(_path);
 
-		auto s = sky::StringToWstring(std::string((char*)asset.getMemory(), asset.getSize()));
+		auto s = sky::to_wstring(std::string((char*)asset.getMemory(), asset.getSize()));
 		auto ss = std::wstringstream(s);
 
 		auto trim = [](std::wstring& s) {
@@ -49,7 +49,7 @@ void LocalizationSystem::loadDicrionaries(const std::string& path)
 			if (key.empty() || value.empty())
 				continue;
 
-			dictionary[sky::WstringToString(key)] = value;
+			dictionary[sky::to_string(key)] = value;
 		}
 	};
 
@@ -75,7 +75,7 @@ std::wstring LocalizationSystem::getString(const std::string& key) const
 	if (dictionary.count(key) == 0)
 	{
 		CONSOLE_DEVICE->writeLine("cannot find locale: " + key, Console::Color::Red);
-		return sky::StringToWstring(key);
+		return sky::to_wstring(key);
 	}
 
 	return dictionary.at(key);

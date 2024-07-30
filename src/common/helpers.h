@@ -70,6 +70,6 @@ namespace Common::Helpers
 
 namespace sky
 {
-	std::string WstringToString(const std::wstring& wstr);
-	std::wstring StringToWstring(const std::string& str);
+	std::string to_string(const std::wstring& wstr);
+	std::wstring to_wstring(const std::string& str);
 }

@@ -161,13 +161,13 @@ float Helpers::SmoothRotation(float src_radians, float dst_radians, float fricti
 	return SmoothRotation(src_radians, dst_radians, FRAME->getTimeDelta(), friction, delta_limit);
 }
 
-std::string sky::WstringToString(const std::wstring& wstr)
+std::string sky::to_string(const std::wstring& wstr)
 {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 	return converter.to_bytes(wstr);
 }
 
-std::wstring sky::StringToWstring(const std::string& str)
+std::wstring sky::to_wstring(const std::string& str)
 {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 	return converter.from_bytes(str);

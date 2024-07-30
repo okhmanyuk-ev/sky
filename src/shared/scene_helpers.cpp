@@ -1227,7 +1227,7 @@ void SceneHelpers::RichLabel::refresh()
 	auto insertCustomTags = [&] {
 		for (const auto& [name, callback] : mTags)
 		{
-			std::wregex tag(fmt::format(L"^<{}>", sky::StringToWstring(name)));
+			std::wregex tag(fmt::format(L"^<{}>", sky::to_wstring(name)));
 			if (std::regex_search(text, match, tag))
 			{
 				flushLabelText();
@@ -1246,7 +1246,7 @@ void SceneHelpers::RichLabel::refresh()
 		if (std::regex_search(text, match, icon_tag))
 		{
 			flushLabelText();
-			auto path = sky::WstringToString(match[1]);
+			auto path = sky::to_string(match[1]);
 			cells.push_back(createCell(createSprite(path), true));
 			text.erase(0, match.length());
 		}
