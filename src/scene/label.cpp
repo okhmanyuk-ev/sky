@@ -98,106 +98,99 @@ void Label::refresh()
 
 	float height = 0.0f;
 
-	auto replaceEscapedNewlines = [](const std::wstring& input) {
+	auto replace_escaped_newlines = [](const std::wstring& input) {
 		std::wregex pattern(LR"(\\n)");
 		return std::regex_replace(input, pattern, L"\n");
 	};
 
-	auto parseColorTags = [](std::wstring str) {
-		std::vector<glm::vec4> colormap;
-		std::wstring sublimed_text;
+	auto parse_color_tags = [](std::wstring str) {
+		auto parse_u8_color = [](auto match) {
+			auto r = static_cast<uint8_t>(std::stoi(match[1]));
+			auto g = static_cast<uint8_t>(std::stoi(match[2]));
+			auto b = static_cast<uint8_t>(std::stoi(match[3]));
+			auto a = match.size() > 4 ? static_cast<uint8_t>(std::stoi(match[4])) : 255;
+			return Graphics::Color::ToNormalized(r, g, b, a);
+		};
 
-		std::wregex color_open_rgba_tag(LR"(^<color=rgba\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
-		std::wregex color_open_rgb_tag(LR"(^<color=rgb\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)");
-		std::wregex color_open_frgba_tag(LR"(^<color=frgba\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\)>)");
-		std::wregex color_open_frgb_tag(LR"(^<color=frgb\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\)>)");
-		std::wregex color_open_hex_rgba_tag(LR"(^<color=hex\([ ]*([0-9A-Fa-f]{8})[ ]*\)>)");
-		std::wregex color_open_hex_rgb_tag(LR"(^<color=hex\([ ]*([0-9A-Fa-f]{6})[ ]*\)>)");
-		std::wregex color_close_tag(LR"(^</color>)");
+		auto parse_float_color = [](auto match) {
+			auto r = std::stof(match[1]);
+			auto g = std::stof(match[2]);
+			auto b = std::stof(match[3]);
+			auto a = match.size() > 4 ? std::stof(match[4]) : 1.0f;
+			return glm::vec4{ r, g, b, a };
+		};
+
+		auto parse_hex_color = [](auto match) {
+			auto hex_color = match[1];
+			auto rgba = std::stoul(hex_color, nullptr, 16);
+			auto has_alpha = hex_color.length() == 8;
+			auto r = static_cast<uint8_t>((rgba >> (has_alpha ? 24 : 16)) & 0xFF);
+			auto g = static_cast<uint8_t>((rgba >> (has_alpha ? 16 : 8)) & 0xFF);
+			auto b = static_cast<uint8_t>((rgba >> (has_alpha ? 8 : 0)) & 0xFF);
+			auto a = static_cast<uint8_t>(has_alpha ? (rgba & 0xFF) : 255);
+			return Graphics::Color::ToNormalized(r, g, b, a);
+		};
+
+		std::vector<std::tuple<std::wregex, std::function<glm::vec4(std::wsmatch match)>>> color_tags = {
+			{ std::wregex(LR"(^<color=rgba\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)"), parse_u8_color },
+			{ std::wregex(LR"(^<color=rgb\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)"), parse_u8_color },
+			{ std::wregex(LR"(^<color=frgba\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\)>)"), parse_float_color },
+			{ std::wregex(LR"(^<color=frgb\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\)>)"), parse_float_color },
+			{ std::wregex(LR"(^<color=hex\([ ]*([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})[ ]*\)>)"), parse_hex_color },
+		};
+
 		std::wsmatch match;
 
-		const glm::vec4 default_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		std::stack<glm::vec4> color_stack;
+		color_stack.push({ 1.0f, 1.0f, 1.0f, 1.0f });
 
-		glm::vec4 color = default_color;
+		auto parse_color_push_tag = [&] {
+			for (const auto& [regex, callback] : color_tags)
+			{
+				if (std::regex_search(str, match, regex))
+				{
+					color_stack.push(callback(match));
+					str.erase(0, match.length());
+					return true;
+				}
+			}
+			return false;
+		};
+
+		std::wregex pop_color_regex(LR"(^</color>)");
+		std::wstring result_text;
+		std::vector<glm::vec4> colormap;
 
 		while (!str.empty())
-		{
-			if (std::regex_search(str, match, color_open_rgba_tag))
-			{
-				uint8_t r = std::stoi(match[1]);
-				uint8_t g = std::stoi(match[2]);
-				uint8_t b = std::stoi(match[3]);
-				uint8_t a = std::stoi(match[4]);
+		{			
+			if (parse_color_push_tag())
+				continue;
 
-				color = Graphics::Color::ToNormalized(r, g, b, a);
-				str.erase(0, match.length());
-			}
-			else if (std::regex_search(str, match, color_open_rgb_tag))
+			if (std::regex_search(str, match, pop_color_regex))
 			{
-				uint8_t r = std::stoi(match[1]);
-				uint8_t g = std::stoi(match[2]);
-				uint8_t b = std::stoi(match[3]);
-
-				color = Graphics::Color::ToNormalized(r, g, b, 255);
-				str.erase(0, match.length());
-			}
-			if (std::regex_search(str, match, color_open_frgba_tag))
-			{
-				color.r = std::stof(match[1]);
-				color.g = std::stof(match[2]);
-				color.b = std::stof(match[3]);
-				color.a = std::stof(match[4]);
-				str.erase(0, match.length());
-			}
-			else if (std::regex_search(str, match, color_open_frgb_tag))
-			{
-				color.r = std::stof(match[1]);
-				color.g = std::stof(match[2]);
-				color.b = std::stof(match[3]);
-				color.a = 1.0f;
-				str.erase(0, match.length());
-			}
-			else if (std::regex_search(str, match, color_open_hex_rgba_tag))
-			{
-				auto hex_color = match[1];
-				auto rgba = std::stoul(hex_color, nullptr, 16);
-				color = Graphics::Color::ToNormalized((rgba >> 24) & 0xFF, (rgba >> 16) & 0xFF,
-					(rgba >> 8) & 0xFF, rgba & 0xFF);
-				str.erase(0, match.length());
-			}
-			else if (std::regex_search(str, match, color_open_hex_rgb_tag))
-			{
-				auto hex_color = match[1];
-				auto rgb = std::stoul(hex_color, nullptr, 16) << 8;
-				color = Graphics::Color::ToNormalized((rgb >> 24) & 0xFF, (rgb >> 16) & 0xFF,
-					(rgb >> 8) & 0xFF, 255);
-				str.erase(0, match.length());
-			}
-			else if (std::regex_search(str, match, color_close_tag))
-			{
-				color = default_color;
+				color_stack.pop();
 				str.erase(0, match.length());
 			}
 			else
 			{
-				sublimed_text.push_back(str.front());
+				result_text.push_back(str.front());
 				str.erase(0, 1);
-				colormap.push_back(color);
+				colormap.push_back(color_stack.top());
 			}
 		}
 
-		return std::make_tuple(colormap, sublimed_text);
+		return std::make_tuple(colormap, result_text);
 	};
 
 	auto text = mText;
 
 	if (mReplaceEscapedNewLines)
-		text = replaceEscapedNewlines(text);
+		text = replace_escaped_newlines(text);
 
 	std::vector<glm::vec4> colormap;
 
 	if (mParseColorTags)
-		std::tie(colormap, text) = parseColorTags(text);
+		std::tie(colormap, text) = parse_color_tags(text);
 
 	if (!mMultiline)
 	{
