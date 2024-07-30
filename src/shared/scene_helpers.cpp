@@ -1185,21 +1185,23 @@ void SceneHelpers::RichLabel::refresh()
 
 	std::vector<HorizontalGridCell> cells;
 
-	auto createLabelCell = [](const std::wstring& str) {
+	auto createCell = [](auto node, bool cell_parent_vertically_stretches_to_grid) {
+		HorizontalGridCell cell;
+		cell.cell_parent_vertically_stretches_to_grid = cell_parent_vertically_stretches_to_grid;
+		cell.node = node;
+		return cell;
+	};
+
+	auto createLabel = [](const std::wstring& str) {
 		auto label = std::make_shared<Scene::Label>();
 		label->setText(str);
 		label->setParseColorTagsEnabled(true);
 		label->setAnchor(0.5f);
 		label->setPivot(0.5f);
-
-		HorizontalGridCell cell;
-		cell.cell_parent_vertically_stretches_to_grid = false;
-		cell.node = label;
-
-		return cell;
+		return label;
 	};
 
-	auto createSpriteCell = [this_index = size_t(this)](const std::string& path) {
+	auto createSprite = [this_index = size_t(this)](const std::string& path) {
 		auto sprite = std::make_shared<Scene::Adaptive<Scene::Sprite>>();
 		sprite->setTexture(TEXTURE(path));
 		sprite->setAnchor(0.5f);
@@ -1207,12 +1209,7 @@ void SceneHelpers::RichLabel::refresh()
 		sprite->setAdaptStretch(1.0f);
 		sprite->setBakingAdaption(true);
 		sprite->setBatchGroup(fmt::format("rich_label_icon_{}_{}", this_index, path));
-
-		HorizontalGridCell cell;
-		cell.cell_parent_vertically_stretches_to_grid = true;
-		cell.node = sprite;
-		
-		return cell;
+		return sprite;
 	};
 
 	std::wregex icon_tag(LR"(^<icon=([^>]+)>)");
@@ -1220,15 +1217,37 @@ void SceneHelpers::RichLabel::refresh()
 	std::wstring sublimed_text;
 	std::wsmatch match;
 
+	auto flushLabelText = [&] {
+		cells.push_back(createCell(createLabel(sublimed_text), false));
+		sublimed_text.clear();
+	};
+
 	auto text = mState.text;
 
+	auto insertCustomTags = [&] {
+		for (const auto& [name, callback] : mTags)
+		{
+			std::wregex tag(fmt::format(L"^<{}>", sky::StringToWstring(name)));
+			if (std::regex_search(text, match, tag))
+			{
+				flushLabelText();
+				cells.push_back(createCell(callback(), true));
+				text.erase(0, match.length());
+				return true;
+			}
+		}
+		return false;
+	};
+
 	while (!text.empty()) {
+		if (insertCustomTags())
+			continue;
+
 		if (std::regex_search(text, match, icon_tag))
 		{
-			cells.push_back(createLabelCell(sublimed_text));
-			sublimed_text.clear();
+			flushLabelText();
 			auto path = sky::WstringToString(match[1]);
-			cells.push_back(createSpriteCell(path));
+			cells.push_back(createCell(createSprite(path), true));
 			text.erase(0, match.length());
 		}
 		else {
@@ -1238,12 +1257,17 @@ void SceneHelpers::RichLabel::refresh()
 	}
 
 	if (!sublimed_text.empty())
-		cells.push_back(createLabelCell(sublimed_text));
+		cells.push_back(createCell(createLabel(sublimed_text), false));
 
 	mContent = MakeHorizontalGrid(cells);
 	mContent->setAnchor(0.5f);
 	mContent->setPivot(0.5f);
 	attach(mContent);
+}
+
+void SceneHelpers::RichLabel::setTag(const std::string& name, std::function<std::shared_ptr<Scene::Node>()> callback)
+{
+	mTags[name] = callback;
 }
 
 bool SceneHelpers::ImScene::IsMouseHovered(const Scene::Scene& scene, Scene::Node& node)

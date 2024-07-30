@@ -697,6 +697,8 @@ namespace Shared::SceneHelpers
 	public:
 		const auto& getText() const { return mState.text; }
 		void setText(std::wstring text) { mState.text = std::move(text); }
+		
+		void setTag(const std::string& name, std::function<std::shared_ptr<Scene::Node>()> callback);
 
 	private:
 		struct State
@@ -707,6 +709,7 @@ namespace Shared::SceneHelpers
 		State mState;
 		State mPrevState;
 		std::shared_ptr<Scene::Node> mContent;
+		std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>()>> mTags;
 	};
 
 	namespace ImScene
