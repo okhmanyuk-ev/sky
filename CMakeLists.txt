@@ -14,102 +14,14 @@ endif()
 
 set(LIBS_FOLDER "libs")
 
-file(GLOB CORE_SRC
-    src/core/*.cpp
-    src/core/*.h
+file(GLOB_RECURSE ALL_SRC
+	src/**/*.cpp
+	src/**/*.h
 )
 
-file(GLOB CONSOLE_SRC
-    src/console/*.cpp
-    src/console/*.h
-)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src FILES ${ALL_SRC})
 
-file(GLOB COMMON_SRC
-    src/common/*.cpp
-    src/common/*.h
-)
-
-file(GLOB PLATFORM_SRC
-	src/platform/*.cpp
-	src/platform/*.mm
-    src/platform/*.h
-)
-
-file(GLOB GRAPHICS_SRC
-    src/graphics/*.cpp
-    src/graphics/*.h
-)
-
-file(GLOB RENDERER_SRC
-	src/renderer/*.cpp
-	src/renderer/*.mm
-    src/renderer/*.h
-)
-
-file (GLOB RENDERER_SHADERS_SRC
-	src/renderer/shaders/*.cpp
-    src/renderer/shaders/*.h
-)
-
-file(GLOB AUDIO_SRC
-	src/audio/*.cpp
-	src/audio/*.h
-)
-
-file(GLOB SCENE_SRC
-    src/scene/*.cpp
-    src/scene/*.h
-)
-
-file(GLOB SCENE3D_SRC
-    src/scene3d/*.cpp
-    src/scene3d/*.h
-)
-
-file(GLOB IMSCENE_SRC
-    src/imscene/*.cpp
-    src/imscene/*.h
-)
-
-file(GLOB SHARED_SRC
-    src/shared/*.cpp
-    src/shared/*.h
-)
-
-file(GLOB NETWORK_SRC
-    src/network/*.cpp
-    src/network/*.h
-)
-
-source_group("core" FILES ${CORE_SRC})
-source_group("console" FILES ${CONSOLE_SRC})
-source_group("common" FILES ${COMMON_SRC})
-source_group("platform" FILES ${PLATFORM_SRC})
-source_group("graphics" FILES ${GRAPHICS_SRC})
-source_group("renderer" FILES ${RENDERER_SRC})
-source_group("renderer\\shaders" FILES ${RENDERER_SHADERS_SRC})
-source_group("audio" FILES ${AUDIO_SRC})
-source_group("scene" FILES ${SCENE_SRC})
-source_group("scene3d" FILES ${SCENE3D_SRC})
-source_group("imscene" FILES ${IMSCENE_SRC})
-source_group("shared" FILES ${SHARED_SRC})
-source_group("network" FILES ${NETWORK_SRC})
-
-add_library(${PROJECT_NAME} STATIC
-	${CORE_SRC}
-	${CONSOLE_SRC}
-	${COMMON_SRC}
-	${PLATFORM_SRC}
-	${GRAPHICS_SRC}
-	${RENDERER_SRC}
-	${RENDERER_SHADERS_SRC}
-	${AUDIO_SRC}
-	${SCENE_SRC}
-	${SCENE3D_SRC}
-	${IMSCENE_SRC}
-	${SHARED_SRC}
-	${NETWORK_SRC}
-)
+add_library(${PROJECT_NAME} STATIC ${ALL_SRC})
 
 if(MSVC)
 	target_compile_options(${PROJECT_NAME} PUBLIC /MP) # multicore compile
@@ -247,7 +159,7 @@ if(WIN32)
 elseif(ANDROID)
 	add_library(fmod SHARED IMPORTED)
 	add_library(fmodstudio SHARED IMPORTED)
-	
+
 	set_target_properties(fmod PROPERTIES IMPORTED_LOCATION
 		${PROJECT_SOURCE_DIR}/lib/fmod/android/${ANDROID_ABI}/libfmod.so)
 
@@ -267,7 +179,7 @@ elseif(APPLE)
 		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudio_iphonesimulator.a)
 		target_link_libraries(${PROJECT_NAME} optimized ${PROJECT_SOURCE_DIR}/lib/fmod/ios/libfmodstudio_iphoneos.a)
 	else()
-		# TODO: implement for mac	
+		# TODO: implement for mac
 	endif()
 endif()
 
@@ -312,12 +224,12 @@ endfunction()
 
 # imgui
 
-file(GLOB IMGUI_SRC 
-	lib/imgui/*.cpp 
+file(GLOB IMGUI_SRC
+	lib/imgui/*.cpp
 	lib/imgui/*.h
-	lib/imgui/misc/cpp/*.cpp 
+	lib/imgui/misc/cpp/*.cpp
 	lib/imgui/misc/cpp/*.h
-)	
+)
 add_library(imgui STATIC ${IMGUI_SRC})
 target_include_directories(imgui PUBLIC lib/imgui)
 target_include_directories(imgui PUBLIC lib/imgui/misc/cpp)
@@ -337,9 +249,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC lib/nlohmann_json)
 # tinyobjloader
 
 file(GLOB TINYOBJLOADER_SRC
-	lib/tinyobjloader/*.cc 
+	lib/tinyobjloader/*.cc
 	lib/tinyobjloader/*.h
-)	
+)
 target_include_directories(${PROJECT_NAME} PUBLIC lib/tinyobjloader)
 add_library(tinyobjloader STATIC ${TINYOBJLOADER_SRC})
 target_link_libraries(${PROJECT_NAME} tinyobjloader)
