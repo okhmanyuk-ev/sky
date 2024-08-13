@@ -12,11 +12,11 @@ ImguiSystem::ImguiSystem()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	
+
 	auto& io = ImGui::GetIO();
 
 	io.IniFilename = NULL;
-	
+
 	using Platform::Input::Keyboard::Key;
 	io.KeyMap[ImGuiKey_Tab] = static_cast<int>(Key::Tab);
 	io.KeyMap[ImGuiKey_LeftArrow] = static_cast<int>(Key::Left);
@@ -56,7 +56,7 @@ void ImguiSystem::begin()
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.DeltaTime = Clock::ToSeconds(FRAME->getTimeDelta());
-	
+
 	io.DisplaySize.x = getLogicalWidth();
 	io.DisplaySize.y = getLogicalHeight();
 
@@ -75,7 +75,7 @@ void ImguiSystem::begin()
 		PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::RightAlt);
 
 	mMouseWheel = { 0.0f, 0.0f };
-	
+
 	ImGui::NewFrame();
 
 	for (auto key : mReleasedKeyboardKeys)
@@ -96,7 +96,7 @@ void ImguiSystem::end()
 	GRAPHICS->begin();
 	GRAPHICS->pushSampler(mSampler);
 	GRAPHICS->pushOrthoMatrix(getLogicalWidth(), getLogicalHeight());
-	
+
 	auto drawData = ImGui::GetDrawData();
 	drawData->ScaleClipRects({ PLATFORM->getScale() * getScale(), PLATFORM->getScale() * getScale() });
 
@@ -121,7 +121,7 @@ void ImguiSystem::end()
 
 					for (uint32_t i = index_offset; i < index_offset + cmd.ElemCount; i++)
 					{
-						const auto& v = cmds->VtxBuffer[cmds->IdxBuffer[i]];	
+						const auto& v = cmds->VtxBuffer[cmds->IdxBuffer[i]];
 						mesh_builder.vertex({
 							.pos = { v.pos.x, v.pos.y, 0.0f },
 							.color = glm::unpackUnorm4x8(v.col),
@@ -136,16 +136,16 @@ void ImguiSystem::end()
 			index_offset += cmd.ElemCount;
 		}
 	}
-	
+
 	GRAPHICS->pop(2);
 	GRAPHICS->end();
 }
 
-void ImguiSystem::ensureFont() 
+void ImguiSystem::ensureFont()
 {
 	auto& io = ImGui::GetIO();
-	
-	if (io.Fonts->IsBuilt()) 
+
+	if (io.Fonts->IsBuilt())
 		return;
 
 	uint8_t* data;

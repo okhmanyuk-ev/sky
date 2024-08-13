@@ -57,9 +57,9 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 
 	float x_scale;
 	float y_scale;
-	
+
 	glfwGetWindowContentScale((GLFWwindow*)mWindow, &x_scale, &y_scale);
-	
+
 	gScale = std::fmaxf(x_scale, y_scale);
 
 	auto monitor = glfwGetPrimaryMonitor();
@@ -81,11 +81,11 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 
 	double mouse_x;
 	double mouse_y;
-	
+
 	glfwGetCursorPos((GLFWwindow*)mWindow, &mouse_x, &mouse_y);
-	
+
 	mCursorPos = { (int)(mouse_x * gScale), (int)(mouse_y * gScale) };
-	
+
 	gContext = this;
 }
 
@@ -178,7 +178,7 @@ bool SystemGlfw::isKeyPressed(Input::Keyboard::Key key) const
 		{ Input::Keyboard::Key::PrintScreen, GLFW_KEY_PRINT_SCREEN },
 		{ Input::Keyboard::Key::Insert, GLFW_KEY_INSERT },
 		{ Input::Keyboard::Key::Delete, GLFW_KEY_DELETE },
-		
+
 		{ Input::Keyboard::Key::A, GLFW_KEY_A },
 		{ Input::Keyboard::Key::B, GLFW_KEY_B },
 		{ Input::Keyboard::Key::C, GLFW_KEY_C },
@@ -339,7 +339,7 @@ static void MouseButtonCallback(GLFWwindow* window, int button, int action, int 
 		{ GLFW_REPEAT, Input::Mouse::ButtonEvent::Type::Pressed },
 		{ GLFW_RELEASE, Input::Mouse::ButtonEvent::Type::Released },
 	};
-	
+
 	static const std::unordered_map<int, Input::Mouse::Button> ButtonMap = {
 		{ GLFW_MOUSE_BUTTON_LEFT, Input::Mouse::Button::Left },
 		{ GLFW_MOUSE_BUTTON_MIDDLE, Input::Mouse::Button::Middle },
@@ -389,7 +389,7 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		{ GLFW_KEY_PRINT_SCREEN, Input::Keyboard::Key::PrintScreen },
 		{ GLFW_KEY_INSERT, Input::Keyboard::Key::Insert },
 		{ GLFW_KEY_DELETE, Input::Keyboard::Key::Delete },
-		
+
 		{ GLFW_KEY_A, Input::Keyboard::Key::A },
 		{ GLFW_KEY_B, Input::Keyboard::Key::B },
 		{ GLFW_KEY_C, Input::Keyboard::Key::C },
@@ -463,10 +463,10 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		return;
 
 	Input::Keyboard::Event e;
-	
+
 	e.type = TypeMap.at(action);
 	e.key = KeyMap.at(key);
-	
+
 	EVENT->emit(e);
 }
 

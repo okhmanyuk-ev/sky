@@ -40,7 +40,7 @@ namespace Shared
 
 	private:
 		static inline Core::Engine Engine;
-	
+
 	public:
 		Application(const std::string& appname, const Flags& flags = {});
 		~Application();

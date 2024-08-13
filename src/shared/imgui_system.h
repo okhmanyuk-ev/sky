@@ -34,9 +34,9 @@ namespace Shared
 
 	public:
 		void begin();
-		void end();	
+		void end();
 		void ensureFont();
-		
+
 	public:
 		auto getSampler() const { return mSampler; }
 		void setSampler(skygfx::Sampler value) { mSampler = value; }
@@ -55,7 +55,7 @@ namespace Shared
 		bool mScaleIndependence = false;
 		glm::vec2 mLogicalSize = { 0.0f, 0.0f };
 
-	private:	
+	private:
 		void onEvent(const Platform::Input::Keyboard::Event& e) override;
 		void onEvent(const Platform::Input::Keyboard::CharEvent& e) override;
 		void onEvent(const Platform::Input::Mouse::ButtonEvent& e) override;

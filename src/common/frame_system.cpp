@@ -12,16 +12,16 @@ void FrameSystem::add(StatusCallback callback)
 void FrameSystem::addInfinity(Callback callback)
 {
 	add([callback] {
-		callback(); 
+		callback();
 		return Status::Continue;
 	});
 }
 
 void FrameSystem::addOne(Callback callback)
 {
-	add([callback] { 
+	add([callback] {
 		callback();
-		return Status::Finished; 
+		return Status::Finished;
 	});
 }
 
@@ -88,9 +88,9 @@ void FrameSystem::frame()
 FrameSystem::Frameable::Frameable()
 {
 	FRAME->add([this, finished = mFinished] {
-		if (*finished) 
+		if (*finished)
 			return Status::Finished;
-		
+
 		onFrame();
 		return Status::Continue;
 	});
@@ -103,14 +103,13 @@ FrameSystem::Frameable::~Frameable()
 
 FrameSystem::Framer::Framer(Callback callback) : Frameable(),
 	mCallback(callback)
-{ 
-	//
+{
 }
 
 void FrameSystem::Framer::onFrame()
 {
 	if (mCallback == nullptr)
 		return;
-	
+
 	mCallback();
 }

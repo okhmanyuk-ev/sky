@@ -61,7 +61,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		PLATFORM->quit();
 	});
 
-#if defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_EMSCRIPTEN)
 	IMGUI_SYSTEM->setScaleIndependence(true);
 #endif
 
@@ -77,7 +77,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		ENGINE->addSystem<Shared::SceneManager>(std::make_shared<Shared::SceneManager>());
 		mScene->getRoot()->attach(SCENE_MANAGER);
 
-		auto getter = [this] { 
+		auto getter = [this] {
 			auto fps = 1.0f / Clock::ToSeconds(mScene->getTimestepFixer().getTimestep());
 			return std::vector<std::string>({ std::to_string(fps) });
 		};
@@ -134,7 +134,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 			if (CON_ARG_EXIST(0))
 				intensity = CON_ARG_FLOAT(0);
-			
+
 			bool outlined = true;
 
 			if (CON_ARG_EXIST(1))
@@ -217,7 +217,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 			sky::Log("fetching {}", url);
 #endif
-		});		
+		});
 	}
 
 #if defined(BUILD_DEVELOPER)
@@ -266,12 +266,16 @@ Application::~Application()
 	//	ENGINE->removeSystem<Common::EventSystem>(); // should be removed later
 }
 
-std::function<bool()> frame_func;
-void frame() { frame_func(); }
+static std::function<bool()> gFrameFunc;
+
+static void Frame()
+{
+	gFrameFunc();
+}
 
 void Application::run()
 {
-	frame_func = [&]{
+	gFrameFunc = [&]{
 		PLATFORM->process();
 
 		if (PLATFORM->isFinished())
@@ -292,11 +296,11 @@ void Application::run()
 	};
 
 #ifdef EMSCRIPTEN
-	emscripten_set_main_loop(frame, 0, 1);
+	emscripten_set_main_loop(Frame, 0, 1);
 #else
 	while (true)
 	{
-		if (!frame_func())
+		if (!gFrameFunc())
 			break;
 	}
 #endif

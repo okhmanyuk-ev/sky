@@ -175,14 +175,14 @@ void ConsoleDevice::onFrame()
 	ImGui::EndChild();
 
 	static auto filterLetters = [](ImGuiInputTextCallbackData* data) {
-		auto thiz = (ConsoleDevice*)data->UserData;
+		auto self = (ConsoleDevice*)data->UserData;
 		if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackCompletion)
 		{
-			thiz->handleInputCompletion(data);
+			self->handleInputCompletion(data);
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackHistory)
 		{
-			thiz->handleInputHistory(data);
+			self->handleInputHistory(data);
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackCharFilter)
 		{
@@ -195,14 +195,14 @@ void ConsoleDevice::onFrame()
 			if (data->EventChar == '~')
 				return 1;
 
-			thiz->mInputState = InputState::Text;
+			self->mInputState = InputState::Text;
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackAlways)
 		{
-			if (thiz->mNeedToComplete)
+			if (self->mNeedToComplete)
 			{
-				thiz->handleInputCompletion(data);
-				thiz->mNeedToComplete = false;
+				self->handleInputCompletion(data);
+				self->mNeedToComplete = false;
 			}
 		}
 
