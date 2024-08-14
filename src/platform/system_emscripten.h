@@ -62,6 +62,9 @@ namespace Platform
 
 		void* getWindow() const override;
 
+		std::string getClipboardText() const override;
+		void setClipboardText(const std::string& text) override;
+
 	private:
 		std::string mAppName;
 		float mScale = 1.0f;

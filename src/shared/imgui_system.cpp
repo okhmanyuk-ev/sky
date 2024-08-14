@@ -15,6 +15,15 @@ ImguiSystem::ImguiSystem()
 
 	auto& io = ImGui::GetIO();
 
+	io.SetClipboardTextFn = [](void* userdata, const char* text) {
+		PLATFORM->setClipboardText(text);
+	};
+	io.GetClipboardTextFn = [](void* userdata) -> const char* {
+		static std::string text;
+		text = PLATFORM->getClipboardText();
+		return text.c_str();
+	};
+
 	io.IniFilename = NULL;
 
 	using Platform::Input::Keyboard::Key;

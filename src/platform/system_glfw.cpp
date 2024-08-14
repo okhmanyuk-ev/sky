@@ -335,6 +335,16 @@ void* SystemGlfw::getWindow() const
 	return mNativeWindow;
 }
 
+std::string SystemGlfw::getClipboardText() const
+{
+	return std::string(glfwGetClipboardString(gWindow));
+}
+
+void SystemGlfw::setClipboardText(const std::string& text)
+{
+	glfwSetClipboardString(gWindow, text.c_str());
+}
+
 static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	static const std::unordered_map<int, Input::Mouse::ButtonEvent::Type> TypeMap = {

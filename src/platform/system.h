@@ -76,6 +76,9 @@ namespace Platform
 
 		virtual void* getWindow() const = 0;
 
+		virtual std::string getClipboardText() const = 0;
+		virtual void setClipboardText(const std::string& text) = 0;
+
 	public:
 		enum class HapticType
 		{

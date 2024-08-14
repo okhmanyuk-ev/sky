@@ -392,4 +392,14 @@ void* SystemEmscripten::getWindow() const
 	return gWindow;
 }
 
+std::string SystemEmscripten::getClipboardText() const
+{
+	return std::string(SDL_GetClipboardText());
+}
+
+void SystemEmscripten::setClipboardText(const std::string& text)
+{
+	SDL_SetClipboardText(text.c_str());
+}
+
 #endif
