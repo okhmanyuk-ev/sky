@@ -67,7 +67,6 @@ namespace Platform
 
 	private:
 		std::string mAppName;
-		void* mWindow = nullptr;
 		glm::ivec2 mCursorPos = { 0, 0 };
 		void* mNativeWindow = nullptr;
 	};

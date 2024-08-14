@@ -183,7 +183,7 @@ void ImguiSystem::onEvent(const Platform::Input::Keyboard::Event& e)
 void ImguiSystem::onEvent(const Platform::Input::Keyboard::CharEvent& e)
 {
 	auto& io = ImGui::GetIO();
-	io.AddInputCharactersUTF8((const char*)&e.codepoint);
+	io.AddInputCharacter(e.codepoint);
 }
 
 void ImguiSystem::onEvent(const Platform::Input::Mouse::ButtonEvent& e)

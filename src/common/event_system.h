@@ -56,8 +56,8 @@ namespace Common::Event
 		}
 
 	public:
-		auto getListenersCount() const 
-		{ 
+		auto getListenersCount() const
+		{
 			size_t result = 0;
 
 			for (const auto& [type, listeners] : mListeners)
@@ -65,7 +65,7 @@ namespace Common::Event
 				result += listeners.size();
 			}
 
-			return result; 
+			return result;
 		}
 
 	private:
@@ -75,15 +75,15 @@ namespace Common::Event
 	template <typename T> class Listenable
 	{
 	public:
-		Listenable() 
-		{ 
+		Listenable()
+		{
 			mHandle = EVENT->createListener<T>([this](const T& e) {
 				onEvent(e);
 			});
 		}
 
-		virtual ~Listenable() 
-		{ 
+		virtual ~Listenable()
+		{
 			EVENT->destroyListener<T>(mHandle);
 		}
 
@@ -113,7 +113,7 @@ namespace Common::Event
 
 	public:
 		void setCallback(Callback value) { mCallback = value; }
-		
+
 	private:
 		Callback mCallback = nullptr;
 	};

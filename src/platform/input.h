@@ -201,7 +201,7 @@ namespace Platform::Input
 			Type type;              ///< The event type
 			Key  key;               ///< The last key that was pressed/released
 		};
-		
+
 		struct CharEvent
 		{
 			char32_t codepoint;

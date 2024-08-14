@@ -299,7 +299,7 @@ void System::processConsoleCommand(std::vector<std::string> args)
 	if (mAliases.count(name) > 0)
 	{
 		known = true;
-		
+
 		if (args.size() == 0)
 			CONSOLE_DEVICE->writeLine(name + " = " + MakeStringFromTokens(mAliases.at(name)));
 		else
@@ -346,7 +346,7 @@ std::vector<std::string> System::dereferenceTokens(std::vector<std::string> toke
 			{
 				continue;
 			}
-			
+
 			tokens.erase(std::next(tokens.begin(), i));
 			tokens.insert(std::next(tokens.begin(), i), args.begin(), args.end());
 			dereferenced = true;

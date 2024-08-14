@@ -28,7 +28,7 @@ ConsoleDevice::ConsoleDevice()
 			return;
 
 		mButtonAttempts -= 1;
-		
+
 		sky::Log("console open attempt {}/{}", mButtonAttempts, MaxButtonAttempts);
 	});
 	mButtonTimer.setInterval(Clock::FromSeconds(1.0f));
@@ -72,7 +72,7 @@ void ConsoleDevice::onFrame()
 
 	if (mState == State::Closed)
 	{
-		if (mHiddenButtonEnabled) 
+		if (mHiddenButtonEnabled)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0001f);
 			ImGui::Begin("ConsoleButton", nullptr, ImGui::User::ImGuiWindowFlags_Overlay & ~ImGuiWindowFlags_NoInputs);
@@ -84,14 +84,14 @@ void ConsoleDevice::onFrame()
 				mButtonTimer.setPassed(Clock::Duration::zero());
 
 				sky::Log("console open attempt {}/{}", mButtonAttempts, MaxButtonAttempts);
-		
+
 				if (mButtonAttempts >= MaxButtonAttempts)
 				{
 					mButtonAttempts = 0;
 					toggle();
 				}
 			}
-		
+
 			ImGui::End();
 			ImGui::PopStyleVar(1);
 		}
@@ -102,7 +102,7 @@ void ConsoleDevice::onFrame()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
-	
+
 	auto& style = ImGui::GetStyle();
 
 	auto prevscrollsize = style.ScrollbarSize;
@@ -134,16 +134,16 @@ void ConsoleDevice::onFrame()
 		"Sky Engine",
 		std::string(__DATE__) + " " + std::string(__TIME__)
 	};
-	
+
 	auto backend_name = magic_enum::enum_name(skygfx::GetBackendType());
 	strings.push_back(std::string(backend_name));
-	
+
 	const float margin = 17.0f;
 
 	ImGui::SetCursorPosY(ImGui::GetCursorPos().y + ImGui::User::GetSafeAreaTop());
 
 	auto savedCursor = ImGui::GetCursorPos();
-	
+
 	float base_x = ImGui::GetWindowWidth() - margin;
 
 	for (const auto& str : strings)
@@ -151,7 +151,7 @@ void ConsoleDevice::onFrame()
 		ImGui::SetCursorPosX(base_x - ImGui::CalcTextSize(str.c_str()).x);
 		ImGui::TextDisabled("%s", str.c_str());
 	}
-	
+
 	ImGui::SetCursorPos(savedCursor);
 
 	ImGui::BeginChild("ScrollingRegion", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), false);
@@ -270,7 +270,7 @@ void ConsoleDevice::showHints(float height, float top)
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
 	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, IMGUI_SYSTEM->getLogicalHeight() - height - top - 10));
-	
+
 	ImGui::Begin("ConsoleHints", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel & ~ImGuiWindowFlags_NoBringToFrontOnFocus);
 	ImGui::SetWindowPos(ImVec2(8 + PLATFORM->getSafeAreaLeftMargin(), 4 + top + height));
 
@@ -335,7 +335,7 @@ void ConsoleDevice::showFastLogs()
 
 	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), 0));
 	ImGui::SetWindowPos(ImGui::User::BottomLeftCorner(0.0f));
-	
+
 	auto now = Clock::Now();
 
 	for (int i = 0; i < mBuffer.size(); i++)
@@ -383,7 +383,7 @@ void ConsoleDevice::showCloseButton(float pos_y)
 	mCheckMouseForClose = false;
 
 	ImGui::End();
-	
+
 	ImGui::PopStyleVar(3);
 }
 
@@ -466,7 +466,7 @@ void ConsoleDevice::enterInput()
 	else
 	{
 		auto line = std::string(mInputText);
-		
+
 		auto trim = [](std::string str) {
 			while (str.starts_with(" "))
 				str = str.substr(1);
@@ -520,7 +520,7 @@ void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardTextChanged& 
 {
 	if (!isOpened())
 		return;
-	
+
 	mInputText = e.text;
 	mInputState = InputState::Text;
 }
@@ -546,7 +546,7 @@ void ConsoleDevice::handleInputCompletion(ImGuiInputTextCallbackData* data)
 		mInputState = InputState::Text;
 		return; // whole string is already written, do not replace it
 	}
-	
+
 	strcpy(data->Buf, hint_str.c_str());
 	data->CursorPos = data->SelectionStart = data->SelectionEnd = data->BufTextLen = static_cast<int>(hint_str.size());
 	data->BufDirty = true;
@@ -626,7 +626,7 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 {
 	if (match.empty())
 		return {};
-		
+
 	auto lowercase_match = match;
 
 	std::transform(lowercase_match.begin(), lowercase_match.end(), lowercase_match.begin(), tolower);
@@ -659,7 +659,7 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 			.description = command.getDescription(),
 			.args = command.getArgsAsString()
 		};
-		
+
 		result.push_back(hint);
 	}
 
@@ -674,14 +674,14 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 			.description = "alias",
 			.args = Console::System::MakeStringFromTokens(value)
 		};
-		
+
 		result.push_back(hint);
 	}
 
 	std::sort(result.begin(), result.end(), [](const Hint& left, const Hint& right) {
 		return left.name < right.name;
 	});
-	
+
 	if (result.empty())
 	{
 		return getHints(match.substr(0, match.length() - 1));

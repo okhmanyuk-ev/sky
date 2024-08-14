@@ -10,7 +10,7 @@
 using namespace Platform;
 
 static SystemEmscripten* gContext = nullptr;
-SDL_Window* gWindow = nullptr;
+static SDL_Window* gWindow = nullptr;
 
 int main(int argc, char* argv[])
 {
@@ -133,7 +133,7 @@ void SystemEmscripten::process()
 				{ SDLK_PRINTSCREEN, Input::Keyboard::Key::PrintScreen },
 				{ SDLK_INSERT, Input::Keyboard::Key::Insert },
 				{ SDLK_DELETE, Input::Keyboard::Key::Delete },
-				
+
 				{ SDLK_a, Input::Keyboard::Key::A },
 				{ SDLK_b, Input::Keyboard::Key::B },
 				{ SDLK_c, Input::Keyboard::Key::C },
@@ -260,7 +260,7 @@ bool SystemEmscripten::isKeyPressed(Input::Keyboard::Key key) const
 		{ Input::Keyboard::Key::PrintScreen, SDLK_PRINTSCREEN },
 		{ Input::Keyboard::Key::Insert, SDLK_INSERT },
 		{ Input::Keyboard::Key::Delete, SDLK_DELETE },
-		
+
 		{ Input::Keyboard::Key::A, SDLK_a },
 		{ Input::Keyboard::Key::B, SDLK_b },
 		{ Input::Keyboard::Key::C, SDLK_c },

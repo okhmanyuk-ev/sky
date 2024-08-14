@@ -44,7 +44,7 @@ namespace Platform
 
 		virtual float getScale() const = 0;
 		virtual void setScale(float value) = 0;
-        
+
         virtual float getSafeAreaTopMargin() const = 0;
         virtual float getSafeAreaBottomMargin() const = 0;
         virtual float getSafeAreaLeftMargin() const = 0;
@@ -69,7 +69,7 @@ namespace Platform
 
 		virtual std::string getVirtualKeyboardText() const = 0;
 		virtual void setVirtualKeyboardText(const std::string& text) = 0;
-        
+
         virtual std::string getUUID() const = 0;
 
 		virtual void alert(const std::string& text) { };

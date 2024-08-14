@@ -15,7 +15,7 @@
 
 using namespace Platform;
 
-static SystemGlfw* gContext = nullptr;
+static GLFWwindow* gWindow = nullptr;
 static int gWidth = 800;
 static int gHeight = 600;
 static float gScale = 1.0f;
@@ -47,18 +47,18 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-	mWindow = glfwCreateWindow(gWidth, gHeight, appname.c_str(), NULL, NULL);
+	gWindow = glfwCreateWindow(gWidth, gHeight, appname.c_str(), NULL, NULL);
 
 #if defined(PLATFORM_WINDOWS)
-	mNativeWindow = glfwGetWin32Window((GLFWwindow*)mWindow);
+	mNativeWindow = glfwGetWin32Window(gWindow);
 #elif defined(PLATFORM_MAC)
-	mNativeWindow = glfwGetCocoaWindow((GLFWwindow*)mWindow);
+	mNativeWindow = glfwGetCocoaWindow(gWindow);
 #endif
 
 	float x_scale;
 	float y_scale;
 
-	glfwGetWindowContentScale((GLFWwindow*)mWindow, &x_scale, &y_scale);
+	glfwGetWindowContentScale(gWindow, &x_scale, &y_scale);
 
 	gScale = std::fmaxf(x_scale, y_scale);
 
@@ -73,25 +73,23 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	window_pos_y /= gScale;
 #endif
 
-	glfwSetWindowPos((GLFWwindow*)mWindow, (int)window_pos_x, (int)window_pos_y);
+	glfwSetWindowPos(gWindow, (int)window_pos_x, (int)window_pos_y);
 
 	resize(gWidth, gHeight);
 
-	glfwSetMouseButtonCallback((GLFWwindow*)mWindow, MouseButtonCallback);
-	glfwSetKeyCallback((GLFWwindow*)mWindow, KeyCallback);
-	glfwSetCharCallback((GLFWwindow*)mWindow, CharCallback);
-	glfwSetScrollCallback((GLFWwindow*)mWindow, ScrollCallback);
-	glfwSetWindowSizeCallback((GLFWwindow*)mWindow, WindowSizeCallback);
-	glfwSetFramebufferSizeCallback((GLFWwindow*)mWindow, FramebufferSizeCallback);
+	glfwSetMouseButtonCallback(gWindow, MouseButtonCallback);
+	glfwSetKeyCallback(gWindow, KeyCallback);
+	glfwSetCharCallback(gWindow, CharCallback);
+	glfwSetScrollCallback(gWindow, ScrollCallback);
+	glfwSetWindowSizeCallback(gWindow, WindowSizeCallback);
+	glfwSetFramebufferSizeCallback(gWindow, FramebufferSizeCallback);
 
 	double mouse_x;
 	double mouse_y;
 
-	glfwGetCursorPos((GLFWwindow*)mWindow, &mouse_x, &mouse_y);
+	glfwGetCursorPos(gWindow, &mouse_x, &mouse_y);
 
 	mCursorPos = { (int)(mouse_x * gScale), (int)(mouse_y * gScale) };
-
-	gContext = this;
 }
 
 SystemGlfw::~SystemGlfw()
@@ -105,7 +103,7 @@ void SystemGlfw::process()
 
 	double mouse_x;
 	double mouse_y;
-	glfwGetCursorPos((GLFWwindow*)mWindow, &mouse_x, &mouse_y);
+	glfwGetCursorPos(gWindow, &mouse_x, &mouse_y);
 
 	auto mouse_x_i = static_cast<int>(mouse_x);
 	auto mouse_y_i = static_cast<int>(mouse_y);
@@ -126,12 +124,12 @@ void SystemGlfw::process()
 
 void SystemGlfw::quit()
 {
-	glfwSetWindowShouldClose((GLFWwindow*)mWindow, true);
+	glfwSetWindowShouldClose(gWindow, true);
 }
 
 bool SystemGlfw::isFinished() const
 {
-	return glfwWindowShouldClose((GLFWwindow*)mWindow);
+	return glfwWindowShouldClose(gWindow);
 }
 
 int SystemGlfw::getWidth() const
@@ -243,7 +241,7 @@ bool SystemGlfw::isKeyPressed(Input::Keyboard::Key key) const
 	};
 
 	auto button = KeyMap.at(key);
-	auto state = glfwGetKey((GLFWwindow*)mWindow, button);
+	auto state = glfwGetKey(gWindow, button);
 
 	return state == GLFW_PRESS;
 }
@@ -257,7 +255,7 @@ bool SystemGlfw::isKeyPressed(Input::Mouse::Button key) const
 	};
 
 	auto button = ButtonMap.at(key);
-	auto state = glfwGetMouseButton((GLFWwindow*)mWindow, button);
+	auto state = glfwGetMouseButton(gWindow, button);
 
 	return state == GLFW_PRESS;
 }
@@ -267,7 +265,7 @@ void SystemGlfw::resize(int width, int height)
 	int pos_x;
 	int pos_y;
 
-	glfwGetWindowPos((GLFWwindow*)mWindow, &pos_x, &pos_y);
+	glfwGetWindowPos(gWindow, &pos_x, &pos_y);
 	auto w_delta = gWidth - width;
 	auto h_delta = gHeight - height;
 
@@ -281,28 +279,28 @@ void SystemGlfw::resize(int width, int height)
 	height /= gScale;
 #endif
 
-	glfwSetWindowPos((GLFWwindow*)mWindow, int(pos_x + x_offset), int(pos_y + y_offset));
-	glfwSetWindowSize((GLFWwindow*)mWindow, width, height);
+	glfwSetWindowPos(gWindow, int(pos_x + x_offset), int(pos_y + y_offset));
+	glfwSetWindowSize(gWindow, width, height);
 }
 
 void SystemGlfw::setTitle(const std::string& text)
 {
-	glfwSetWindowTitle((GLFWwindow*)mWindow, text.c_str());
+	glfwSetWindowTitle(gWindow, text.c_str());
 }
 
 void SystemGlfw::hideCursor()
 {
-	glfwSetInputMode((GLFWwindow*)mWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void SystemGlfw::showCursor()
 {
-	glfwSetInputMode((GLFWwindow*)mWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void SystemGlfw::setCursorPos(int x, int y)
 {
-	glfwSetCursorPos((GLFWwindow*)mWindow, (double)x, (double)y);
+	glfwSetCursorPos(gWindow, (double)x, (double)y);
 }
 
 std::optional<glm::ivec2> SystemGlfw::getCursorPos() const
