@@ -65,8 +65,13 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	auto monitor = glfwGetPrimaryMonitor();
 	auto video_mode = glfwGetVideoMode(monitor);
 
-	auto window_pos_x = (video_mode->width / 2 ) - (gWidth / 2) / gScale;
-	auto window_pos_y = (video_mode->height / 2) - (gHeight / 2) / gScale;
+	auto window_pos_x = (video_mode->width / 2) - (gWidth / 2);
+	auto window_pos_y = (video_mode->height / 2) - (gHeight / 2);
+
+#if defined(PLATFORM_MAC)
+	window_pos_x /= gScale;
+	window_pos_y /= gScale;
+#endif
 
 	glfwSetWindowPos((GLFWwindow*)mWindow, (int)window_pos_x, (int)window_pos_y);
 
@@ -100,15 +105,13 @@ void SystemGlfw::process()
 
 	double mouse_x;
 	double mouse_y;
-
 	glfwGetCursorPos((GLFWwindow*)mWindow, &mouse_x, &mouse_y);
 
+	auto mouse_x_i = static_cast<int>(mouse_x);
+	auto mouse_y_i = static_cast<int>(mouse_y);
 #if defined(PLATFORM_MAC)
-	auto mouse_x_i = (int)(mouse_x * gScale);
-	auto mouse_y_i = (int)(mouse_y * gScale);
-#elif defined(PLATFORM_WINDOWS)
-	auto mouse_x_i = (int)mouse_x;
-	auto mouse_y_i = (int)mouse_y;
+	mouse_x_i *= gScale;
+	mouse_y_i *= gScale;
 #endif
 
 	if (mouse_x_i != mCursorPos.x || mouse_y_i != mCursorPos.y)
@@ -263,20 +266,22 @@ void SystemGlfw::resize(int width, int height)
 {
 	int pos_x;
 	int pos_y;
-	
+
 	glfwGetWindowPos((GLFWwindow*)mWindow, &pos_x, &pos_y);
-	
 	auto w_delta = gWidth - width;
 	auto h_delta = gHeight - height;
-	
-	auto x_offset = w_delta / 2 / gScale;
-	auto y_offset = h_delta / 2 / gScale;
-	
+
+	auto x_offset = w_delta / 2;
+	auto y_offset = h_delta / 2;
+
+#if defined(PLATFORM_MAC)
+	x_offset /= gScale;
+	y_offset /= gScale;
+	width /= gScale;
+	height /= gScale;
+#endif
+
 	glfwSetWindowPos((GLFWwindow*)mWindow, int(pos_x + x_offset), int(pos_y + y_offset));
-
-	width = int(width / gScale);
-	height = int(height / gScale);
-
 	glfwSetWindowSize((GLFWwindow*)mWindow, width, height);
 }
 
@@ -484,17 +489,13 @@ static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 #if defined(PLATFORM_MAC)
 	x *= gScale;
 	y *= gScale;
-
-	auto scroll_x = xoffset / gScale;
-	auto scroll_y = yoffset / gScale;
-#elif defined(PLATFORM_WINDOWS)
-	auto scroll_x = xoffset;
-	auto scroll_y = yoffset;
+	xoffset /= gScale;
+	yoffset /= gScale;
 #endif
 
  	EVENT->emit(Input::Mouse::ScrollEvent{
  		.pos = { x, y },
- 		.scroll = { scroll_x, scroll_y }
+ 		.scroll = { xoffset, yoffset }
 	});
 }
 
