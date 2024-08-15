@@ -109,7 +109,7 @@ void ConsoleDevice::onFrame()
 
 	style.ScrollbarSize = 2;
 
-	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoDecoration);
+	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
 	auto bg_width = IMGUI_SYSTEM->getLogicalWidth();
 
@@ -370,7 +370,7 @@ void ConsoleDevice::showCloseButton(float pos_y)
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
 
-	ImGui::Begin("ConsoleCloseButton", nullptr, ImGuiWindowFlags_NoDecoration);
+	ImGui::Begin("ConsoleCloseButton", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 	ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10.0f - PLATFORM->getSafeAreaRightMargin(), pos_y + 4.0f));
 
 	ImGui::Button("Close");
