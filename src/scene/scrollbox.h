@@ -20,7 +20,7 @@ namespace Scene
 
 	private:
 		glm::vec2 mPrevPosition = { 0.0f, 0.0f };
-		
+
 	public:
 		glm::vec2 screenToScrollPosition(const glm::vec2& projected_screen_pos);
 

@@ -78,7 +78,7 @@ namespace Scene
 
 		auto getX() const { return mPosition.x; }
 		void setX(float value) { mPosition.x = value; }
-		
+
 		auto getY() const { return mPosition.y; }
 		void setY(float value) { mPosition.y = value; }
 
@@ -114,7 +114,7 @@ namespace Scene
 
 		auto getHorizontalPivot() const { return mPivot.x; }
 		void setHorizontalPivot(float value) { mPivot.x = value; }
-	
+
 		auto getVerticalPivot() const { return mPivot.y; }
 		void setVerticalPivot(float value) { mPivot.y = value; }
 

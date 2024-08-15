@@ -15,11 +15,12 @@ endif()
 set(LIBS_FOLDER "libs")
 
 file(GLOB_RECURSE ALL_SRC
-	src/**/*.cpp
-	src/**/*.h
+	src/*.cpp
+	src/*.hpp
+	src/*.h
 )
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src FILES ${ALL_SRC})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ALL_SRC})
 
 add_library(${PROJECT_NAME} STATIC ${ALL_SRC})
 
@@ -84,7 +85,7 @@ elseif(EMSCRIPTEN)
 	)
 	target_compile_options(${PROJECT_NAME} PUBLIC
 		-sUSE_SDL=2
-		-sNO_DISABLE_EXCEPTION_CATCHING
+		-sNO_DISABLE_EXCEPTION_CATCHING=1
 		-sDISABLE_EXCEPTION_THROWING=0
 	)
 	target_link_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,

@@ -90,7 +90,7 @@ namespace Shared::SceneHelpers
 			if (isActive())
 			{
 				executeCallback(mActiveCallback);
-				sky::PlaySound(mActiveSound);				
+				sky::PlaySound(mActiveSound);
 				PLATFORM->haptic(Platform::System::HapticType::Medium);
 			}
 			else
@@ -146,9 +146,9 @@ namespace Shared::SceneHelpers
 
 	public:
 		void onChooseBegin() override
-		{	
+		{
 			T::onChooseBegin();
-			
+
 			if (mChooseAnimationProcessing)
 				return;
 
@@ -258,7 +258,6 @@ namespace Shared::SceneHelpers
 	template <typename T> class Backshaded : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-
 	protected:
 		void enterDraw() override
 		{
@@ -282,7 +281,6 @@ namespace Shared::SceneHelpers
 	template <typename T> class Frontshaded : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-
 	protected:
 		void leaveDraw() override
 		{
@@ -306,7 +304,6 @@ namespace Shared::SceneHelpers
 	template <typename T> class Outlined : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-
 	protected:
 		void leaveDraw() override
 		{
@@ -316,7 +313,6 @@ namespace Shared::SceneHelpers
 				return;
 
 			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
-			
 			GRAPHICS->pushModelMatrix(model);
 			GRAPHICS->drawLineRectangle(mOutlineColor->getColor());
 			GRAPHICS->pop();
@@ -336,7 +332,6 @@ namespace Shared::SceneHelpers
 	template <typename T> class MovableByHand : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-
 	public:
 		MovableByHand()
 		{
@@ -349,7 +344,7 @@ namespace Shared::SceneHelpers
 			T::touch(type, pos);
 
 			auto fixed_pos = pos;
-			
+
 			if (type != Scene::Node::Touch::Begin)
 				T::setPosition(T::getPosition() + T::unproject(fixed_pos) - T::unproject(mPrevPosition));
 
@@ -364,7 +359,6 @@ namespace Shared::SceneHelpers
 		public std::enable_shared_from_this<KillableByClick<T>>
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-
 	public:
 		KillableByClick()
 		{
@@ -400,7 +394,7 @@ namespace Shared::SceneHelpers
 
 	public:
 		void setScrollbox(std::weak_ptr<Scene::Scrollbox> value) { mScrollbox = value; }
-		
+
 		auto isHidingEnabled() const { return mHidingEnabled; }
 		void setHidingEnabled(bool value) { mHidingEnabled = value; }
 
@@ -463,7 +457,7 @@ namespace Shared::SceneHelpers
 			Gray
 		};
 
-		enum class ContentEffect 
+		enum class ContentEffect
 		{
 			Anchor,
 			Blur,
@@ -474,7 +468,7 @@ namespace Shared::SceneHelpers
 	public:
 		static const glm::vec2 inline StartContentAnchor = { 0.5f, -0.5f };
 		static const glm::vec2 inline StartContentScale = { 0.75f, 0.75f };
-		static const auto inline StartContentBlur = 1.0f;		
+		static const auto inline StartContentBlur = 1.0f;
 
 	public:
 		StandardWindow(const std::set<BackgroundEffect> background_effect = { BackgroundEffect::Fade }, 
@@ -546,10 +540,10 @@ namespace Shared::SceneHelpers
 		{
 			auto prev_transform = T::getTransform();
 			T::updateTransform();
-			
+
 			if (!mSmoothTransform)
 				return;
-			
+
 			auto now = FRAME->getUptime();
 			if (mPrevTransformTimepoint.has_value())
 			{
@@ -650,7 +644,6 @@ namespace Shared::SceneHelpers
 	template <class T> class StretchedToContent : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-
 	public:
 		void update(Clock::Duration delta) override
 		{
@@ -697,7 +690,7 @@ namespace Shared::SceneHelpers
 	public:
 		const auto& getText() const { return mState.text; }
 		void setText(std::wstring text) { mState.text = std::move(text); }
-		
+
 		void setTag(const std::string& name, std::function<std::shared_ptr<Scene::Node>()> callback);
 
 	private:

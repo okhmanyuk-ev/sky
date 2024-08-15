@@ -230,27 +230,33 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	STATS->setEnabled(false);
 #endif
 
-	FRAME->addOne([] {
-		const auto& args = PLATFORM->getArguments();
-		for (const auto& arg : args | std::views::drop(1))
-		{
-			auto tokens = CONSOLE->MakeTokensFromString(arg);
+	std::vector<std::string> startup_commands;
 
-			if (tokens.empty())
-				continue;
+	const auto& args = PLATFORM->getArguments();
+	for (const auto& arg : args | std::views::drop(1))
+	{
+		sky::Log(Console::Color::Gray, "processing argument: {}", arg);
+		auto tokens = CONSOLE->MakeTokensFromString(arg);
 
-			auto& cmd = tokens.at(0);
+		if (tokens.empty())
+			continue;
 
-			if (cmd.size() <= 1)
-				continue;
+		auto& cmd = tokens.at(0);
 
-			if (cmd.at(0) != '+')
-				continue;
+		if (cmd.size() <= 1)
+			continue;
 
-			cmd = cmd.substr(1);
+		if (cmd.at(0) != '+')
+			continue;
 
-			CONSOLE->execute(CONSOLE->MakeStringFromTokens(tokens));
-		}
+		cmd = cmd.substr(1);
+		auto final_cmd = CONSOLE->MakeStringFromTokens(tokens);
+		startup_commands.push_back(final_cmd);
+	}
+
+	FRAME->addOne([startup_commands] {
+		for (auto cmd : startup_commands)
+			CONSOLE->execute(cmd);
 	});
 }
 
@@ -289,16 +295,9 @@ Application::~Application()
 	//	ENGINE->removeSystem<Common::EventSystem>(); // should be removed later
 }
 
-static std::function<bool()> gFrameFunc;
-
-static void Frame()
-{
-	gFrameFunc();
-}
-
 void Application::run()
 {
-	gFrameFunc = [&]{
+	static auto frame = [&]{
 		PLATFORM->process();
 
 		if (PLATFORM->isFinished())
@@ -319,11 +318,11 @@ void Application::run()
 	};
 
 #ifdef EMSCRIPTEN
-	emscripten_set_main_loop(Frame, 0, 1);
+	emscripten_set_main_loop([] { frame(); }, 0, 1);
 #else
 	while (true)
 	{
-		if (!gFrameFunc())
+		if (!frame())
 			break;
 	}
 #endif

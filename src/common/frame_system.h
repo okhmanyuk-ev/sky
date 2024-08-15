@@ -15,7 +15,7 @@ namespace Common
 	public:
 		class Frameable;
 		class Framer;
-		
+
 	public:
 		enum class Status
 		{
@@ -26,7 +26,7 @@ namespace Common
 	public:
 		using Callback = std::function<void()>;
 		using StatusCallback = std::function<Status()>;
-		
+
 	public:
 		void frame();
 

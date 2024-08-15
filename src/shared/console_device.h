@@ -71,7 +71,7 @@ namespace Shared
 		void open();
 
 		bool isOpened() const override { return mState != State::Closed; }
-		
+
 		bool isEnabled() const override { return mEnabled; }
 		void setEnabled(bool value) override { mEnabled = value; }
 
@@ -92,10 +92,10 @@ namespace Shared
 		void onEvent(const TouchEmulator::Event& e) override;
 		void onEvent(const Platform::System::VirtualKeyboardTextChanged& e) override;
 		void onEvent(const Platform::System::VirtualKeyboardEnterPressed& e) override;
-		
+
 		void handleInputCompletion(ImGuiInputTextCallbackData* data);
 		void handleInputHistory(ImGuiInputTextCallbackData* data);
-	
+
 	private:
 		State mState = State::Closed;
 		std::string mInputText;
@@ -106,7 +106,7 @@ namespace Shared
 		Common::Interpolator mInterpolator;
 		bool mHiddenButtonEnabled = true;
 		bool mAtBottom = false;
-		
+
 	private:
 		struct Hint
 		{

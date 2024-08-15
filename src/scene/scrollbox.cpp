@@ -28,7 +28,7 @@ void Scrollbox::update(Clock::Duration dTime)
 	auto scroll_space = getScrollSpace();
 	auto overscroll_factor = 1.0f - (glm::abs(mOverscrollDistance) / getAbsoluteSize());
 	auto speed = mSpeed * mSensitivity / scroll_space * glm::pow3(overscroll_factor);
-	
+
 	if (glm::isnan(speed.x) || glm::isinf(speed.x))
 		speed.x = 0.0f;
 

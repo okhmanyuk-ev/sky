@@ -272,7 +272,7 @@ void System::processConsoleCommand(std::vector<std::string> args)
 
 	bool known = false;
 
-	if (mCVars.count(name) > 0)
+	if (mCVars.contains(name))
 	{
 		known = true;
 
@@ -285,7 +285,7 @@ void System::processConsoleCommand(std::vector<std::string> args)
 			CONSOLE_DEVICE->writeLine("Syntax: " + name + " " + cvar.getArgsAsString());
 	}
 
-	if (mCommands.count(name) > 0)
+	if (mCommands.contains(name))
 	{
 		known = true;
 
@@ -296,7 +296,7 @@ void System::processConsoleCommand(std::vector<std::string> args)
 			command.getCallback()(args);
 	}
 
-	if (mAliases.count(name) > 0)
+	if (mAliases.contains(name))
 	{
 		known = true;
 
@@ -334,11 +334,11 @@ std::vector<std::string> System::dereferenceTokens(std::vector<std::string> toke
 
 			auto args = std::vector<std::string>();
 
-			if (mCVars.count(name) > 0)
+			if (mCVars.contains(name))
 			{
 				args = mCVars.at(name).getGetter()();
 			}
-			else if (mAliases.count(name) > 0)
+			else if (mAliases.contains(name))
 			{
 				args = mAliases.at(name);
 			}
@@ -366,14 +366,14 @@ std::string CVar::getArgsAsString() const
 	std::string result = "";
 
 	if (mArguments.size() > 0)
-		result += "<" + std::accumulate(std::next(mArguments.begin()), mArguments.end(), *mArguments.begin(), 
+		result += "<" + std::accumulate(std::next(mArguments.begin()), mArguments.end(), *mArguments.begin(),
 			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
 
 	if (mArguments.size() > 0 && mOptionalArguments.size() > 0)
 		result += " ";
 
 	if (mOptionalArguments.size() > 0)
-		result += "(<" + std::accumulate(std::next(mOptionalArguments.begin()), mOptionalArguments.end(), *mOptionalArguments.begin(), 
+		result += "(<" + std::accumulate(std::next(mOptionalArguments.begin()), mOptionalArguments.end(), *mOptionalArguments.begin(),
 			[](const auto& a, const auto& b) { return a + ">) (<" + b; }) + ">)";
 
 	return result;
@@ -384,14 +384,14 @@ std::string Command::getArgsAsString() const
 	std::string result = "";
 
 	if (mArguments.size() > 0)
-		result += "<" + std::accumulate(std::next(mArguments.begin()), mArguments.end(), *mArguments.begin(), 
+		result += "<" + std::accumulate(std::next(mArguments.begin()), mArguments.end(), *mArguments.begin(),
 			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
 
 	if (mArguments.size() > 0 && mOptionalArguments.size() > 0)
 		result += " ";
 
 	if (mOptionalArguments.size() > 0)
-		result += "(<" + std::accumulate(std::next(mOptionalArguments.begin()), mOptionalArguments.end(), *mOptionalArguments.begin(), 
+		result += "(<" + std::accumulate(std::next(mOptionalArguments.begin()), mOptionalArguments.end(), *mOptionalArguments.begin(),
 			[](const auto& a, const auto& b) { return a + ">) (<" + b; }) + ">)";
 
 	return result;

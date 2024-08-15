@@ -73,7 +73,7 @@ namespace Console
 
 	public:
 		void registerCommand(const std::string& name, std::optional<std::string> description,
-			const std::vector<std::string>& args, const std::vector<std::string>& optional_args, 
+			const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 			Command::Callback callback);
 
 		void registerCommand(const std::string& name, std::optional<std::string> description,
@@ -91,16 +91,16 @@ namespace Console
 
 	public:
 		void registerCVar(const std::string& name, std::optional<std::string> description,
-			const std::vector<std::string>& args, const std::vector<std::string>& optional_args, 
+			const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 			CVar::Getter getter, CVar::Setter setter = nullptr);
 
-		void registerCVar(const std::string& name, const std::vector<std::string>& args, 
+		void registerCVar(const std::string& name, const std::vector<std::string>& args,
 			const std::vector<std::string>& optional_args, CVar::Getter getter, CVar::Setter setter = nullptr);
 
 		void registerCVar(const std::string& name, std::optional<std::string> description,
 			const std::vector<std::string>& args, CVar::Getter getter, CVar::Setter setter = nullptr);
 
-		void registerCVar(const std::string& name, const std::vector<std::string>& args, 
+		void registerCVar(const std::string& name, const std::vector<std::string>& args,
 			CVar::Getter getter, CVar::Setter setter = nullptr);
 
 		void removeCVar(const std::string& name);
@@ -121,7 +121,7 @@ namespace Console
 		static std::vector<std::string> ParseCommandLine(const std::string& cmds);
 		static std::vector<std::string> MakeTokensFromString(const std::string& cmd);
 		static std::string MakeStringFromTokens(const std::vector<std::string>& value);
-		
+
 	private:
 		void processConsoleCommand(std::vector<std::string> args);
 		std::vector<std::string> dereferenceTokens(std::vector<std::string> tokens);
