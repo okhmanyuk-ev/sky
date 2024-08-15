@@ -229,6 +229,29 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	CONSOLE_DEVICE->setEnabled(false);
 	STATS->setEnabled(false);
 #endif
+
+	FRAME->addOne([] {
+		const auto& args = PLATFORM->getArguments();
+		for (const auto& arg : args | std::views::drop(1))
+		{
+			auto tokens = CONSOLE->MakeTokensFromString(arg);
+
+			if (tokens.empty())
+				continue;
+
+			auto& cmd = tokens.at(0);
+
+			if (cmd.size() <= 1)
+				continue;
+
+			if (cmd.at(0) != '+')
+				continue;
+
+			cmd = cmd.substr(1);
+
+			CONSOLE->execute(CONSOLE->MakeStringFromTokens(tokens));
+		}
+	});
 }
 
 Application::~Application()
