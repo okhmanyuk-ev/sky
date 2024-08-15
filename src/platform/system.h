@@ -79,6 +79,8 @@ namespace Platform
 		virtual std::string getClipboardText() const = 0;
 		virtual void setClipboardText(const std::string& text) = 0;
 
+		virtual const std::vector<std::string>& getArguments() const = 0;
+
 	public:
 		enum class HapticType
 		{

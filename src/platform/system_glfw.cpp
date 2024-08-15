@@ -19,6 +19,7 @@ static GLFWwindow* gWindow = nullptr;
 static int gWidth = 800;
 static int gHeight = 600;
 static float gScale = 1.0f;
+static std::vector<std::string> gArguments;
 
 static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -29,6 +30,7 @@ static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 int main(int argc, char* argv[])
 {
+	gArguments = std::vector<std::string>(argv, argv + argc);
 	sky_main();
 	return 0;
 }
@@ -343,6 +345,11 @@ std::string SystemGlfw::getClipboardText() const
 void SystemGlfw::setClipboardText(const std::string& text)
 {
 	glfwSetClipboardString(gWindow, text.c_str());
+}
+
+const std::vector<std::string>& SystemGlfw::getArguments() const
+{
+	return gArguments;
 }
 
 static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)

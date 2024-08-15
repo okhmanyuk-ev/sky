@@ -65,6 +65,8 @@ namespace Platform
 		std::string getClipboardText() const override;
 		void setClipboardText(const std::string& text) override;
 
+		const std::vector<std::string>& getArguments() const override;
+
 	private:
 		std::string mAppName;
 		float mScale = 1.0f;

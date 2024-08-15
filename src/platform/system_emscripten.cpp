@@ -11,9 +11,11 @@ using namespace Platform;
 
 static SystemEmscripten* gContext = nullptr;
 static SDL_Window* gWindow = nullptr;
+static std::vector<std::string> gArguments;
 
 int main(int argc, char* argv[])
 {
+	gArguments = std::vector<std::string>(argv, argv + argc);
 	sky_main();
 	return 0;
 }
@@ -400,6 +402,11 @@ std::string SystemEmscripten::getClipboardText() const
 void SystemEmscripten::setClipboardText(const std::string& text)
 {
 	SDL_SetClipboardText(text.c_str());
+}
+
+const std::vector<std::string>& SystemEmscripten::getArguments() const
+{
+	return gArguments;
 }
 
 #endif
