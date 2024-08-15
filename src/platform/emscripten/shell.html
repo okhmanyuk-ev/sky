@@ -45,11 +45,11 @@
           border-right: 5px solid rgb(0 0 0 / 0%);
           border-bottom: 5px solid rgb(0 0 0 / 0%);
           border-top: 5px solid rgb(255, 255, 192);
-          
+
           border-radius: 100%;
           background-color: rgb(0 0 0 / 0%);
         }
-        
+
         @-webkit-keyframes rotation {
           from {-webkit-transform: rotate(0deg);}
           to {-webkit-transform: rotate(360deg);}
@@ -127,7 +127,7 @@
         }(),
         setStatus: function(text) {
           console.log(text);
-          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);    
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
           if (m) {
             var current = parseInt(m[2]);
             var total = parseInt(m[4])
@@ -136,7 +136,7 @@
             progressElement.max = total;
             progressElement.hidden = false;
             spinnerElement.hidden = false;
-          } 
+          }
           else {
             progressElement.value = progressElement.max;
             if (!text) {
@@ -159,7 +159,7 @@
           if (text) console.error('[post-exception status] ' + text);
         };
       };
-      Module['arguments'] = window.location.search.substr(1).trim().split('&');      
+      Module['arguments'] = window.location.search.substr(1).trim().split('&');
       for (let i = 0; i < Module['arguments'].length; ++i) {
         Module['arguments'][i] = decodeURI(Module['arguments'][i]);
       }
