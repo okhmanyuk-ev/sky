@@ -88,6 +88,13 @@ glm::vec2 Scrollbox::screenToScrollPosition(const glm::vec2& projected_screen_po
 	return unproject_pos / getScrollSpace();
 }
 
+void Scrollbox::setCustomContent(std::shared_ptr<Node> node)
+{
+	mBounding->detach(mContent);
+	mContent = node;
+	mBounding->attach(mContent);
+}
+
 glm::vec2 Scrollbox::getScrollSpace() const
 {
 	return mContent->getAbsoluteSize() - mBounding->getAbsoluteSize();

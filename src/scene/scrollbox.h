@@ -23,6 +23,7 @@ namespace Scene
 
 	public:
 		glm::vec2 screenToScrollPosition(const glm::vec2& projected_screen_pos);
+		void setCustomContent(std::shared_ptr<Node> node);
 
 	public:
 		auto getContent() { return mContent; }
