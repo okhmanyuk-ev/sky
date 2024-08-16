@@ -261,11 +261,11 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentHorizontalGrid(
 	const std::vector<std::shared_ptr<Scene::Node>>& items)
 {
 	auto grid = std::make_shared<Scene::Node>();
-	std::vector<std::shared_ptr<StretchedToContent<Scene::Node>>> cells;
+	std::vector<std::shared_ptr<Scene::AutoSized<Scene::Node>>> cells;
 	for (auto item : items)
 	{
-		auto cell = std::make_shared<StretchedToContent<Scene::Node>>();
-		cell->setStretchToContentHeightEnabled(false);
+		auto cell = std::make_shared<Scene::AutoSized<Scene::Node>>();
+		cell->setAutoSizeHeightEnabled(false);
 		cell->attach(item);
 		grid->attach(cell);
 		cells.push_back(cell);
@@ -274,7 +274,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentHorizontalGrid(
 		glm::vec2 size = { 0.0f, 0.0f };
 		for (const auto& cell : cells)
 		{
-			size.y = glm::max(size.y, cell->getStretchToContentHeight());
+			size.y = glm::max(size.y, cell->getAutoSizeHeight());
 		}
 		for (const auto& cell : cells)
 		{
@@ -291,11 +291,11 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
 	const std::vector<std::shared_ptr<Scene::Node>>& items)
 {
 	auto grid = std::make_shared<Scene::Node>();
-	std::vector<std::shared_ptr<StretchedToContent<Scene::Node>>> cells;
+	std::vector<std::shared_ptr<Scene::AutoSized<Scene::Node>>> cells;
 	for (auto item : items)
 	{
-		auto cell = std::make_shared<StretchedToContent<Scene::Node>>();
-		cell->setStretchToContentWidthEnabled(false);
+		auto cell = std::make_shared<Scene::AutoSized<Scene::Node>>();
+		cell->setAutoSizeWidthEnabled(false);
 		cell->attach(item);
 		grid->attach(cell);
 		cells.push_back(cell);
@@ -304,7 +304,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
 		glm::vec2 size = { 0.0f, 0.0f };
 		for (const auto& cell : cells)
 		{
-			size.x = glm::max(size.x, cell->getStretchToContentWidth());
+			size.x = glm::max(size.x, cell->getAutoSizeWidth());
 		}
 		for (const auto& cell : cells)
 		{
@@ -323,15 +323,15 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<
 
 	struct HolderData
 	{
-		std::shared_ptr<StretchedToContent<Scene::Node>> cell_parent;
+		std::shared_ptr<Scene::AutoSized<Scene::Node>> cell_parent;
 		HorizontalGridCell cell;
 	};
 
 	std::vector<HolderData> holder_datas;
 	for (auto cell : cells)
 	{
-		auto cell_holder = std::make_shared<StretchedToContent<Scene::Node>>();
-		cell_holder->setStretchToContentHeightEnabled(false);
+		auto cell_holder = std::make_shared<Scene::AutoSized<Scene::Node>>();
+		cell_holder->setAutoSizeHeightEnabled(false);
 		cell_holder->attach(cell.node);
 		grid->attach(cell_holder);
 
@@ -347,10 +347,10 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<
 			if (holder_data.cell.cell_parent_vertically_stretches_to_grid)
 				continue;
 
-			size.y = glm::max(size.y, holder_data.cell_parent->getStretchToContentHeight());
+			size.y = glm::max(size.y, holder_data.cell_parent->getAutoSizeHeight());
 		}
 		for (const auto& holder_data : holder_datas)
-		{			
+		{
 			holder_data.cell_parent->setX(size.x);
 			holder_data.cell_parent->setHeight(size.y);
 			size.x += holder_data.cell_parent->getWidth();
@@ -1169,7 +1169,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 
 void SceneHelpers::RichLabel::update(Clock::Duration dTime)
 {
-	StretchedToContent<Scene::Node>::update(dTime);
+	AutoSized<Scene::Node>::update(dTime);
 	refresh();
 }
 
@@ -1312,8 +1312,8 @@ void SceneHelpers::ImScene::Tooltip(const Scene::Scene& scene, Scene::Node& hold
 
 	auto pos = holder.unproject(cursor_pos.value());
 
-	auto rect = IMSCENE->spawn<Shared::SceneHelpers::Smoother<Shared::SceneHelpers::StretchedToContent<
-		Scene::ClippableScissor<Scene::Rectangle>>>>(holder, std::to_string((size_t)&node));
+	auto rect = IMSCENE->spawn<Smoother<Scene::AutoSized<Scene::ClippableScissor<Scene::Rectangle>>>>(holder,
+		std::to_string((size_t)&node));
 	if (IMSCENE->isFirstCall())
 	{
 		rect->setAbsoluteRounding(true);

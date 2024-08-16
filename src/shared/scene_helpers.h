@@ -424,7 +424,7 @@ namespace Shared::SceneHelpers
 
 	public:
 		StandardScreen(const std::set<Effect>& effects = { Effect::Alpha, Effect::Scale, Effect::WindowAppearingScale });
-		
+
 	protected:
 		void onEnterBegin() override;
 		void onEnterEnd() override;
@@ -641,47 +641,7 @@ namespace Shared::SceneHelpers
 		std::optional<int> mCursorPos;
 	};
 
-	template <class T> class StretchedToContent : public T
-	{
-		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-	public:
-		void update(Clock::Duration delta) override
-		{
-			T::update(delta);
-
-			mStretchToContentSize = { 0.0f, 0.0f };
-
-			for (const auto& node : T::getNodes())
-			{
-				mStretchToContentSize.x = glm::max(mStretchToContentSize.x, node->getWidth());
-				mStretchToContentSize.y = glm::max(mStretchToContentSize.y, node->getHeight());
-			}
-
-			if (mStretchToContentWidth)
-				T::setWidth(mStretchToContentSize.x);
-
-			if (mStretchToContentHeight)
-				T::setHeight(mStretchToContentSize.y);
-		}
-
-	public:
-		auto getStretchToContentSize() const { return mStretchToContentSize; }
-		auto getStretchToContentWidth() const { return mStretchToContentSize.x; }
-		auto getStretchToContentHeight() const { return mStretchToContentSize.y; }
-
-		bool isStretchToContentWidthEnabled() const { return mStretchToContentWidth; }
-		void setStretchToContentWidthEnabled(bool value) { mStretchToContentWidth = value; }
-
-		bool isStretchToContentHeightEnabled() const { return mStretchToContentHeight; }
-		void setStretchToContentHeightEnabled(bool value) { mStretchToContentHeight = value; }
-
-	private:
-		glm::vec2 mStretchToContentSize = { 0.0f, 0.0f };
-		bool mStretchToContentWidth = true;
-		bool mStretchToContentHeight = true;
-	};
-
-	class RichLabel : public StretchedToContent<Scene::Node>
+	class RichLabel : public Scene::AutoSized<Scene::Node>
 	{
 	public:
 		void update(Clock::Duration dTime) override;

@@ -3,6 +3,7 @@
 #include <scene/actions.h>
 #include <scene/adaptive.h>
 #include <scene/ani_sprite.h>
+#include <scene/auto_sized.h>
 #include <scene/blend.h>
 #include <scene/bloom_layer.h>
 #include <scene/circle.h>
