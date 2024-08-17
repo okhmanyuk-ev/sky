@@ -671,6 +671,6 @@ namespace Shared::SceneHelpers
 		void Tooltip(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
 			std::function<std::shared_ptr<Scene::Node>()> createContentCallback);
 		void TooltipLabel(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node, const std::wstring& text);
-		void Highlight(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node);
+		void HighlightUnderCursor(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node);
 	}
 }

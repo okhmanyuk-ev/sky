@@ -1343,7 +1343,7 @@ void SceneHelpers::ImScene::TooltipLabel(const Scene::Scene& scene, Scene::Node&
 	});
 }
 
-void SceneHelpers::ImScene::Highlight(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node)
+void SceneHelpers::ImScene::HighlightUnderCursor(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node)
 {
 	if (!IsMouseHovered(scene, node))
 		return;
