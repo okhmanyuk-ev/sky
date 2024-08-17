@@ -257,23 +257,6 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeGrid(const std::vector<std::vecto
 	return MakeVerticalGrid(horz_grids);
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeAutoSizedVerticalGrid(
-	const std::vector<std::shared_ptr<Scene::Node>>& items)
-{
-	auto grid = std::make_shared<Scene::AutoSized<Scene::Grid>>();
-	grid->setDirection(Scene::Grid::Direction::DownRight);
-	grid->setMaxItemsInRow(items.size());
-	for (auto item : items)
-	{
-		auto cell = std::make_shared<Scene::AutoSized<Scene::Node>>();
-		cell->setAnchor({ 0.5f, 0.0f });
-		cell->setPivot({ 0.5f, 0.0f });
-		cell->attach(item);
-		grid->attach(cell);
-	}
-	return grid;
-}
-
 std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<HorizontalGridCell>& cells)
 {
 	auto grid = std::make_shared<Scene::Node>();

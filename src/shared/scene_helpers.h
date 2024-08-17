@@ -41,8 +41,6 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items);
 	std::shared_ptr<Scene::Node> MakeGrid(const std::vector<std::vector<std::shared_ptr<Scene::Node>>>& items);
 
-	std::shared_ptr<Scene::Node> MakeAutoSizedVerticalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items);
-
 	struct HorizontalGridCell
 	{
 		bool cell_parent_vertically_stretches_to_grid = false;
