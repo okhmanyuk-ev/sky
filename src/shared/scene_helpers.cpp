@@ -257,63 +257,20 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeGrid(const std::vector<std::vecto
 	return MakeVerticalGrid(horz_grids);
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentHorizontalGrid(
+std::shared_ptr<Scene::Node> SceneHelpers::MakeAutoSizedVerticalGrid(
 	const std::vector<std::shared_ptr<Scene::Node>>& items)
 {
-	auto grid = std::make_shared<Scene::Node>();
-	std::vector<std::shared_ptr<Scene::AutoSized<Scene::Node>>> cells;
+	auto grid = std::make_shared<Scene::AutoSized<Scene::Grid>>();
+	grid->setDirection(Scene::Grid::Direction::DownRight);
+	grid->setMaxItemsInRow(items.size());
 	for (auto item : items)
 	{
 		auto cell = std::make_shared<Scene::AutoSized<Scene::Node>>();
-		cell->setAutoSizeHeightEnabled(false);
+		cell->setAnchor({ 0.5f, 0.0f });
+		cell->setPivot({ 0.5f, 0.0f });
 		cell->attach(item);
 		grid->attach(cell);
-		cells.push_back(cell);
 	}
-	grid->runAction(Actions::Collection::ExecuteInfinite([grid, cells] {
-		glm::vec2 size = { 0.0f, 0.0f };
-		for (const auto& cell : cells)
-		{
-			size.y = glm::max(size.y, cell->getAutoSizeHeight());
-		}
-		for (const auto& cell : cells)
-		{
-			cell->setX(size.x);
-			cell->setHeight(size.y);
-			size.x += cell->getWidth();
-		}
-		grid->setSize(size);
-	}));
-	return grid;
-}
-
-std::shared_ptr<Scene::Node> SceneHelpers::MakeStretchedToContentVerticalGrid(
-	const std::vector<std::shared_ptr<Scene::Node>>& items)
-{
-	auto grid = std::make_shared<Scene::Node>();
-	std::vector<std::shared_ptr<Scene::AutoSized<Scene::Node>>> cells;
-	for (auto item : items)
-	{
-		auto cell = std::make_shared<Scene::AutoSized<Scene::Node>>();
-		cell->setAutoSizeWidthEnabled(false);
-		cell->attach(item);
-		grid->attach(cell);
-		cells.push_back(cell);
-	}
-	grid->runAction(Actions::Collection::ExecuteInfinite([grid, cells] {
-		glm::vec2 size = { 0.0f, 0.0f };
-		for (const auto& cell : cells)
-		{
-			size.x = glm::max(size.x, cell->getAutoSizeWidth());
-		}
-		for (const auto& cell : cells)
-		{
-			cell->setY(size.y);
-			cell->setWidth(size.x);
-			size.y += cell->getHeight();
-		}
-		grid->setSize(size);
-	}));
 	return grid;
 }
 

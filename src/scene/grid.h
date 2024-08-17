@@ -7,10 +7,10 @@ namespace Scene
 	class Grid : public Node
 	{
 	public:
-		enum class Orientation
+		enum class Direction
 		{
-			Vertical,
-			Horizontal
+			RightDown,
+			DownRight
 		};
 
 	public:
@@ -20,10 +20,14 @@ namespace Scene
 		void update(Clock::Duration dTime) override;
 
 	public:
-		auto getOrientation() const { return mOrientation; }
-		void setOrientation(Orientation value) { mOrientation = value; }
+		auto getDirection() const { return mDirection; }
+		void setDirection(Direction value) { mDirection = value; }
+
+		auto getMaxItemsInRow() const { return mMaxItemsInRow; }
+		void setMaxItemsInRow(std::optional<size_t> value) { mMaxItemsInRow = value; }
 
 	private:
-		Orientation mOrientation = Orientation::Vertical;
+		Direction mDirection = Direction::RightDown;
+		std::optional<size_t> mMaxItemsInRow;
 	};
 }
