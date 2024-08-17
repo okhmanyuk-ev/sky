@@ -17,8 +17,8 @@ namespace Scene
 
 			for (const auto& node : T::getNodes())
 			{
-				mAutoSize.x = glm::max(mAutoSize.x, node->getX() + node->getWidth());
-				mAutoSize.y = glm::max(mAutoSize.y, node->getY() + node->getHeight());
+				mAutoSize.x = glm::max(mAutoSize.x, node->getX() + node->getAbsoluteWidth());
+				mAutoSize.y = glm::max(mAutoSize.y, node->getY() + node->getAbsoluteHeight());
 			}
 
 			if (mAutoSizeWidthEnabled)
