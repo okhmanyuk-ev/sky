@@ -64,6 +64,19 @@ void Grid::update(Clock::Duration dTime)
 	}
 }
 
+void Row::update(Clock::Duration dTime)
+{
+	Node::update(dTime);
+
+	float x = 0.0f;
+
+	for (auto node : getNodes())
+	{
+		node->setX(x);
+		x += node->getWidth();
+	}
+}
+
 void Column::update(Clock::Duration dTime)
 {
 	Node::update(dTime);

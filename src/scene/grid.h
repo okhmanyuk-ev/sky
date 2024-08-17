@@ -28,6 +28,12 @@ namespace Scene
 		std::optional<size_t> mMaxItemsInRow;
 	};
 
+	class Row : public Node
+	{
+	protected:
+		void update(Clock::Duration dTime) override;
+	};
+
 	class Column : public Node
 	{
 	protected:
