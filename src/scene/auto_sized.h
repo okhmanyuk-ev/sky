@@ -26,6 +26,9 @@ namespace Scene
 
 			if (mAutoSizeHeightEnabled)
 				T::setHeight(mAutoSize.y);
+
+			if (mAutoSizeWidthEnabled || mAutoSizeHeightEnabled)
+				T::updateAbsoluteSize();
 		}
 
 	public:
