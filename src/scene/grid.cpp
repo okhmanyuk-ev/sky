@@ -2,10 +2,6 @@
 
 using namespace Scene;
 
-Grid::Grid()
-{
-}
-
 void Grid::update(Clock::Duration dTime)
 {
 	Node::update(dTime);
@@ -65,5 +61,18 @@ void Grid::update(Clock::Duration dTime)
 			max_column_width = glm::max(max_column_width, node->getWidth());
 			items_in_column++;
 		}
+	}
+}
+
+void Column::update(Clock::Duration dTime)
+{
+	Node::update(dTime);
+
+	float y = 0.0f;
+
+	for (auto node : getNodes())
+	{
+		node->setY(y);
+		y += node->getHeight();
 	}
 }

@@ -13,9 +13,6 @@ namespace Scene
 			DownRight
 		};
 
-	public:
-		Grid();
-
 	protected:
 		void update(Clock::Duration dTime) override;
 
@@ -29,5 +26,11 @@ namespace Scene
 	private:
 		Direction mDirection = Direction::RightDown;
 		std::optional<size_t> mMaxItemsInRow;
+	};
+
+	class Column : public Node
+	{
+	protected:
+		void update(Clock::Duration dTime) override;
 	};
 }
