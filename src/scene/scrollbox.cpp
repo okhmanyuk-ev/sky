@@ -11,7 +11,9 @@ Scrollbox::Scrollbox()
 	mBounding = std::make_shared<Node>();
 	attach(mBounding);
 
-	mContent = std::make_shared<Node>();
+	mContent = std::make_shared<AutoSized<Node>>();
+	mContent->setAutoSizeHeightEnabled(false);
+	mContent->setAutoSizeWidthEnabled(false);
 	mBounding->attach(mContent);
 }
 
@@ -86,13 +88,6 @@ glm::vec2 Scrollbox::screenToScrollPosition(const glm::vec2& projected_screen_po
 {
 	auto unproject_pos = mContent->unproject(projected_screen_pos);
 	return unproject_pos / getScrollSpace();
-}
-
-void Scrollbox::setCustomContent(std::shared_ptr<Node> node)
-{
-	mBounding->detach(mContent);
-	mContent = node;
-	mBounding->attach(mContent);
 }
 
 glm::vec2 Scrollbox::getScrollSpace() const

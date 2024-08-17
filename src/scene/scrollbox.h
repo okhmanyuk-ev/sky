@@ -1,6 +1,7 @@
 #pragma once
 
 #include <scene/node.h>
+#include <scene/auto_sized.h>
 #include <common/timestep_fixer.h>
 
 namespace Scene
@@ -23,7 +24,6 @@ namespace Scene
 
 	public:
 		glm::vec2 screenToScrollPosition(const glm::vec2& projected_screen_pos);
-		void setCustomContent(std::shared_ptr<Node> node);
 
 	public:
 		auto getContent() { return mContent; }
@@ -71,7 +71,7 @@ namespace Scene
 
 	private:
 		std::shared_ptr<Node> mBounding;
-		std::shared_ptr<Node> mContent;
+		std::shared_ptr<AutoSized<Node>> mContent;
 		glm::vec2 mSensitivity = { 1.0f, 1.0f };
 		glm::vec2 mSpeed = { 0.0f, 0.0f };
 		glm::vec2 mScrollPosition = { 0.0f, 0.0f };
