@@ -19,7 +19,7 @@ void Grid::update(Clock::Duration dTime)
 				if (mMaxItemsInRow.has_value())
 					return items_in_row >= mMaxItemsInRow.value();
 
-				return pos.x + node->getWidth() > getAbsoluteWidth();
+				return pos.x + node->getAbsoluteWidth() > getAbsoluteWidth();
 			}();
 
 			if (need_break)
@@ -30,8 +30,8 @@ void Grid::update(Clock::Duration dTime)
 				items_in_row = 0;
 			}
 			node->setPosition(pos);
-			pos.x += node->getWidth();
-			max_row_height = glm::max(max_row_height, node->getHeight());
+			pos.x += node->getAbsoluteWidth();
+			max_row_height = glm::max(max_row_height, node->getAbsoluteHeight());
 			items_in_row++;
 		}
 	}
@@ -46,7 +46,7 @@ void Grid::update(Clock::Duration dTime)
 				if (mMaxItemsInRow.has_value())
 					return items_in_column >= mMaxItemsInRow.value();
 
-				return pos.y + node->getHeight() > getAbsoluteHeight();
+				return pos.y + node->getAbsoluteHeight() > getAbsoluteHeight();
 			}();
 
 			if (need_break)
@@ -57,8 +57,8 @@ void Grid::update(Clock::Duration dTime)
 				items_in_column = 0;
 			}
 			node->setPosition(pos);
-			pos.y += node->getHeight();
-			max_column_width = glm::max(max_column_width, node->getWidth());
+			pos.y += node->getAbsoluteHeight();
+			max_column_width = glm::max(max_column_width, node->getAbsoluteWidth());
 			items_in_column++;
 		}
 	}
@@ -73,7 +73,7 @@ void Row::update(Clock::Duration dTime)
 	for (auto node : getNodes())
 	{
 		node->setX(x);
-		x += node->getWidth();
+		x += node->getAbsoluteWidth();
 	}
 }
 
@@ -86,6 +86,6 @@ void Column::update(Clock::Duration dTime)
 	for (auto node : getNodes())
 	{
 		node->setY(y);
-		y += node->getHeight();
+		y += node->getAbsoluteHeight();
 	}
 }
