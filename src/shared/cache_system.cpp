@@ -11,10 +11,10 @@ Graphics::TexCell CacheSystem::getTexture(const std::string& name)
 		return mTexCells.at(name);
 
 	loadTexture(name);
-	
+
 	if (mTextures.count(name) == 0)
 		return { nullptr, Graphics::TexRegion() };
-	
+
 	return { mTextures.at(name), Graphics::TexRegion() };
 }
 
@@ -52,6 +52,11 @@ const nlohmann::json& CacheSystem::getJson(const std::string& name)
 	return mJsons.at(name);
 }
 
+bool CacheSystem::hasTexture(const std::string& name) const
+{
+	return mTextures.contains(name);
+}
+
 void CacheSystem::loadTexture(std::shared_ptr<skygfx::Texture> texture, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
@@ -66,7 +71,7 @@ void CacheSystem::loadTexture(const Graphics::Image& image, const std::string& n
 		return;
 
 	assert(image.getChannels() == 4); // TODO: skygfx::Format::Byte(1/2/3)
-	
+
 	auto texture = std::make_shared<skygfx::Texture>(image.getWidth(), image.getHeight(),
 		skygfx::Format::Byte4, image.getMemory());
 

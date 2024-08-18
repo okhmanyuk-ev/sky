@@ -25,7 +25,7 @@
 #define ANIMATION(NAME) CACHE->getAnimation(NAME)
 #define JSON(NAME) CACHE->getJson(NAME)
 
-namespace Shared 
+namespace Shared
 {
 	class CacheSystem
 	{
@@ -38,6 +38,8 @@ namespace Shared
 		const nlohmann::json& getJson(const std::string& name);
 
 	public:
+		bool hasTexture(const std::string& name) const;
+
 		void loadTexture(std::shared_ptr<skygfx::Texture> texture, const std::string& name);
 		void loadTexture(const Graphics::Image& image, const std::string& name);
 		void loadTexture(const std::string& path, const std::string& name);
