@@ -9,10 +9,9 @@ namespace Scene
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 	protected:
-		void update(Clock::Duration delta) override
+		void leaveUpdate() override
 		{
-			T::update(delta);
-
+			T::leaveUpdate();
 			mAutoSize = { 0.0f, 0.0f };
 
 			for (const auto& node : this->getNodes())
