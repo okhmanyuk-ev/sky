@@ -639,10 +639,12 @@ namespace Shared::SceneHelpers
 	{
 	public:
 		RichLabel();
-		void refreshRichLabel();
 
 	protected:
 		void update(Clock::Duration dTime) override;
+
+	public:
+		void refreshRichLabel();
 
 	public:
 		const auto& getText() const { return mState.text; }
