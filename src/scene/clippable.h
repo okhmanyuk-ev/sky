@@ -67,7 +67,7 @@ namespace Scene
 				GRAPHICS->pushBlendMode(blend);
 			}
 
-			this->draw();
+			T::draw();
 
 			if (mDrawOnlyStencil)
 			{
@@ -83,7 +83,6 @@ namespace Scene
 			ClipLayer -= 1;
 			T::leaveDraw();
 		}
-
 
 	public:
 		bool isDrawOnlyStencil() const { return mDrawOnlyStencil; }
