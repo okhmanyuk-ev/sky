@@ -32,11 +32,25 @@ namespace Scene
 	{
 	protected:
 		void update(Clock::Duration dTime) override;
+
+	public:
+		bool getRowReadAbsoluteSize() const { return mRowReadAbsoluteSize; }
+		void setRowumnReadAbsoluteSize(bool value) { mRowReadAbsoluteSize = value; }
+
+	private:
+		bool mRowReadAbsoluteSize = true;
 	};
 
 	class Column : public Node
 	{
 	protected:
 		void update(Clock::Duration dTime) override;
+
+	public:
+		bool getColumnReadAbsoluteSize() const { return mColumnReadAbsoluteSize; }
+		void setColumnReadAbsoluteSize(bool value) { mColumnReadAbsoluteSize = value; }
+
+	private:
+		bool mColumnReadAbsoluteSize = true;
 	};
 }

@@ -73,7 +73,7 @@ void Row::update(Clock::Duration dTime)
 	for (auto node : getNodes())
 	{
 		node->setX(x);
-		x += node->getAbsoluteWidth();
+		x += mRowReadAbsoluteSize ? node->getAbsoluteWidth() : node->getWidth();
 	}
 }
 
@@ -86,6 +86,6 @@ void Column::update(Clock::Duration dTime)
 	for (auto node : getNodes())
 	{
 		node->setY(y);
-		y += node->getAbsoluteHeight();
+		y += mColumnReadAbsoluteSize ? node->getAbsoluteHeight() : node->getHeight();
 	}
 }
