@@ -638,8 +638,11 @@ namespace Shared::SceneHelpers
 	class RichLabel : public Scene::AutoSized<Scene::Node>
 	{
 	public:
+		RichLabel();
+		void refreshRichLabel();
+
+	protected:
 		void update(Clock::Duration dTime) override;
-		void refresh();
 
 	public:
 		const auto& getText() const { return mState.text; }
@@ -655,7 +658,7 @@ namespace Shared::SceneHelpers
 		};
 		State mState;
 		State mPrevState;
-		std::shared_ptr<Scene::Node> mContent;
+		std::shared_ptr<Scene::AutoSized<Scene::Row>> mContent;
 		std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>()>> mTags;
 	};
 

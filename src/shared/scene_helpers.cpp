@@ -1107,45 +1107,48 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 	));
 }
 
+SceneHelpers::RichLabel::RichLabel()
+{
+	mContent = std::make_shared<Scene::AutoSized<Scene::Row>>();
+	mContent->setAnchor(0.5f);
+	mContent->setPivot(0.5f);
+	attach(mContent);
+}
+
 void SceneHelpers::RichLabel::update(Clock::Duration dTime)
 {
 	AutoSized<Scene::Node>::update(dTime);
-	refresh();
+	refreshRichLabel();
 }
 
-void SceneHelpers::RichLabel::refresh()
+void SceneHelpers::RichLabel::refreshRichLabel()
 {
 	if (mState == mPrevState)
 		return;
 
 	mPrevState = mState;
+	mContent->clear();
 
-	if (mContent)
-		detach(mContent);
-
-	std::vector<HorizontalGridCell> cells;
-
-	auto createCell = [](auto node, bool cell_parent_vertically_stretches_to_grid) {
-		HorizontalGridCell cell;
-		cell.cell_parent_vertically_stretches_to_grid = cell_parent_vertically_stretches_to_grid;
-		cell.node = node;
-		return cell;
+	auto append = [&](std::shared_ptr<Scene::Node> item, bool stretch) {
+		auto holder = std::make_shared<Scene::AutoSized<Scene::Node>>();
+		holder->setAnchor({ 0.0f, 0.5f });
+		holder->setPivot({ 0.0f, 0.5f });
+		holder->setAutoSizeHeightEnabled(!stretch);
+		holder->setVerticalStretch(stretch);
+		holder->attach(item);
+		mContent->attach(holder);
 	};
 
 	auto createLabel = [](const std::wstring& str) {
 		auto label = std::make_shared<Scene::Label>();
 		label->setText(str);
 		label->setParseColorTagsEnabled(true);
-		label->setAnchor(0.5f);
-		label->setPivot(0.5f);
 		return label;
 	};
 
 	auto createSprite = [this_index = size_t(this)](const std::string& path) {
 		auto sprite = std::make_shared<Scene::Adaptive<Scene::Sprite>>();
 		sprite->setTexture(TEXTURE(path));
-		sprite->setAnchor(0.5f);
-		sprite->setPivot(0.5f);
 		sprite->setAdaptStretch(1.0f);
 		sprite->setBakingAdaption(true);
 		sprite->setBatchGroup(fmt::format("rich_label_icon_{}_{}", this_index, path));
@@ -1158,7 +1161,7 @@ void SceneHelpers::RichLabel::refresh()
 	std::wsmatch match;
 
 	auto flushLabelText = [&] {
-		cells.push_back(createCell(createLabel(sublimed_text), false));
+		append(createLabel(sublimed_text), false);
 		sublimed_text.clear();
 	};
 
@@ -1171,7 +1174,7 @@ void SceneHelpers::RichLabel::refresh()
 			if (std::regex_search(text, match, tag))
 			{
 				flushLabelText();
-				cells.push_back(createCell(callback(), true));
+				append(callback(), true);
 				text.erase(0, match.length());
 				return true;
 			}
@@ -1179,7 +1182,8 @@ void SceneHelpers::RichLabel::refresh()
 		return false;
 	};
 
-	while (!text.empty()) {
+	while (!text.empty())
+	{
 		if (insertCustomTags())
 			continue;
 
@@ -1187,22 +1191,18 @@ void SceneHelpers::RichLabel::refresh()
 		{
 			flushLabelText();
 			auto path = sky::to_string(match[1]);
-			cells.push_back(createCell(createSprite(path), true));
+			append(createSprite(path), true);
 			text.erase(0, match.length());
 		}
-		else {
+		else
+		{
 			sublimed_text.push_back(text.front());
 			text.erase(0, 1);
 		}
 	}
 
 	if (!sublimed_text.empty())
-		cells.push_back(createCell(createLabel(sublimed_text), false));
-
-	mContent = MakeHorizontalGrid(cells);
-	mContent->setAnchor(0.5f);
-	mContent->setPivot(0.5f);
-	attach(mContent);
+		append(createLabel(sublimed_text), false);
 }
 
 void SceneHelpers::RichLabel::setTag(const std::string& name, std::function<std::shared_ptr<Scene::Node>()> callback)
