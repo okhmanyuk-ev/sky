@@ -13,7 +13,7 @@ namespace Scene
 		{
 			T::updateTransform();
 
-			auto [left_pos, left_size] = T::getGlobalBounds();	
+			auto [left_pos, left_size] = this->getGlobalBounds();	
 
 			bool visible = false;
 
@@ -25,7 +25,7 @@ namespace Scene
 			}
 			else
 			{
-				auto viewport = T::getScene()->getViewport();
+				auto viewport = this->getScene()->getViewport();
 
 				viewport.size *= PLATFORM->getScale();
 				viewport.position *= PLATFORM->getScale();
@@ -33,7 +33,7 @@ namespace Scene
 				visible = isIntersect(left_pos, left_size, viewport.position, viewport.size);
 			}
 
-			T::setVisible(visible);
+			this->setVisible(visible);
 		}
 
 	private:

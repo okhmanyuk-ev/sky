@@ -32,7 +32,7 @@ namespace Scene
 
 			if (mUseLocalTargetSize)
 			{
-				auto [pos, size] = T::getGlobalBounds();
+				auto [pos, size] = this->getGlobalBounds();
 
 				assert(!glm::isnan(size.x));
 				assert(!glm::isnan(size.y));
@@ -81,7 +81,7 @@ namespace Scene
 
 			if (mUseLocalTargetSize)
 			{
-				auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
+				auto model = glm::scale(this->getTransform(), { this->getAbsoluteSize(), 1.0f });
 				GRAPHICS->pushModelMatrix(model);
 			}
 			else

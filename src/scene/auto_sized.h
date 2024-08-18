@@ -8,27 +8,27 @@ namespace Scene
 	template <class T> class AutoSized : public T
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
-	public:
+	protected:
 		void update(Clock::Duration delta) override
 		{
 			T::update(delta);
 
 			mAutoSize = { 0.0f, 0.0f };
 
-			for (const auto& node : T::getNodes())
+			for (const auto& node : this->getNodes())
 			{
 				mAutoSize.x = glm::max(mAutoSize.x, node->getX() + node->getAbsoluteWidth());
 				mAutoSize.y = glm::max(mAutoSize.y, node->getY() + node->getAbsoluteHeight());
 			}
 
 			if (mAutoSizeWidthEnabled)
-				T::setWidth(mAutoSize.x);
+				this->setWidth(mAutoSize.x);
 
 			if (mAutoSizeHeightEnabled)
-				T::setHeight(mAutoSize.y);
+				this->setHeight(mAutoSize.y);
 
 			if (mAutoSizeWidthEnabled || mAutoSizeHeightEnabled)
-				T::updateAbsoluteSize();
+				this->updateAbsoluteSize();
 		}
 
 	public:
@@ -47,5 +47,4 @@ namespace Scene
 		bool mAutoSizeWidthEnabled = true;
 		bool mAutoSizeHeightEnabled = true;
 	};
-
 }

@@ -17,13 +17,13 @@ namespace Scene
 			if (!mAdaptingEnabled)
 				return;
 
-			auto parent_size = T::hasParent() ? T::getParent()->getAbsoluteSize() : T::getScene()->getViewport().size;
+			auto parent_size = this->hasParent() ? this->getParent()->getAbsoluteSize() : this->getScene()->getViewport().size;
 
 			auto size = mAdaptSize;
 			size -= mAdaptMargin;
 			size += mAdaptStretch * parent_size;
 
-			auto scale = size / T::getAbsoluteSize();
+			auto scale = size / this->getAbsoluteSize();
 			mAdaptScale = glm::min(scale.x, scale.y);
 
 			if (mBakingAdaption)
@@ -32,21 +32,21 @@ namespace Scene
 				return;
 			}
 
-			auto offset = T::getPivot() * T::getAbsoluteSize();
+			auto offset = this->getPivot() * this->getAbsoluteSize();
 
-			auto transform = T::getTransform();
+			auto transform = this->getTransform();
 			transform = glm::translate(transform, { offset, 0.0f });
 			transform = glm::scale(transform, { mAdaptScale, mAdaptScale, 1.0f });
 			transform = glm::translate(transform, { -offset, 0.0f });
-			T::setTransform(transform);
+			this->setTransform(transform);
 		}
 
 		void updateAbsoluteScale() override
 		{
 			T::updateAbsoluteScale();
-			auto absolute_scale = T::getAbsoluteScale();
+			auto absolute_scale = this->getAbsoluteScale();
 			absolute_scale *= mAdaptScale;
-			T::setAbsoluteScale(absolute_scale);
+			this->setAbsoluteScale(absolute_scale);
 		}
 
 	public:
@@ -58,7 +58,7 @@ namespace Scene
 			if (glm::isnan(mAdaptScale))
 				return;
 
-			T::setSize(T::getSize() * mAdaptScale);
+			this->setSize(this->getSize() * mAdaptScale);
 			mAdaptScale = 1.0f;
 		}
 

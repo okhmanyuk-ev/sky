@@ -11,9 +11,9 @@ namespace Scene
 	public:
 		Tappable()
 		{
-			T::setTouchable(true);
+			this->setTouchable(true);
 		}
-	
+
 	protected:
 		void touch(Node::Touch type, const glm::vec2& pos) override
 		{

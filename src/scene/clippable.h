@@ -6,7 +6,7 @@
 namespace Scene
 {
 	inline static int ClipLayer = 0;
-	
+
 	template <typename T> class ClippableStencil : public T
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
@@ -14,7 +14,7 @@ namespace Scene
 	public:
 		bool interactTest(const glm::vec2& value) const override
 		{
-			return T::hitTest(value);
+			return this->hitTest(value);
 		}
 
 	protected:
@@ -67,7 +67,7 @@ namespace Scene
 				GRAPHICS->pushBlendMode(blend);
 			}
 
-			T::draw();
+			this->draw();
 
 			if (mDrawOnlyStencil)
 			{
@@ -80,9 +80,7 @@ namespace Scene
 		void leaveDraw() override
 		{
 			GRAPHICS->pop();
-
 			ClipLayer -= 1;
-
 			T::leaveDraw();
 		}
 
@@ -98,19 +96,19 @@ namespace Scene
 	template <typename T> class ClippableScissor : public T
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
-	
+
 	public:
 		bool interactTest(const glm::vec2& value) const override
 		{
-			return T::hitTest(value);
+			return this->hitTest(value);
 		}
 
 	protected:
 		void enterDraw() override
 		{
 			T::enterDraw();
-			
-			auto [pos, size] = T::getGlobalBounds();
+
+			auto [pos, size] = this->getGlobalBounds();
 
 			auto scissor = skygfx::Scissor();
 			scissor.position = pos;
@@ -122,7 +120,6 @@ namespace Scene
 		void leaveDraw() override
 		{
 			GRAPHICS->pop();
-
 			T::leaveDraw();
 		}
 	};
@@ -153,8 +150,8 @@ namespace Scene
 			state.stencil_mode = stencil;
 			state.blend_mode.color_mask = { false, false, false, false };
 
-			auto absolute_size = T::getAbsoluteSize();
-			state.model_matrix = glm::scale(T::getTransform(), { absolute_size, 1.0f });
+			auto absolute_size = this->getAbsoluteSize();
+			state.model_matrix = glm::scale(this->getTransform(), { absolute_size, 1.0f });
 
 			GRAPHICS->push(state);
 			GRAPHICS->clear(std::nullopt, std::nullopt, 0);

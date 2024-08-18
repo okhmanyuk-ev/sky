@@ -129,13 +129,13 @@ namespace Shared::SceneHelpers
 		{
 			T::updateTransform();
 
-			auto offset = 0.5f * T::getAbsoluteSize();
+			auto offset = 0.5f * this->getAbsoluteSize();
 
-			auto transform = T::getTransform();
+			auto transform = this->getTransform();
 			transform = glm::translate(transform, { offset, 0.0f });
 			transform = glm::scale(transform, { mRelativeScale, mRelativeScale, 1.0f });
 			transform = glm::translate(transform, { -offset, 0.0f });
-            T::setTransform(transform);
+            this->setTransform(transform);
 		}
 
 	public:
@@ -147,9 +147,9 @@ namespace Shared::SceneHelpers
 				return;
 
 			mChooseAnimationStarted = true;
-			T::runAction(Actions::Collection::MakeSequence(
+			this->runAction(Actions::Collection::MakeSequence(
 				Actions::Collection::Execute([this] {
-					mChooseAnimationProcessing = true; 
+					mChooseAnimationProcessing = true;
 				}),
 				Actions::Collection::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
 				Actions::Collection::Execute([this] {
@@ -168,7 +168,7 @@ namespace Shared::SceneHelpers
 			const float Duration = 0.125f / 1.5f;
 
 			mChooseAnimationStarted = false;
-			T::runAction(Actions::Collection::MakeSequence(
+			this->runAction(Actions::Collection::MakeSequence(
 				Actions::Collection::Wait(mChooseAnimationProcessing),
 				Actions::Collection::Execute([this] {
 					mChooseAnimationProcessing = true; 
@@ -306,7 +306,7 @@ namespace Shared::SceneHelpers
 			if (!mOutlined)
 				return;
 
-			auto model = glm::scale(T::getTransform(), { T::getAbsoluteSize(), 1.0f });
+			auto model = glm::scale(this->getTransform(), { this->getAbsoluteSize(), 1.0f });
 			GRAPHICS->pushModelMatrix(model);
 			GRAPHICS->drawLineRectangle(mOutlineColor->getColor());
 			GRAPHICS->pop();
@@ -329,7 +329,7 @@ namespace Shared::SceneHelpers
 	public:
 		MovableByHand()
 		{
-			T::setTouchable(true);
+			this->setTouchable(true);
 		}
 
 	protected:
@@ -340,7 +340,7 @@ namespace Shared::SceneHelpers
 			auto fixed_pos = pos;
 
 			if (type != Scene::Node::Touch::Begin)
-				T::setPosition(T::getPosition() + T::unproject(fixed_pos) - T::unproject(mPrevPosition));
+				this->setPosition(this->getPosition() + this->unproject(fixed_pos) - this->unproject(mPrevPosition));
 
 			mPrevPosition = fixed_pos;
 		}
@@ -529,10 +529,10 @@ namespace Shared::SceneHelpers
 	template <class T> class Smoother : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-	public:
+	protected:
 		void updateTransform() override
 		{
-			auto prev_transform = T::getTransform();
+			auto prev_transform = this->getTransform();
 			T::updateTransform();
 
 			if (!mSmoothTransform)
@@ -542,15 +542,15 @@ namespace Shared::SceneHelpers
 			if (mPrevTransformTimepoint.has_value())
 			{
 				auto dTime = now - mPrevTransformTimepoint.value();
-				auto new_transform = T::getTransform();
-				T::setTransform(Common::Helpers::SmoothValue(prev_transform, new_transform, dTime));
+				auto new_transform = this->getTransform();
+				this->setTransform(Common::Helpers::SmoothValue(prev_transform, new_transform, dTime));
 			}
 			mPrevTransformTimepoint = now;
 		}
 
 		void updateAbsoluteSize() override
 		{
-			auto prev_size = T::getAbsoluteSize();
+			auto prev_size = this->getAbsoluteSize();
 			T::updateAbsoluteSize();
 
 			if (!mSmoothAbsoluteSize)
@@ -560,8 +560,8 @@ namespace Shared::SceneHelpers
 			if (mPrevSizeTimepoint.has_value())
 			{
 				auto dTime = now - mPrevSizeTimepoint.value();
-				auto new_size = T::getAbsoluteSize();
-				T::setAbsoluteSize(Common::Helpers::SmoothValue(prev_size, new_size, dTime));
+				auto new_size = this->getAbsoluteSize();
+				this->setAbsoluteSize(Common::Helpers::SmoothValue(prev_size, new_size, dTime));
 			}
 			mPrevSizeTimepoint = now;
 		}
