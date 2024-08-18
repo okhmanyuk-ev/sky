@@ -55,10 +55,12 @@ namespace Scene
 		virtual void updateAbsoluteScale();
 
 	protected:
-		virtual void enterDraw();
-		virtual void leaveDraw();
+		virtual void enterUpdate();
 		virtual void update(Clock::Duration dTime);
+		virtual void leaveUpdate();
+		virtual void enterDraw();
 		virtual void draw();
+		virtual void leaveDraw();
 		virtual void touch(Touch type, const glm::vec2& pos);
 		virtual void scroll(float x, float y);
 

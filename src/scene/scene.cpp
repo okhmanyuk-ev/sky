@@ -30,10 +30,13 @@ void Scene::Scene::recursiveNodeUpdate(Node& node, Clock::Duration delta)
 	if (!node.isEnabled())
 		return;
 
+	node.enterUpdate();
 	node.update(delta);
 
 	for (auto _node : node.getNodes())
 		recursiveNodeUpdate(*_node, delta);
+
+	node.leaveUpdate();
 }
 
 void Scene::Scene::recursiveNodeDraw(Node& node)

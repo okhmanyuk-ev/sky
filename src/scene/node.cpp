@@ -153,11 +153,7 @@ void Node::updateAbsoluteScale()
 	mAbsoluteScale = getScale() * parent_scale;
 }
 
-void Node::enterDraw()
-{
-}
-
-void Node::leaveDraw()
+void Node::enterUpdate()
 {
 }
 
@@ -168,7 +164,19 @@ void Node::update(Clock::Duration dTime)
 	updateAbsoluteScale();
 }
 
+void Node::leaveUpdate()
+{
+}
+
+void Node::enterDraw()
+{
+}
+
 void Node::draw()
+{
+}
+
+void Node::leaveDraw()
 {
 }
 
