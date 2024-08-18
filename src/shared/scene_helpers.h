@@ -31,15 +31,15 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(glm::vec2 size,
 		const std::vector<std::shared_ptr<Scene::Node>>& items);
 
-	struct GridPart
+	struct ScaledCell
 	{
-		float part = 1.0f;
+		ScaledCell(std::shared_ptr<Scene::Node> node, float weight = 1.0f);
 		std::shared_ptr<Scene::Node> node;
+		float weight;
 	};
-	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const std::vector<GridPart>& items);
-	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items);
-	std::shared_ptr<Scene::Node> MakeVerticalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items);
-	std::shared_ptr<Scene::Node> MakeGrid(const std::vector<std::vector<std::shared_ptr<Scene::Node>>>& items);
+
+	std::shared_ptr<Scene::Node> MakeScaledRow(const std::vector<ScaledCell>& items);
+	std::shared_ptr<Scene::Node> MakeScaledColumn(const std::vector<ScaledCell>& items);
 
 	struct HorizontalGridCell
 	{
@@ -644,7 +644,7 @@ namespace Shared::SceneHelpers
 		void update(Clock::Duration dTime) override;
 
 	public:
-		void refreshRichLabel();
+		void refresh();
 
 	public:
 		const auto& getText() const { return mState.text; }

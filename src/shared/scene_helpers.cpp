@@ -191,70 +191,47 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(glm::vec2 size, cons
 	return MakeVerticalGrid(size.x, size.y, items);
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<GridPart>& items)
+SceneHelpers::ScaledCell::ScaledCell(std::shared_ptr<Scene::Node> _node, float _weight) :
+	node(_node), weight(_weight)
 {
-	auto holder = std::make_shared<Scene::Node>();
+}
 
+std::shared_ptr<Scene::Node> SceneHelpers::MakeScaledRow(const std::vector<ScaledCell>& items)
+{
+	auto row = std::make_shared<Scene::Row>();
 	float all = 0.0f;
 	for (const auto& item : items)
 	{
-		all += item.part;
+		all += item.weight;
 	}
-
-	float anchor_x = 0.0f;
 	for (const auto& item : items)
 	{
 		auto cell = std::make_shared<Scene::Node>();
-		auto stretch_x = item.part / all;
+		auto stretch_x = item.weight / all;
 		cell->setStretch({ stretch_x, 1.0f });
-		cell->setHorizontalAnchor(anchor_x);
-		holder->attach(cell);
+		row->attach(cell);
 		cell->attach(item.node);
-		anchor_x += stretch_x;
 	}
-	return holder;
+	return row;
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items)
+std::shared_ptr<Scene::Node> SceneHelpers::MakeScaledColumn(const std::vector<ScaledCell>& items)
 {
-	std::vector<GridPart> grid_parts;
-	for (auto item : items)
+	auto column = std::make_shared<Scene::Column>();
+	float all = 0.0f;
+	for (const auto& item : items)
 	{
-		grid_parts.push_back(GridPart{
-			.part = 1.0f,
-			.node = item
-		});
+		all += item.weight;
 	}
-	return MakeHorizontalGrid(grid_parts);
-}
-
-std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(const std::vector<std::shared_ptr<Scene::Node>>& items)
-{
-	auto holder = std::make_shared<Scene::Node>();
-	float stretch_y = 1.0f / (float)items.size();
-	float anchor_y = 0.0f;
-	for (auto item : items)
+	for (const auto& item : items)
 	{
 		auto cell = std::make_shared<Scene::Node>();
+		auto stretch_y = item.weight / all;
 		cell->setStretch({ 1.0f, stretch_y });
-		cell->setVerticalAnchor(anchor_y);
-		holder->attach(cell);
-		cell->attach(item);
-		anchor_y += stretch_y;
+		column->attach(cell);
+		cell->attach(item.node);
 	}
-	return holder;
-}
-
-std::shared_ptr<Scene::Node> SceneHelpers::MakeGrid(const std::vector<std::vector<std::shared_ptr<Scene::Node>>>& items)
-{
-	std::vector<std::shared_ptr<Scene::Node>> horz_grids;
-	for (auto item : items)
-	{
-		auto horz_grid = MakeHorizontalGrid(item);
-		horz_grid->setStretch(1.0f);
-		horz_grids.push_back(horz_grid);
-	}
-	return MakeVerticalGrid(horz_grids);
+	return column;
 }
 
 std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<HorizontalGridCell>& cells)
@@ -1118,10 +1095,10 @@ SceneHelpers::RichLabel::RichLabel()
 void SceneHelpers::RichLabel::update(Clock::Duration dTime)
 {
 	AutoSized<Scene::Node>::update(dTime);
-	refreshRichLabel();
+	refresh();
 }
 
-void SceneHelpers::RichLabel::refreshRichLabel()
+void SceneHelpers::RichLabel::refresh()
 {
 	if (mState == mPrevState)
 		return;
