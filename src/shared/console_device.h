@@ -22,7 +22,7 @@
 
 namespace Shared
 {
-	class ConsoleDevice : public Console::Device, 
+	class ConsoleDevice : public Console::Device,
 		public Common::FrameSystem::Frameable,
 		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
 		public Common::Event::Listenable<TouchEmulator::Event>,

@@ -1,6 +1,6 @@
 #include "system_glfw.h"
 
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)// | defined(PLATFORM_EMSCRIPTEN)
 
 #if defined(PLATFORM_WINDOWS)
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -8,7 +8,9 @@
 #define GLFW_EXPOSE_NATIVE_COCOA
 #endif
 #include <GLFW/glfw3.h>
+#if !defined(PLATFORM_EMSCRIPTEN)
 #include <GLFW/glfw3native.h>
+#endif
 #include <common/event_system.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -37,11 +39,7 @@ int main(int argc, char* argv[])
 
 std::shared_ptr<System> System::create(const std::string& appname)
 {
-#if defined(PLATFORM_WINDOWS)
-	return std::make_shared<SystemWindows>(appname);
-#elif defined(PLATFORM_MAC)
-	return std::make_shared<SystemMac>(appname);
-#endif
+	return std::make_shared<SystemGlfw>(appname);
 }
 
 SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
@@ -55,6 +53,8 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	mNativeWindow = glfwGetWin32Window(gWindow);
 #elif defined(PLATFORM_MAC)
 	mNativeWindow = glfwGetCocoaWindow(gWindow);
+#elif defined(PLATFORM_EMSCRIPTEN)
+	mNativeWindow = gWindow;
 #endif
 
 	float x_scale;

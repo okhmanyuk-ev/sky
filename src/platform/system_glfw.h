@@ -2,7 +2,7 @@
 
 #include <platform/system.h>
 
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)// | defined(PLATFORM_EMSCRIPTEN)
 
 #include <platform/low_level_api.h>
 #include <platform/input.h>
@@ -75,11 +75,5 @@ namespace Platform
 		glm::ivec2 mCursorPos = { 0, 0 };
 		void* mNativeWindow = nullptr;
 	};
-
-#if defined(PLATFORM_WINDOWS)
-	using SystemWindows = SystemGlfw;
-#elif defined(PLATFORM_MAC)
-	using SystemMac = SystemGlfw;
-#endif
 }
 #endif

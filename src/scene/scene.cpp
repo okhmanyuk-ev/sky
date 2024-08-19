@@ -81,7 +81,7 @@ void Scene::Scene::drawBatchGroup(const std::string& name)
 
 		node.lock()->draw();
 	}
-	
+
 	mBatchGroups.erase(name);
 }
 

@@ -169,7 +169,7 @@ void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, skygf
 
 	const auto& state = mStates.top();
 
-	//RENDERER->setRenderTarget(state.render_target); 
+	//RENDERER->setRenderTarget(state.render_target);
 
 	std::vector<skygfx::utils::Command> cmds;
 
@@ -337,7 +337,7 @@ void System::drawRoundedRectangle(const glm::vec4& top_left_color, const glm::ve
 {
 	static auto effect = sky::effects::Effect<sky::effects::Rounded>();
 	effect.uniform.size = size;
-	
+
 	if (absolute_rounding)
 	{
 		effect.uniform.radius = glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f);
@@ -397,7 +397,7 @@ void System::drawLineRectangle(const glm::vec4& color)
 	});
 }
 
-void System::drawCircle(const glm::vec4& inner_color, const glm::vec4& outer_color, 
+void System::drawCircle(const glm::vec4& inner_color, const glm::vec4& outer_color,
 	float fill, float pie)
 {
 	static auto effect = sky::effects::Effect<sky::effects::Circle>();
@@ -477,7 +477,7 @@ void System::drawSlicedSprite(sky::effects::IEffect* effect, std::shared_ptr<sky
 	const glm::vec4& color)
 {
 	glm::vec2 tex_size = { static_cast<float>(texture->getWidth()), static_cast<float>(texture->getHeight()) };
-	
+
 	glm::vec2 s1 = center_region.pos / tex_size;
 	glm::vec2 s2 = (center_region.size / tex_size) + s1;
 
@@ -498,7 +498,7 @@ void System::drawSlicedSprite(sky::effects::IEffect* effect, std::shared_ptr<sky
 	vertices[1] = { { 0.0f, p1.y, 0.0f }, color, { 0.0f, s1.y } };
 	vertices[2] = { { p1.x, p1.y, 0.0f }, color, { s1.x, s1.y } };
 	vertices[3] = { { p1.x, 0.0f, 0.0f }, color, { s1.x, 0.0f } };
-	
+
 	// top center
 
 	vertices[4] = { { p1.x, 0.0f, 0.0f }, color, { s1.x, 0.0f } };
@@ -669,7 +669,7 @@ glm::vec3 System::project(const glm::vec3& pos)
 
 void System::push(const State& value)
 {
-	assert(mWorking);	
+	assert(mWorking);
 	mStates.push(value);
 }
 
@@ -815,12 +815,12 @@ void System::pushMipmapBias(float bias)
 	push(state);
 }
 
-void System::setBatching(bool value) 
-{ 
-	if (!value && mBatching) 
-		flush(); 
-	
-	mBatching = value; 
+void System::setBatching(bool value)
+{
+	if (!value && mBatching)
+		flush();
+
+	mBatching = value;
 }
 
 std::shared_ptr<skygfx::RenderTarget> System::getRenderTarget(const std::string& name, uint32_t width, uint32_t height)
@@ -842,7 +842,7 @@ std::shared_ptr<skygfx::RenderTarget> System::getRenderTarget(const std::string&
 	}
 
 	mUnusedRenderTargets.erase(name);
-	
+
 	return mRenderTargets.at(name);
 }
 
