@@ -5,7 +5,7 @@
 
 namespace Scene
 {
-	class Rectangle : public Node, public Color
+	class RectangleComponent : public ComponentNode::Component, public Color
 	{
 	public:
 		enum class Corner
@@ -24,8 +24,8 @@ namespace Scene
 			Right
 		};
 
-	protected:
-		void draw() override;
+	public:
+		RectangleComponent();
 
 	public:
 		auto getCornerColor(Corner corner) const { return mCornerColors.at(corner); }
@@ -60,5 +60,38 @@ namespace Scene
 		float mRounding = 0.0f;
 		bool mAbsoluteRounding = false;
 		bool mSlicedSpriteOptimizationEnabled = true;
+	};
+
+	class Rectangle : public ComponentNode
+	{
+	public:
+		using Corner = RectangleComponent::Corner;
+		using Edge = RectangleComponent::Edge;
+
+		Rectangle();
+
+		glm::vec4 getColor() const;
+		void setColor(const glm::vec4& value);
+		void setColor(const glm::vec3& value);
+
+		float getAlpha() const;
+		void setAlpha(float value);
+
+		std::shared_ptr<Color> getCornerColor(Corner corner) const;
+		std::shared_ptr<Color> getEdgeColor(Edge edge) const;
+
+		float getRounding() const;
+		void setRounding(float value);
+
+		bool isAbsoluteRounding() const;
+		void setAbsoluteRounding(bool value);
+
+		bool isSlicedSpriteOptimizationEnabled() const;
+		void setSlicedSpriteOptimizationEnabled(bool value);
+
+		std::shared_ptr<RectangleComponent> getRectangleComponent() const;
+
+	private:
+		std::shared_ptr<RectangleComponent> mRectangleComponent;
 	};
 }

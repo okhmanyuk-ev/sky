@@ -373,8 +373,7 @@ namespace Shared::SceneHelpers
 		void update(Clock::Duration dTime) override;
 	};
 
-	class VerticalScrollbar : public Scene::Rectangle,
-		public std::enable_shared_from_this<VerticalScrollbar>
+	class VerticalScrollbar : public Scene::Rectangle
 	{
 	private:
 		const float BarAlpha = 0.125f;
@@ -624,7 +623,7 @@ namespace Shared::SceneHelpers
 
 	//std::vector<std::shared_ptr<Scene3D::Model>> MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension);
 
-	class CursorIndicator : public Scene::Rectangle, public std::enable_shared_from_this<CursorIndicator>
+	class CursorIndicator : public Scene::Rectangle
 	{
 	public:
 		CursorIndicator(std::shared_ptr<Scene::Label> label);

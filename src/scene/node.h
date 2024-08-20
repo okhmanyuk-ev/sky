@@ -129,4 +129,32 @@ namespace Scene
 	private:
 		Actions::GenericActionsPlayer<Actions::Parallel> mActions;
 	};
+
+	class ComponentNode : public Node
+	{
+	public:
+		class Component;
+
+	protected:
+		void draw() override;
+
+	public:
+		void addComponent(std::shared_ptr<Component> component);
+
+	private:
+		std::unordered_set<std::shared_ptr<Component>> mComponents;
+	};
+
+	class ComponentNode::Component
+	{
+	public:
+		virtual ~Component() = default;
+
+	public:
+		auto getDrawCallback() const { return mDrawCallback; }
+		void setDrawCallback(std::function<void(Node&)> value) { mDrawCallback = value; }
+
+	private:
+		std::function<void(Node&)> mDrawCallback;
+	};
 }

@@ -463,25 +463,25 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 		mAlphaAnimating = true;
 		runAction(Actions::Collection::MakeSequence(
 			Actions::Collection::MakeParallel(
-				Actions::Collection::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
-				Actions::Collection::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
+				Actions::Collection::ChangeAlpha(getRectangleComponent(), BarAlpha, AnimDuration, Easing::CubicInOut),
+				Actions::Collection::ChangeAlpha(mIndicator->getRectangleComponent(), IndicatorAlpha, AnimDuration, Easing::CubicInOut)
 			),
 			Actions::Collection::Execute([this] {
 				mHidden = false;
 				mAlphaAnimating = false;
 			})
 		));
-	} 
-	else 
+	}
+	else
 	{
 		if (mHidden)
 			return;
-		
+
 		mAlphaAnimating = true;
 		runAction(Actions::Collection::MakeSequence(
 			Actions::Collection::MakeParallel(
-				Actions::Collection::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
-				Actions::Collection::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
+				Actions::Collection::ChangeAlpha(getRectangleComponent(), 0.0f, AnimDuration, Easing::CubicInOut),
+				Actions::Collection::ChangeAlpha(mIndicator->getRectangleComponent(), 0.0f, AnimDuration, Easing::CubicInOut)
 			),
 			Actions::Collection::Execute([this] {
 				mHidden = true;
@@ -501,7 +501,7 @@ SceneHelpers::StandardScreen::StandardScreen(const std::set<Effect>& effects) :
 	setStretch(1.0f);
 	setAnchor(0.5f);
 	setPivot(0.5f);
-	
+
 	mContent = std::make_shared<Scene::Node>();
 	mContent->setStretch(1.0f);
 	mContent->setAnchor(0.5f);
@@ -1039,7 +1039,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 	setRounding(1.0f);
 	runAction(Actions::Collection::ExecuteInfinite([this, label] {
 		auto font = label->getFont();
-		
+
 		auto font_scale = font->getScaleFactorForSize(label->getFontSize());
 		auto height = font->getAscent() * font_scale;
 		height -= font->getDescent() * font_scale;
@@ -1064,7 +1064,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 
 		auto [pos, size] = label->getSymbolBounds(index);
 		auto line_y = label->getSymbolLineY(index);
-		
+
 		setX(pos.x + size.x);
 		setY(line_y);
 	}));
@@ -1074,9 +1074,9 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 		Actions::Collection::Execute([this] {
 			runAction(Actions::Collection::RepeatInfinite([this] {
 				return Actions::Collection::MakeSequence(
-					Actions::Collection::ChangeAlpha(shared_from_this(), 1.0f, 0.125f),
+					Actions::Collection::ChangeAlpha(getRectangleComponent(), 1.0f, 0.125f),
 					Actions::Collection::Wait(0.25f),
-					Actions::Collection::ChangeAlpha(shared_from_this(), 0.0f, 0.125f),
+					Actions::Collection::ChangeAlpha(getRectangleComponent(), 0.0f, 0.125f),
 					Actions::Collection::Wait(0.25f)
 				);
 			}));

@@ -191,3 +191,21 @@ void Node::touch(Touch type, const glm::vec2& pos)
 void Node::scroll(float x, float y)
 {
 }
+
+template<typename Func, typename... Args>
+static void SafeExecute(Func callback, Args&&... args)
+{
+	if (callback)
+		callback(std::forward<Args>(args)...);
+}
+
+void ComponentNode::draw()
+{
+	for (auto component : mComponents)
+		SafeExecute(component->getDrawCallback(), *this);
+}
+
+void ComponentNode::addComponent(std::shared_ptr<Component> component)
+{
+	mComponents.insert(component);
+}
