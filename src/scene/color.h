@@ -11,6 +11,7 @@ namespace Scene
 		Color();
 		Color(const glm::vec3& color);
 		Color(const glm::vec4& color);
+		virtual ~Color() = default;
 
 	public:
 		auto getColor() const { return mColor; }

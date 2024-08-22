@@ -7,6 +7,8 @@ namespace Scene
 	class Transform
 	{
 	public:
+		virtual ~Transform() = default;
+
 		auto getSize() const { return mSize; }
 		void setSize(const glm::vec2& value) { mSize = value; }
 

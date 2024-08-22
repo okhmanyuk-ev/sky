@@ -32,7 +32,7 @@ namespace Scene
 
 	public:
 		Node();
-		virtual ~Node();
+		~Node();
 
 	public:
 		virtual void attach(std::shared_ptr<Node> node, AttachDirection attach_direction = AttachDirection::Back);
