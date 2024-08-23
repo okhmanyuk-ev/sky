@@ -333,11 +333,11 @@ void System::drawRectangle(sky::effects::IEffect* effect, const glm::vec4& color
 }
 
 void System::drawRoundedRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
-	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size, float rounding, bool absolute_rounding)
+	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size,
+	float rounding, bool absolute_rounding)
 {
 	static auto effect = sky::effects::Effect<sky::effects::Rounded>();
 	effect.uniform.size = size;
-
 	if (absolute_rounding)
 	{
 		effect.uniform.radius = glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f);
@@ -346,7 +346,6 @@ void System::drawRoundedRectangle(const glm::vec4& top_left_color, const glm::ve
 	{
 		effect.uniform.radius = (glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;
 	}
-
 	drawRectangle(&effect, top_left_color, top_right_color, bottom_left_color, bottom_right_color);
 }
 
@@ -555,7 +554,7 @@ void System::drawSlicedSprite(sky::effects::IEffect* effect, std::shared_ptr<sky
 	vertices[34] = { { 1.0f, 1.0f, 0.0f }, color, { 1.0f, 1.0f } };
 	vertices[35] = { { 1.0f, p2.y, 0.0f }, color, { 1.0f, s2.y } };
 
-	static const std::vector<uint32_t> indices = { 
+	static const std::vector<uint32_t> indices = {
 		0, 1, 2, 0, 2, 3,
 		4, 5, 6, 4, 6, 7,
 		8, 9, 10, 8, 10, 11,
@@ -835,7 +834,7 @@ std::shared_ptr<skygfx::RenderTarget> System::getRenderTarget(const std::string&
 		}
 	}
 
-	if (!mRenderTargets.contains(name)) 
+	if (!mRenderTargets.contains(name))
 	{
 		auto target = std::make_shared<skygfx::RenderTarget>(width, height);
 		mRenderTargets.insert({ name, target });

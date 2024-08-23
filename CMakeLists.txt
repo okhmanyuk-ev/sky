@@ -25,7 +25,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ALL_SRC})
 add_library(${PROJECT_NAME} STATIC ${ALL_SRC})
 
 if(MSVC)
-	target_compile_options(${PROJECT_NAME} PUBLIC /MP) # multicore compile
+	target_compile_options(${PROJECT_NAME} PUBLIC /MP /bigobj)
 endif()
 
 if(APPLE)
@@ -285,10 +285,6 @@ if(MSVC)
 endif()
 target_include_directories(websocketpp INTERFACE lib/websocketpp)
 target_link_libraries(${PROJECT_NAME} websocketpp)
-
-if(WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-endif()
 
 # box2d
 
