@@ -11,7 +11,10 @@ namespace Scene
 		void leaveUpdate() override
 		{
 			T::leaveUpdate();
-			
+
+			if (!mAutoScaleEnabled)
+				return;
+
 			if (!this->hasParent())
 				return;
 
@@ -19,5 +22,12 @@ namespace Scene
 			auto scale = parent_size / this->getSize();
 			this->setScale(glm::min(scale.x, scale.y));
 		}
+
+	public:
+		bool isAutoScaleEnabled() const { return mAutoScaleEnabled; }
+		void setAutoScaleEnabled(bool value) { mAutoScaleEnabled = value; }
+
+	private:
+		bool mAutoScaleEnabled = true;
 	};
 }
