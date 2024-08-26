@@ -246,7 +246,7 @@ size_t Scene::Scene::getNodesCount(std::shared_ptr<Node> node) const
 {
 	if (node == nullptr)
 		return getNodesCount(mRoot);
-	
+
 	size_t result = 1;
 
 	for (auto _node : node->getNodes())
@@ -317,7 +317,7 @@ void Scene::Scene::onEvent(const Platform::Input::Touch::Event& e)
 	}
 	else if (e.type == Platform::Input::Touch::Event::Type::Continue && !mTouchedNodes.empty())
 	{
-		executeTouchedNodes(Node::Touch::Continue, pos);	
+		executeTouchedNodes(Node::Touch::Continue, pos);
 	}
 	else if (e.type == Platform::Input::Touch::Event::Type::End && !mTouchedNodes.empty())
 	{

@@ -29,7 +29,7 @@ namespace Scene
 
 	public:
 		void frame();
-		
+
 		size_t getNodesCount(std::shared_ptr<Node> node = nullptr) const;
 
 	private:
@@ -50,7 +50,7 @@ namespace Scene
 
 	public:
 		static void MakeBatchLists(BatchGroups& batchGroups, std::shared_ptr<Node> node);
-	
+
 	private:
 		std::list<std::shared_ptr<Node>> getTouchableNodes(std::shared_ptr<Node> node, const glm::vec2& pos) const;
 		std::list<std::shared_ptr<Node>> getTouchableNodes(const glm::vec2& pos) const;

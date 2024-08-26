@@ -2,15 +2,15 @@
 
 using namespace Platform;
 
-float System::getLogicalWidth() const 
-{ 
-	return getWidth() / getScale(); 
+float System::getLogicalWidth() const
+{
+	return getWidth() / getScale();
 }
-;
-float System::getLogicalHeight() const 
-{ 
-	return getHeight() / getScale(); 
-};
+
+float System::getLogicalHeight() const
+{
+	return getHeight() / getScale();
+}
 
 void System::rescale(float value)
 {
