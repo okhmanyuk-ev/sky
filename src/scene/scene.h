@@ -74,6 +74,8 @@ namespace Scene
 
 		auto& getTimestepFixer() { return mTimestepFixer; }
 
+		void setScreenAdaption(std::optional<glm::vec2> value) { mScreenAdaption = value; }
+
 	private:
 		std::shared_ptr<RootNode> mRoot = std::make_shared<RootNode>();
 		std::list<std::weak_ptr<Node>> mTouchedNodes;
@@ -83,6 +85,7 @@ namespace Scene
 		BatchGroups mBatchGroups;
 		bool mBatchGroupsEnabled = true;
 		Common::TimestepFixer mTimestepFixer;
+		std::optional<glm::vec2> mScreenAdaption;
 	};
 
 	class Scene::RootNode : public Node

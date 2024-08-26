@@ -228,6 +228,14 @@ void Scene::Scene::frame()
 		recursiveNodeUpdateTransform(*mRoot);
 	});
 
+	if (mScreenAdaption.has_value())
+	{
+		auto scale = mViewport.size / mScreenAdaption.value();
+		auto min_scale = glm::min(scale.x, scale.y);
+		mRoot->setScale(min_scale);
+		mRoot->setStretch(1.0f / min_scale);
+	}
+
 	if (mBatchGroupsEnabled)
 	{
 		mBatchGroups.clear();
