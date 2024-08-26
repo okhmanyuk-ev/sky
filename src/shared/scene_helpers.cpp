@@ -60,7 +60,7 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	label->setX(8.0f);
 	outer_rect->attach(label);
 
-	holder->setClickCallback([inner_rect, changeCallback] { 
+	holder->setClickCallback([inner_rect, changeCallback] {
 		inner_rect->setEnabled(!inner_rect->isEnabled());
 		changeCallback(inner_rect->isEnabled());
 	});
@@ -87,7 +87,7 @@ std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std
 		auto [checkbox, setter] = MakeFastCheckbox(title, title_size, choosed == index, [index, setters, changeCallback](bool value) {
 			for (auto setter : *setters)
 				setter(false);
-			
+
 			setters->at(index)(true);
 			changeCallback(index);
 		});
@@ -101,7 +101,7 @@ std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std
 	return result;
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(float height, 
+std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(float height,
 	const std::vector<std::pair<float/*width*/, std::shared_ptr<Scene::Node>>>& items)
 {
 	auto holder = std::make_shared<Scene::Node>();
@@ -116,7 +116,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(float height,
 		cell->setWidth(width);
 		cell->setX(x);
 		holder->attach(cell);
-		
+
 		cell->attach(node);
 
 		x += width;
@@ -154,7 +154,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeVerticalGrid(std::optional<float>
 	{
 		auto cell = std::make_shared<Scene::Node>();
 		cell->setHeight(height);
-		
+
 		if (width.has_value())
 			cell->setWidth(width.value());
 		else
@@ -312,11 +312,17 @@ void SceneHelpers::SpriteButton::refresh()
 
 SceneHelpers::RectangleButton::RectangleButton()
 {
-	mLabel = std::make_shared<Scene::Adaptive<Scene::Label>>();
+	auto label_holder = std::make_shared<Scene::Node>();
+	label_holder->setAnchor(0.5f);
+	label_holder->setPivot(0.5f);
+	label_holder->setStretch(0.75f);
+	attach(label_holder);
+
+	mLabel = std::make_shared<Scene::AutoScaled<Scene::Label>>();
 	mLabel->setAnchor(0.5f);
 	mLabel->setPivot(0.5f);
-	mLabel->setAdaptStretch(0.7f);
-	attach(mLabel);
+	label_holder->attach(mLabel);
+
 	refresh();
 }
 
@@ -353,7 +359,7 @@ void SceneHelpers::RectangleButton::onChooseEnd()
 SceneHelpers::Progressbar::Progressbar()
 {
 	setAlpha(0.33f);
-	
+
 	mProgressContent = std::make_shared<Scene::Rectangle>();
 	mProgressContent->setAnchor({ 0.0f, 0.5f });
 	mProgressContent->setPivot({ 0.0f, 0.5f });
@@ -471,12 +477,12 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 				mAlphaAnimating = false;
 			})
 		));
-	} 
-	else 
+	}
+	else
 	{
 		if (mHidden)
 			return;
-		
+
 		mAlphaAnimating = true;
 		runAction(Actions::Collection::MakeSequence(
 			Actions::Collection::MakeParallel(
@@ -501,7 +507,7 @@ SceneHelpers::StandardScreen::StandardScreen(const std::set<Effect>& effects) :
 	setStretch(1.0f);
 	setAnchor(0.5f);
 	setPivot(0.5f);
-	
+
 	mContent = std::make_shared<Scene::Node>();
 	mContent->setStretch(1.0f);
 	mContent->setAnchor(0.5f);
@@ -557,7 +563,7 @@ void SceneHelpers::StandardScreen::onLeaveEnd()
 void SceneHelpers::StandardScreen::onWindowAppearingBegin()
 {
 	setInteractions(false);
-	if (mEffects.contains(Effect::WindowAppearingScale)) 
+	if (mEffects.contains(Effect::WindowAppearingScale))
 	{
 		runAction(Actions::Collection::ChangeScale(mContent, StartScale, 1.0f, Easing::CubicOut));
 	}
@@ -618,7 +624,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction
 	{
 		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::Linear));
 	}
-	
+
 	if (mEffects.contains(Effect::Scale))
 	{
 		parallel->add(Actions::Collection::ChangeScale(mContent, StartScale, Duration, Easing::CubicIn));
@@ -996,7 +1002,7 @@ SceneHelpers::Editbox::Window::Window()
 		auto material = materials.at(material_id);
 
 		auto model = std::make_shared<Scene3D::Model>();
-		
+
 		bool has_texture = !material.diffuse_texname.empty();
 
 		if (has_texture)
@@ -1019,10 +1025,10 @@ SceneHelpers::Editbox::Window::Window()
 
 		model->setPositionAttribs(positions);
 		model->setNormalAttribs(normals);
-		
+
 		if (has_texture)
 			model->setTexCoordAttribs(texcoords);
-		
+
 		model->setColorAttribs(colors);
 
 		result.push_back(model);
@@ -1039,7 +1045,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 	setRounding(1.0f);
 	runAction(Actions::Collection::ExecuteInfinite([this, label] {
 		auto font = label->getFont();
-		
+
 		auto font_scale = font->getScaleFactorForSize(label->getFontSize());
 		auto height = font->getAscent() * font_scale;
 		height -= font->getDescent() * font_scale;
@@ -1064,7 +1070,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 
 		auto [pos, size] = label->getSymbolBounds(index);
 		auto line_y = label->getSymbolLineY(index);
-		
+
 		setX(pos.x + size.x);
 		setY(line_y);
 	}));

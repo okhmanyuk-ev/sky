@@ -20,7 +20,7 @@ namespace Shared::SceneHelpers
 		std::shared_ptr<Scene::Node>>>& items);
 
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const glm::vec2& cell_size,
-		const std::vector<std::shared_ptr<Scene::Node>>& items); 
+		const std::vector<std::shared_ptr<Scene::Node>>& items);
 
 	std::shared_ptr<Scene::Node> MakeVerticalGrid(std::optional<float> width, const std::vector<std::pair<float/*height*/,
 		std::shared_ptr<Scene::Node>>>& items);
@@ -171,7 +171,7 @@ namespace Shared::SceneHelpers
 			this->runAction(Actions::Collection::MakeSequence(
 				Actions::Collection::Wait(mChooseAnimationProcessing),
 				Actions::Collection::Execute([this] {
-					mChooseAnimationProcessing = true; 
+					mChooseAnimationProcessing = true;
 				}),
 				Actions::Collection::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
 				Actions::Collection::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
@@ -227,7 +227,7 @@ namespace Shared::SceneHelpers
 		void setHighlightColor(const glm::vec3& value) { setHighlightColor({ value.x, value.y, value.z, mHighlightColor.a }); }
 
 	private:
-		std::shared_ptr<Scene::Adaptive<Scene::Label>> mLabel;
+		std::shared_ptr<Scene::AutoScaled<Scene::Label>> mLabel;
 		bool mHighlightEnabled = true;
 		glm::vec4 mActiveColor = { 1.0f, 1.0f, 1.0f, 0.33f };
 		glm::vec4 mInactiveColor = { 1.0f, 1.0f, 1.0f, 0.125f };
