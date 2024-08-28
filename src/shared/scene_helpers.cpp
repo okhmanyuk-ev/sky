@@ -1223,7 +1223,7 @@ bool SceneHelpers::ImScene::IsMouseHovered(Scene::Node& node)
 }
 
 void SceneHelpers::ImScene::Tooltip(Scene::Node& holder,
-	std::function<std::shared_ptr<Scene::Node>()> createContentCallback)
+	std::function<std::shared_ptr<Scene::Node>()> createContentCallback, std::optional<std::string> key)
 {
 	if (!holder.isTransformReady())
 		return;
@@ -1235,7 +1235,7 @@ void SceneHelpers::ImScene::Tooltip(Scene::Node& holder,
 
 	auto pos = holder.unproject(cursor_pos.value());
 
-	auto rect = IMSCENE->spawn<Smoother<Scene::AutoSized<Scene::ClippableScissor<Scene::Rectangle>>>>(holder);
+	auto rect = IMSCENE->spawn<Smoother<Scene::AutoSized<Scene::ClippableScissor<Scene::Rectangle>>>>(holder, key);
 	if (IMSCENE->isFirstCall())
 	{
 		rect->setAbsoluteRounding(true);
@@ -1261,7 +1261,7 @@ void SceneHelpers::ImScene::Tooltip(Scene::Node& holder, const std::wstring& tex
 		label->setFontSize(26.0f);
 		label->setText(text);
 		return label;
-	});
+	}, sky::to_string(text));
 }
 
 void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Node& node)

@@ -667,7 +667,8 @@ namespace Shared::SceneHelpers
 	namespace ImScene
 	{
 		bool IsMouseHovered(Scene::Node& node);
-		void Tooltip(Scene::Node& holder, std::function<std::shared_ptr<Scene::Node>()> createContentCallback);
+		void Tooltip(Scene::Node& holder, std::function<std::shared_ptr<Scene::Node>()> createContentCallback,
+			std::optional<std::string> key = std::nullopt);
 		void Tooltip(Scene::Node& holder, const std::wstring& text);
 		void HighlightUnderCursor(Scene::Node& holder, Scene::Node& node);
 	}
