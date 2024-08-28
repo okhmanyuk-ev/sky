@@ -52,10 +52,13 @@ void Node::clear()
 
 glm::vec2 Node::project(const glm::vec2& value) const
 {
-	assert(mTransformReady);
+	if (!mTransformReady)
+		throw std::runtime_error("transform isn't ready");
 
 	auto scene = getScene();
-	assert(scene != nullptr);
+
+	if (scene == nullptr)
+		throw std::runtime_error("scene is null");
 
 	auto vp = scene->getViewport();
 	auto scaled_size = vp.size / PLATFORM->getScale();
@@ -70,10 +73,13 @@ glm::vec2 Node::project(const glm::vec2& value) const
 
 glm::vec2 Node::unproject(const glm::vec2& value) const
 {
-	assert(mTransformReady);
+	if (!mTransformReady)
+		throw std::runtime_error("transform isn't ready");
 
 	auto scene = getScene();
-	assert(scene != nullptr);
+
+	if (scene == nullptr)
+		throw std::runtime_error("scene is null");
 
 	auto vp = scene->getViewport();
 	auto scaled_size = vp.size / PLATFORM->getScale();
