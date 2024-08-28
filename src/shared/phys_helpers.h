@@ -26,13 +26,13 @@ namespace Shared::PhysHelpers
 	public:
 		auto getType() const { return mType; }
 		void setType(Type value) { mType = value; }
-	
+
 		auto getShape() const { return mShape; }
 		void setShape(Shape value) { mShape = value; }
 
 		auto isFixedRotation() const { return mFixedRotation; }
 		void setFixedRotation(bool value) { mFixedRotation = value; }
-		
+
 		auto isBullet() const { return mBullet; }
 		void setBullet(bool value) { mBullet = value; }
 
@@ -41,7 +41,7 @@ namespace Shared::PhysHelpers
 		Shape mShape = Shape::Box;
 		bool mFixedRotation = false;
 		bool mBullet = false;
-	
+
 	public:
 		auto getB2Fixture() const { return mB2Fixture; }
 		void setB2Fixture(b2Fixture* value) { mB2Fixture = value; }
@@ -61,7 +61,7 @@ namespace Shared::PhysHelpers
 	public:
 		auto getFilterLayer() const { return mFilterLayer; }
 		void setFilterLayer(int value) { mFilterLayer = value; };
-		
+
 	private:
 		int mFilterLayer = 0;
 

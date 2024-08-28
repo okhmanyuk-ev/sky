@@ -305,14 +305,14 @@ void World::attach(std::shared_ptr<Node> node, AttachDirection attach_direction)
 
 	auto body = mB2World.CreateBody(&body_def);
 	auto fixture = body->CreateFixture(&fixture_def);
-	
+
 	entity->setB2Fixture(fixture);
 }
 
 void World::detach(std::shared_ptr<Node> node)
 {
 	Scene::Node::detach(node);
-	
+
 	auto entity = std::dynamic_pointer_cast<Entity>(node);
 
 	if (!entity)
