@@ -75,8 +75,10 @@ namespace Scene
 	public:
 		void setChooseBeginCallback(Callback value) { mChooseBeginCallback = value; }
 		void setChooseEndCallback(Callback value) { mChooseEndCallback = value; }
+
+		auto getClickCallback() const { return mClickCallback; }
 		void setClickCallback(Callback value) { mClickCallback = value; }
-	
+
 		float getChooseTolerance() const { return mChooseTolerance; }
 		void setChooseTolerance(float value) { mChooseTolerance = value; }
 
