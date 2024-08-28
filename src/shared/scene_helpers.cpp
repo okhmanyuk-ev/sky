@@ -1203,6 +1203,9 @@ bool SceneHelpers::ImScene::IsMouseHovered(Scene::Node& node)
 	if (!cursor_pos.has_value())
 		return false;
 
+	if (!node.getScene()->interactTest(cursor_pos.value()))
+		return false;
+
 	static std::unordered_set<Scene::Node*> touched_nodes_set;
 	static std::optional<uint64_t> prev_frame;
 
