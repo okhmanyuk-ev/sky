@@ -52,11 +52,13 @@ void SystemEmscripten::process()
     {
 		if (event.type == SDL_MOUSEMOTION)
 		{
+			mCursorPos = {
+				(int)((float)event.motion.x * mScale),
+				(int)((float)event.motion.y * mScale)
+			};
+
 			EVENT->emit(Input::Mouse::MoveEvent{
-				.pos = {
-					(int)((float)event.motion.x * mScale),
-					(int)((float)event.motion.y * mScale)
-				}
+				.pos = mCursorPos
 			});
 		}
 		else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
@@ -365,6 +367,11 @@ void SystemEmscripten::showCursor()
 
 void SystemEmscripten::setCursorPos(int x, int y)
 {
+}
+
+std::optional<glm::ivec2> SystemEmscripten::getCursorPos() const
+{
+	return mCursorPos;
 }
 
 std::string SystemEmscripten::getAppName() const
