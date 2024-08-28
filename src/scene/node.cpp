@@ -107,10 +107,10 @@ std::tuple<glm::vec2, glm::vec2> Node::getGlobalBounds() const
 
 ::Scene::Scene* Node::getScene() const
 {
-	if (hasParent())
-		return getParent()->getScene();
-	else
-		return nullptr;
+	if (!hasParent())
+		throw std::runtime_error("parent is null");
+
+	return getParent()->getScene();
 }
 
 bool Node::hitTest(const glm::vec2& value) const
