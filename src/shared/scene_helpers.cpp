@@ -1193,7 +1193,7 @@ void SceneHelpers::RichLabel::setTag(const std::string& name, std::function<std:
 	mTags[name] = callback;
 }
 
-bool SceneHelpers::ImScene::IsMouseHovered(const Scene::Scene& scene, Scene::Node& node)
+bool SceneHelpers::ImScene::IsMouseHovered(Scene::Node& node)
 {
 	if (!node.isTransformReady())
 		return false;
@@ -1211,7 +1211,7 @@ bool SceneHelpers::ImScene::IsMouseHovered(const Scene::Scene& scene, Scene::Nod
 	if (prev_frame != current_frame)
 	{
 		// do it one time per frame, because it is very heavyweight function
-		auto touched_nodes = scene.getTouchedNodes(cursor_pos.value());
+		auto touched_nodes = node.getScene()->getTouchedNodes(cursor_pos.value());
 		touched_nodes_set.clear();
 		std::ranges::transform(touched_nodes, std::inserter(touched_nodes_set, touched_nodes_set.begin()), [](const auto& node) {
 			return node.lock().get();
@@ -1222,10 +1222,10 @@ bool SceneHelpers::ImScene::IsMouseHovered(const Scene::Scene& scene, Scene::Nod
 	return touched_nodes_set.contains(&node);
 }
 
-void SceneHelpers::ImScene::Tooltip(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
+void SceneHelpers::ImScene::Tooltip(Scene::Node& holder,
 	std::function<std::shared_ptr<Scene::Node>()> createContentCallback)
 {
-	if (!IsMouseHovered(scene, node))
+	if (!holder.isTransformReady())
 		return;
 
 	auto cursor_pos = PLATFORM->getCursorPos();
@@ -1235,8 +1235,7 @@ void SceneHelpers::ImScene::Tooltip(const Scene::Scene& scene, Scene::Node& hold
 
 	auto pos = holder.unproject(cursor_pos.value());
 
-	auto rect = IMSCENE->spawn<Smoother<Scene::AutoSized<Scene::ClippableScissor<Scene::Rectangle>>>>(holder,
-		std::to_string((size_t)&node));
+	auto rect = IMSCENE->spawn<Smoother<Scene::AutoSized<Scene::ClippableScissor<Scene::Rectangle>>>>(holder);
 	if (IMSCENE->isFirstCall())
 	{
 		rect->setAbsoluteRounding(true);
@@ -1253,10 +1252,9 @@ void SceneHelpers::ImScene::Tooltip(const Scene::Scene& scene, Scene::Node& hold
 	rect->setPosition(pos);
 }
 
-void SceneHelpers::ImScene::TooltipLabel(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node,
-	const std::wstring& text)
+void SceneHelpers::ImScene::Tooltip(Scene::Node& holder, const std::wstring& text)
 {
-	Tooltip(scene, holder, node, [&] {
+	Tooltip(holder, [&] {
 		auto label = std::make_shared<Scene::Label>();
 		label->setAnchor(0.5f);
 		label->setPivot(0.5f);
@@ -1266,9 +1264,9 @@ void SceneHelpers::ImScene::TooltipLabel(const Scene::Scene& scene, Scene::Node&
 	});
 }
 
-void SceneHelpers::ImScene::HighlightUnderCursor(const Scene::Scene& scene, Scene::Node& holder, Scene::Node& node)
+void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Node& node)
 {
-	if (!IsMouseHovered(scene, node))
+	if (!IsMouseHovered(node))
 		return;
 
 	auto [pos, size] = node.getGlobalBounds();
