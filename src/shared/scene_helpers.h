@@ -72,7 +72,7 @@ namespace Shared::SceneHelpers
 	public:
 		virtual void refresh()
 		{
-            Scene::Clickable<T>::setClickEnabled(isActive());
+            this->setClickEnabled(isActive());
 		};
 
 	protected:
@@ -356,8 +356,8 @@ namespace Shared::SceneHelpers
 	public:
 		KillableByClick()
 		{
-			Scene::Clickable<T>::setClickCallback([this] {
-				Scene::Clickable<T>::runAction(Actions::Collection::Kill(KillableByClick<T>::shared_from_this()));
+			this->setClickCallback([this] {
+				this->runAction(Actions::Collection::Kill(this->shared_from_this()));
 			});
 		}
 	};
