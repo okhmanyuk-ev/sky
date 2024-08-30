@@ -55,7 +55,7 @@ namespace Graphics
 			std::function<void(skygfx::utils::MeshBuilder&)> draw_func);
 
 		// colored rectangle
-		void drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture, 
+		void drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
 			const glm::vec2& top_left_uv, const glm::vec2& top_right_uv,
 			const glm::vec2& bottom_left_uv, const glm::vec2& bottom_right_uv,
 			const glm::vec4& top_left_color, const glm::vec4& top_right_color,
@@ -205,7 +205,7 @@ namespace Graphics
 
 	public:
 		std::shared_ptr<skygfx::Texture> makeGenericTexture(const glm::ivec2& size, std::function<void()> callback);
-		
+
 	private:
 		std::shared_ptr<skygfx::Texture> mWhiteCircleTexture = nullptr;
 	};
