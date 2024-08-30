@@ -12,38 +12,38 @@ namespace Scene
 		void leaveUpdate() override
 		{
 			T::leaveUpdate();
-			mAutoSize = { 0.0f, 0.0f };
+			mMaxSize = { 0.0f, 0.0f };
 
 			for (const auto& node : this->getNodes())
 			{
-				mAutoSize.x = glm::max(mAutoSize.x, node->getX() + node->getAbsoluteWidth());
-				mAutoSize.y = glm::max(mAutoSize.y, node->getY() + node->getAbsoluteHeight());
+				mMaxSize.x = glm::max(mMaxSize.x, node->getX() + node->getAbsoluteWidth());
+				mMaxSize.y = glm::max(mMaxSize.y, node->getY() + node->getAbsoluteHeight());
 			}
 
-			if (mAutoSizeWidthEnabled)
-				this->setWidth(mAutoSize.x);
+			if (mAutoWidthEnabled)
+				this->setWidth(mMaxSize.x);
 
-			if (mAutoSizeHeightEnabled)
-				this->setHeight(mAutoSize.y);
+			if (mAutoHeightEnabled)
+				this->setHeight(mMaxSize.y);
 
-			if (mAutoSizeWidthEnabled || mAutoSizeHeightEnabled)
+			if (mAutoWidthEnabled || mAutoHeightEnabled)
 				this->updateAbsoluteSize();
 		}
 
 	public:
-		auto getAutoSize() const { return mAutoSize; }
-		auto getAutoSizeWidth() const { return mAutoSize.x; }
-		auto getAutoSizeHeight() const { return mAutoSize.y; }
+		auto getMaxSize() const { return mMaxSize; }
+		auto getMaxWidth() const { return mMaxSize.x; }
+		auto getMaxHeight() const { return mMaxSize.y; }
 
-		bool isAutoSizeWidthEnabled() const { return mAutoSizeWidthEnabled; }
-		void setAutoSizeWidthEnabled(bool value) { mAutoSizeWidthEnabled = value; }
+		bool isAutoWidthEnabled() const { return mAutoWidthEnabled; }
+		void setAutoWidthEnabled(bool value) { mAutoWidthEnabled = value; }
 
-		bool isAutoSizeHeightEnabled() const { return mAutoSizeHeightEnabled; }
-		void setAutoSizeHeightEnabled(bool value) { mAutoSizeHeightEnabled = value; }
+		bool isAutoHeightEnabled() const { return mAutoHeightEnabled; }
+		void setAutoHeightEnabled(bool value) { mAutoHeightEnabled = value; }
 
 	private:
-		glm::vec2 mAutoSize = { 0.0f, 0.0f };
-		bool mAutoSizeWidthEnabled = true;
-		bool mAutoSizeHeightEnabled = true;
+		glm::vec2 mMaxSize = { 0.0f, 0.0f };
+		bool mAutoWidthEnabled = true;
+		bool mAutoHeightEnabled = true;
 	};
 }

@@ -12,8 +12,8 @@ Scrollbox::Scrollbox()
 	attach(mBounding);
 
 	mContent = std::make_shared<AutoSized<Node>>();
-	mContent->setAutoSizeHeightEnabled(false);
-	mContent->setAutoSizeWidthEnabled(false);
+	mContent->setAutoHeightEnabled(false);
+	mContent->setAutoWidthEnabled(false);
 	mBounding->attach(mContent);
 }
 

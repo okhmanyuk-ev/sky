@@ -248,7 +248,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<
 	for (auto cell : cells)
 	{
 		auto cell_holder = std::make_shared<Scene::AutoSized<Scene::Node>>();
-		cell_holder->setAutoSizeHeightEnabled(false);
+		cell_holder->setAutoHeightEnabled(false);
 		cell_holder->attach(cell.node);
 		grid->attach(cell_holder);
 
@@ -264,7 +264,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<
 			if (holder_data.cell.cell_parent_vertically_stretches_to_grid)
 				continue;
 
-			size.y = glm::max(size.y, holder_data.cell_parent->getAutoSizeHeight());
+			size.y = glm::max(size.y, holder_data.cell_parent->getMaxHeight());
 		}
 		for (const auto& holder_data : holder_datas)
 		{
@@ -1116,7 +1116,7 @@ void SceneHelpers::RichLabel::refresh()
 		auto holder = std::make_shared<Scene::AutoSized<Scene::Node>>();
 		holder->setAnchor({ 0.0f, 0.5f });
 		holder->setPivot({ 0.0f, 0.5f });
-		holder->setAutoSizeHeightEnabled(!stretch);
+		holder->setAutoHeightEnabled(!stretch);
 		holder->setVerticalStretch(stretch);
 		holder->attach(item);
 		mContent->attach(holder);
