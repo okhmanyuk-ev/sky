@@ -35,7 +35,7 @@ namespace Scene
 
 	public:
 		bool getRowReadAbsoluteSize() const { return mRowReadAbsoluteSize; }
-		void setRowumnReadAbsoluteSize(bool value) { mRowReadAbsoluteSize = value; }
+		void setRowReadAbsoluteSize(bool value) { mRowReadAbsoluteSize = value; }
 
 	private:
 		bool mRowReadAbsoluteSize = true;
