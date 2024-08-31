@@ -48,6 +48,8 @@ namespace Shared::SceneHelpers
 	};
 
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const std::vector<HorizontalGridCell>& cells);
+	std::shared_ptr<Scene::ClippableScissor<Scene::Scrollbox>>
+		MakeVerticalOptimizedItemList(const std::vector<std::shared_ptr<Scene::Node>>& items);
 
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 

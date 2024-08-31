@@ -277,6 +277,68 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<
 	return grid;
 }
 
+std::shared_ptr<Scene::ClippableScissor<Scene::Scrollbox>>
+	SceneHelpers::MakeVerticalOptimizedItemList(const std::vector<std::shared_ptr<Scene::Node>>& items)
+{
+	auto scrollbox = std::make_shared<Scene::ClippableScissor<Scene::Scrollbox>>();
+	scrollbox->getContent()->setAutoHeightEnabled(true);
+	scrollbox->getBounding()->setStretch(1.0f);
+	scrollbox->getContent()->setStretch({ 1.0f, 0.0f });
+
+	auto scrollbar = std::make_shared<Shared::SceneHelpers::VerticalScrollbar>();
+	scrollbar->setX(-4.0f);
+	scrollbar->setScrollbox(scrollbox);
+	scrollbox->attach(scrollbar);
+
+	auto column = std::make_shared<Scene::AutoSized<Scene::Column>>();
+	column->setAutoWidthEnabled(false);
+	column->setStretch({ 1.0f, 0.0f });
+
+	for (auto item : items)
+	{
+		auto cell = std::make_shared<Scene::Cullable<Scene::AutoSized<Scene::Node>>>();
+		cell->setAutoWidthEnabled(false);
+		cell->setStretch({ 1.0f, 0.0f });
+		cell->setCullTarget(scrollbox);
+		cell->attach(item);
+		column->attach(cell);
+	}
+
+	scrollbox->getContent()->attach(column);
+
+	const auto& cullable_nodes = column->getNodes();
+
+	scrollbox->runAction(Actions::Collection::ExecuteInfinite([nodes = std::vector(cullable_nodes.begin(), cullable_nodes.end())] {
+		bool any_enabled = false;
+		for (auto it = nodes.begin(); it != nodes.end(); ++it)
+		{
+			auto isAlive = [](const Scene::Node& node) {
+				return node.isEnabled() && node.isVisible();
+			};
+
+			bool any_alive = false;
+
+			if (it != nodes.begin())
+				any_alive |= isAlive(**(it - 1));
+
+			if (it != nodes.end() - 1)
+				any_alive |= isAlive(**(it + 1));
+
+			any_enabled |= any_alive;
+			(*it)->setEnabled(any_alive);
+		}
+		if (!any_enabled)
+		{
+			for (auto& node : nodes)
+			{
+				node->setEnabled(true);
+			}
+		}
+	}));
+
+	return scrollbox;
+}
+
 void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color)
 {
 	for (auto child : node->getNodes())
