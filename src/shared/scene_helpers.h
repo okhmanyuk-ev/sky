@@ -10,9 +10,6 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Label> MakePopupLabel(std::shared_ptr<Scene::Node> holder,
 		std::shared_ptr<Scene::Node> target, const std::wstring& text, float text_size, float move_duration = 0.5f);
 
-	std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> MakeFastCheckbox(
-		const std::wstring& title, float title_size, bool checked, std::function<void(bool)> changeCallback = nullptr);
-
 	std::shared_ptr<Scene::Node> MakeHorizontalGrid(float height, const std::vector<std::pair<float/*width*/,
 		std::shared_ptr<Scene::Node>>>& items);
 

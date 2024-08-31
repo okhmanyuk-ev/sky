@@ -27,53 +27,6 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakePopupLabel(std::shared_ptr<Scene
 	return label;
 }
 
-std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers::MakeFastCheckbox(
-	const std::wstring& title, float title_size, bool checked, std::function<void(bool)> changeCallback)
-{
-	auto holder = std::make_shared<Scene::Clickable<Scene::Node>>();
-
-	auto outer_rect = std::make_shared<Scene::Rectangle>();
-	outer_rect->setAlpha(0.33f);
-	outer_rect->setStretch({ 0.0f, 1.0f });
-	outer_rect->setMargin(8.0f);
-	outer_rect->setAnchor({ 0.0f, 0.5f });
-	outer_rect->setPivot({ 0.0f, 0.5f });
-	holder->attach(outer_rect);
-
-	outer_rect->runAction(Actions::Collection::ExecuteInfinite([outer_rect] {
-		outer_rect->setWidth(outer_rect->getAbsoluteHeight() + outer_rect->getVerticalMargin());
-	}));
-
-	auto inner_rect = std::make_shared<Scene::Rectangle>();
-	inner_rect->setAnchor(0.5f);
-	inner_rect->setPivot(0.5f);
-	inner_rect->setStretch(0.66f);
-	inner_rect->setAlpha(0.66f);
-	inner_rect->setEnabled(checked);
-	outer_rect->attach(inner_rect);
-
-	auto label = std::make_shared<Scene::Label>();
-	label->setFontSize(title_size);
-	label->setText(title);
-	label->setAnchor({ 1.0f, 0.5f });
-	label->setPivot({ 0.0f, 0.5f });
-	label->setX(8.0f);
-	outer_rect->attach(label);
-
-	holder->setClickCallback([inner_rect, changeCallback] {
-		inner_rect->setEnabled(!inner_rect->isEnabled());
-		changeCallback(inner_rect->isEnabled());
-	});
-	holder->setChooseBeginCallback([outer_rect] { outer_rect->setAlpha(0.66f); });
-	holder->setChooseEndCallback([outer_rect] { outer_rect->setAlpha(0.33f); });
-
-	auto setter = [inner_rect](bool value) {
-		inner_rect->setEnabled(value);
-	};
-
-	return { holder, setter };
-}
-
 std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(float height,
 	const std::vector<std::pair<float/*width*/, std::shared_ptr<Scene::Node>>>& items)
 {
