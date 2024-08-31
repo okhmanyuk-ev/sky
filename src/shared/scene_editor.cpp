@@ -4,6 +4,7 @@
 #include <common/console_commands.h>
 #include <shared/imgui_user.h>
 #include <shared/scene_helpers.h>
+#include <magic_enum.hpp>
 
 using namespace Shared;
 
@@ -207,7 +208,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		showTexture(sprite->getTexture(), sprite->getTexRegion());
 
 		auto direct_tex_coords = sprite->getDirectTexCoords();
-		
+
 		if (direct_tex_coords.has_value())
 		{
 			auto direct_tex_coords_nn = direct_tex_coords.value();
@@ -234,9 +235,9 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Checkbox("Absolute Rounding", &absolute_rounding);
 		ImGui::SliderFloat("Rounding", &rounding, 0.0f, absolute_rounding ? 128.0f : 1.0f);
 		ImGui::Separator();
-		
+
 		rectangle->setAbsoluteRounding(absolute_rounding);
-		rectangle->setRounding(rounding);	
+		rectangle->setRounding(rounding);
 		rectangle->setSlicedSpriteOptimizationEnabled(sliced);
 	}
 
@@ -265,7 +266,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		circle->setPiePivot(pie_pivot);
 		circle->setInnerColor(inner_color);
 		circle->setOuterColor(outer_color);
-	
+
 		ImGui::Separator();
 	}
 
@@ -275,7 +276,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::SliderFloat("Blur Intensity", &intensity, 0.0f, 1.0f);
 		blur->setBlurIntensity(intensity);
 
-		auto passes = blur->getBlurPasses();		
+		auto passes = blur->getBlurPasses();
 		ImGui::SliderInt("Blur Passes", &passes, 1, 32);
 		blur->setBlurPasses(passes);
 		ImGui::Separator();
@@ -316,6 +317,35 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 		scrollbox->setScrollPosition(scroll_position);
 		scrollbox->setScrollOrigin(scroll_origin);
+
+		ImGui::Separator();
+	}
+
+	if (auto grid = std::dynamic_pointer_cast<Scene::Grid>(node); grid != nullptr)
+	{
+		auto align = grid->getAlign();
+
+		ImGui::SliderFloat("Align", &align, 0.0f, 1.0f);
+
+		auto direction = grid->getDirection();
+		auto current_direction_name = std::string(magic_enum::enum_name(direction));
+		if (ImGui::BeginCombo("Direction", current_direction_name.c_str()))
+		{
+			for (auto value : magic_enum::enum_values<Scene::Grid::Direction>())
+			{
+				bool selected = direction == value;
+				auto name = std::string(magic_enum::enum_name(value));
+
+				if (ImGui::Selectable(name.c_str(), selected))
+					grid->setDirection(value);
+
+				if (selected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		grid->setAlign(align);
 
 		ImGui::Separator();
 	}
@@ -465,7 +495,7 @@ void SceneEditor::drawImage(std::shared_ptr<skygfx::Texture> texture, std::optio
 
 	if (max > max_size)
 		scale = max_size / max;
-		
+
 	size *= scale;
 
 	auto pos = ImGui::GetCursorScreenPos();
@@ -473,7 +503,7 @@ void SceneEditor::drawImage(std::shared_ptr<skygfx::Texture> texture, std::optio
 	auto prev_cursor_pos = ImGui::GetCursorPos();
 
 	ImGui::Image(ImGui::User::GetImTextureID(texture), ImVec2(size.x, size.y));
-	
+
 	if (region.has_value() && region.value().size.x > 0.0f && region.value().size.y > 0.0f)
 	{
 		auto new_cursor_pos = ImGui::GetCursorPos();
@@ -524,7 +554,7 @@ void SceneEditor::showBatchGroupsMenu()
 	Scene::Scene::MakeBatchLists(mBatchGroups, mScene.getRoot());
 
 	ImGui::Begin("BatchGroups", &mBatchGroupsEnabled);
-	
+
 	bool enabled = mScene.isBatchGroupsEnabled();
 
 	ImGui::Checkbox("Enabled", &enabled);

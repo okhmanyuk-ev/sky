@@ -6,61 +6,77 @@ void Grid::update(Clock::Duration dTime)
 {
 	Node::update(dTime);
 
-	glm::vec2 pos = { 0.0f, 0.0f };
-
 	if (mDirection == Direction::RightDown)
 	{
-		float max_row_height = 0.0f;
-		size_t items_in_row = 0;
+		glm::vec2 row_size = { 0.0f, 0.0f };
+		std::vector<Node*> row;
+		float row_y = 0.0f;
+
+		auto setup_row = [this](std::vector<Node*> items, glm::vec2 row_size, float row_y) {
+			glm::vec2 pos = { getAbsoluteWidth() >= row_size.x ? (getAbsoluteWidth() - row_size.x) * mAlign : 0.0f, row_y };
+			for (auto item : items)
+			{
+				item->setPosition(pos);
+				pos.x += item->getAbsoluteWidth();
+			}
+		};
 
 		for (auto node : getNodes())
 		{
-			auto need_break = [&] {
-				if (mMaxItemsInRow.has_value())
-					return items_in_row >= mMaxItemsInRow.value();
+			auto item_size = node->getAbsoluteSize();
 
-				return pos.x + node->getAbsoluteWidth() > getAbsoluteWidth();
-			}();
+			bool row_completed = mMaxItemsInRow.has_value() ? row.size() >= mMaxItemsInRow.value() :
+				row_size.x + item_size.x > getAbsoluteWidth();
 
-			if (need_break)
+			if (row_completed)
 			{
-				pos.x = 0.0f;
-				pos.y += max_row_height;
-				max_row_height = 0.0f;
-				items_in_row = 0;
+				setup_row(row, row_size, row_y);
+				row_y += row_size.y;
+				row_size = { 0.0f, 0.0f };
+				row.clear();
 			}
-			node->setPosition(pos);
-			pos.x += node->getAbsoluteWidth();
-			max_row_height = glm::max(max_row_height, node->getAbsoluteHeight());
-			items_in_row++;
+
+			row.push_back(node.get());
+			row_size.x += item_size.x;
+			row_size.y = glm::max(row_size.y, item_size.y);
 		}
+		setup_row(row, row_size, row_y);
 	}
 	else if (mDirection == Direction::DownRight)
 	{
-		float max_column_width = 0.0f;
-		size_t items_in_column = 0;
+		glm::vec2 column_size = { 0.0f, 0.0f };
+		std::vector<Node*> column;
+		float column_x = 0.0f;
+
+		auto setup_column = [this](std::vector<Node*> items, glm::vec2 column_size, float column_x) {
+			glm::vec2 pos = { column_x, getAbsoluteHeight() >= column_size.y ? (getAbsoluteHeight() - column_size.y) * mAlign : 0.0f };
+			for (auto item : items)
+			{
+				item->setPosition(pos);
+				pos.y += item->getAbsoluteHeight();
+			}
+		};
 
 		for (auto node : getNodes())
 		{
-			auto need_break = [&] {
-				if (mMaxItemsInRow.has_value())
-					return items_in_column >= mMaxItemsInRow.value();
+			auto item_size = node->getAbsoluteSize();
 
-				return pos.y + node->getAbsoluteHeight() > getAbsoluteHeight();
-			}();
+			bool column_completed = mMaxItemsInRow.has_value() ? column.size() >= mMaxItemsInRow.value() :
+				column_size.y + item_size.y > getAbsoluteHeight();
 
-			if (need_break)
+			if (column_completed)
 			{
-				pos.x += max_column_width;
-				pos.y = 0.0f;
-				max_column_width = 0.0f;
-				items_in_column = 0;
+				setup_column(column, column_size, column_x);
+				column_x += column_size.x;
+				column_size = { 0.0f, 0.0f };
+				column.clear();
 			}
-			node->setPosition(pos);
-			pos.y += node->getAbsoluteHeight();
-			max_column_width = glm::max(max_column_width, node->getAbsoluteWidth());
-			items_in_column++;
+
+			column.push_back(node.get());
+			column_size.y += item_size.y;
+			column_size.x = glm::max(column_size.x, item_size.x);
 		}
+		setup_column(column, column_size, column_x);
 	}
 }
 

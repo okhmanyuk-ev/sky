@@ -23,9 +23,13 @@ namespace Scene
 		auto getMaxItemsInRow() const { return mMaxItemsInRow; }
 		void setMaxItemsInRow(std::optional<size_t> value) { mMaxItemsInRow = value; }
 
+		auto getAlign() const { return mAlign; }
+		void setAlign(float value) { mAlign = value; }
+
 	private:
 		Direction mDirection = Direction::RightDown;
 		std::optional<size_t> mMaxItemsInRow;
+		float mAlign = 0.0f;
 	};
 
 	class Row : public Node
