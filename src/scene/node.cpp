@@ -108,7 +108,7 @@ std::tuple<glm::vec2, glm::vec2> Node::getGlobalBounds() const
 ::Scene::Scene* Node::getScene() const
 {
 	if (!hasParent())
-		throw std::runtime_error("parent is null");
+		throw nullptr;
 
 	return getParent()->getScene();
 }
