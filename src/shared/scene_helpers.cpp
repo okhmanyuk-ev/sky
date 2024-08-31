@@ -74,33 +74,6 @@ std::tuple<std::shared_ptr<Scene::Node>, std::function<void(bool)>> SceneHelpers
 	return { holder, setter };
 }
 
-std::vector<std::shared_ptr<Scene::Node>> SceneHelpers::MakeFastRadioButtons(std::vector<std::wstring> titles,
-	float title_size, int choosed, std::function<void(int)> changeCallback)
-{
-	std::vector<std::shared_ptr<Scene::Node>> result;
-	auto setters = std::make_shared<std::vector<std::function<void(bool)>>>();
-
-	int index = 0;
-
-	for (const auto& title : titles)
-	{
-		auto [checkbox, setter] = MakeFastCheckbox(title, title_size, choosed == index, [index, setters, changeCallback](bool value) {
-			for (auto setter : *setters)
-				setter(false);
-
-			setters->at(index)(true);
-			changeCallback(index);
-		});
-
-		setters->push_back(setter);
-		result.push_back(checkbox);
-
-		index += 1;
-	}
-
-	return result;
-}
-
 std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(float height,
 	const std::vector<std::pair<float/*width*/, std::shared_ptr<Scene::Node>>>& items)
 {
