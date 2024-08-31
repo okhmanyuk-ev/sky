@@ -27,12 +27,12 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakePopupLabel(std::shared_ptr<Scene
 	return label;
 }
 
-SceneHelpers::ScaledCell::ScaledCell(std::shared_ptr<Scene::Node> _node, float _weight) :
+SceneHelpers::WeightedCell::WeightedCell(std::shared_ptr<Scene::Node> _node, float _weight) :
 	node(_node), weight(_weight)
 {
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeScaledRow(const std::vector<ScaledCell>& items)
+std::shared_ptr<Scene::Node> SceneHelpers::MakeWeightedRow(const std::vector<WeightedCell>& items)
 {
 	auto row = std::make_shared<Scene::Row>();
 	float all = 0.0f;
@@ -51,7 +51,7 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeScaledRow(const std::vector<Scale
 	return row;
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeScaledColumn(const std::vector<ScaledCell>& items)
+std::shared_ptr<Scene::Node> SceneHelpers::MakeWeightedColumn(const std::vector<WeightedCell>& items)
 {
 	auto column = std::make_shared<Scene::Column>();
 	float all = 0.0f;

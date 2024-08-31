@@ -10,15 +10,15 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Label> MakePopupLabel(std::shared_ptr<Scene::Node> holder,
 		std::shared_ptr<Scene::Node> target, const std::wstring& text, float text_size, float move_duration = 0.5f);
 
-	struct ScaledCell
+	struct WeightedCell
 	{
-		ScaledCell(std::shared_ptr<Scene::Node> node, float weight = 1.0f);
+		WeightedCell(std::shared_ptr<Scene::Node> node, float weight = 1.0f);
 		std::shared_ptr<Scene::Node> node;
 		float weight;
 	};
 
-	std::shared_ptr<Scene::Node> MakeScaledRow(const std::vector<ScaledCell>& items);
-	std::shared_ptr<Scene::Node> MakeScaledColumn(const std::vector<ScaledCell>& items);
+	std::shared_ptr<Scene::Node> MakeWeightedRow(const std::vector<WeightedCell>& items);
+	std::shared_ptr<Scene::Node> MakeWeightedColumn(const std::vector<WeightedCell>& items);
 
 	std::shared_ptr<Scene::ClippableScissor<Scene::Scrollbox>>
 		MakeVerticalOptimizedItemList(const std::vector<std::shared_ptr<Scene::Node>>& items);
