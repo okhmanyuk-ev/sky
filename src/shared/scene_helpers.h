@@ -35,13 +35,6 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeScaledRow(const std::vector<ScaledCell>& items);
 	std::shared_ptr<Scene::Node> MakeScaledColumn(const std::vector<ScaledCell>& items);
 
-	struct HorizontalGridCell
-	{
-		bool cell_parent_vertically_stretches_to_grid = false;
-		std::shared_ptr<Scene::Node> node;
-	};
-
-	std::shared_ptr<Scene::Node> MakeHorizontalGrid(const std::vector<HorizontalGridCell>& cells);
 	std::shared_ptr<Scene::ClippableScissor<Scene::Scrollbox>>
 		MakeVerticalOptimizedItemList(const std::vector<std::shared_ptr<Scene::Node>>& items);
 

@@ -160,49 +160,6 @@ std::shared_ptr<Scene::Node> SceneHelpers::MakeScaledColumn(const std::vector<Sc
 	return column;
 }
 
-std::shared_ptr<Scene::Node> SceneHelpers::MakeHorizontalGrid(const std::vector<HorizontalGridCell>& cells)
-{
-	auto grid = std::make_shared<Scene::Node>();
-
-	struct HolderData
-	{
-		std::shared_ptr<Scene::AutoSized<Scene::Node>> cell_parent;
-		HorizontalGridCell cell;
-	};
-
-	std::vector<HolderData> holder_datas;
-	for (auto cell : cells)
-	{
-		auto cell_holder = std::make_shared<Scene::AutoSized<Scene::Node>>();
-		cell_holder->setAutoHeightEnabled(false);
-		cell_holder->attach(cell.node);
-		grid->attach(cell_holder);
-
-		HolderData holder_data;
-		holder_data.cell = cell;
-		holder_data.cell_parent = cell_holder;
-		holder_datas.push_back(holder_data);
-	}
-	grid->runAction(Actions::Collection::ExecuteInfinite([grid, holder_datas] {
-		glm::vec2 size = { 0.0f, 0.0f };
-		for (const auto& holder_data : holder_datas)
-		{
-			if (holder_data.cell.cell_parent_vertically_stretches_to_grid)
-				continue;
-
-			size.y = glm::max(size.y, holder_data.cell_parent->getMaxHeight());
-		}
-		for (const auto& holder_data : holder_datas)
-		{
-			holder_data.cell_parent->setX(size.x);
-			holder_data.cell_parent->setHeight(size.y);
-			size.x += holder_data.cell_parent->getWidth();
-		}
-		grid->setSize(size);
-	}));
-	return grid;
-}
-
 std::shared_ptr<Scene::ClippableScissor<Scene::Scrollbox>>
 	SceneHelpers::MakeVerticalOptimizedItemList(const std::vector<std::shared_ptr<Scene::Node>>& items)
 {
