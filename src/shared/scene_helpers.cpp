@@ -8,7 +8,7 @@
 
 using namespace Shared;
 
-std::shared_ptr<Scene::Label> SceneHelpers::MakeFastPopupLabel(std::shared_ptr<Scene::Node> holder,
+std::shared_ptr<Scene::Label> SceneHelpers::MakePopupLabel(std::shared_ptr<Scene::Node> holder,
 	std::shared_ptr<Scene::Node> target, const std::wstring& text, float text_size, float move_duration)
 {
 	auto label = std::make_shared<Scene::Label>();
