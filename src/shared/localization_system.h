@@ -28,7 +28,7 @@ namespace Shared
 		void loadDicrionaries(const std::string& path);
 
 		std::wstring getString(const std::string& key) const;
-		
+
 		auto getLanguage() const { return mLanguage; }
 		void setLanguage(Language value) { mLanguage = value; }
 

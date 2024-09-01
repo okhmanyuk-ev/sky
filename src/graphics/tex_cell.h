@@ -21,8 +21,8 @@ namespace Graphics
 		auto getTexture() const { return mTexture; }
 		const auto& getRegion() const { return mRegion; }
 
-		float getWidth() const 
-		{ 
+		float getWidth() const
+		{
 			if (mRegion.size.x > 0.0f)
 				return mRegion.size.x;
 
