@@ -61,9 +61,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		PLATFORM->quit();
 	});
 
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_EMSCRIPTEN)
-	IMGUI_SYSTEM->setScaleIndependence(true);
-#endif
+	IMGUI_SYSTEM->setSamplerNearest(false);
 
 	if (flags.count(Flag::Scene))
 	{

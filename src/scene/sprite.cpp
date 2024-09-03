@@ -8,10 +8,10 @@ void Sprite::draw()
 
 	if (mTexture == nullptr)
 		mTexture = DefaultTexture;
-	
+
 	if (getAlpha() <= 0.0f)
 		return;
-	
+
 	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
 
 	GRAPHICS->pushSampler(getSampler());
@@ -39,7 +39,7 @@ void Sprite::update(Clock::Duration dTime)
 {
 	Node::update(dTime);
 
-	if (mTexture == nullptr) 
+	if (mTexture == nullptr)
 		return;
 
 	if (getAbsoluteWidth() <= 0.0f && getHorizontalStretch() <= 0.0f)

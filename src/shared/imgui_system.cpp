@@ -5,6 +5,8 @@
 #include <graphics/color.h>
 #include <shared/imgui_user.h>
 #include <graphics/all.h>
+#include <console/system.h>
+#include <common/console_commands.h>
 
 using namespace Shared;
 
@@ -48,10 +50,17 @@ ImguiSystem::ImguiSystem()
 	io.KeyMap[ImGuiKey_X] = static_cast<int>(Key::X);
 	io.KeyMap[ImGuiKey_Y] = static_cast<int>(Key::Y);
 	io.KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);
+
+	CONSOLE->registerCVar("imgui_sampler_nearest", { "bool" }, CVAR_GETTER_BOOL(mSamplerNearest),
+		CVAR_SETTER_BOOL(mSamplerNearest));
+	CONSOLE->registerCVar("imgui_scale_independence", { "bool" }, CVAR_GETTER_BOOL(mScaleIndependence),
+		CVAR_SETTER_BOOL(mScaleIndependence));
 }
 
 ImguiSystem::~ImguiSystem()
 {
+	CONSOLE->removeCVar("imgui_sampler_nearest");
+	CONSOLE->removeCVar("imgui_scale_independence");
 	ImGui::DestroyContext();
 }
 
@@ -103,7 +112,7 @@ void ImguiSystem::end()
 	ImGui::Render();
 
 	GRAPHICS->begin();
-	GRAPHICS->pushSampler(mSampler);
+	GRAPHICS->pushSampler(mSamplerNearest ? skygfx::Sampler::Nearest : skygfx::Sampler::Linear);
 	GRAPHICS->pushOrthoMatrix(getLogicalWidth(), getLogicalHeight());
 
 	auto drawData = ImGui::GetDrawData();

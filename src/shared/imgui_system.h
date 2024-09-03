@@ -38,8 +38,8 @@ namespace Shared
 		void ensureFont();
 
 	public:
-		auto getSampler() const { return mSampler; }
-		void setSampler(skygfx::Sampler value) { mSampler = value; }
+		auto isSamplerNearest() const { return mSamplerNearest; }
+		void setSamplerNearest(bool value) { mSamplerNearest = value; }
 
 		auto isScaleIndependence() const { return mScaleIndependence; }
 		void setScaleIndependence(bool value) { mScaleIndependence = value; }
@@ -51,7 +51,7 @@ namespace Shared
 		float getScale() const;
 
 	private:
-		skygfx::Sampler mSampler = skygfx::Sampler::Nearest;
+		bool mSamplerNearest = true;
 		bool mScaleIndependence = false;
 		glm::vec2 mLogicalSize = { 0.0f, 0.0f };
 
