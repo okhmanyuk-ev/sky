@@ -4,6 +4,7 @@
 #include <common/console_commands.h>
 #include <shared/imgui_user.h>
 #include <shared/scene_helpers.h>
+#include <imgui_stdlib.h>
 #include <magic_enum.hpp>
 
 using namespace Shared;
@@ -177,9 +178,9 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::SliderFloat("Font Size", &fontSize, 0.0f, 96.0f);
 		label->setFontSize(fontSize);
 
-		auto text = label->getText();
-		auto narrow_text = std::string(text.begin(), text.end());
-		ImGui::InputTextWithHint("Text", "No text", narrow_text.data(), narrow_text.size(), ImGuiInputTextFlags_ReadOnly);
+		auto text = sky::to_string(label->getText());
+		if (ImGui::InputTextWithHint("Text", "No text", &text))
+			label->setText(sky::to_wstring(text));
 
 		ImGui::Separator();
 
@@ -200,7 +201,6 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		glm::i32vec2 texture_size = { texture->getWidth(), texture->getHeight() };
 		ImGui::InputInt2("Resolution", (int*)&texture_size, ImGuiInputTextFlags_ReadOnly);
 		drawImage(texture, region);
-		ImGui::Separator();
 	};
 
 	if (auto sprite = std::dynamic_pointer_cast<Scene::Sprite>(node); sprite != nullptr)
@@ -223,6 +223,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	if (auto sliced = std::dynamic_pointer_cast<Scene::SlicedSprite>(node); sliced != nullptr)
 	{
 		showTexture(sliced->getTexture(), sliced->getCenterRegion());
+		ImGui::Separator();
 	}
 
 	if (auto rectangle = std::dynamic_pointer_cast<Scene::Rectangle>(node); rectangle != nullptr)
@@ -406,7 +407,7 @@ void SceneEditor::showTooltip(std::shared_ptr<Scene::Node> node)
 	}
 	else if (auto label = std::dynamic_pointer_cast<Scene::Label>(node); label != nullptr)
 	{
-		auto str = label->getText();
+		auto str = sky::to_string(label->getText());
 		ImGui::BeginTooltip();
 		ImGui::Text("Label: %s", str.c_str());
 		ImGui::EndTooltip();

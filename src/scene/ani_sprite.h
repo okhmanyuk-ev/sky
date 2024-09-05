@@ -14,7 +14,7 @@ namespace Scene
 
 	protected:
 		void update(Clock::Duration delta) override;
-		
+
 	public:
 		void randomizeProgress();
 

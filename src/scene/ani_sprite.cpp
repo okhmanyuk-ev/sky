@@ -18,7 +18,7 @@ void AniSprite::update(Clock::Duration delta)
 
 	if (states.count(mState) == 0)
 		return;
-	
+
 	if (mPlaying)
 	{
 		mAccumulator += delta;
@@ -67,7 +67,7 @@ void AniSprite::randomizeProgress()
 }
 
 void AniSprite::setAnimation(std::shared_ptr<skygfx::Texture> texture, std::shared_ptr<Graphics::Atlas> atlas, std::shared_ptr<Graphics::Animation> animation)
-{ 
+{
 	mSprite->setTexture(texture);
 	mAnimation = animation;;
 	mAtlas = atlas;
