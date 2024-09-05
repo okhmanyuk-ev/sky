@@ -4,6 +4,7 @@
 #include <scene/sprite.h>
 #include <scene/adaptive.h>
 #include <graphics/animation.h>
+#include <magic_enum.hpp>
 
 namespace Scene
 {
@@ -57,10 +58,21 @@ namespace Scene
 
 	public:
 		using Animation = T;
-		using StateMap = std::map<Animation, std::string>;
+		using StateMap = std::unordered_map<Animation, std::string>;
+
+		static StateMap MakeStateMapFromEnum()
+		{
+			StateMap result;
+			for (auto [field, name] : magic_enum::enum_entries<T>())
+			{
+				result.insert({ field, std::string(name) });
+			}
+			return result;
+		}
 
 	public:
-		MappedAniSprite(const StateMap& state_map) : mStateMap(state_map) { }
+		MappedAniSprite(const StateMap& state_map) : mStateMap(state_map) {}
+		MappedAniSprite() : MappedAniSprite(MakeStateMapFromEnum()) {}
 
 	public:
 		void setStateType(T value)
