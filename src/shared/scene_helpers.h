@@ -38,7 +38,8 @@ namespace Shared::SceneHelpers
 		float mGrayIntensity = 1.0f;
 	};
 
-	template <class T> class Button : public Scene::Clickable<T>
+	template <class T>
+	class Button : public Scene::Clickable<T>
 	{
 	public:
 		using Callback = std::function<void()>;
@@ -58,13 +59,11 @@ namespace Shared::SceneHelpers
 			if (isActive())
 			{
 				executeCallback(mActiveCallback);
-				sky::PlaySound(mActiveSound);
 				PLATFORM->haptic(Platform::System::HapticType::Medium);
 			}
 			else
 			{
 				executeCallback(mInactiveCallback);
-				sky::PlaySound(mInactiveSound);
 			}
 		}
 
@@ -84,18 +83,32 @@ namespace Shared::SceneHelpers
 		auto getInactiveCallback() const { return mInactiveCallback; }
 		void setInactiveCallback(Callback value) { mInactiveCallback = value; }
 
-		void setActiveSound(std::shared_ptr<Audio::Sound> value) { mActiveSound = value; }
-		void setInactiveSound(std::shared_ptr<Audio::Sound> value) { mInactiveSound = value; }
-
 	private:
 		bool mActive = true;
 		Callback mActiveCallback = nullptr;
 		Callback mInactiveCallback = nullptr;
-		std::shared_ptr<Audio::Sound> mActiveSound = nullptr;
-		std::shared_ptr<Audio::Sound> mInactiveSound = nullptr;
 	};
 
-	template <class T> class BouncingButtonBehavior : public T
+	template <class T>
+	class SoundButtonBehavior : public T
+	{
+		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
+	protected:
+		void onClick() override
+		{
+			T::onClick();
+			sky::PlaySound(mClickSound);
+		}
+
+	public:
+		void setClickSound(std::shared_ptr<Audio::Sound> value) { mClickSound = value; }
+
+	private:
+		std::shared_ptr<Audio::Sound> mClickSound = nullptr;
+	};
+
+	template <class T>
+	class BouncingButtonBehavior : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
 	public:
