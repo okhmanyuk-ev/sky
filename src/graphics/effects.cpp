@@ -2,7 +2,7 @@
 
 using namespace sky::effects;
 
-const std::string Sdf::Shader = R"(
+const std::string Sdf::Effect = R"(
 layout(binding = EFFECT_UNIFORM_BINDING) uniform _sdf
 {
 	vec4 color;
@@ -31,7 +31,7 @@ void effect(inout vec4 result)
 	}
 })";
 
-const std::string Circle::Shader = R"(
+const std::string Circle::Effect = R"(
 layout(binding = EFFECT_UNIFORM_BINDING) uniform _circle
 {
 	vec4 color;
@@ -43,9 +43,7 @@ layout(binding = EFFECT_UNIFORM_BINDING) uniform _circle
 
 void effect(inout vec4 result)
 {
-	result = In.color;
-	result *= settings.color;
-	result *= texture(sColorTexture, In.tex_coord, settings.mipmap_bias);
+	result = GetBasicResult();
 
 	const float Pi = 3.14159265;
 
@@ -64,10 +62,10 @@ void effect(inout vec4 result)
 	{
 		float max_radius = 0.5;
 		float min_radius = max_radius * (1.0f - circle.fill);
-			
+
 		float radius = distance(vertex_pos, center);
 
-		if (radius > max_radius || radius < min_radius)	
+		if (radius > max_radius || radius < min_radius)
 		{
 			discard;
 		}
@@ -80,7 +78,7 @@ void effect(inout vec4 result)
 	}
 })";
 
-const std::string Rounded::Shader = R"(
+const std::string Rounded::Effect = R"(
 layout(binding = EFFECT_UNIFORM_BINDING) uniform _rounded
 {
 	vec4 color;
@@ -90,9 +88,7 @@ layout(binding = EFFECT_UNIFORM_BINDING) uniform _rounded
 
 void effect(inout vec4 result)
 {
-	result = In.color;
-	result *= settings.color;
-	result *= texture(sColorTexture, In.tex_coord, settings.mipmap_bias);
+	result = GetBasicResult();
 
 	vec2 vertex_pos = (inverse(settings.model) * vec4(In.world_position, 1.0)).xy;
 
@@ -111,7 +107,7 @@ void effect(inout vec4 result)
 		discard;
 })";
 
-const std::string Shockwave::Shader = R"(
+const std::string Shockwave::Effect = R"(
 layout(binding = EFFECT_UNIFORM_BINDING) uniform _shockwave
 {
 	float size;

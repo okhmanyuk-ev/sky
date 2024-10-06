@@ -148,7 +148,7 @@ void System::flush()
 		skygfx::utils::commands::SetMipmapBias(state.mipmap_bias),
 		skygfx::utils::commands::SetMesh(&mesh),
 		skygfx::utils::commands::SetColorTexture(texture),
-		skygfx::utils::commands::Draw()
+		skygfx::utils::commands::DrawMesh()
 	});
 
 	mBatch.verticesCount = 0;
@@ -175,8 +175,8 @@ void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, skygf
 
 	if (effect != nullptr)
 	{
-		cmds.push_back(skygfx::utils::commands::SetEffect(effect->getShader(), effect->getUniformData(),
-			effect->getUniformSize()));
+		cmds.push_back(skygfx::utils::commands::SetEffect(effect->getShader(), effect->getUniformBinding(),
+			effect->getUniformData(), effect->getUniformSize()));
 	}
 
 	cmds.insert(cmds.end(), {
@@ -194,7 +194,7 @@ void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, skygf
 		skygfx::utils::commands::SetModelMatrix(state.model_matrix),
 		skygfx::utils::commands::SetMesh(&mesh),
 		skygfx::utils::commands::SetColorTexture(texture),
-		skygfx::utils::commands::Draw()
+		skygfx::utils::commands::DrawMesh()
 	});
 
 	skygfx::utils::ExecuteCommands(cmds);
