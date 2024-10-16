@@ -167,6 +167,14 @@
       if (!Module['arguments'][0]) {
         Module['arguments'] = [];
       }
+      (async () => {
+        if (!navigator.gpu) {
+          throw Error("WebGPU not supported.");
+        }
+        const adapter = await navigator.gpu.requestAdapter();
+        const device = await adapter.requestDevice();
+        Module.preinitializedWebGPUDevice = device;
+      })();
     </script>
     {{{ SCRIPT }}}
   </body>
