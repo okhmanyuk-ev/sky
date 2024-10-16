@@ -87,8 +87,11 @@ void PerformanceConsoleCommands::onFrame()
 		ENGINE_STATS("drawcalls", RENDERER->getDrawcalls());
 
 	if (mWantShowBatches > 0)
+	{
 		ENGINE_STATS("batches", GRAPHICS->getBatchesCount());
-	
+		ENGINE_STATS("flushes", GRAPHICS->getBatchFlushCount());
+	}
+
 	if (mWantShowTargets > 0)
 		ENGINE_STATS("targets", GRAPHICS->getRenderTargets().size());
 

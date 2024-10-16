@@ -35,7 +35,7 @@ namespace Graphics
 		void begin();
 		void end();
 
-		void flush();
+		void flushBatch();
 
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
@@ -173,12 +173,15 @@ namespace Graphics
 		void setSdfSmoothFactor(float value) { mSdfSmoothFactor = value; }
 
 		auto getBatchesCount() const { return mBatchesCountPublic; }
+		auto getBatchFlushCount() const { return mFlushCountPublic; }
 
 	private:
 		bool mBatching = true;
 		float mSdfSmoothFactor = 1.0f;
 		int mBatchesCount = 0;
 		int mBatchesCountPublic = 0;
+		int mFlushCount = 0;
+		int mFlushCountPublic = 0;
 
 	private:
 		struct
@@ -186,11 +189,10 @@ namespace Graphics
 			std::shared_ptr<skygfx::Texture> texture;
 			std::optional<skygfx::Topology> topology;
 
-			uint32_t verticesCount = 0;
-			uint32_t indicesCount = 0;
-
 			skygfx::utils::Mesh::Vertices vertices;
 			skygfx::utils::Mesh::Indices indices;
+
+			skygfx::utils::Mesh mesh;
 		} mBatch;
 
 	public:

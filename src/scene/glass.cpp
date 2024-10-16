@@ -26,7 +26,7 @@ void Glass::draw()
 		mBackbufferFormat = format;
 	}
 
-	GRAPHICS->flush();
+	GRAPHICS->flushBatch();
 	skygfx::ReadPixels({ x, y }, { w, h }, *getTexture());
 
 	if (mGenerateMipmaps)

@@ -15,6 +15,8 @@ void System::onFrame()
 {
 	mBatchesCountPublic = mBatchesCount;
 	mBatchesCount = 0;
+	mFlushCountPublic = mFlushCount;
+	mFlushCount = 0;
 
 	for (const auto& name : mUnusedRenderTargets)
 	{
@@ -42,7 +44,7 @@ void System::end()
 	assert(mWorking);
 	assert(mStates.size() == 1);
 	applyState();
-	flush();
+	flushBatch();
 	pop();
 	mWorking = false;
 }
@@ -74,7 +76,7 @@ void System::applyState()
 	if (mAppliedState.has_value() && isSameBatch(mAppliedState.value(), state))
 		return;
 
-	flush();
+	flushBatch();
 
 	bool renderTargetChanged = true;
 
@@ -90,53 +92,27 @@ void System::applyState()
 	mAppliedState = state;
 }
 
-void System::flush()
+void System::flushBatch()
 {
-	if (mBatch.verticesCount == 0)
+	if (mBatch.vertices.empty())
 		return;
+
+	mFlushCount += 1;
 
 	assert(mAppliedState.has_value());
 
+	mBatch.mesh.setVertices(mBatch.vertices);
+	mBatch.mesh.setIndices(mBatch.indices);
+
+	mBatch.vertices.clear();
+	mBatch.indices.clear();
+
 	const auto& state = mAppliedState.value();
-	auto scale = PLATFORM->getScale();
-
-	float width;
-	float height;
-
-	if (state.viewport.has_value())
-	{
-		width = state.viewport->size.x;
-		height = state.viewport->size.y;
-	}
-	else if (state.render_target)
-	{
-		width = static_cast<float>(state.render_target->getWidth());
-		height = static_cast<float>(state.render_target->getHeight());
-	}
-	else
-	{
-		width = static_cast<float>(PLATFORM->getWidth());
-		height = static_cast<float>(PLATFORM->getHeight());
-	}
-
-	width /= scale;
-	height /= scale;
-
-	auto [proj, view] = skygfx::utils::MakeCameraMatrices(skygfx::utils::OrthogonalCamera{
-		.width = width,
-		.height = height
-	});
-
-	static skygfx::utils::Mesh mesh;
-	mesh.setVertices(mBatch.vertices.data(), mBatch.verticesCount);
-	mesh.setIndices(mBatch.indices.data(), mBatch.indicesCount);
-
-	auto texture = mBatch.texture ? mBatch.texture.get() : nullptr;
 
 	skygfx::utils::ExecuteCommands({
 		skygfx::utils::commands::SetTopology(mBatch.topology.value()),
-		skygfx::utils::commands::SetProjectionMatrix(proj),
-		skygfx::utils::commands::SetViewMatrix(view),
+		skygfx::utils::commands::SetProjectionMatrix(state.projection_matrix),
+		skygfx::utils::commands::SetViewMatrix(state.view_matrix),
 		skygfx::utils::commands::SetViewport(state.viewport),
 		skygfx::utils::commands::SetScissor(state.scissor),
 		skygfx::utils::commands::SetDepthMode(state.depth_mode),
@@ -146,13 +122,10 @@ void System::flush()
 		skygfx::utils::commands::SetSampler(state.sampler),
 		skygfx::utils::commands::SetTextureAddress(state.texture_address),
 		skygfx::utils::commands::SetMipmapBias(state.mipmap_bias),
-		skygfx::utils::commands::SetMesh(&mesh),
-		skygfx::utils::commands::SetColorTexture(texture),
+		skygfx::utils::commands::SetMesh(&mBatch.mesh),
+		skygfx::utils::commands::SetColorTexture(mBatch.texture ? mBatch.texture.get() : nullptr),
 		skygfx::utils::commands::DrawMesh()
 	});
-
-	mBatch.verticesCount = 0;
-	mBatch.indicesCount = 0;
 }
 
 void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
@@ -165,11 +138,9 @@ void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, skygf
 	const skygfx::utils::Mesh& mesh)
 {
 	applyState();
-	flush();
+	flushBatch();
 
 	const auto& state = mStates.top();
-
-	//RENDERER->setRenderTarget(state.render_target);
 
 	std::vector<skygfx::utils::Command> cmds;
 
@@ -204,54 +175,41 @@ void System::draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture
 	skygfx::Topology topology, skygfx::utils::Mesh::Vertex* vertices, uint32_t vertex_count,
 	skygfx::utils::Mesh::Index* indices, uint32_t index_count)
 {
-	if (mBatching && vertex_count <= 40 && effect == nullptr)
-	{
-		applyState();
-
-		if (mBatch.topology != topology || mBatch.texture != texture)
-			flush();
-		else
-			mBatchesCount += 1;
-
-		mBatch.texture = texture;
-		mBatch.topology = topology;
-		mBatch.verticesCount += vertex_count;
-
-		if (mBatch.verticesCount > mBatch.vertices.size())
-			mBatch.vertices.resize(mBatch.verticesCount);
-
-		auto start_vertex = mBatch.verticesCount - vertex_count;
-
-		for (uint32_t i = 0; i < vertex_count; i++)
-		{
-			const auto& src_vertex = vertices[i];
-			auto& dst_vertex = mBatch.vertices.at(start_vertex + i);
-			dst_vertex.pos = project(src_vertex.pos);
-			dst_vertex.color = src_vertex.color;
-			dst_vertex.texcoord = src_vertex.texcoord;
-		}
-
-		mBatch.indicesCount += index_count;
-
-		if (mBatch.indicesCount > mBatch.indices.size())
-			mBatch.indices.resize(mBatch.indicesCount);
-
-		auto start_index = mBatch.indicesCount - index_count;
-
-		for (uint32_t i = 0; i < index_count; i++)
-		{
-			auto src_index = indices[i];
-			auto& dst_index = mBatch.indices.at(start_index + i);
-			dst_index = static_cast<uint32_t>(mBatch.verticesCount - vertex_count) + src_index;
-		}
-	}
-	else
+	if (!mBatching || vertex_count > 40 || effect != nullptr)
 	{
 		static skygfx::utils::Mesh mesh;
 		mesh.setVertices(vertices, vertex_count);
 		mesh.setIndices(indices, index_count);
 
 		draw(effect, texture ? texture.get() : nullptr, topology, mesh);
+		return;
+	}
+
+	applyState();
+
+	if (mBatch.topology != topology || mBatch.texture != texture)
+		flushBatch();
+
+	mBatchesCount += 1;
+
+	mBatch.texture = texture;
+	mBatch.topology = topology;
+
+	for (uint32_t i = 0; i < vertex_count; i++)
+	{
+		const auto& vertex = vertices[i];
+		auto projected_pos = project(vertex.pos);
+		mBatch.vertices.push_back(skygfx::utils::Mesh::Vertex{
+			.pos = projected_pos,
+			.color = vertex.color,
+			.texcoord = vertex.texcoord
+		});
+	}
+
+	for (uint32_t i = 0; i < index_count; i++)
+	{
+		auto index = indices[i];
+		mBatch.indices.push_back(static_cast<uint32_t>(mBatch.vertices.size() - vertex_count) + index);
 	}
 }
 
@@ -761,6 +719,7 @@ void System::pushScissor(std::optional<skygfx::Scissor> value, bool inherit_prev
 
 void System::pushViewMatrix(const glm::mat4& value)
 {
+	flushBatch();
 	auto state = mStates.top();
 	state.view_matrix = value;
 	push(state);
@@ -768,6 +727,7 @@ void System::pushViewMatrix(const glm::mat4& value)
 
 void System::pushProjectionMatrix(const glm::mat4& value)
 {
+	flushBatch();
 	auto state = mStates.top();
 	state.projection_matrix = value;
 	push(state);
@@ -817,7 +777,7 @@ void System::pushMipmapBias(float bias)
 void System::setBatching(bool value)
 {
 	if (!value && mBatching)
-		flush();
+		flushBatch();
 
 	mBatching = value;
 }
