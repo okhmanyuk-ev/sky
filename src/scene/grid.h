@@ -26,35 +26,29 @@ namespace Scene
 		auto getAlign() const { return mAlign; }
 		void setAlign(float value) { mAlign = value; }
 
+		bool isBreakToFitSize() const { return mBreakToFitSize; }
+		void setBreakToFitSize(bool value) { mBreakToFitSize = value; }
+
+		bool isUseAbsoluteSizeOfItems() const { return mUseAbsoluteSizeOfItems; }
+		void setUseAbsoluteSizeOfItems(bool value) { mUseAbsoluteSizeOfItems = value; }
+
 	private:
 		Direction mDirection = Direction::RightDown;
 		std::optional<size_t> mMaxItemsInRow;
+		bool mBreakToFitSize = true;
+		bool mUseAbsoluteSizeOfItems = true;
 		float mAlign = 0.0f;
 	};
 
-	class Row : public Node
+	class Row : public Grid
 	{
-	protected:
-		void update(Clock::Duration dTime) override;
-
 	public:
-		bool getRowReadAbsoluteSize() const { return mRowReadAbsoluteSize; }
-		void setRowReadAbsoluteSize(bool value) { mRowReadAbsoluteSize = value; }
-
-	private:
-		bool mRowReadAbsoluteSize = true;
+		Row();
 	};
 
-	class Column : public Node
+	class Column : public Grid
 	{
-	protected:
-		void update(Clock::Duration dTime) override;
-
 	public:
-		bool getColumnReadAbsoluteSize() const { return mColumnReadAbsoluteSize; }
-		void setColumnReadAbsoluteSize(bool value) { mColumnReadAbsoluteSize = value; }
-
-	private:
-		bool mColumnReadAbsoluteSize = true;
+		Column();
 	};
 }
