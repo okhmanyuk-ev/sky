@@ -114,13 +114,13 @@ Font::Font(void* data, size_t size)
 		}
 	}
 
-	mTexture = std::make_shared<skygfx::Texture>(image.getWidth(), image.getHeight(), skygfx::Format::Byte4,
+	mTexture = std::make_shared<skygfx::Texture>(image.getWidth(), image.getHeight(), skygfx::PixelFormat::RGBA8UNorm,
 		image.getMemory());
 
 	int ascent = 0;
 	int descent = 0;
 	int linegap = 0;
-	
+
 	auto res = stbtt_GetFontVMetricsOS2(&info, &ascent, &descent, &linegap);
 
 	assert(res == 1);

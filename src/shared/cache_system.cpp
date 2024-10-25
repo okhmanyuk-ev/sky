@@ -73,7 +73,7 @@ void CacheSystem::loadTexture(const Graphics::Image& image, const std::string& n
 	assert(image.getChannels() == 4); // TODO: skygfx::Format::Byte(1/2/3)
 
 	auto texture = std::make_shared<skygfx::Texture>(image.getWidth(), image.getHeight(),
-		skygfx::Format::Byte4, image.getMemory());
+		skygfx::PixelFormat::RGBA8UNorm, image.getMemory());
 
 	loadTexture(texture, name);
 }

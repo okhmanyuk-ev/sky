@@ -11,7 +11,7 @@ namespace Scene
 
 	private:
 		glm::vec2 mPrevSize = { 0.0f, 0.0f };
-		std::optional<skygfx::Format> mBackbufferFormat;
+		std::optional<skygfx::PixelFormat> mBackbufferFormat;
 
 	public:
 		auto getGenerateMipmaps() const { return mGenerateMipmaps; }
@@ -19,8 +19,8 @@ namespace Scene
 
 	private:
 		bool mGenerateMipmaps = false;
-	};	
-	
+	};
+
 	class BlurredGlass : public Glass
 	{
 	public:
