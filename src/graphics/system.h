@@ -52,7 +52,8 @@ namespace Graphics
 			const skygfx::utils::Mesh::Indices& indices);
 
 		void draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
-			std::function<void(skygfx::utils::MeshBuilder&)> draw_func);
+			skygfx::utils::MeshBuilder::Mode mode,
+			std::function<void(std::function<void(const skygfx::utils::Mesh::Vertex&)>)> callback);
 
 		// colored rectangle
 		void drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,

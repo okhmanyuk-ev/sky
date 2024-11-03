@@ -134,20 +134,16 @@ void ImguiSystem::end()
 			{
 				auto texture = *(std::shared_ptr<skygfx::Texture>*)cmd.TextureId;
 				GRAPHICS->pushScissor(skygfx::Scissor{ {cmd.ClipRect.x, cmd.ClipRect.y }, { cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y } });
-				GRAPHICS->draw(nullptr, texture, [&](skygfx::utils::MeshBuilder& mesh_builder) {
-					mesh_builder.begin(skygfx::utils::MeshBuilder::Mode::Triangles);
-
+				GRAPHICS->draw(nullptr, texture, skygfx::utils::MeshBuilder::Mode::Triangles, [&](auto vertex) {
 					for (uint32_t i = index_offset; i < index_offset + cmd.ElemCount; i++)
 					{
 						const auto& v = cmds->VtxBuffer[cmds->IdxBuffer[i]];
-						mesh_builder.vertex({
+						vertex({
 							.pos = { v.pos.x, v.pos.y, 0.0f },
 							.color = glm::unpackUnorm4x8(v.col),
 							.texcoord = { v.uv.x, v.uv.y }
 						});
 					}
-
-					mesh_builder.end();
 				});
 				GRAPHICS->pop();
 			}

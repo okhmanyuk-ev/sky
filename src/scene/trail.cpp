@@ -111,9 +111,7 @@ void Trail::draw()
 
 	GRAPHICS->pushStencilMode(stencil);
 	GRAPHICS->pushModelMatrix(holder->getTransform());
-	GRAPHICS->draw(nullptr, nullptr, [&](skygfx::utils::MeshBuilder& mesh) {
-		mesh.begin(skygfx::utils::MeshBuilder::Mode::TriangleStrip);
-
+	GRAPHICS->draw(nullptr, nullptr, skygfx::utils::MeshBuilder::Mode::TriangleStrip, [&](auto vertex) {
 		for (int i = (int)mSegments.size() - 1; i >= 0; i--)
 		{
 			bool last = i == mSegments.size() - 1;
@@ -139,11 +137,9 @@ void Trail::draw()
 			auto color = glm::lerp(mEndColor, mBeginColor, interp);
 			color *= getColor();
 
-			mesh.vertex({ .pos = { last ? v2 : v1, 0.0f }, .color = color });
-			mesh.vertex({ .pos = { last ? v1 : v2, 0.0f }, .color = color });
+			vertex({ .pos = { last ? v2 : v1, 0.0f }, .color = color });
+			vertex({ .pos = { last ? v1 : v2, 0.0f }, .color = color });
 		}
-
-		mesh.end();
 	});
 
 	GRAPHICS->pop(2);
