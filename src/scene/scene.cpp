@@ -14,17 +14,6 @@ Scene::Scene::~Scene()
 {
 }
 
-void Scene::Scene::recursiveNodeUpdateTransform(Node& node)
-{
-	if (!node.isEnabled())
-		return;
-
-	node.updateTransform();
-
-	for (auto _node : node.getNodes())
-		recursiveNodeUpdateTransform(*_node);
-}
-
 void Scene::Scene::recursiveNodeUpdate(Node& node, Clock::Duration delta)
 {
 	if (!node.isEnabled())
@@ -225,7 +214,6 @@ void Scene::Scene::frame()
 
 	mTimestepFixer.execute([&](auto delta) {
 		recursiveNodeUpdate(*mRoot, delta);
-		recursiveNodeUpdateTransform(*mRoot);
 	});
 
 	if (mScreenAdaption.has_value())

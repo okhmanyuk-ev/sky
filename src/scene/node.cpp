@@ -178,6 +178,7 @@ void Node::update(Clock::Duration dTime)
 	mActions.update(dTime);
 	updateAbsoluteSize();
 	updateAbsoluteScale();
+	updateTransform();
 }
 
 void Node::leaveUpdate()
