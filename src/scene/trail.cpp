@@ -111,37 +111,40 @@ void Trail::draw()
 
 	GRAPHICS->pushStencilMode(stencil);
 	GRAPHICS->pushModelMatrix(holder->getTransform());
-	GRAPHICS->draw(nullptr, nullptr, skygfx::utils::MeshBuilder::Mode::TriangleStrip, [&](auto vertex) {
-		for (int i = (int)mSegments.size() - 1; i >= 0; i--)
-		{
-			bool last = i == mSegments.size() - 1;
 
-			const auto& s1 = mSegments.at(i);
-			const auto& s2 = mSegments.at(last ? i - 1 : i + 1);
+	std::vector<skygfx::utils::Mesh::Vertex> vertices;
+	vertices.reserve(mSegments.size() * 2);
 
-			auto perp = glm::normalize(s1.pos - s2.pos); // perpendicular
-			perp = { -perp.y, perp.x };
+	for (int i = (int)mSegments.size() - 1; i >= 0; i--)
+	{
+		bool last = i == mSegments.size() - 1;
 
-			float thickness = (getAbsoluteSize().x + getAbsoluteSize().y) / 4.0f; // TODO: bad size effect when parent node was scaled
+		const auto& s1 = mSegments.at(i);
+		const auto& s2 = mSegments.at(last ? i - 1 : i + 1);
 
-			perp *= thickness;
+		auto perp = glm::normalize(s1.pos - s2.pos); // perpendicular
+		perp = { -perp.y, perp.x };
 
-			auto interp = Easing::Linear((float)i / (float)mSegments.size());
+		float thickness = (getAbsoluteSize().x + getAbsoluteSize().y) / 4.0f; // TODO: bad size effect when parent node was scaled
 
-			if (mNarrowing)
-				perp *= interp;
+		perp *= thickness;
 
-			auto v1 = s1.pos + perp;
-			auto v2 = s1.pos - perp;
+		auto interp = Easing::Linear((float)i / (float)mSegments.size());
 
-			auto color = glm::lerp(mEndColor, mBeginColor, interp);
-			color *= getColor();
+		if (mNarrowing)
+			perp *= interp;
 
-			vertex({ .pos = { last ? v2 : v1, 0.0f }, .color = color });
-			vertex({ .pos = { last ? v1 : v2, 0.0f }, .color = color });
-		}
-	});
+		auto v1 = s1.pos + perp;
+		auto v2 = s1.pos - perp;
 
+		auto color = glm::lerp(mEndColor, mBeginColor, interp);
+		color *= getColor();
+
+		vertices.push_back({ .pos = { last ? v2 : v1, 0.0f }, .color = color });
+		vertices.push_back({ .pos = { last ? v1 : v2, 0.0f }, .color = color });
+	}
+
+	GRAPHICS->draw(nullptr, nullptr, skygfx::utils::MeshBuilder::Mode::TriangleStrip, vertices);
 	GRAPHICS->pop(2);
 }
 

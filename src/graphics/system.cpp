@@ -226,17 +226,11 @@ void System::draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture
 }
 
 void System::draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
-	skygfx::utils::MeshBuilder::Mode mode,
-	std::function<void(std::function<void(const skygfx::utils::Mesh::Vertex&)>)> callback)
+	skygfx::utils::MeshBuilder::Mode mode, std::vector<skygfx::utils::Mesh::Vertex> _vertices)
 {
 	static skygfx::utils::MeshBuilder mesh_builder;
 	mesh_builder.reset();
-	mesh_builder.begin(mode);
-	callback([&](const skygfx::utils::Mesh::Vertex& vertex) {
-		mesh_builder.vertex(vertex);
-	});
-	mesh_builder.end();
-	assert(!mesh_builder.isBegan());
+	mesh_builder.addPrimitive(mode, _vertices);
 
 	auto topology = mesh_builder.getTopology().value();
 	const auto& vertices = mesh_builder.getVertices();
@@ -251,11 +245,11 @@ void System::drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_pt
 	const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color)
 {
-	draw(effect, texture, skygfx::utils::MeshBuilder::Mode::TriangleStrip, [&](auto vertex) {
-		vertex({ .pos = { 0.0f, 0.0f, 0.0f }, .color = top_left_color, .texcoord = top_left_uv });
-		vertex({ .pos = { 0.0f, 1.0f, 0.0f }, .color = bottom_left_color, .texcoord = bottom_left_uv });
-		vertex({ .pos = { 1.0f, 0.0f, 0.0f }, .color = top_right_color, .texcoord = top_right_uv });
-		vertex({ .pos = { 1.0f, 1.0f, 0.0f }, .color = bottom_right_color, .texcoord = bottom_right_uv });
+	draw(effect, texture, skygfx::utils::MeshBuilder::Mode::TriangleStrip, {
+		{ .pos = { 0.0f, 0.0f, 0.0f }, .color = top_left_color, .texcoord = top_left_uv },
+		{ .pos = { 0.0f, 1.0f, 0.0f }, .color = bottom_left_color, .texcoord = bottom_left_uv },
+		{ .pos = { 1.0f, 0.0f, 0.0f }, .color = top_right_color, .texcoord = top_right_uv },
+		{ .pos = { 1.0f, 1.0f, 0.0f }, .color = bottom_right_color, .texcoord = bottom_right_uv }
 	});
 }
 
@@ -347,11 +341,11 @@ void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 
 void System::drawLineRectangle(const glm::vec4& color)
 {
-	draw(nullptr, nullptr, skygfx::utils::MeshBuilder::Mode::LineLoop, [&](auto vertex) {
-		vertex({ .pos = { 0.0f, 0.0f, 0.0f }, .color = color });
-		vertex({ .pos = { 0.0f, 1.0f, 0.0f }, .color = color });
-		vertex({ .pos = { 1.0f, 1.0f, 0.0f }, .color = color });
-		vertex({ .pos = { 1.0f, 0.0f, 0.0f }, .color = color });
+	draw(nullptr, nullptr, skygfx::utils::MeshBuilder::Mode::LineLoop, {
+		{ .pos = { 0.0f, 0.0f, 0.0f }, .color = color },
+		{ .pos = { 0.0f, 1.0f, 0.0f }, .color = color },
+		{ .pos = { 1.0f, 1.0f, 0.0f }, .color = color },
+		{ .pos = { 1.0f, 0.0f, 0.0f }, .color = color }
 	});
 }
 
@@ -388,35 +382,38 @@ void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
 	auto v1_outer = radius_outer * r1;
 	auto v1_inner = radius_inner * r1;
 
-	draw(nullptr, nullptr, skygfx::utils::MeshBuilder::Mode::Triangles, [&](auto vertex) {
-		for (int i = 0; i < segments; i++)
-		{
-			auto r2 = glm::vec2({
-				(cosInc * r1.x) - (sinInc * r1.y),
-				(sinInc * r1.x) + (cosInc * r1.y)
-			});
+	std::vector<skygfx::utils::Mesh::Vertex> vertices;
+	vertices.reserve(segments * 6);
 
-			auto v2_outer = radius_outer * r2;
-			auto v2_inner = radius_inner * r2;
+	for (int i = 0; i < segments; i++)
+	{
+		auto r2 = glm::vec2({
+			(cosInc * r1.x) - (sinInc * r1.y),
+			(sinInc * r1.x) + (cosInc * r1.y)
+		});
 
-			auto p1 = glm::vec3({ v1_outer + radius_outer - delta_outer, 0.0f });
-			auto p2 = glm::vec3({ v2_outer + radius_outer - delta_outer, 0.0f });
-			auto p3 = glm::vec3({ v1_inner + radius_inner + delta_inner, 0.0f });
-			auto p4 = glm::vec3({ v2_inner + radius_inner + delta_inner, 0.0f });
+		auto v2_outer = radius_outer * r2;
+		auto v2_inner = radius_inner * r2;
 
-			vertex({ .pos = p1, .color = outer_color });
-			vertex({ .pos = p2, .color = outer_color });
-			vertex({ .pos = p3, .color = inner_color });
+		auto p1 = glm::vec3({ v1_outer + radius_outer - delta_outer, 0.0f });
+		auto p2 = glm::vec3({ v2_outer + radius_outer - delta_outer, 0.0f });
+		auto p3 = glm::vec3({ v1_inner + radius_inner + delta_inner, 0.0f });
+		auto p4 = glm::vec3({ v2_inner + radius_inner + delta_inner, 0.0f });
 
-			vertex({ .pos = p3, .color = inner_color });
-			vertex({ .pos = p2, .color = outer_color });
-			vertex({ .pos = p4, .color = inner_color });
+		vertices.push_back({ .pos = p1, .color = outer_color });
+		vertices.push_back({ .pos = p2, .color = outer_color });
+		vertices.push_back({ .pos = p3, .color = inner_color });
 
-			r1 = r2;
-			v1_outer = v2_outer;
-			v1_inner = v2_inner;
-		}
-	});
+		vertices.push_back({ .pos = p3, .color = inner_color });
+		vertices.push_back({ .pos = p2, .color = outer_color });
+		vertices.push_back({ .pos = p4, .color = inner_color });
+
+		r1 = r2;
+		v1_outer = v2_outer;
+		v1_inner = v2_inner;
+	}
+
+	draw(nullptr, nullptr, skygfx::utils::MeshBuilder::Mode::Triangles, vertices);
 }
 
 void System::drawCircleTexture(const glm::vec4& color)
