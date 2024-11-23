@@ -107,11 +107,11 @@ namespace Scene
 		{
 			T::enterDraw();
 
-			auto [pos, size] = this->getGlobalBounds();
+			auto bounds = this->getGlobalBounds();
 
 			auto scissor = skygfx::Scissor();
-			scissor.position = pos;
-			scissor.size = size;
+			scissor.position = bounds.pos;
+			scissor.size = bounds.size;
 
 			GRAPHICS->pushScissor(scissor, true);
 		}

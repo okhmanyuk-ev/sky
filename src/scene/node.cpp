@@ -92,7 +92,7 @@ glm::vec2 Node::unproject(const glm::vec2& value) const
 	return { result.x, result.y };
 }
 
-std::tuple<glm::vec2, glm::vec2> Node::getGlobalBounds() const
+Node::Bounds Node::getGlobalBounds() const
 {
 	auto tl = project({ 0.0f, 0.0f });
 	auto tr = project({ getAbsoluteWidth(), 0.0f });
@@ -102,7 +102,10 @@ std::tuple<glm::vec2, glm::vec2> Node::getGlobalBounds() const
 	auto min = glm::min(glm::min(tl, tr), glm::min(bl, br));
 	auto max = glm::max(glm::max(tl, tr), glm::max(bl, br));
 
-	return { min, max - min };
+	return Bounds{ 
+		.pos = min, 
+		.size = max - min
+	};
 }
 
 ::Scene::Scene* Node::getScene() const

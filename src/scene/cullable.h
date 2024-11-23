@@ -13,15 +13,15 @@ namespace Scene
 		{
 			T::updateTransform();
 
-			auto [left_pos, left_size] = this->getGlobalBounds();	
+			auto left_bounds = this->getGlobalBounds();	
 
 			bool visible = false;
 
 			if (!mCullTarget.expired())
 			{
-				auto [right_pos, right_size] = mCullTarget.lock()->getGlobalBounds();
+				auto right_bounds = mCullTarget.lock()->getGlobalBounds();
 
-				visible = isIntersect(left_pos, left_size, right_pos, right_size);
+				visible = isIntersect(left_bounds.pos, left_bounds.size, right_bounds.pos, right_bounds.size);
 			}
 			else
 			{
@@ -30,7 +30,7 @@ namespace Scene
 				viewport.size *= PLATFORM->getScale();
 				viewport.position *= PLATFORM->getScale();
 
-				visible = isIntersect(left_pos, left_size, viewport.position, viewport.size);
+				visible = isIntersect(left_bounds.pos, left_bounds.size, viewport.position, viewport.size);
 			}
 
 			this->setVisible(visible);

@@ -30,6 +30,12 @@ namespace Scene
 			Back
 		};
 
+		struct Bounds
+		{
+			glm::vec2 pos = { 0.0f, 0.0f };
+			glm::vec2 size = { 0.0f, 0.0f };
+		};
+
 	public:
 		Node();
 		~Node();
@@ -43,8 +49,7 @@ namespace Scene
 		glm::vec2 project(const glm::vec2& value) const;
 		glm::vec2 unproject(const glm::vec2& value) const;
 
-		// returning [pos, size]
-		std::tuple<glm::vec2, glm::vec2> getGlobalBounds() const; 
+		Bounds getGlobalBounds() const;
 
 		virtual Scene* getScene() const;
 		virtual bool hitTest(const glm::vec2& value) const;

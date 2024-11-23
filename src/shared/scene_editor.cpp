@@ -466,14 +466,14 @@ void SceneEditor::highlightNode(std::shared_ptr<Scene::Node> node, const glm::ve
 	if (!node->isTransformReady())
 		return;
 
-	auto [pos, size] = node->getGlobalBounds();
+	auto bounds = node->getGlobalBounds();
 
-	pos /= PLATFORM->getScale();
-	size /= PLATFORM->getScale();
+	bounds.pos /= PLATFORM->getScale();
+	bounds.size /= PLATFORM->getScale();
 
 	auto model = glm::mat4(1.0f);
-	model = glm::translate(model, { pos, 0.0f });
-	model = glm::scale(model, { size, 1.0f });
+	model = glm::translate(model, { bounds.pos, 0.0f });
+	model = glm::scale(model, { bounds.size, 1.0f });
 
 	GRAPHICS->begin();
 	GRAPHICS->pushOrthoMatrix();

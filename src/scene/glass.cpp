@@ -7,22 +7,22 @@ using namespace Scene;
 
 void Glass::draw()
 {
-	auto [pos, size] = getGlobalBounds();
+	auto bounds = getGlobalBounds();
 
-	if (size.x <= 0 || size.y <= 0)
+	if (bounds.size.x <= 0 || bounds.size.y <= 0)
 		return;
 
-	auto x = (int)glm::round(pos.x);
-	auto y = (int)glm::round(pos.y);
-	auto w = (int)glm::round(size.x);
-	auto h = (int)glm::round(size.y);
+	auto x = (int)glm::round(bounds.pos.x);
+	auto y = (int)glm::round(bounds.pos.y);
+	auto w = (int)glm::round(bounds.size.x);
+	auto h = (int)glm::round(bounds.size.y);
 
 	auto format = skygfx::GetBackbufferFormat();
 
-	if (size != mPrevSize || !mBackbufferFormat.has_value() || mBackbufferFormat.value() != format)
+	if (bounds.size != mPrevSize || !mBackbufferFormat.has_value() || mBackbufferFormat.value() != format)
 	{
 		setTexture(std::make_shared<skygfx::Texture>(w, h, format, skygfx::GetMipCount(w, h)));
-		mPrevSize = size;
+		mPrevSize = bounds.size;
 		mBackbufferFormat = format;
 	}
 

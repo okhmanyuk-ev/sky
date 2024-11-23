@@ -1127,7 +1127,7 @@ void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Nod
 	if (!IsMouseHovered(node))
 		return;
 
-	auto [pos, size] = node.getGlobalBounds();
+	auto bounds = node.getGlobalBounds();
 
 	const auto color = Graphics::Color::Yellow;
 
@@ -1138,6 +1138,6 @@ void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Nod
 		rect->getOutlineColor()->setColor({ color, 0.5f });
 		rect->setAlpha(0.25f);
 	}
-	rect->setPosition(holder.unproject(pos));
-	rect->setSize(holder.unproject(size));
+	rect->setPosition(holder.unproject(bounds.pos));
+	rect->setSize(holder.unproject(bounds.size));
 }

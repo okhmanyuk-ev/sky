@@ -32,18 +32,18 @@ namespace Scene
 
 			if (mUseLocalTargetSize)
 			{
-				auto [pos, size] = this->getGlobalBounds();
+				auto bounds = this->getGlobalBounds();
 
-				assert(!glm::isnan(size.x));
-				assert(!glm::isnan(size.y));
+				assert(!glm::isnan(bounds.size.x));
+				assert(!glm::isnan(bounds.size.y));
 
-				auto width = static_cast<int>(glm::floor(size.x));
-				auto height = static_cast<int>(glm::floor(size.y));
+				auto width = static_cast<int>(glm::floor(bounds.size.x));
+				auto height = static_cast<int>(glm::floor(bounds.size.y));
 
 				auto target = GRAPHICS->getRenderTarget(fmt::format("renderlayer_{}", (void*)this), width, height);
 
 				auto view = glm::mat4(1.0f);
-				view = glm::translate(view, { -pos, 0.0f });
+				view = glm::translate(view, { -bounds.pos, 0.0f });
 				view = glm::scale(view, { PLATFORM->getScale(), PLATFORM->getScale(), 1.0f });
 
 				GRAPHICS->pushRenderTarget(target);
