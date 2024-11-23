@@ -6,6 +6,13 @@
 
 using namespace Scene;
 
+bool Node::Bounds::isIntersect(const Bounds& other) const
+{
+	auto max = pos + size;
+	auto other_max = other.pos + other.size;
+	return max.x > other.pos.x && pos.x < other_max.x && max.y > other.pos.y && pos.y < other_max.y;
+}
+
 Node::Node()
 {
 }

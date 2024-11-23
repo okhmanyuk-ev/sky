@@ -34,6 +34,8 @@ namespace Scene
 		{
 			glm::vec2 pos = { 0.0f, 0.0f };
 			glm::vec2 size = { 0.0f, 0.0f };
+
+			bool isIntersect(const Bounds& other) const;
 		};
 
 	public:
