@@ -20,9 +20,6 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeWeightedRow(const std::vector<WeightedCell>& items);
 	std::shared_ptr<Scene::Node> MakeWeightedColumn(const std::vector<WeightedCell>& items);
 
-	std::shared_ptr<Scene::ClippableScissor<Scene::Scrollbox>>
-		MakeVerticalOptimizedItemList(const std::vector<std::shared_ptr<Scene::Node>>& items);
-
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 
 	class GrayscaleSprite : public Scene::Sprite
