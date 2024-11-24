@@ -109,10 +109,39 @@ void System::flushBatch()
 
 	const auto& state = mAppliedState.value();
 
+	float width;
+	float height;
+
+	if (state.viewport.has_value())
+	{
+		width = state.viewport->size.x;
+		height = state.viewport->size.y;
+	}
+	else if (state.render_target)
+	{
+		width = static_cast<float>(state.render_target->getWidth());
+		height = static_cast<float>(state.render_target->getHeight());
+	}
+	else
+	{
+		width = static_cast<float>(PLATFORM->getWidth());
+		height = static_cast<float>(PLATFORM->getHeight());
+	}
+
+	auto scale = PLATFORM->getScale();
+
+	width /= scale;
+	height /= scale;
+
+	auto [proj, view] = skygfx::utils::MakeCameraMatrices(skygfx::utils::OrthogonalCamera{
+		.width = width,
+		.height = height
+	});
+
 	skygfx::utils::ExecuteCommands({
 		skygfx::utils::commands::SetTopology(mBatch.topology.value()),
-		skygfx::utils::commands::SetProjectionMatrix(state.projection_matrix),
-		skygfx::utils::commands::SetViewMatrix(state.view_matrix),
+		skygfx::utils::commands::SetProjectionMatrix(proj),
+		skygfx::utils::commands::SetViewMatrix(view),
 		skygfx::utils::commands::SetViewport(state.viewport),
 		skygfx::utils::commands::SetScissor(state.scissor),
 		skygfx::utils::commands::SetDepthMode(state.depth_mode),
@@ -716,7 +745,6 @@ void System::pushScissor(std::optional<skygfx::Scissor> value, bool inherit_prev
 
 void System::pushViewMatrix(const glm::mat4& value)
 {
-	flushBatch();
 	auto state = mStates.top();
 	state.view_matrix = value;
 	push(state);
@@ -724,7 +752,6 @@ void System::pushViewMatrix(const glm::mat4& value)
 
 void System::pushProjectionMatrix(const glm::mat4& value)
 {
-	flushBatch();
 	auto state = mStates.top();
 	state.projection_matrix = value;
 	push(state);
