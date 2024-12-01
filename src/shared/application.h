@@ -53,10 +53,12 @@ namespace Shared
 
 	protected:
 		auto getScene() const { return mScene; }
+		const auto& getStartupKeyValues() const { return mStartupKeyValues; }
 
 	private: // Scene
 		std::shared_ptr<Scene::Scene> mScene;
 		std::shared_ptr<SceneEditor> mSceneEditor;
+		std::unordered_map<std::string, std::string> mStartupKeyValues;
 
 	private:
 		std::shared_ptr<Common::ConsoleCommands> mConsoleCommands;

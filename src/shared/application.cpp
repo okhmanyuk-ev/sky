@@ -1,12 +1,11 @@
 #include "application.h"
-
 #include <imgui.h>
 #include <shared/imgui_user.h>
 #include <shared/imscene.h>
 #include <audio/system.h>
 #include <shared/scene_manager.h>
 #include <shared/scene_helpers.h>
-
+#include <regex>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -234,6 +233,18 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	for (const auto& arg : args | std::views::drop(1))
 	{
 		sky::Log(Console::Color::Gray, "processing argument: {}", arg);
+
+		std::regex pattern(R"((\w+)=(\w+))"); // default web arguments 'http://localhost/?draft=true&lang=ru'
+		std::smatch matches;
+
+		if (std::regex_match(arg, matches, pattern))
+		{
+			auto key = matches[1].str();
+			auto value = matches[2].str();
+			mStartupKeyValues[key] = value;
+			continue;
+		}
+
 		auto tokens = CONSOLE->MakeTokensFromString(arg);
 
 		if (tokens.empty())
