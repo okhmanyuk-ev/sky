@@ -73,13 +73,19 @@ elseif(ANDROID)
 		m
 	)
 elseif(EMSCRIPTEN)
+	if(NOT DEFINED EMSCRIPTEN_SHELL_FILE_PATH)
+		set(EMSCRIPTEN_SHELL_FILE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/platform/emscripten/shell.html)
+	endif()
+
+	message(STATUS "EMSCRIPTEN_SHELL_FILE_PATH is ${EMSCRIPTEN_SHELL_FILE_PATH}")
+
 	target_link_options(${PROJECT_NAME} PUBLIC
 		-sFETCH=1
 		-sUSE_SDL=2
 		-sNO_DISABLE_EXCEPTION_CATCHING=1
 		-sDISABLE_EXCEPTION_THROWING=0
 		-sALLOW_MEMORY_GROWTH
-		--shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/platform/emscripten/shell.html
+		--shell-file ${EMSCRIPTEN_SHELL_FILE_PATH}
 		--use-preload-cache
 		-lwebsocket.js
 	)
