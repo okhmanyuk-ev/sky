@@ -619,7 +619,8 @@ namespace Shared::SceneHelpers
 		std::optional<int> mCursorPos;
 	};
 
-	class RichLabel : public Scene::AutoSized<Scene::Node>
+	class RichLabel : public Scene::AutoSized<Scene::Node>,
+		public Scene::Color
 	{
 	public:
 		RichLabel();
@@ -631,6 +632,12 @@ namespace Shared::SceneHelpers
 		void refresh();
 
 	public:
+		auto getFont() const { return mState.font; }
+		void setFont(const std::shared_ptr<Graphics::Font>& value) { mState.font = value; }
+
+		auto getFontSize() const { return mState.font_size; }
+		void setFontSize(float value) { mState.font_size = value; }
+
 		const auto& getText() const { return mState.text; }
 		void setText(std::wstring text) { mState.text = std::move(text); }
 
@@ -640,6 +647,8 @@ namespace Shared::SceneHelpers
 		struct State
 		{
 			std::wstring text;
+			std::shared_ptr<Graphics::Font> font = Scene::Label::DefaultFont;
+			float font_size = Scene::Label::DefaultFontSize;
 			bool operator==(const State& other) const = default;
 		};
 		State mState;

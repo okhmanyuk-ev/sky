@@ -895,6 +895,8 @@ void SceneHelpers::RichLabel::update(Clock::Duration dTime)
 {
 	AutoSized<Scene::Node>::update(dTime);
 	refresh();
+
+	Shared::SceneHelpers::RecursiveColorSet(mContent, getColor());
 }
 
 void SceneHelpers::RichLabel::refresh()
@@ -915,10 +917,12 @@ void SceneHelpers::RichLabel::refresh()
 		mContent->attach(holder);
 	};
 
-	auto createLabel = [](const std::wstring& str) {
+	auto createLabel = [&](const std::wstring& str) {
 		auto label = std::make_shared<Scene::Label>();
 		label->setText(str);
 		label->setParseColorTagsEnabled(true);
+		label->setFont(mState.font);
+		label->setFontSize(mState.font_size);
 		return label;
 	};
 
