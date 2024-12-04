@@ -61,7 +61,7 @@ void Scrollbox::update(Clock::Duration dTime)
 	}
 	else if (!isTouching())
 	{
-		mScrollPosition = Common::Helpers::SmoothValue(mScrollPosition, clamped_pos, dTime);
+		mScrollPosition = Common::Helpers::SmoothValue(mScrollPosition, clamped_pos, dTime, mInertiaFriction);
 
 		if (glm::distance(mScrollPosition.x, clamped_pos.x) <= mOverscrollThreshold)
 			mScrollPosition.x = clamped_pos.x;
