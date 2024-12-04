@@ -941,6 +941,9 @@ void SceneHelpers::RichLabel::refresh()
 	std::wsmatch match;
 
 	auto flushLabelText = [&] {
+		if (sublimed_text.empty())
+			return;
+
 		append(createLabel(sublimed_text), false);
 		sublimed_text.clear();
 	};
