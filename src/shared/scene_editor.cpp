@@ -310,14 +310,40 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 
 	if (auto scrollbox = std::dynamic_pointer_cast<Scene::Scrollbox>(node); scrollbox != nullptr)
 	{
+		auto sensitivity = scrollbox->getSensitivity();
+		auto speed = scrollbox->getSpeed();
+		bool inertia = scrollbox->isInertiaEnabled();
+		auto inertia_friction = scrollbox->getInertiaFriction();
 		auto scroll_position = scrollbox->getScrollPosition();
 		auto scroll_origin = scrollbox->getScrollOrigin();
+		auto scroll_space = scrollbox->getScrollSpace();
+		auto speed_threshold = scrollbox->getSpeedThreshold();
+		auto overscroll_threshold = scrollbox->getOverscrollThreshold();
+		bool overscroll = scrollbox->isOverscrollEnabled();
+		auto overscroll_size = scrollbox->getOverscrollSize();
 
+		ImGui::DragFloat2("Sensitivity", (float*)&sensitivity, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat2("Speed", (float*)&speed, 0.01f);
+		ImGui::Checkbox("Inertia", &inertia);
+		ImGui::DragFloat("Inertia Friction", &inertia_friction, 0.001f);
 		ImGui::DragFloat2("Scroll Position", (float*)&scroll_position, 0.01f, 0.0f, 1.0f);
 		ImGui::DragFloat2("Scroll Origin", (float*)&scroll_origin, 0.01f, 0.0f, 1.0f);
+		ImGui::InputFloat2("Scroll Space", (float*)&scroll_space, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::DragFloat("Speed Threshold", (float*)&speed_threshold, 0.01f);
+		ImGui::DragFloat("Overscroll Threshold", (float*)&overscroll_threshold, 0.01f);
+		ImGui::Checkbox("Overscroll", &overscroll);
+		ImGui::InputFloat2("Overscroll Size", (float*)&overscroll_size, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::Text("Inerting: %s", scrollbox->isInerting() ? "Yes" : "No");
+		ImGui::Text("Pullbacking: %s", scrollbox->isPullbacking() ? "Yes" : "No");
 
+		scrollbox->setSensitivity(sensitivity);
+		scrollbox->setInertiaEnabled(inertia);
+		scrollbox->setInertiaFriction(inertia_friction);
 		scrollbox->setScrollPosition(scroll_position);
 		scrollbox->setScrollOrigin(scroll_origin);
+		scrollbox->setSpeedThreshold(speed_threshold);
+		scrollbox->setOverscrollThreshold(overscroll_threshold);
+		scrollbox->setOverscrollEnabled(overscroll);
 
 		ImGui::Separator();
 	}

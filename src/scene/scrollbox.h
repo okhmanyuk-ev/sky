@@ -35,11 +35,11 @@ namespace Scene
 		auto getSpeed() const { return mSpeed; }
 		void setSpeed(const glm::vec2& value) { mSpeed = value; }
 
-		auto getInertiaFriction() const { return mInertiaFriction; }
-		void setInertiaFriction(float value) { mInertiaFriction = value; }
-
 		auto isInertiaEnabled() const { return mInertiaEnabled; }
 		void setInertiaEnabled(bool value) { mInertiaEnabled = value; }
+
+		auto getInertiaFriction() const { return mInertiaFriction; }
+		void setInertiaFriction(float value) { mInertiaFriction = value; }
 
 		auto getScrollPosition() const { return mScrollPosition; }
 		void setScrollPosition(const glm::vec2& value) { mScrollPosition = value; }
@@ -59,15 +59,18 @@ namespace Scene
 		auto getHorizontalScrollSpace() const { return getScrollSpace().x; }
 		auto getVerticalScrollSpace() const { return getScrollSpace().y; }
 
-		auto getInsignificantSpeed() const { return mInsignificantSpeed; }
-		void setInsignificantSpeed(float value) { mInsignificantSpeed = value; }
+		auto getSpeedThreshold() const { return mSpeedThreshold; }
+		void setSpeedThreshold(float value) { mSpeedThreshold = value; }
+
+		auto getOverscrollThreshold() const { return mOverscrollThreshold; }
+		void setOverscrollThreshold(float value) { mOverscrollThreshold = value; }
 
 		bool isOverscrollEnabled() const { return mOverscrollEnabled; }
 		void setOverscrollEnabled(bool value) { mOverscrollEnabled = value; }
 
 		bool isInerting() const;
 		bool isPullbacking() const;
-		const auto& getOverscrollDistance() const { return mOverscrollDistance; }
+		const auto& getOverscrollSize() const { return mOverscrollSize; }
 
 	private:
 		std::shared_ptr<Node> mBounding;
@@ -76,10 +79,11 @@ namespace Scene
 		glm::vec2 mSpeed = { 0.0f, 0.0f };
 		glm::vec2 mScrollPosition = { 0.0f, 0.0f };
 		glm::vec2 mScrollOrigin = { 0.0f, 0.0f };
-		float mInertiaFriction = DefaultInertiaFriction;
-		float mInsignificantSpeed = 0.01f;
 		bool mInertiaEnabled = true;
+		float mInertiaFriction = DefaultInertiaFriction;
+		float mSpeedThreshold = 0.01f;
+		float mOverscrollThreshold = 0.001f;
 		bool mOverscrollEnabled = true;
-		glm::vec2 mOverscrollDistance = { 0.0f, 0.0 };
+		glm::vec2 mOverscrollSize = { 0.0f, 0.0 };
 	};
 }
