@@ -69,8 +69,12 @@ namespace Scene
 		void setOverscrollEnabled(bool value) { mOverscrollEnabled = value; }
 
 		bool isInerting() const;
+		bool isOverscrolled() const;
 		bool isPullbacking() const;
 		const auto& getOverscrollSize() const { return mOverscrollSize; }
+
+		void setPage(std::optional<glm::vec2> size) { mPage = size; }
+		const auto& getPage() const { return mPage; }
 
 	private:
 		std::shared_ptr<Node> mBounding;
@@ -85,5 +89,6 @@ namespace Scene
 		float mOverscrollThreshold = 0.001f;
 		bool mOverscrollEnabled = true;
 		glm::vec2 mOverscrollSize = { 0.0f, 0.0 };
+		std::optional<glm::vec2> mPage;
 	};
 }

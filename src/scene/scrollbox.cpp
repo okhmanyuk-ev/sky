@@ -49,12 +49,19 @@ void Scrollbox::update(Clock::Duration dTime)
 
 	auto clamped_pos = glm::clamp(mScrollPosition);
 
-	if (!mOverscrollEnabled)
-	{
-		mScrollPosition = clamped_pos;
-	}
-	else if (!isTouching())
-	{
+	auto overscrollPullback = [&] {
+		if (!isOverscrolled())
+			return;
+
+		if (!mOverscrollEnabled)
+		{
+			mScrollPosition = clamped_pos;
+			return;
+		}
+
+		if (isTouching())
+			return;
+
 		mScrollPosition = Common::Helpers::SmoothValue(mScrollPosition, clamped_pos, dTime, mInertiaFriction);
 
 		if (glm::distance(mScrollPosition.x, clamped_pos.x) <= mOverscrollThreshold)
@@ -62,9 +69,41 @@ void Scrollbox::update(Clock::Duration dTime)
 
 		if (glm::distance(mScrollPosition.y, clamped_pos.y) <= mOverscrollThreshold)
 			mScrollPosition.y = clamped_pos.y;
-	}
+	};
+
+	auto alignToPage = [&] {
+		if (!mPage.has_value())
+			return;
+
+		if (isTouching())
+			return;
+
+		if (isOverscrolled())
+			return;
+
+		auto normalized_item_size = sky::sanitize(mPage.value() / scroll_space);
+		auto remainder = sky::sanitize(glm::mod(mScrollPosition, normalized_item_size));
+
+		auto adjust_scroll_axis = [](auto current_axis_pos, auto item_axis_size, auto remainder_axis) {
+			if (remainder_axis >= item_axis_size * 0.5f)
+				return current_axis_pos + (item_axis_size - remainder_axis);
+			else
+				return current_axis_pos - remainder_axis;
+		};
+
+		glm::vec2 new_scroll_pos = {
+			adjust_scroll_axis(mScrollPosition.x, normalized_item_size.x, remainder.x),
+			adjust_scroll_axis(mScrollPosition.y, normalized_item_size.y, remainder.y)
+		};
+
+		mScrollPosition = Common::Helpers::SmoothValue(mScrollPosition, new_scroll_pos, dTime, mInertiaFriction);
+	};
+
+	overscrollPullback();
 
 	mOverscrollSize = (mScrollPosition - clamped_pos) * scroll_space;
+
+	alignToPage();
 
 	mContent->setAnchor(mScrollPosition);
 	mContent->setPivot(mScrollPosition);
@@ -101,10 +140,15 @@ glm::vec2 Scrollbox::getScrollSpace() const
 
 bool Scrollbox::isInerting() const
 {
-	return glm::length(mSpeed) != 0.0f && !isTouching();
+	return glm::length(mSpeed) > 0.0f && !isTouching();
+}
+
+bool Scrollbox::isOverscrolled() const
+{
+	return glm::length(mOverscrollSize) > 0.0f;
 }
 
 bool Scrollbox::isPullbacking() const
 {
-	return glm::length(mOverscrollSize) != 0.0f && !isTouching();
+	return isOverscrolled() && !isTouching();
 }
