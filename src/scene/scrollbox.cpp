@@ -29,13 +29,7 @@ void Scrollbox::update(Clock::Duration dTime)
 
 	auto scroll_space = getScrollSpace();
 	auto overscroll_factor = 1.0f - (glm::abs(mOverscrollSize) / getAbsoluteSize());
-	auto speed = mSpeed * mSensitivity / scroll_space * glm::pow3(overscroll_factor);
-
-	if (glm::isnan(speed.x) || glm::isinf(speed.x))
-		speed.x = 0.0f;
-
-	if (glm::isnan(speed.y) || glm::isinf(speed.y))
-		speed.y = 0.0f;
+	auto speed = sky::sanitize(mSpeed * mSensitivity / scroll_space * glm::pow3(overscroll_factor));
 
 	if (!isTouching())
 		speed *= Clock::ToSeconds(dTime) * 100.0f;

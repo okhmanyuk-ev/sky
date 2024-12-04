@@ -62,7 +62,7 @@ namespace Common::Helpers
 	// TODO: find identical function in glm
 	// TODO: it seems every smoothstep function call should be changed to this
 	template<typename T>
-	inline T invLerp(T edge0, T edge1, T x) 
+	inline T invLerp(T edge0, T edge1, T x)
 	{
 		return (x - edge0) / (edge1 - edge0);
 	};
@@ -72,4 +72,7 @@ namespace sky
 {
 	std::string to_string(const std::wstring& wstr);
 	std::wstring to_wstring(const std::string& str);
+
+	float sanitize(float value, float default_value = 0.0f);
+	glm::vec2 sanitize(glm::vec2 value, float default_value = 0.0f);
 }

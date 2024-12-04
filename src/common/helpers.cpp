@@ -90,7 +90,7 @@ std::string Helpers::BytesArrayToNiceString(void* mem, size_t size)
 {
 	int k;
 
-	// CRC-32C (iSCSI) polynomial in reversed bit order. 
+	// CRC-32C (iSCSI) polynomial in reversed bit order.
 	const auto POLY = 0x82f63b78;
 
 	crc = ~crc;
@@ -102,7 +102,7 @@ std::string Helpers::BytesArrayToNiceString(void* mem, size_t size)
 	return ~crc;
 }*/
 
-uint32_t crc32_for_byte(uint32_t r) 
+uint32_t crc32_for_byte(uint32_t r)
 {
 	for (int j = 0; j < 8; ++j)
 		r = (r & 1 ? 0 : (uint32_t)0xEDB88320L) ^ r >> 1;
@@ -110,7 +110,7 @@ uint32_t crc32_for_byte(uint32_t r)
 	return r ^ (uint32_t)0xFF000000L;
 }
 
-uint32_t Helpers::crc32(void* data, size_t size, uint32_t initial) 
+uint32_t Helpers::crc32(void* data, size_t size, uint32_t initial)
 {
 	static uint32_t table[0x100];
 
@@ -121,7 +121,7 @@ uint32_t Helpers::crc32(void* data, size_t size, uint32_t initial)
 	}
 
 	uint32_t crc = initial;
-		
+
 	for (size_t i = 0; i < size; ++i)
 		crc = table[(uint8_t)crc ^ ((uint8_t*)data)[i]] ^ crc >> 8;
 
@@ -171,4 +171,17 @@ std::wstring sky::to_wstring(const std::string& str)
 {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 	return converter.from_bytes(str);
+}
+
+float sky::sanitize(float value, float default_value)
+{
+	if (std::isnan(value) || std::isinf(value))
+		return default_value;
+	else
+		return value;
+}
+
+glm::vec2 sky::sanitize(glm::vec2 value, float default_value)
+{
+	return { sanitize(value.x, default_value), sanitize(value.y, default_value) };
 }
