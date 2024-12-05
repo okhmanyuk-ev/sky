@@ -43,7 +43,7 @@ void Scrollbox::update(Clock::Duration dTime)
 		mScrollPosition.y = mScrollOrigin.y;
 
 	if (mInertiaEnabled && !isTouching())
-		mSpeed = Common::Helpers::SmoothValue(mSpeed, { 0.0f, 0.0f }, dTime, mInertiaFriction);
+		mSpeed = sky::ease_towards(mSpeed, { 0.0f, 0.0f }, dTime, mInertiaFriction);
 	else
 		mSpeed = { 0.0f, 0.0f };
 
@@ -62,7 +62,7 @@ void Scrollbox::update(Clock::Duration dTime)
 		if (isTouching())
 			return;
 
-		mScrollPosition = Common::Helpers::SmoothValue(mScrollPosition, clamped_pos, dTime, mInertiaFriction);
+		mScrollPosition = sky::ease_towards(mScrollPosition, clamped_pos, dTime, mInertiaFriction);
 
 		if (glm::distance(mScrollPosition.x, clamped_pos.x) <= mOverscrollThreshold)
 			mScrollPosition.x = clamped_pos.x;
@@ -96,7 +96,7 @@ void Scrollbox::update(Clock::Duration dTime)
 			adjust_scroll_axis(mScrollPosition.y, normalized_item_size.y, remainder.y)
 		};
 
-		mScrollPosition = Common::Helpers::SmoothValue(mScrollPosition, new_scroll_pos, dTime, mInertiaFriction);
+		mScrollPosition = sky::ease_towards(mScrollPosition, new_scroll_pos, dTime, mInertiaFriction);
 	};
 
 	overscrollPullback();

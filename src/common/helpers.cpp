@@ -16,11 +16,6 @@ std::string Helpers::SecondsToFmtString(int seconds)
 	return fmt::format("{:02}:{:02}:{:02}", h, m, s);
 }
 
-bool Helpers::Chance(float normalized_percent)
-{
-	return glm::linearRand(0.0f, 1.0f) <= normalized_percent;
-}
-
 std::string Helpers::BytesToNiceString(uint64_t value) // we need uint128_t here
 {
 	int q = 0;
@@ -139,28 +134,6 @@ nlohmann::json Helpers::LoadBsonFromAsset(const Platform::Asset& asset)
 	return nlohmann::json::from_bson(std::string((char*)asset.getMemory(), asset.getSize()));
 }
 
-float Helpers::SmoothRotation(float src_radians, float dst_radians, Clock::Duration dTime, float friction, float delta_limit)
-{
-	auto src_deg = glm::degrees(src_radians);
-	auto dst_deg = glm::degrees(dst_radians);
-
-	auto distance = glm::distance(src_deg, dst_deg);
-
-	if (distance > glm::distance(src_deg - 360.0f, dst_deg))
-		src_deg -= 360.0f;
-	else if (distance > glm::distance(src_deg + 360.0f, dst_deg))
-		src_deg += 360.0f;
-
-	src_radians = glm::radians(src_deg);
-
-	return SmoothValue(src_radians, dst_radians, dTime, friction, delta_limit);
-}
-
-float Helpers::SmoothRotation(float src_radians, float dst_radians, float friction, float delta_limit)
-{
-	return SmoothRotation(src_radians, dst_radians, FRAME->getTimeDelta(), friction, delta_limit);
-}
-
 std::string sky::to_string(const std::wstring& wstr)
 {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
@@ -184,4 +157,27 @@ float sky::sanitize(float value, float default_value)
 glm::vec2 sky::sanitize(glm::vec2 value, float default_value)
 {
 	return { sanitize(value.x, default_value), sanitize(value.y, default_value) };
+}
+
+float sky::ease_rotation_towards(float src_radians, float dst_radians, Clock::Duration dTime, float friction,
+	float delta_limit)
+{
+	auto src_deg = glm::degrees(src_radians);
+	auto dst_deg = glm::degrees(dst_radians);
+
+	auto distance = glm::distance(src_deg, dst_deg);
+
+	if (distance > glm::distance(src_deg - 360.0f, dst_deg))
+		src_deg -= 360.0f;
+	else if (distance > glm::distance(src_deg + 360.0f, dst_deg))
+		src_deg += 360.0f;
+
+	src_radians = glm::radians(src_deg);
+
+	return ease_towards(src_radians, dst_radians, dTime, friction, delta_limit);
+}
+
+bool sky::chance(float normalized_percent)
+{
+	return glm::linearRand(0.0f, 1.0f) <= normalized_percent;
 }

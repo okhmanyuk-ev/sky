@@ -513,6 +513,7 @@ namespace Shared::SceneHelpers
 	template <class T> class Smoother : public T
 	{
 		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
+
 	protected:
 		void updateTransform() override
 		{
@@ -527,7 +528,7 @@ namespace Shared::SceneHelpers
 			{
 				auto dTime = now - mPrevTransformTimepoint.value();
 				auto new_transform = this->getTransform();
-				this->setTransform(Common::Helpers::SmoothValue(prev_transform, new_transform, dTime));
+				this->setTransform(sky::ease_towards(prev_transform, new_transform, dTime));
 			}
 			mPrevTransformTimepoint = now;
 		}
@@ -545,7 +546,7 @@ namespace Shared::SceneHelpers
 			{
 				auto dTime = now - mPrevSizeTimepoint.value();
 				auto new_size = this->getAbsoluteSize();
-				this->setAbsoluteSize(Common::Helpers::SmoothValue(prev_size, new_size, dTime));
+				this->setAbsoluteSize(sky::ease_towards(prev_size, new_size, dTime));
 			}
 			mPrevSizeTimepoint = now;
 		}

@@ -10,7 +10,6 @@
 namespace Common::Helpers
 {
 	std::string SecondsToFmtString(int seconds);
-	bool Chance(float normalized_percent);
 	std::string BytesToNiceString(uint64_t value);
 	std::string BytesArrayToNiceString(void* mem, size_t size);
 
@@ -36,29 +35,6 @@ namespace Common::Helpers
 	nlohmann::json LoadJsonFromAsset(const Platform::Asset& asset);
 	nlohmann::json LoadBsonFromAsset(const Platform::Asset& asset);
 
-	constexpr float DefaultFriction = 0.1f;
-	constexpr float DefaultDeltaLimit = 1.0f / 30.0f;
-
-	template<class T>
-	T SmoothValue(T src, T dst, Clock::Duration dTime, float friction = DefaultFriction, float delta_limit = DefaultDeltaLimit)
-	{
-		auto distance = dst - src;
-		auto delta = glm::min(delta_limit, Clock::ToSeconds(dTime)) * 100.0f;
-		return src + (distance * delta * friction);
-	}
-
-	template<class T>
-	T SmoothValue(T src, T dst, float friction = DefaultFriction, float delta_limit = DefaultDeltaLimit)
-	{
-		return SmoothValue(src, dst, FRAME->getTimeDelta(), friction, delta_limit);
-	}
-
-	float SmoothRotation(float src_radians, float dst_radians, Clock::Duration dTime, float friction = DefaultFriction,
-		float delta_limit = DefaultDeltaLimit);
-
-	float SmoothRotation(float src_radians, float dst_radians, float friction = DefaultFriction,
-		float delta_limit = DefaultDeltaLimit);
-
 	// TODO: find identical function in glm
 	// TODO: it seems every smoothstep function call should be changed to this
 	template<typename T>
@@ -75,4 +51,21 @@ namespace sky
 
 	float sanitize(float value, float default_value = 0.0f);
 	glm::vec2 sanitize(glm::vec2 value, float default_value = 0.0f);
+
+	constexpr float default_friction = 0.1f;
+	constexpr float default_delta_limit = 1.0f / 30.0f;
+
+	template<class T>
+	T ease_towards(T src, T dst, Clock::Duration dTime = FRAME->getTimeDelta(),
+		float friction = default_friction, float delta_limit = default_delta_limit)
+	{
+		auto distance = dst - src;
+		auto delta = glm::min(delta_limit, Clock::ToSeconds(dTime)) * 100.0f;
+		return src + (distance * delta * friction);
+	}
+
+	float ease_rotation_towards(float src_radians, float dst_radians, Clock::Duration dTime = FRAME->getTimeDelta(),
+		float friction = default_friction, float delta_limit = default_delta_limit);
+
+	bool chance(float normalized_percent);
 }
