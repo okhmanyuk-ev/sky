@@ -895,8 +895,6 @@ void SceneHelpers::RichLabel::update(Clock::Duration dTime)
 {
 	AutoSized<Scene::Node>::update(dTime);
 	refresh();
-
-	Shared::SceneHelpers::RecursiveColorSet(mContent, getColor());
 }
 
 void SceneHelpers::RichLabel::refresh()

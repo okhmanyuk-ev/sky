@@ -620,8 +620,7 @@ namespace Shared::SceneHelpers
 		std::optional<int> mCursorPos;
 	};
 
-	class RichLabel : public Scene::AutoSized<Scene::Node>,
-		public Scene::Color
+	class RichLabel : public Scene::AutoSized<Scene::Node>
 	{
 	public:
 		RichLabel();
