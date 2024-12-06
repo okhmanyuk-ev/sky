@@ -317,3 +317,13 @@ if(WIN32 OR APPLE AND NOT IOS)
 	set_property(TARGET update_mappings PROPERTY FOLDER ${LIBS_FOLDER}/glfw)
 	target_link_libraries(${PROJECT_NAME} glfw)
 endif()
+
+# tinyxml2
+
+add_library(tinyxml2 STATIC
+	lib/tinyxml2/tinyxml2.cpp
+	lib/tinyxml2/tinyxml2.h
+)
+target_include_directories(imgui PUBLIC lib/tinyxml2)
+target_link_libraries(${PROJECT_NAME} tinyxml2)
+set_property(TARGET tinyxml2 PROPERTY FOLDER ${LIBS_FOLDER})

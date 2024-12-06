@@ -5,6 +5,8 @@
 #include <regex>
 #include <ranges>
 #include "imscene.h"
+#include <tinyxml2.h>
+#include <shared/localization_system.h>
 
 using namespace Shared;
 
@@ -98,6 +100,142 @@ void SceneHelpers::RecursiveAlphaSet(std::shared_ptr<Scene::Node> node, float al
 		return;
 
 	color_node->setAlpha(alpha);
+}
+
+template <class T>
+std::shared_ptr<T> CreateNode(const tinyxml2::XMLElement& root)
+{
+	auto autosize = root.BoolAttribute("autosize");
+
+	bool autowidth = autosize || root.BoolAttribute("autowidth");
+	bool autoheight = autosize || root.BoolAttribute("autoheight");
+
+	if (!autowidth && !autoheight)
+		return std::make_shared<T>();
+
+	auto result = std::make_shared<Scene::AutoSized<T>>();
+	result->setAutoWidthEnabled(autowidth);
+	result->setAutoHeightEnabled(autoheight);
+	return result;
+}
+
+static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XMLElement& root,
+	std::unordered_map<std::string, std::shared_ptr<Scene::Node>>& collection)
+{
+	auto parseVec2 = [](const char* _str) -> std::optional<glm::vec2> {
+		if (!_str)
+			return std::nullopt;
+
+		std::string str = _str;
+
+		if (str.empty())
+			return std::nullopt;
+		else if (str == "center")
+			return glm::vec2(0.5f, 0.5f);
+		else if (str == "bottom_center")
+			return glm::vec2(0.5f, 1.0f);
+		else if (str == "top_center")
+			return glm::vec2(0.5f, 0.0f);
+		else if (str == "full")
+			return glm::vec2(1.0f, 1.0f);
+
+		std::regex rgx(R"(([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+))");
+		std::smatch matches;
+
+		if (!std::regex_match(str, matches, rgx))
+			return std::nullopt;
+
+		auto x = std::stof(matches[1].str());
+		auto y = std::stof(matches[2].str());
+		return glm::vec2(x, y);
+	};
+
+	std::shared_ptr<Scene::Node> result;
+
+	std::string name = root.Name();
+
+	auto parseDefaults = [parseVec2](auto& node, const auto& root) {
+		auto anchor = parseVec2(root.Attribute("anchor"));
+		auto pivot = parseVec2(root.Attribute("pivot"));
+		auto pos = parseVec2(root.Attribute("pos"));
+		auto size = parseVec2(root.Attribute("size"));
+		auto stretch = parseVec2(root.Attribute("stretch"));
+		if (anchor) node.setAnchor(anchor.value());
+		if (pivot) node.setPivot(pivot.value());
+		if (pos) node.setPosition(pos.value());
+		if (size) node.setSize(size.value());
+		if (stretch) node.setStretch(stretch.value());
+
+		node.setX(root.FloatAttribute("x", node.getX()));
+		node.setY(root.FloatAttribute("y", node.getY()));
+		node.setHeight(root.FloatAttribute("height", node.getHeight()));
+		node.setWidth(root.FloatAttribute("width", node.getWidth()));
+	};
+
+	if (name == "Node")
+	{
+		result = CreateNode<Scene::Node>(root);
+		parseDefaults(*result, root);
+	}
+	else if (name == "Label")
+	{
+		auto node = CreateNode<Scene::Label>(root);
+		parseDefaults(*node, root);
+		node->setFontSize(root.FloatAttribute("font_size", Scene::Label::DefaultFontSize));
+		node->setAlpha(root.FloatAttribute("alpha", 1.0f));
+		auto text = sky::to_wstring(root.Attribute("text"));
+		node->setText(root.BoolAttribute("localized") ? LOCALIZE(sky::to_string(text)) : text);
+		result = node;
+	}
+	else if (name == "RichLabel")
+	{
+		auto node = CreateNode<SceneHelpers::RichLabel>(root);
+		parseDefaults(*node, root);
+		node->setFontSize(root.FloatAttribute("font_size", Scene::Label::DefaultFontSize));
+		auto text = sky::to_wstring(root.Attribute("text"));
+		node->setText(root.BoolAttribute("localized") ? LOCALIZE(sky::to_string(text)) : text);
+		result = node;
+	}
+	else if (name == "Column")
+	{
+		auto node = CreateNode<Scene::Column>(root);
+		parseDefaults(*node, root);
+		auto align = root.FloatAttribute("align");
+		node->setAlign(align);
+		result = node;
+	}
+
+	if (!result)
+		return nullptr;
+
+	if (auto id = root.Attribute("id"); id != nullptr)
+		collection.insert({ id, result });
+
+	for (auto element = root.FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
+	{
+		auto node = CreateNodesFromXmlElement(*element, collection);
+		if (!node)
+			continue;
+
+		result->attach(node);
+	}
+
+	return result;
+}
+
+std::tuple<std::shared_ptr<Scene::Node>, std::unordered_map<std::string, std::shared_ptr<Scene::Node>>>
+	SceneHelpers::CreateNodesFromXml(const std::string& xml)
+{
+	tinyxml2::XMLDocument doc;
+	auto res = doc.Parse(xml.c_str());
+
+	if (res != tinyxml2::XML_SUCCESS)
+		return { nullptr, {} };
+
+	auto root = doc.RootElement();
+	std::unordered_map<std::string, std::shared_ptr<Scene::Node>> collection;
+	auto node = CreateNodesFromXmlElement(*root, collection);
+	return { node, collection };
 }
 
 void SceneHelpers::GrayscaleSprite::draw()

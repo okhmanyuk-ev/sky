@@ -23,6 +23,9 @@ namespace Shared::SceneHelpers
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 	void RecursiveAlphaSet(std::shared_ptr<Scene::Node> node, float alpha);
 
+	std::tuple<std::shared_ptr<Scene::Node>, std::unordered_map<std::string, std::shared_ptr<Scene::Node>>>
+		CreateNodesFromXml(const std::string& xml);
+
 	class GrayscaleSprite : public Scene::Sprite
 	{
 	protected:
