@@ -21,6 +21,7 @@ namespace Shared::SceneHelpers
 	std::shared_ptr<Scene::Node> MakeWeightedColumn(const std::vector<WeightedCell>& items);
 
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
+	void RecursiveAlphaSet(std::shared_ptr<Scene::Node> node, float alpha);
 
 	class GrayscaleSprite : public Scene::Sprite
 	{

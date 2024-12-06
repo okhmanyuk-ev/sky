@@ -85,6 +85,21 @@ void SceneHelpers::RecursiveColorSet(std::shared_ptr<Scene::Node> node, const gl
 	color_node->setColor(color);
 }
 
+void SceneHelpers::RecursiveAlphaSet(std::shared_ptr<Scene::Node> node, float alpha)
+{
+	for (auto child : node->getNodes())
+	{
+		RecursiveAlphaSet(child, alpha);
+	}
+
+	auto color_node = std::dynamic_pointer_cast<Scene::Color>(node);
+
+	if (!color_node)
+		return;
+
+	color_node->setAlpha(alpha);
+}
+
 void SceneHelpers::GrayscaleSprite::draw()
 {
 	static auto effect = sky::effects::Effect<skygfx::utils::effects::Grayscale>();
