@@ -4,89 +4,90 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
 		<style>
-				body {
-					margin: 0;
-					background-color: black
-				}
-				.emscripten {
-					position: absolute;
-					top: 0px;
-					left: 0px;
-					margin: 0px;
-					border: 0;
-					width: 100%;
-					height: 100%;
-					overflow: hidden;
-					display: block;
-					image-rendering: optimizeSpeed;
-					image-rendering: -moz-crisp-edges;
-					image-rendering: -o-crisp-edges;
-					image-rendering: -webkit-optimize-contrast;
-					image-rendering: optimize-contrast;
-					image-rendering: crisp-edges;
-					image-rendering: pixelated;
-					-ms-interpolation-mode: nearest-neighbor;
-				}
-				.spinner {
-					height: 30px;
-					width: 30px;
-					margin: 0;
-					margin-top: 20px;
-					margin-left: 20px;
-					display: inline-block;
-					vertical-align: top;
+			body {
+				user-select: none;
+				margin: 0;
+				background-color: black
+			}
+			.emscripten {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				margin: 0px;
+				border: 0;
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+				display: block;
+				image-rendering: optimizeSpeed;
+				image-rendering: -moz-crisp-edges;
+				image-rendering: -o-crisp-edges;
+				image-rendering: -webkit-optimize-contrast;
+				image-rendering: optimize-contrast;
+				image-rendering: crisp-edges;
+				image-rendering: pixelated;
+				-ms-interpolation-mode: nearest-neighbor;
+			}
+			.spinner {
+				height: 30px;
+				width: 30px;
+				margin: 0;
+				margin-top: 20px;
+				margin-left: 20px;
+				display: inline-block;
+				vertical-align: top;
 
-					-webkit-animation: rotation .8s linear infinite;
-					-moz-animation: rotation .8s linear infinite;
-					-o-animation: rotation .8s linear infinite;
-					animation: rotation 0.8s linear infinite;
+				-webkit-animation: rotation .8s linear infinite;
+				-moz-animation: rotation .8s linear infinite;
+				-o-animation: rotation .8s linear infinite;
+				animation: rotation 0.8s linear infinite;
 
-					border-left: 5px solid rgb(0 0 0 / 0%);
-					border-right: 5px solid rgb(0 0 0 / 0%);
-					border-bottom: 5px solid rgb(0 0 0 / 0%);
-					border-top: 5px solid rgb(255, 255, 192);
+				border-left: 5px solid rgb(0 0 0 / 0%);
+				border-right: 5px solid rgb(0 0 0 / 0%);
+				border-bottom: 5px solid rgb(0 0 0 / 0%);
+				border-top: 5px solid rgb(255, 255, 192);
 
-					border-radius: 100%;
-					background-color: rgb(0 0 0 / 0%);
-				}
+				border-radius: 100%;
+				background-color: rgb(0 0 0 / 0%);
+			}
 
-				@-webkit-keyframes rotation {
-					from {-webkit-transform: rotate(0deg);}
-					to {-webkit-transform: rotate(360deg);}
-				}
-				@-moz-keyframes rotation {
-					from {-moz-transform: rotate(0deg);}
-					to {-moz-transform: rotate(360deg);}
-				}
-				@-o-keyframes rotation {
-					from {-o-transform: rotate(0deg);}
-					to {-o-transform: rotate(360deg);}
-				}
-				@keyframes rotation {
-					from {transform: rotate(0deg);}
-					to {transform: rotate(360deg);}
-				}
+			@-webkit-keyframes rotation {
+				from {-webkit-transform: rotate(0deg);}
+				to {-webkit-transform: rotate(360deg);}
+			}
+			@-moz-keyframes rotation {
+				from {-moz-transform: rotate(0deg);}
+				to {-moz-transform: rotate(360deg);}
+			}
+			@-o-keyframes rotation {
+				from {-o-transform: rotate(0deg);}
+				to {-o-transform: rotate(360deg);}
+			}
+			@keyframes rotation {
+				from {transform: rotate(0deg);}
+				to {transform: rotate(360deg);}
+			}
 
-				#status {
-					display: inline-block;
-					vertical-align: top;
-					font: 12pt sans-serif;
-					position: absolute;
-					left: 50%;
-					top: calc(50% - 28px);
-					transform: translate(-50%);
-					color: rgb(192, 192, 192);
-				}
+			#status {
+				display: inline-block;
+				vertical-align: top;
+				font: 12pt sans-serif;
+				position: absolute;
+				left: 50%;
+				top: calc(50% - 28px);
+				transform: translate(-50%);
+				color: rgb(192, 192, 192);
+			}
 
-				#progress {
-					position: absolute;
-					height: 32px;
-					width: 75%;
-					left: 50%;
-					top: 50%;
-					transform: translate(-50%);
-					accent-color: rgb(255, 255, 192);
-				}
+			#progress {
+				position: absolute;
+				height: 32px;
+				width: 75%;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%);
+				accent-color: rgb(255, 255, 192);
+			}
 		</style>
 	</head>
 	<body>
