@@ -105,14 +105,14 @@
 				preRun: [],
 				postRun: [],
 				print: (function() {
-						return function(text) {
-								text = Array.prototype.slice.call(arguments).join(' ');
-								console.log(text);
-						};
+					return function(text) {
+						text = Array.prototype.slice.call(arguments).join(' ');
+						console.log(text);
+					};
 				})(),
 				printErr: function(text) {
-						text = Array.prototype.slice.call(arguments).join(' ');
-						console.error(text);
+					text = Array.prototype.slice.call(arguments).join(' ');
+					console.error(text);
 				},
 				canvas: function() {
 					var canvas = document.getElementById('canvas');
@@ -148,8 +148,8 @@
 				},
 				totalDependencies: 0,
 				monitorRunDependencies: function(num) {
-						this.totalDependencies = Math.max(this.totalDependencies, num);
-						Module.setStatus("Preparing... (" + (this.totalDependencies - num) + "/" + this.totalDependencies + ")")
+					this.totalDependencies = Math.max(this.totalDependencies, num);
+					Module.setStatus("Preparing... (" + (this.totalDependencies - num) + "/" + this.totalDependencies + ")")
 				}
 			};
 			window.onerror = function() {
