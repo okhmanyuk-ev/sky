@@ -43,6 +43,8 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		ENGINE->addSystem<Audio::System>(std::make_shared<Audio::System>());
 	}
 
+	Scene::RichLabel::DefaultIconTextureCallback = [](const auto& path) { return TEXTURE(path); };
+
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
 	mPerformanceConsoleCommands = std::make_shared<Shared::PerformanceConsoleCommands>();

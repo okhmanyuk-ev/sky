@@ -19,6 +19,7 @@
 #include <scene/node.h>
 #include <scene/rectangle.h>
 #include <scene/render_layer.h>
+#include <scene/rich_label.h>
 #include <scene/sampler.h>
 #include <scene/scene.h>
 #include <scene/scrollbox.h>

@@ -624,43 +624,6 @@ namespace Shared::SceneHelpers
 		std::optional<int> mCursorPos;
 	};
 
-	class RichLabel : public Scene::AutoSized<Scene::Node>
-	{
-	public:
-		RichLabel();
-
-	protected:
-		void update(Clock::Duration dTime) override;
-
-	public:
-		void refresh();
-
-	public:
-		auto getFont() const { return mState.font; }
-		void setFont(const std::shared_ptr<Graphics::Font>& value) { mState.font = value; }
-
-		auto getFontSize() const { return mState.font_size; }
-		void setFontSize(float value) { mState.font_size = value; }
-
-		const auto& getText() const { return mState.text; }
-		void setText(std::wstring text) { mState.text = std::move(text); }
-
-		void setTag(const std::string& name, std::function<std::shared_ptr<Scene::Node>()> callback);
-
-	private:
-		struct State
-		{
-			std::wstring text;
-			std::shared_ptr<Graphics::Font> font = Scene::Label::DefaultFont;
-			float font_size = Scene::Label::DefaultFontSize;
-			bool operator==(const State& other) const = default;
-		};
-		State mState;
-		State mPrevState;
-		std::shared_ptr<Scene::AutoSized<Scene::Row>> mContent;
-		std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>()>> mTags;
-	};
-
 	namespace ImScene
 	{
 		bool IsMouseHovered(Scene::Node& node);

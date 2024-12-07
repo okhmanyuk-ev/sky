@@ -189,7 +189,7 @@ static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XM
 	}
 	else if (name == "RichLabel")
 	{
-		auto node = CreateNode<SceneHelpers::RichLabel>(root);
+		auto node = CreateNode<Scene::RichLabel>(root);
 		parseDefaults(*node, root);
 		node->setFontSize(root.FloatAttribute("font_size", Scene::Label::DefaultFontSize));
 		auto text = sky::to_wstring(root.Attribute("text"));
@@ -1034,114 +1034,6 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 			}));
 		})
 	));
-}
-
-SceneHelpers::RichLabel::RichLabel()
-{
-	mContent = std::make_shared<Scene::AutoSized<Scene::Row>>();
-	mContent->setAnchor(0.5f);
-	mContent->setPivot(0.5f);
-	attach(mContent);
-}
-
-void SceneHelpers::RichLabel::update(Clock::Duration dTime)
-{
-	AutoSized<Scene::Node>::update(dTime);
-	refresh();
-}
-
-void SceneHelpers::RichLabel::refresh()
-{
-	if (mState == mPrevState)
-		return;
-
-	mPrevState = mState;
-	mContent->clear();
-
-	auto append = [&](std::shared_ptr<Scene::Node> item, bool stretch) {
-		auto holder = std::make_shared<Scene::AutoSized<Scene::Node>>();
-		holder->setAnchor({ 0.0f, 0.5f });
-		holder->setPivot({ 0.0f, 0.5f });
-		holder->setAutoHeightEnabled(!stretch);
-		holder->setVerticalStretch(stretch ? 1.0f : 0.0f);
-		holder->attach(item);
-		mContent->attach(holder);
-	};
-
-	auto createLabel = [&](const std::wstring& str) {
-		auto label = std::make_shared<Scene::Label>();
-		label->setText(str);
-		label->setParseColorTagsEnabled(true);
-		label->setFont(mState.font);
-		label->setFontSize(mState.font_size);
-		return label;
-	};
-
-	auto createSprite = [this_index = size_t(this)](const std::string& path) {
-		auto sprite = std::make_shared<Scene::Adaptive<Scene::Sprite>>();
-		sprite->setTexture(TEXTURE(path));
-		sprite->setAdaptStretch(1.0f);
-		sprite->setBakingAdaption(true);
-		sprite->setBatchGroup(fmt::format("rich_label_icon_{}_{}", this_index, path));
-		return sprite;
-	};
-
-	std::wregex icon_tag(LR"(^<icon=([^>]+)>)");
-
-	std::wstring sublimed_text;
-	std::wsmatch match;
-
-	auto flushLabelText = [&] {
-		if (sublimed_text.empty())
-			return;
-
-		append(createLabel(sublimed_text), false);
-		sublimed_text.clear();
-	};
-
-	auto text = mState.text;
-
-	auto insertCustomTags = [&] {
-		for (const auto& [name, callback] : mTags)
-		{
-			std::wregex tag(fmt::format(L"^<{}>", sky::to_wstring(name)));
-			if (std::regex_search(text, match, tag))
-			{
-				flushLabelText();
-				append(callback(), true);
-				text.erase(0, match.length());
-				return true;
-			}
-		}
-		return false;
-	};
-
-	while (!text.empty())
-	{
-		if (insertCustomTags())
-			continue;
-
-		if (std::regex_search(text, match, icon_tag))
-		{
-			flushLabelText();
-			auto path = sky::to_string(match[1]);
-			append(createSprite(path), true);
-			text.erase(0, match.length());
-		}
-		else
-		{
-			sublimed_text.push_back(text.front());
-			text.erase(0, 1);
-		}
-	}
-
-	if (!sublimed_text.empty())
-		append(createLabel(sublimed_text), false);
-}
-
-void SceneHelpers::RichLabel::setTag(const std::string& name, std::function<std::shared_ptr<Scene::Node>()> callback)
-{
-	mTags[name] = callback;
 }
 
 bool SceneHelpers::ImScene::IsMouseHovered(Scene::Node& node)
