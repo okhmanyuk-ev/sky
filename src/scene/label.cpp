@@ -162,7 +162,7 @@ void Label::refresh()
 		std::vector<glm::vec4> colormap;
 
 		while (!str.empty())
-		{			
+		{
 			if (parse_color_push_tag())
 				continue;
 

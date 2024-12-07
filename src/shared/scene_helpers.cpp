@@ -1063,7 +1063,7 @@ void SceneHelpers::RichLabel::refresh()
 		holder->setAnchor({ 0.0f, 0.5f });
 		holder->setPivot({ 0.0f, 0.5f });
 		holder->setAutoHeightEnabled(!stretch);
-		holder->setVerticalStretch(stretch);
+		holder->setVerticalStretch(stretch ? 1.0f : 0.0f);
 		holder->attach(item);
 		mContent->attach(holder);
 	};
