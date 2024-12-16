@@ -64,7 +64,7 @@ void Sequence::add(std::unique_ptr<Action> action, Origin origin)
 {
 	if (origin == Origin::Begin)
 		mActions.push_front(std::move(action));
-	else 
+	else
 		mActions.push_back(std::move(action));
 }
 
@@ -113,10 +113,10 @@ Action::Status Repeat::frame(Clock::Duration delta)
 
 	if (status == Status::Continue)
 		return Status::Continue;
-	
+
 	if (mStatus == Status::Finished)
 		return Status::Finished;
-		
+
 	mStatus.reset();
 
 	return Status::Continue;

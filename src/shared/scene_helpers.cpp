@@ -130,67 +130,91 @@ static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XM
 
 		if (str.empty())
 			return std::nullopt;
-		else if (str == "center")
-			return glm::vec2(0.5f, 0.5f);
-		else if (str == "bottom_center")
-			return glm::vec2(0.5f, 1.0f);
-		else if (str == "top_center")
-			return glm::vec2(0.5f, 0.0f);
-		else if (str == "full")
-			return glm::vec2(1.0f, 1.0f);
 
-		std::regex rgx(R"(([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+))");
+		std::regex rgx_one_arg(R"(([-+]?[0-9]*\.?[0-9]+))");
+		std::regex rgx_two_args(R"(([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+))");
 		std::smatch matches;
 
-		if (!std::regex_match(str, matches, rgx))
-			return std::nullopt;
+		if (std::regex_match(str, matches, rgx_two_args))
+		{
+			auto x = std::stof(matches[1].str());
+			auto y = std::stof(matches[2].str());
+			return glm::vec2(x, y);
+		}
 
-		auto x = std::stof(matches[1].str());
-		auto y = std::stof(matches[2].str());
-		return glm::vec2(x, y);
+		if (std::regex_match(str, matches, rgx_one_arg))
+		{
+			auto value = std::stof(matches[1].str());
+			return glm::vec2(value, value);
+		}
+
+		return std::nullopt;
 	};
 
 	std::shared_ptr<Scene::Node> result;
 
 	std::string name = root.Name();
 
-	auto parseDefaults = [parseVec2](auto& node, const auto& root) {
-		auto anchor = parseVec2(root.Attribute("anchor"));
-		auto pivot = parseVec2(root.Attribute("pivot"));
-		auto pos = parseVec2(root.Attribute("pos"));
-		auto size = parseVec2(root.Attribute("size"));
-		auto stretch = parseVec2(root.Attribute("stretch"));
-		if (anchor) node.setAnchor(anchor.value());
-		if (pivot) node.setPivot(pivot.value());
-		if (pos) node.setPosition(pos.value());
-		if (size) node.setSize(size.value());
-		if (stretch) node.setStretch(stretch.value());
-
+	auto parseTransform = [parseVec2](Scene::Transform& node, const tinyxml2::XMLElement& root) {
+		node.setAnchor(parseVec2(root.Attribute("anchor")).value_or(node.getAnchor()));
+		node.setPivot(parseVec2(root.Attribute("pivot")).value_or(node.getPivot()));
+		node.setPosition(parseVec2(root.Attribute("pos")).value_or(node.getPosition()));
+		node.setSize(parseVec2(root.Attribute("size")).value_or(node.getSize()));
+		node.setStretch(parseVec2(root.Attribute("stretch")).value_or(node.getStretch()));
+		node.setMargin(parseVec2(root.Attribute("margin")).value_or(node.getMargin()));
 		node.setX(root.FloatAttribute("x", node.getX()));
 		node.setY(root.FloatAttribute("y", node.getY()));
 		node.setHeight(root.FloatAttribute("height", node.getHeight()));
 		node.setWidth(root.FloatAttribute("width", node.getWidth()));
 	};
 
+	auto parseColor = [](Scene::Color& node, const tinyxml2::XMLElement& root) {
+		node.setAlpha(root.FloatAttribute("alpha", node.getAlpha()));
+	};
+
 	if (name == "Node")
 	{
 		result = CreateNode<Scene::Node>(root);
-		parseDefaults(*result, root);
+		parseTransform(*result, root);
+	}
+	else if (name == "Rectangle")
+	{
+		auto node = CreateNode<Scene::Rectangle>(root);
+		parseTransform(*node, root);
+		parseColor(*node, root);
+		node->setRounding(root.FloatAttribute("rounding", node->getRounding()));
+		node->setAbsoluteRounding(root.BoolAttribute("absolute_rounding", node->isAbsoluteRounding()));
+		result = node;
+	}
+	else if (name == "Sprite")
+	{
+		auto node = CreateNode<Scene::Sprite>(root);
+		parseTransform(*node, root);
+		parseColor(*node, root);
+		auto texture = root.Attribute("texture");
+		if (texture != nullptr)
+		{
+			node->setTexture(TEXTURE(texture));
+		}
+		result = node;
 	}
 	else if (name == "Label")
 	{
 		auto node = CreateNode<Scene::Label>(root);
-		parseDefaults(*node, root);
-		node->setFontSize(root.FloatAttribute("font_size", Scene::Label::DefaultFontSize));
-		node->setAlpha(root.FloatAttribute("alpha", 1.0f));
-		auto text = sky::to_wstring(root.Attribute("text"));
-		node->setText(root.BoolAttribute("localized") ? LOCALIZE(sky::to_string(text)) : text);
+		parseTransform(*node, root);
+		parseColor(*node, root);
+		node->setFontSize(root.FloatAttribute("font_size", node->getFontSize()));
+		auto text = root.Attribute("text");
+		if (text != nullptr)
+		{
+			node->setText(root.BoolAttribute("localized") ? LOCALIZE(text) : sky::to_wstring(text));
+		}
 		result = node;
 	}
 	else if (name == "RichLabel")
 	{
 		auto node = CreateNode<Scene::RichLabel>(root);
-		parseDefaults(*node, root);
+		parseTransform(*node, root);
 		node->setFontSize(root.FloatAttribute("font_size", Scene::Label::DefaultFontSize));
 		auto text = sky::to_wstring(root.Attribute("text"));
 		node->setText(root.BoolAttribute("localized") ? LOCALIZE(sky::to_string(text)) : text);
@@ -199,7 +223,7 @@ static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XM
 	else if (name == "Column")
 	{
 		auto node = CreateNode<Scene::Column>(root);
-		parseDefaults(*node, root);
+		parseTransform(*node, root);
 		auto align = root.FloatAttribute("align");
 		node->setAlign(align);
 		result = node;
