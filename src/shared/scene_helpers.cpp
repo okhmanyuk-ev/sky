@@ -157,6 +157,57 @@ void SceneHelpers::ParseNodeFromXml(Scene::Node& node, const tinyxml2::XMLElemen
 void SceneHelpers::ParseColorFromXml(Scene::Color& node, const tinyxml2::XMLElement& root)
 {
 	node.setAlpha(root.FloatAttribute("alpha", node.getAlpha()));
+	auto color = root.Attribute("color");
+	if (color)
+	{
+		auto parse_u8_color = [](auto match, float default_alpha) {
+			auto r = static_cast<uint8_t>(std::stoi(match[1]));
+			auto g = static_cast<uint8_t>(std::stoi(match[2]));
+			auto b = static_cast<uint8_t>(std::stoi(match[3]));
+			auto a = match.size() > 4 ? static_cast<uint8_t>(std::stoi(match[4])) : static_cast<uint8_t>(default_alpha * 255.0f);
+			return Graphics::Color::ToNormalized(r, g, b, a);
+		};
+
+		auto parse_float_color = [](auto match, float default_alpha) {
+			auto r = std::stof(match[1]);
+			auto g = std::stof(match[2]);
+			auto b = std::stof(match[3]);
+			auto a = match.size() > 4 ? std::stof(match[4]) : default_alpha;
+			return glm::vec4{ r, g, b, a };
+		};
+
+		auto parse_hex_color = [](auto match, float default_alpha) {
+			auto hex_color = match[1];
+			auto rgba = std::stoul(hex_color, nullptr, 16);
+			auto has_alpha = hex_color.length() == 8;
+			auto r = static_cast<uint8_t>((rgba >> (has_alpha ? 24 : 16)) & 0xFF);
+			auto g = static_cast<uint8_t>((rgba >> (has_alpha ? 16 : 8)) & 0xFF);
+			auto b = static_cast<uint8_t>((rgba >> (has_alpha ? 8 : 0)) & 0xFF);
+			auto a = static_cast<uint8_t>(has_alpha ? (rgba & 0xFF) : static_cast<uint8_t>(default_alpha * 255.0f));
+			return Graphics::Color::ToNormalized(r, g, b, a);
+		};
+
+		std::vector<std::tuple<std::regex, std::function<glm::vec4(std::smatch match, float default_alpha)>>> color_tags = {
+			{ std::regex(R"(^rgba\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\))"), parse_u8_color },
+			{ std::regex(R"(^rgb\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\))"), parse_u8_color },
+			{ std::regex(R"(^frgba\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\))"), parse_float_color },
+			{ std::regex(R"(^frgb\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\))"), parse_float_color },
+			{ std::regex(R"(^hex\([ ]*([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})[ ]*\))"), parse_hex_color },
+		};
+
+		std::smatch match;
+		std::string color_str = color;
+
+		for (const auto& [regex, callback] : color_tags)
+		{
+			if (!std::regex_search(color_str, match, regex))
+				continue;
+
+			auto rgba = callback(match, node.getAlpha());
+			node.setColor(rgba);
+			break;
+		}
+	}
 }
 
 void SceneHelpers::ParseSpriteFromXml(Scene::Sprite& node, const tinyxml2::XMLElement& root)
