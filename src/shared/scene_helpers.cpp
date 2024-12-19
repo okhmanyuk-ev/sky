@@ -5,7 +5,6 @@
 #include <regex>
 #include <ranges>
 #include "imscene.h"
-#include <tinyxml2.h>
 #include <shared/localization_system.h>
 
 using namespace Shared;
@@ -102,25 +101,7 @@ void SceneHelpers::RecursiveAlphaSet(std::shared_ptr<Scene::Node> node, float al
 	color_node->setAlpha(alpha);
 }
 
-template <class T>
-std::shared_ptr<T> CreateNode(const tinyxml2::XMLElement& root)
-{
-	auto autosize = root.BoolAttribute("autosize");
-
-	bool autowidth = autosize || root.BoolAttribute("autowidth");
-	bool autoheight = autosize || root.BoolAttribute("autoheight");
-
-	if (!autowidth && !autoheight)
-		return std::make_shared<T>();
-
-	auto result = std::make_shared<Scene::AutoSized<T>>();
-	result->setAutoWidthEnabled(autowidth);
-	result->setAutoHeightEnabled(autoheight);
-	return result;
-}
-
-static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XMLElement& root,
-	std::unordered_map<std::string, std::shared_ptr<Scene::Node>>& collection)
+void SceneHelpers::ParseNodeFromXml(Scene::Node& node, const tinyxml2::XMLElement& root)
 {
 	auto parseVec2 = [](const char* _str) -> std::optional<glm::vec2> {
 		if (!_str)
@@ -151,83 +132,122 @@ static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XM
 		return std::nullopt;
 	};
 
-	std::shared_ptr<Scene::Node> result;
+	node.setAnchor(parseVec2(root.Attribute("anchor")).value_or(node.getAnchor()));
+	node.setPivot(parseVec2(root.Attribute("pivot")).value_or(node.getPivot()));
+	node.setPosition(parseVec2(root.Attribute("pos")).value_or(node.getPosition()));
+	node.setSize(parseVec2(root.Attribute("size")).value_or(node.getSize()));
+	node.setStretch(parseVec2(root.Attribute("stretch")).value_or(node.getStretch()));
+	node.setMargin(parseVec2(root.Attribute("margin")).value_or(node.getMargin()));
+	node.setOrigin(parseVec2(root.Attribute("origin")).value_or(node.getOrigin()));
+	node.setX(root.FloatAttribute("x", node.getX()));
+	node.setY(root.FloatAttribute("y", node.getY()));
+	node.setHeight(root.FloatAttribute("height", node.getHeight()));
+	node.setWidth(root.FloatAttribute("width", node.getWidth()));
+	node.setHorizontalOrigin(root.FloatAttribute("origin_x", node.getHorizontalOrigin()));
+	node.setVerticalOrigin(root.FloatAttribute("origin_y", node.getVerticalOrigin()));
 
-	std::string name = root.Name();
+	node.setTouchable(root.BoolAttribute("touchable", node.isTouchable()));
 
-	auto parseTransform = [parseVec2](Scene::Transform& node, const tinyxml2::XMLElement& root) {
-		node.setAnchor(parseVec2(root.Attribute("anchor")).value_or(node.getAnchor()));
-		node.setPivot(parseVec2(root.Attribute("pivot")).value_or(node.getPivot()));
-		node.setPosition(parseVec2(root.Attribute("pos")).value_or(node.getPosition()));
-		node.setSize(parseVec2(root.Attribute("size")).value_or(node.getSize()));
-		node.setStretch(parseVec2(root.Attribute("stretch")).value_or(node.getStretch()));
-		node.setMargin(parseVec2(root.Attribute("margin")).value_or(node.getMargin()));
-		node.setX(root.FloatAttribute("x", node.getX()));
-		node.setY(root.FloatAttribute("y", node.getY()));
-		node.setHeight(root.FloatAttribute("height", node.getHeight()));
-		node.setWidth(root.FloatAttribute("width", node.getWidth()));
-	};
+	auto batch_group = root.Attribute("batch_group");
 
-	auto parseColor = [](Scene::Color& node, const tinyxml2::XMLElement& root) {
-		node.setAlpha(root.FloatAttribute("alpha", node.getAlpha()));
-	};
+	if (batch_group)
+		node.setBatchGroup(batch_group);
+}
 
-	if (name == "Node")
+void SceneHelpers::ParseColorFromXml(Scene::Color& node, const tinyxml2::XMLElement& root)
+{
+	node.setAlpha(root.FloatAttribute("alpha", node.getAlpha()));
+}
+
+void SceneHelpers::ParseSpriteFromXml(Scene::Sprite& node, const tinyxml2::XMLElement& root)
+{
+	ParseNodeFromXml(node, root);
+	ParseColorFromXml(node, root);
+	auto texture = root.Attribute("texture");
+	if (texture != nullptr)
 	{
-		result = CreateNode<Scene::Node>(root);
-		parseTransform(*result, root);
+		node.setTexture(TEXTURE(texture));
 	}
-	else if (name == "Rectangle")
+}
+
+void SceneHelpers::ParseLabelFromXml(Scene::Label& node, const tinyxml2::XMLElement& root)
+{
+	ParseNodeFromXml(node, root);
+	ParseColorFromXml(node, root);
+	node.setFontSize(root.FloatAttribute("font_size", node.getFontSize()));
+	auto text = root.Attribute("text");
+	if (text != nullptr)
 	{
+		node.setText(root.BoolAttribute("localized") ? LOCALIZE(text) : sky::to_wstring(text));
+	}
+}
+
+template <class T>
+std::shared_ptr<T> CreateNode(const tinyxml2::XMLElement& root)
+{
+	auto autosize = root.BoolAttribute("autosize");
+
+	bool autowidth = autosize || root.BoolAttribute("autowidth");
+	bool autoheight = autosize || root.BoolAttribute("autoheight");
+
+	if (!autowidth && !autoheight)
+		return std::make_shared<T>();
+
+	auto result = std::make_shared<Scene::AutoSized<T>>();
+	result->setAutoWidthEnabled(autowidth);
+	result->setAutoHeightEnabled(autoheight);
+	return result;
+}
+
+std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>(const tinyxml2::XMLElement& root)>> SceneHelpers::XmlCreateFuncs = {
+	{ "Node", [](const auto& root) {
+		auto node = CreateNode<Scene::Node>(root);
+		ParseNodeFromXml(*node, root);
+		return node;
+	} },
+	{ "Sprite", [](const auto& root) {
+		auto node = CreateNode<Scene::Sprite>(root);
+		ParseSpriteFromXml(*node, root);
+		return node;
+	} },
+	{ "Rectangle", [](const auto& root) {
 		auto node = CreateNode<Scene::Rectangle>(root);
-		parseTransform(*node, root);
-		parseColor(*node, root);
+		ParseNodeFromXml(*node, root);
+		ParseColorFromXml(*node, root);
 		node->setRounding(root.FloatAttribute("rounding", node->getRounding()));
 		node->setAbsoluteRounding(root.BoolAttribute("absolute_rounding", node->isAbsoluteRounding()));
-		result = node;
-	}
-	else if (name == "Sprite")
-	{
-		auto node = CreateNode<Scene::Sprite>(root);
-		parseTransform(*node, root);
-		parseColor(*node, root);
-		auto texture = root.Attribute("texture");
-		if (texture != nullptr)
-		{
-			node->setTexture(TEXTURE(texture));
-		}
-		result = node;
-	}
-	else if (name == "Label")
-	{
+		return node;
+	} },
+	{ "Label", [](const auto& root) {
 		auto node = CreateNode<Scene::Label>(root);
-		parseTransform(*node, root);
-		parseColor(*node, root);
-		node->setFontSize(root.FloatAttribute("font_size", node->getFontSize()));
-		auto text = root.Attribute("text");
-		if (text != nullptr)
-		{
-			node->setText(root.BoolAttribute("localized") ? LOCALIZE(text) : sky::to_wstring(text));
-		}
-		result = node;
-	}
-	else if (name == "RichLabel")
-	{
+		ParseLabelFromXml(*node, root);
+		return node;
+	} },
+	{ "RichLabel", [](const auto& root) {
 		auto node = CreateNode<Scene::RichLabel>(root);
-		parseTransform(*node, root);
+		ParseNodeFromXml(*node, root);
 		node->setFontSize(root.FloatAttribute("font_size", Scene::Label::DefaultFontSize));
 		auto text = sky::to_wstring(root.Attribute("text"));
 		node->setText(root.BoolAttribute("localized") ? LOCALIZE(sky::to_string(text)) : text);
-		result = node;
-	}
-	else if (name == "Column")
-	{
+		return node;
+	} },
+	{ "Column", [](const auto& root) {
 		auto node = CreateNode<Scene::Column>(root);
-		parseTransform(*node, root);
+		ParseNodeFromXml(*node, root);
 		auto align = root.FloatAttribute("align");
 		node->setAlign(align);
-		result = node;
-	}
+		return node;
+	} },
+};
+
+static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XMLElement& root,
+	std::unordered_map<std::string, std::shared_ptr<Scene::Node>>& collection)
+{
+	std::shared_ptr<Scene::Node> result;
+	std::string name = root.Name();
+
+	if (SceneHelpers::XmlCreateFuncs.contains(name))
+		result = SceneHelpers::XmlCreateFuncs.at(name)(root);
 
 	if (!result)
 		return nullptr;
@@ -238,9 +258,6 @@ static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XM
 	for (auto element = root.FirstChildElement(); element != nullptr; element = element->NextSiblingElement())
 	{
 		auto node = CreateNodesFromXmlElement(*element, collection);
-		if (!node)
-			continue;
-
 		result->attach(node);
 	}
 

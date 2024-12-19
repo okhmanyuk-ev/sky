@@ -4,6 +4,7 @@
 #include <audio/system.h>
 #include "scene_manager.h"
 #include <common/helpers.h>
+#include <tinyxml2.h>
 
 namespace Shared::SceneHelpers
 {
@@ -22,6 +23,13 @@ namespace Shared::SceneHelpers
 
 	void RecursiveColorSet(std::shared_ptr<Scene::Node> node, const glm::vec4& color);
 	void RecursiveAlphaSet(std::shared_ptr<Scene::Node> node, float alpha);
+
+	void ParseNodeFromXml(Scene::Node& node, const tinyxml2::XMLElement& root);
+	void ParseColorFromXml(Scene::Color& node, const tinyxml2::XMLElement& root);
+	void ParseSpriteFromXml(Scene::Sprite& node, const tinyxml2::XMLElement& root);
+	void ParseLabelFromXml(Scene::Label& node, const tinyxml2::XMLElement& root);
+
+	extern std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>(const tinyxml2::XMLElement& root)>> XmlCreateFuncs;
 
 	std::tuple<std::shared_ptr<Scene::Node>, std::unordered_map<std::string, std::shared_ptr<Scene::Node>>>
 		CreateNodesFromXml(const std::string& xml);
