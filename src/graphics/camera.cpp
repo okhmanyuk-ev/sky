@@ -4,7 +4,7 @@ using namespace Graphics;
 
 // camera 2d
 
-glm::mat4 Camera2D::getViewMatrix() const 
+glm::mat4 Camera2D::getViewMatrix() const
 {
 	auto eye = glm::vec3(0.0f, 0.0f, 0.0f);
 	auto center = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -18,7 +18,7 @@ glm::mat4 Camera2D::getViewMatrix() const
 	return view;
 }
 
-glm::mat4 Camera2D::getProjectionMatrix() const 
+glm::mat4 Camera2D::getProjectionMatrix() const
 {
 	return glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
 }
@@ -27,10 +27,9 @@ glm::mat4 Camera2D::getProjectionMatrix() const
 
 Camera3D::Camera3D()
 {
-	//
 }
 
-void Camera3D::onFrame()
+void Camera3D::update()
 {
 	auto yaw = mYaw;// *(mWorldUp.y * -1.0f);
 	auto pitch = mPitch;// *(mWorldUp.y * -1.0f);

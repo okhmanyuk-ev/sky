@@ -28,3 +28,4 @@
 #include <scene/trail.h>
 #include <scene/transform.h>
 #include <scene/tappable.h>
+#include <scene/viewport3d.h>

@@ -23,18 +23,18 @@ namespace Graphics
 	public:
 		auto getPosition() const { return mPosition; }
 		void setPosition(glm::vec2 value) { mPosition = value; }
-		
+
 	private:
 		glm::vec2 mPosition = { 0.0f, 0.0f };
 	};
 
-	class Camera3D : public Camera, public Common::FrameSystem::Frameable
+	class Camera3D : public Camera
 	{
 	public:
 		Camera3D();
 
 	public:
-		void onFrame() override;
+		void update();
 
 	public:
 		void frontMove(float offset);
@@ -47,7 +47,7 @@ namespace Graphics
 	private:
 		glm::mat4 mViewMatrix = glm::mat4(1.0f);
 		glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
-	
+
 	public:
 		auto getPosition() const { return mPosition; }
 		void setPosition(glm::vec3 value) { mPosition = value; }
