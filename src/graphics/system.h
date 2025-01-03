@@ -6,7 +6,6 @@
 
 #include <graphics/color.h>
 #include <graphics/font.h>
-#include <graphics/camera.h>
 #include <graphics/tex_region.h>
 #include <graphics/effects.h>
 

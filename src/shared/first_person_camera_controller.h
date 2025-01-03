@@ -1,13 +1,11 @@
 #pragma once
 
-#include <graphics/camera.h>
 #include <common/event_system.h>
 #include <common/frame_system.h>
 #include <common/timestep_fixer.h>
 #include <platform/system.h>
 #include <platform/input.h>
-
-#include <shared/console_device.h>
+#include <skygfx/utils.h>
 
 namespace Shared
 {
@@ -19,7 +17,7 @@ namespace Shared
 		public Common::Event::Listenable<Platform::Input::Touch::Event>
 	{
 	public:
-		FirstPersonCameraController(std::shared_ptr<Graphics::Camera3D> camera);
+		FirstPersonCameraController(std::shared_ptr<skygfx::utils::PerspectiveCamera> camera);
 		~FirstPersonCameraController();
 
 	private:
@@ -53,7 +51,7 @@ namespace Shared
 		bool mKeyCtrl = false;
 
 	private:
-		std::shared_ptr<Graphics::Camera3D> mCamera; // TODO: maybe weak_ptr
+		std::shared_ptr<skygfx::utils::PerspectiveCamera> mCamera;
 
 	public:
 		auto getSensivity() const { return mSensivity; }

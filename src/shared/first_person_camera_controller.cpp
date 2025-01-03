@@ -4,7 +4,7 @@
 
 using namespace Shared;
 
-FirstPersonCameraController::FirstPersonCameraController(std::shared_ptr<Graphics::Camera3D> camera) :
+FirstPersonCameraController::FirstPersonCameraController(std::shared_ptr<skygfx::utils::PerspectiveCamera> camera) :
 	mCamera(camera)
 {
 	mTimestepFixer.setSkipLongFrames(true);
@@ -30,8 +30,8 @@ void FirstPersonCameraController::update(Clock::Duration dTime)
 		{
 			diff *= mSensivity / 10.0f;
 
-			mCamera->setYaw(mCamera->getYaw() - glm::radians(diff.x));
-			mCamera->setPitch(mCamera->getPitch() + glm::radians(diff.y));
+			mCamera->yaw -= glm::radians(diff.x);
+			mCamera->pitch += glm::radians(diff.y);
 
 			mPrevAngles = mCurrentAngles;
 		}
@@ -43,29 +43,28 @@ void FirstPersonCameraController::update(Clock::Duration dTime)
 		auto offset = mSensivity * Clock::ToSeconds(dTime) * 1.5f;
 
 		if (mLeftArrow)
-			mCamera->setYaw(mCamera->getYaw() + offset);
+			mCamera->yaw += offset;
 
 		if (mRightArrow)
-			mCamera->setYaw(mCamera->getYaw() - offset);
+			mCamera->yaw -= offset;
 
 		if (mUpArrow)
-			mCamera->setPitch(mCamera->getPitch() - offset);
+			mCamera->pitch -= offset;
 
 		if (mDownArrow)
-			mCamera->setPitch(mCamera->getPitch() + offset);
+			mCamera->pitch += offset;
 
 		float limit = glm::pi<float>() / 2.0f - 0.01f;
 
-		mCamera->setPitch(fmaxf(-limit, mCamera->getPitch()));
-		mCamera->setPitch(fminf(+limit, mCamera->getPitch()));
+		mCamera->pitch = glm::clamp(mCamera->pitch, -limit, +limit);
 
 		auto pi = glm::pi<float>();
 
-		while (mCamera->getYaw() > pi)
-			mCamera->setYaw(mCamera->getYaw() - (pi * 2.0f));
+		while (mCamera->yaw > pi)
+			mCamera->yaw -= pi * 2.0f;
 
-		while (mCamera->getYaw() < -pi)
-			mCamera->setYaw(mCamera->getYaw() + (pi * 2.0f));
+		while (mCamera->yaw < -pi)
+			mCamera->yaw += pi * 2.0f;
 	}
 	{
 		auto speed = mSpeed * Clock::ToSeconds(dTime) * 50.0f;
@@ -100,15 +99,15 @@ void FirstPersonCameraController::update(Clock::Duration dTime)
 
 		if (glm::length(mSmoothDirection) > 0.0f)
 		{
-			mCamera->sideMove(mSmoothDirection.x);
-			mCamera->frontMove(mSmoothDirection.y);
+			auto vectors = skygfx::utils::MakePerspectiveCameraVectors(*mCamera);
+			mCamera->position += vectors.right * mSmoothDirection.x;
+			mCamera->position += vectors.front * mSmoothDirection.y;
 		}
 	}
 }
 
 FirstPersonCameraController::~FirstPersonCameraController()
 {
-	//
 }
 
 void FirstPersonCameraController::onEvent(const Platform::Input::Keyboard::Event& e)
@@ -175,7 +174,7 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::ScrollEv
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 		return;
 
-	mCamera->setFieldOfView(mCamera->getFieldOfView() - e.scroll.y * 0.05f);
+	mCamera->fov -= e.scroll.y * 0.05f;
 }
 
 void FirstPersonCameraController::onEvent(const Platform::Input::Touch::Event& e)

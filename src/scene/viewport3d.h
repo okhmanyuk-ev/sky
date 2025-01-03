@@ -80,7 +80,7 @@ namespace Scene
 		void setTechnique(skygfx::utils::DrawSceneOptions::Technique value) { mTechnique = value; }
 
 	private:
-		std::shared_ptr<Graphics::Camera3D> mCamera;
+		std::shared_ptr<skygfx::utils::PerspectiveCamera> mCamera;
 		std::list<std::shared_ptr<Entity3D>> mEntities;
 		skygfx::utils::DrawSceneOptions::Technique mTechnique = skygfx::utils::DrawSceneOptions::Technique::ForwardShading;
 	};

@@ -38,7 +38,7 @@ void SingleMeshEntity::setVertices(const std::vector<skygfx::utils::Mesh::Vertex
 
 Viewport3D::Viewport3D()
 {
-	mCamera = std::make_shared<Graphics::Camera3D>();
+	mCamera = std::make_shared<skygfx::utils::PerspectiveCamera>();
 }
 
 void Viewport3D::addEntity(std::shared_ptr<Entity3D> entity)
@@ -54,7 +54,6 @@ void Viewport3D::removeEntity(std::shared_ptr<Entity3D> entity)
 void Viewport3D::update(Clock::Duration dTime)
 {
 	Node::update(dTime);
-	mCamera->update();
 	for (auto& entity : mEntities)
 	{
 		entity->updateTransform();
@@ -70,17 +69,8 @@ void Viewport3D::draw()
 	for (auto& entity : mEntities)
 		entity->provideModels(models);
 
-	skygfx::utils::PerspectiveCamera camera;
-	camera.yaw = mCamera->getYaw();
-	camera.pitch = mCamera->getPitch();
-	camera.position = mCamera->getPosition();
-	camera.world_up = mCamera->getWorldUp();
-	camera.far_plane = mCamera->getFarPlane();
-	camera.near_plane = mCamera->getNearPlane();
-	camera.fov = mCamera->getFieldOfView();
-
 	skygfx::utils::DrawSceneOptions options;
 	options.technique = mTechnique;
 
-	skygfx::utils::DrawScene(nullptr, camera, models, { skygfx::utils::DirectionalLight{} }, options);
+	skygfx::utils::DrawScene(nullptr, *mCamera, models, { skygfx::utils::DirectionalLight{} }, options);
 }
