@@ -57,14 +57,7 @@ void FirstPersonCameraController::update(Clock::Duration dTime)
 		float limit = glm::pi<float>() / 2.0f - 0.01f;
 
 		mCamera->pitch = glm::clamp(mCamera->pitch, -limit, +limit);
-
-		auto pi = glm::pi<float>();
-
-		while (mCamera->yaw > pi)
-			mCamera->yaw -= pi * 2.0f;
-
-		while (mCamera->yaw < -pi)
-			mCamera->yaw += pi * 2.0f;
+		mCamera->yaw = glm::wrapAngle(mCamera->yaw);
 	}
 	{
 		auto speed = mSpeed * Clock::ToSeconds(dTime) * 50.0f;
