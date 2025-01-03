@@ -2,29 +2,6 @@
 
 using namespace Graphics;
 
-// camera 2d
-
-glm::mat4 Camera2D::getViewMatrix() const
-{
-	auto eye = glm::vec3(0.0f, 0.0f, 0.0f);
-	auto center = glm::vec3(0.0f, 0.0f, 1.0f);
-	auto up = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	auto view = glm::lookAtLH(eye, center, up);
-
-	view = glm::translate(view, glm::vec3({ PLATFORM->getLogicalWidth() / 2.0f, PLATFORM->getLogicalHeight() / 2.0f, 0.0f }));
-	view = glm::translate(view, { -mPosition, 0.0f });
-
-	return view;
-}
-
-glm::mat4 Camera2D::getProjectionMatrix() const
-{
-	return glm::orthoLH(0.0f, PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight(), 0.0f, -1.0f, 1.0f);
-}
-
-// camera 3d
-
 Camera3D::Camera3D()
 {
 }

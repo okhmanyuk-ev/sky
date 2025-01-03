@@ -14,20 +14,6 @@ namespace Graphics
 		virtual glm::mat4 getProjectionMatrix() const = 0;
 	};
 
-	class Camera2D : public Camera
-	{
-	public:
-		glm::mat4 getViewMatrix() const override;
-		glm::mat4 getProjectionMatrix() const override;
-
-	public:
-		auto getPosition() const { return mPosition; }
-		void setPosition(glm::vec2 value) { mPosition = value; }
-
-	private:
-		glm::vec2 mPosition = { 0.0f, 0.0f };
-	};
-
 	class Camera3D : public Camera
 	{
 	public:
