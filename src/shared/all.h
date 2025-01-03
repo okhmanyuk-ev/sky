@@ -30,7 +30,6 @@
 #include <platform/all.h>
 #include <renderer/all.h>
 #include <scene/all.h>
-#include <scene3d/all.h>
 #include <graphics/all.h>
 
 #include <shared/stats_system.h>

@@ -1,6 +1,5 @@
 #pragma once
 #include <scene/all.h>
-#include <scene3d/all.h>
 #include <audio/system.h>
 #include "scene_manager.h"
 #include <common/helpers.h>
@@ -616,10 +615,6 @@ namespace Shared::SceneHelpers
 	public:
 		Window();
 	};
-
-	// 3d
-
-	//std::vector<std::shared_ptr<Scene3D::Model>> MakeModelsFromObj(const std::string& path_to_folder, const std::string& name_without_extension);
 
 	class CursorIndicator : public Scene::Rectangle, public std::enable_shared_from_this<CursorIndicator>
 	{
