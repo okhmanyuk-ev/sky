@@ -80,7 +80,7 @@ void Viewport3D::draw()
 	camera.fov = mCamera->getFieldOfView();
 
 	skygfx::utils::DrawSceneOptions options;
-	//options.technique = skygfx::utils::DrawSceneOptions::Technique::ForwardShading;
+	options.technique = mTechnique;
 
 	skygfx::utils::DrawScene(nullptr, camera, models, { skygfx::utils::DirectionalLight{} }, options);
 }
