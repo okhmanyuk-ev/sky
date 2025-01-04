@@ -30,8 +30,8 @@ void FirstPersonCameraController::update(Clock::Duration dTime)
 		{
 			diff *= mSensivity / 10.0f;
 
-			mCamera->yaw -= glm::radians(diff.x);
-			mCamera->pitch += glm::radians(diff.y);
+			mCamera->yaw += glm::radians(diff.x);
+			mCamera->pitch -= glm::radians(diff.y);
 
 			mPrevAngles = mCurrentAngles;
 		}
@@ -167,7 +167,7 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::ScrollEv
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 		return;
 
-	mCamera->fov -= e.scroll.y * 0.05f;
+	mCamera->fov -= glm::degrees(e.scroll.y * 0.05f);
 }
 
 void FirstPersonCameraController::onEvent(const Platform::Input::Touch::Event& e)
