@@ -35,10 +35,14 @@ namespace Scene
 		virtual void provideModels(std::vector<skygfx::utils::Model>& models);
 
 	public:
+		bool isEnabled() const { return mEnabled; }
+		void setEnabled(bool value) { mEnabled = value; }
+
 		const auto& getTransform() const { return mTransform; }
 		void setProvideModelsCallback(ProvideModelsCallback value) { mProvideModelsCallback = value; }
 
 	private:
+		bool mEnabled = true;
 		glm::mat4 mTransform = glm::mat4(1.0f);
 		ProvideModelsCallback mProvideModelsCallback;
 	};

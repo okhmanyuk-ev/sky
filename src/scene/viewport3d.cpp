@@ -19,7 +19,6 @@ void Entity3D::provideModels(std::vector<skygfx::utils::Model>& models)
 		mProvideModelsCallback(models);
 }
 
-
 void SingleMeshEntity::provideModels(std::vector<skygfx::utils::Model>& models)
 {
 	Entity3D::provideModels(models);
@@ -28,6 +27,7 @@ void SingleMeshEntity::provideModels(std::vector<skygfx::utils::Model>& models)
 	model.topology = mTopology;
 	model.mesh = &mMesh;
 	model.matrix = getTransform();
+	model.depth_mode = skygfx::DepthMode(skygfx::ComparisonFunc::Less);
 	models.push_back(model);
 }
 
@@ -67,10 +67,18 @@ void Viewport3D::draw()
 	std::vector<skygfx::utils::Model> models;
 
 	for (auto& entity : mEntities)
+	{
+		if (!entity->isEnabled())
+			continue;
+
 		entity->provideModels(models);
+	}
 
 	skygfx::utils::DrawSceneOptions options;
 	options.technique = mTechnique;
 
-	skygfx::utils::DrawScene(nullptr, *mCamera, models, { skygfx::utils::DirectionalLight{} }, options);
+	skygfx::utils::DirectionalLight light;
+	light.direction = { -0.5f, -0.5f, -0.5f };
+
+	skygfx::utils::DrawScene(nullptr, *mCamera, models, { light }, options);
 }
