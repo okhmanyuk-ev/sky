@@ -57,6 +57,7 @@ namespace Scene
 		void setTopology(skygfx::Topology value) { mTopology = value; }
 
 		void setVertices(const std::vector<skygfx::utils::Mesh::Vertex>& vertices);
+		void setIndices(const std::vector<skygfx::utils::Mesh::Index>& indices);
 
 		const auto& getMesh() const { return mMesh; }
 

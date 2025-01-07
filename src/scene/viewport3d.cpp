@@ -36,6 +36,11 @@ void SingleMeshEntity::setVertices(const std::vector<skygfx::utils::Mesh::Vertex
 	mMesh.setVertices(vertices);
 }
 
+void SingleMeshEntity::setIndices(const std::vector<skygfx::utils::Mesh::Index>& indices)
+{
+	mMesh.setIndices(indices);
+}
+
 Viewport3D::Viewport3D()
 {
 	mCamera = std::make_shared<skygfx::utils::PerspectiveCamera>();
