@@ -17,3 +17,10 @@ add_executable(02_windows 02_windows/main.cpp)
 target_link_libraries(02_windows sky)
 set_property(TARGET 02_windows PROPERTY FOLDER ${EXAMPLES_FOLDER})
 copy_required_libs(02_windows "${PROJECT_SOURCE_DIR}/lib/fmod")
+
+# 03 - cube
+
+add_executable(03_cube 03_cube/main.cpp)
+target_link_libraries(03_cube sky)
+set_property(TARGET 03_cube PROPERTY FOLDER ${EXAMPLES_FOLDER})
+copy_required_libs(03_cube "${PROJECT_SOURCE_DIR}/lib/fmod")
