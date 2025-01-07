@@ -3,8 +3,9 @@
 #include <string>
 #include <list>
 #include <common/timer.h>
+#include <sky/singleton.h>
 
-#define PROFILER ENGINE->getSystem<Common::ProfilerSystem>()
+#define PROFILER sky::Singleton<Common::ProfilerSystem>::GetInstance()
 
 namespace Common
 {

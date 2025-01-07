@@ -1,6 +1,5 @@
 #pragma once
 
-#include <core/engine.h>
 #include <renderer/all.h>
 #include <graphics/all.h>
 #include <platform/asset.h>
@@ -10,7 +9,7 @@
 #include <audio/sound.h>
 #include <nlohmann/json.hpp>
 
-#define CACHE ENGINE->getSystem<Shared::CacheSystem>()
+#define CACHE sky::Singleton<Shared::CacheSystem>::GetInstance()
 
 #define PRECACHE_TEXTURE_ALIAS(NAME, ALIAS) CACHE->loadTexture(NAME, ALIAS)
 #define PRECACHE_FONT_ALIAS(NAME, ALIAS) CACHE->loadFont(NAME, ALIAS)

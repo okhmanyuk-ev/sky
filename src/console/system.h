@@ -1,16 +1,15 @@
 #pragma once
 
-#include <core/engine.h>
 #include <common/event_system.h>
 #include <console/device.h>
-
+#include <sky/singleton.h>
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
 #include <optional>
 
-#define CONSOLE ENGINE->getSystem<Console::System>()
+#define CONSOLE sky::Singleton<Console::System>::GetInstance()
 
 namespace Console
 {

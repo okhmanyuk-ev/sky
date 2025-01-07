@@ -1,6 +1,5 @@
 #pragma once
 
-#include <core/engine.h>
 #include <common/frame_system.h>
 #include <common/event_system.h>
 #include <renderer/all.h>
@@ -16,7 +15,7 @@
 
 #include <cstddef>
 
-#define IMGUI_SYSTEM ENGINE->getSystem<Shared::ImguiSystem>()
+#define IMGUI_SYSTEM sky::Singleton<Shared::ImguiSystem>::GetInstance()
 
 namespace Shared
 {

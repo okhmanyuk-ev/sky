@@ -4,7 +4,7 @@
 #include <graphics/all.h>
 #include <scene/all.h>
 
-#define IMSCENE ENGINE->getSystem<Shared::ImScene>()
+#define IMSCENE sky::Singleton<Shared::ImScene>::GetInstance()
 
 namespace Shared
 {

@@ -1,9 +1,8 @@
 #pragma once
 
-#include <core/engine.h>
 #include <platform/defines.h>
 #include <platform/input.h>
-
+#include <sky/singleton.h>
 #include <string>
 #include <memory>
 #include <vector>
@@ -11,7 +10,7 @@
 #include <map>
 #include <optional>
 
-#define PLATFORM ENGINE->getSystem<Platform::System>()
+#define PLATFORM sky::Singleton<Platform::System>::GetInstance()
 
 extern void sky_main();
 

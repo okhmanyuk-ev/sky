@@ -2,10 +2,10 @@
 
 #include <string>
 #include <functional>
-#include <core/engine.h>
 #include <fmt/format.h>
+#include <sky/singleton.h>
 
-#define CONSOLE_DEVICE ENGINE->getSystem<Console::Device>()
+#define CONSOLE_DEVICE sky::Singleton<Console::Device>::GetInstance()
 
 namespace Console
 {

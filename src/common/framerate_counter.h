@@ -1,6 +1,5 @@
 #pragma once
 
-#include <core/engine.h>
 #include <common/timer.h>
 #include <common/frame_system.h>
 

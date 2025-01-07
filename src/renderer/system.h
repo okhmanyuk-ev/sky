@@ -1,17 +1,14 @@
 #pragma once
 
-#include <core/engine.h>
 #include <renderer/shader.h>
-
 #include <optional>
-
 #include <skygfx/skygfx.h>
 #include <skygfx/vertex.h>
 #include <skygfx/utils.h>
 #include <common/event_system.h>
 #include <platform/all.h>
 
-#define RENDERER ENGINE->getSystem<Renderer::System>()
+#define RENDERER sky::Singleton<Renderer::System>::GetInstance()
 
 namespace Renderer
 {

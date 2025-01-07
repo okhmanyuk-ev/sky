@@ -1,13 +1,12 @@
 #pragma once
 
-#include <core/engine.h>
 #include <list>
 #include <thread>
 #include <mutex>
 #include <future>
 #include <condition_variable>
 
-#define TASK ENGINE->getSystem<Common::TaskSystem>()
+#define TASK sky::Singleton<Common::TaskSystem>::GetInstance()
 
 namespace Common
 {

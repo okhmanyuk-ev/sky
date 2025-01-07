@@ -1,10 +1,10 @@
 #pragma once
 
-#include <core/engine.h>
+#include <sky/singleton.h>
 #include <audio/sound.h>
 #include <fmod/fmod_studio.hpp>
 
-#define AUDIO ENGINE->getSystem<Audio::System>()
+#define AUDIO sky::Singleton<Audio::System>::GetInstance()
 
 namespace Audio
 {

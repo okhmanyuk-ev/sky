@@ -1,13 +1,12 @@
 #pragma once
 
-#include <core/engine.h>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <common/frame_system.h>
 #include <fmt/format.h>
 
-#define STATS ENGINE->getSystem<Shared::StatsSystem>()
+#define STATS sky::Singleton<Shared::StatsSystem>::GetInstance()
 
 #define STATS_INDICATE(KEY, VALUE) STATS->indicate(KEY, VALUE)
 #define STATS_INDICATE_GROUP(GROUP, KEY, VALUE) STATS->indicate(KEY, VALUE, GROUP)

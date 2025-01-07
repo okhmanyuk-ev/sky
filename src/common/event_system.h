@@ -1,12 +1,12 @@
 #pragma once
 
-#include <core/engine.h>
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
 #include <typeindex>
+#include <sky/singleton.h>
 
-#define EVENT ENGINE->getSystem<Common::Event::System>()
+#define EVENT sky::Singleton<Common::Event::System>::GetInstance()
 
 namespace Common::Event
 {

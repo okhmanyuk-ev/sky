@@ -1,10 +1,10 @@
 #pragma once
 
-#include <core/engine.h>
 #include <map>
 #include <fmt/format.h>
+#include <sky/singleton.h>
 
-#define LOCALIZATION ENGINE->getSystem<Shared::LocalizationSystem>()
+#define LOCALIZATION sky::Singleton<Shared::LocalizationSystem>::GetInstance()
 #define LOCALIZE(KEY) LOCALIZATION->getString(KEY)
 
 namespace Shared

@@ -2,7 +2,7 @@
 
 #include <scene/all.h>
 
-#define SCENE_MANAGER ENGINE->getSystem<Shared::SceneManager>()
+#define SCENE_MANAGER sky::Singleton<Shared::SceneManager>::GetInstance()
 
 namespace Shared
 {

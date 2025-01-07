@@ -1,6 +1,5 @@
 #pragma once
 
-#include <core/engine.h>
 #include <platform/system.h>
 #include <graphics/system.h>
 #include <common/event_system.h>

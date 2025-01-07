@@ -2,13 +2,12 @@
 
 #include <functional>
 #include <unordered_set>
-#include <core/engine.h>
 #include <common/bitbuffer.h>
 #include <platform/defines.h>
 #include <common/frame_system.h>
 #include <common/timer.h>
 
-#define NETWORK ENGINE->getSystem<Network::System>()
+#define NETWORK sky::Singleton<Network::System>::GetInstance()
 
 namespace Network
 {

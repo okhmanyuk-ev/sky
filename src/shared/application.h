@@ -1,7 +1,5 @@
 #pragma once
 
-#include <core/engine.h>
-
 #include <common/task_system.h>
 #include <common/frame_system.h>
 #include <common/event_system.h>
@@ -37,9 +35,6 @@ namespace Shared
 		};
 
 		using Flags = std::set<Flag>;
-
-	private:
-		static inline Core::Engine Engine;
 
 	public:
 		Application(const std::string& appname, const Flags& flags = {});

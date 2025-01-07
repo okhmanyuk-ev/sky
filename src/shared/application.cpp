@@ -6,6 +6,7 @@
 #include <shared/scene_manager.h>
 #include <shared/scene_helpers.h>
 #include <regex>
+#include <sky/singleton.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -17,30 +18,30 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 {
 	std::srand((unsigned int)std::time(nullptr));
 
-	ENGINE->addSystem<Common::Event::System>(std::make_shared<Common::Event::System>());
+	sky::Singleton<Common::Event::System>::Init(std::make_shared<Common::Event::System>());
 #ifndef EMSCRIPTEN
-	ENGINE->addSystem<Common::TaskSystem>(std::make_shared<Common::TaskSystem>());
+	sky::Singleton<Common::TaskSystem>::Init(std::make_shared<Common::TaskSystem>());
 #endif
-	ENGINE->addSystem<Common::FrameSystem>(std::make_shared<Common::FrameSystem>());
-	ENGINE->addSystem<Common::ProfilerSystem>(std::make_shared<Common::ProfilerSystem>());
-	ENGINE->addSystem<Platform::System>(Platform::System::create(appname));
-	ENGINE->addSystem<Renderer::System>(std::make_shared<Renderer::System>());
-	ENGINE->addSystem<Console::Device>(std::make_shared<Shared::ConsoleDevice>());
-	ENGINE->addSystem<Console::System>(std::make_shared<Console::System>());
-	ENGINE->addSystem<Graphics::System>(std::make_shared<Graphics::System>());
+	sky::Singleton<Common::FrameSystem>::Init(std::make_shared<Common::FrameSystem>());
+	sky::Singleton<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
+	sky::Singleton<Platform::System>::Init(Platform::System::create(appname));
+	sky::Singleton<Renderer::System>::Init(std::make_shared<Renderer::System>());
+	sky::Singleton<Console::Device>::Init(std::make_shared<Shared::ConsoleDevice>());
+	sky::Singleton<Console::System>::Init(std::make_shared<Console::System>());
+	sky::Singleton<Graphics::System>::Init(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
 	{
-		ENGINE->addSystem<Network::System>(std::make_shared<Network::System>());
+		sky::Singleton<Network::System>::Init(std::make_shared<Network::System>());
 	}
-	ENGINE->addSystem<Shared::LocalizationSystem>(std::make_shared<Shared::LocalizationSystem>());
-	ENGINE->addSystem<Shared::StatsSystem>(std::make_shared<Shared::StatsSystem>());
-	ENGINE->addSystem<Shared::CacheSystem>(std::make_shared<Shared::CacheSystem>());
-	ENGINE->addSystem<Shared::ImguiSystem>(std::make_shared<Shared::ImguiSystem>());
-	ENGINE->addSystem<Shared::Stylebook>(std::make_shared<Shared::Stylebook>());
-	ENGINE->addSystem<Shared::ImScene>(std::make_shared<Shared::ImScene>());
+	sky::Singleton<Shared::LocalizationSystem>::Init(std::make_shared<Shared::LocalizationSystem>());
+	sky::Singleton<Shared::StatsSystem>::Init(std::make_shared<Shared::StatsSystem>());
+	sky::Singleton<Shared::CacheSystem>::Init(std::make_shared<Shared::CacheSystem>());
+	sky::Singleton<Shared::ImguiSystem>::Init(std::make_shared<Shared::ImguiSystem>());
+	sky::Singleton<Shared::Stylebook>::Init(std::make_shared<Shared::Stylebook>());
+	sky::Singleton<Shared::ImScene>::Init(std::make_shared<Shared::ImScene>());
 	if (flags.count(Flag::Audio))
 	{
-		ENGINE->addSystem<Audio::System>(std::make_shared<Audio::System>());
+		sky::Singleton<Audio::System>::Init(std::make_shared<Audio::System>());
 	}
 
 	Scene::RichLabel::DefaultIconTextureCallback = [](const auto& path) { return TEXTURE(path); };
@@ -73,8 +74,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		});
 		mSceneEditor = std::make_shared<SceneEditor>(*mScene);
 
-		ENGINE->addSystem<Shared::SceneManager>(std::make_shared<Shared::SceneManager>());
-		mScene->getRoot()->attach(SCENE_MANAGER);
+		auto scene_manager = std::make_shared<Shared::SceneManager>();
+		sky::Singleton<Shared::SceneManager>::Init(scene_manager);
+		mScene->getRoot()->attach(scene_manager);
 
 		auto getter = [this] {
 			auto fps = 1.0f / Clock::ToSeconds(mScene->getTimestepFixer().getTimestep());
@@ -275,35 +277,34 @@ Application::~Application()
 {
 	if (mFlags.count(Flag::Scene))
 	{
-		ENGINE->removeSystem<Shared::SceneManager>();
+		sky::Singleton<Shared::SceneManager>::Reset();
 		mSceneEditor = nullptr;
 		mScene = nullptr;
 	}
 	if (mFlags.count(Flag::Audio))
 	{
-		ENGINE->removeSystem<Audio::System>();
+		sky::Singleton<Audio::System>::Reset();
 	}
-	ENGINE->removeSystem<Shared::ImScene>();
-	ENGINE->removeSystem<Shared::Stylebook>();
-	ENGINE->removeSystem<Shared::ImguiSystem>();
-	ENGINE->removeSystem<Shared::CacheSystem>();
-	ENGINE->removeSystem<Shared::StatsSystem>();
-	ENGINE->removeSystem<Shared::LocalizationSystem>();
+	sky::Singleton<Shared::ImScene>::Reset();
+	sky::Singleton<Shared::Stylebook>::Reset();
+	sky::Singleton<Shared::ImguiSystem>::Reset();
+	sky::Singleton<Shared::CacheSystem>::Reset();
+	sky::Singleton<Shared::StatsSystem>::Reset();
+	sky::Singleton<Shared::LocalizationSystem>::Reset();
 	if (mFlags.count(Flag::Network))
 	{
-		ENGINE->removeSystem<Network::System>();
+		sky::Singleton<Network::System>::Reset();
 	}
-	ENGINE->removeSystem<Graphics::System>();
-	ENGINE->removeSystem<Console::System>();
-	ENGINE->removeSystem<Console::Device>();
-	ENGINE->removeSystem<Renderer::System>();
-	ENGINE->removeSystem<Platform::System>();
-	ENGINE->removeSystem<Common::ProfilerSystem>();
-	ENGINE->removeSystem<Common::FrameSystem>();
+	sky::Singleton<Graphics::System>::Reset();
+	sky::Singleton<Console::System>::Reset();
+	sky::Singleton<Console::Device>::Reset();
+	sky::Singleton<Renderer::System>::Reset();
+	sky::Singleton<Platform::System>::Reset();
+	sky::Singleton<Common::ProfilerSystem>::Reset();
+	sky::Singleton<Common::FrameSystem>::Reset();
 #ifndef EMSCRIPTEN
-	ENGINE->removeSystem<Common::TaskSystem>();
+	sky::Singleton<Common::TaskSystem>::Reset();
 #endif
-	//	ENGINE->removeSystem<Common::EventSystem>(); // should be removed later
 }
 
 void Application::run()

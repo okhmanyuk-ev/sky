@@ -3,7 +3,7 @@
 #include <common/frame_system.h>
 #include <platform/system.h>
 #include <renderer/all.h>
-
+#include <sky/singleton.h>
 #include <graphics/color.h>
 #include <graphics/font.h>
 #include <graphics/tex_region.h>
@@ -15,7 +15,7 @@
 #include <stack>
 #include "text_mesh.h"
 
-#define GRAPHICS ENGINE->getSystem<Graphics::System>()
+#define GRAPHICS sky::Singleton<Graphics::System>::GetInstance()
 
 namespace Graphics
 {

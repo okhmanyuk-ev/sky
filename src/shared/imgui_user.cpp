@@ -1,5 +1,4 @@
 #include "imgui_user.h"
-#include <core/engine.h>
 #include <platform/system.h>
 #include <shared/imgui_system.h>
 

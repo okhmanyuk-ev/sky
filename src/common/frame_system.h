@@ -1,12 +1,12 @@
 #pragma once
 
-#include <core/engine.h>
 #include <core/clock.h>
 #include <list>
 #include <functional>
 #include <mutex>
+#include <sky/singleton.h>
 
-#define FRAME ENGINE->getSystem<Common::FrameSystem>()
+#define FRAME sky::Singleton<Common::FrameSystem>::GetInstance()
 
 namespace Common
 {
