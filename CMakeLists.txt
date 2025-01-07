@@ -191,6 +191,13 @@ elseif(APPLE)
 endif()
 
 function(copy_required_libs TARGET_NAME)
+	#if(NOT BASE_FOLDER)
+	#	set(BASE_FOLDER "${PROJECT_SOURCE_DIR}/sky/lib/fmod")
+	#endif()
+	set(BASE_FOLDER "${PROJECT_SOURCE_DIR}/sky/lib/fmod")
+	if(ARGC GREATER 1)
+		list(GET ARGN 0 BASE_FOLDER)
+	endif()
 	if(WIN32)
 		if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 			set(X64 TRUE)
@@ -199,32 +206,32 @@ function(copy_required_libs TARGET_NAME)
 		endif()
 		if(X64)
 			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodL.dll">
-				$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmod.dll">
+				$<$<CONFIG:Debug>:"${BASE_FOLDER}/x64/fmodL.dll">
+				$<$<NOT:$<CONFIG:Debug>>:"${BASE_FOLDER}/x64/fmod.dll">
 				$<TARGET_FILE_DIR:${TARGET_NAME}>)
 
 			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodstudioL.dll">
-				$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x64/fmodstudio.dll">
+				$<$<CONFIG:Debug>:"${BASE_FOLDER}/x64/fmodstudioL.dll">
+				$<$<NOT:$<CONFIG:Debug>>:"${BASE_FOLDER}/x64/fmodstudio.dll">
 				$<TARGET_FILE_DIR:${TARGET_NAME}>)
 		else()
 			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodL.dll">
-				$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmod.dll">
+				$<$<CONFIG:Debug>:"${BASE_FOLDER}/x86/fmodL.dll">
+				$<$<NOT:$<CONFIG:Debug>>:"${BASE_FOLDER}/x86/fmod.dll">
 				$<TARGET_FILE_DIR:${TARGET_NAME}>)
 
 			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				$<$<CONFIG:Debug>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodstudioL.dll">
-				$<$<NOT:$<CONFIG:Debug>>:"${PROJECT_SOURCE_DIR}/sky/lib/fmod/x86/fmodstudio.dll">
+				$<$<CONFIG:Debug>:"${BASE_FOLDER}/x86/fmodstudioL.dll">
+				$<$<NOT:$<CONFIG:Debug>>:"${BASE_FOLDER}/x86/fmodstudio.dll">
 				$<TARGET_FILE_DIR:${TARGET_NAME}>)
 		endif()
 	elseif(ANDROID)
 		add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
-			${PROJECT_SOURCE_DIR}/sky/lib/fmod/android/${ANDROID_ABI}/libfmod.so
+			${BASE_FOLDER}/android/${ANDROID_ABI}/libfmod.so
 			${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libfmod.so)
 
 		add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
-			${PROJECT_SOURCE_DIR}/sky/lib/fmod/android/${ANDROID_ABI}/libfmodstudio.so
+			${BASE_FOLDER}/android/${ANDROID_ABI}/libfmodstudio.so
 			${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libfmodstudio.so)
 	endif()
 endfunction()
@@ -327,3 +334,7 @@ add_library(tinyxml2 STATIC
 target_include_directories(imgui PUBLIC lib/tinyxml2)
 target_link_libraries(${PROJECT_NAME} tinyxml2)
 set_property(TARGET tinyxml2 PROPERTY FOLDER ${LIBS_FOLDER})
+
+# examples
+
+add_subdirectory(examples)
