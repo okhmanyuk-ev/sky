@@ -1,11 +1,5 @@
 #include <sky/sky.h>
 
-class App : public Shared::Application
-{
-public:
-	App();
-};
-
 static const std::vector<skygfx::utils::Mesh::Vertex> Vertices = {
 	/* front */
 	/* 0  */ { .pos = { -1.0f,  1.0f,  1.0f }, .texcoord = { 0.0f, 0.0f }, .normal = { 0.0f, 0.0f, 1.0f } },
@@ -53,10 +47,12 @@ static const std::vector<uint32_t> Indices = {
 	20, 21, 22, 21, 23, 22, // right
 };
 
-App::App() : Shared::Application("Cube", { Flag::Scene })
+void sky_main()
 {
+	Shared::Application app("Cube", { Shared::Application::Flag::Scene });
+
 	auto viewport = std::make_shared<Scene::Viewport3D>();
-	getScene()->getRoot()->attach(viewport);
+	app.getScene()->getRoot()->attach(viewport);
 
 	auto entity = std::make_shared<Scene::SingleMeshEntity>();
 	entity->setVertices(Vertices);
@@ -72,9 +68,6 @@ App::App() : Shared::Application("Cube", { Flag::Scene })
 			entity->setRotation({ 0.0f, glm::radians(value), 0.0f });
 		});
 	}));
-}
 
-void sky_main()
-{
-	App().run();
+	app.run();
 }

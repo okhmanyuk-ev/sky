@@ -51,7 +51,7 @@ namespace Shared
 	private:
 		Flags mFlags;
 
-	protected:
+	public:
 		auto getScene() const { return mScene; }
 		const auto& getStartupKeyValues() const { return mStartupKeyValues; }
 

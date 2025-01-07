@@ -1,11 +1,5 @@
 #include <sky/sky.h>
 
-class App : public Shared::Application
-{
-public:
-	App();
-};
-
 static std::shared_ptr<Shared::SceneManager::Window> CreateWindow()
 {
 	auto window = std::make_shared<Shared::SceneHelpers::StandardWindow>();
@@ -50,13 +44,12 @@ static std::shared_ptr<Shared::SceneManager::Window> CreateWindow()
 	return window;
 }
 
-App::App() : Shared::Application("Windows", { Flag::Scene })
-{
-	auto window = CreateWindow();
-	SCENE_MANAGER->pushWindow(window);
-}
-
 void sky_main()
 {
-	App().run();
+	Shared::Application app("Windows", { Shared::Application::Flag::Scene });
+
+	auto window = CreateWindow();
+	SCENE_MANAGER->pushWindow(window);
+
+	app.run();
 }
