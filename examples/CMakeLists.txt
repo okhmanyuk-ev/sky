@@ -4,9 +4,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXAMPLES_FOLDER "examples")
 
-# 01 - triangle
+# 01 - hello_world
 
 add_executable(01_hello_world 01_hello_world/main.cpp)
 target_link_libraries(01_hello_world sky)
 set_property(TARGET 01_hello_world PROPERTY FOLDER ${EXAMPLES_FOLDER})
 copy_required_libs(01_hello_world "${PROJECT_SOURCE_DIR}/lib/fmod")
+
+# 02 - windows
+
+add_executable(02_windows 02_windows/main.cpp)
+target_link_libraries(02_windows sky)
+set_property(TARGET 02_windows PROPERTY FOLDER ${EXAMPLES_FOLDER})
+copy_required_libs(02_windows "${PROJECT_SOURCE_DIR}/lib/fmod")
