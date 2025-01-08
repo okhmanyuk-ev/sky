@@ -1,5 +1,5 @@
 #include "scene_helpers.h"
-#include <shared/cache_system.h>
+#include <sky/utils.h>
 #include <tiny_obj_loader.h>
 #include <sstream>
 #include <regex>
@@ -217,7 +217,7 @@ void SceneHelpers::ParseSpriteFromXml(Scene::Sprite& node, const tinyxml2::XMLEl
 	auto texture = root.Attribute("texture");
 	if (texture != nullptr)
 	{
-		node.setTexture(TEXTURE(texture));
+		node.setTexture(sky::GetTexture(texture));
 	}
 }
 

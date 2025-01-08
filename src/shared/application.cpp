@@ -7,6 +7,8 @@
 #include <shared/scene_helpers.h>
 #include <regex>
 #include <sky/locator.h>
+#include <sky/cache.h>
+#include <sky/utils.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -35,7 +37,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	}
 	sky::Locator<Shared::LocalizationSystem>::Init(std::make_shared<Shared::LocalizationSystem>());
 	sky::Locator<Shared::StatsSystem>::Init(std::make_shared<Shared::StatsSystem>());
-	sky::Locator<Shared::CacheSystem>::Init(std::make_shared<Shared::CacheSystem>());
+	sky::Locator<sky::Cache>::Init(std::make_shared<sky::Cache>());
 	sky::Locator<Shared::ImguiSystem>::Init(std::make_shared<Shared::ImguiSystem>());
 	sky::Locator<Shared::Stylebook>::Init(std::make_shared<Shared::Stylebook>());
 	sky::Locator<Shared::ImScene>::Init(std::make_shared<Shared::ImScene>());
@@ -44,7 +46,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		sky::Locator<Audio::System>::Init(std::make_shared<Audio::System>());
 	}
 
-	Scene::RichLabel::DefaultIconTextureCallback = [](const auto& path) { return TEXTURE(path); };
+	Scene::RichLabel::DefaultIconTextureCallback = [](const auto& path) { return sky::GetTexture(path); };
 
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
@@ -288,7 +290,7 @@ Application::~Application()
 	sky::Locator<Shared::ImScene>::Reset();
 	sky::Locator<Shared::Stylebook>::Reset();
 	sky::Locator<Shared::ImguiSystem>::Reset();
-	sky::Locator<Shared::CacheSystem>::Reset();
+	sky::Locator<sky::Cache>::Reset();
 	sky::Locator<Shared::StatsSystem>::Reset();
 	sky::Locator<Shared::LocalizationSystem>::Reset();
 	if (mFlags.count(Flag::Network))

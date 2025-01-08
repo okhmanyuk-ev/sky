@@ -1,11 +1,9 @@
-#include "cache_system.h"
+#include "cache.h"
 #include <console/device.h>
 #include <nlohmann/json.hpp>
 #include <common/helpers.h>
 
-using namespace Shared;
-
-Graphics::TexCell CacheSystem::getTexture(const std::string& name)
+Graphics::TexCell sky::Cache::getTexture(const std::string& name)
 {
 	if (mTexCells.count(name) > 0)
 		return mTexCells.at(name);
@@ -18,13 +16,13 @@ Graphics::TexCell CacheSystem::getTexture(const std::string& name)
 	return { mTextures.at(name), Graphics::TexRegion() };
 }
 
-std::shared_ptr<Graphics::Font> CacheSystem::getFont(const std::string& name)
+std::shared_ptr<Graphics::Font> sky::Cache::getFont(const std::string& name)
 {
 	loadFont(name);
 	return mFonts.at(name);
 }
 
-std::shared_ptr<Audio::Sound> CacheSystem::getSound(const std::string& name)
+std::shared_ptr<Audio::Sound> sky::Cache::getSound(const std::string& name)
 {
 	loadSound(name);
 
@@ -34,30 +32,30 @@ std::shared_ptr<Audio::Sound> CacheSystem::getSound(const std::string& name)
 	return mSounds.at(name);
 }
 
-std::shared_ptr<Graphics::Atlas> CacheSystem::getAtlas(const std::string& name)
+std::shared_ptr<Graphics::Atlas> sky::Cache::getAtlas(const std::string& name)
 {
 	loadAtlas(name);
 	return mAtlases.at(name);
 }
 
-std::shared_ptr<Graphics::Animation> CacheSystem::getAnimation(const std::string& name)
+std::shared_ptr<Graphics::Animation> sky::Cache::getAnimation(const std::string& name)
 {
 	loadAnimation(name);
 	return mAnimations.at(name);
 }
 
-const nlohmann::json& CacheSystem::getJson(const std::string& name)
+const nlohmann::json& sky::Cache::getJson(const std::string& name)
 {
 	loadJson(name);
 	return mJsons.at(name);
 }
 
-bool CacheSystem::hasTexture(const std::string& name) const
+bool sky::Cache::hasTexture(const std::string& name) const
 {
 	return mTextures.contains(name);
 }
 
-void CacheSystem::loadTexture(std::shared_ptr<skygfx::Texture> texture, const std::string& name)
+void sky::Cache::loadTexture(std::shared_ptr<skygfx::Texture> texture, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
 		return;
@@ -65,7 +63,7 @@ void CacheSystem::loadTexture(std::shared_ptr<skygfx::Texture> texture, const st
 	mTextures[name] = texture;
 }
 
-void CacheSystem::loadTexture(const Graphics::Image& image, const std::string& name)
+void sky::Cache::loadTexture(const Graphics::Image& image, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
 		return;
@@ -78,7 +76,7 @@ void CacheSystem::loadTexture(const Graphics::Image& image, const std::string& n
 	loadTexture(texture, name);
 }
 
-void CacheSystem::loadTexture(const std::string& path, const std::string& name)
+void sky::Cache::loadTexture(const std::string& path, const std::string& name)
 {
 	if (mTextures.count(name) > 0)
 		return;
@@ -94,12 +92,12 @@ void CacheSystem::loadTexture(const std::string& path, const std::string& name)
 	loadTexture(image, name);
 }
 
-void CacheSystem::loadTexture(const std::string& path)
+void sky::Cache::loadTexture(const std::string& path)
 {
 	loadTexture(path, path);
 }
 
-void CacheSystem::loadFont(const std::string& path, const std::string& name)
+void sky::Cache::loadFont(const std::string& path, const std::string& name)
 {
 	if (mFonts.count(name) > 0)
 		return;
@@ -107,12 +105,12 @@ void CacheSystem::loadFont(const std::string& path, const std::string& name)
 	mFonts[name] = std::make_shared<Graphics::Font>(path);
 }
 
-void CacheSystem::loadFont(const std::string& path)
+void sky::Cache::loadFont(const std::string& path)
 {
 	loadFont(path, path);
 }
 
-void CacheSystem::loadSound(std::shared_ptr<Audio::Sound> sound, const std::string& name)
+void sky::Cache::loadSound(std::shared_ptr<Audio::Sound> sound, const std::string& name)
 {
 	if (mSounds.count(name) > 0)
 		return;
@@ -120,7 +118,7 @@ void CacheSystem::loadSound(std::shared_ptr<Audio::Sound> sound, const std::stri
 	mSounds[name] = sound;
 }
 
-void CacheSystem::loadSound(const std::string& path, const std::string& name)
+void sky::Cache::loadSound(const std::string& path, const std::string& name)
 {
 	if (mSounds.count(name) > 0)
 		return;
@@ -136,12 +134,12 @@ void CacheSystem::loadSound(const std::string& path, const std::string& name)
 	loadSound(sound, name);
 }
 
-void CacheSystem::loadSound(const std::string& path)
+void sky::Cache::loadSound(const std::string& path)
 {
 	loadSound(path, path);
 }
 
-void CacheSystem::loadAtlas(const std::string& path, const std::string& name)
+void sky::Cache::loadAtlas(const std::string& path, const std::string& name)
 {
 	if (mAtlases.count(name) > 0)
 		return;
@@ -149,12 +147,12 @@ void CacheSystem::loadAtlas(const std::string& path, const std::string& name)
 	mAtlases[name] = std::make_shared<Graphics::Atlas>(path);
 }
 
-void CacheSystem::loadAtlas(const std::string& path)
+void sky::Cache::loadAtlas(const std::string& path)
 {
 	loadAtlas(path, path);
 }
 
-void CacheSystem::loadAnimation(const std::string& path, const std::string& name)
+void sky::Cache::loadAnimation(const std::string& path, const std::string& name)
 {
 	if (mAnimations.count(name) > 0)
 		return;
@@ -162,12 +160,12 @@ void CacheSystem::loadAnimation(const std::string& path, const std::string& name
 	mAnimations[name] = std::make_shared<Graphics::Animation>(path);
 }
 
-void CacheSystem::loadAnimation(const std::string& path)
+void sky::Cache::loadAnimation(const std::string& path)
 {
 	loadAnimation(path, path);
 }
 
-void CacheSystem::loadJson(const std::string& path, const std::string& name)
+void sky::Cache::loadJson(const std::string& path, const std::string& name)
 {
 	if (mJsons.count(name) > 0)
 		return;
@@ -178,12 +176,12 @@ void CacheSystem::loadJson(const std::string& path, const std::string& name)
 	mJsons[name] = Common::Helpers::LoadJsonFromAsset({ path });
 }
 
-void CacheSystem::loadJson(const std::string& path)
+void sky::Cache::loadJson(const std::string& path)
 {
 	loadJson(path, path);
 }
 
-void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>& paths)
+void sky::Cache::makeAtlas(const std::string& name, const std::set<std::string>& paths)
 {
 	Graphics::Atlas::Images images;
 
@@ -204,9 +202,9 @@ void CacheSystem::makeAtlas(const std::string& name, const std::set<std::string>
 	}
 }
 
-void CacheSystem::makeAtlases()
+void sky::Cache::makeAtlases()
 {
-	auto json = JSON("atlases.json");
+	auto json = getJson("atlases.json");
 
 	for (auto field : json.items())
 	{

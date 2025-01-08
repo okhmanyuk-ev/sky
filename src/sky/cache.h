@@ -9,24 +9,9 @@
 #include <audio/sound.h>
 #include <nlohmann/json.hpp>
 
-#define CACHE sky::Locator<Shared::CacheSystem>::GetService()
-
-#define PRECACHE_TEXTURE_ALIAS(NAME, ALIAS) CACHE->loadTexture(NAME, ALIAS)
-#define PRECACHE_FONT_ALIAS(NAME, ALIAS) CACHE->loadFont(NAME, ALIAS)
-
-#define PRECACHE_TEXTURE(NAME) PRECACHE_TEXTURE_ALIAS(NAME, NAME)
-#define PRECACHE_FONT(NAME) PRECACHE_FONT_ALIAS(NAME, NAME)
-
-#define TEXTURE(NAME) CACHE->getTexture(NAME)
-#define FONT(NAME) CACHE->getFont(NAME)
-#define SOUND(NAME) CACHE->getSound(NAME)
-#define ATLAS(NAME) CACHE->getAtlas(NAME)
-#define ANIMATION(NAME) CACHE->getAnimation(NAME)
-#define JSON(NAME) CACHE->getJson(NAME)
-
-namespace Shared
+namespace sky
 {
-	class CacheSystem
+	class Cache
 	{
 	public:
 		Graphics::TexCell getTexture(const std::string& name);

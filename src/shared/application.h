@@ -15,7 +15,6 @@
 #include <shared/console_device.h>
 #include <shared/localization_system.h>
 #include <shared/stats_system.h>
-#include <shared/cache_system.h>
 #include <shared/touch_emulator.h>
 #include <shared/gesture_detector.h>
 #include <common/profiler_system.h>

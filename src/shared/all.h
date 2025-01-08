@@ -33,7 +33,6 @@
 #include <graphics/all.h>
 
 #include <shared/stats_system.h>
-#include <shared/cache_system.h>
 #include <shared/application.h>
 #include <shared/localization_system.h>
 #include <shared/first_person_camera_controller.h>
