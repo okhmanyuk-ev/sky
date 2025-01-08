@@ -1,5 +1,4 @@
 #include "scene_helpers.h"
-#include <sky/utils.h>
 #include <tiny_obj_loader.h>
 #include <sstream>
 #include <regex>

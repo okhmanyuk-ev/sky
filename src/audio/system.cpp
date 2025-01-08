@@ -44,14 +44,3 @@ System::~System()
 	FmodStudio->release();
 #endif
 }
-
-void sky::PlaySound(std::shared_ptr<Audio::Sound> sound)
-{
-	if (!sky::Locator<Audio::System>::HasService())
-	{
-		Log("PlaySound: cannot find audio system");
-		return;
-	}
-
-	AUDIO->play(sound);
-}

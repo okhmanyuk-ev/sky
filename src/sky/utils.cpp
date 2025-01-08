@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <sky/cache.h>
 #include <sky/localization.h>
+#include <audio/system.h>
 
 Graphics::TexCell sky::GetTexture(const std::string& name)
 {
@@ -45,4 +46,25 @@ void sky::PrecacheFont(const std::string& name, std::optional<std::string> alias
 std::wstring sky::Localize(const std::string& key)
 {
 	return GetService<Localization>()->getString(key);
+}
+
+void sky::PlaySound(std::shared_ptr<Audio::Sound> sound)
+{
+	if (!sky::Locator<Audio::System>::HasService())
+	{
+		Log("PlaySound: cannot find audio system");
+		return;
+	}
+
+	AUDIO->play(sound);
+}
+
+void sky::Log(const std::string& text)
+{
+	CONSOLE_DEVICE->writeLine(text);
+}
+
+void sky::Log(Console::Color color, const std::string& text)
+{
+	CONSOLE_DEVICE->writeLine(text, color);
 }

@@ -2,7 +2,7 @@
 #include <console/device.h>
 #include <common/buffer_helpers.h>
 #include <common/console_commands.h>
-
+#include <sky/utils.h>
 #ifdef EMSCRIPTEN
 #include <emscripten/websocket.h>
 #else
@@ -32,7 +32,7 @@ NetCommands::~NetCommands()
 void Channel::read(sky::BitBuffer& buf)
 {
 	auto name = sky::bitbuffer_helpers::ReadString(buf);
-	
+
 	if (mMessageReaders.count(name) == 0)
 		throw std::runtime_error(("unknown message type in channel: " + name).c_str());
 
@@ -359,7 +359,7 @@ std::tuple<Userbase::UID, std::shared_ptr<Userbase::Profile>> Userbase::auth(con
 	auto profile = mProfiles.at(uid);
 
 	return { uid, profile };
-}		
+}
 
 void Userbase::commit(UID uid, std::shared_ptr<Profile> profile)
 {
@@ -377,14 +377,14 @@ void Userbase::load(const nlohmann::json& json)
 		UID uid = user["uid"];
 		std::string uuid = user["uuid"];
 		auto profile_dump = user["profile"];
-		
+
 		mUIDS.insert({ uuid, uid });
-		
+
 		if (!profile_dump.is_string())
 			continue;
-		
+
 		auto profile = nlohmann::json::parse((std::string)profile_dump);
-		
+
 		mProfiles.insert({ uid, std::make_shared<Profile>(profile) });
 	}
 }
@@ -403,7 +403,7 @@ void Userbase::save(nlohmann::json& json)
 			{ "uuid", uuid },
 			{ "uid", uid }
 		};
-	
+
 		if (mProfiles.count(uid) > 0)
 		{
 			const auto& profile = mProfiles.at(uid);

@@ -27,8 +27,3 @@ namespace Audio
 		FMOD::Channel* channel = nullptr;
 	};
 }
-
-namespace sky
-{
-	void PlaySound(std::shared_ptr<Audio::Sound> sound);
-}

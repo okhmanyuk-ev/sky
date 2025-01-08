@@ -33,7 +33,7 @@ namespace Console
 	class Device
 	{
 	public:
-		struct ReadEvent 
+		struct ReadEvent
 		{
 			std::string text;
 		};
@@ -48,22 +48,4 @@ namespace Console
 		virtual bool isEnabled() const = 0;
 		virtual void setEnabled(bool value) = 0;
 	};
-}
-
-namespace sky
-{
-	void Log(const std::string& text);
-	void Log(Console::Color color, const std::string& text);
-
-	template<typename... Args>
-	void Log(const std::string& text, Args&&... args)
-	{
-		Log(fmt::format(text, args...));
-	}
-
-	template<typename... Args>
-	void Log(Console::Color color, const std::string& text, Args&&... args)
-	{
-		Log(color, fmt::format(text, args...));
-	}
 }

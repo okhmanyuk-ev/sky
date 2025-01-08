@@ -4,6 +4,7 @@
 #include "scene_manager.h"
 #include <common/helpers.h>
 #include <tinyxml2.h>
+#include <sky/utils.h>
 
 namespace Shared::SceneHelpers
 {

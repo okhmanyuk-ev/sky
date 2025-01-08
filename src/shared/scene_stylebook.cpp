@@ -1,5 +1,6 @@
 #include "scene_stylebook.h"
 #include <console/device.h>
+#include <sky/utils.h>
 
 using namespace Shared;
 
@@ -51,7 +52,7 @@ void Stylebook::apply(std::shared_ptr<Scene::Node> node, const std::string& name
 	if (item.contains("pivot"))
 	{
 		auto pivot = item.at("pivot");
-		
+
 		if (auto value = pivot.at(0); !value.is_null())
 			node->setHorizontalPivot(value);
 

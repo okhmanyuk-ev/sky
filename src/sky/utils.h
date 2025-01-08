@@ -8,10 +8,15 @@
 #include <audio/sound.h>
 #include <nlohmann/json.hpp>
 #include <sky/dispatcher.h>
+#include <console/device.h>
 
 namespace sky
 {
-	template<class T> T* GetService() { return Locator<T>::GetService(); }
+	template<class T>
+	T* GetService()
+	{
+		return Locator<T>::GetService();
+	}
 
 	Graphics::TexCell GetTexture(const std::string& name);
 	std::shared_ptr<Graphics::Font> GetFont(const std::string& name);
@@ -25,5 +30,26 @@ namespace sky
 
 	std::wstring Localize(const std::string& key);
 
-	template<class T> void Emit(const T& e) { GetService<Dispatcher>()->emit(e); }
+	template<class T>
+	void Emit(const T& e)
+	{
+		GetService<Dispatcher>()->emit(e);
+	}
+
+	void PlaySound(std::shared_ptr<Audio::Sound> sound);
+
+	void Log(const std::string& text);
+	void Log(Console::Color color, const std::string& text);
+
+	template<typename... Args>
+	void Log(const std::string& text, Args&&... args)
+	{
+		Log(fmt::format(text, args...));
+	}
+
+	template<typename... Args>
+	void Log(Console::Color color, const std::string& text, Args&&... args)
+	{
+		Log(color, fmt::format(text, args...));
+	}
 }

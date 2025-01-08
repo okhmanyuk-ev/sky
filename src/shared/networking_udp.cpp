@@ -4,6 +4,7 @@
 #include <common/buffer_helpers.h>
 #include <common/helpers.h>
 #include <common/console_commands.h>
+#include <sky/utils.h>
 
 using namespace Shared::NetworkingUDP;
 

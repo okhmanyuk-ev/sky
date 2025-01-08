@@ -1,8 +1,6 @@
 #include "actions.h"
-
 #include <cassert>
-
-#include <console/device.h>
+#include <sky/utils.h>
 
 using namespace Actions;
 
