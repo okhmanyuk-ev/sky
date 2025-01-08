@@ -159,7 +159,7 @@ glm::vec2 sky::sanitize(glm::vec2 value, float default_value)
 	return { sanitize(value.x, default_value), sanitize(value.y, default_value) };
 }
 
-float sky::ease_rotation_towards(float src_radians, float dst_radians, Clock::Duration dTime, float friction,
+float sky::ease_rotation_towards(float src_radians, float dst_radians, sky::Duration dTime, float friction,
 	float delta_limit)
 {
 	auto src_deg = glm::degrees(src_radians);

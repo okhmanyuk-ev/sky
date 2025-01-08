@@ -14,7 +14,7 @@ RichLabel::RichLabel()
 	attach(mContent);
 }
 
-void RichLabel::update(Clock::Duration dTime)
+void RichLabel::update(sky::Duration dTime)
 {
 	AutoSized<Node>::update(dTime);
 	refresh();

@@ -10,6 +10,7 @@
 #include <common/frame_system.h>
 #include <common/event_system.h>
 #include <common/easing.h>
+#include <sky/clock.h>
 
 namespace Actions
 {
@@ -24,7 +25,7 @@ namespace Actions
 	
 	public:
 		virtual ~Action() = default;
-		virtual Status frame(Clock::Duration delta) = 0;
+		virtual Status frame(sky::Duration delta) = 0;
 	};
 
 	class Parallel : public Action
@@ -42,7 +43,7 @@ namespace Actions
 		Parallel(Awaiting awaitingType = Awaiting::All);
 
 	protected:
-		Status frame(Clock::Duration delta) override;
+		Status frame(sky::Duration delta) override;
 
 	public:
 		void add(std::unique_ptr<Action> action);
@@ -66,7 +67,7 @@ namespace Actions
 		};
 
 	protected:
-		Status frame(Clock::Duration delta) override;
+		Status frame(sky::Duration delta) override;
 
 	public:
 		void add(std::unique_ptr<Action> action, Origin origin = Origin::End);
@@ -94,14 +95,14 @@ namespace Actions
 			"T must be derived from Sequence or Parallel");
 
 	public:
-		void update(Clock::Duration delta) { T::frame(delta); }
+		void update(sky::Duration delta) { T::frame(delta); }
 	};
 
 	class Generic : public Action
 	{
 	public:
-		using StatusCallback = std::function<Status(Clock::Duration)>;
-		using Callback = std::function<void(Clock::Duration)>;
+		using StatusCallback = std::function<Status(sky::Duration)>;
+		using Callback = std::function<void(sky::Duration)>;
 
 	public:
 		enum class Type 
@@ -115,7 +116,7 @@ namespace Actions
 		Generic(Type type, Callback callback);
 
 	private:
-		Status frame(Clock::Duration delta) override;
+		Status frame(sky::Duration delta) override;
 
 	private:
 		StatusCallback mCallback = nullptr;
@@ -131,7 +132,7 @@ namespace Actions
 		Repeat(Callback callback);
 		
 	private:
-		Status frame(Clock::Duration delta) override;
+		Status frame(sky::Duration delta) override;
 
 	private:
 		Callback mCallback;
@@ -145,7 +146,7 @@ namespace Actions
 		std::unique_ptr<Action> RepeatInfinite(std::function<std::unique_ptr<Action>()> action);
 
 		std::unique_ptr<Action> Execute(std::function<void()> callback);
-		std::unique_ptr<Action> ExecuteInfinite(std::function<void(Clock::Duration delta)> callback);
+		std::unique_ptr<Action> ExecuteInfinite(std::function<void(sky::Duration delta)> callback);
 		std::unique_ptr<Action> ExecuteInfinite(std::function<void()> callback);
 		std::unique_ptr<Action> ExecuteInfiniteGlobal(std::function<void()> callback);
 
@@ -153,7 +154,7 @@ namespace Actions
 		std::unique_ptr<Action> Wait(float duration);
 
 		// will wait while returning true
-		std::unique_ptr<Action> Wait(std::function<bool(Clock::Duration delta)> while_callback);
+		std::unique_ptr<Action> Wait(std::function<bool(sky::Duration delta)> while_callback);
 		std::unique_ptr<Action> Wait(std::function<bool()> while_callback);
 		
 		// will wait while flag is true

@@ -4,7 +4,7 @@
 #include <platform/input.h>
 #include <shared/touch_emulator.h>
 #include <glm/glm.hpp>
-#include <core/clock.h>
+#include <sky/clock.h>
 #include <map>
 
 namespace Shared 
@@ -34,6 +34,6 @@ namespace Shared
 		void onEvent(const TouchEmulator::Event& e) override;
 
 	private:
-		std::map<Clock::TimePoint, glm::vec2> mPositions;
+		std::map<sky::TimePoint, glm::vec2> mPositions;
 	};
 }

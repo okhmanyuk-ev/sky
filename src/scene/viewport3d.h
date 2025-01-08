@@ -75,7 +75,7 @@ namespace Scene
 		void removeEntity(std::shared_ptr<Entity3D> model);
 
 	protected:
-		void update(Clock::Duration dTime) override;
+		void update(sky::Duration dTime) override;
 		void draw() override;
 
 	public:

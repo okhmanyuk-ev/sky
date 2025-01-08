@@ -25,10 +25,10 @@ namespace Common
 		void setDestinationValue(float value) { mDestinationValue = value; }
 
 		auto getDuration() const { return mDuration; }
-		void setDuration(Clock::Duration value) { mDuration = value; }
+		void setDuration(sky::Duration value) { mDuration = value; }
 
 		auto getPassed() const { return mPassed; }
-		void setPassed(Clock::Duration value) { mPassed = value; }
+		void setPassed(sky::Duration value) { mPassed = value; }
 
 		auto& getProcessCallback() const { return mProcessCallback; } 
 		void setProcessCallback(ProcessCallback value) { mProcessCallback = value; }
@@ -44,8 +44,8 @@ namespace Common
 		float mStartValue = 0.0f;
 		float mDestinationValue = 0.0f;
 
-		Clock::Duration mDuration = Clock::FromSeconds(1.0f);
-		Clock::Duration mPassed = Clock::Duration::zero();
+		sky::Duration mDuration = sky::FromSeconds(1.0f);
+		sky::Duration mPassed = sky::Duration::zero();
 
 		EasingFunction mEasingFunction = nullptr;
 		ProcessCallback mProcessCallback = nullptr; // when value was changed

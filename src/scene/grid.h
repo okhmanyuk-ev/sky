@@ -14,7 +14,7 @@ namespace Scene
 		};
 
 	protected:
-		void update(Clock::Duration dTime) override;
+		void update(sky::Duration dTime) override;
 
 	public:
 		auto getDirection() const { return mDirection; }

@@ -14,17 +14,17 @@ namespace Common
 	
 	public:
 		auto getInterval() const { return mInterval; }
-		void setInterval(Clock::Duration value) { mInterval = value; }
+		void setInterval(sky::Duration value) { mInterval = value; }
 
 		auto getPassed() const { return mPassed; }
-		void setPassed(Clock::Duration value) { mPassed = value; }
+		void setPassed(sky::Duration value) { mPassed = value; }
 
 		auto& getCallback() const { return mCallback; }
 		void setCallback(Callback value) { mCallback = value; }
 
 	private:
-		Clock::Duration mInterval = Clock::FromSeconds(1.0f);
-		Clock::Duration mPassed = Clock::Duration::zero();
+		sky::Duration mInterval = sky::FromSeconds(1.0f);
+		sky::Duration mPassed = sky::Duration::zero();
 		Callback mCallback = nullptr;
 	};
 }

@@ -79,7 +79,7 @@ void StatsSystem::onFrame()
 
 		for (const auto& [key, value] : indicators)
 		{
-			auto lifetime = Clock::ToSeconds(now - value.time);
+			auto lifetime = sky::ToSeconds(now - value.time);
 
 			if (lifetime >= MaxLifetime)
 				continue;
@@ -123,7 +123,7 @@ void StatsSystem::onFrame()
 	{
 		for (auto ind_it = group_it->second.begin(); ind_it != group_it->second.end();)
 		{
-			auto lifetime = Clock::ToSeconds(now - ind_it->second.time);
+			auto lifetime = sky::ToSeconds(now - ind_it->second.time);
 
 			if (lifetime >= MaxLifetime)
 				ind_it = group_it->second.erase(ind_it);

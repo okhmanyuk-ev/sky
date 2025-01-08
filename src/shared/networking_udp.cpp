@@ -17,9 +17,9 @@ void Channel::onFrame()
 		return;
 	}
 
-	auto now = Clock::Now();
+	auto now = sky::Now();
 
-	if (now - mIncomingTime >= Clock::FromSeconds(Networking::NetTimeout))
+	if (now - mIncomingTime >= sky::FromSeconds(Networking::NetTimeout))
 	{
 		disconnect("timed out");
 		return;
@@ -31,13 +31,13 @@ void Channel::onFrame()
 	if (!mReliableAcknowledgements.empty())
 		awake();
 
-	auto durationSinceAwake = Clock::ToSeconds(now - mAwakeTime);
+	auto durationSinceAwake = sky::ToSeconds(now - mAwakeTime);
 	mHibernation = (durationSinceAwake - 0.5f) / 10.0f;
 	mHibernation = glm::clamp(mHibernation, 0.0f, 1.0f);
 
-	auto min_delay = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDelayMin));
-	auto max_delay = Clock::ToSeconds(Clock::FromMilliseconds(Networking::NetTransmitDelayMax));
-	auto transmit_delay = Clock::FromSeconds(glm::lerp(min_delay, max_delay, mHibernation));
+	auto min_delay = sky::ToSeconds(sky::FromMilliseconds(Networking::NetTransmitDelayMin));
+	auto max_delay = sky::ToSeconds(sky::FromMilliseconds(Networking::NetTransmitDelayMax));
+	auto transmit_delay = sky::FromSeconds(glm::lerp(min_delay, max_delay, mHibernation));
 
 	if (now - mTransmitTime < transmit_delay)
 		return;
@@ -106,7 +106,7 @@ void Channel::transmit()
 
 void Channel::awake()
 {
-	mAwakeTime = Clock::Now();
+	mAwakeTime = sky::Now();
 }
 
 void Channel::readReliableMessages()
@@ -223,7 +223,7 @@ void Channel::read(sky::BitBuffer& buf)
 			Common::Helpers::BytesToNiceString(buf.getSize()));
 	}
 
-	mIncomingTime = Clock::Now();
+	mIncomingTime = sky::Now();
 }
 
 void Channel::sendReliable(const std::string& msg, sky::BitBuffer& buf)
@@ -451,9 +451,9 @@ void Client::onFrame()
 	if (isConnected())
 		return;
 
-	auto now = Clock::Now();
+	auto now = sky::Now();
 
-	if (now - mConnectTime < Clock::FromSeconds(Networking::NetReconnectDelay))
+	if (now - mConnectTime < sky::FromSeconds(Networking::NetReconnectDelay))
 		return;
 
 	connect();
@@ -465,7 +465,7 @@ void Client::connect()
 	buf.writeBitsVar(ProtocolVersion);
 	sendMessage((uint32_t)Networking::Message::Connect, mServerAddress, buf);
 	sky::Log("connecting to " + mServerAddress.toString());
-	mConnectTime = Clock::Now();
+	mConnectTime = sky::Now();
 }
 
 // simplechannel

@@ -4,6 +4,7 @@
 #include <list>
 #include <common/timer.h>
 #include <sky/singleton.h>
+#include <sky/clock.h>
 
 #define PROFILER sky::Singleton<Common::ProfilerSystem>::GetInstance()
 
@@ -42,15 +43,15 @@ namespace Common
 		auto getCount() const { return mCount; }
 		const auto& getName() const { return mName; }
 		auto& getNodes() { return mNodes; }
-		auto getPercentage() const { return Clock::ToSeconds(mDuration) / 1.0f; }
+		auto getPercentage() const { return sky::ToSeconds(mDuration) / 1.0f; }
 
 	private:
 		std::list<Node*> mNodes;
 		std::string mName;
 		Node* mParent = nullptr;
-		Clock::TimePoint mBeginTime;
-		Clock::TimePoint mEndTime;
-		Clock::Duration mDuration = Clock::Duration::zero();
+		sky::TimePoint mBeginTime;
+		sky::TimePoint mEndTime;
+		sky::Duration mDuration = sky::Duration::zero();
 		int mCount = 0;
 	};
 }

@@ -12,7 +12,7 @@ namespace Scene
 		Trail(std::weak_ptr<Node> holder);
 
 	public:
-		void update(Clock::Duration dTime) override;
+		void update(sky::Duration dTime) override;
 		void updateTransform() override;
 	
 	protected:
@@ -41,13 +41,13 @@ namespace Scene
 		bool mNarrowing = false;
 		glm::vec4 mBeginColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glm::vec4 mEndColor = { 1.0f, 1.0f, 1.0f, 0.0f };
-		Clock::Duration mUptime;
+		sky::Duration mUptime;
 		std::weak_ptr<Node> mHolder;
 
 		struct Segment
 		{
 			glm::vec2 pos = { 0.0f, 0.0f };
-			Clock::Duration time;
+			sky::Duration time;
 		};
 
 		std::deque<Segment> mSegments;

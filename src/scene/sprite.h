@@ -15,7 +15,7 @@ namespace Scene
 		inline static skygfx::TextureAddress DefaultTextureAddress = skygfx::TextureAddress::Clamp;
 
 	protected:
-		void update(Clock::Duration dTime) override;
+		void update(sky::Duration dTime) override;
 		void draw() override;
 
 	private:

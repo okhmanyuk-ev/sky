@@ -173,7 +173,7 @@ void Node::enterUpdate()
 {
 }
 
-void Node::update(Clock::Duration dTime)
+void Node::update(sky::Duration dTime)
 {
 	mActions.update(dTime);
 	updateAbsoluteSize();

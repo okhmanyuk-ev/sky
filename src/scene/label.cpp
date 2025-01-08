@@ -31,7 +31,7 @@ void Label::draw()
 	GRAPHICS->pop(2);
 }
 
-void Label::update(Clock::Duration dTime)
+void Label::update(sky::Duration dTime)
 {
 	Node::update(dTime);
 	refresh();

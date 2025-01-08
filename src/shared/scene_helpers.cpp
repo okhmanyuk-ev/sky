@@ -423,7 +423,7 @@ SceneHelpers::SafeArea::SafeArea()
 	setStretch(1.0f);
 }
 
-void SceneHelpers::SafeArea::update(Clock::Duration dTime)
+void SceneHelpers::SafeArea::update(sky::Duration dTime)
 {
 	Scene::Node::update(dTime);
 
@@ -459,7 +459,7 @@ SceneHelpers::VerticalScrollbar::VerticalScrollbar()
 	attach(mIndicator);
 }
 
-void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
+void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 {
 	Scene::Rectangle::update(dTime);
 
@@ -481,7 +481,7 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 
 	setVisible(true);
 
-	auto now = Clock::Now();
+	auto now = sky::Now();
 
 	if (mPrevScrollPosition != v_scroll_pos)
 		mScrollMoveTime = now;
@@ -497,7 +497,7 @@ void SceneHelpers::VerticalScrollbar::update(Clock::Duration dTime)
 	const float Timeout = 0.5f;
 	const float AnimDuration = 0.25f;
 
-	bool visible = now - mScrollMoveTime < Clock::FromSeconds(Timeout) || scrollbox->isTouching();
+	bool visible = now - mScrollMoveTime < sky::FromSeconds(Timeout) || scrollbox->isTouching();
 
 	if (visible)
 	{

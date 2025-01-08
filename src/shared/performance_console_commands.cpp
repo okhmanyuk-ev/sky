@@ -56,7 +56,7 @@ void PerformanceConsoleCommands::onFrame()
 		if (time_scale != 1.0f)
 			str = fmt::format("(x{}) {}", time_scale, str);
 
-		auto now = Clock::Now();
+		auto now = sky::Now();
 
 		static bool choked = false;
 		static auto choke_time = now;
@@ -66,7 +66,7 @@ void PerformanceConsoleCommands::onFrame()
 			choked = true;
 			choke_time = now;
 		}
-		else if (now - choke_time > Clock::FromSeconds(2.0f))
+		else if (now - choke_time > sky::FromSeconds(2.0f))
 		{
 			choked = false;
 		}

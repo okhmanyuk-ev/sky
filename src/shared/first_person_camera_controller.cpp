@@ -17,7 +17,7 @@ void FirstPersonCameraController::onFrame()
 	});
 }
 
-void FirstPersonCameraController::update(Clock::Duration dTime)
+void FirstPersonCameraController::update(sky::Duration dTime)
 {
 	if (ImGui::IsAnyItemActive())
 		return;
@@ -40,7 +40,7 @@ void FirstPersonCameraController::update(Clock::Duration dTime)
 	mMouseCaptured = false;
 
 	{
-		auto offset = mSensivity * Clock::ToSeconds(dTime) * 1.5f;
+		auto offset = mSensivity * sky::ToSeconds(dTime) * 1.5f;
 
 		if (mLeftArrow)
 			mCamera->yaw += offset;
@@ -60,7 +60,7 @@ void FirstPersonCameraController::update(Clock::Duration dTime)
 		mCamera->yaw = glm::wrapAngle(mCamera->yaw);
 	}
 	{
-		auto speed = mSpeed * Clock::ToSeconds(dTime) * 50.0f;
+		auto speed = mSpeed * sky::ToSeconds(dTime) * 50.0f;
 
 		if (mKeyShift)
 			speed *= 3.0f;

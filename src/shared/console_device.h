@@ -53,7 +53,7 @@ namespace Shared
 			Console::Color color;
 			std::string text;
 			bool linebreak;
-			Clock::TimePoint time;
+			sky::TimePoint time;
 		};
 
 	public:

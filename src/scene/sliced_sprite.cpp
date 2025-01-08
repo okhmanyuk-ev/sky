@@ -20,7 +20,7 @@ void SlicedSprite::draw()
 	GRAPHICS->pop(3);
 }
 
-void SlicedSprite::update(Clock::Duration dTime)
+void SlicedSprite::update(sky::Duration dTime)
 {
 	Node::update(dTime);
 

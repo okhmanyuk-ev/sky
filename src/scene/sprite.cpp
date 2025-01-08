@@ -35,7 +35,7 @@ void Sprite::draw()
 	GRAPHICS->pop(4);
 }
 
-void Sprite::update(Clock::Duration dTime)
+void Sprite::update(sky::Duration dTime)
 {
 	Node::update(dTime);
 

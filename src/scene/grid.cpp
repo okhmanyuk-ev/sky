@@ -2,7 +2,7 @@
 
 using namespace Scene;
 
-void Grid::update(Clock::Duration dTime)
+void Grid::update(sky::Duration dTime)
 {
 	Node::update(dTime);
 

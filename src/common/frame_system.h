@@ -1,10 +1,10 @@
 #pragma once
 
-#include <core/clock.h>
 #include <list>
 #include <functional>
 #include <mutex>
 #include <sky/singleton.h>
+#include <sky/clock.h>
 
 #define FRAME sky::Singleton<Common::FrameSystem>::GetInstance()
 
@@ -48,14 +48,14 @@ namespace Common
 		auto getTimeScale() const { return mTimeScale; }
 		void setTimeScale(double value) { mTimeScale = value; }
 
-		auto getFramerate() const { return 1.0 / Clock::ToSeconds<double>(mTimeDelta) * mTimeScale; } // frame count per second
+		auto getFramerate() const { return 1.0 / sky::ToSeconds<double>(mTimeDelta) * mTimeScale; } // frame count per second
 		auto getFramerCount() const { return mFramers.size(); }
 
 		auto getUptime() const { return mUptime; }
 		auto getFrameCount() { return mFrameCount; }
 
 		auto getTimeDeltaLimit() const { return mTimeDeltaLimit; }
-		void setTimeDeltaLimit(std::optional<Clock::Duration> value) { mTimeDeltaLimit = value; }
+		void setTimeDeltaLimit(std::optional<sky::Duration> value) { mTimeDeltaLimit = value; }
 
 		auto isChoked() const { return mChoked; }
 
@@ -65,10 +65,10 @@ namespace Common
 		int mFramerateLimit = 0;
 		bool mSleepAllowed = true;
 		double mTimeScale = 1.0;
-		Clock::TimePoint mLastTime = Clock::Now();
-		Clock::Duration mTimeDelta = Clock::Duration::zero();
-		Clock::Duration mUptime = Clock::Duration::zero();
-		std::optional<Clock::Duration> mTimeDeltaLimit; // this can save from animation breaks
+		sky::TimePoint mLastTime = sky::Now();
+		sky::Duration mTimeDelta = sky::Duration::zero();
+		sky::Duration mUptime = sky::Duration::zero();
+		std::optional<sky::Duration> mTimeDeltaLimit; // this can save from animation breaks
 		uint64_t mFrameCount = 0;
 		std::mutex mMutex;
 		bool mChoked = false;

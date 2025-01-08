@@ -2,7 +2,7 @@
 
 using namespace Scene;
 
-void Circle::update(Clock::Duration dTime)
+void Circle::update(sky::Duration dTime)
 {
 	Node::update(dTime);
 

@@ -18,7 +18,7 @@ namespace Scene
 		RichLabel();
 
 	protected:
-		void update(Clock::Duration dTime) override;
+		void update(sky::Duration dTime) override;
 
 	public:
 		void refresh();

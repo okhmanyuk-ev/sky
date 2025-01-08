@@ -103,8 +103,8 @@ void ConsoleHelperCommands::onFrame()
 				ImGui::BeginTooltip();
 				ImGui::Text("Name: %s", node->getName().c_str());
 				ImGui::Text("Count: %d", node->getCount());
-				ImGui::Text("Frame: %.3f msec", Clock::ToSeconds(node->getDuration()) * 1000.0f);
-				ImGui::Text("Total: %.3f msec", Clock::ToSeconds(node->getDuration() * node->getCount()) * 1000.0f);
+				ImGui::Text("Frame: %.3f msec", sky::ToSeconds(node->getDuration()) * 1000.0f);
+				ImGui::Text("Total: %.3f msec", sky::ToSeconds(node->getDuration() * node->getCount()) * 1000.0f);
 				ImGui::EndTooltip();
 			}
 

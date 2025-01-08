@@ -8,7 +8,7 @@ using namespace Actions;
 std::unique_ptr<Action> Collection::ChangePositionByDirection(std::shared_ptr<Scene::Transform> node, const glm::vec2& direction, float speed)
 {
 	return ExecuteInfinite([node, direction, speed](auto delta) {
-		auto dTime = Clock::ToSeconds(delta);
+		auto dTime = sky::ToSeconds(delta);
 		node->setPosition(node->getPosition() + direction * dTime * speed);
 	});
 }

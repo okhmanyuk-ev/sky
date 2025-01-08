@@ -16,7 +16,7 @@ using namespace Shared;
 
 ConsoleDevice::ConsoleDevice()
 {
-	mInterpolator.setDuration(Clock::FromMilliseconds(500));
+	mInterpolator.setDuration(sky::FromMilliseconds(500));
 	close();
 	mInterpolator.setPassed(mInterpolator.getDuration());
 
@@ -31,7 +31,7 @@ ConsoleDevice::ConsoleDevice()
 
 		sky::Log("console open attempt {}/{}", mButtonAttempts, MaxButtonAttempts);
 	});
-	mButtonTimer.setInterval(Clock::FromSeconds(1.0f));
+	mButtonTimer.setInterval(sky::FromSeconds(1.0f));
 }
 
 void ConsoleDevice::write(const std::string& s, Console::Color color)
@@ -40,7 +40,7 @@ void ConsoleDevice::write(const std::string& s, Console::Color color)
 	text.color = color;
 	text.linebreak = false;
 	text.text = s;
-	text.time = Clock::Now();
+	text.time = sky::Now();
 	mBuffer.push_back(text);
 }
 
@@ -50,7 +50,7 @@ void ConsoleDevice::writeLine(const std::string& s, Console::Color color)
 	text.color = color;
 	text.linebreak = true;
 	text.text = s;
-	text.time = Clock::Now();
+	text.time = sky::Now();
 	mBuffer.push_back(text);
 
 	if (mAtBottom)
@@ -81,7 +81,7 @@ void ConsoleDevice::onFrame()
 			if (ImGui::Button("Console"))
 			{
 				mButtonAttempts += 1;
-				mButtonTimer.setPassed(Clock::Duration::zero());
+				mButtonTimer.setPassed(sky::Duration::zero());
 
 				sky::Log("console open attempt {}/{}", mButtonAttempts, MaxButtonAttempts);
 
@@ -336,7 +336,7 @@ void ConsoleDevice::showFastLogs()
 	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), 0));
 	ImGui::SetWindowPos(ImGui::User::BottomLeftCorner(0.0f));
 
-	auto now = Clock::Now();
+	auto now = sky::Now();
 
 	for (int i = 0; i < mBuffer.size(); i++)
 	{
@@ -345,7 +345,7 @@ void ConsoleDevice::showFastLogs()
 		const float MaxLifetime = 5.0f;
 		const int MaxRowsOnScreen = 16;
 
-		auto lifetime = Clock::ToSeconds(now - item.time);
+		auto lifetime = sky::ToSeconds(now - item.time);
 
 		if (lifetime >= MaxLifetime)
 			continue;

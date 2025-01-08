@@ -28,8 +28,8 @@ void Interpolator::onFrame()
 	}
 	else
 	{
-		float p = Clock::ToSeconds(mPassed);
-		float d = Clock::ToSeconds(mDuration);
+		float p = sky::ToSeconds(mPassed);
+		float d = sky::ToSeconds(mDuration);
 
 		mValue = glm::lerp(mStartValue, mDestinationValue, mEasingFunction(p / d));
 	}

@@ -20,13 +20,13 @@ void GestureDetector::onEvent(const Platform::Input::Keyboard::Event& e)
 
 void GestureDetector::onEvent(const TouchEmulator::Event& e)
 {	
-	auto now = Clock::Now();
+	auto now = sky::Now();
 
 	while (!mPositions.empty())
 	{
 		auto time = mPositions.begin()->first;
 		
-		if (Clock::ToSeconds(now - time) < 0.125f)
+		if (sky::ToSeconds(now - time) < 0.125f)
 			break;
 
 		mPositions.erase(time);

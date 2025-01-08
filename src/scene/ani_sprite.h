@@ -14,7 +14,7 @@ namespace Scene
 		AniSprite();
 
 	protected:
-		void update(Clock::Duration delta) override;
+		void update(sky::Duration delta) override;
 
 	public:
 		void randomizeProgress();
@@ -44,7 +44,7 @@ namespace Scene
 		std::shared_ptr<Adaptive<Sprite>> mSprite = nullptr;
 		float mFrequency = 10.0f;
 		std::string mState = "idle";
-		Clock::Duration mAccumulator = Clock::Duration::zero();
+		sky::Duration mAccumulator = sky::Duration::zero();
 		std::shared_ptr<Graphics::Animation> mAnimation;
 		std::shared_ptr<Graphics::Atlas> mAtlas;
 		size_t mProgress = 0;

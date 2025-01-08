@@ -58,7 +58,7 @@ void Entity::setGravityScale(float value)
 World::World()
 {
 	mTimestepFixer.setForceTimeCompletion(false);
-	mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / 120.0f));
+	mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / 120.0f));
 
 	mB2World.SetContactFilter(&mContactFilter);
 	mB2World.SetContactListener(&mContactListener);
@@ -81,13 +81,13 @@ World::World()
 	CONSOLE->registerCVar("phys_position_iterations", { "int" }, CVAR_GETTER_INT(mPositionIterations), CVAR_SETTER_INT(mPositionIterations));
 
 	auto getter = [this] {
-		auto fps = 1.0f / Clock::ToSeconds(mTimestepFixer.getTimestep());
+		auto fps = 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep());
 		return std::vector<std::string>({ std::to_string(fps) });
 	};
 
 	auto setter = [this](CON_ARGS) {
 		auto sec = std::stof(CON_ARG(0));
-		mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / sec));
+		mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / sec));
 	};
 
 	CONSOLE->registerCVar("phys_timestep_fps", { "float" }, getter, setter);
@@ -191,7 +191,7 @@ void World::onEvent(const Shared::TouchEmulator::Event& e)
 	}
 }
 
-void World::update(Clock::Duration delta)
+void World::update(sky::Duration delta)
 {
 	Scene::Node::update(delta);
 
@@ -238,7 +238,7 @@ void World::update(Clock::Duration delta)
 	}
 
 	mTimestepFixer.execute(delta, [&](auto delta) {
-		mB2World.Step(Clock::ToSeconds(delta), mVelocityIterations, mPositionIterations);
+		mB2World.Step(sky::ToSeconds(delta), mVelocityIterations, mPositionIterations);
 	});
 
 	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())

@@ -22,7 +22,7 @@ namespace Shared
 
 	private:
 		void onFrame() override;
-		void update(Clock::Duration dTime);
+		void update(sky::Duration dTime);
 
 	private:
 		void onEvent(const Platform::Input::Keyboard::Event& e) override;

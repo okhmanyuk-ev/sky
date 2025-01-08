@@ -56,7 +56,7 @@ void Viewport3D::removeEntity(std::shared_ptr<Entity3D> entity)
 	mEntities.remove(entity);
 }
 
-void Viewport3D::update(Clock::Duration dTime)
+void Viewport3D::update(sky::Duration dTime)
 {
 	Node::update(dTime);
 	for (auto& entity : mEntities)

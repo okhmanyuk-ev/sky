@@ -9,7 +9,7 @@ void Timer::onFrame()
 	if (mPassed < mInterval)
 		return;
 
-	mPassed = Clock::Duration::zero();
+	mPassed = sky::Duration::zero();
 
 	auto callback = mCallback;
 

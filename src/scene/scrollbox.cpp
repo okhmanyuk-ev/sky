@@ -17,7 +17,7 @@ Scrollbox::Scrollbox()
 	mBounding->attach(mContent);
 }
 
-void Scrollbox::update(Clock::Duration dTime)
+void Scrollbox::update(sky::Duration dTime)
 {
 	Node::update(dTime);
 
@@ -32,7 +32,7 @@ void Scrollbox::update(Clock::Duration dTime)
 	auto speed = sky::sanitize(mSpeed * mSensitivity / scroll_space * glm::pow3(overscroll_factor));
 
 	if (!isTouching())
-		speed *= Clock::ToSeconds(dTime) * 100.0f;
+		speed *= sky::ToSeconds(dTime) * 100.0f;
 
 	mScrollPosition += speed;
 

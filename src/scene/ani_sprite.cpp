@@ -10,7 +10,7 @@ AniSprite::AniSprite()
 	attach(mSprite);
 }
 
-void AniSprite::update(Clock::Duration delta)
+void AniSprite::update(sky::Duration delta)
 {
 	Node::update(delta);
 
@@ -23,7 +23,7 @@ void AniSprite::update(Clock::Duration delta)
 	{
 		mAccumulator += delta;
 
-		const auto duration = Clock::FromSeconds(1.0f / mFrequency);
+		const auto duration = sky::FromSeconds(1.0f / mFrequency);
 
 		while (mAccumulator >= duration)
 		{

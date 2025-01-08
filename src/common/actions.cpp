@@ -12,7 +12,7 @@ Parallel::Parallel(Awaiting awaitingType) : mAwaitingType(awaitingType)
 {
 }
 
-Action::Status Parallel::frame(Clock::Duration delta)
+Action::Status Parallel::frame(sky::Duration delta)
 {
 	auto it = mActions.begin();
 	while (it != mActions.end())
@@ -47,7 +47,7 @@ void Parallel::clear()
 
 // sequence action
 
-Action::Status Sequence::frame(Clock::Duration delta)
+Action::Status Sequence::frame(sky::Duration delta)
 {
 	if (mActions.empty())
 		return Status::Finished;
@@ -89,7 +89,7 @@ Generic::Generic(Type type, Callback callback)
 	};
 }
 
-Action::Status Generic::frame(Clock::Duration delta)
+Action::Status Generic::frame(sky::Duration delta)
 {
 	assert(mCallback);
 	return mCallback(delta);
@@ -101,7 +101,7 @@ Repeat::Repeat(Callback callback) : mCallback(std::move(callback))
 {
 }
 
-Action::Status Repeat::frame(Clock::Duration delta)
+Action::Status Repeat::frame(sky::Duration delta)
 {
 	if (!mStatus.has_value())
 		std::tie(mStatus, mAction) = mCallback();
@@ -146,7 +146,7 @@ std::unique_ptr<Action> Collection::Execute(std::function<void()> callback)
 	});
 }
 
-std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void(Clock::Duration delta)> callback)
+std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
 {
 	return std::make_unique<Generic>(Generic::Type::Infinity, callback);
 }
@@ -182,12 +182,12 @@ std::unique_ptr<Action> Collection::Wait()
 std::unique_ptr<Action> Collection::Wait(float duration)
 {
 	return Wait([duration](auto delta) mutable {
-		duration -= Clock::ToSeconds(delta);
+		duration -= sky::ToSeconds(delta);
 		return duration > 0.0f;
 	});
 }
 
-std::unique_ptr<Action> Collection::Wait(std::function<bool(Clock::Duration delta)> while_callback)
+std::unique_ptr<Action> Collection::Wait(std::function<bool(sky::Duration delta)> while_callback)
 {
 	return std::make_unique<Generic>([while_callback](auto delta) {
 		if (while_callback(delta))
@@ -283,7 +283,7 @@ std::unique_ptr<Action> Collection::Pausable(std::function<bool()> run_callback,
 std::unique_ptr<Action> Collection::Interpolate(float start, float dest, float duration, EasingFunction easing, std::function<void(float)> callback)
 {
 	return std::make_unique<Generic>([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
-		passed += Clock::ToSeconds(delta);
+		passed += sky::ToSeconds(delta);
 		if (passed >= duration)
 		{
 			callback(dest);

@@ -76,7 +76,7 @@ std::string Address::toString() const
 System::System() :
 	mImpl(std::make_unique<Impl>())
 {
-	mPacketsPerSecondTimer.setInterval(Clock::FromSeconds(1.0f));
+	mPacketsPerSecondTimer.setInterval(sky::FromSeconds(1.0f));
 	mPacketsPerSecondTimer.setCallback([this] {
 		mIncomingPacketsPerSecond = mIncomingPacketsCount - mPrevIncomingPacketsPerSecond;
 		mOutgoingPacketsPerSecond = mOutgoingPacketsCount - mPrevOutgoingPacketsPerSecond;

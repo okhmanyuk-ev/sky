@@ -7,7 +7,7 @@ Trail::Trail(std::weak_ptr<Node> holder) : mHolder(holder)
 	//
 }
 
-void Trail::update(Clock::Duration dTime)
+void Trail::update(sky::Duration dTime)
 {
 	Node::update(dTime);
 	mUptime += dTime;
@@ -20,7 +20,7 @@ void Trail::updateTransform()
 	auto now = mUptime;
 
 	auto isSegmentOutdated = [now, this](size_t index) {
-		return now - mSegments.at(index).time > Clock::FromSeconds(mLifetime);
+		return now - mSegments.at(index).time > sky::FromSeconds(mLifetime);
 	};
 
 	while (!mSegments.empty())
@@ -43,15 +43,15 @@ void Trail::updateTransform()
 		const auto& prev = mSegments[1];
 
 		auto lifetime = mLifetime;
-		auto segment_uptime = Clock::ToSeconds(now - segment.time);
-		auto prev_uptime = Clock::ToSeconds(now - prev.time);
+		auto segment_uptime = sky::ToSeconds(now - segment.time);
+		auto prev_uptime = sky::ToSeconds(now - prev.time);
 
 		auto percent =  (segment_uptime - lifetime) / (segment_uptime - prev_uptime);
 
 		auto fixed_pos = glm::lerp(segment.pos, prev.pos, percent);
 
 		segment.pos = fixed_pos;
-		segment.time = now - Clock::FromSeconds(lifetime);
+		segment.time = now - sky::FromSeconds(lifetime);
 	}
 
 	auto holder = mHolder.lock();
@@ -80,7 +80,7 @@ void Trail::updateTransform()
 		added_count += 1;
 	}
 
-	auto this_frame_duration = Clock::ToSeconds(now - last_time);
+	auto this_frame_duration = sky::ToSeconds(now - last_time);
 
 	for (int i = 0; i < added_count; i++)
 	{
@@ -88,7 +88,7 @@ void Trail::updateTransform()
 		auto& segment = mSegments.at(index);
 		auto fix_percent = (float)(i + 1) / (float)added_count;
 		auto duration_fix = glm::lerp(this_frame_duration, 0.0f, fix_percent);
-		segment.time -= Clock::FromSeconds(duration_fix);
+		segment.time -= sky::FromSeconds(duration_fix);
 	}
 }
 

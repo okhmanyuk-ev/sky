@@ -5,7 +5,7 @@ using namespace Common;
 
 ProfilerSystem::ProfilerSystem()
 {
-	mTimer.setInterval(Clock::FromSeconds(1.0f));
+	mTimer.setInterval(sky::FromSeconds(1.0f));
 	mTimer.setCallback([this] {
 		std::function<void(std::list<Node*>)> freeAll = [&freeAll](std::list<Node*> nodes) {
 			for (auto node : nodes)
@@ -44,14 +44,14 @@ void ProfilerSystem::begin(const std::string& name)
 	}
 
 	node->mCount += 1;
-	node->mBeginTime = Clock::Now();
+	node->mBeginTime = sky::Now();
 
 	mCurrentNode = node;
 }
 
 void ProfilerSystem::end()
 {
-	mCurrentNode->mEndTime = Clock::Now();
+	mCurrentNode->mEndTime = sky::Now();
 	mCurrentNode->mDuration += mCurrentNode->mEndTime - mCurrentNode->mBeginTime;
 	mCurrentNode = mCurrentNode->mParent;
 }

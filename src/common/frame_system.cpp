@@ -38,20 +38,20 @@ void FrameSystem::frame()
 
 	if (mFramerateLimit > 0)
 	{
-		auto frameTime = Clock::FromSeconds(1.0 / mFramerateLimit);
+		auto frameTime = sky::FromSeconds(1.0 / mFramerateLimit);
 
-		while (Clock::Now() - mLastTime < frameTime)
+		while (sky::Now() - mLastTime < frameTime)
 		{
 			if (!mSleepAllowed)
 				continue;
 
-			std::this_thread::sleep_for(Clock::FromMilliseconds(1));
+			std::this_thread::sleep_for(sky::FromMilliseconds(1));
 		}
 	}
 
-	auto now = Clock::Now();
+	auto now = sky::Now();
 
-	mTimeDelta = Clock::FromSeconds(Clock::ToSeconds<double>(now - mLastTime) * mTimeScale);
+	mTimeDelta = sky::FromSeconds(sky::ToSeconds<double>(now - mLastTime) * mTimeScale);
 
 	if (mTimeDeltaLimit.has_value() && mTimeDelta > mTimeDeltaLimit.value())
 	{

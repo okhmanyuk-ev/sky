@@ -23,8 +23,8 @@ ConsoleCommands::ConsoleCommands()
 		auto delta_limit = FRAME->getTimeDeltaLimit();
 		if (!delta_limit.has_value())
 			return { "null" };
-		
-		auto fps = 1.0f / Clock::ToSeconds(delta_limit.value());
+
+		auto fps = 1.0f / sky::ToSeconds(delta_limit.value());
 		return { std::to_string(fps) };
 	};
 
@@ -36,7 +36,7 @@ ConsoleCommands::ConsoleCommands()
 		}
 
 		auto sec = std::stof(CON_ARG(0));
-		FRAME->setTimeDeltaLimit(Clock::FromSeconds(1.0f / sec));
+		FRAME->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec));
 	};
 
 	CONSOLE->registerCVar("sys_time_delta_limit_fps", { "null/float" }, getter, setter);

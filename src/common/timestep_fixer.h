@@ -1,22 +1,22 @@
 #pragma once
 
 #include <functional>
-#include <core/clock.h>
+#include <sky/clock.h>
 
 namespace Common
 {
 	class TimestepFixer
 	{
 	public:
-		using Callback = std::function<void(Clock::Duration)>;
+		using Callback = std::function<void(sky::Duration)>;
 
 	public:
-		void execute(Clock::Duration dTime, Callback callback);
+		void execute(sky::Duration dTime, Callback callback);
 		void execute(Callback callback);
 
 	public:
 		auto getTimestep() const { return mTimestep; }
-		void setTimestep(Clock::Duration value) { mTimestep = value; }
+		void setTimestep(sky::Duration value) { mTimestep = value; }
 
 		bool getForceTimeCompletion() const { return mForceTimeCompletion; }
 		void setForceTimeCompletion(bool value) { mForceTimeCompletion = value; }
@@ -25,19 +25,19 @@ namespace Common
 		void setSkipLongFrames(bool value) { mSkipLongFrames = value; }
 
 		auto getLongFrameDuration() const { return mLongFrameDuration; }
-		void setLongFrameDuration(Clock::Duration value) { mLongFrameDuration = value; }
+		void setLongFrameDuration(sky::Duration value) { mLongFrameDuration = value; }
 
 		bool isEnabled() const { return mEnabled; }
 		void setEnabled(bool value) { mEnabled = value; }
 
 	private:
-		Clock::Duration mTimestep = Clock::FromSeconds(1.0f / 120.0f);
+		sky::Duration mTimestep = sky::FromSeconds(1.0f / 120.0f);
 		bool mForceTimeCompletion = true;
 		bool mSkipLongFrames = false;
-		Clock::Duration mLongFrameDuration = Clock::FromSeconds(1.0f);
+		sky::Duration mLongFrameDuration = sky::FromSeconds(1.0f);
 		bool mEnabled = true;
 
 	private:
-		Clock::Duration mTimeAccumulator = Clock::Duration::zero();
+		sky::Duration mTimeAccumulator = sky::Duration::zero();
 	};
 }

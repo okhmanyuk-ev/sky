@@ -18,7 +18,7 @@ namespace Scene
 		}
 
 	protected:
-		void update(Clock::Duration dTime) override
+		void update(sky::Duration dTime) override
 		{
 			assert(ClipLayer == 0);
 			T::update(dTime);

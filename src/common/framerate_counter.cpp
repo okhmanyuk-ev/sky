@@ -4,11 +4,11 @@ using namespace Common;
 
 FramerateCounter::FramerateCounter()
 {
-	mTimer.setInterval(Clock::FromSeconds(1.0f));
+	mTimer.setInterval(sky::FromSeconds(1.0f));
 	mTimer.setCallback([this] {
 		mFramerate = mFramerateInternal;
 		mFramerateInternal = 0;
-		mAverageFramerate = static_cast<int>(static_cast<float>(getFrameCount()) / Clock::ToSeconds(getDuration()));
+		mAverageFramerate = static_cast<int>(static_cast<float>(getFrameCount()) / sky::ToSeconds(getDuration()));
 	});
 }
 

@@ -63,7 +63,7 @@ namespace Scene
 
 	protected:
 		virtual void enterUpdate();
-		virtual void update(Clock::Duration dTime);
+		virtual void update(sky::Duration dTime);
 		virtual void leaveUpdate();
 		virtual void enterDraw();
 		virtual void draw();

@@ -1,10 +1,9 @@
 #include "timestep_fixer.h"
-#include <core/clock.h>
 #include <common/frame_system.h>
 
 using namespace Common;
 
-void TimestepFixer::execute(Clock::Duration dTime, Callback callback)
+void TimestepFixer::execute(sky::Duration dTime, Callback callback)
 {
 	if (!mEnabled)
 	{
@@ -28,10 +27,10 @@ void TimestepFixer::execute(Clock::Duration dTime, Callback callback)
 
 	if (mForceTimeCompletion)
 	{
-		if (mTimeAccumulator > Clock::Duration::zero())
+		if (mTimeAccumulator > sky::Duration::zero())
 		{
 			callback(mTimeAccumulator);
-			mTimeAccumulator = Clock::Duration::zero();
+			mTimeAccumulator = sky::Duration::zero();
 		}
 	}
 }

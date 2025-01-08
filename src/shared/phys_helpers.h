@@ -94,7 +94,7 @@ namespace Shared::PhysHelpers
 		void onEvent(const Shared::TouchEmulator::Event& e) override;
 
 	public:
-		void update(Clock::Duration delta) override;
+		void update(sky::Duration delta) override;
 		void leaveDraw() override;
 
 	public:

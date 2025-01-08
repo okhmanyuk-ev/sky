@@ -92,10 +92,10 @@ namespace Shared::NetworkingUDP
 		DisconnectCallback mDisconnectCallback = nullptr;
 
 		float mHibernation = 0.0f; // 0.0f..1.0f
-		Clock::TimePoint mAwakeTime = Clock::Now();
+		sky::TimePoint mAwakeTime = sky::Now();
 
-		Clock::TimePoint mTransmitTime = Clock::Now();
-		Clock::TimePoint mIncomingTime = Clock::Now();
+		sky::TimePoint mTransmitTime = sky::Now();
+		sky::TimePoint mIncomingTime = sky::Now();
 
 		uint32_t mOutgoingSequence = 0;
 		uint32_t mIncomingSequence = 0;
@@ -175,7 +175,7 @@ namespace Shared::NetworkingUDP
 	private:
 		Network::Address mServerAddress;
 		std::shared_ptr<Channel> mChannel = nullptr;
-		Clock::TimePoint mConnectTime = Clock::Now();
+		sky::TimePoint mConnectTime = sky::Now();
 	};
 
 	class SimpleChannel : public Channel

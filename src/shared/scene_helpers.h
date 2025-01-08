@@ -365,7 +365,7 @@ namespace Shared::SceneHelpers
 		SafeArea();
 
 	protected:
-		void update(Clock::Duration dTime) override;
+		void update(sky::Duration dTime) override;
 	};
 
 	class VerticalScrollbar : public Scene::Rectangle,
@@ -379,7 +379,7 @@ namespace Shared::SceneHelpers
 		VerticalScrollbar();
 
 	public:
-		void update(Clock::Duration dTime) override;
+		void update(sky::Duration dTime) override;
 
 	public:
 		void setScrollbox(std::weak_ptr<Scene::Scrollbox> value) { mScrollbox = value; }
@@ -391,7 +391,7 @@ namespace Shared::SceneHelpers
 		std::weak_ptr<Scene::Scrollbox> mScrollbox;
 		std::shared_ptr<Scene::Rectangle> mIndicator;
 		float mPrevScrollPosition = 0.0f;
-		Clock::TimePoint mScrollMoveTime = Clock::Now();
+		sky::TimePoint mScrollMoveTime = sky::Now();
 		bool mAlphaAnimating = false;
 		bool mHidden = false;
 		bool mHidingEnabled = false;
@@ -563,8 +563,8 @@ namespace Shared::SceneHelpers
 		}
 
 	private:
-		std::optional<Clock::Duration> mPrevTransformTimepoint;
-		std::optional<Clock::Duration> mPrevSizeTimepoint;
+		std::optional<sky::Duration> mPrevTransformTimepoint;
+		std::optional<sky::Duration> mPrevSizeTimepoint;
 
 	public:
 		void setSmoothTransform(bool value) { mSmoothTransform = value; }

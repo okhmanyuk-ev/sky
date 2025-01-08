@@ -18,7 +18,7 @@ namespace Common
 		auto getFrameCount() const { return mFrameCount; }
 		auto getFramerate() const { return mFramerate; }
 		auto getStartTime() const { return mStartTime; }
-		auto getDuration() const { return Clock::Now() - getStartTime(); }
+		auto getDuration() const { return sky::Now() - getStartTime(); }
 		auto getAverageFramerate() const { return mAverageFramerate; }
 
 	private:
@@ -27,6 +27,6 @@ namespace Common
 		int mFramerateInternal = 0;
 		int mFramerate = 0;
 		int mAverageFramerate = 0;
-		Clock::TimePoint mStartTime = Clock::Now();
+		sky::TimePoint mStartTime = sky::Now();
 	};
 }

@@ -5,7 +5,7 @@ Scene::Scene::Scene()
 	mRoot->setStretch(1.0f);
 	mRoot->setScene(this);
 
-	mTimestepFixer.setTimestep(Clock::FromSeconds(1.0f / 120.0f));
+	mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / 120.0f));
 	mTimestepFixer.setForceTimeCompletion(true);
 	mTimestepFixer.setSkipLongFrames(true);
 }
@@ -14,7 +14,7 @@ Scene::Scene::~Scene()
 {
 }
 
-void Scene::Scene::recursiveNodeUpdate(Node& node, Clock::Duration delta)
+void Scene::Scene::recursiveNodeUpdate(Node& node, sky::Duration delta)
 {
 	if (!node.isEnabled())
 		return;

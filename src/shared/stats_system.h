@@ -56,7 +56,7 @@ namespace Shared
 		struct Value
 		{
 			std::string text;
-			Clock::Duration time;
+			sky::Duration time;
 		};
 
 		using Indicators = std::unordered_map<std::string, Value>;
