@@ -6,11 +6,9 @@
 #include <typeindex>
 #include <sky/locator.h>
 
-#define EVENT sky::Locator<Common::Event::System>::GetService()
-
-namespace Common::Event
+namespace sky
 {
-	class System
+	class Event
 	{
 	public:
 		using ListenerHandle = void*;
@@ -61,17 +59,7 @@ namespace Common::Event
 		}
 
 	public:
-		auto getListenersCount() const
-		{
-			size_t result = 0;
-
-			for (const auto& [type, listeners] : mListeners)
-			{
-				result += listeners.size();
-			}
-
-			return result;
-		}
+		auto getListenersCount() const;
 
 	private:
 		std::unordered_map<std::type_index, std::unordered_set<void*>> mListeners;
@@ -83,28 +71,28 @@ namespace Common::Event
 	public:
 		Listenable()
 		{
-			mHandle = EVENT->createListener<T>([this](const T& e) {
+			mHandle = Locator<Event>::GetService()->createListener<T>([this](const T& e) {
 				onEvent(e);
 			});
 		}
 
 		virtual ~Listenable()
 		{
-			EVENT->destroyListener<T>(mHandle);
+			Locator<Event>::GetService()->destroyListener<T>(mHandle);
 		}
 
 	protected:
 		virtual void onEvent(const T& e) = 0;
 
 	private:
-		System::ListenerHandle mHandle;
+		Event::ListenerHandle mHandle;
 	};
 
 	template <typename T>
 	class Listener final : public Listenable<T>
 	{
 	public:
-		using Callback = System::ListenerCallback<T>;
+		using Callback = Event::ListenerCallback<T>;
 
 	public:
 		Listener(Callback callback = nullptr) : Listenable<T>(), mCallback(callback) { }

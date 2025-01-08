@@ -1,6 +1,7 @@
 #ifdef _WIN32
 #include "native_console_device.h"
-
+#include <common/frame_system.h>
+#include <sky/utils.h>
 #include <iostream>
 #include <string>
 #include <conio.h>
@@ -16,7 +17,7 @@ NativeConsoleDevice::NativeConsoleDevice()
 			std::string s;
 			std::getline(std::cin, s);
 			FRAME->addOne([this, s] {
-				EVENT->emit(ReadEvent({ s }));
+				sky::Emit(ReadEvent({ s }));
 			});
 		}
 	});

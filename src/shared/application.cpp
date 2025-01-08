@@ -9,6 +9,7 @@
 #include <sky/locator.h>
 #include <sky/cache.h>
 #include <sky/localization.h>
+#include <sky/event.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -20,7 +21,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 {
 	std::srand((unsigned int)std::time(nullptr));
 
-	sky::Locator<Common::Event::System>::Init(std::make_shared<Common::Event::System>());
+	sky::Locator<sky::Event>::Init(std::make_shared<sky::Event>());
 #ifndef EMSCRIPTEN
 	sky::Locator<Common::TaskSystem>::Init(std::make_shared<Common::TaskSystem>());
 #endif

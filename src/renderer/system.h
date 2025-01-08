@@ -5,7 +5,7 @@
 #include <skygfx/skygfx.h>
 #include <skygfx/vertex.h>
 #include <skygfx/utils.h>
-#include <common/event_system.h>
+#include <sky/event.h>
 #include <platform/all.h>
 
 #define RENDERER sky::Locator<Renderer::System>::GetService()
@@ -23,7 +23,7 @@ namespace Renderer
 		size_t stride = 0;
 	};
 
-	class System : public Common::Event::Listenable<Platform::System::ResizeEvent>
+	class System : public sky::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
 		System(std::optional<skygfx::BackendType> type = std::nullopt,

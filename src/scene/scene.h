@@ -2,7 +2,7 @@
 
 #include <platform/system.h>
 #include <graphics/system.h>
-#include <common/event_system.h>
+#include <sky/event.h>
 #include <scene/node.h>
 #include <common/timestep_fixer.h>
 #include <platform/input.h>
@@ -10,10 +10,10 @@
 namespace Scene
 {
 	class Scene :
-		public Common::Event::Listenable<Platform::Input::Mouse::ButtonEvent>,
-		public Common::Event::Listenable<Platform::Input::Mouse::MoveEvent>,
-		public Common::Event::Listenable<Platform::Input::Mouse::ScrollEvent>,
-		public Common::Event::Listenable<Platform::Input::Touch::Event>
+		public sky::Listenable<Platform::Input::Mouse::ButtonEvent>,
+		public sky::Listenable<Platform::Input::Mouse::MoveEvent>,
+		public sky::Listenable<Platform::Input::Mouse::ScrollEvent>,
+		public sky::Listenable<Platform::Input::Touch::Event>
 	{
 	private:
 		class RootNode;

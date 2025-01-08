@@ -1,10 +1,13 @@
 #pragma once
 
 #include <sky/locator.h>
-#include <renderer/all.h>
-#include <graphics/all.h>
+#include <graphics/tex_cell.h>
+#include <graphics/font.h>
+#include <graphics/animation.h>
+#include <graphics/atlas.h>
 #include <audio/sound.h>
 #include <nlohmann/json.hpp>
+#include <sky/event.h>
 
 namespace sky
 {
@@ -21,4 +24,6 @@ namespace sky
 	void PrecacheFont(const std::string& name, std::optional<std::string> alias = std::nullopt);
 
 	std::wstring Localize(const std::string& key);
+
+	template<class T> void Emit(const T& e) { GetService<Event>()->emit(e); }
 }

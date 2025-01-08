@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common/frame_system.h>
-#include <common/event_system.h>
+#include <sky/event.h>
 #include <renderer/all.h>
 
 #include <platform/system.h>
@@ -20,12 +20,12 @@
 namespace Shared
 {
 	class ImguiSystem :
-		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
-		public Common::Event::Listenable<Platform::Input::Keyboard::CharEvent>,
-		public Common::Event::Listenable<Platform::Input::Mouse::ButtonEvent>,
-		public Common::Event::Listenable<Platform::Input::Mouse::MoveEvent>,
-		public Common::Event::Listenable<Platform::Input::Mouse::ScrollEvent>,
-		public Common::Event::Listenable<Platform::Input::Touch::Event>
+		public sky::Listenable<Platform::Input::Keyboard::Event>,
+		public sky::Listenable<Platform::Input::Keyboard::CharEvent>,
+		public sky::Listenable<Platform::Input::Mouse::ButtonEvent>,
+		public sky::Listenable<Platform::Input::Mouse::MoveEvent>,
+		public sky::Listenable<Platform::Input::Mouse::ScrollEvent>,
+		public sky::Listenable<Platform::Input::Touch::Event>
 	{
 	public:
 		ImguiSystem();

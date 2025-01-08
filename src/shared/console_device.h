@@ -7,7 +7,7 @@
 #include <console/device.h>
 #include <console/system.h>
 #include <common/interpolator.h>
-#include <common/event_system.h>
+#include <sky/event.h>
 #include <common/frame_system.h>
 #include <common/timer.h>
 #include <platform/system.h>
@@ -24,10 +24,10 @@ namespace Shared
 {
 	class ConsoleDevice : public Console::Device,
 		public Common::FrameSystem::Frameable,
-		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
-		public Common::Event::Listenable<TouchEmulator::Event>,
-		public Common::Event::Listenable<Platform::System::VirtualKeyboardTextChanged>,
-		public Common::Event::Listenable<Platform::System::VirtualKeyboardEnterPressed>
+		public sky::Listenable<Platform::Input::Keyboard::Event>,
+		public sky::Listenable<TouchEmulator::Event>,
+		public sky::Listenable<Platform::System::VirtualKeyboardTextChanged>,
+		public sky::Listenable<Platform::System::VirtualKeyboardEnterPressed>
 	{
 	public:
 		enum class State

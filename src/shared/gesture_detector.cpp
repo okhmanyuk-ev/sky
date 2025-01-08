@@ -1,5 +1,6 @@
 #include "gesture_detector.h"
 #include <platform/system.h>
+#include <sky/utils.h>
 
 using namespace Shared;
 
@@ -9,13 +10,13 @@ void GestureDetector::onEvent(const Platform::Input::Keyboard::Event& e)
 		return;
 
 	if (e.key == Platform::Input::Keyboard::Key::W || e.key == Platform::Input::Keyboard::Key::Up)
-		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Up }));
+		sky::Emit(SwipeEvent({ SwipeEvent::Type::Up }));
 	else if (e.key == Platform::Input::Keyboard::Key::A || e.key == Platform::Input::Keyboard::Key::Left)
-		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Left }));
+		sky::Emit(SwipeEvent({ SwipeEvent::Type::Left }));
 	else if (e.key == Platform::Input::Keyboard::Key::S || e.key == Platform::Input::Keyboard::Key::Down)
-		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Down }));
+		sky::Emit(SwipeEvent({ SwipeEvent::Type::Down }));
 	else if (e.key == Platform::Input::Keyboard::Key::D || e.key == Platform::Input::Keyboard::Key::Right)
-		EVENT->emit(SwipeEvent({ SwipeEvent::Type::Right }));
+		sky::Emit(SwipeEvent({ SwipeEvent::Type::Right }));
 }
 
 void GestureDetector::onEvent(const TouchEmulator::Event& e)
@@ -45,14 +46,14 @@ void GestureDetector::onEvent(const TouchEmulator::Event& e)
 
 	if (glm::abs(delta.y) > glm::abs(delta.x))
 		if (delta.y > 0)
-			EVENT->emit(SwipeEvent({ SwipeEvent::Type::Down }));
+			sky::Emit(SwipeEvent({ SwipeEvent::Type::Down }));
 		else
-			EVENT->emit(SwipeEvent({ SwipeEvent::Type::Up }));
+			sky::Emit(SwipeEvent({ SwipeEvent::Type::Up }));
 	else
 		if (delta.x > 0)
-			EVENT->emit(SwipeEvent({ SwipeEvent::Type::Right }));
+			sky::Emit(SwipeEvent({ SwipeEvent::Type::Right }));
 		else
-			EVENT->emit(SwipeEvent({ SwipeEvent::Type::Left }));
+			sky::Emit(SwipeEvent({ SwipeEvent::Type::Left }));
 
 	mPositions.clear();
 }

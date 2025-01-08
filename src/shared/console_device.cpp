@@ -9,6 +9,7 @@
 #include <shared/imgui_system.h>
 #include <magic_enum.hpp>
 #include <shared/stats_system.h>
+#include <sky/utils.h>
 
 #define CONSOLE_STATS(KEY, VALUE) STATS_INDICATE_GROUP("console", KEY, VALUE)
 
@@ -488,7 +489,7 @@ void ConsoleDevice::enterInput()
 		}
 		writeLine("] " + line, Console::Color::Gray);
 		scrollToBottom();
-		EVENT->emit(ReadEvent({ line }));
+		sky::Emit(ReadEvent({ line }));
 	}
 }
 

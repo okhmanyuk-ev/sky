@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/event_system.h>
+#include <sky/event.h>
 #include <console/device.h>
 #include <sky/locator.h>
 #include <string>
@@ -65,7 +65,7 @@ namespace Console
 		Callback mCallback;
 	};
 
-	class System : public Common::Event::Listenable<Device::ReadEvent>
+	class System : public sky::Listenable<Device::ReadEvent>
 	{
 	public:
 		void execute(const std::string& cmd);

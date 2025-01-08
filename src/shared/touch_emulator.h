@@ -1,14 +1,14 @@
 #pragma once
 
 #include <platform/input.h>
-#include <common/event_system.h>
+#include <sky/event.h>
 
 namespace Shared
 {
 	class TouchEmulator :
-		public Common::Event::Listenable<Platform::Input::Mouse::ButtonEvent>,
-		public Common::Event::Listenable<Platform::Input::Mouse::MoveEvent>,
-		public Common::Event::Listenable<Platform::Input::Touch::Event>
+		public sky::Listenable<Platform::Input::Mouse::ButtonEvent>,
+		public sky::Listenable<Platform::Input::Mouse::MoveEvent>,
+		public sky::Listenable<Platform::Input::Touch::Event>
 	{
 	public:
 		struct Event

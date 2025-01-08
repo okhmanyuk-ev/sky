@@ -3,7 +3,7 @@
 #include <platform/asset.h>
 #include <console/device.h>
 #include <common/task_system.h>
-#include <common/event_system.h>
+#include <sky/utils.h>
 #include <common/frame_system.h>
 #include <common/helpers.h>
 #ifdef EMSCRIPTEN
@@ -68,13 +68,13 @@ void Profile::save()
 	emscripten_run_script(fmt::format("localStorage.setItem('profile', '{}');", str).c_str());
 #endif
 	FRAME->addOneThreadsafe([] {
-		EVENT->emit(ProfileSavedEvent());
+		sky::Emit(ProfileSavedEvent());
 	});
 }
 
 void Profile::clear()
 {
-	EVENT->emit(ProfileClearedEvent());
+	sky::Emit(ProfileClearedEvent());
 	makeDefault();
 }
 

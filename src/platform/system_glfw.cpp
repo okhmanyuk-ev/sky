@@ -11,7 +11,7 @@
 #if !defined(PLATFORM_EMSCRIPTEN)
 #include <GLFW/glfw3native.h>
 #endif
-#include <common/event_system.h>
+#include <sky/utils.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
@@ -118,7 +118,7 @@ void SystemGlfw::process()
 	{
 		mCursorPos = { mouse_x_i, mouse_y_i };
 
-		EVENT->emit(Input::Mouse::MoveEvent{
+		sky::Emit(Input::Mouse::MoveEvent{
 			.pos = mCursorPos
 		});
 	}
@@ -375,7 +375,7 @@ static void MouseButtonCallback(GLFWwindow* window, int button, int action, int 
 	y *= gScale;
 #endif
 
-	EVENT->emit(Input::Mouse::ButtonEvent{
+	sky::Emit(Input::Mouse::ButtonEvent{
 		.type = TypeMap.at(action),
 		.button = ButtonMap.at(button),
 		.pos = { x, y }
@@ -487,12 +487,12 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 	e.type = TypeMap.at(action);
 	e.key = KeyMap.at(key);
 
-	EVENT->emit(e);
+	sky::Emit(e);
 }
 
 static void CharCallback(GLFWwindow* window, unsigned int codepoint)
 {
-	EVENT->emit(Input::Keyboard::CharEvent{ codepoint });
+	sky::Emit(Input::Keyboard::CharEvent{ codepoint });
 }
 
 static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
@@ -508,7 +508,7 @@ static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	yoffset /= gScale;
 #endif
 
-	EVENT->emit(Input::Mouse::ScrollEvent{
+	sky::Emit(Input::Mouse::ScrollEvent{
 		.pos = { x, y },
 		.scroll = { xoffset, yoffset }
 	});
@@ -525,7 +525,7 @@ static void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 
 	gWidth = width;
 	gHeight = height;
-	EVENT->emit(Platform::System::ResizeEvent({ width, height }));
+	sky::Emit(Platform::System::ResizeEvent({ width, height }));
 }
 
 #endif

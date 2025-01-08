@@ -8,7 +8,7 @@
 #include <glm/ext.hpp>
 
 #include <common/frame_system.h>
-#include <common/event_system.h>
+#include <sky/event.h>
 #include <common/easing.h>
 #include <sky/clock.h>
 
@@ -216,11 +216,11 @@ namespace Actions
 			return MakeParallel(Parallel::Awaiting::All, std::forward<Args>(args)...);
 		}
 
-		template<class T> std::unique_ptr<Action> WaitEvent(Common::Event::System::ListenerCallback<T> onEvent)
+		template<class T> std::unique_ptr<Action> WaitEvent(sky::Event::ListenerCallback<T> onEvent)
 		{
 			auto event_holder = std::make_shared<std::optional<T>>();
 
-			auto listener = std::make_shared<Common::Event::Listener<T>>();
+			auto listener = std::make_shared<sky::Listener<T>>();
 			listener->setCallback([event_holder](const auto& e) {
 				if (event_holder->has_value())
 					return;

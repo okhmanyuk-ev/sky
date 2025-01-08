@@ -3,9 +3,6 @@
 #ifdef _WIN32
 
 #include <console/device.h>
-#include <common/event_system.h>
-#include <common/frame_system.h>
-
 #include <thread>
 
 #define NATIVE_CONSOLE_DEVICE std::static_pointer_cast<Common::NativeConsoleDevice>(CONSOLE_DEVICE)

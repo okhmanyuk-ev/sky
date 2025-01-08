@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/event_system.h>
+#include <sky/event.h>
 #include <platform/input.h>
 #include <shared/touch_emulator.h>
 #include <glm/glm.hpp>
@@ -9,9 +9,8 @@
 
 namespace Shared
 {
-	class GestureDetector :
-		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
-		public Common::Event::Listenable<TouchEmulator::Event>
+	class GestureDetector : public sky::Listenable<Platform::Input::Keyboard::Event>,
+		public sky::Listenable<TouchEmulator::Event>
 	{
 	public:
 		struct SwipeEvent
