@@ -8,6 +8,7 @@
 #include <regex>
 #include <sky/locator.h>
 #include <sky/cache.h>
+#include <sky/localization.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -34,7 +35,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	{
 		sky::Locator<Network::System>::Init(std::make_shared<Network::System>());
 	}
-	sky::Locator<Shared::LocalizationSystem>::Init(std::make_shared<Shared::LocalizationSystem>());
+	sky::Locator<sky::Localization>::Init(std::make_shared<sky::Localization>());
 	sky::Locator<Shared::StatsSystem>::Init(std::make_shared<Shared::StatsSystem>());
 	sky::Locator<sky::Cache>::Init(std::make_shared<sky::Cache>());
 	sky::Locator<Shared::ImguiSystem>::Init(std::make_shared<Shared::ImguiSystem>());
@@ -289,7 +290,7 @@ Application::~Application()
 	sky::Locator<Shared::ImguiSystem>::Reset();
 	sky::Locator<sky::Cache>::Reset();
 	sky::Locator<Shared::StatsSystem>::Reset();
-	sky::Locator<Shared::LocalizationSystem>::Reset();
+	sky::Locator<sky::Localization>::Reset();
 	if (mFlags.count(Flag::Network))
 	{
 		sky::Locator<Network::System>::Reset();

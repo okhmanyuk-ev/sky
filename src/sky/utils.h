@@ -19,4 +19,6 @@ namespace sky
 
 	void PrecacheTexture(const std::string& name, std::optional<std::string> alias = std::nullopt);
 	void PrecacheFont(const std::string& name, std::optional<std::string> alias = std::nullopt);
+
+	std::wstring Localize(const std::string& key);
 }

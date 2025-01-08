@@ -5,7 +5,6 @@
 #include <regex>
 #include <ranges>
 #include "imscene.h"
-#include <shared/localization_system.h>
 
 using namespace Shared;
 
@@ -229,7 +228,7 @@ void SceneHelpers::ParseLabelFromXml(Scene::Label& node, const tinyxml2::XMLElem
 	auto text = root.Attribute("text");
 	if (text != nullptr)
 	{
-		node.setText(root.BoolAttribute("localized") ? LOCALIZE(text) : sky::to_wstring(text));
+		node.setText(root.BoolAttribute("localized") ? sky::Localize(text) : sky::to_wstring(text));
 	}
 }
 
@@ -279,7 +278,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>(const
 		ParseNodeFromXml(*node, root);
 		node->setFontSize(root.FloatAttribute("font_size", Scene::Label::DefaultFontSize));
 		auto text = sky::to_wstring(root.Attribute("text"));
-		node->setText(root.BoolAttribute("localized") ? LOCALIZE(sky::to_string(text)) : text);
+		node->setText(root.BoolAttribute("localized") ? sky::Localize(sky::to_string(text)) : text);
 		return node;
 	} },
 	{ "Column", [](const auto& root) {

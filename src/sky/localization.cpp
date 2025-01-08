@@ -1,19 +1,17 @@
-#include "localization_system.h"
+#include "localization.h"
 #include <sstream>
 #include <cassert>
 #include <platform/asset.h>
 #include <console/device.h>
 #include <common/helpers.h>
 
-using namespace Shared;
-
-LocalizationSystem::LocalizationSystem(const std::string& path)
+sky::Localization::Localization(const std::string& path)
 {
 	loadDicrionaries(path);
-	setLanguage(Shared::LocalizationSystem::Language::English);
+	setLanguage(Language::English);
 }
 
-void LocalizationSystem::loadDicrionaries(const std::string& path)
+void sky::Localization::loadDicrionaries(const std::string& path)
 {
 	auto loadDictionary = [this, path](Language language) {
 		auto& dictionary = mDictionaries[language];
@@ -57,7 +55,7 @@ void LocalizationSystem::loadDicrionaries(const std::string& path)
 	loadDictionary(Language::Russian);
 }
 
-std::string LocalizationSystem::getLanguageName(Language language)
+std::string sky::Localization::getLanguageName(Language language)
 {
 	if (language == Language::English)
 		return "english";
@@ -68,7 +66,7 @@ std::string LocalizationSystem::getLanguageName(Language language)
 	return "";
 }
 
-std::wstring LocalizationSystem::getString(const std::string& key) const
+std::wstring sky::Localization::getString(const std::string& key) const
 {
 	auto& dictionary = mDictionaries.at(mLanguage);
 

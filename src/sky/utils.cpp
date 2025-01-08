@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <sky/cache.h>
+#include <sky/localization.h>
 
 Graphics::TexCell sky::GetTexture(const std::string& name)
 {
@@ -39,4 +40,9 @@ void sky::PrecacheTexture(const std::string& name, std::optional<std::string> al
 void sky::PrecacheFont(const std::string& name, std::optional<std::string> alias)
 {
 	GetService<Cache>()->loadFont(name, alias.value_or(name));
+}
+
+std::wstring sky::Localize(const std::string& key)
+{
+	return GetService<Localization>()->getString(key);
 }

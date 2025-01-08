@@ -1,15 +1,11 @@
 #pragma once
 
-#include <map>
-#include <fmt/format.h>
-#include <sky/locator.h>
+#include <unordered_map>
+#include <string>
 
-#define LOCALIZATION sky::Locator<Shared::LocalizationSystem>::GetService()
-#define LOCALIZE(KEY) LOCALIZATION->getString(KEY)
-
-namespace Shared
+namespace sky
 {
-	class LocalizationSystem
+	class Localization
 	{
 	public:
 		enum class Language
@@ -22,7 +18,7 @@ namespace Shared
 		static std::string getLanguageName(Language language);
 
 	public:
-		LocalizationSystem(const std::string& path = "localization");
+		Localization(const std::string& path = "localization");
 
 	public:
 		void loadDicrionaries(const std::string& path);
@@ -33,7 +29,7 @@ namespace Shared
 		void setLanguage(Language value) { mLanguage = value; }
 
 	private:
-		std::map<Language, std::map<std::string, std::wstring>> mDictionaries;
+		std::unordered_map<Language, std::unordered_map<std::string, std::wstring>> mDictionaries;
 		Language mLanguage = Language::English;
 	};
 }

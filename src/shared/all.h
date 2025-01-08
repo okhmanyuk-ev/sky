@@ -34,7 +34,6 @@
 
 #include <shared/stats_system.h>
 #include <shared/application.h>
-#include <shared/localization_system.h>
 #include <shared/first_person_camera_controller.h>
 #include <shared/imgui_user.h>
 #include <shared/imscene.h>

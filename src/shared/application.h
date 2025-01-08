@@ -13,7 +13,6 @@
 #include <shared/performance_console_commands.h>
 #include <shared/console_helper_commands.h>
 #include <shared/console_device.h>
-#include <shared/localization_system.h>
 #include <shared/stats_system.h>
 #include <shared/touch_emulator.h>
 #include <shared/gesture_detector.h>
