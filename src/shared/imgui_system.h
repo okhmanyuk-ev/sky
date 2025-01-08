@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common/frame_system.h>
-#include <sky/event.h>
+#include <sky/dispatcher.h>
 #include <renderer/all.h>
 
 #include <platform/system.h>

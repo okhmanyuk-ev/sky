@@ -1,7 +1,7 @@
 #pragma once
 
 #include <platform/input.h>
-#include <sky/event.h>
+#include <sky/dispatcher.h>
 
 namespace Shared
 {

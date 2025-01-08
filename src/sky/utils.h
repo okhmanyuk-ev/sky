@@ -7,7 +7,7 @@
 #include <graphics/atlas.h>
 #include <audio/sound.h>
 #include <nlohmann/json.hpp>
-#include <sky/event.h>
+#include <sky/dispatcher.h>
 
 namespace sky
 {
@@ -25,5 +25,5 @@ namespace sky
 
 	std::wstring Localize(const std::string& key);
 
-	template<class T> void Emit(const T& e) { GetService<Event>()->emit(e); }
+	template<class T> void Emit(const T& e) { GetService<Dispatcher>()->emit(e); }
 }

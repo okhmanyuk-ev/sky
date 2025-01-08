@@ -2,7 +2,7 @@
 
 #include <platform/system.h>
 #include <graphics/system.h>
-#include <sky/event.h>
+#include <sky/dispatcher.h>
 #include <scene/node.h>
 #include <common/timestep_fixer.h>
 #include <platform/input.h>

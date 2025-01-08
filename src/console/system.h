@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sky/event.h>
+#include <sky/dispatcher.h>
 #include <console/device.h>
 #include <sky/locator.h>
 #include <string>

@@ -7,7 +7,7 @@
 #include <console/device.h>
 #include <console/system.h>
 #include <common/interpolator.h>
-#include <sky/event.h>
+#include <sky/dispatcher.h>
 #include <common/frame_system.h>
 #include <common/timer.h>
 #include <platform/system.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sky/event.h>
+#include <sky/dispatcher.h>
 #include <common/frame_system.h>
 #include <common/timestep_fixer.h>
 #include <platform/system.h>

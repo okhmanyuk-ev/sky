@@ -5,7 +5,7 @@
 #include <skygfx/skygfx.h>
 #include <skygfx/vertex.h>
 #include <skygfx/utils.h>
-#include <sky/event.h>
+#include <sky/dispatcher.h>
 #include <platform/all.h>
 
 #define RENDERER sky::Locator<Renderer::System>::GetService()
@@ -40,7 +40,7 @@ namespace Renderer
 		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
 		void setShader(std::shared_ptr<Shader> value);
 
-		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }, 
+		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
 
 		void draw(uint32_t vertexCount, uint32_t vertexOffset = 0);

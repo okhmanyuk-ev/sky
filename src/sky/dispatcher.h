@@ -8,7 +8,7 @@
 
 namespace sky
 {
-	class Event
+	class Dispatcher
 	{
 	public:
 		using ListenerHandle = void*;
@@ -71,28 +71,28 @@ namespace sky
 	public:
 		Listenable()
 		{
-			mHandle = Locator<Event>::GetService()->createListener<T>([this](const T& e) {
+			mHandle = Locator<Dispatcher>::GetService()->createListener<T>([this](const T& e) {
 				onEvent(e);
 			});
 		}
 
 		virtual ~Listenable()
 		{
-			Locator<Event>::GetService()->destroyListener<T>(mHandle);
+			Locator<Dispatcher>::GetService()->destroyListener<T>(mHandle);
 		}
 
 	protected:
 		virtual void onEvent(const T& e) = 0;
 
 	private:
-		Event::ListenerHandle mHandle;
+		Dispatcher::ListenerHandle mHandle;
 	};
 
 	template <typename T>
-	class Listener final : public Listenable<T>
+	class Listener : public Listenable<T>
 	{
 	public:
-		using Callback = Event::ListenerCallback<T>;
+		using Callback = Dispatcher::ListenerCallback<T>;
 
 	public:
 		Listener(Callback callback = nullptr) : Listenable<T>(), mCallback(callback) { }
