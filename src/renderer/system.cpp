@@ -25,21 +25,6 @@ void System::onEvent(const Platform::System::ResizeEvent& e)
 	skygfx::Resize(e.width, e.height);
 }
 
-void System::setVertexBuffer(const Buffer& value)
-{
-	skygfx::SetVertexBuffer(value.data, value.size, value.stride);
-}
-
-void System::setIndexBuffer(const Buffer& value)
-{
-	skygfx::SetIndexBuffer(value.data, value.size, value.stride);
-}
-
-void System::setTexture(const skygfx::Texture& value)
-{
-	skygfx::SetTexture(0, value);
-}
-
 void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 {
 	if (value == nullptr)
@@ -51,16 +36,6 @@ void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
 	skygfx::Clear(color, depth, stencil);
-}
-
-void System::draw(uint32_t vertexCount, uint32_t vertexOffset)
-{
-	skygfx::Draw(vertexCount, vertexOffset);
-}
-
-void System::drawIndexed(uint32_t indexCount, uint32_t indexOffset)
-{
-	skygfx::DrawIndexed(indexCount, indexOffset);
 }
 
 void System::present()

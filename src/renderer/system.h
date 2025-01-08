@@ -11,17 +11,6 @@
 
 namespace Renderer
 {
-	struct Buffer
-	{
-		Buffer() {}
-		template<typename T> Buffer(T* memory, size_t count) : data((void*)memory), size(count * sizeof(T)), stride(sizeof(T)) {}
-		template<typename T> Buffer(const std::vector<T>& values) : Buffer(values.data(), values.size()) {}
-
-		void* data = nullptr;
-		size_t size = 0;
-		size_t stride = 0;
-	};
-
 	class System : public sky::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
@@ -33,16 +22,10 @@ namespace Renderer
 		void onEvent(const Platform::System::ResizeEvent& e) override;
 
 	public:
-		void setVertexBuffer(const Buffer& value);
-		void setIndexBuffer(const Buffer& value);
-		void setTexture(const skygfx::Texture& value);
 		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
 
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);
-
-		void draw(uint32_t vertexCount, uint32_t vertexOffset = 0);
-		void drawIndexed(uint32_t indexCount, uint32_t indexOffset = 0);
 
 		void present();
 
