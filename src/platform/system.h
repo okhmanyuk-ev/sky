@@ -2,7 +2,7 @@
 
 #include <platform/defines.h>
 #include <platform/input.h>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 #include <string>
 #include <memory>
 #include <vector>
@@ -10,7 +10,7 @@
 #include <map>
 #include <optional>
 
-#define PLATFORM sky::Singleton<Platform::System>::GetInstance()
+#define PLATFORM sky::Locator<Platform::System>::GetService()
 
 extern void sky_main();
 

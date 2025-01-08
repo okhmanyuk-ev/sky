@@ -3,9 +3,9 @@
 #include <string>
 #include <functional>
 #include <fmt/format.h>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 
-#define CONSOLE_DEVICE sky::Singleton<Console::Device>::GetInstance()
+#define CONSOLE_DEVICE sky::Locator<Console::Device>::GetService()
 
 namespace Console
 {

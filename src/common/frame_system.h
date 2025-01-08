@@ -3,10 +3,10 @@
 #include <list>
 #include <functional>
 #include <mutex>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 #include <sky/clock.h>
 
-#define FRAME sky::Singleton<Common::FrameSystem>::GetInstance()
+#define FRAME sky::Locator<Common::FrameSystem>::GetService()
 
 namespace Common
 {

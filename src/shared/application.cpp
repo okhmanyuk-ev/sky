@@ -6,7 +6,7 @@
 #include <shared/scene_manager.h>
 #include <shared/scene_helpers.h>
 #include <regex>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -18,30 +18,30 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 {
 	std::srand((unsigned int)std::time(nullptr));
 
-	sky::Singleton<Common::Event::System>::Init(std::make_shared<Common::Event::System>());
+	sky::Locator<Common::Event::System>::Init(std::make_shared<Common::Event::System>());
 #ifndef EMSCRIPTEN
-	sky::Singleton<Common::TaskSystem>::Init(std::make_shared<Common::TaskSystem>());
+	sky::Locator<Common::TaskSystem>::Init(std::make_shared<Common::TaskSystem>());
 #endif
-	sky::Singleton<Common::FrameSystem>::Init(std::make_shared<Common::FrameSystem>());
-	sky::Singleton<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
-	sky::Singleton<Platform::System>::Init(Platform::System::create(appname));
-	sky::Singleton<Renderer::System>::Init(std::make_shared<Renderer::System>());
-	sky::Singleton<Console::Device>::Init(std::make_shared<Shared::ConsoleDevice>());
-	sky::Singleton<Console::System>::Init(std::make_shared<Console::System>());
-	sky::Singleton<Graphics::System>::Init(std::make_shared<Graphics::System>());
+	sky::Locator<Common::FrameSystem>::Init(std::make_shared<Common::FrameSystem>());
+	sky::Locator<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
+	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
+	sky::Locator<Renderer::System>::Init(std::make_shared<Renderer::System>());
+	sky::Locator<Console::Device>::Init(std::make_shared<Shared::ConsoleDevice>());
+	sky::Locator<Console::System>::Init(std::make_shared<Console::System>());
+	sky::Locator<Graphics::System>::Init(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
 	{
-		sky::Singleton<Network::System>::Init(std::make_shared<Network::System>());
+		sky::Locator<Network::System>::Init(std::make_shared<Network::System>());
 	}
-	sky::Singleton<Shared::LocalizationSystem>::Init(std::make_shared<Shared::LocalizationSystem>());
-	sky::Singleton<Shared::StatsSystem>::Init(std::make_shared<Shared::StatsSystem>());
-	sky::Singleton<Shared::CacheSystem>::Init(std::make_shared<Shared::CacheSystem>());
-	sky::Singleton<Shared::ImguiSystem>::Init(std::make_shared<Shared::ImguiSystem>());
-	sky::Singleton<Shared::Stylebook>::Init(std::make_shared<Shared::Stylebook>());
-	sky::Singleton<Shared::ImScene>::Init(std::make_shared<Shared::ImScene>());
+	sky::Locator<Shared::LocalizationSystem>::Init(std::make_shared<Shared::LocalizationSystem>());
+	sky::Locator<Shared::StatsSystem>::Init(std::make_shared<Shared::StatsSystem>());
+	sky::Locator<Shared::CacheSystem>::Init(std::make_shared<Shared::CacheSystem>());
+	sky::Locator<Shared::ImguiSystem>::Init(std::make_shared<Shared::ImguiSystem>());
+	sky::Locator<Shared::Stylebook>::Init(std::make_shared<Shared::Stylebook>());
+	sky::Locator<Shared::ImScene>::Init(std::make_shared<Shared::ImScene>());
 	if (flags.count(Flag::Audio))
 	{
-		sky::Singleton<Audio::System>::Init(std::make_shared<Audio::System>());
+		sky::Locator<Audio::System>::Init(std::make_shared<Audio::System>());
 	}
 
 	Scene::RichLabel::DefaultIconTextureCallback = [](const auto& path) { return TEXTURE(path); };
@@ -75,7 +75,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		mSceneEditor = std::make_shared<SceneEditor>(*mScene);
 
 		auto scene_manager = std::make_shared<Shared::SceneManager>();
-		sky::Singleton<Shared::SceneManager>::Init(scene_manager);
+		sky::Locator<Shared::SceneManager>::Init(scene_manager);
 		mScene->getRoot()->attach(scene_manager);
 
 		auto getter = [this] {
@@ -277,33 +277,33 @@ Application::~Application()
 {
 	if (mFlags.count(Flag::Scene))
 	{
-		sky::Singleton<Shared::SceneManager>::Reset();
+		sky::Locator<Shared::SceneManager>::Reset();
 		mSceneEditor = nullptr;
 		mScene = nullptr;
 	}
 	if (mFlags.count(Flag::Audio))
 	{
-		sky::Singleton<Audio::System>::Reset();
+		sky::Locator<Audio::System>::Reset();
 	}
-	sky::Singleton<Shared::ImScene>::Reset();
-	sky::Singleton<Shared::Stylebook>::Reset();
-	sky::Singleton<Shared::ImguiSystem>::Reset();
-	sky::Singleton<Shared::CacheSystem>::Reset();
-	sky::Singleton<Shared::StatsSystem>::Reset();
-	sky::Singleton<Shared::LocalizationSystem>::Reset();
+	sky::Locator<Shared::ImScene>::Reset();
+	sky::Locator<Shared::Stylebook>::Reset();
+	sky::Locator<Shared::ImguiSystem>::Reset();
+	sky::Locator<Shared::CacheSystem>::Reset();
+	sky::Locator<Shared::StatsSystem>::Reset();
+	sky::Locator<Shared::LocalizationSystem>::Reset();
 	if (mFlags.count(Flag::Network))
 	{
-		sky::Singleton<Network::System>::Reset();
+		sky::Locator<Network::System>::Reset();
 	}
-	sky::Singleton<Graphics::System>::Reset();
-	sky::Singleton<Console::System>::Reset();
-	sky::Singleton<Console::Device>::Reset();
-	sky::Singleton<Renderer::System>::Reset();
-	sky::Singleton<Platform::System>::Reset();
-	sky::Singleton<Common::ProfilerSystem>::Reset();
-	sky::Singleton<Common::FrameSystem>::Reset();
+	sky::Locator<Graphics::System>::Reset();
+	sky::Locator<Console::System>::Reset();
+	sky::Locator<Console::Device>::Reset();
+	sky::Locator<Renderer::System>::Reset();
+	sky::Locator<Platform::System>::Reset();
+	sky::Locator<Common::ProfilerSystem>::Reset();
+	sky::Locator<Common::FrameSystem>::Reset();
 #ifndef EMSCRIPTEN
-	sky::Singleton<Common::TaskSystem>::Reset();
+	sky::Locator<Common::TaskSystem>::Reset();
 #endif
 }
 

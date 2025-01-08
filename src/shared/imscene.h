@@ -4,7 +4,7 @@
 #include <graphics/all.h>
 #include <scene/all.h>
 
-#define IMSCENE sky::Singleton<Shared::ImScene>::GetInstance()
+#define IMSCENE sky::Locator<Shared::ImScene>::GetService()
 
 namespace Shared
 {

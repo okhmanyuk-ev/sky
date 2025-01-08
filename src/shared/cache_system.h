@@ -9,7 +9,7 @@
 #include <audio/sound.h>
 #include <nlohmann/json.hpp>
 
-#define CACHE sky::Singleton<Shared::CacheSystem>::GetInstance()
+#define CACHE sky::Locator<Shared::CacheSystem>::GetService()
 
 #define PRECACHE_TEXTURE_ALIAS(NAME, ALIAS) CACHE->loadTexture(NAME, ALIAS)
 #define PRECACHE_FONT_ALIAS(NAME, ALIAS) CACHE->loadFont(NAME, ALIAS)

@@ -15,7 +15,7 @@
 
 #include <cstddef>
 
-#define IMGUI_SYSTEM sky::Singleton<Shared::ImguiSystem>::GetInstance()
+#define IMGUI_SYSTEM sky::Locator<Shared::ImguiSystem>::GetService()
 
 namespace Shared
 {

@@ -6,7 +6,7 @@
 #include <common/frame_system.h>
 #include <fmt/format.h>
 
-#define STATS sky::Singleton<Shared::StatsSystem>::GetInstance()
+#define STATS sky::Locator<Shared::StatsSystem>::GetService()
 
 #define STATS_INDICATE(KEY, VALUE) STATS->indicate(KEY, VALUE)
 #define STATS_INDICATE_GROUP(GROUP, KEY, VALUE) STATS->indicate(KEY, VALUE, GROUP)

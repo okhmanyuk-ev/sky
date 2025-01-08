@@ -3,7 +3,7 @@
 #include <scene/all.h>
 #include <nlohmann/json.hpp>
 
-#define STYLEBOOK sky::Singleton<Shared::Stylebook>::GetInstance()
+#define STYLEBOOK sky::Locator<Shared::Stylebook>::GetService()
 
 namespace Shared
 {

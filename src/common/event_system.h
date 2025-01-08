@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <typeindex>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 
-#define EVENT sky::Singleton<Common::Event::System>::GetInstance()
+#define EVENT sky::Locator<Common::Event::System>::GetService()
 
 namespace Common::Event
 {

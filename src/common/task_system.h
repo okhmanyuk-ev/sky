@@ -6,7 +6,7 @@
 #include <future>
 #include <condition_variable>
 
-#define TASK sky::Singleton<Common::TaskSystem>::GetInstance()
+#define TASK sky::Locator<Common::TaskSystem>::GetService()
 
 namespace Common
 {

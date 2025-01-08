@@ -8,7 +8,7 @@
 #include <common/event_system.h>
 #include <platform/all.h>
 
-#define RENDERER sky::Singleton<Renderer::System>::GetInstance()
+#define RENDERER sky::Locator<Renderer::System>::GetService()
 
 namespace Renderer
 {

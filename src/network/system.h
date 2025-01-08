@@ -7,7 +7,7 @@
 #include <common/frame_system.h>
 #include <common/timer.h>
 
-#define NETWORK sky::Singleton<Network::System>::GetInstance()
+#define NETWORK sky::Locator<Network::System>::GetService()
 
 namespace Network
 {

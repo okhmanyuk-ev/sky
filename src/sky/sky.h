@@ -1,5 +1,5 @@
 #pragma once
 
 #include <shared/all.h>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 #include <sky/clock.h>

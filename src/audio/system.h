@@ -1,10 +1,10 @@
 #pragma once
 
-#include <sky/singleton.h>
+#include <sky/locator.h>
 #include <audio/sound.h>
 #include <fmod/fmod_studio.hpp>
 
-#define AUDIO sky::Singleton<Audio::System>::GetInstance()
+#define AUDIO sky::Locator<Audio::System>::GetService()
 
 namespace Audio
 {

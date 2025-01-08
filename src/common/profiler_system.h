@@ -3,10 +3,10 @@
 #include <string>
 #include <list>
 #include <common/timer.h>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 #include <sky/clock.h>
 
-#define PROFILER sky::Singleton<Common::ProfilerSystem>::GetInstance()
+#define PROFILER sky::Locator<Common::ProfilerSystem>::GetService()
 
 namespace Common
 {

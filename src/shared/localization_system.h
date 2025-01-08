@@ -2,9 +2,9 @@
 
 #include <map>
 #include <fmt/format.h>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 
-#define LOCALIZATION sky::Singleton<Shared::LocalizationSystem>::GetInstance()
+#define LOCALIZATION sky::Locator<Shared::LocalizationSystem>::GetService()
 #define LOCALIZE(KEY) LOCALIZATION->getString(KEY)
 
 namespace Shared

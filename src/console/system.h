@@ -2,14 +2,14 @@
 
 #include <common/event_system.h>
 #include <console/device.h>
-#include <sky/singleton.h>
+#include <sky/locator.h>
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
 #include <optional>
 
-#define CONSOLE sky::Singleton<Console::System>::GetInstance()
+#define CONSOLE sky::Locator<Console::System>::GetService()
 
 namespace Console
 {

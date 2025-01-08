@@ -47,7 +47,7 @@ System::~System()
 
 void sky::PlaySound(std::shared_ptr<Audio::Sound> sound)
 {
-	if (!sky::Singleton<Audio::System>::HasInstance())
+	if (!sky::Locator<Audio::System>::HasService())
 	{
 		Log("PlaySound: cannot find audio system");
 		return;
