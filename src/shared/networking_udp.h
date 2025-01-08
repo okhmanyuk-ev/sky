@@ -86,7 +86,7 @@ namespace Shared::NetworkingUDP
 
 		auto getIncomingReliableIndex() const { return mIncomingReliableIndex; }
 		auto getOutgoingReliableIndex() const { return mOutgoingReliableIndex; }
-		
+
 	private:
 		SendCallback mSendCallback = nullptr;
 		DisconnectCallback mDisconnectCallback = nullptr;
@@ -182,7 +182,7 @@ namespace Shared::NetworkingUDP
 	{
 	public:
 		using EventCallback = std::function<void(std::map<std::string, std::string>)>;
-		
+
 	public:
 		SimpleChannel();
 
@@ -197,7 +197,7 @@ namespace Shared::NetworkingUDP
 
 	private:
 		std::map<std::string, EventCallback> mEvents;
-		
+
 	public:
 		auto isShowEventLogs() const { return mShowEventLogs; }
 		void setShowEventLogs(bool value) { mShowEventLogs = value; }

@@ -4,7 +4,6 @@ using namespace Scene;
 
 Trail::Trail(std::weak_ptr<Node> holder) : mHolder(holder)
 {
-	//
 }
 
 void Trail::update(sky::Duration dTime)

@@ -7,7 +7,7 @@ using namespace Common;
 
 ConsoleCommands::ConsoleCommands()
 {
-	CONSOLE->registerCVar("sys_framerate", "limit of fps", { "int" }, 
+	CONSOLE->registerCVar("sys_framerate", "limit of fps", { "int" },
 		CVAR_GETTER_INT_FUNC(FRAME->getFramerateLimit),
 		CVAR_SETTER_INT_FUNC(FRAME->setFramerateLimit));
 
@@ -18,7 +18,7 @@ ConsoleCommands::ConsoleCommands()
 	CONSOLE->registerCVar("sys_timescale", "time delta multiplier", { "float" },
 		CVAR_GETTER_DOUBLE_FUNC(FRAME->getTimeScale),
 		CVAR_SETTER_DOUBLE_FUNC(FRAME->setTimeScale));
-		
+
 	auto getter = []() -> std::vector<std::string> {
 		auto delta_limit = FRAME->getTimeDeltaLimit();
 		if (!delta_limit.has_value())

@@ -34,6 +34,6 @@ void Interpolator::onFrame()
 		mValue = glm::lerp(mStartValue, mDestinationValue, mEasingFunction(p / d));
 	}
 
-	if (mProcessCallback) 
+	if (mProcessCallback)
 		mProcessCallback(mValue);
 }

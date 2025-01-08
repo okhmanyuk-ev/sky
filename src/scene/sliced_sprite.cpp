@@ -7,12 +7,12 @@ void SlicedSprite::draw()
 	Node::draw();
 
 	assert(mTexture != nullptr);
-	
+
 	if (getAlpha() <= 0.0f)
 		return;
 
 	auto model = glm::scale(getTransform(), { getAbsoluteSize(), 1.0f });
-	
+
 	GRAPHICS->pushSampler(getSampler());
 	GRAPHICS->pushBlendMode(getBlendMode());
 	GRAPHICS->pushModelMatrix(model);

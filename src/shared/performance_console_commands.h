@@ -31,7 +31,7 @@ namespace Shared
 		int mWantShowTasks = 0;
 		bool mWantShowNetSpeed = false;
 		bool mWantShowNetPps = false;
-		
+
 	private:
 		std::deque<float> mDeltaTimes;
 	};

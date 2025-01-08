@@ -109,8 +109,8 @@ Node::Bounds Node::getGlobalBounds() const
 	auto min = glm::min(glm::min(tl, tr), glm::min(bl, br));
 	auto max = glm::max(glm::max(tl, tr), glm::max(bl, br));
 
-	return Bounds{ 
-		.pos = min, 
+	return Bounds{
+		.pos = min,
 		.size = max - min
 	};
 }

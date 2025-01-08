@@ -27,34 +27,34 @@ namespace ImGui::User
 		const float Zero = 0.0f;
 
 		ImVec4* colors = ImGui::GetStyle().Colors;
-		
+
 		colors[ImGuiCol_Text] = color(Full);
 		colors[ImGuiCol_TextDisabled] = color(Half);
-		
+
 		colors[ImGuiCol_WindowBg] = black(Half + Quad);
 		colors[ImGuiCol_ChildBg] = color(Zero);
 		colors[ImGuiCol_PopupBg] = black(Half + Quad);
-		
+
 		colors[ImGuiCol_Border] = color(Half + Bit);
 		colors[ImGuiCol_BorderShadow] = black(Zero);
-		
+
 		colors[ImGuiCol_FrameBg] = color(Quad);
 		colors[ImGuiCol_FrameBgHovered] = color(Quad + Bit);
 		colors[ImGuiCol_FrameBgActive] = color(Half + Bit);
-		
+
 		colors[ImGuiCol_TitleBg] = color(Quad);
 		colors[ImGuiCol_TitleBgActive] = color(Quad + VeryBit);
 		colors[ImGuiCol_TitleBgCollapsed] = color(Bit);
 
 		colors[ImGuiCol_MenuBarBg] = color(Bit);
 		colors[ImGuiCol_ScrollbarBg] = color(Bit);
-		
+
 		colors[ImGuiCol_ScrollbarGrab] = color(Quad + Bit);
 		colors[ImGuiCol_ScrollbarGrabHovered] = color(Half);
 		colors[ImGuiCol_ScrollbarGrabActive] = color(Half + Bit);
-		
+
 		colors[ImGuiCol_CheckMark] = color(Half + Quad);
-		
+
 		colors[ImGuiCol_SliderGrab] = color(Quad + Bit);
 		colors[ImGuiCol_SliderGrabActive] = color(Half);
 
@@ -94,13 +94,13 @@ namespace ImGui::User
 	}
 
 	ImVec2 TopLeftCorner(float margin)
-	{ 
+	{
 		return ImVec2(margin + (PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()),
             margin + (PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()));
 	}
 
 	ImVec2 TopRightCorner(float margin)
-	{ 
+	{
 		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - (PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()),
             margin + (PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()));
 	}

@@ -37,14 +37,12 @@ namespace Common
 	{
 		auto func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
 		auto task = std::make_shared<std::packaged_task<decltype(f(args...))()>>(func);
-		
 		{
 			std::unique_lock<std::mutex> lock(mMutex);
-			mTasks.emplace_back([task] { 
-				(*task)(); 
+			mTasks.emplace_back([task] {
+				(*task)();
 			});
 		}
-
 		mCondition.notify_one();
 		return task->get_future();
 	}

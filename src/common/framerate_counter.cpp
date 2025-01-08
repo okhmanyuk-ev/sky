@@ -14,7 +14,6 @@ FramerateCounter::FramerateCounter()
 
 FramerateCounter::~FramerateCounter()
 {
-	//
 }
 
 void FramerateCounter::onFrame()

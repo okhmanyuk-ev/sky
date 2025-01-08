@@ -50,12 +50,12 @@ void Channel::onFrame()
 void Channel::transmit()
 {
 	mOutgoingSequence += 1;
-	
+
 	auto buf = sky::BitBuffer();
 
 	buf.writeBitsVar(mOutgoingSequence);
 	buf.writeBitsVar(mIncomingSequence);
-	
+
 	for (auto index : mReliableAcknowledgements)
 	{
 		buf.writeBit(true);
@@ -65,7 +65,7 @@ void Channel::transmit()
 	buf.writeBit(false);
 
 	mReliableAcknowledgements.clear();
-	
+
 	while (!mOutgoingReliableMessages.empty())
 	{
 		auto [index, rel_msg] = *mOutgoingReliableMessages.begin();
@@ -140,7 +140,7 @@ void Channel::resendReliableMessages(uint32_t ack)
 
 		if (Networking::NetLogRel)
 			sky::Log("resend reliable {}", index);
-		
+
 		resendReliableMessages(ack);
 		return;
 	}
@@ -155,7 +155,7 @@ void Channel::read(sky::BitBuffer& buf)
 	{
 		if (Networking::NetLogLoss)
 			sky::Log("out of order {} packet", seq);
-		
+
 		return;
 	}
 
@@ -171,7 +171,7 @@ void Channel::read(sky::BitBuffer& buf)
 	{
 		auto index = buf.readBitsVar();
 		mPendingOutgoingReliableMessages.erase(index);
-		
+
 		if (Networking::NetLogRel)
 			sky::Log("reliable {} delivered", index);
 	}
@@ -230,7 +230,7 @@ void Channel::sendReliable(const std::string& msg, sky::BitBuffer& buf)
 {
 	mOutgoingReliableIndex += 1;
 	mOutgoingReliableMessages.insert({ mOutgoingReliableIndex, { msg, std::make_shared<sky::BitBuffer>(buf) } });
-	
+
 	if (Networking::NetLogRel)
 		sky::Log("send reliable {}", mOutgoingReliableIndex);
 }
@@ -377,7 +377,7 @@ Server::Server(uint16_t port) : Networking(port)
 			return;
 
 		auto reason = sky::bitbuffer_helpers::ReadString(packet.buf);
-		
+
 		sky::Log("{} disconnected ({})", packet.adr.toString(), reason);
 		mChannels.erase(packet.adr);
 	});
@@ -428,16 +428,16 @@ Client::Client(const Network::Address& server_address) :
 			return;
 
 		auto reason = sky::bitbuffer_helpers::ReadString(packet.buf);
-		
+
 		mChannel = nullptr;
 		sky::Log("disconnected ({})", reason);
 	});
 	addMessage((uint32_t)Message::Redirect, [this](auto& packet) {
 		if (packet.adr != mServerAddress)
-			return; 
-		
+			return;
+
 		auto redirect_address = sky::bitbuffer_helpers::ReadString(packet.buf);
-		
+
 		sky::Log("redirected to {}", redirect_address);
 		mServerAddress = redirect_address;
 		connect();

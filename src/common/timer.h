@@ -8,10 +8,10 @@ namespace Common
 	{
 	public:
 		using Callback = std::function<void()>;
-	
+
 	private:
 		void onFrame() override;
-	
+
 	public:
 		auto getInterval() const { return mInterval; }
 		void setInterval(sky::Duration value) { mInterval = value; }

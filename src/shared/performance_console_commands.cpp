@@ -42,7 +42,6 @@ PerformanceConsoleCommands::PerformanceConsoleCommands()
 
 PerformanceConsoleCommands::~PerformanceConsoleCommands()
 {
-	//
 }
 
 void PerformanceConsoleCommands::onFrame()

@@ -32,7 +32,7 @@ void StatsSystem::onFrame()
 
 	ImGui::Begin("Statistics", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 	ImGui::Columns(2, nullptr, false);
-	
+
 	if (ImGui::BeginPopupContextWindow(nullptr, 0))
 	{
 		if (ImGui::BeginMenu("Align"))
@@ -45,10 +45,10 @@ void StatsSystem::onFrame()
 
 			if (ImGui::MenuItem("Bottom Left", "", mAlignment == Align::BottomLeft))
 				mAlignment = Align::BottomLeft;
-			
+
 			if (ImGui::MenuItem("Bottom Right", "", mAlignment == Align::BottomRight))
 				mAlignment = Align::BottomRight;
-			
+
 			ImGui::EndMenu();
 		}
 		if (ImGui::MenuItem("Close"))
@@ -103,7 +103,7 @@ void StatsSystem::onFrame()
 
 	ImGui::SetColumnWidth(0, key_column_width);
 	ImGui::SetColumnWidth(1, value_column_width);
-	
+
 	ImGui::SetWindowSize(ImVec2(key_column_width + value_column_width, 0.0f));
 
 	if (mAlignment == Align::TopLeft)

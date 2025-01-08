@@ -2,7 +2,6 @@
 
 using namespace Common;
 
-
 ProfilerSystem::ProfilerSystem()
 {
 	mTimer.setInterval(sky::FromSeconds(1.0f));

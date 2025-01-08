@@ -35,7 +35,7 @@ namespace Shared
 		void onFrame() override;
 
 	public:
-		template <class T> 
+		template <class T>
 		void indicate(const std::string& key, const T& value, const std::string& group = "")
 		{
 			mGroups[group][key] = { fmt::format("{}", value), FRAME->getUptime()};

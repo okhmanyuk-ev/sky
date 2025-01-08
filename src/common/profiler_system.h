@@ -37,7 +37,7 @@ namespace Common
 	class ProfilerSystem::Node
 	{
 		friend ProfilerSystem;
-	
+
 	public:
 		auto getDuration() const { return mDuration / mCount; }
 		auto getCount() const { return mCount; }

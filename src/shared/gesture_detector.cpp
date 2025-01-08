@@ -19,13 +19,13 @@ void GestureDetector::onEvent(const Platform::Input::Keyboard::Event& e)
 }
 
 void GestureDetector::onEvent(const TouchEmulator::Event& e)
-{	
+{
 	auto now = sky::Now();
 
 	while (!mPositions.empty())
 	{
 		auto time = mPositions.begin()->first;
-		
+
 		if (sky::ToSeconds(now - time) < 0.125f)
 			break;
 
@@ -35,7 +35,7 @@ void GestureDetector::onEvent(const TouchEmulator::Event& e)
 	auto newest = glm::vec2(e.pos);
 
 	mPositions[now] = newest;
-	
+
 	auto oldest = mPositions.begin()->second;
 
 	if (glm::distance(oldest, newest) < 32.0f * PLATFORM->getScale())

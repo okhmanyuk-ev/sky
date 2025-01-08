@@ -11,7 +11,7 @@ namespace Shared
 	public:
 		class Screen;
 		class Window;
-	
+
 	public:
 		using Callback = std::function<void()>;
 
@@ -25,7 +25,7 @@ namespace Shared
 		void pushWindow(std::shared_ptr<Window> window, Callback finishCallback = nullptr);
 		void popWindow(size_t count = 1, Callback finishCallback = nullptr);
 		void popWindow(Callback finishCallback);
-		
+
 		size_t getWindowsCount() const { return mWindows.size(); }
 		bool hasWindows() const { return getWindowsCount() > 0; }
 

@@ -7,9 +7,9 @@
 #include <sky/clock.h>
 #include <map>
 
-namespace Shared 
+namespace Shared
 {
-	class GestureDetector : 
+	class GestureDetector :
 		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
 		public Common::Event::Listenable<TouchEmulator::Event>
 	{

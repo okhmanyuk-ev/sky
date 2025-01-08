@@ -30,7 +30,7 @@ namespace Common
 		auto getPassed() const { return mPassed; }
 		void setPassed(sky::Duration value) { mPassed = value; }
 
-		auto& getProcessCallback() const { return mProcessCallback; } 
+		auto& getProcessCallback() const { return mProcessCallback; }
 		void setProcessCallback(ProcessCallback value) { mProcessCallback = value; }
 
 		auto& getFinishCallback() const { return mFinishCallback; }

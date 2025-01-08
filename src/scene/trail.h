@@ -14,7 +14,7 @@ namespace Scene
 	public:
 		void update(sky::Duration dTime) override;
 		void updateTransform() override;
-	
+
 	protected:
 		void draw() override;
 

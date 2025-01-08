@@ -22,7 +22,7 @@ namespace Actions
 			Continue,
 			Finished
 		};
-	
+
 	public:
 		virtual ~Action() = default;
 		virtual Status frame(sky::Duration delta) = 0;
@@ -31,7 +31,7 @@ namespace Actions
 	class Parallel : public Action
 	{
 		static_assert(std::has_virtual_destructor<Action>::value);
-	
+
 	public:
 		enum class Awaiting
 		{
@@ -80,7 +80,7 @@ namespace Actions
 
 	template <typename T> class ActionsPlayer : public T
 	{
-		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value, 
+		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value,
 			"T must be derived from Sequence or Parallel");
 	private:
 		Common::FrameSystem::Framer mFramer = Common::FrameSystem::Framer([this] { T::frame(FRAME->getTimeDelta()); });
@@ -89,7 +89,7 @@ namespace Actions
 	using SequentialActionsPlayer = ActionsPlayer<Sequence>;
 	using ParallelActionsPlayer = ActionsPlayer<Parallel>;
 
-	template <typename T> class GenericActionsPlayer : public T 
+	template <typename T> class GenericActionsPlayer : public T
 	{
 		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value,
 			"T must be derived from Sequence or Parallel");
@@ -105,7 +105,7 @@ namespace Actions
 		using Callback = std::function<void(sky::Duration)>;
 
 	public:
-		enum class Type 
+		enum class Type
 		{
 			One,
 			Infinity
@@ -127,10 +127,10 @@ namespace Actions
 	public:
 		using Result = std::tuple<Action::Status, std::unique_ptr<Action>>;
 		using Callback = std::function<Result()>;
-		
+
 	public:
 		Repeat(Callback callback);
-		
+
 	private:
 		Status frame(sky::Duration delta) override;
 
@@ -156,13 +156,13 @@ namespace Actions
 		// will wait while returning true
 		std::unique_ptr<Action> Wait(std::function<bool(sky::Duration delta)> while_callback);
 		std::unique_ptr<Action> Wait(std::function<bool()> while_callback);
-		
+
 		// will wait while flag is true
 		std::unique_ptr<Action> Wait(bool& while_flag);
 		std::unique_ptr<Action> WaitGlobalFrame();
 
 		std::unique_ptr<Action> Delayed(float duration, std::unique_ptr<Action> action);
-		
+
 		// will wait while returning true
 		std::unique_ptr<Action> Delayed(std::function<bool()> while_callback, std::unique_ptr<Action> action);
 
