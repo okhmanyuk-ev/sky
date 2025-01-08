@@ -121,7 +121,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 		Actions::Collection::Execute([this, window, finishCallback] {
 			window->onOpenEnd();
 			window->mState = Window::State::Opened;
-			
+
 			if (mWindows.size() == 1 && mCurrentScreen)
 				mCurrentScreen->onWindowAppearingEnd();
 
@@ -163,7 +163,7 @@ void SceneManager::popWindow(size_t count, Callback finishCallback)
 			window->mState = Window::State::Closed;
 			mWindowHolder->detach(window);
 			mWindows.pop();
-			
+
 			if (mWindows.empty() && mCurrentScreen)
 				mCurrentScreen->onWindowDisappearingEnd();
 

@@ -14,16 +14,19 @@ namespace Common::Event
 	{
 	public:
 		using ListenerHandle = void*;
-		template <typename T> using ListenerCallback = std::function<void(const T&)>;
+		template <typename T>
+		using ListenerCallback = std::function<void(const T&)>;
 
 	private:
-		template <typename T> struct ListenerData
+		template <typename T>
+		struct ListenerData
 		{
 			ListenerCallback<T> callback;
 		};
 
 	public:
-		template <typename T> ListenerHandle createListener(ListenerCallback<T> callback)
+		template <typename T>
+		ListenerHandle createListener(ListenerCallback<T> callback)
 		{
 			auto listener = new ListenerData<T>;
 			listener->callback = callback;
@@ -32,7 +35,8 @@ namespace Common::Event
 			return listener;
 		}
 
-		template <typename T> void destroyListener(ListenerHandle handle)
+		template <typename T>
+		void destroyListener(ListenerHandle handle)
 		{
 			auto listener = static_cast<ListenerData<T>*>(handle);
 			auto index = std::type_index(typeid(T));
@@ -41,7 +45,8 @@ namespace Common::Event
 		}
 
 	public:
-		template <typename T> void emit(const T& e)
+		template <typename T>
+		void emit(const T& e)
 		{
 			auto index = std::type_index(typeid(T));
 
@@ -72,7 +77,8 @@ namespace Common::Event
 		std::unordered_map<std::type_index, std::unordered_set<void*>> mListeners;
 	};
 
-	template <typename T> class Listenable
+	template <typename T>
+	class Listenable
 	{
 	public:
 		Listenable()
@@ -94,7 +100,8 @@ namespace Common::Event
 		System::ListenerHandle mHandle;
 	};
 
-	template <typename T> class Listener final : public Listenable<T>
+	template <typename T>
+	class Listener final : public Listenable<T>
 	{
 	public:
 		using Callback = System::ListenerCallback<T>;

@@ -30,11 +30,11 @@ namespace Shared
 		void highlightHoveredNode();
 		void highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color = Graphics::Color::White, bool filled = true);
 		void showBatchGroupsMenu();
-		
+
 	public:
 		static void drawImage(std::shared_ptr<skygfx::Texture> texture, std::optional<Graphics::TexRegion> region = std::nullopt,
 			float max_size = 256.0f);
-		
+
 	public:
 		bool isEnabled() const { return mEnabled; }
 		void setEnabled(bool value) { mEnabled = value; }

@@ -12,7 +12,7 @@ namespace Scene
 	template <typename T> class RenderLayer : public T
 	{
 		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
-		
+
 	public:
 		RenderLayer()
 		{

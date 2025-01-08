@@ -44,10 +44,10 @@ namespace Platform
 		virtual float getScale() const = 0;
 		virtual void setScale(float value) = 0;
 
-        virtual float getSafeAreaTopMargin() const = 0;
-        virtual float getSafeAreaBottomMargin() const = 0;
-        virtual float getSafeAreaLeftMargin() const = 0;
-        virtual float getSafeAreaRightMargin() const = 0;
+		virtual float getSafeAreaTopMargin() const = 0;
+		virtual float getSafeAreaBottomMargin() const = 0;
+		virtual float getSafeAreaLeftMargin() const = 0;
+		virtual float getSafeAreaRightMargin() const = 0;
 
 		virtual bool isKeyPressed(Input::Keyboard::Key key) const = 0;
 		virtual bool isKeyPressed(Input::Mouse::Button key) const = 0;
@@ -69,7 +69,7 @@ namespace Platform
 		virtual std::string getVirtualKeyboardText() const = 0;
 		virtual void setVirtualKeyboardText(const std::string& text) = 0;
 
-        virtual std::string getUUID() const = 0;
+		virtual std::string getUUID() const = 0;
 
 		virtual void alert(const std::string& text) { };
 
@@ -91,15 +91,15 @@ namespace Platform
 	public:
 		virtual void haptic(HapticType hapticType) = 0;
 
-	public:        
+	public:
 		float getLogicalWidth() const;
 		float getLogicalHeight() const;
 
 		void rescale(float value);
 
 	public:
-        using ConsumeCallback = std::function<void()>;
-        using ProductsMap = std::map<std::string /*id*/, ConsumeCallback>;
+		using ConsumeCallback = std::function<void()>;
+		using ProductsMap = std::map<std::string /*id*/, ConsumeCallback>;
 
 	public:
 		virtual void initializeBilling(const ProductsMap& products) = 0;

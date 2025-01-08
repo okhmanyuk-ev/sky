@@ -3,7 +3,7 @@
 #include <platform/input.h>
 #include <common/event_system.h>
 
-namespace Shared 
+namespace Shared
 {
 	class TouchEmulator :
 		public Common::Event::Listenable<Platform::Input::Mouse::ButtonEvent>,

@@ -508,9 +508,9 @@ static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	yoffset /= gScale;
 #endif
 
- 	EVENT->emit(Input::Mouse::ScrollEvent{
- 		.pos = { x, y },
- 		.scroll = { xoffset, yoffset }
+	EVENT->emit(Input::Mouse::ScrollEvent{
+		.pos = { x, y },
+		.scroll = { xoffset, yoffset }
 	});
 }
 

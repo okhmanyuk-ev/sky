@@ -51,7 +51,7 @@ Asset::Asset(const Asset& asset)
 	memcpy(mMemory, asset.getMemory(), mSize);
 }
 
-Asset::~Asset() 
+Asset::~Asset()
 {
 	free(mMemory);
 }
@@ -60,17 +60,17 @@ void Asset::Write(const std::string& path, void* memory, size_t size, Storage st
 {
 #if defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
 #if defined(PLATFORM_IOS)
-    assert(storage != Storage::Assets);
-    if (storage == Storage::Assets)
-        return;
+	assert(storage != Storage::Assets);
+	if (storage == Storage::Assets)
+		return;
 #endif
 	auto p = StoragePathToAbsolute(path, storage);
-	
+
 	auto dirs = std::filesystem::path(p).remove_filename().string();
-	
+
 	if (!dirs.empty())
 		std::filesystem::create_directories(dirs);
-	
+
 	std::ofstream file(p, std::ios::out | std::ios::binary);
 	file.write((char*)memory, size);
 	file.close();
@@ -109,9 +109,9 @@ bool Asset::Exists(const std::string& path, Storage storage)
 		return file.good(); // TODO: std::filesystem::exists() ?
 	}
 #elif defined(PLATFORM_IOS)
-    auto p = StoragePathToAbsolute(path, storage);
-    auto file = std::ifstream(p.c_str());
-    return file.good(); // TODO: std::filesystem::exists() ?
+	auto p = StoragePathToAbsolute(path, storage);
+	auto file = std::ifstream(p.c_str());
+	return file.good(); // TODO: std::filesystem::exists() ?
 #endif
 }
 

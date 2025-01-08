@@ -30,7 +30,7 @@ SystemEmscripten::SystemEmscripten(const std::string& appname) : mAppName(appnam
 	SDL_Init(SDL_INIT_VIDEO);
 
 	auto window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    gWindow = SDL_CreateWindow(appname.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWidth, mHeight, window_flags);
+	gWindow = SDL_CreateWindow(appname.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWidth, mHeight, window_flags);
 
 	gContext = this;
 
@@ -48,8 +48,8 @@ SystemEmscripten::~SystemEmscripten()
 void SystemEmscripten::process()
 {
 	SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
+	while (SDL_PollEvent(&event))
+	{
 		if (event.type == SDL_MOUSEMOTION)
 		{
 			mCursorPos = {
@@ -213,9 +213,9 @@ void SystemEmscripten::process()
 		}
 	}
 
-    int width;
+	int width;
 	int height;
-    SDL_GetWindowSize(gWindow, &width, &height);
+	SDL_GetWindowSize(gWindow, &width, &height);
 
 	width *= mScale;
 	height *= mScale;

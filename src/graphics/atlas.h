@@ -16,9 +16,9 @@ namespace Graphics
 		using Regions = std::map<std::string, TexRegion>;
 
 	public:
-		static void SaveToFile(const std::string& path, const Regions& regions, 
+		static void SaveToFile(const std::string& path, const Regions& regions,
 			Platform::Asset::Storage storage = Platform::Asset::Storage::Assets);
-		
+
 		static std::tuple<Image, Regions> MakeFromImages(const Images& images, bool anti_bleeding = true);
 		static Image MakeAntibleedImage(const Image& image);
 

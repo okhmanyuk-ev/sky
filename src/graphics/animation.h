@@ -11,7 +11,7 @@ namespace Graphics
 		using States = std::map<std::string, Frames>;
 
 	public:
-		static void SaveToFile(const std::string& path, const States& states, 
+		static void SaveToFile(const std::string& path, const States& states,
 			Platform::Asset::Storage storage = Platform::Asset::Storage::Assets);
 
 	public:

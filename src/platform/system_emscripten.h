@@ -29,10 +29,10 @@ namespace Platform
 		float getScale() const override { return mScale; }
 		void setScale(float value) override { mScale = value; }
 
-        float getSafeAreaTopMargin() const override { return 0.0f; }
-        float getSafeAreaBottomMargin() const override { return 0.0f; }
-        float getSafeAreaLeftMargin() const override { return 0.0f; }
-        float getSafeAreaRightMargin() const override { return 0.0f; }
+		float getSafeAreaTopMargin() const override { return 0.0f; }
+		float getSafeAreaBottomMargin() const override { return 0.0f; }
+		float getSafeAreaLeftMargin() const override { return 0.0f; }
+		float getSafeAreaRightMargin() const override { return 0.0f; }
 
 		bool isKeyPressed(Input::Keyboard::Key key) const override;
 		bool isKeyPressed(Input::Mouse::Button key) const override;

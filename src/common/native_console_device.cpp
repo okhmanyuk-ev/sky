@@ -22,7 +22,7 @@ NativeConsoleDevice::NativeConsoleDevice()
 	});
 
 	mReadThread.detach();
-		
+
 	mConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleOutputCP(1251);
 }

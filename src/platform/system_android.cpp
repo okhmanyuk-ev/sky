@@ -10,39 +10,39 @@ static bool gInitialized = false;
 
 extern "C"
 {
-    void Java_com_dreamskies_sky_SkyActivity_createSkyActivity(JNIEnv* env, jobject thiz)
-    {
-        gSkyActivity = env->NewGlobalRef(thiz);
-    }
+	void Java_com_dreamskies_sky_SkyActivity_createSkyActivity(JNIEnv* env, jobject thiz)
+	{
+		gSkyActivity = env->NewGlobalRef(thiz);
+	}
 
-    void Java_com_dreamskies_sky_SkyActivity_destroySkyActivity(JNIEnv* env, jobject thiz)
-    {
-        env->DeleteGlobalRef(gSkyActivity);
-    }
+	void Java_com_dreamskies_sky_SkyActivity_destroySkyActivity(JNIEnv* env, jobject thiz)
+	{
+		env->DeleteGlobalRef(gSkyActivity);
+	}
 
-    void Java_com_dreamskies_sky_SkyActivity_onConsume(JNIEnv* env, jobject thiz, jstring _id)
+	void Java_com_dreamskies_sky_SkyActivity_onConsume(JNIEnv* env, jobject thiz, jstring _id)
 	{
 		auto id = env->GetStringUTFChars(_id, 0);
 
-    	SystemAndroid::ExecuteInMainLoop([id] {
+		SystemAndroid::ExecuteInMainLoop([id] {
 			if (gProductsMap.count(id) == 0)
 				return;
 
 			gProductsMap.at(id)();
-    	});
+		});
 	}
 
 	void Java_com_dreamskies_sky_SkyActivity_onKeyboardTextChanged(JNIEnv* env, jobject thiz, jstring _text)
-    {
+	{
 		auto text = env->GetStringUTFChars(_text, 0);
 
-    	SystemAndroid::ExecuteInMainLoop([text] {
+		SystemAndroid::ExecuteInMainLoop([text] {
 			gVirtualKeyboardText = text;
 
-    		if (gInitialized)
+			if (gInitialized)
 				EVENT->emit(Platform::System::VirtualKeyboardTextChanged({ gVirtualKeyboardText }));
-    	});
-    }
+		});
+	}
 
 	void Java_com_dreamskies_sky_SkyActivity_onKeyboardEnterPressed(JNIEnv* env, jobject thiz)
 	{
@@ -90,20 +90,20 @@ void SystemAndroid::setupScale()
 {
 	auto env = BeginEnv();
 
-    auto clazz = env->GetObjectClass(gSkyActivity);
+	auto clazz = env->GetObjectClass(gSkyActivity);
 
-    auto getWindowManagerMethod = env->GetMethodID(clazz, "getWindowManager" , "()Landroid/view/WindowManager;");
-    auto windowManager = env->CallObjectMethod(Instance->activity->clazz, getWindowManagerMethod);
-    auto windowManagerClass = env->FindClass("android/view/WindowManager");
-    auto getDefaultDisplayMethod = env->GetMethodID(windowManagerClass, "getDefaultDisplay" , "()Landroid/view/Display;");
-    auto display = env->CallObjectMethod(windowManager, getDefaultDisplayMethod);
-    auto displayClass = env->FindClass("android/view/Display");
-    auto displayMetricsClass = env->FindClass("android/util/DisplayMetrics");
-    auto displayMetricsConstructor = env->GetMethodID(displayMetricsClass, "<init>", "()V");
-    auto displayMetrics = env->NewObject(displayMetricsClass, displayMetricsConstructor);
-    auto getMetricsMethod = env->GetMethodID(displayClass, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
-    env->CallVoidMethod(display, getMetricsMethod, displayMetrics);
-    auto densityField = env->GetFieldID(displayMetricsClass, "density", "F");
+	auto getWindowManagerMethod = env->GetMethodID(clazz, "getWindowManager" , "()Landroid/view/WindowManager;");
+	auto windowManager = env->CallObjectMethod(Instance->activity->clazz, getWindowManagerMethod);
+	auto windowManagerClass = env->FindClass("android/view/WindowManager");
+	auto getDefaultDisplayMethod = env->GetMethodID(windowManagerClass, "getDefaultDisplay" , "()Landroid/view/Display;");
+	auto display = env->CallObjectMethod(windowManager, getDefaultDisplayMethod);
+	auto displayClass = env->FindClass("android/view/Display");
+	auto displayMetricsClass = env->FindClass("android/util/DisplayMetrics");
+	auto displayMetricsConstructor = env->GetMethodID(displayMetricsClass, "<init>", "()V");
+	auto displayMetrics = env->NewObject(displayMetricsClass, displayMetricsConstructor);
+	auto getMetricsMethod = env->GetMethodID(displayClass, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
+	env->CallVoidMethod(display, getMetricsMethod, displayMetrics);
+	auto densityField = env->GetFieldID(displayMetricsClass, "density", "F");
 	Scale = env->GetFloatField(displayMetrics, densityField);
 
 	EndEnv();
@@ -239,30 +239,30 @@ Input::Keyboard::Key translateKey(int32_t key)
 
 int SystemAndroid::getUnicode(AInputEvent* event)
 {
-    auto downTime = AKeyEvent_getDownTime(event);
-    auto eventTime = AKeyEvent_getEventTime(event);
-    auto action = AKeyEvent_getAction(event);
-    auto code = AKeyEvent_getKeyCode(event);
-    auto repeat = AKeyEvent_getRepeatCount(event); // not sure!
-    auto metaState = AKeyEvent_getMetaState(event);
-    auto deviceId = AInputEvent_getDeviceId(event);
-    auto scancode = AKeyEvent_getScanCode(event);
-    auto flags = AKeyEvent_getFlags(event);
-    auto source = AInputEvent_getSource(event);
+	auto downTime = AKeyEvent_getDownTime(event);
+	auto eventTime = AKeyEvent_getEventTime(event);
+	auto action = AKeyEvent_getAction(event);
+	auto code = AKeyEvent_getKeyCode(event);
+	auto repeat = AKeyEvent_getRepeatCount(event); // not sure!
+	auto metaState = AKeyEvent_getMetaState(event);
+	auto deviceId = AInputEvent_getDeviceId(event);
+	auto scancode = AKeyEvent_getScanCode(event);
+	auto flags = AKeyEvent_getFlags(event);
+	auto source = AInputEvent_getSource(event);
 
 	auto env = BeginEnv();
 
 	auto keyEventClass = env->FindClass("android/view/KeyEvent");
-    auto KeyEventConstructor = env->GetMethodID(keyEventClass, "<init>", "(JJIIIIIIII)V");
-    auto keyEventObject = env->NewObject(keyEventClass, KeyEventConstructor, downTime, eventTime, action, code, repeat, metaState, deviceId, scancode, flags, source);
+	auto KeyEventConstructor = env->GetMethodID(keyEventClass, "<init>", "(JJIIIIIIII)V");
+	auto keyEventObject = env->NewObject(keyEventClass, KeyEventConstructor, downTime, eventTime, action, code, repeat, metaState, deviceId, scancode, flags, source);
 
-    auto getUnicodeCharMethod = env->GetMethodID(keyEventClass, "getUnicodeChar", "(I)I");
-    auto result = env->CallIntMethod(keyEventObject, getUnicodeCharMethod, metaState);
+	auto getUnicodeCharMethod = env->GetMethodID(keyEventClass, "getUnicodeChar", "(I)I");
+	auto result = env->CallIntMethod(keyEventObject, getUnicodeCharMethod, metaState);
 
-    env->DeleteLocalRef(keyEventClass);
-    env->DeleteLocalRef(keyEventObject);
+	env->DeleteLocalRef(keyEventClass);
+	env->DeleteLocalRef(keyEventObject);
 
-    EndEnv();
+	EndEnv();
 
 	return result;
 }
@@ -343,7 +343,7 @@ void SystemAndroid::handle_cmd(android_app* app, int32_t cmd)
 			Width = ANativeWindow_getWidth(Window);
 			Height = ANativeWindow_getHeight(Window);
 
-            setupScale();
+			setupScale();
 
 			gInitialized = true;
 
@@ -534,22 +534,22 @@ std::string SystemAndroid::getAppName() const
 
 void SystemAndroid::showVirtualKeyboard()
 {
-    auto env = BeginEnv();
-    auto clazz = env->GetObjectClass(gSkyActivity);
-    auto method = env->GetMethodID(clazz, "showKeyboard", "()V");
-    env->CallVoidMethod(gSkyActivity, method);
-    env->DeleteLocalRef(clazz);
-    EndEnv();
+	auto env = BeginEnv();
+	auto clazz = env->GetObjectClass(gSkyActivity);
+	auto method = env->GetMethodID(clazz, "showKeyboard", "()V");
+	env->CallVoidMethod(gSkyActivity, method);
+	env->DeleteLocalRef(clazz);
+	EndEnv();
 }
 
 void SystemAndroid::hideVirtualKeyboard()
 {
-    auto env = BeginEnv();
-    auto clazz = env->GetObjectClass(gSkyActivity);
-    auto method = env->GetMethodID(clazz, "hideKeyboard", "()V");
-    env->CallVoidMethod(gSkyActivity, method);
-    env->DeleteLocalRef(clazz);
-    EndEnv();
+	auto env = BeginEnv();
+	auto clazz = env->GetObjectClass(gSkyActivity);
+	auto method = env->GetMethodID(clazz, "hideKeyboard", "()V");
+	env->CallVoidMethod(gSkyActivity, method);
+	env->DeleteLocalRef(clazz);
+	EndEnv();
 }
 
 bool SystemAndroid::isVirtualKeyboardOpened() const
@@ -590,23 +590,23 @@ std::string SystemAndroid::getUUID() const
 
 void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallback>& products)
 {
-    gProductsMap = products;
+	gProductsMap = products;
 
-    auto env = BeginEnv();
-    auto list = env->FindClass("java/util/ArrayList");
-    auto init = env->GetMethodID(list, "<init>", "()V");
-    auto add = env->GetMethodID(list, "add", "(Ljava/lang/Object;)Z");
-    auto list_obj = env->NewObject(list, init);
+	auto env = BeginEnv();
+	auto list = env->FindClass("java/util/ArrayList");
+	auto init = env->GetMethodID(list, "<init>", "()V");
+	auto add = env->GetMethodID(list, "add", "(Ljava/lang/Object;)Z");
+	auto list_obj = env->NewObject(list, init);
 
-    for (const auto& [product, callback]: products)
-    {
-        auto element = env->NewStringUTF(product.c_str());
-        env->CallBooleanMethod(list_obj, add, element);
-        env->DeleteLocalRef(element);
-    }
+	for (const auto& [product, callback]: products)
+	{
+		auto element = env->NewStringUTF(product.c_str());
+		env->CallBooleanMethod(list_obj, add, element);
+		env->DeleteLocalRef(element);
+	}
 
-    auto clazz = env->GetObjectClass(gSkyActivity);
-    auto method = env->GetMethodID(clazz, "initializeBilling", "(Ljava/util/List;)V");
+	auto clazz = env->GetObjectClass(gSkyActivity);
+	auto method = env->GetMethodID(clazz, "initializeBilling", "(Ljava/util/List;)V");
 	env->CallVoidMethod(gSkyActivity, method, list_obj);
 	env->DeleteLocalRef(clazz);
 	env->DeleteLocalRef(list_obj);
@@ -615,24 +615,24 @@ void SystemAndroid::initializeBilling(const std::map<std::string, ConsumeCallbac
 
 void SystemAndroid::purchase(const std::string& product)
 {
-    auto env = BeginEnv();
-    auto clazz = env->GetObjectClass(gSkyActivity);
-    auto method = env->GetMethodID(clazz, "purchase", "(Ljava/lang/String;)V");
-    auto str_arg = env->NewStringUTF(product.c_str());
-    env->CallVoidMethod(gSkyActivity, method, str_arg);
-    env->DeleteLocalRef(str_arg);
-    env->DeleteLocalRef(clazz);
-    EndEnv();
+	auto env = BeginEnv();
+	auto clazz = env->GetObjectClass(gSkyActivity);
+	auto method = env->GetMethodID(clazz, "purchase", "(Ljava/lang/String;)V");
+	auto str_arg = env->NewStringUTF(product.c_str());
+	env->CallVoidMethod(gSkyActivity, method, str_arg);
+	env->DeleteLocalRef(str_arg);
+	env->DeleteLocalRef(clazz);
+	EndEnv();
 }
 
 JNIEnv* SystemAndroid::BeginEnv()
 {
-    auto jvm = Instance->activity->vm;
-    auto env = Instance->activity->env;
+	auto jvm = Instance->activity->vm;
+	auto env = Instance->activity->env;
 
-    jvm->AttachCurrentThread(&env, NULL);
+	jvm->AttachCurrentThread(&env, NULL);
 
-    return env;
+	return env;
 }
 
 void SystemAndroid::EndEnv()

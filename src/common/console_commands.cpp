@@ -61,19 +61,18 @@ ConsoleCommands::ConsoleCommands()
 
 	CONSOLE->registerCommand("alias", "manage aliases",
 		CMD_METHOD(onAlias));
-		
+
 	CONSOLE->registerCommand("if", "condition checking and execution", { "var", "value", "then" }, { "else" },
 		CMD_METHOD(onIf));
 
 	CONSOLE->registerCommand("quit", "shutdown the app",
 		CMD_METHOD(onQuit));
-		
+
 	CONSOLE_DEVICE->writeLine("type \"cmdlist\" to see available commands");
 }
 
 ConsoleCommands::~ConsoleCommands()
 {
-	//
 }
 
 void ConsoleCommands::onCmdList(CON_ARGS)
@@ -93,7 +92,7 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 			s += " " + args;
 
 		auto description = command.getDescription();
-		
+
 		if (description.has_value())
 			s += " - " + description.value();
 
