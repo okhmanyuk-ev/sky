@@ -1,6 +1,5 @@
 #pragma once
 
-#include <renderer/shader.h>
 #include <optional>
 #include <skygfx/skygfx.h>
 #include <skygfx/vertex.h>
@@ -38,7 +37,6 @@ namespace Renderer
 		void setIndexBuffer(const Buffer& value);
 		void setTexture(const skygfx::Texture& value);
 		void setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value);
-		void setShader(std::shared_ptr<Shader> value);
 
 		void clear(std::optional<glm::vec4> color = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f },
 			std::optional<float> depth = 1.0f, std::optional<uint8_t> stencil = 0);

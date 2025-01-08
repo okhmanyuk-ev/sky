@@ -48,13 +48,6 @@ void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 		skygfx::SetRenderTarget(*value);
 }
 
-void System::setShader(std::shared_ptr<Shader> value)
-{
-	skygfx::SetShader(*value);
-	// TODO: skygfx::SetInputLayout(...);
-	value->setupUniforms();
-}
-
 void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
 	skygfx::Clear(color, depth, stencil);
