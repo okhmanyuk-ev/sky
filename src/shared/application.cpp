@@ -8,7 +8,6 @@
 #include <regex>
 #include <sky/locator.h>
 #include <sky/cache.h>
-#include <sky/utils.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -45,8 +44,6 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	{
 		sky::Locator<Audio::System>::Init(std::make_shared<Audio::System>());
 	}
-
-	Scene::RichLabel::DefaultIconTextureCallback = [](const auto& path) { return sky::GetTexture(path); };
 
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
 	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();

@@ -3,6 +3,7 @@
 #include <scene/sprite.h>
 #include <regex>
 #include <common/helpers.h>
+#include <sky/utils.h>
 
 using namespace Scene;
 
@@ -49,7 +50,7 @@ void RichLabel::refresh()
 
 	auto createSprite = [this_index = size_t(this)](const std::string& path) {
 		auto sprite = std::make_shared<Adaptive<Sprite>>();
-		sprite->setTexture(DefaultIconTextureCallback(path));
+		sprite->setTexture(sky::GetTexture(path));
 		sprite->setAdaptStretch(1.0f);
 		sprite->setBakingAdaption(true);
 		sprite->setBatchGroup(std::format("rich_label_icon_{}_{}", this_index, path));

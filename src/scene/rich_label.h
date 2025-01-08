@@ -11,10 +11,6 @@ namespace Scene
 	class RichLabel : public AutoSized<Node>
 	{
 	public:
-		using IconTextureCallback = std::function<Graphics::TexCell(const std::string& path)>;
-		inline static IconTextureCallback DefaultIconTextureCallback = nullptr;
-
-	public:
 		RichLabel();
 
 	protected:
