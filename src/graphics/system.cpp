@@ -206,11 +206,9 @@ void System::draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture
 {
 	if (!mBatching || vertex_count > 40 || effect != nullptr)
 	{
-		static skygfx::utils::Mesh mesh;
-		mesh.setVertices(vertices, vertex_count);
-		mesh.setIndices(indices, index_count);
-
-		draw(effect, texture ? texture.get() : nullptr, topology, mesh);
+		mMesh.setVertices(vertices, vertex_count);
+		mMesh.setIndices(indices, index_count);
+		draw(effect, texture ? texture.get() : nullptr, topology, mMesh);
 		return;
 	}
 
@@ -258,18 +256,17 @@ void System::draw(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture
 	skygfx::utils::MeshBuilder::Mode mode,
 	std::function<void(std::function<void(const skygfx::utils::Mesh::Vertex&)>)> callback)
 {
-	static skygfx::utils::MeshBuilder mesh_builder;
-	mesh_builder.reset();
-	mesh_builder.begin(mode);
+	mMeshBuilder.reset();
+	mMeshBuilder.begin(mode);
 	callback([&](const skygfx::utils::Mesh::Vertex& vertex) {
-		mesh_builder.vertex(vertex);
+		mMeshBuilder.vertex(vertex);
 	});
-	mesh_builder.end();
-	assert(!mesh_builder.isBegan());
+	mMeshBuilder.end();
+	assert(!mMeshBuilder.isBegan());
 
-	auto topology = mesh_builder.getTopology().value();
-	const auto& vertices = mesh_builder.getVertices();
-	const auto& indices = mesh_builder.getIndices();
+	auto topology = mMeshBuilder.getTopology().value();
+	const auto& vertices = mMeshBuilder.getVertices();
+	const auto& indices = mMeshBuilder.getIndices();
 
 	draw(effect, texture, topology, vertices, indices);
 }
@@ -326,17 +323,16 @@ void System::drawRoundedRectangle(const glm::vec4& top_left_color, const glm::ve
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color, const glm::vec2& size,
 	float rounding, bool absolute_rounding)
 {
-	static auto effect = sky::effects::Effect<sky::effects::Rounded>();
-	effect.uniform.size = size;
+	mRoundedEffect.uniform.size = size;
 	if (absolute_rounding)
 	{
-		effect.uniform.radius = glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f);
+		mRoundedEffect.uniform.radius = glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f);
 	}
 	else
 	{
-		effect.uniform.radius = (glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;
+		mRoundedEffect.uniform.radius = (glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;
 	}
-	drawRectangle(&effect, top_left_color, top_right_color, bottom_left_color, bottom_right_color);
+	drawRectangle(&mRoundedEffect, top_left_color, top_right_color, bottom_left_color, bottom_right_color);
 }
 
 void System::drawRoundedRectangle(const glm::vec4& color,
@@ -348,26 +344,13 @@ void System::drawRoundedRectangle(const glm::vec4& color,
 void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 	const glm::vec2& size, float rounding, bool absolute_rounding)
 {
-	static Graphics::TexRegion center_region = {
-		{
-			(mWhiteCircleTexture->getWidth() / 2.0f) - 1.0f,
-			(mWhiteCircleTexture->getHeight() / 2.0f) - 1.0f
-		},
-		{
-			2.0f, 2.0f
-		}
+	auto center_region = Graphics::TexRegion{
+		.pos ={ (mWhiteCircleTexture->getWidth() / 2.0f) - 1.0f, (mWhiteCircleTexture->getHeight() / 2.0f) - 1.0f },
+		.size = { 2.0f, 2.0f }
 	};
 
-	float edge_size = 0.0f;
-
-	if (absolute_rounding)
-	{
-		edge_size = glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f);
-	}
-	else
-	{
-		edge_size = (glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;
-	}
+	float edge_size = absolute_rounding ? glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f) :
+		(glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;
 
 	pushSampler(skygfx::Sampler::Linear);
 	drawSlicedSprite(nullptr, mWhiteCircleTexture, center_region, size, edge_size, color);
@@ -387,12 +370,11 @@ void System::drawLineRectangle(const glm::vec4& color)
 void System::drawCircle(const glm::vec4& inner_color, const glm::vec4& outer_color,
 	float fill, float pie)
 {
-	static auto effect = sky::effects::Effect<sky::effects::Circle>();
-	effect.uniform.fill = fill;
-	effect.uniform.pie = pie;
-	effect.uniform.inner_color = inner_color;
-	effect.uniform.outer_color = outer_color;
-	drawRectangle(&effect);
+	mCircleEffect.uniform.fill = fill;
+	mCircleEffect.uniform.pie = pie;
+	mCircleEffect.uniform.inner_color = inner_color;
+	mCircleEffect.uniform.outer_color = outer_color;
+	drawRectangle(&mCircleEffect);
 }
 
 void System::drawSegmentedCircle(int segments, const glm::vec4& inner_color,
@@ -560,13 +542,12 @@ void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture>
 	assert(!vertices.empty());
 	assert(!indices.empty());
 
-	static auto effect = sky::effects::Effect<sky::effects::Sdf>();
-	effect.uniform.min_value = minValue;
-	effect.uniform.max_value = maxValue;
-	effect.uniform.smooth_factor = smoothFactor;
-	effect.uniform.color = color;
+	mSdfEffect.uniform.min_value = minValue;
+	mSdfEffect.uniform.max_value = maxValue;
+	mSdfEffect.uniform.smooth_factor = smoothFactor;
+	mSdfEffect.uniform.color = color;
 
-	draw(&effect, texture, topology, vertices, indices);
+	draw(&mSdfEffect, texture, topology, vertices, indices);
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue,

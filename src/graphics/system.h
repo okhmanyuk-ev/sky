@@ -210,5 +210,10 @@ namespace Graphics
 
 	private:
 		std::shared_ptr<skygfx::Texture> mWhiteCircleTexture = nullptr;
+		sky::effects::Effect<sky::effects::Circle> mCircleEffect;
+		sky::effects::Effect<sky::effects::Sdf> mSdfEffect;
+		sky::effects::Effect<sky::effects::Rounded> mRoundedEffect;
+		skygfx::utils::Mesh mMesh;
+		skygfx::utils::MeshBuilder mMeshBuilder;
 	};
 }
