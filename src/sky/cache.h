@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <memory>
 #include <set>
+#include <optional>
 #include <audio/sound.h>
 #include <nlohmann/json.hpp>
 
@@ -26,24 +27,18 @@ namespace sky
 
 		void loadTexture(std::shared_ptr<skygfx::Texture> texture, const std::string& name);
 		void loadTexture(const Graphics::Image& image, const std::string& name);
-		void loadTexture(const std::string& path, const std::string& name);
-		void loadTexture(const std::string& path);
+		void loadTexture(const std::string& path, std::optional<std::string> name = std::nullopt);
 
-		void loadFont(const std::string& path, const std::string& name);
-		void loadFont(const std::string& path);
+		void loadFont(const std::string& path, std::optional<std::string> name = std::nullopt);
 
 		void loadSound(std::shared_ptr<Audio::Sound> sound, const std::string& name);
-		void loadSound(const std::string& path, const std::string& name);
-		void loadSound(const std::string& path);
+		void loadSound(const std::string& path, std::optional<std::string> name = std::nullopt);
 
-		void loadAtlas(const std::string& path, const std::string& name);
-		void loadAtlas(const std::string& path);
+		void loadAtlas(const std::string& path, std::optional<std::string> name = std::nullopt);
 
-		void loadAnimation(const std::string& path, const std::string& name);
-		void loadAnimation(const std::string& path);
+		void loadAnimation(const std::string& path, std::optional<std::string> name = std::nullopt);
 
-		void loadJson(const std::string& path, const std::string& name);
-		void loadJson(const std::string& path);
+		void loadJson(const std::string& path, std::optional<std::string> name = std::nullopt);
 
 	public:
 		void makeAtlas(const std::string& name, const std::set<std::string>& paths);

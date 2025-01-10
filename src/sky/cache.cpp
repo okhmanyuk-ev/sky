@@ -76,8 +76,10 @@ void sky::Cache::loadTexture(const Graphics::Image& image, const std::string& na
 	loadTexture(texture, name);
 }
 
-void sky::Cache::loadTexture(const std::string& path, const std::string& name)
+void sky::Cache::loadTexture(const std::string& path, std::optional<std::string> _name)
 {
+	auto name = _name.value_or(path);
+
 	if (mTextures.count(name) > 0)
 		return;
 
@@ -92,22 +94,14 @@ void sky::Cache::loadTexture(const std::string& path, const std::string& name)
 	loadTexture(image, name);
 }
 
-void sky::Cache::loadTexture(const std::string& path)
+void sky::Cache::loadFont(const std::string& path, std::optional<std::string> _name)
 {
-	loadTexture(path, path);
-}
+	auto name = _name.value_or(path);
 
-void sky::Cache::loadFont(const std::string& path, const std::string& name)
-{
 	if (mFonts.count(name) > 0)
 		return;
 
 	mFonts[name] = std::make_shared<Graphics::Font>(path);
-}
-
-void sky::Cache::loadFont(const std::string& path)
-{
-	loadFont(path, path);
 }
 
 void sky::Cache::loadSound(std::shared_ptr<Audio::Sound> sound, const std::string& name)
@@ -118,8 +112,10 @@ void sky::Cache::loadSound(std::shared_ptr<Audio::Sound> sound, const std::strin
 	mSounds[name] = sound;
 }
 
-void sky::Cache::loadSound(const std::string& path, const std::string& name)
+void sky::Cache::loadSound(const std::string& path, std::optional<std::string> _name)
 {
+	auto name = _name.value_or(path);
+
 	if (mSounds.count(name) > 0)
 		return;
 
@@ -130,43 +126,33 @@ void sky::Cache::loadSound(const std::string& path, const std::string& name)
 	}
 
 	auto sound = std::make_shared<Audio::Sound>(path);
-
 	loadSound(sound, name);
 }
 
-void sky::Cache::loadSound(const std::string& path)
+void sky::Cache::loadAtlas(const std::string& path, std::optional<std::string> _name)
 {
-	loadSound(path, path);
-}
+	auto name = _name.value_or(path);
 
-void sky::Cache::loadAtlas(const std::string& path, const std::string& name)
-{
 	if (mAtlases.count(name) > 0)
 		return;
 
 	mAtlases[name] = std::make_shared<Graphics::Atlas>(path);
 }
 
-void sky::Cache::loadAtlas(const std::string& path)
+void sky::Cache::loadAnimation(const std::string& path, std::optional<std::string> _name)
 {
-	loadAtlas(path, path);
-}
+	auto name = _name.value_or(path);
 
-void sky::Cache::loadAnimation(const std::string& path, const std::string& name)
-{
 	if (mAnimations.count(name) > 0)
 		return;
 
 	mAnimations[name] = std::make_shared<Graphics::Animation>(path);
 }
 
-void sky::Cache::loadAnimation(const std::string& path)
+void sky::Cache::loadJson(const std::string& path, std::optional<std::string> _name)
 {
-	loadAnimation(path, path);
-}
+	auto name = _name.value_or(path);
 
-void sky::Cache::loadJson(const std::string& path, const std::string& name)
-{
 	if (mJsons.count(name) > 0)
 		return;
 
@@ -174,11 +160,6 @@ void sky::Cache::loadJson(const std::string& path, const std::string& name)
 		return;
 
 	mJsons[name] = Common::Helpers::LoadJsonFromAsset({ path });
-}
-
-void sky::Cache::loadJson(const std::string& path)
-{
-	loadJson(path, path);
 }
 
 void sky::Cache::makeAtlas(const std::string& name, const std::set<std::string>& paths)

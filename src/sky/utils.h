@@ -25,8 +25,8 @@ namespace sky
 	std::shared_ptr<Graphics::Atlas> GetAtlas(const std::string& name);
 	const nlohmann::json& GetJson(const std::string& name);
 
-	void PrecacheTexture(const std::string& name, std::optional<std::string> alias = std::nullopt);
-	void PrecacheFont(const std::string& name, std::optional<std::string> alias = std::nullopt);
+	void PrecacheTexture(const std::string& path, std::optional<std::string> name = std::nullopt);
+	void PrecacheFont(const std::string& path, std::optional<std::string> name = std::nullopt);
 
 	std::wstring Localize(const std::string& key);
 

@@ -33,14 +33,14 @@ const nlohmann::json& sky::GetJson(const std::string& name)
 	return GetService<Cache>()->getJson(name);
 }
 
-void sky::PrecacheTexture(const std::string& name, std::optional<std::string> alias)
+void sky::PrecacheTexture(const std::string& path, std::optional<std::string> name)
 {
-	GetService<Cache>()->loadTexture(name, alias.value_or(name));
+	GetService<Cache>()->loadTexture(path, name);
 }
 
-void sky::PrecacheFont(const std::string& name, std::optional<std::string> alias)
+void sky::PrecacheFont(const std::string& path, std::optional<std::string> name)
 {
-	GetService<Cache>()->loadFont(name, alias.value_or(name));
+	GetService<Cache>()->loadFont(path, name);
 }
 
 std::wstring sky::Localize(const std::string& key)
