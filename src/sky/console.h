@@ -6,6 +6,7 @@
 #include <optional>
 #include <platform/defines.h>
 #include <sky/dispatcher.h>
+#include <sky/locator.h>
 #include <map>
 
 namespace sky
@@ -103,64 +104,44 @@ namespace sky
 	};
 #endif
 
-	class CVar
-	{
-	public:
-		using Getter = std::function<std::vector<std::string>()>;
-		using Setter = std::function<void(const std::vector<std::string>&)>;
-
-	public:
-		CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
-			Getter getter, Setter setter);
-		CVar(std::optional<std::string> description, std::vector<std::string> arguments, Getter getter, Setter setter);
-
-	public:
-		std::string getValueAsString() const;
-		std::string getArgsAsString() const;
-
-	public:
-		const auto& getDescription() const { return mDescription; }
-		const auto& getArguments() const { return mArguments; }
-		const auto& getOptionalArguments() const { return mOptionalArguments; }
-		auto getGetter() const { return mGetter; }
-		auto getSetter() const { return mSetter; }
-
-	private:
-		std::optional<std::string> mDescription;
-		std::vector<std::string> mArguments;
-		std::vector<std::string> mOptionalArguments;
-		Getter mGetter;
-		Setter mSetter;
-	};
-
-	class Command
-	{
-	public:
-		using Callback = std::function<void(const std::vector<std::string>&)>;
-
-	public:
-		Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments, Callback callback);
-		Command(std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback);
-		Command(std::optional<std::string> description, Callback callback);
-
-	public:
-		std::string getArgsAsString() const;
-
-	public:
-		auto getDescription() const { return mDescription; }
-		const auto& getArguments() const { return mArguments; }
-		const auto& getOptionalArguments() const { return mOptionalArguments; }
-		auto getCallback() const { return mCallback; }
-
-	private:
-		std::optional<std::string> mDescription;
-		std::vector<std::string> mArguments;
-		std::vector<std::string> mOptionalArguments;
-		Callback mCallback;
-	};
-
 	class CommandProcessor : public sky::Listenable<sky::Console::ReadEvent>
 	{
+	public:
+		struct CVar
+		{
+			using Getter = std::function<std::vector<std::string>()>;
+			using Setter = std::function<void(const std::vector<std::string>&)>;
+
+			CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
+				Getter getter, Setter setter);
+			CVar(std::optional<std::string> description, std::vector<std::string> arguments, Getter getter, Setter setter);
+
+			std::string getValueAsString() const;
+			std::string getArgsAsString() const;
+
+			std::optional<std::string> description;
+			std::vector<std::string> arguments;
+			std::vector<std::string> optional_arguments;
+			Getter getter;
+			Setter setter;
+		};
+
+		struct Command
+		{
+			using Callback = std::function<void(const std::vector<std::string>&)>;
+
+			Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments, Callback callback);
+			Command(std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback);
+			Command(std::optional<std::string> description, Callback callback);
+
+			std::string getArgsAsString() const;
+
+			std::optional<std::string> description;
+			std::vector<std::string> arguments;
+			std::vector<std::string> optional_arguments;
+			Callback callback;
+		};
+
 	public:
 		void execute(const std::string& cmd);
 		void addCommand(const std::string& name, Command command);
@@ -195,45 +176,56 @@ namespace sky
 		std::map<std::string, std::vector<std::string>> mAliases;
 	};
 
-	class CVarBool
+	template<typename T>
+	struct CVarTraits;
+
+	template<>
+	struct CVarTraits<bool>
 	{
-	public:
-		CVarBool(const std::string& name, bool default_value, std::optional<std::string> description = std::nullopt);
-		~CVarBool();
-
-		operator bool() const { return mValue; }
-		CVarBool& operator=(bool value) { mValue = value; return *this; }
-
-	private:
-		std::string mName;
-		bool mValue;
+		static const std::vector<std::string> Args;
+		static std::vector<std::string> ValueToArgs(bool value);
+		static bool ArgsToValue(const std::vector<std::string>& args);
 	};
 
-	class CVarInt
+	template<>
+	struct CVarTraits<int>
 	{
-	public:
-		CVarInt(const std::string& name, int default_value, std::optional<std::string> description = std::nullopt);
-		~CVarInt();
-
-		operator int() const { return mValue; }
-		CVarInt& operator=(int value) { mValue = value; return *this; }
-
-	private:
-		std::string mName;
-		int mValue;
+		static const std::vector<std::string> Args;
+		static std::vector<std::string> ValueToArgs(int value);
+		static int ArgsToValue(const std::vector<std::string>& args);
 	};
 
-	class CVarFloat
+	template<>
+	struct CVarTraits<float>
+	{
+		static const std::vector<std::string> Args;
+		static std::vector<std::string> ValueToArgs(float value);
+		static float ArgsToValue(const std::vector<std::string>& args);
+	};
+
+	template<class T>
+	class CVar
 	{
 	public:
-		CVarFloat(const std::string& name, float default_value, std::optional<std::string> description = std::nullopt);
-		~CVarFloat();
+		CVar(const std::string& name, T value, std::optional<std::string> description = std::nullopt) :
+			mName(name),
+			mValue(value)
+		{
+			auto getter = [this] { return CVarTraits<T>::ValueToArgs(mValue); };
+			auto setter = [this](const auto& args) { mValue = CVarTraits<T>::ArgsToValue(args); };
+			sky::Locator<CommandProcessor>::GetService()->addCVar(mName, sky::CommandProcessor::CVar(description, CVarTraits<T>::Args, getter, setter));
+		}
 
-		operator float() const { return mValue; }
-		CVarFloat& operator=(float value) { mValue = value; return *this; }
+		~CVar()
+		{
+			sky::Locator<CommandProcessor>::GetService()->removeCVar(mName);
+		}
+
+		operator T() const { return mValue; }
+		CVar& operator=(T value) { mValue = value; return *this; }
 
 	private:
 		std::string mName;
-		float mValue;
+		T mValue;
 	};
 }

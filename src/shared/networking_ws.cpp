@@ -18,7 +18,7 @@ using namespace Shared::NetworkingWS;
 
 NetCommands::NetCommands()
 {
-	sky::AddCVar("net_log_events", sky::CVar(std::nullopt, { "bool" },
+	sky::AddCVar("net_log_events", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
 		CVAR_GETTER_BOOL(NetCommands::LogEvents), CVAR_SETTER_BOOL(NetCommands::LogEvents)));
 }
 

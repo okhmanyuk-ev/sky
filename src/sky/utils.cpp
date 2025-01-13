@@ -73,12 +73,12 @@ void sky::Log(Console::Color color, const std::string& text)
 	GetService<Console>()->writeLine(text, color);
 }
 
-void sky::AddCommand(const std::string& name, Command command)
+void sky::AddCommand(const std::string& name, CommandProcessor::Command command)
 {
 	GetService<CommandProcessor>()->addCommand(name, command);
 }
 
-void sky::AddCVar(const std::string& name, CVar cvar)
+void sky::AddCVar(const std::string& name, CommandProcessor::CVar cvar)
 {
 	GetService<CommandProcessor>()->addCVar(name, cvar);
 }

@@ -74,11 +74,11 @@ World::World()
 	b2BodyDef dummy_body_def;
 	mDummyBody = mB2World.CreateBody(&dummy_body_def);
 
-	sky::AddCVar("phys_debug", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(isDebug), CVAR_SETTER_BOOL_FUNC(setDebug)));
-	sky::AddCVar("phys_stats", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(getShowStats), CVAR_SETTER_BOOL_FUNC(setShowStats)));
-	sky::AddCVar("phys_allow_sleep", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(mB2World.GetAllowSleeping), CVAR_SETTER_BOOL_FUNC(mB2World.SetAllowSleeping)));
-	sky::AddCVar("phys_velocity_iterations", sky::CVar(std::nullopt, { "int" }, CVAR_GETTER_INT(mVelocityIterations), CVAR_SETTER_INT(mVelocityIterations)));
-	sky::AddCVar("phys_position_iterations", sky::CVar(std::nullopt, { "int" }, CVAR_GETTER_INT(mPositionIterations), CVAR_SETTER_INT(mPositionIterations)));
+	sky::AddCVar("phys_debug", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(isDebug), CVAR_SETTER_BOOL_FUNC(setDebug)));
+	sky::AddCVar("phys_stats", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(getShowStats), CVAR_SETTER_BOOL_FUNC(setShowStats)));
+	sky::AddCVar("phys_allow_sleep", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(mB2World.GetAllowSleeping), CVAR_SETTER_BOOL_FUNC(mB2World.SetAllowSleeping)));
+	sky::AddCVar("phys_velocity_iterations", sky::CommandProcessor::CVar(std::nullopt, { "int" }, CVAR_GETTER_INT(mVelocityIterations), CVAR_SETTER_INT(mVelocityIterations)));
+	sky::AddCVar("phys_position_iterations", sky::CommandProcessor::CVar(std::nullopt, { "int" }, CVAR_GETTER_INT(mPositionIterations), CVAR_SETTER_INT(mPositionIterations)));
 
 	auto getter = [this] {
 		auto fps = 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep());
@@ -90,13 +90,13 @@ World::World()
 		mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / sec));
 	};
 
-	sky::AddCVar("phys_timestep_fps", sky::CVar(std::nullopt, { "float" }, getter, setter));
+	sky::AddCVar("phys_timestep_fps", sky::CommandProcessor::CVar(std::nullopt, { "float" }, getter, setter));
 
-	sky::AddCVar("phys_timestep_enabled", sky::CVar(std::nullopt, { "bool" },
+	sky::AddCVar("phys_timestep_enabled", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
 		CVAR_GETTER_BOOL_FUNC(mTimestepFixer.isEnabled),
 		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setEnabled)));
 
-	sky::AddCVar("phys_timestep_force_time_completion", sky::CVar(std::nullopt, { "bool" },
+	sky::AddCVar("phys_timestep_force_time_completion", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
 		CVAR_GETTER_BOOL_FUNC(mTimestepFixer.getForceTimeCompletion),
 		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setForceTimeCompletion)));
 }

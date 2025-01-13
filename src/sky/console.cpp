@@ -83,34 +83,36 @@ void NativeConsole::setTitle(const std::string& s)
 
 #endif
 
-CVar::CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments, Getter getter, Setter setter) :
-	mDescription(description),
-	mArguments(arguments),
-	mOptionalArguments(optional_arguments),
-	mGetter(getter),
-	mSetter(setter)
+CommandProcessor::CVar::CVar(std::optional<std::string> _description, std::vector<std::string> _arguments, std::vector<std::string> _optional_arguments,
+	Getter _getter, Setter _setter) :
+	description(_description),
+	arguments(_arguments),
+	optional_arguments(_optional_arguments),
+	getter(_getter),
+	setter(_setter)
 {
 }
 
-CVar::CVar(std::optional<std::string> description, std::vector<std::string> arguments, Getter getter, Setter setter) :
+CommandProcessor::CVar::CVar(std::optional<std::string> description, std::vector<std::string> arguments, Getter getter, Setter setter) :
 	CVar(description, arguments, {}, getter, setter)
 {
 }
 
-Command::Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments, Callback callback) :
-	mDescription(description),
-	mArguments(arguments),
-	mOptionalArguments(optional_arguments),
-	mCallback(callback)
+CommandProcessor::Command::Command(std::optional<std::string> _description, std::vector<std::string> _arguments, std::vector<std::string> _optional_arguments,
+	Callback _callback) :
+	description(_description),
+	arguments(_arguments),
+	optional_arguments(_optional_arguments),
+	callback(_callback)
 {
 }
 
-Command::Command(std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback) :
+CommandProcessor::Command::Command(std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback) :
 	Command(description, args, {}, callback)
 {
 }
 
-Command::Command(std::optional<std::string> description, Callback callback) :
+CommandProcessor::Command::Command(std::optional<std::string> description, Callback callback) :
 	Command(description, {}, callback)
 {
 }
@@ -334,10 +336,10 @@ void CommandProcessor::processConsoleCommand(std::vector<std::string> args)
 		known = true;
 
 		auto cvar = mCVars.at(name);
-		if (args.size() == 0 || cvar.getSetter() == nullptr)
+		if (args.size() == 0 || cvar.setter == nullptr)
 			sky::GetService<sky::Console>()->writeLine(name + " = " + cvar.getValueAsString());
-		else if (args.size() >= cvar.getArguments().size() && cvar.getSetter() != nullptr)
-			cvar.getSetter()(args);
+		else if (args.size() >= cvar.arguments.size() && cvar.setter != nullptr)
+			cvar.setter(args);
 		else
 			sky::GetService<sky::Console>()->writeLine("Syntax: " + name + " " + cvar.getArgsAsString());
 	}
@@ -347,10 +349,10 @@ void CommandProcessor::processConsoleCommand(std::vector<std::string> args)
 		known = true;
 
 		auto command = mCommands.at(name);
-		if (command.getArguments().size() > args.size())
+		if (command.arguments.size() > args.size())
 			sky::GetService<sky::Console>()->writeLine("Syntax: " + name + " " + command.getArgsAsString());
 		else
-			command.getCallback()(args);
+			command.callback(args);
 	}
 
 	if (mAliases.contains(name))
@@ -393,7 +395,7 @@ std::vector<std::string> CommandProcessor::dereferenceTokens(std::vector<std::st
 
 			if (mCVars.contains(name))
 			{
-				args = mCVars.at(name).getGetter()();
+				args = mCVars.at(name).getter();
 			}
 			else if (mAliases.contains(name))
 			{
@@ -413,100 +415,79 @@ std::vector<std::string> CommandProcessor::dereferenceTokens(std::vector<std::st
 	return tokens;
 }
 
-std::string CVar::getValueAsString() const
+std::string CommandProcessor::CVar::getValueAsString() const
 {
-	return CommandProcessor::MakeStringFromTokens(mGetter());
+	return CommandProcessor::MakeStringFromTokens(getter());
 }
 
-std::string CVar::getArgsAsString() const
+std::string CommandProcessor::CVar::getArgsAsString() const
 {
 	std::string result = "";
 
-	if (mArguments.size() > 0)
-		result += "<" + std::accumulate(std::next(mArguments.begin()), mArguments.end(), *mArguments.begin(),
+	if (arguments.size() > 0)
+		result += "<" + std::accumulate(std::next(arguments.begin()), arguments.end(), *arguments.begin(),
 			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
 
-	if (mArguments.size() > 0 && mOptionalArguments.size() > 0)
+	if (arguments.size() > 0 && optional_arguments.size() > 0)
 		result += " ";
 
-	if (mOptionalArguments.size() > 0)
-		result += "(<" + std::accumulate(std::next(mOptionalArguments.begin()), mOptionalArguments.end(), *mOptionalArguments.begin(),
+	if (optional_arguments.size() > 0)
+		result += "(<" + std::accumulate(std::next(optional_arguments.begin()), optional_arguments.end(), *optional_arguments.begin(),
 			[](const auto& a, const auto& b) { return a + ">) (<" + b; }) + ">)";
 
 	return result;
 }
 
-std::string Command::getArgsAsString() const
+std::string CommandProcessor::Command::getArgsAsString() const
 {
 	std::string result = "";
 
-	if (mArguments.size() > 0)
-		result += "<" + std::accumulate(std::next(mArguments.begin()), mArguments.end(), *mArguments.begin(),
+	if (arguments.size() > 0)
+		result += "<" + std::accumulate(std::next(arguments.begin()), arguments.end(), *arguments.begin(),
 			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
 
-	if (mArguments.size() > 0 && mOptionalArguments.size() > 0)
+	if (arguments.size() > 0 && optional_arguments.size() > 0)
 		result += " ";
 
-	if (mOptionalArguments.size() > 0)
-		result += "(<" + std::accumulate(std::next(mOptionalArguments.begin()), mOptionalArguments.end(), *mOptionalArguments.begin(),
+	if (optional_arguments.size() > 0)
+		result += "(<" + std::accumulate(std::next(optional_arguments.begin()), optional_arguments.end(), *optional_arguments.begin(),
 			[](const auto& a, const auto& b) { return a + ">) (<" + b; }) + ">)";
 
 	return result;
 }
 
-CVarBool::CVarBool(const std::string& name, bool default_value, std::optional<std::string> description) :
-	mName(name),
-	mValue(default_value)
+const std::vector<std::string> CVarTraits<bool>::Args = { "bool" };
+
+std::vector<std::string> CVarTraits<bool>::ValueToArgs(bool value)
 {
-	auto getter = [this] {
-		return std::vector<std::string>({ std::to_string(mValue) });
-	};
-	auto setter = [this](const std::vector<std::string>& args) {
-		try { mValue = stoi(args[0]); }
-		catch (const std::exception& e) { sky::Log(e.what()); }
-	};
-	sky::AddCVar(name, sky::CVar(description, { "bool" }, getter, setter));
+	return { std::to_string(value) };
 }
 
-CVarBool::~CVarBool()
+bool CVarTraits<bool>::ArgsToValue(const std::vector<std::string>& args)
 {
-	sky::GetService<CommandProcessor>()->removeCVar(mName);
+	return stof(args.at(0));
 }
 
-CVarInt::CVarInt(const std::string& name, int default_value, std::optional<std::string> description) :
-	mName(name),
-	mValue(default_value)
+const std::vector<std::string> CVarTraits<int>::Args = { "int" };
+
+std::vector<std::string> CVarTraits<int>::ValueToArgs(int value)
 {
-	auto getter = [this] {
-		return std::vector<std::string>({ std::to_string(mValue) });
-	};
-	auto setter = [this](const std::vector<std::string>& args) {
-		try { mValue = stoi(args[0]); }
-		catch (const std::exception& e) { sky::Log(e.what()); }
-	};
-	sky::AddCVar(name, sky::CVar(description, { "int" }, getter, setter));
+	return { std::to_string(value) };
 }
 
-CVarInt::~CVarInt()
+int CVarTraits<int>::ArgsToValue(const std::vector<std::string>& args)
 {
-	sky::GetService<CommandProcessor>()->removeCVar(mName);
+	return stoi(args.at(0));
 }
 
-CVarFloat::CVarFloat(const std::string& name, float default_value, std::optional<std::string> description) :
-	mName(name),
-	mValue(default_value)
+const std::vector<std::string> CVarTraits<float>::Args = { "float" };
+
+std::vector<std::string> CVarTraits<float>::ValueToArgs(float value)
 {
-	auto getter = [this] {
-		return std::vector<std::string>({ std::to_string(mValue) });
-	};
-	auto setter = [this](const std::vector<std::string>& args) {
-		try { mValue = stof(args[0]); }
-		catch (const std::exception& e) { sky::Log(e.what()); }
-	};
-	sky::AddCVar(name, sky::CVar(description, { "float" }, getter, setter));
+	return { std::to_string(value) };
 }
 
-CVarFloat::~CVarFloat()
+float CVarTraits<float>::ArgsToValue(const std::vector<std::string>& args)
 {
-	sky::GetService<CommandProcessor>()->removeCVar(mName);
+	return stof(args.at(0));
 }

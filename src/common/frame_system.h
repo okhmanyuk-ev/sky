@@ -63,9 +63,9 @@ namespace Common
 	private:
 		std::list<StatusCallback> mFramers;
 		std::list<Callback> mThreadsafeCallbacks;
-		sky::CVarInt mFramerateLimit = sky::CVarInt("sys_framerate", 0, "limit of fps");
-		sky::CVarBool mSleepAllowed = sky::CVarBool("sys_sleep", true, "cpu saving between frames");
-		sky::CVarFloat mTimeScale = sky::CVarFloat("sys_timescale", 1.0f, "time delta multiplier");
+		sky::CVar<int> mFramerateLimit = sky::CVar<int>("sys_framerate", 0, "limit of fps");
+		sky::CVar<bool> mSleepAllowed = sky::CVar<bool>("sys_sleep", true, "cpu saving between frames");
+		sky::CVar<float> mTimeScale = sky::CVar<float>("sys_timescale", 1.0f, "time delta multiplier");
 		sky::TimePoint mLastTime = sky::Now();
 		sky::Duration mTimeDelta = sky::Duration::zero();
 		sky::Duration mUptime = sky::Duration::zero();

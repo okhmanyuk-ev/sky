@@ -47,8 +47,8 @@ namespace Shared
 		float getScale() const;
 
 	private:
-		sky::CVarBool mSamplerNearest = sky::CVarBool("imgui_sampler_nearest", false);
-		sky::CVarBool mScaleIndependence = sky::CVarBool("imgui_scale_independence", false);
+		sky::CVar<bool> mSamplerNearest = sky::CVar<bool>("imgui_sampler_nearest", false);
+		sky::CVar<bool> mScaleIndependence = sky::CVar<bool>("imgui_scale_independence", false);
 		glm::vec2 mLogicalSize = { 0.0f, 0.0f };
 
 	private:

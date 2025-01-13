@@ -12,7 +12,7 @@ using namespace Shared;
 
 SceneEditor::SceneEditor(Scene::Scene& scene) : mScene(scene)
 {
-	sky::AddCVar("scene_editor", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled)));
+	sky::AddCVar("scene_editor", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled)));
 }
 
 SceneEditor::~SceneEditor()

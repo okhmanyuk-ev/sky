@@ -641,7 +641,7 @@ std::vector<ImguiConsole::Hint> ImguiConsole::getHints(const std::string& match)
 		auto hint = Hint{
 			.type = Hint::Type::CVar,
 			.name = name,
-			.description = cvar.getDescription(),
+			.description = cvar.description,
 			.args = cvar.getArgsAsString()
 		};
 
@@ -656,7 +656,7 @@ std::vector<ImguiConsole::Hint> ImguiConsole::getHints(const std::string& match)
 		auto hint = Hint{
 			.type = Hint::Type::Command,
 			.name = name,
-			.description = command.getDescription(),
+			.description = command.description,
 			.args = command.getArgsAsString()
 		};
 
