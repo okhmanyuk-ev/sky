@@ -222,4 +222,18 @@ namespace sky
 		std::string mName;
 		int mValue;
 	};
+
+	class CVarFloat
+	{
+	public:
+		CVarFloat(const std::string& name, float default_value, std::optional<std::string> description = std::nullopt);
+		~CVarFloat();
+
+		operator float() const { return mValue; }
+		CVarFloat& operator=(float value) { mValue = value; return *this; }
+
+	private:
+		std::string mName;
+		float mValue;
+	};
 }

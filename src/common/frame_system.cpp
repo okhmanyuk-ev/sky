@@ -51,7 +51,7 @@ void FrameSystem::frame()
 
 	auto now = sky::Now();
 
-	mTimeDelta = sky::FromSeconds(sky::ToSeconds<double>(now - mLastTime) * mTimeScale);
+	mTimeDelta = sky::FromSeconds(sky::ToSeconds(now - mLastTime) * mTimeScale);
 
 	if (mTimeDeltaLimit.has_value() && mTimeDelta > mTimeDeltaLimit.value())
 	{

@@ -5,6 +5,7 @@
 #include <mutex>
 #include <sky/locator.h>
 #include <sky/clock.h>
+#include <sky/console.h>
 
 #define FRAME sky::Locator<Common::FrameSystem>::GetService()
 
@@ -37,7 +38,7 @@ namespace Common
 		void addOneThreadsafe(Callback callback);
 
 	public:
-		auto getFramerateLimit() const { return mFramerateLimit; }
+		int getFramerateLimit() const { return mFramerateLimit; }
 		void setFramerateLimit(int value) { mFramerateLimit = value; }
 
 		bool isSleepAllowed() const { return mSleepAllowed; }
@@ -45,10 +46,10 @@ namespace Common
 
 		auto getTimeDelta() const { return mTimeDelta; }
 
-		auto getTimeScale() const { return mTimeScale; }
-		void setTimeScale(double value) { mTimeScale = value; }
+		float getTimeScale() const { return mTimeScale; }
+		void setTimeScale(float value) { mTimeScale = value; }
 
-		auto getFramerate() const { return 1.0 / sky::ToSeconds<double>(mTimeDelta) * mTimeScale; } // frame count per second
+		auto getFramerate() const { return 1.0f / sky::ToSeconds(mTimeDelta) * mTimeScale; } // frame count per second
 		auto getFramerCount() const { return mFramers.size(); }
 
 		auto getUptime() const { return mUptime; }
@@ -62,9 +63,9 @@ namespace Common
 	private:
 		std::list<StatusCallback> mFramers;
 		std::list<Callback> mThreadsafeCallbacks;
-		int mFramerateLimit = 0;
-		bool mSleepAllowed = true;
-		double mTimeScale = 1.0;
+		sky::CVarInt mFramerateLimit = sky::CVarInt("sys_framerate", 0, "limit of fps");
+		sky::CVarBool mSleepAllowed = sky::CVarBool("sys_sleep", true, "cpu saving between frames");
+		sky::CVarFloat mTimeScale = sky::CVarFloat("sys_timescale", 1.0f, "time delta multiplier");
 		sky::TimePoint mLastTime = sky::Now();
 		sky::Duration mTimeDelta = sky::Duration::zero();
 		sky::Duration mUptime = sky::Duration::zero();

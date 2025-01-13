@@ -7,15 +7,6 @@ using namespace Common;
 
 ConsoleCommands::ConsoleCommands()
 {
-	sky::AddCVar("sys_framerate", sky::CVar("limit of fps", { "int" },
-		CVAR_GETTER_INT_FUNC(FRAME->getFramerateLimit), CVAR_SETTER_INT_FUNC(FRAME->setFramerateLimit)));
-
-	sky::AddCVar("sys_sleep", sky::CVar("cpu saving between frames", { "bool" }, CVAR_GETTER_BOOL_FUNC(FRAME->isSleepAllowed),
-		CVAR_SETTER_BOOL_FUNC(FRAME->setSleepAllowed)));
-
-	sky::AddCVar("sys_timescale", sky::CVar("time delta multiplier", { "float" }, CVAR_GETTER_DOUBLE_FUNC(FRAME->getTimeScale),
-		CVAR_SETTER_DOUBLE_FUNC(FRAME->setTimeScale)));
-
 	auto getter = []() -> std::vector<std::string> {
 		auto delta_limit = FRAME->getTimeDeltaLimit();
 		if (!delta_limit.has_value())

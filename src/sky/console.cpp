@@ -491,3 +491,22 @@ CVarInt::~CVarInt()
 {
 	sky::GetService<CommandProcessor>()->removeCVar(mName);
 }
+
+CVarFloat::CVarFloat(const std::string& name, float default_value, std::optional<std::string> description) :
+	mName(name),
+	mValue(default_value)
+{
+	auto getter = [this] {
+		return std::vector<std::string>({ std::to_string(mValue) });
+	};
+	auto setter = [this](const std::vector<std::string>& args) {
+		try { mValue = stof(args[0]); }
+		catch (const std::exception& e) { sky::Log(e.what()); }
+	};
+	sky::AddCVar(name, sky::CVar(description, { "float" }, getter, setter));
+}
+
+CVarFloat::~CVarFloat()
+{
+	sky::GetService<CommandProcessor>()->removeCVar(mName);
+}

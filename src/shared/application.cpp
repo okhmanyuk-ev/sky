@@ -25,12 +25,12 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 #ifndef EMSCRIPTEN
 	sky::Locator<Common::TaskSystem>::Init(std::make_shared<Common::TaskSystem>());
 #endif
+	sky::Locator<sky::CommandProcessor>::Init(std::make_shared<sky::CommandProcessor>());
 	sky::Locator<Common::FrameSystem>::Init(std::make_shared<Common::FrameSystem>());
 	sky::Locator<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
 	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
 	sky::Locator<Renderer::System>::Init(std::make_shared<Renderer::System>());
 	sky::Locator<sky::Console>::Init(std::make_shared<Shared::ImguiConsole>());
-	sky::Locator<sky::CommandProcessor>::Init(std::make_shared<sky::CommandProcessor>());
 	sky::Locator<Graphics::System>::Init(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
 	{
