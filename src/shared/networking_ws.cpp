@@ -24,7 +24,7 @@ NetCommands::NetCommands()
 
 NetCommands::~NetCommands()
 {
-	sky::GetService<sky::CommandProcessor>()->removeCVar("net_log_events");
+	sky::GetService<sky::CommandProcessor>()->removeItem("net_log_events");
 }
 
 // channel

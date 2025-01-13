@@ -29,7 +29,13 @@ void ConsoleHelperCommands::onFrame()
 		ImGui::Begin("CVars", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel);
 		ImGui::SetWindowPos(ImGui::User::TopRightCorner());
 
-		for (auto& [name, cvar] : sky::GetService<sky::CommandProcessor>()->getCVars())
+		auto cvars = sky::GetService<sky::CommandProcessor>()->getItems() | std::views::filter([](const auto& pair) {
+			return std::holds_alternative<sky::CommandProcessor::CVar>(pair.second);
+		}) | std::views::transform([](const auto& pair) {
+			return std::pair{ pair.first, std::get<sky::CommandProcessor::CVar>(pair.second) };
+		});
+
+		for (const auto& [name, cvar] : cvars)
 		{
 			ImGui::Text("%s", name.c_str());
 

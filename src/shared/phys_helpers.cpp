@@ -103,14 +103,14 @@ World::World()
 
 World::~World()
 {
-	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_debug");
-	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_stats");
-	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_allow_sleep");
-	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_velocity_iterations");
-	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_position_iterations");
-	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_timestep_fps");
-	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_timestep_enabled");
-	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_timestep_force_time_completion");
+	sky::GetService<sky::CommandProcessor>()->removeItem("phys_debug");
+	sky::GetService<sky::CommandProcessor>()->removeItem("phys_stats");
+	sky::GetService<sky::CommandProcessor>()->removeItem("phys_allow_sleep");
+	sky::GetService<sky::CommandProcessor>()->removeItem("phys_velocity_iterations");
+	sky::GetService<sky::CommandProcessor>()->removeItem("phys_position_iterations");
+	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_fps");
+	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_enabled");
+	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_force_time_completion");
 }
 
 void World::onEvent(const Shared::TouchEmulator::Event& e)

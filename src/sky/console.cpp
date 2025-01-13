@@ -117,44 +117,38 @@ CommandProcessor::Command::Command(std::optional<std::string> description, Callb
 {
 }
 
+CommandProcessor::Alias::Alias(std::vector<std::string> _value) :
+	value(_value)
+{
+}
+
 void CommandProcessor::execute(const std::string& cmd)
 {
 	for (auto s : ParseCommandLine(cmd))
 	{
-		processConsoleCommand(dereferenceTokens(MakeTokensFromString(s)));
+		try
+		{
+			processConsoleCommand(dereferenceTokens(MakeTokensFromString(s)));
+		}
+		catch (const std::exception& e)
+		{
+			sky::Log("raised exception in command \"{}\", reason: \"{}\"", s, e.what());
+		}
 	}
 }
 
-void CommandProcessor::addCommand(const std::string& name, Command command)
+void CommandProcessor::addItem(const std::string& name, Item item)
 {
-	assert(!mCommands.contains(name));
-	mCommands.insert({ name, command });
+	assert(!name.empty());
+	assert(!mItems.contains(name));
+	mItems.insert({ name, item });
 }
 
-void CommandProcessor::addCVar(const std::string& name, CVar cvar)
+void CommandProcessor::removeItem(const std::string& name)
 {
-	assert(!mCVars.contains(name));
-	mCVars.insert({ name, cvar });
-}
-
-void CommandProcessor::removeCommand(const std::string& name)
-{
-	mCommands.erase(name);
-}
-
-void CommandProcessor::removeCVar(const std::string& name)
-{
-	mCVars.erase(name);
-}
-
-void CommandProcessor::addAlias(const std::string& name, const std::vector<std::string>& value)
-{
-	mAliases[name] = value;
-}
-
-void CommandProcessor::removeAlias(const std::string& name)
-{
-	mAliases.erase(name);
+	assert(!name.empty());
+	assert(mItems.contains(name));
+	mItems.erase(name);
 }
 
 void CommandProcessor::onEvent(const sky::Console::ReadEvent& e)
@@ -329,46 +323,36 @@ void CommandProcessor::processConsoleCommand(std::vector<std::string> args)
 
 	args.erase(args.begin());
 
-	bool known = false;
-
-	if (mCVars.contains(name))
+	if (!mItems.contains(name))
 	{
-		known = true;
-
-		auto cvar = mCVars.at(name);
-		if (args.size() == 0 || cvar.setter == nullptr)
-			sky::GetService<sky::Console>()->writeLine(name + " = " + cvar.getValueAsString());
-		else if (args.size() >= cvar.arguments.size() && cvar.setter != nullptr)
-			cvar.setter(args);
-		else
-			sky::GetService<sky::Console>()->writeLine("Syntax: " + name + " " + cvar.getArgsAsString());
+		sky::Log("Unknown command: {}", name);
+		return;
 	}
 
-	if (mCommands.contains(name))
-	{
-		known = true;
+	auto& item = mItems.at(name);
 
-		auto command = mCommands.at(name);
-		if (command.arguments.size() > args.size())
-			sky::GetService<sky::Console>()->writeLine("Syntax: " + name + " " + command.getArgsAsString());
-		else
-			command.callback(args);
-	}
-
-	if (mAliases.contains(name))
-	{
-		known = true;
-
-		if (args.size() == 0)
-			sky::GetService<sky::Console>()->writeLine(name + " = " + MakeStringFromTokens(mAliases.at(name)));
-		else
-			mAliases[name] = MakeTokensFromString(args[0]);
-	}
-
-	if (!known)
-	{
-		sky::GetService<sky::Console>()->writeLine("Unknown command: \"" + name + "\"");
-	}
+	std::visit(cases{
+		[&](const CVar& cvar) {
+			if (args.size() == 0 || cvar.setter == nullptr)
+				sky::Log("{} = {}", name, cvar.getValueAsString());
+			else if (args.size() >= cvar.arguments.size() && cvar.setter != nullptr)
+				cvar.setter(args);
+			else
+				sky::Log("Syntax: {} {}", name, cvar.getArgsAsString());
+		},
+		[&](const Command& command) {
+			if (command.arguments.size() > args.size())
+				sky::Log("Syntax: {} {}", name, command.getArgsAsString());
+			else
+				command.callback(args);
+		},
+		[&](Alias& alias) {
+			if (args.size() == 0)
+				sky::Log("{} = {}", name, MakeStringFromTokens(alias.value));
+			else
+				alias.value = MakeTokensFromString(args[0]);
+		}
+	}, item);
 }
 
 std::vector<std::string> CommandProcessor::dereferenceTokens(std::vector<std::string> tokens)
@@ -391,20 +375,21 @@ std::vector<std::string> CommandProcessor::dereferenceTokens(std::vector<std::st
 			std::transform(name.begin(), name.end(), name.begin(), tolower);
 			tokens[i].clear();
 
+			if (!mItems.contains(name))
+				continue;
+
+			const auto& item = mItems.at(name);
 			auto args = std::vector<std::string>();
 
-			if (mCVars.contains(name))
-			{
-				args = mCVars.at(name).getter();
-			}
-			else if (mAliases.contains(name))
-			{
-				args = mAliases.at(name);
-			}
-			else
-			{
-				continue;
-			}
+			std::visit(cases{
+				[&](const CVar& cvar) {
+					args = cvar.getter();
+				},
+				[&](const Command& command) { },
+				[&](const Alias& alias) {
+					args = alias.value;
+				}
+			}, item);
 
 			tokens.erase(std::next(tokens.begin(), i));
 			tokens.insert(std::next(tokens.begin(), i), args.begin(), args.end());

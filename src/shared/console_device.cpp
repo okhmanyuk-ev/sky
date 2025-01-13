@@ -633,54 +633,39 @@ std::vector<ImguiConsole::Hint> ImguiConsole::getHints(const std::string& match)
 
 	std::vector<Hint> result = {};
 
-	for (auto& [name, cvar] : sky::GetService<sky::CommandProcessor>()->getCVars())
+	for (const auto& [name, item] : sky::GetService<sky::CommandProcessor>()->getItems())
 	{
 		if (name.find(lowercase_match) == std::string::npos)
 			continue;
 
-		auto hint = Hint{
-			.type = Hint::Type::CVar,
-			.name = name,
-			.description = cvar.description,
-			.args = cvar.getArgsAsString()
-		};
-
+		auto hint = std::visit(cases{
+			[&](const sky::CommandProcessor::CVar& cvar) {
+				return Hint{
+					.type = Hint::Type::CVar,
+					.name = name,
+					.description = cvar.description,
+					.args = cvar.getArgsAsString()
+				};
+			},
+			[&](const sky::CommandProcessor::Command& command) {
+				return Hint{
+					.type = Hint::Type::Command,
+					.name = name,
+					.description = command.description,
+					.args = command.getArgsAsString()
+				};
+			},
+			[&](const sky::CommandProcessor::Alias& alias) {\
+				return Hint{
+					.type = Hint::Type::Alias,
+					.name = name,
+					.description = "alias",
+					.args = sky::CommandProcessor::MakeStringFromTokens(alias.value)
+				};
+			}
+		}, item);
 		result.push_back(hint);
 	}
-
-	for (auto& [name, command] : sky::GetService<sky::CommandProcessor>()->getCommands())
-	{
-		if (name.find(lowercase_match) == std::string::npos)
-			continue;
-
-		auto hint = Hint{
-			.type = Hint::Type::Command,
-			.name = name,
-			.description = command.description,
-			.args = command.getArgsAsString()
-		};
-
-		result.push_back(hint);
-	}
-
-	for (auto& [name, value] : sky::GetService<sky::CommandProcessor>()->getAliases())
-	{
-		if (name.find(lowercase_match) == std::string::npos)
-			continue;
-
-		auto hint = Hint{
-			.type = Hint::Type::Alias,
-			.name = name,
-			.description = "alias",
-			.args = sky::CommandProcessor::MakeStringFromTokens(value)
-		};
-
-		result.push_back(hint);
-	}
-
-	std::sort(result.begin(), result.end(), [](const Hint& left, const Hint& right) {
-		return left.name < right.name;
-	});
 
 	if (result.empty())
 	{

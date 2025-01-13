@@ -75,10 +75,10 @@ void sky::Log(Console::Color color, const std::string& text)
 
 void sky::AddCommand(const std::string& name, CommandProcessor::Command command)
 {
-	GetService<CommandProcessor>()->addCommand(name, command);
+	GetService<CommandProcessor>()->addItem(name, command);
 }
 
 void sky::AddCVar(const std::string& name, CommandProcessor::CVar cvar)
 {
-	GetService<CommandProcessor>()->addCVar(name, cvar);
+	GetService<CommandProcessor>()->addItem(name, cvar);
 }

@@ -4,6 +4,7 @@
 #include <functional>
 #include <thread>
 #include <optional>
+#include <variant>
 #include <platform/defines.h>
 #include <sky/dispatcher.h>
 #include <sky/locator.h>
@@ -142,21 +143,25 @@ namespace sky
 			Callback callback;
 		};
 
+		struct Alias
+		{
+			Alias(std::vector<std::string> value);
+			std::vector<std::string> value;
+		};
+
+		using Item = std::variant<
+			CVar,
+			Command,
+			Alias
+		>;
+
 	public:
 		void execute(const std::string& cmd);
-		void addCommand(const std::string& name, Command command);
-		void addCVar(const std::string& name, CVar cvar);
-		void removeCommand(const std::string& name);
-		void removeCVar(const std::string& name);
+		void addItem(const std::string& name, Item item);
+		void removeItem(const std::string& name);
 
 	public:
-		void addAlias(const std::string& name, const std::vector<std::string>& value);
-		void removeAlias(const std::string& name);
-
-	public:
-		const auto& getCVars() const { return mCVars; }
-		const auto& getCommands() const { return mCommands; }
-		const auto& getAliases() const { return mAliases; }
+		const auto& getItems() const { return mItems; }
 
 	public:
 		void onEvent(const sky::Console::ReadEvent& e) override;
@@ -171,9 +176,7 @@ namespace sky
 		std::vector<std::string> dereferenceTokens(std::vector<std::string> tokens);
 
 	private:
-		std::map<std::string, CVar> mCVars;
-		std::map<std::string, Command> mCommands;
-		std::map<std::string, std::vector<std::string>> mAliases;
+		std::map<std::string, Item> mItems;
 	};
 
 	template<typename T>
@@ -213,12 +216,12 @@ namespace sky
 		{
 			auto getter = [this] { return CVarTraits<T>::ValueToArgs(mValue); };
 			auto setter = [this](const auto& args) { mValue = CVarTraits<T>::ArgsToValue(args); };
-			sky::Locator<CommandProcessor>::GetService()->addCVar(mName, sky::CommandProcessor::CVar(description, CVarTraits<T>::Args, getter, setter));
+			sky::Locator<CommandProcessor>::GetService()->addItem(mName, sky::CommandProcessor::CVar(description, CVarTraits<T>::Args, getter, setter));
 		}
 
 		~CVar()
 		{
-			sky::Locator<CommandProcessor>::GetService()->removeCVar(mName);
+			sky::Locator<CommandProcessor>::GetService()->removeItem(mName);
 		}
 
 		operator T() const { return mValue; }

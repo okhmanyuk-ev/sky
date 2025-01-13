@@ -49,7 +49,13 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 {
 	sky::Log("Commands:");
 
-	for (auto& [name, command] : sky::GetService<sky::CommandProcessor>()->getCommands())
+	auto commands = sky::GetService<sky::CommandProcessor>()->getItems() | std::views::filter([](const auto& pair) {
+		return std::holds_alternative<sky::CommandProcessor::Command>(pair.second);
+	}) | std::views::transform([](const auto& pair) {
+		return std::pair{ pair.first, std::get<sky::CommandProcessor::Command>(pair.second) };
+	});
+
+	for (const auto& [name, command] : commands)
 	{
 		if (CON_ARG_EXIST(0) && (name.find(CON_ARG(0)) == std::string::npos))
 			continue;
@@ -74,7 +80,13 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 {
 	sky::Log("CVars:");
 
-	for (auto& [name, cvar] : sky::GetService<sky::CommandProcessor>()->getCVars())
+	auto cvars = sky::GetService<sky::CommandProcessor>()->getItems() | std::views::filter([](const auto& pair) {
+		return std::holds_alternative<sky::CommandProcessor::CVar>(pair.second);
+	}) | std::views::transform([](const auto& pair) {
+		return std::pair{ pair.first, std::get<sky::CommandProcessor::CVar>(pair.second) };
+	});
+
+	for (const auto& [name, cvar] : cvars)
 	{
 		if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
 			continue;
@@ -102,18 +114,7 @@ void ConsoleCommands::onEcho(CON_ARGS)
 
 void ConsoleCommands::onLater(CON_ARGS)
 {
-	float seconds = 0.0f;
-
-	try
-	{
-		seconds = std::stof(CON_ARG(0));
-	}
-	catch (const std::exception& e)
-	{
-		sky::Log(e.what());
-		return;
-	}
-
+	float seconds = std::stof(CON_ARG(0));
 	Actions::Run(Actions::Collection::Delayed(seconds,
 		Actions::Collection::Execute([this, command = CON_ARG(1)] {
 			sky::GetService<sky::CommandProcessor>()->execute(command);
@@ -149,56 +150,64 @@ void ConsoleCommands::onClear(CON_ARGS)
 
 void ConsoleCommands::onAlias(CON_ARGS)
 {
-	const auto& aliases = sky::GetService<sky::CommandProcessor>()->getAliases();
+	const auto& items = sky::GetService<sky::CommandProcessor>()->getItems();
 
 	if (CON_ARGS_COUNT < 2)
 	{
+		auto aliases = items | std::views::filter([](const auto& pair) {
+			return std::holds_alternative<sky::CommandProcessor::Alias>(pair.second);
+		}) | std::views::transform([](const auto& pair) {
+			return std::pair{ pair.first, std::get<sky::CommandProcessor::Alias>(pair.second) };
+		});
+
 		if (aliases.empty())
-		{
 			sky::Log("alias list is empty");
-		}
-		else
+
+		for (const auto& [name, alias] : aliases)
 		{
-			for (auto& [name, value] : aliases)
-			{
-				if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
-					continue;
+			if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
+				continue;
 
-				sky::Log(" - " + name + " = " + sky::CommandProcessor::MakeStringFromTokens(value));
-			}
+			sky::Log(" - {} = {}", name, sky::CommandProcessor::MakeStringFromTokens(alias.value));
 		}
-		sky::Log("aliases can be invoked by adding 'sharp' prefix, example: #alias_name");
 
+		sky::Log("aliases can be invoked by adding 'sharp' prefix, example: #alias_name");
 		return;
 	}
 
 	auto name = CON_ARG(0);
 
-	if (aliases.count(name) > 0)
+	if (name.empty())
 	{
-		if (CON_ARG_EXIST(1))
-		{
-			auto value = CON_ARG(1);
-
-			if (!value.empty())
-			{
-				sky::GetService<sky::CommandProcessor>()->addAlias(name, sky::CommandProcessor::MakeTokensFromString(value));
-			}
-			else
-			{
-				sky::GetService<sky::CommandProcessor>()->removeAlias(name);
-				sky::Log("alias \"" + name + "\" removed");
-			}
-		}
-		else
-		{
-			sky::Log("alias \"" + name + "\" already exist");
-		}
-
+		sky::Log("alias name must not be empty");
 		return;
 	}
 
-	sky::GetService<sky::CommandProcessor>()->addAlias(name, sky::CommandProcessor::MakeTokensFromString(CON_ARG(1)));
+	if (items.contains(name))
+	{
+		const auto& item = items.at(name);
+		auto is_alias = std::holds_alternative<sky::CommandProcessor::Alias>(item);
+
+		if (!is_alias)
+		{
+			if (std::holds_alternative<sky::CommandProcessor::Command>(item))
+				sky::Log("cannot add alias, command {} already exist", name);
+			else if (std::holds_alternative<sky::CommandProcessor::CVar>(item))
+				sky::Log("cannot add alias, cvar {} already exist", name);
+			return;
+		}
+
+		sky::GetService<sky::CommandProcessor>()->removeItem(name);
+		sky::Log("alias {} removed", name);
+	}
+
+	auto value = CON_ARG(1);
+
+	if (value.empty())
+		return;
+
+	sky::GetService<sky::CommandProcessor>()->addItem(name, sky::CommandProcessor::Alias(sky::CommandProcessor::MakeTokensFromString(CON_ARG(1))));
+	sky::Log("alias {} added", name);
 }
 
 void ConsoleCommands::onIf(CON_ARGS)
@@ -212,22 +221,31 @@ void ConsoleCommands::onIf(CON_ARGS)
 	if (has_else_cmd)
 		else_cmd = CON_ARG(3);
 
-	auto& cvars = sky::GetService<sky::CommandProcessor>()->getCVars();
-	auto& aliases = sky::GetService<sky::CommandProcessor>()->getAliases();
+	const auto& items = sky::GetService<sky::CommandProcessor>()->getItems();
 
 	auto var_value = std::vector<std::string>();
 
-	if (cvars.count(var) > 0)
+	if (!items.contains(var))
 	{
-		var_value = cvars.at(var).getter();
+		sky::Log("variable {} not found", var);
+		return;
 	}
-	else if (aliases.count(var) > 0)
+
+	const auto& item = items.at(var);
+
+	if (std::holds_alternative<sky::CommandProcessor::CVar>(item))
 	{
-		var_value = aliases.at(var);
+		const auto& cvar = std::get<sky::CommandProcessor::CVar>(item);
+		var_value = cvar.getter();
+	}
+	else if (std::holds_alternative<sky::CommandProcessor::Alias>(item))
+	{
+		const auto& alias = std::get<sky::CommandProcessor::Alias>(item);
+		var_value = alias.value;
 	}
 	else
 	{
-		sky::Log("variable \"" + var + "\" not found");
+		sky::Log("variable {} not found", var);
 		return;
 	}
 
