@@ -1,22 +1,19 @@
 #pragma once
 
-#include <sky/locator.h>
-#include <audio/sound.h>
+#include <memory>
 #include <fmod/fmod_studio.hpp>
+#include <platform/asset.h>
 
-#define AUDIO sky::Locator<Audio::System>::GetService()
-
-namespace Audio
+namespace sky
 {
-	class System
+	class Audio
 	{
-		friend class Sound;
 	public:
-		System();
-		~System();
+		class Sound;
 
 	public:
-		void update();
+		Audio();
+		~Audio();
 
 	public:
 		void play(std::shared_ptr<Sound> sound);
@@ -25,5 +22,17 @@ namespace Audio
 		static inline FMOD::System* Fmod = nullptr;
 		static inline FMOD::Studio::System* FmodStudio = nullptr;
 		FMOD::Channel* channel = nullptr;
+	};
+
+	class Audio::Sound
+	{
+		friend class Audio;
+
+	public:
+		Sound(const Platform::Asset& asset, bool loop = false);
+		~Sound();
+
+	private:
+		FMOD::Sound* sound;
 	};
 }

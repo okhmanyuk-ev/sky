@@ -7,7 +7,7 @@
 #include <memory>
 #include <set>
 #include <optional>
-#include <audio/sound.h>
+#include <sky/audio.h>
 #include <nlohmann/json.hpp>
 
 namespace sky

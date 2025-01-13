@@ -5,7 +5,7 @@
 #include <graphics/font.h>
 #include <graphics/animation.h>
 #include <graphics/atlas.h>
-#include <audio/sound.h>
+#include <sky/audio.h>
 #include <nlohmann/json.hpp>
 #include <sky/dispatcher.h>
 #include <console/device.h>
@@ -37,6 +37,7 @@ namespace sky
 	}
 
 	void PlaySound(std::shared_ptr<Audio::Sound> sound);
+	void PlaySound(const std::string& name);
 
 	void Log(const std::string& text);
 	void Log(Console::Color color, const std::string& text);

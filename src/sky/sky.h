@@ -1,6 +1,7 @@
 #pragma once
 
 #include <shared/all.h>
+#include <sky/audio.h>
 #include <sky/cache.h>
 #include <sky/clock.h>
 #include <sky/dispatcher.h>

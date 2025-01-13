@@ -2,7 +2,7 @@
 #include <imgui.h>
 #include <shared/imgui_user.h>
 #include <shared/imscene.h>
-#include <audio/system.h>
+#include <sky/audio.h>
 #include <shared/scene_manager.h>
 #include <shared/scene_helpers.h>
 #include <regex>
@@ -44,7 +44,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<Shared::ImScene>::Init(std::make_shared<Shared::ImScene>());
 	if (flags.count(Flag::Audio))
 	{
-		sky::Locator<Audio::System>::Init(std::make_shared<Audio::System>());
+		sky::Locator<sky::Audio>::Init(std::make_shared<sky::Audio>());
 	}
 
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
@@ -284,7 +284,7 @@ Application::~Application()
 	}
 	if (mFlags.count(Flag::Audio))
 	{
-		sky::Locator<Audio::System>::Reset();
+		sky::Locator<sky::Audio>::Reset();
 	}
 	sky::Locator<Shared::ImScene>::Reset();
 	sky::Locator<Shared::Stylebook>::Reset();

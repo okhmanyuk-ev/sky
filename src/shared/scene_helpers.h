@@ -1,6 +1,5 @@
 #pragma once
 #include <scene/all.h>
-#include <audio/system.h>
 #include "scene_manager.h"
 #include <common/helpers.h>
 #include <tinyxml2.h>
@@ -110,10 +109,10 @@ namespace Shared::SceneHelpers
 		}
 
 	public:
-		void setClickSound(std::shared_ptr<Audio::Sound> value) { mClickSound = value; }
+		void setClickSound(std::shared_ptr<sky::Audio::Sound> value) { mClickSound = value; }
 
 	private:
-		std::shared_ptr<Audio::Sound> mClickSound = nullptr;
+		std::shared_ptr<sky::Audio::Sound> mClickSound = nullptr;
 	};
 
 	template <class T>

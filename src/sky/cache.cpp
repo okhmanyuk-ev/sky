@@ -22,7 +22,7 @@ std::shared_ptr<Graphics::Font> sky::Cache::getFont(const std::string& name)
 	return mFonts.at(name);
 }
 
-std::shared_ptr<Audio::Sound> sky::Cache::getSound(const std::string& name)
+std::shared_ptr<sky::Audio::Sound> sky::Cache::getSound(const std::string& name)
 {
 	loadSound(name);
 
