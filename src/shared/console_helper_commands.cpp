@@ -8,8 +8,6 @@ using namespace Shared;
 
 ConsoleHelperCommands::ConsoleHelperCommands()
 {
-	sky::AddCVar("hud_show_cvars", sky::CommandProcessor::CVar("show cvars menu on screen", {"bool"}, CVAR_GETTER_BOOL(mShowCVars), CVAR_SETTER_BOOL(mShowCVars)));
-	sky::AddCVar("hud_show_profiler", sky::CommandProcessor::CVar("show profiler on screen", { "int" }, CVAR_GETTER_INT(mShowProfiler), CVAR_SETTER_INT(mShowProfiler)));
 	sky::AddCVar("con_color", sky::CommandProcessor::CVar(std::nullopt, { "r", "g", "b" },
 		[this] {
 			auto col = ImGui::User::GetColorFromStyle();
@@ -17,11 +15,6 @@ ConsoleHelperCommands::ConsoleHelperCommands()
 		},
 		CVAR_SETTER(ImGui::User::SetupStyleFromColor(CON_ARG_FLOAT(0), CON_ARG_FLOAT(1), CON_ARG_FLOAT(2)))
 	));
-	sky::AddCVar("imgui_show_demo", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(mShowImguiDemo), CVAR_SETTER_BOOL(mShowImguiDemo)));
-}
-
-ConsoleHelperCommands::~ConsoleHelperCommands()
-{
 }
 
 void ConsoleHelperCommands::onFrame()

@@ -3,6 +3,7 @@
 #include <common/frame_system.h>
 #include <platform/system.h>
 #include <glm/glm.hpp>
+#include <sky/console.h>
 
 namespace Shared
 {
@@ -10,14 +11,13 @@ namespace Shared
 	{
 	public:
 		ConsoleHelperCommands();
-		~ConsoleHelperCommands();
 
 	private:
 		void onFrame() override;
 
 	private:
-		bool mShowCVars = false;
-		bool mShowProfiler = false;
-		bool mShowImguiDemo = false;
+		sky::CVar<bool> mShowCVars = sky::CVar<bool>("hud_show_cvars", false, "show cvars menu on screen");
+		sky::CVar<bool> mShowProfiler = sky::CVar<bool>("hud_show_profiler", false, "show profiler on screen");
+		sky::CVar<bool> mShowImguiDemo = sky::CVar<bool>("imgui_show_demo", false, "show imgui demo");
 	};
 }
