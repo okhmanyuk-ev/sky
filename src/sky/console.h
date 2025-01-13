@@ -194,4 +194,30 @@ namespace sky
 		std::map<std::string, Command> mCommands;
 		std::map<std::string, std::vector<std::string>> mAliases;
 	};
+
+	class CVarBool
+	{
+	public:
+		CVarBool(const std::string& name, bool default_value, std::optional<std::string> description = std::nullopt);
+		~CVarBool();
+
+		operator bool() const { return mValue; }
+
+	private:
+		std::string mName;
+		bool mValue;
+	};
+
+	class CVarInt
+	{
+	public:
+		CVarInt(const std::string& name, int default_value, std::optional<std::string> description = std::nullopt);
+		~CVarInt();
+
+		operator int() const { return mValue; }
+
+	private:
+		std::string mName;
+		int mValue;
+	};
 }

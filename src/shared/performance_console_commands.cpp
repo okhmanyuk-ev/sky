@@ -11,21 +11,6 @@
 
 using namespace Shared;
 
-PerformanceConsoleCommands::PerformanceConsoleCommands()
-{
-	sky::AddCVar("hud_show_fps", sky::CVar("show fps on screen", { "int (1/2)" }, CVAR_GETTER_INT(mWantShowFps), CVAR_SETTER_INT(mWantShowFps)));
-	sky::AddCVar("hud_show_drawcalls", sky::CVar("show drawcalls statistics", { "int" }, CVAR_GETTER_INT(mWantShowDrawcalls), CVAR_SETTER_INT(mWantShowDrawcalls)));
-	sky::AddCVar("hud_show_batches", sky::CVar("show batches statistics", { "int" }, CVAR_GETTER_INT(mWantShowBatches), CVAR_SETTER_INT(mWantShowBatches)));
-	sky::AddCVar("hud_show_targets", sky::CVar("show render targets statistics", { "int" }, CVAR_GETTER_INT(mWantShowTargets), CVAR_SETTER_INT(mWantShowTargets)));
-	sky::AddCVar("hud_show_tasks", sky::CVar("show tasks count on screen", { "int" }, CVAR_GETTER_INT(mWantShowTasks), CVAR_SETTER_INT(mWantShowTasks)));
-	sky::AddCVar("hud_show_net_speed", sky::CVar("show net speed", { "bool" }, CVAR_GETTER_BOOL(mWantShowNetSpeed), CVAR_SETTER_BOOL(mWantShowNetSpeed)));
-	sky::AddCVar("hud_show_net_pps", sky::CVar("show net packets per second", { "bool" }, CVAR_GETTER_BOOL(mWantShowNetPps), CVAR_SETTER_BOOL(mWantShowNetPps)));
-}
-
-PerformanceConsoleCommands::~PerformanceConsoleCommands()
-{
-}
-
 void PerformanceConsoleCommands::onFrame()
 {
 	if (mWantShowFps > 0)

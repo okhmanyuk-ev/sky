@@ -453,3 +453,41 @@ std::string Command::getArgsAsString() const
 
 	return result;
 }
+
+CVarBool::CVarBool(const std::string& name, bool default_value, std::optional<std::string> description) :
+	mName(name),
+	mValue(default_value)
+{
+	auto getter = [this] {
+		return std::vector<std::string>({ std::to_string(mValue) });
+	};
+	auto setter = [this](const std::vector<std::string>& args) {
+		try { mValue = stoi(args[0]); }
+		catch (const std::exception& e) { sky::Log(e.what()); }
+	};
+	sky::AddCVar(name, sky::CVar(description, { "bool" }, getter, setter));
+}
+
+CVarBool::~CVarBool()
+{
+	sky::GetService<CommandProcessor>()->removeCVar(mName);
+}
+
+CVarInt::CVarInt(const std::string& name, int default_value, std::optional<std::string> description) :
+	mName(name),
+	mValue(default_value)
+{
+	auto getter = [this] {
+		return std::vector<std::string>({ std::to_string(mValue) });
+	};
+	auto setter = [this](const std::vector<std::string>& args) {
+		try { mValue = stoi(args[0]); }
+		catch (const std::exception& e) { sky::Log(e.what()); }
+	};
+	sky::AddCVar(name, sky::CVar(description, { "int" }, getter, setter));
+}
+
+CVarInt::~CVarInt()
+{
+	sky::GetService<CommandProcessor>()->removeCVar(mName);
+}
