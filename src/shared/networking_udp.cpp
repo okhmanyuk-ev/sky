@@ -1,6 +1,6 @@
 #include "networking_udp.h"
 
-#include <console/device.h>
+#include <sky/console.h>
 #include <common/buffer_helpers.h>
 #include <common/helpers.h>
 #include <common/console_commands.h>
@@ -258,28 +258,28 @@ Networking::Networking(uint16_t port) : mSocket(port)
 		readPacket(packet);
 	});
 
-	CONSOLE->registerCVar("net_log_packets", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_log_packets", { "bool" },
 		CVAR_GETTER_BOOL(Networking::NetLogPackets), CVAR_SETTER_BOOL(Networking::NetLogPackets));
 
-	CONSOLE->registerCVar("net_log_loss", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_log_loss", { "bool" },
 		CVAR_GETTER_BOOL(Networking::NetLogLoss), CVAR_SETTER_BOOL(Networking::NetLogLoss));
 
-	CONSOLE->registerCVar("net_log_rel", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_log_rel", { "bool" },
 		CVAR_GETTER_BOOL(Networking::NetLogRel), CVAR_SETTER_BOOL(Networking::NetLogRel));
 
-	CONSOLE->registerCVar("net_reconnect_delay", { "sec" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_reconnect_delay", { "sec" },
 		CVAR_GETTER_INT(Networking::NetReconnectDelay), CVAR_SETTER_INT(Networking::NetReconnectDelay));
 
-	CONSOLE->registerCVar("net_timeout", { "sec" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_timeout", { "sec" },
 		CVAR_GETTER_INT(Networking::NetTimeout), CVAR_SETTER_INT(Networking::NetTimeout));
 
-	CONSOLE->registerCVar("net_transmit_delay_min", { "msec" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_transmit_delay_min", { "msec" },
 		CVAR_GETTER_INT(Networking::NetTransmitDelayMin), CVAR_SETTER_INT(Networking::NetTransmitDelayMin));
 
-	CONSOLE->registerCVar("net_transmit_delay_max", { "msec" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_transmit_delay_max", { "msec" },
 		CVAR_GETTER_INT(Networking::NetTransmitDelayMax), CVAR_SETTER_INT(Networking::NetTransmitDelayMax));
 
-	CONSOLE->registerCVar("net_max_packet_size", { "bytes" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_max_packet_size", { "bytes" },
 		CVAR_GETTER_INT(Networking::NetMaxPacketSize), CVAR_SETTER_INT(Networking::NetMaxPacketSize));
 }
 

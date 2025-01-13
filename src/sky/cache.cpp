@@ -1,7 +1,7 @@
 #include "cache.h"
-#include <console/device.h>
 #include <nlohmann/json.hpp>
 #include <common/helpers.h>
+#include <sky/utils.h>
 
 Graphics::TexCell sky::Cache::getTexture(const std::string& name)
 {
@@ -85,7 +85,7 @@ void sky::Cache::loadTexture(const std::string& path, std::optional<std::string>
 
 	if (!Platform::Asset::Exists(path))
 	{
-		CONSOLE_DEVICE->writeLine("cannot find texture: " + path, Console::Color::Red);
+		sky::Log(Console::Color::Red, "cannot find texture: " + path);
 		return;
 	}
 
@@ -121,7 +121,7 @@ void sky::Cache::loadSound(const std::string& path, std::optional<std::string> _
 
 	if (!Platform::Asset::Exists(path))
 	{
-		CONSOLE_DEVICE->writeLine("cannot find sound: " + path, Console::Color::Red);
+		sky::Log(Console::Color::Red, "cannot find sound: " + path);
 		return;
 	}
 

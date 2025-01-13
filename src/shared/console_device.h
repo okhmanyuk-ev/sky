@@ -4,8 +4,7 @@
 // no cycle and checking,
 // just remove equal items when adding
 
-#include <console/device.h>
-#include <console/system.h>
+#include <sky/console.h>
 #include <common/interpolator.h>
 #include <sky/dispatcher.h>
 #include <common/frame_system.h>
@@ -22,7 +21,7 @@
 
 namespace Shared
 {
-	class ConsoleDevice : public Console::Device,
+	class ImguiConsole : public sky::Console,
 		public Common::FrameSystem::Frameable,
 		public sky::Listenable<Platform::Input::Keyboard::Event>,
 		public sky::Listenable<TouchEmulator::Event>,
@@ -57,7 +56,7 @@ namespace Shared
 		};
 
 	public:
-		ConsoleDevice();
+		ImguiConsole();
 
 		void write(const std::string& s, Console::Color color = Console::Color::Default) override;
 		void writeLine(const std::string& s, Console::Color color = Console::Color::Default) override;

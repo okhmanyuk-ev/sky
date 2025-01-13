@@ -1,7 +1,8 @@
 #pragma once
-
-#include <console/system.h>
+#include <sky/utils.h>
 #include <common/actions.h>
+#include <vector>
+#include <string>
 
 #define CVAR_GETTER(V) [this] { return std::vector<std::string>({ V }); }
 #define CVAR_GETTER2(V1, V2) [this] { return std::vector<std::string>({ V1, V2 }); }
@@ -41,7 +42,7 @@
 #define CON_ARG_FLOAT(N) stof(CON_ARG(N))
 #define CON_ARG_DOUBLE(N) stod(CON_ARG(N))
 
-#define CVAR_SETTER(V) [this](CON_ARGS) { try { V; } catch (const std::exception& e) { CONSOLE_DEVICE->writeLine(e.what()); } }
+#define CVAR_SETTER(V) [this](CON_ARGS) { try { V; } catch (const std::exception& e) { sky::Log(e.what()); } }
 
 #define CVAR_SETTER_FLOAT(V) CVAR_SETTER(V = CON_ARG_FLOAT(0))
 #define CVAR_SETTER_FLOAT_FUNC(V) CVAR_SETTER(V(CON_ARG_FLOAT(0)))

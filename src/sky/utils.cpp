@@ -65,10 +65,10 @@ void sky::PlaySound(const std::string& name)
 
 void sky::Log(const std::string& text)
 {
-	CONSOLE_DEVICE->writeLine(text);
+	sky::GetService<sky::Console>()->writeLine(text);
 }
 
 void sky::Log(Console::Color color, const std::string& text)
 {
-	CONSOLE_DEVICE->writeLine(text, color);
+	sky::GetService<sky::Console>()->writeLine(text, color);
 }

@@ -1,5 +1,5 @@
 #include "networking_ws.h"
-#include <console/device.h>
+#include <sky/console.h>
 #include <common/buffer_helpers.h>
 #include <common/console_commands.h>
 #include <sky/utils.h>
@@ -18,13 +18,13 @@ using namespace Shared::NetworkingWS;
 
 NetCommands::NetCommands()
 {
-	CONSOLE->registerCVar("net_log_events", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("net_log_events", { "bool" },
 		CVAR_GETTER_BOOL(NetCommands::LogEvents), CVAR_SETTER_BOOL(NetCommands::LogEvents));
 }
 
 NetCommands::~NetCommands()
 {
-	CONSOLE->removeCVar("net_log_events");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("net_log_events");
 }
 
 // channel

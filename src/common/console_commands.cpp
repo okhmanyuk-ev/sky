@@ -7,15 +7,15 @@ using namespace Common;
 
 ConsoleCommands::ConsoleCommands()
 {
-	CONSOLE->registerCVar("sys_framerate", "limit of fps", { "int" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("sys_framerate", "limit of fps", {"int"},
 		CVAR_GETTER_INT_FUNC(FRAME->getFramerateLimit),
 		CVAR_SETTER_INT_FUNC(FRAME->setFramerateLimit));
 
-	CONSOLE->registerCVar("sys_sleep", "cpu saving between frames", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("sys_sleep", "cpu saving between frames", { "bool" },
 		CVAR_GETTER_BOOL_FUNC(FRAME->isSleepAllowed),
 		CVAR_SETTER_BOOL_FUNC(FRAME->setSleepAllowed));
 
-	CONSOLE->registerCVar("sys_timescale", "time delta multiplier", { "float" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("sys_timescale", "time delta multiplier", { "float" },
 		CVAR_GETTER_DOUBLE_FUNC(FRAME->getTimeScale),
 		CVAR_SETTER_DOUBLE_FUNC(FRAME->setTimeScale));
 
@@ -39,36 +39,36 @@ ConsoleCommands::ConsoleCommands()
 		FRAME->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec));
 	};
 
-	CONSOLE->registerCVar("sys_time_delta_limit_fps", { "null/float" }, getter, setter);
+	sky::GetService<sky::CommandProcessor>()->registerCVar("sys_time_delta_limit_fps", { "null/float" }, getter, setter);
 
-	CONSOLE->registerCommand("cmdlist", "show list of commands", {}, { "filter" },
+	sky::GetService<sky::CommandProcessor>()->registerCommand("cmdlist", "show list of commands", {}, { "filter" },
 		CMD_METHOD(onCmdList));
 
-	CONSOLE->registerCommand("cvarlist", "show list of cvars", {}, { "filter" },
+	sky::GetService<sky::CommandProcessor>()->registerCommand("cvarlist", "show list of cvars", {}, { "filter" },
 		CMD_METHOD(onCVarList));
 
-	CONSOLE->registerCommand("echo", "print to console", { "text" }, { "text.." },
+	sky::GetService<sky::CommandProcessor>()->registerCommand("echo", "print to console", { "text" }, { "text.." },
 		CMD_METHOD(onEcho));
 
-	CONSOLE->registerCommand("later", "delayed execution", { "time", "command" },
+	sky::GetService<sky::CommandProcessor>()->registerCommand("later", "delayed execution", { "time", "command" },
 		CMD_METHOD(onLater));
 
-	CONSOLE->registerCommand("exec", "execute console commands from file", { "path" }, { "path.." },
+	sky::GetService<sky::CommandProcessor>()->registerCommand("exec", "execute console commands from file", { "path" }, { "path.." },
 		CMD_METHOD(onExec));
 
-	CONSOLE->registerCommand("clear", "clear console field",
+	sky::GetService<sky::CommandProcessor>()->registerCommand("clear", "clear console field",
 		CMD_METHOD(onClear));
 
-	CONSOLE->registerCommand("alias", "manage aliases",
+	sky::GetService<sky::CommandProcessor>()->registerCommand("alias", "manage aliases",
 		CMD_METHOD(onAlias));
 
-	CONSOLE->registerCommand("if", "condition checking and execution", { "var", "value", "then" }, { "else" },
+	sky::GetService<sky::CommandProcessor>()->registerCommand("if", "condition checking and execution", { "var", "value", "then" }, { "else" },
 		CMD_METHOD(onIf));
 
-	CONSOLE->registerCommand("quit", "shutdown the app",
+	sky::GetService<sky::CommandProcessor>()->registerCommand("quit", "shutdown the app",
 		CMD_METHOD(onQuit));
 
-	CONSOLE_DEVICE->writeLine("type \"cmdlist\" to see available commands");
+	sky::Log("type \"cmdlist\" to see available commands");
 }
 
 ConsoleCommands::~ConsoleCommands()
@@ -77,9 +77,9 @@ ConsoleCommands::~ConsoleCommands()
 
 void ConsoleCommands::onCmdList(CON_ARGS)
 {
-	CONSOLE_DEVICE->writeLine("Commands:");
+	sky::Log("Commands:");
 
-	for (auto& [name, command] : CONSOLE->getCommands())
+	for (auto& [name, command] : sky::GetService<sky::CommandProcessor>()->getCommands())
 	{
 		if (CON_ARG_EXIST(0) && (name.find(CON_ARG(0)) == std::string::npos))
 			continue;
@@ -96,15 +96,15 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 		if (description.has_value())
 			s += " - " + description.value();
 
-		CONSOLE_DEVICE->writeLine(s);
+		sky::Log(s);
 	}
 }
 
 void ConsoleCommands::onCVarList(CON_ARGS)
 {
-	CONSOLE_DEVICE->writeLine("CVars:");
+	sky::Log("CVars:");
 
-	for (auto& [name, cvar] : CONSOLE->getCVars())
+	for (auto& [name, cvar] : sky::GetService<sky::CommandProcessor>()->getCVars())
 	{
 		if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
 			continue;
@@ -121,13 +121,13 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 		if (!hasSetter)
 			s += " (readonly)";
 
-		CONSOLE_DEVICE->writeLine(s);
+		sky::Log(s);
 	}
 }
 
 void ConsoleCommands::onEcho(CON_ARGS)
 {
-	CONSOLE_DEVICE->writeLine(CON_ARGS_ACCUMULATED_STRING);
+	sky::Log(CON_ARGS_ACCUMULATED_STRING);
 }
 
 void ConsoleCommands::onLater(CON_ARGS)
@@ -140,17 +140,17 @@ void ConsoleCommands::onLater(CON_ARGS)
 	}
 	catch (const std::exception& e)
 	{
-		CONSOLE_DEVICE->writeLine(e.what());
+		sky::Log(e.what());
 		return;
 	}
 
 	Actions::Run(Actions::Collection::Delayed(seconds,
 		Actions::Collection::Execute([this, command = CON_ARG(1)] {
-			CONSOLE->execute(command);
+			sky::GetService<sky::CommandProcessor>()->execute(command);
 		})
 	));
 }
-	
+
 void ConsoleCommands::onExec(CON_ARGS)
 {
 	/*for (auto path : args) // TODO: find solution
@@ -169,23 +169,23 @@ void ConsoleCommands::onExec(CON_ARGS)
 			CONSOLE.execute(line);
 		}
 	}*/
-	CONSOLE_DEVICE->writeLine("TODO"); // TODO: make
+	sky::Log("TODO"); // TODO: make
 }
 
 void ConsoleCommands::onClear(CON_ARGS)
 {
-	CONSOLE_DEVICE->clear();
+	sky::GetService<sky::Console>()->clear();
 }
 
 void ConsoleCommands::onAlias(CON_ARGS)
 {
-	const auto& aliases = CONSOLE->getAliases();
-		
+	const auto& aliases = sky::GetService<sky::CommandProcessor>()->getAliases();
+
 	if (CON_ARGS_COUNT < 2)
 	{
 		if (aliases.empty())
 		{
-			CONSOLE_DEVICE->writeLine("alias list is empty");
+			sky::Log("alias list is empty");
 		}
 		else
 		{
@@ -194,10 +194,10 @@ void ConsoleCommands::onAlias(CON_ARGS)
 				if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
 					continue;
 
-				CONSOLE_DEVICE->writeLine(" - " + name + " = " + Console::System::MakeStringFromTokens(value));
+				sky::Log(" - " + name + " = " + sky::CommandProcessor::MakeStringFromTokens(value));
 			}
 		}
-		CONSOLE_DEVICE->writeLine("aliases can be invoked by adding 'sharp' prefix, example: #alias_name");
+		sky::Log("aliases can be invoked by adding 'sharp' prefix, example: #alias_name");
 
 		return;
 	}
@@ -212,38 +212,38 @@ void ConsoleCommands::onAlias(CON_ARGS)
 
 			if (!value.empty())
 			{
-				CONSOLE->addAlias(name, Console::System::MakeTokensFromString(value));
+				sky::GetService<sky::CommandProcessor>()->addAlias(name, sky::CommandProcessor::MakeTokensFromString(value));
 			}
 			else
 			{
-				CONSOLE->removeAlias(name);
-				CONSOLE_DEVICE->writeLine("alias \"" + name + "\" removed");
+				sky::GetService<sky::CommandProcessor>()->removeAlias(name);
+				sky::Log("alias \"" + name + "\" removed");
 			}
 		}
 		else
 		{
-			CONSOLE_DEVICE->writeLine("alias \"" + name + "\" already exist");
+			sky::Log("alias \"" + name + "\" already exist");
 		}
 
 		return;
 	}
 
-	CONSOLE->addAlias(name, Console::System::MakeTokensFromString(CON_ARG(1)));
+	sky::GetService<sky::CommandProcessor>()->addAlias(name, sky::CommandProcessor::MakeTokensFromString(CON_ARG(1)));
 }
 
 void ConsoleCommands::onIf(CON_ARGS)
 {
 	auto var = CON_ARG(0);
-	auto condition_value = Console::System::MakeTokensFromString(CON_ARG(1));
+	auto condition_value = sky::CommandProcessor::MakeTokensFromString(CON_ARG(1));
 	auto then_cmd = CON_ARG(2);
 	auto else_cmd = std::string();
 	auto has_else_cmd = CON_ARG_EXIST(3);
-		
+
 	if (has_else_cmd)
 		else_cmd = CON_ARG(3);
 
-	auto& cvars = CONSOLE->getCVars();
-	auto& aliases = CONSOLE->getAliases();
+	auto& cvars = sky::GetService<sky::CommandProcessor>()->getCVars();
+	auto& aliases = sky::GetService<sky::CommandProcessor>()->getAliases();
 
 	auto var_value = std::vector<std::string>();
 
@@ -257,16 +257,16 @@ void ConsoleCommands::onIf(CON_ARGS)
 	}
 	else
 	{
-		CONSOLE_DEVICE->writeLine("variable \"" + var + "\" not found");
+		sky::Log("variable \"" + var + "\" not found");
 		return;
 	}
 
 	bool equals = condition_value == var_value;
 
 	if (equals)
-		CONSOLE->execute(then_cmd);
+		sky::GetService<sky::CommandProcessor>()->execute(then_cmd);
 	else if (has_else_cmd)
-		CONSOLE->execute(else_cmd);
+		sky::GetService<sky::CommandProcessor>()->execute(else_cmd);
 }
 
 void ConsoleCommands::onQuit(CON_ARGS)

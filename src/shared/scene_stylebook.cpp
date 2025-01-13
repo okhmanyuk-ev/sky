@@ -1,5 +1,4 @@
 #include "scene_stylebook.h"
-#include <console/device.h>
 #include <sky/utils.h>
 
 using namespace Shared;
@@ -29,7 +28,7 @@ void Stylebook::apply(std::shared_ptr<Scene::Node> node, const std::string& name
 {
 	if (!mJson.contains(name))
 	{
-		sky::Log(Console::Color::Red, "style \"" + name + "\" not found");
+		sky::Log(sky::Console::Color::Red, "style \"" + name + "\" not found");
 		return;
 	}
 

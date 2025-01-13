@@ -29,8 +29,8 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
 	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
 	sky::Locator<Renderer::System>::Init(std::make_shared<Renderer::System>());
-	sky::Locator<Console::Device>::Init(std::make_shared<Shared::ConsoleDevice>());
-	sky::Locator<Console::System>::Init(std::make_shared<Console::System>());
+	sky::Locator<sky::Console>::Init(std::make_shared<Shared::ImguiConsole>());
+	sky::Locator<sky::CommandProcessor>::Init(std::make_shared<sky::CommandProcessor>());
 	sky::Locator<Graphics::System>::Init(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
 	{
@@ -89,17 +89,17 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			mScene->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / sec));
 		};
 
-		CONSOLE->registerCVar("scene_timestep_fps", { "float" }, getter, setter);
+		sky::GetService<sky::CommandProcessor>()->registerCVar("scene_timestep_fps", { "float" }, getter, setter);
 
-		CONSOLE->registerCVar("scene_timestep_enabled", { "bool" }, 
+		sky::GetService<sky::CommandProcessor>()->registerCVar("scene_timestep_enabled", { "bool" },
 			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().isEnabled), 
 			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setEnabled));
 
-		CONSOLE->registerCVar("scene_timestep_force_time_completion", { "bool" },
+		sky::GetService<sky::CommandProcessor>()->registerCVar("scene_timestep_force_time_completion", { "bool" },
 			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().getForceTimeCompletion),
 			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion));
 
-		CONSOLE->registerCommand("spawn_blur_glass", std::nullopt, {}, { "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
+		sky::GetService<sky::CommandProcessor>()->registerCommand("spawn_blur_glass", std::nullopt, {}, { "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
 			float intensity = 0.5f;
 
 			if (CON_ARG_EXIST(0))
@@ -131,7 +131,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			getScene()->getRoot()->attach(blur);
 		});
 
-		CONSOLE->registerCommand("spawn_gray_glass", std::nullopt, {}, { "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
+		sky::GetService<sky::CommandProcessor>()->registerCommand("spawn_gray_glass", std::nullopt, {}, { "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
 			float intensity = 1.0f;
 
 			if (CON_ARG_EXIST(0))
@@ -157,7 +157,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			getScene()->getRoot()->attach(gray);
 		});
 
-		CONSOLE->registerCommand("spawn_shockwave", std::nullopt, {}, { "duration" }, [this](CON_ARGS) {
+		sky::GetService<sky::CommandProcessor>()->registerCommand("spawn_shockwave", std::nullopt, {}, { "duration" }, [this](CON_ARGS) {
 			float duration = 1.0f;
 
 			if (CON_ARG_EXIST(0))
@@ -171,7 +171,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			getScene()->getRoot()->attach(shockwave);
 		});
 
-		CONSOLE->registerCommand("spawn_sprite_from_url", std::nullopt, {}, { "url" }, [this](CON_ARGS) {
+		sky::GetService<sky::CommandProcessor>()->registerCommand("spawn_sprite_from_url", std::nullopt, {}, { "url" }, [this](CON_ARGS) {
 #ifndef EMSCRIPTEN
 			sky::Log("this is for emscripten");
 #else
@@ -223,12 +223,12 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	}
 
 #if defined(BUILD_DEVELOPER)
-	CONSOLE->execute("hud_show_fps 1");
-	CONSOLE->execute("hud_show_drawcalls 1");
-	CONSOLE->execute("hud_show_batches 1");
-	CONSOLE->execute("hud_show_targets 1");
+	sky::GetService<sky::CommandProcessor>()->execute("hud_show_fps 1");
+	sky::GetService<sky::CommandProcessor>()->execute("hud_show_drawcalls 1");
+	sky::GetService<sky::CommandProcessor>()->execute("hud_show_batches 1");
+	sky::GetService<sky::CommandProcessor>()->execute("hud_show_targets 1");
 #else
-	CONSOLE_DEVICE->setEnabled(false);
+	sky::GetService<sky::Console>()->setEnabled(false);
 	STATS->setEnabled(false);
 #endif
 
@@ -237,7 +237,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	const auto& args = PLATFORM->getArguments();
 	for (const auto& arg : args | std::views::drop(1))
 	{
-		sky::Log(Console::Color::Gray, "processing argument: {}", arg);
+		sky::Log(sky::Console::Color::Gray, "processing argument: {}", arg);
 
 		std::regex pattern(R"((\w+)=(\w+))"); // default web arguments 'http://localhost/?draft=true&lang=ru'
 		std::smatch matches;
@@ -250,7 +250,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			continue;
 		}
 
-		auto tokens = CONSOLE->MakeTokensFromString(arg);
+		auto tokens = sky::GetService<sky::CommandProcessor>()->MakeTokensFromString(arg);
 
 		if (tokens.empty())
 			continue;
@@ -264,13 +264,13 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			continue;
 
 		cmd = cmd.substr(1);
-		auto final_cmd = CONSOLE->MakeStringFromTokens(tokens);
+		auto final_cmd = sky::GetService<sky::CommandProcessor>()->MakeStringFromTokens(tokens);
 		startup_commands.push_back(final_cmd);
 	}
 
 	FRAME->addOne([startup_commands] {
 		for (auto cmd : startup_commands)
-			CONSOLE->execute(cmd);
+			sky::GetService<sky::CommandProcessor>()->execute(cmd);
 	});
 }
 
@@ -297,8 +297,8 @@ Application::~Application()
 		sky::Locator<Network::System>::Reset();
 	}
 	sky::Locator<Graphics::System>::Reset();
-	sky::Locator<Console::System>::Reset();
-	sky::Locator<Console::Device>::Reset();
+	sky::Locator<sky::Console>::Reset();
+	sky::Locator<sky::CommandProcessor>::Reset();
 	sky::Locator<Renderer::System>::Reset();
 	sky::Locator<Platform::System>::Reset();
 	sky::Locator<Common::ProfilerSystem>::Reset();

@@ -1,9 +1,7 @@
 #pragma once
 
-#include <console/system.h>
 #include <common/task_system.h>
 #include <platform/system.h>
-#include <console/system.h>
 #include <common/frame_system.h>
 #include <common/framerate_counter.h>
 #include <common/task_system.h>

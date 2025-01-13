@@ -13,30 +13,30 @@ using namespace Shared;
 
 PerformanceConsoleCommands::PerformanceConsoleCommands()
 {
-	CONSOLE->registerCVar("hud_show_fps", "show fps on screen", { "int (1/2)" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_fps", "show fps on screen", { "int (1/2)" },
 		CVAR_GETTER_INT(mWantShowFps),
 		CVAR_SETTER_INT(mWantShowFps));
 
-	CONSOLE->registerCVar("hud_show_drawcalls", "show drawcalls statistics", { "int" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_drawcalls", "show drawcalls statistics", { "int" },
 		CVAR_GETTER_INT(mWantShowDrawcalls),
 		CVAR_SETTER_INT(mWantShowDrawcalls));
 
-	CONSOLE->registerCVar("hud_show_batches", "show batches statistics", { "int" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_batches", "show batches statistics", { "int" },
 		CVAR_GETTER_INT(mWantShowBatches),
 		CVAR_SETTER_INT(mWantShowBatches));
 
-	CONSOLE->registerCVar("hud_show_targets", "show render targets statistics", { "int" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_targets", "show render targets statistics", { "int" },
 		CVAR_GETTER_INT(mWantShowTargets),
 		CVAR_SETTER_INT(mWantShowTargets));
 
-	CONSOLE->registerCVar("hud_show_tasks", "show tasks count on screen", { "int" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_tasks", "show tasks count on screen", { "int" },
 		CVAR_GETTER_INT(mWantShowTasks),
 		CVAR_SETTER_INT(mWantShowTasks));
 
-	CONSOLE->registerCVar("hud_show_net_speed", "show net speed", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_net_speed", "show net speed", { "bool" },
 		CVAR_GETTER_BOOL(mWantShowNetSpeed), CVAR_SETTER_BOOL(mWantShowNetSpeed));
 
-	CONSOLE->registerCVar("hud_show_net_pps", "show net packets per second", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_net_pps", "show net packets per second", { "bool" },
 		CVAR_GETTER_BOOL(mWantShowNetPps), CVAR_SETTER_BOOL(mWantShowNetPps));
 }
 

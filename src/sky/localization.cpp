@@ -2,7 +2,7 @@
 #include <sstream>
 #include <cassert>
 #include <platform/asset.h>
-#include <console/device.h>
+#include <sky/utils.h>
 #include <common/helpers.h>
 
 sky::Localization::Localization(const std::string& path)
@@ -72,7 +72,7 @@ std::wstring sky::Localization::getString(const std::string& key) const
 
 	if (dictionary.count(key) == 0)
 	{
-		CONSOLE_DEVICE->writeLine("cannot find locale: " + key, Console::Color::Red);
+		sky::Log(Console::Color::Red, "cannot find locale: " + key);
 		return sky::to_wstring(key);
 	}
 

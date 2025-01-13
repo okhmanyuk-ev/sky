@@ -1,5 +1,4 @@
 #include "scrollbox.h"
-#include <console/device.h>
 #include <common/helpers.h>
 
 using namespace Scene;

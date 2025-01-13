@@ -1,22 +1,23 @@
 #include "scene_editor.h"
 #include <imgui.h>
-#include <console/system.h>
+#include <sky/console.h>
 #include <common/console_commands.h>
 #include <shared/imgui_user.h>
 #include <shared/scene_helpers.h>
 #include <imgui_stdlib.h>
 #include <magic_enum.hpp>
+#include <sky/utils.h>
 
 using namespace Shared;
 
 SceneEditor::SceneEditor(Scene::Scene& scene) : mScene(scene)
 {
-	CONSOLE->registerCVar("scene_editor", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
+	sky::GetService<sky::CommandProcessor>()->registerCVar("scene_editor", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
 }
 
 SceneEditor::~SceneEditor()
 {
-	CONSOLE->removeCVar("scene_editor");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("scene_editor");
 }
 
 void SceneEditor::onEvent(const Platform::Input::Mouse::ButtonEvent& e)

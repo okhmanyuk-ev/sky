@@ -4,19 +4,19 @@
 #include <platform/system.h>
 #include <glm/glm.hpp>
 #include <shared/imgui_user.h>
-#include <console/system.h>
+#include <sky/console.h>
 #include <common/console_commands.h>
 
 using namespace Shared;
 
 StatsSystem::StatsSystem()
 {
-	CONSOLE->registerCVar("g_stats", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
+	sky::GetService<sky::CommandProcessor>()->registerCVar("g_stats", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
 }
 
 StatsSystem::~StatsSystem()
 {
-	CONSOLE->removeCVar("g_stats");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("g_stats");
 }
 
 void StatsSystem::onFrame()

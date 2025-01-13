@@ -8,15 +8,15 @@ using namespace Shared;
 
 ConsoleHelperCommands::ConsoleHelperCommands()
 {
-	CONSOLE->registerCVar("hud_show_cvars", "show cvars menu on screen", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_cvars", "show cvars menu on screen", {"bool"},
 		CVAR_GETTER_BOOL(mShowCVars),
 		CVAR_SETTER_BOOL(mShowCVars));
 
-	CONSOLE->registerCVar("hud_show_profiler", "show profiler on screen", { "int" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_profiler", "show profiler on screen", { "int" },
 		CVAR_GETTER_INT(mShowProfiler),
 		CVAR_SETTER_INT(mShowProfiler));
 
-	CONSOLE->registerCVar("con_color", { "r", "g", "b" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("con_color", { "r", "g", "b" },
 		[this] {
 			auto col = ImGui::User::GetColorFromStyle();
 			return std::vector<std::string>({ std::to_string(col.x), std::to_string(col.y), std::to_string(col.z) });
@@ -26,14 +26,13 @@ ConsoleHelperCommands::ConsoleHelperCommands()
 		)
 	);
 
-	CONSOLE->registerCVar("imgui_show_demo", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("imgui_show_demo", { "bool" },
 		CVAR_GETTER_BOOL(mShowImguiDemo),
 		CVAR_SETTER_BOOL(mShowImguiDemo));
 }
 
 ConsoleHelperCommands::~ConsoleHelperCommands()
 {
-	//
 }
 
 void ConsoleHelperCommands::onFrame()
@@ -48,7 +47,7 @@ void ConsoleHelperCommands::onFrame()
 		ImGui::Begin("CVars", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel);
 		ImGui::SetWindowPos(ImGui::User::TopRightCorner());
 
-		for (auto& [name, cvar] : CONSOLE->getCVars())
+		for (auto& [name, cvar] : sky::GetService<sky::CommandProcessor>()->getCVars())
 		{
 			ImGui::Text("%s", name.c_str());
 

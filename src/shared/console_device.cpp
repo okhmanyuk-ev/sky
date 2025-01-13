@@ -1,5 +1,4 @@
 #include "console_device.h"
-
 #include <common/easing.h>
 #include <algorithm>
 #include <cassert>
@@ -15,7 +14,7 @@
 
 using namespace Shared;
 
-ConsoleDevice::ConsoleDevice()
+ImguiConsole::ImguiConsole()
 {
 	mInterpolator.setDuration(sky::FromMilliseconds(500));
 	close();
@@ -35,7 +34,7 @@ ConsoleDevice::ConsoleDevice()
 	mButtonTimer.setInterval(sky::FromSeconds(1.0f));
 }
 
-void ConsoleDevice::write(const std::string& s, Console::Color color)
+void ImguiConsole::write(const std::string& s, Console::Color color)
 {
 	Text text;
 	text.color = color;
@@ -45,7 +44,7 @@ void ConsoleDevice::write(const std::string& s, Console::Color color)
 	mBuffer.push_back(text);
 }
 
-void ConsoleDevice::writeLine(const std::string& s, Console::Color color)
+void ImguiConsole::writeLine(const std::string& s, Console::Color color)
 {
 	Text text;
 	text.color = color;
@@ -58,12 +57,12 @@ void ConsoleDevice::writeLine(const std::string& s, Console::Color color)
 		scrollToBottom();
 }
 
-void ConsoleDevice::clear()
+void ImguiConsole::clear()
 {
 	mBuffer.clear();
 }
 
-void ConsoleDevice::onFrame()
+void ImguiConsole::onFrame()
 {
 	if (!mEnabled)
 		return;
@@ -176,7 +175,7 @@ void ConsoleDevice::onFrame()
 	ImGui::EndChild();
 
 	static auto filterLetters = [](ImGuiInputTextCallbackData* data) {
-		auto self = (ConsoleDevice*)data->UserData;
+		auto self = (ImguiConsole*)data->UserData;
 		if (data->EventFlag == ImGuiInputTextFlags_::ImGuiInputTextFlags_CallbackCompletion)
 		{
 			self->handleInputCompletion(data);
@@ -253,7 +252,7 @@ void ConsoleDevice::onFrame()
 	CONSOLE_STATS("state", magic_enum::enum_name(mInputState));
 }
 
-void ConsoleDevice::showHints(float height, float top)
+void ImguiConsole::showHints(float height, float top)
 {
 	if (mInputState != InputState::Hints)
 		mSelectedHint = -1;
@@ -326,7 +325,7 @@ void ConsoleDevice::showHints(float height, float top)
 	ImGui::PopStyleVar();
 }
 
-void ConsoleDevice::showFastLogs()
+void ImguiConsole::showFastLogs()
 {
 	ImGui::Begin("Console Fast Logs", nullptr,
 		ImGuiWindowFlags_NoInputs |
@@ -362,7 +361,7 @@ void ConsoleDevice::showFastLogs()
 	ImGui::End();
 }
 
-void ConsoleDevice::showCloseButton(float pos_y)
+void ImguiConsole::showCloseButton(float pos_y)
 {
 	if (mState != State::Opened)
 		return;
@@ -388,7 +387,7 @@ void ConsoleDevice::showCloseButton(float pos_y)
 	ImGui::PopStyleVar(3);
 }
 
-void ConsoleDevice::drawText(const Text& text, glm::vec4 colorMultiplier)
+void ImguiConsole::drawText(const Text& text, glm::vec4 colorMultiplier)
 {
 	auto& style = ImGui::GetStyle();
 	ImVec4 _col = style.Colors[ImGuiCol_Text];
@@ -458,7 +457,7 @@ void ConsoleDevice::drawText(const Text& text, glm::vec4 colorMultiplier)
 		ImGui::SameLine();
 }
 
-void ConsoleDevice::enterInput()
+void ImguiConsole::enterInput()
 {
 	if (mInputState == InputState::Hints)
 	{
@@ -493,7 +492,7 @@ void ConsoleDevice::enterInput()
 	}
 }
 
-void ConsoleDevice::onEvent(const Platform::Input::Keyboard::Event& e)
+void ImguiConsole::onEvent(const Platform::Input::Keyboard::Event& e)
 {
 	if (e.type == Platform::Input::Keyboard::Event::Type::Pressed && e.key == Platform::Input::Keyboard::Key::Tilde)
 	{
@@ -505,7 +504,7 @@ void ConsoleDevice::onEvent(const Platform::Input::Keyboard::Event& e)
 	}
 }
 
-void ConsoleDevice::onEvent(const TouchEmulator::Event& e)
+void ImguiConsole::onEvent(const TouchEmulator::Event& e)
 {
 	if (mState == State::Closed)
 		return;
@@ -517,7 +516,7 @@ void ConsoleDevice::onEvent(const TouchEmulator::Event& e)
 	}
 }
 
-void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardTextChanged& e)
+void ImguiConsole::onEvent(const Platform::System::VirtualKeyboardTextChanged& e)
 {
 	if (!isOpened())
 		return;
@@ -526,7 +525,7 @@ void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardTextChanged& 
 	mInputState = InputState::Text;
 }
 
-void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardEnterPressed& e)
+void ImguiConsole::onEvent(const Platform::System::VirtualKeyboardEnterPressed& e)
 {
 	if (!isOpened())
 		return;
@@ -534,7 +533,7 @@ void ConsoleDevice::onEvent(const Platform::System::VirtualKeyboardEnterPressed&
 	enterInput();
 }
 
-void ConsoleDevice::handleInputCompletion(ImGuiInputTextCallbackData* data)
+void ImguiConsole::handleInputCompletion(ImGuiInputTextCallbackData* data)
 {
 	if (mInputState != InputState::Hints)
 		return;
@@ -554,7 +553,7 @@ void ConsoleDevice::handleInputCompletion(ImGuiInputTextCallbackData* data)
 	mInputState = InputState::Completion;
 }
 
-void ConsoleDevice::handleInputHistory(ImGuiInputTextCallbackData* data)
+void ImguiConsole::handleInputHistory(ImGuiInputTextCallbackData* data)
 {
 	if (mHints.size() > 0 && mInputState != InputState::History)
 	{
@@ -623,7 +622,7 @@ void ConsoleDevice::handleInputHistory(ImGuiInputTextCallbackData* data)
 	data->BufDirty = true;
 }
 
-std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& match) const
+std::vector<ImguiConsole::Hint> ImguiConsole::getHints(const std::string& match) const
 {
 	if (match.empty())
 		return {};
@@ -634,7 +633,7 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 
 	std::vector<Hint> result = {};
 
-	for (auto& [name, cvar] : CONSOLE->getCVars())
+	for (auto& [name, cvar] : sky::GetService<sky::CommandProcessor>()->getCVars())
 	{
 		if (name.find(lowercase_match) == std::string::npos)
 			continue;
@@ -649,7 +648,7 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 		result.push_back(hint);
 	}
 
-	for (auto& [name, command] : CONSOLE->getCommands())
+	for (auto& [name, command] : sky::GetService<sky::CommandProcessor>()->getCommands())
 	{
 		if (name.find(lowercase_match) == std::string::npos)
 			continue;
@@ -664,7 +663,7 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 		result.push_back(hint);
 	}
 
-	for (auto& [name, value] : CONSOLE->getAliases())
+	for (auto& [name, value] : sky::GetService<sky::CommandProcessor>()->getAliases())
 	{
 		if (name.find(lowercase_match) == std::string::npos)
 			continue;
@@ -673,7 +672,7 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 			.type = Hint::Type::Alias,
 			.name = name,
 			.description = "alias",
-			.args = Console::System::MakeStringFromTokens(value)
+			.args = sky::CommandProcessor::MakeStringFromTokens(value)
 		};
 
 		result.push_back(hint);
@@ -691,7 +690,7 @@ std::vector<ConsoleDevice::Hint> ConsoleDevice::getHints(const std::string& matc
 	return result;
 }
 
-void ConsoleDevice::toggle()
+void ImguiConsole::toggle()
 {
 	if (mState == State::Closed || mState == State::Closing)
 		open();
@@ -699,7 +698,7 @@ void ConsoleDevice::toggle()
 		close();
 }
 
-void ConsoleDevice::close()
+void ImguiConsole::close()
 {
 	PLATFORM->hideVirtualKeyboard();
 
@@ -713,7 +712,7 @@ void ConsoleDevice::close()
 	});
 }
 
-void ConsoleDevice::open()
+void ImguiConsole::open()
 {
 	PLATFORM->setVirtualKeyboardText("");
 	PLATFORM->showVirtualKeyboard();
@@ -727,7 +726,7 @@ void ConsoleDevice::open()
 	scrollToBottom();
 }
 
-void ConsoleDevice::scrollToBottom()
+void ImguiConsole::scrollToBottom()
 {
 	mNeedScrollToBottom = true;
 	mAtBottom = false;

@@ -1,5 +1,4 @@
 #include "system.h"
-#include <console/device.h>
 #include <asio.hpp>
 
 using namespace Network;

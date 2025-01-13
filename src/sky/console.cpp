@@ -1,11 +1,90 @@
-#include "system.h"
-#include <algorithm>
-#include <numeric>
-#include <cassert>
+#include "console.h"
+#include <conio.h>
+#include <Windows.h>
+#include <iostream>
+#include <string>
+#include <common/frame_system.h>
+#include <sky/utils.h>
 
-using namespace Console;
+using namespace sky;
 
-void System::execute(const std::string& cmd)
+void EmbeddedConsole::write(const std::string& s, Console::Color color)
+{
+	if (mWriteCallback)
+	{
+		mWriteCallback(s, color);
+	}
+}
+
+void EmbeddedConsole::writeLine(const std::string& s, Console::Color color)
+{
+	if (mWriteLineCallback)
+	{
+		mWriteLineCallback(s, color);
+	}
+}
+
+void EmbeddedConsole::clear()
+{
+	if (mClearCallback)
+	{
+		mClearCallback();
+	}
+}
+
+#ifdef PLATFORM_WINDOWS
+
+NativeConsole::NativeConsole()
+{
+	mReadThread = std::thread([this] {
+		while (true)
+		{
+			std::string s;
+			std::getline(std::cin, s);
+			FRAME->addOne([this, s] {
+				sky::Emit(ReadEvent({ s }));
+			});
+		}
+		});
+
+	mReadThread.detach();
+
+	mConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleOutputCP(1251);
+}
+
+NativeConsole::~NativeConsole()
+{
+	//mReadThread.~mReadThread();
+}
+
+void NativeConsole::write(const std::string& s, Console::Color color)
+{
+	SetConsoleTextAttribute(mConsoleHandle, color == Console::Color::Default ? (WORD)Console::Color::Gray : (WORD)color);
+	std::cout << s;
+	SetConsoleTextAttribute(mConsoleHandle, (WORD)Console::Color::Gray);
+}
+
+void NativeConsole::writeLine(const std::string& s, Console::Color color)
+{
+	write(s, color);
+	std::cout << std::endl;
+}
+
+void NativeConsole::clear()
+{
+	system("cls");
+}
+
+void NativeConsole::setTitle(const std::string& s)
+{
+	SetConsoleTitle(std::string(s).c_str());
+}
+
+#endif
+
+
+void CommandProcessor::execute(const std::string& cmd)
 {
 	for (auto s : ParseCommandLine(cmd))
 	{
@@ -13,7 +92,7 @@ void System::execute(const std::string& cmd)
 	}
 }
 
-void System::registerCommand(const std::string& name, std::optional<std::string> description,
+void CommandProcessor::registerCommand(const std::string& name, std::optional<std::string> description,
 	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 	Command::Callback callback)
 {
@@ -26,32 +105,32 @@ void System::registerCommand(const std::string& name, std::optional<std::string>
 	mCommands[name] = cmd;
 }
 
-void System::registerCommand(const std::string& name, std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback)
+void CommandProcessor::registerCommand(const std::string& name, std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback)
 {
 	registerCommand(name, description, args, {}, callback);
 }
 
-void System::registerCommand(const std::string& name, std::optional<std::string> description, Command::Callback callback)
+void CommandProcessor::registerCommand(const std::string& name, std::optional<std::string> description, Command::Callback callback)
 {
 	registerCommand(name, description, {}, callback);
 }
 
-void System::registerCommand(const std::string& name, const std::vector<std::string>& args, Command::Callback callback)
+void CommandProcessor::registerCommand(const std::string& name, const std::vector<std::string>& args, Command::Callback callback)
 {
 	registerCommand(name, std::nullopt, args, callback);
 }
 
-void System::registerCommand(const std::string& name, Command::Callback callback)
+void CommandProcessor::registerCommand(const std::string& name, Command::Callback callback)
 {
 	registerCommand(name, std::nullopt, {}, callback);
 }
 
-void System::removeCommand(const std::string& name)
+void CommandProcessor::removeCommand(const std::string& name)
 {
 	mCommands.erase(name);
 }
 
-void System::registerCVar(const std::string& name, std::optional<std::string> description,
+void CommandProcessor::registerCVar(const std::string& name, std::optional<std::string> description,
 	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 	CVar::Getter getter, CVar::Setter setter)
 {
@@ -65,45 +144,45 @@ void System::registerCVar(const std::string& name, std::optional<std::string> de
 	mCVars[name] = cvar;
 }
 
-void System::registerCVar(const std::string& name, const std::vector<std::string>& args,
+void CommandProcessor::registerCVar(const std::string& name, const std::vector<std::string>& args,
 	const std::vector<std::string>& optional_args, CVar::Getter getter, CVar::Setter setter)
 {
 	registerCVar(name, std::nullopt, args, optional_args, getter, setter);
 }
 
-void System::registerCVar(const std::string& name, std::optional<std::string> description,
+void CommandProcessor::registerCVar(const std::string& name, std::optional<std::string> description,
 	const std::vector<std::string>& args, CVar::Getter getter, CVar::Setter setter)
 {
 	registerCVar(name, description, args, {}, getter, setter);
 }
 
-void System::registerCVar(const std::string& name, const std::vector<std::string>& args, 
+void CommandProcessor::registerCVar(const std::string& name, const std::vector<std::string>& args,
 	CVar::Getter getter, CVar::Setter setter)
 {
 	registerCVar(name, std::nullopt, args, getter, setter);
 }
 
-void System::removeCVar(const std::string& name)
+void CommandProcessor::removeCVar(const std::string& name)
 {
 	mCVars.erase(name);
 }
 
-void System::addAlias(const std::string& name, const std::vector<std::string>& value)
+void CommandProcessor::addAlias(const std::string& name, const std::vector<std::string>& value)
 {
 	mAliases[name] = value;
 }
 
-void System::removeAlias(const std::string& name)
+void CommandProcessor::removeAlias(const std::string& name)
 {
 	mAliases.erase(name);
 }
 
-void System::onEvent(const Device::ReadEvent& e)
+void CommandProcessor::onEvent(const sky::Console::ReadEvent& e)
 {
 	execute(e.text);
 }
 
-std::vector<std::string> System::ParseCommandLine(const std::string& cmds)
+std::vector<std::string> CommandProcessor::ParseCommandLine(const std::string& cmds)
 {
 	int quotes = 0;
 	char quote = '\0';
@@ -161,7 +240,7 @@ std::vector<std::string> System::ParseCommandLine(const std::string& cmds)
 	return result;
 }
 
-std::vector<std::string> System::MakeTokensFromString(const std::string& cmd)
+std::vector<std::string> CommandProcessor::MakeTokensFromString(const std::string& cmd)
 {
 	int quotes = 0;
 	char quote = '\0';
@@ -247,7 +326,7 @@ std::vector<std::string> System::MakeTokensFromString(const std::string& cmd)
 	return tokens;
 }
 
-std::string System::MakeStringFromTokens(const std::vector<std::string>& value)
+std::string CommandProcessor::MakeStringFromTokens(const std::vector<std::string>& value)
 {
 	if (value.empty())
 		return "\"\"";
@@ -256,7 +335,7 @@ std::string System::MakeStringFromTokens(const std::vector<std::string>& value)
 		[](const auto& a, const auto& b) { return a + "\" \"" + b; }) + '"';
 }
 
-void System::processConsoleCommand(std::vector<std::string> args)
+void CommandProcessor::processConsoleCommand(std::vector<std::string> args)
 {
 	if (args.size() == 0)
 		return;
@@ -278,11 +357,11 @@ void System::processConsoleCommand(std::vector<std::string> args)
 
 		auto cvar = mCVars.at(name);
 		if (args.size() == 0 || cvar.getSetter() == nullptr)
-			CONSOLE_DEVICE->writeLine(name + " = " + cvar.getValueAsString());
+			sky::GetService<sky::Console>()->writeLine(name + " = " + cvar.getValueAsString());
 		else if (args.size() >= cvar.getArguments().size() && cvar.getSetter() != nullptr)
 			cvar.getSetter()(args);
 		else
-			CONSOLE_DEVICE->writeLine("Syntax: " + name + " " + cvar.getArgsAsString());
+			sky::GetService<sky::Console>()->writeLine("Syntax: " + name + " " + cvar.getArgsAsString());
 	}
 
 	if (mCommands.contains(name))
@@ -291,7 +370,7 @@ void System::processConsoleCommand(std::vector<std::string> args)
 
 		auto command = mCommands.at(name);
 		if (command.getArguments().size() > args.size())
-			CONSOLE_DEVICE->writeLine("Syntax: " + name + " " + command.getArgsAsString());
+			sky::GetService<sky::Console>()->writeLine("Syntax: " + name + " " + command.getArgsAsString());
 		else
 			command.getCallback()(args);
 	}
@@ -301,18 +380,18 @@ void System::processConsoleCommand(std::vector<std::string> args)
 		known = true;
 
 		if (args.size() == 0)
-			CONSOLE_DEVICE->writeLine(name + " = " + MakeStringFromTokens(mAliases.at(name)));
+			sky::GetService<sky::Console>()->writeLine(name + " = " + MakeStringFromTokens(mAliases.at(name)));
 		else
 			mAliases[name] = MakeTokensFromString(args[0]);
 	}
 
 	if (!known)
 	{
-		CONSOLE_DEVICE->writeLine("Unknown command: \"" + name + "\"");
+		sky::GetService<sky::Console>()->writeLine("Unknown command: \"" + name + "\"");
 	}
 }
 
-std::vector<std::string> System::dereferenceTokens(std::vector<std::string> tokens)
+std::vector<std::string> CommandProcessor::dereferenceTokens(std::vector<std::string> tokens)
 {
 	bool dereferenced = true;
 
@@ -358,7 +437,7 @@ std::vector<std::string> System::dereferenceTokens(std::vector<std::string> toke
 
 std::string CVar::getValueAsString() const
 {
-	return Console::System::MakeStringFromTokens(mGetter());
+	return CommandProcessor::MakeStringFromTokens(mGetter());
 }
 
 std::string CVar::getArgsAsString() const

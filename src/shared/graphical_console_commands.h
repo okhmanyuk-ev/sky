@@ -1,9 +1,6 @@
 #pragma once
 
-#include <console/system.h>
-#include <common/console_commands.h>
-#include <platform/system.h>
-#include <graphics/system.h>
+#include <common/frame_system.h>
 
 namespace Shared
 {

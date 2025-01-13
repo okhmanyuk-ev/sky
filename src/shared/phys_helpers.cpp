@@ -1,5 +1,5 @@
 #include "phys_helpers.h"
-#include <console/system.h>
+#include <sky/console.h>
 #include <common/console_commands.h>
 #include <shared/stats_system.h>
 
@@ -74,11 +74,11 @@ World::World()
 	b2BodyDef dummy_body_def;
 	mDummyBody = mB2World.CreateBody(&dummy_body_def);
 
-	CONSOLE->registerCVar("phys_debug", { "bool" }, CVAR_GETTER_BOOL_FUNC(isDebug), CVAR_SETTER_BOOL_FUNC(setDebug));
-	CONSOLE->registerCVar("phys_stats", { "bool" }, CVAR_GETTER_BOOL_FUNC(getShowStats), CVAR_SETTER_BOOL_FUNC(setShowStats));
-	CONSOLE->registerCVar("phys_allow_sleep", { "bool" }, CVAR_GETTER_BOOL_FUNC(mB2World.GetAllowSleeping), CVAR_SETTER_BOOL_FUNC(mB2World.SetAllowSleeping));
-	CONSOLE->registerCVar("phys_velocity_iterations", { "int" }, CVAR_GETTER_INT(mVelocityIterations), CVAR_SETTER_INT(mVelocityIterations));
-	CONSOLE->registerCVar("phys_position_iterations", { "int" }, CVAR_GETTER_INT(mPositionIterations), CVAR_SETTER_INT(mPositionIterations));
+	sky::GetService<sky::CommandProcessor>()->registerCVar("phys_debug", { "bool" }, CVAR_GETTER_BOOL_FUNC(isDebug), CVAR_SETTER_BOOL_FUNC(setDebug));
+	sky::GetService<sky::CommandProcessor>()->registerCVar("phys_stats", { "bool" }, CVAR_GETTER_BOOL_FUNC(getShowStats), CVAR_SETTER_BOOL_FUNC(setShowStats));
+	sky::GetService<sky::CommandProcessor>()->registerCVar("phys_allow_sleep", { "bool" }, CVAR_GETTER_BOOL_FUNC(mB2World.GetAllowSleeping), CVAR_SETTER_BOOL_FUNC(mB2World.SetAllowSleeping));
+	sky::GetService<sky::CommandProcessor>()->registerCVar("phys_velocity_iterations", { "int" }, CVAR_GETTER_INT(mVelocityIterations), CVAR_SETTER_INT(mVelocityIterations));
+	sky::GetService<sky::CommandProcessor>()->registerCVar("phys_position_iterations", { "int" }, CVAR_GETTER_INT(mPositionIterations), CVAR_SETTER_INT(mPositionIterations));
 
 	auto getter = [this] {
 		auto fps = 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep());
@@ -90,27 +90,27 @@ World::World()
 		mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / sec));
 	};
 
-	CONSOLE->registerCVar("phys_timestep_fps", { "float" }, getter, setter);
+	sky::GetService<sky::CommandProcessor>()->registerCVar("phys_timestep_fps", { "float" }, getter, setter);
 
-	CONSOLE->registerCVar("phys_timestep_enabled", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("phys_timestep_enabled", { "bool" },
 		CVAR_GETTER_BOOL_FUNC(mTimestepFixer.isEnabled),
 		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setEnabled));
 
-	CONSOLE->registerCVar("phys_timestep_force_time_completion", { "bool" },
+	sky::GetService<sky::CommandProcessor>()->registerCVar("phys_timestep_force_time_completion", { "bool" },
 		CVAR_GETTER_BOOL_FUNC(mTimestepFixer.getForceTimeCompletion),
 		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setForceTimeCompletion));
 }
 
 World::~World()
 {
-	CONSOLE->removeCVar("phys_debug");
-	CONSOLE->removeCVar("phys_stats");
-	CONSOLE->removeCVar("phys_allow_sleep");
-	CONSOLE->removeCVar("phys_velocity_iterations");
-	CONSOLE->removeCVar("phys_position_iterations");
-	CONSOLE->removeCVar("phys_timestep_fps");
-	CONSOLE->removeCVar("phys_timestep_enabled");
-	CONSOLE->removeCVar("phys_timestep_force_time_completion");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_debug");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_stats");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_allow_sleep");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_velocity_iterations");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_position_iterations");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_timestep_fps");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_timestep_enabled");
+	sky::GetService<sky::CommandProcessor>()->removeCVar("phys_timestep_force_time_completion");
 }
 
 void World::onEvent(const Shared::TouchEmulator::Event& e)

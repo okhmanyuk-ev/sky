@@ -8,7 +8,8 @@
 #include <sky/audio.h>
 #include <nlohmann/json.hpp>
 #include <sky/dispatcher.h>
-#include <console/device.h>
+#include <sky/console.h>
+#include <fmt/format.h>
 
 namespace sky
 {

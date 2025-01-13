@@ -1,22 +1,112 @@
 #pragma once
 
-#include <sky/dispatcher.h>
-#include <console/device.h>
-#include <sky/locator.h>
 #include <string>
-#include <vector>
-#include <list>
-#include <map>
+#include <functional>
+#include <thread>
 #include <optional>
+#include <platform/defines.h>
+#include <sky/dispatcher.h>
+#include <map>
 
-#define CONSOLE sky::Locator<Console::System>::GetService()
-
-namespace Console
+namespace sky
 {
+	class Console
+	{
+	public:
+		enum class Color
+		{
+			Black = 0,
+			DarkBlue = 1,
+			DarkGreen = 2,
+			DarkCyan = 3,
+			DarkRed = 4,
+			DarkMagenta = 5,
+			DarkYellow = 6,
+			Gray = 7,
+			DarkGray = 8,
+			Blue = 9,
+			Green = 10,
+			Cyan = 11,
+			Red = 12,
+			Magenta = 13,
+			Yellow = 14,
+			White = 15,
+			Default
+		};
+
+	public:
+		struct ReadEvent
+		{
+			std::string text;
+		};
+
+	public:
+		virtual void write(const std::string& s, Color color = Color::Default) = 0;
+		virtual void writeLine(const std::string& s, Color color = Color::Default) = 0;
+		virtual void clear() = 0;
+
+		virtual bool isOpened() const = 0;
+
+		virtual bool isEnabled() const = 0;
+		virtual void setEnabled(bool value) = 0;
+	};
+
+	class EmbeddedConsole : public sky::Console
+	{
+	public:
+		typedef std::function<void(const std::string&, Console::Color)> WriteCallback;
+		typedef std::function<void()> ClearCallback;
+
+	public:
+		void write(const std::string& s, Console::Color color = Console::Color::Default) override;
+		void writeLine(const std::string& s, Console::Color color = Console::Color::Default) override;
+		void clear() override;
+
+		bool isOpened() const  override { return true; }
+
+		bool isEnabled() const override { return true; }
+		void setEnabled(bool value)  override {}
+
+	public:
+		void setWriteCallback(WriteCallback value) { mWriteCallback = value; }
+		void setWriteLineCallback(WriteCallback value) { mWriteLineCallback = value; }
+		void setClearCallback(ClearCallback value) { mClearCallback = value; }
+
+	private:
+		WriteCallback mWriteCallback = nullptr;
+		WriteCallback mWriteLineCallback = nullptr;
+		ClearCallback mClearCallback = nullptr;
+	};
+
+#ifdef PLATFORM_WINDOWS
+	class NativeConsole : public sky::Console
+	{
+	public:
+		NativeConsole();
+		~NativeConsole();
+
+	public:
+		void write(const std::string& s, Console::Color color = Console::Color::Default) override;
+		void writeLine(const std::string& s, Console::Color color = Console::Color::Default) override;
+		void clear() override;
+		bool isOpened() const override { return true; }
+
+		bool isEnabled() const override { return true; }
+		void setEnabled(bool value) override {};
+
+	public:
+		void setTitle(const std::string& s);
+
+	private:
+		std::thread mReadThread;
+		void* mConsoleHandle;
+	};
+#endif
+
 	class CVar
 	{
 	public:
-		friend class System;
+		friend class CommandProcessor;
 
 	public:
 		using Getter = std::function<std::vector<std::string>()>;
@@ -44,7 +134,7 @@ namespace Console
 	class Command
 	{
 	public:
-		friend class System;
+		friend class CommandProcessor;
 
 	public:
 		using Callback = std::function<void(const std::vector<std::string>&)>;
@@ -65,7 +155,7 @@ namespace Console
 		Callback mCallback;
 	};
 
-	class System : public sky::Listenable<Device::ReadEvent>
+	class CommandProcessor : public sky::Listenable<sky::Console::ReadEvent>
 	{
 	public:
 		void execute(const std::string& cmd);
@@ -114,7 +204,7 @@ namespace Console
 		const auto& getAliases() const { return mAliases; }
 
 	public:
-		void onEvent(const Device::ReadEvent& e) override;
+		void onEvent(const sky::Console::ReadEvent& e) override;
 
 	public:
 		static std::vector<std::string> ParseCommandLine(const std::string& cmds);
