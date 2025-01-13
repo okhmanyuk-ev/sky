@@ -83,8 +83,7 @@ void NativeConsole::setTitle(const std::string& s)
 
 #endif
 
-CVar::CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
-	Getter getter, Setter setter) :
+CVar::CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments, Getter getter, Setter setter) :
 	mDescription(description),
 	mArguments(arguments),
 	mOptionalArguments(optional_arguments),
@@ -93,12 +92,26 @@ CVar::CVar(std::optional<std::string> description, std::vector<std::string> argu
 {
 }
 
-Command::Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
-	Callback callback) :
+CVar::CVar(std::optional<std::string> description, std::vector<std::string> arguments, Getter getter, Setter setter) :
+	CVar(description, arguments, {}, getter, setter)
+{
+}
+
+Command::Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments, Callback callback) :
 	mDescription(description),
 	mArguments(arguments),
 	mOptionalArguments(optional_arguments),
 	mCallback(callback)
+{
+}
+
+Command::Command(std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback) :
+	Command(description, args, {}, callback)
+{
+}
+
+Command::Command(std::optional<std::string> description, Callback callback) :
+	Command(description, {}, callback)
 {
 }
 
@@ -110,65 +123,21 @@ void CommandProcessor::execute(const std::string& cmd)
 	}
 }
 
-void CommandProcessor::registerCommand(const std::string& name, std::optional<std::string> description,
-	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
-	Command::Callback callback)
+void CommandProcessor::addCommand(const std::string& name, Command command)
 {
 	assert(!mCommands.contains(name));
-	auto cmd = Command(description, args, optional_args, callback);
-	mCommands.insert({ name, cmd });
+	mCommands.insert({ name, command });
 }
 
-void CommandProcessor::registerCommand(const std::string& name, std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback)
+void CommandProcessor::addCVar(const std::string& name, CVar cvar)
 {
-	registerCommand(name, description, args, {}, callback);
-}
-
-void CommandProcessor::registerCommand(const std::string& name, std::optional<std::string> description, Command::Callback callback)
-{
-	registerCommand(name, description, {}, callback);
-}
-
-void CommandProcessor::registerCommand(const std::string& name, const std::vector<std::string>& args, Command::Callback callback)
-{
-	registerCommand(name, std::nullopt, args, callback);
-}
-
-void CommandProcessor::registerCommand(const std::string& name, Command::Callback callback)
-{
-	registerCommand(name, std::nullopt, {}, callback);
+	assert(!mCVars.contains(name));
+	mCVars.insert({ name, cvar });
 }
 
 void CommandProcessor::removeCommand(const std::string& name)
 {
 	mCommands.erase(name);
-}
-
-void CommandProcessor::registerCVar(const std::string& name, std::optional<std::string> description,
-	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
-	CVar::Getter getter, CVar::Setter setter)
-{
-	assert(!mCVars.contains(name));
-	auto cvar = CVar(description, args, optional_args, getter, setter);
-	mCVars.insert({ name, cvar });
-}
-
-void CommandProcessor::registerCVar(const std::string& name, const std::vector<std::string>& args,
-	const std::vector<std::string>& optional_args, CVar::Getter getter, CVar::Setter setter)
-{
-	registerCVar(name, std::nullopt, args, optional_args, getter, setter);
-}
-
-void CommandProcessor::registerCVar(const std::string& name, std::optional<std::string> description,
-	const std::vector<std::string>& args, CVar::Getter getter, CVar::Setter setter)
-{
-	registerCVar(name, description, args, {}, getter, setter);
-}
-
-void CommandProcessor::registerCVar(const std::string& name, const std::vector<std::string>& args,
-	CVar::Getter getter, CVar::Setter setter)
-{
-	registerCVar(name, std::nullopt, args, getter, setter);
 }
 
 void CommandProcessor::removeCVar(const std::string& name)

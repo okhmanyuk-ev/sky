@@ -54,4 +54,7 @@ namespace sky
 	{
 		Log(color, fmt::format(text, args...));
 	}
+
+	void AddCommand(const std::string& name, Command command);
+	void AddCVar(const std::string& name, CVar cvar);
 }

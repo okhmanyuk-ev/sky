@@ -65,10 +65,20 @@ void sky::PlaySound(const std::string& name)
 
 void sky::Log(const std::string& text)
 {
-	sky::GetService<sky::Console>()->writeLine(text);
+	GetService<Console>()->writeLine(text);
 }
 
 void sky::Log(Console::Color color, const std::string& text)
 {
-	sky::GetService<sky::Console>()->writeLine(text, color);
+	GetService<Console>()->writeLine(text, color);
+}
+
+void sky::AddCommand(const std::string& name, Command command)
+{
+	GetService<CommandProcessor>()->addCommand(name, command);
+}
+
+void sky::AddCVar(const std::string& name, CVar cvar)
+{
+	GetService<CommandProcessor>()->addCVar(name, cvar);
 }

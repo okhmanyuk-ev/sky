@@ -11,28 +11,20 @@ using namespace Shared;
 
 GraphicalConsoleCommands::GraphicalConsoleCommands()
 {
-	sky::GetService<sky::CommandProcessor>()->registerCVar("r_resolution", "resolution of screen", { "int", "int" },
-		CVAR_GETTER_INT2_FUNC(PLATFORM->getWidth, PLATFORM->getHeight),
-		CVAR_SETTER_INT2_FUNC(PLATFORM->resize));
+	sky::AddCVar("r_resolution", sky::CVar("resolution of screen", { "int", "int" }, CVAR_GETTER_INT2_FUNC(PLATFORM->getWidth, PLATFORM->getHeight),
+		CVAR_SETTER_INT2_FUNC(PLATFORM->resize)));
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("r_scale", "logical scaling on retina displays", { "float" },
-		CVAR_GETTER_FLOAT_FUNC(PLATFORM->getScale),
-		CVAR_SETTER_FLOAT_FUNC(PLATFORM->setScale));
+	sky::AddCVar("r_scale", sky::CVar("logical scaling on retina displays", { "float" }, CVAR_GETTER_FLOAT_FUNC(PLATFORM->getScale),
+		CVAR_SETTER_FLOAT_FUNC(PLATFORM->setScale)));
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("r_batching", { "bool" },
-		CVAR_GETTER_BOOL_FUNC(GRAPHICS->isBatching),
-		CVAR_SETTER_BOOL_FUNC(GRAPHICS->setBatching));
+	sky::AddCVar("r_batching", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(GRAPHICS->isBatching), CVAR_SETTER_BOOL_FUNC(GRAPHICS->setBatching)));
+	sky::AddCVar("r_vsync", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(skygfx::IsVsyncEnabled), CVAR_SETTER_BOOL_FUNC(skygfx::SetVsync)));
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("r_vsync", { "bool" },
-		CVAR_GETTER_BOOL_FUNC(skygfx::IsVsyncEnabled),
-		CVAR_SETTER_BOOL_FUNC(skygfx::SetVsync));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("rescale", "smart scaling", { "float" }, [](CON_ARGS) {
+	sky::AddCommand("rescale", sky::Command("smart scaling", { "float" }, [](CON_ARGS) {
 		PLATFORM->rescale(CON_ARG_FLOAT(0));
-	});
+	}));
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("r_showtargets", { "bool" },
-		CVAR_GETTER_BOOL(mShowTargets), CVAR_SETTER_BOOL(mShowTargets));
+	sky::AddCVar("r_showtargets", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(mShowTargets), CVAR_SETTER_BOOL(mShowTargets)));
 }
 
 GraphicalConsoleCommands::~GraphicalConsoleCommands()

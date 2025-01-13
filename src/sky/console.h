@@ -112,6 +112,7 @@ namespace sky
 	public:
 		CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
 			Getter getter, Setter setter);
+		CVar(std::optional<std::string> description, std::vector<std::string> arguments, Getter getter, Setter setter);
 
 	public:
 		std::string getValueAsString() const;
@@ -138,8 +139,9 @@ namespace sky
 		using Callback = std::function<void(const std::vector<std::string>&)>;
 
 	public:
-		Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
-			Callback callback);
+		Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments, Callback callback);
+		Command(std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback);
+		Command(std::optional<std::string> description, Callback callback);
 
 	public:
 		std::string getArgsAsString() const;
@@ -161,39 +163,9 @@ namespace sky
 	{
 	public:
 		void execute(const std::string& cmd);
-
-	public:
-		void registerCommand(const std::string& name, std::optional<std::string> description,
-			const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
-			Command::Callback callback);
-
-		void registerCommand(const std::string& name, std::optional<std::string> description,
-			const std::vector<std::string>& args, Command::Callback callback);
-
-		void registerCommand(const std::string& name, std::optional<std::string> description,
-			Command::Callback callback);
-
-		void registerCommand(const std::string& name, const std::vector<std::string>& args,
-			Command::Callback callback);
-
-		void registerCommand(const std::string& name, Command::Callback callback);
-
+		void addCommand(const std::string& name, Command command);
+		void addCVar(const std::string& name, CVar cvar);
 		void removeCommand(const std::string& name);
-
-	public:
-		void registerCVar(const std::string& name, std::optional<std::string> description,
-			const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
-			CVar::Getter getter, CVar::Setter setter = nullptr);
-
-		void registerCVar(const std::string& name, const std::vector<std::string>& args,
-			const std::vector<std::string>& optional_args, CVar::Getter getter, CVar::Setter setter = nullptr);
-
-		void registerCVar(const std::string& name, std::optional<std::string> description,
-			const std::vector<std::string>& args, CVar::Getter getter, CVar::Setter setter = nullptr);
-
-		void registerCVar(const std::string& name, const std::vector<std::string>& args,
-			CVar::Getter getter, CVar::Setter setter = nullptr);
-
 		void removeCVar(const std::string& name);
 
 	public:

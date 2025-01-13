@@ -11,7 +11,7 @@ using namespace Shared;
 
 StatsSystem::StatsSystem()
 {
-	sky::GetService<sky::CommandProcessor>()->registerCVar("g_stats", { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled));
+	sky::AddCVar("g_stats", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled)));
 }
 
 StatsSystem::~StatsSystem()

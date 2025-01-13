@@ -50,10 +50,8 @@ ImguiSystem::ImguiSystem()
 	io.KeyMap[ImGuiKey_Y] = static_cast<int>(Key::Y);
 	io.KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("imgui_sampler_nearest", { "bool" }, CVAR_GETTER_BOOL(mSamplerNearest),
-		CVAR_SETTER_BOOL(mSamplerNearest));
-	sky::GetService<sky::CommandProcessor>()->registerCVar("imgui_scale_independence", { "bool" }, CVAR_GETTER_BOOL(mScaleIndependence),
-		CVAR_SETTER_BOOL(mScaleIndependence));
+	sky::AddCVar("imgui_sampler_nearest", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(mSamplerNearest), CVAR_SETTER_BOOL(mSamplerNearest)));
+	sky::AddCVar("imgui_scale_independence", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(mScaleIndependence), CVAR_SETTER_BOOL(mScaleIndependence)));
 }
 
 ImguiSystem::~ImguiSystem()

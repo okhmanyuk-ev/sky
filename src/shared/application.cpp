@@ -89,17 +89,17 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			mScene->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / sec));
 		};
 
-		sky::GetService<sky::CommandProcessor>()->registerCVar("scene_timestep_fps", { "float" }, getter, setter);
+		sky::AddCVar("scene_timestep_fps", sky::CVar(std::nullopt, { "float" }, getter, setter));
 
-		sky::GetService<sky::CommandProcessor>()->registerCVar("scene_timestep_enabled", { "bool" },
-			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().isEnabled), 
-			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setEnabled));
+		sky::AddCVar("scene_timestep_enabled", sky::CVar(std::nullopt, { "bool" },
+			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().isEnabled),
+			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setEnabled)));
 
-		sky::GetService<sky::CommandProcessor>()->registerCVar("scene_timestep_force_time_completion", { "bool" },
+		sky::AddCVar("scene_timestep_force_time_completion", sky::CVar(std::nullopt, { "bool" },
 			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().getForceTimeCompletion),
-			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion));
+			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion)));
 
-		sky::GetService<sky::CommandProcessor>()->registerCommand("spawn_blur_glass", std::nullopt, {}, { "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
+		sky::AddCommand("spawn_blur_glass", sky::Command(std::nullopt, {}, { "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
 			float intensity = 0.5f;
 
 			if (CON_ARG_EXIST(0))
@@ -129,9 +129,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			blur->setBlurPasses(passes);
 			blur->setRounding(rounding);
 			getScene()->getRoot()->attach(blur);
-		});
+		}));
 
-		sky::GetService<sky::CommandProcessor>()->registerCommand("spawn_gray_glass", std::nullopt, {}, { "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
+		sky::AddCommand("spawn_gray_glass", sky::Command(std::nullopt, {}, { "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
 			float intensity = 1.0f;
 
 			if (CON_ARG_EXIST(0))
@@ -155,9 +155,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			gray->setRounding(rounding);
 			gray->setGrayscaleIntensity(intensity);
 			getScene()->getRoot()->attach(gray);
-		});
+		}));
 
-		sky::GetService<sky::CommandProcessor>()->registerCommand("spawn_shockwave", std::nullopt, {}, { "duration" }, [this](CON_ARGS) {
+		sky::AddCommand("spawn_shockwave", sky::Command(std::nullopt, {}, { "duration" }, [this](CON_ARGS) {
 			float duration = 1.0f;
 
 			if (CON_ARG_EXIST(0))
@@ -169,9 +169,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			shockwave->setPivot(0.5f);
 			shockwave->setScale(4.0f);
 			getScene()->getRoot()->attach(shockwave);
-		});
+		}));
 
-		sky::GetService<sky::CommandProcessor>()->registerCommand("spawn_sprite_from_url", std::nullopt, {}, { "url" }, [this](CON_ARGS) {
+		sky::AddCommand("spawn_sprite_from_url", sky::Command(std::nullopt, {}, { "url" }, [this](CON_ARGS) {
 #ifndef EMSCRIPTEN
 			sky::Log("this is for emscripten");
 #else
@@ -219,7 +219,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 			sky::Log("fetching {}", url);
 #endif
-		});
+		}));
 	}
 
 #if defined(BUILD_DEVELOPER)

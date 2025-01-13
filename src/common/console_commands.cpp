@@ -7,17 +7,14 @@ using namespace Common;
 
 ConsoleCommands::ConsoleCommands()
 {
-	sky::GetService<sky::CommandProcessor>()->registerCVar("sys_framerate", "limit of fps", {"int"},
-		CVAR_GETTER_INT_FUNC(FRAME->getFramerateLimit),
-		CVAR_SETTER_INT_FUNC(FRAME->setFramerateLimit));
+	sky::AddCVar("sys_framerate", sky::CVar("limit of fps", { "int" },
+		CVAR_GETTER_INT_FUNC(FRAME->getFramerateLimit), CVAR_SETTER_INT_FUNC(FRAME->setFramerateLimit)));
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("sys_sleep", "cpu saving between frames", { "bool" },
-		CVAR_GETTER_BOOL_FUNC(FRAME->isSleepAllowed),
-		CVAR_SETTER_BOOL_FUNC(FRAME->setSleepAllowed));
+	sky::AddCVar("sys_sleep", sky::CVar("cpu saving between frames", { "bool" }, CVAR_GETTER_BOOL_FUNC(FRAME->isSleepAllowed),
+		CVAR_SETTER_BOOL_FUNC(FRAME->setSleepAllowed)));
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("sys_timescale", "time delta multiplier", { "float" },
-		CVAR_GETTER_DOUBLE_FUNC(FRAME->getTimeScale),
-		CVAR_SETTER_DOUBLE_FUNC(FRAME->setTimeScale));
+	sky::AddCVar("sys_timescale", sky::CVar("time delta multiplier", { "float" }, CVAR_GETTER_DOUBLE_FUNC(FRAME->getTimeScale),
+		CVAR_SETTER_DOUBLE_FUNC(FRAME->setTimeScale)));
 
 	auto getter = []() -> std::vector<std::string> {
 		auto delta_limit = FRAME->getTimeDeltaLimit();
@@ -39,34 +36,16 @@ ConsoleCommands::ConsoleCommands()
 		FRAME->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec));
 	};
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("sys_time_delta_limit_fps", { "null/float" }, getter, setter);
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("cmdlist", "show list of commands", {}, { "filter" },
-		CMD_METHOD(onCmdList));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("cvarlist", "show list of cvars", {}, { "filter" },
-		CMD_METHOD(onCVarList));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("echo", "print to console", { "text" }, { "text.." },
-		CMD_METHOD(onEcho));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("later", "delayed execution", { "time", "command" },
-		CMD_METHOD(onLater));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("exec", "execute console commands from file", { "path" }, { "path.." },
-		CMD_METHOD(onExec));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("clear", "clear console field",
-		CMD_METHOD(onClear));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("alias", "manage aliases",
-		CMD_METHOD(onAlias));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("if", "condition checking and execution", { "var", "value", "then" }, { "else" },
-		CMD_METHOD(onIf));
-
-	sky::GetService<sky::CommandProcessor>()->registerCommand("quit", "shutdown the app",
-		CMD_METHOD(onQuit));
+	sky::AddCVar("sys_time_delta_limit_fps", sky::CVar(std::nullopt, { "null/float" }, getter, setter));
+	sky::AddCommand("cmdlist", sky::Command("show list of commands", {}, { "filter" }, CMD_METHOD(onCmdList)));
+	sky::AddCommand("cvarlist", sky::Command("show list of cvars", {}, { "filter" }, CMD_METHOD(onCVarList)));
+	sky::AddCommand("echo", sky::Command("print to console", { "text" }, { "text.." }, CMD_METHOD(onEcho)));
+	sky::AddCommand("later", sky::Command("delayed execution", { "time", "command" }, CMD_METHOD(onLater)));
+	sky::AddCommand("exec", sky::Command("execute console commands from file", { "path" }, { "path.." }, CMD_METHOD(onExec)));
+	sky::AddCommand("clear", sky::Command("clear console field", CMD_METHOD(onClear)));
+	sky::AddCommand("alias", sky::Command("manage aliases", CMD_METHOD(onAlias)));
+	sky::AddCommand("if", sky::Command("condition checking and execution", { "var", "value", "then" }, { "else" }, CMD_METHOD(onIf)));
+	sky::AddCommand("quit", sky::Command("shutdown the app", CMD_METHOD(onQuit)));
 
 	sky::Log("type \"cmdlist\" to see available commands");
 }

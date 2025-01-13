@@ -8,27 +8,16 @@ using namespace Shared;
 
 ConsoleHelperCommands::ConsoleHelperCommands()
 {
-	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_cvars", "show cvars menu on screen", {"bool"},
-		CVAR_GETTER_BOOL(mShowCVars),
-		CVAR_SETTER_BOOL(mShowCVars));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("hud_show_profiler", "show profiler on screen", { "int" },
-		CVAR_GETTER_INT(mShowProfiler),
-		CVAR_SETTER_INT(mShowProfiler));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("con_color", { "r", "g", "b" },
+	sky::AddCVar("hud_show_cvars", sky::CVar("show cvars menu on screen", {"bool"}, CVAR_GETTER_BOOL(mShowCVars), CVAR_SETTER_BOOL(mShowCVars)));
+	sky::AddCVar("hud_show_profiler", sky::CVar("show profiler on screen", { "int" }, CVAR_GETTER_INT(mShowProfiler), CVAR_SETTER_INT(mShowProfiler)));
+	sky::AddCVar("con_color", sky::CVar(std::nullopt, { "r", "g", "b" },
 		[this] {
 			auto col = ImGui::User::GetColorFromStyle();
 			return std::vector<std::string>({ std::to_string(col.x), std::to_string(col.y), std::to_string(col.z) });
 		},
-		CVAR_SETTER(
-			ImGui::User::SetupStyleFromColor(CON_ARG_FLOAT(0), CON_ARG_FLOAT(1), CON_ARG_FLOAT(2))
-		)
-	);
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("imgui_show_demo", { "bool" },
-		CVAR_GETTER_BOOL(mShowImguiDemo),
-		CVAR_SETTER_BOOL(mShowImguiDemo));
+		CVAR_SETTER(ImGui::User::SetupStyleFromColor(CON_ARG_FLOAT(0), CON_ARG_FLOAT(1), CON_ARG_FLOAT(2)))
+	));
+	sky::AddCVar("imgui_show_demo", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(mShowImguiDemo), CVAR_SETTER_BOOL(mShowImguiDemo)));
 }
 
 ConsoleHelperCommands::~ConsoleHelperCommands()

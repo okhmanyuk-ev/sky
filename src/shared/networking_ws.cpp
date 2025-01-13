@@ -18,8 +18,8 @@ using namespace Shared::NetworkingWS;
 
 NetCommands::NetCommands()
 {
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_log_events", { "bool" },
-		CVAR_GETTER_BOOL(NetCommands::LogEvents), CVAR_SETTER_BOOL(NetCommands::LogEvents));
+	sky::AddCVar("net_log_events", sky::CVar(std::nullopt, { "bool" },
+		CVAR_GETTER_BOOL(NetCommands::LogEvents), CVAR_SETTER_BOOL(NetCommands::LogEvents)));
 }
 
 NetCommands::~NetCommands()

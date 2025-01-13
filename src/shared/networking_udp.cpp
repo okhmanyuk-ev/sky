@@ -258,29 +258,14 @@ Networking::Networking(uint16_t port) : mSocket(port)
 		readPacket(packet);
 	});
 
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_log_packets", { "bool" },
-		CVAR_GETTER_BOOL(Networking::NetLogPackets), CVAR_SETTER_BOOL(Networking::NetLogPackets));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_log_loss", { "bool" },
-		CVAR_GETTER_BOOL(Networking::NetLogLoss), CVAR_SETTER_BOOL(Networking::NetLogLoss));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_log_rel", { "bool" },
-		CVAR_GETTER_BOOL(Networking::NetLogRel), CVAR_SETTER_BOOL(Networking::NetLogRel));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_reconnect_delay", { "sec" },
-		CVAR_GETTER_INT(Networking::NetReconnectDelay), CVAR_SETTER_INT(Networking::NetReconnectDelay));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_timeout", { "sec" },
-		CVAR_GETTER_INT(Networking::NetTimeout), CVAR_SETTER_INT(Networking::NetTimeout));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_transmit_delay_min", { "msec" },
-		CVAR_GETTER_INT(Networking::NetTransmitDelayMin), CVAR_SETTER_INT(Networking::NetTransmitDelayMin));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_transmit_delay_max", { "msec" },
-		CVAR_GETTER_INT(Networking::NetTransmitDelayMax), CVAR_SETTER_INT(Networking::NetTransmitDelayMax));
-
-	sky::GetService<sky::CommandProcessor>()->registerCVar("net_max_packet_size", { "bytes" },
-		CVAR_GETTER_INT(Networking::NetMaxPacketSize), CVAR_SETTER_INT(Networking::NetMaxPacketSize));
+	sky::AddCVar("net_log_packets", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(Networking::NetLogPackets), CVAR_SETTER_BOOL(Networking::NetLogPackets)));
+	sky::AddCVar("net_log_loss", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(Networking::NetLogLoss), CVAR_SETTER_BOOL(Networking::NetLogLoss)));
+	sky::AddCVar("net_log_rel", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(Networking::NetLogRel), CVAR_SETTER_BOOL(Networking::NetLogRel)));
+	sky::AddCVar("net_reconnect_delay", sky::CVar(std::nullopt, { "sec" }, CVAR_GETTER_INT(Networking::NetReconnectDelay), CVAR_SETTER_INT(Networking::NetReconnectDelay)));
+	sky::AddCVar("net_timeout", sky::CVar(std::nullopt, { "sec" }, CVAR_GETTER_INT(Networking::NetTimeout), CVAR_SETTER_INT(Networking::NetTimeout)));
+	sky::AddCVar("net_transmit_delay_min", sky::CVar(std::nullopt, { "msec" }, CVAR_GETTER_INT(Networking::NetTransmitDelayMin), CVAR_SETTER_INT(Networking::NetTransmitDelayMin)));
+	sky::AddCVar("net_transmit_delay_max", sky::CVar(std::nullopt, { "msec" }, CVAR_GETTER_INT(Networking::NetTransmitDelayMax), CVAR_SETTER_INT(Networking::NetTransmitDelayMax)));
+	sky::AddCVar("net_max_packet_size", sky::CVar(std::nullopt, { "bytes" }, CVAR_GETTER_INT(Networking::NetMaxPacketSize), CVAR_SETTER_INT(Networking::NetMaxPacketSize)));
 }
 
 void Networking::readPacket(Network::Packet& packet)
