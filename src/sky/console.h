@@ -106,11 +106,12 @@ namespace sky
 	class CVar
 	{
 	public:
-		friend class CommandProcessor;
+		using Getter = std::function<std::vector<std::string>()>;
+		using Setter = std::function<void(const std::vector<std::string>&)>;
 
 	public:
-		using Getter = std::function<std::vector<std::string>()>;
-		using Setter = std::function <void(const std::vector<std::string>&)>;
+		CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
+			Getter getter, Setter setter);
 
 	public:
 		std::string getValueAsString() const;
@@ -134,10 +135,11 @@ namespace sky
 	class Command
 	{
 	public:
-		friend class CommandProcessor;
+		using Callback = std::function<void(const std::vector<std::string>&)>;
 
 	public:
-		using Callback = std::function<void(const std::vector<std::string>&)>;
+		Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
+			Callback callback);
 
 	public:
 		std::string getArgsAsString() const;

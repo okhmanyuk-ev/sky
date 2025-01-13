@@ -83,6 +83,24 @@ void NativeConsole::setTitle(const std::string& s)
 
 #endif
 
+CVar::CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
+	Getter getter, Setter setter) :
+	mDescription(description),
+	mArguments(arguments),
+	mOptionalArguments(optional_arguments),
+	mGetter(getter),
+	mSetter(setter)
+{
+}
+
+Command::Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
+	Callback callback) :
+	mDescription(description),
+	mArguments(arguments),
+	mOptionalArguments(optional_arguments),
+	mCallback(callback)
+{
+}
 
 void CommandProcessor::execute(const std::string& cmd)
 {
@@ -96,13 +114,9 @@ void CommandProcessor::registerCommand(const std::string& name, std::optional<st
 	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 	Command::Callback callback)
 {
-	assert(mCommands.count(name) == 0);
-	auto cmd = Command();
-	cmd.mDescription = description;
-	cmd.mCallback = callback;
-	cmd.mArguments = args;
-	cmd.mOptionalArguments = optional_args;
-	mCommands[name] = cmd;
+	assert(!mCommands.contains(name));
+	auto cmd = Command(description, args, optional_args, callback);
+	mCommands.insert({ name, cmd });
 }
 
 void CommandProcessor::registerCommand(const std::string& name, std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback)
@@ -134,14 +148,9 @@ void CommandProcessor::registerCVar(const std::string& name, std::optional<std::
 	const std::vector<std::string>& args, const std::vector<std::string>& optional_args,
 	CVar::Getter getter, CVar::Setter setter)
 {
-	assert(mCVars.count(name) == 0);
-	auto cvar = CVar();
-	cvar.mDescription = description;
-	cvar.mArguments = args;
-	cvar.mOptionalArguments = optional_args;
-	cvar.mGetter = getter;
-	cvar.mSetter = setter;
-	mCVars[name] = cvar;
+	assert(!mCVars.contains(name));
+	auto cvar = CVar(description, args, optional_args, getter, setter);
+	mCVars.insert({ name, cvar });
 }
 
 void CommandProcessor::registerCVar(const std::string& name, const std::vector<std::string>& args,
