@@ -19,6 +19,7 @@ namespace sky
 
 		static T* GetService()
 		{
+			assert(HasService());
 			return Service.get();
 		}
 
@@ -30,6 +31,7 @@ namespace sky
 
 		static void Reset()
 		{
+			assert(HasService());
 			Service.reset();
 		}
 
