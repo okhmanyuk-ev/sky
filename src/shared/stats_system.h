@@ -27,10 +27,6 @@ namespace Shared
 			BottomRight
 		};
 
-	public:
-		StatsSystem();
-		~StatsSystem();
-
 	private:
 		void onFrame() override;
 
@@ -42,14 +38,11 @@ namespace Shared
 		}
 
 	public:
-		auto isEnabled() const { return mEnabled; }
-		void setEnabled(bool value) { mEnabled = value; }
-
 		auto getAlignment() const { return mAlignment; }
 		void setAlignment(Align value) { mAlignment = value; }
 
 	private:
-		bool mEnabled = true;
+		sky::CVar<bool> mEnabled = sky::CVar<bool>("g_stats", true);
 		Align mAlignment = Align::TopLeft;
 
 	private:

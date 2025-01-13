@@ -9,16 +9,6 @@
 
 using namespace Shared;
 
-StatsSystem::StatsSystem()
-{
-	sky::AddCVar("g_stats", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled)));
-}
-
-StatsSystem::~StatsSystem()
-{
-	sky::GetService<sky::CommandProcessor>()->removeCVar("g_stats");
-}
-
 void StatsSystem::onFrame()
 {
 	if (!mEnabled)

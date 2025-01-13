@@ -1,6 +1,7 @@
 #pragma once
 
 #include <scene/all.h>
+#include <sky/console.h>
 
 namespace Shared
 {
@@ -11,7 +12,6 @@ namespace Shared
 	{
 	public:
 		SceneEditor(Scene::Scene& scene);
-		~SceneEditor();
 
 	private:
 		void onEvent(const Platform::Input::Mouse::ButtonEvent& e) override;
@@ -35,12 +35,8 @@ namespace Shared
 		static void drawImage(std::shared_ptr<skygfx::Texture> texture, std::optional<Graphics::TexRegion> region = std::nullopt,
 			float max_size = 256.0f);
 
-	public:
-		bool isEnabled() const { return mEnabled; }
-		void setEnabled(bool value) { mEnabled = value; }
-
 	private:
-		bool mEnabled = false;
+		sky::CVar<bool> mEnabled = sky::CVar<bool>("scene_editor", false);
 		bool mBatchGroupsEnabled = false;
 		Scene::Scene& mScene;
 		Scene::Scene::BatchGroups mBatchGroups;

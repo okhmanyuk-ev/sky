@@ -12,12 +12,6 @@ using namespace Shared;
 
 SceneEditor::SceneEditor(Scene::Scene& scene) : mScene(scene)
 {
-	sky::AddCVar("scene_editor", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(isEnabled), CVAR_SETTER_BOOL_FUNC(setEnabled)));
-}
-
-SceneEditor::~SceneEditor()
-{
-	sky::GetService<sky::CommandProcessor>()->removeCVar("scene_editor");
 }
 
 void SceneEditor::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
@@ -74,7 +68,9 @@ void SceneEditor::onFrame()
 
 void SceneEditor::showNodeTreeWindow()
 {
-	ImGui::Begin("Scene", &mEnabled);
+	bool enabled = mEnabled;
+	ImGui::Begin("Scene", &enabled);
+	mEnabled = enabled;
 	if (ImGui::Button("Batch Groups"))
 	{
 		mBatchGroupsEnabled = true;
