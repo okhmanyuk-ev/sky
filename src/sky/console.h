@@ -202,6 +202,7 @@ namespace sky
 		~CVarBool();
 
 		operator bool() const { return mValue; }
+		CVarBool& operator=(bool value) { mValue = value; return *this; }
 
 	private:
 		std::string mName;
@@ -215,6 +216,7 @@ namespace sky
 		~CVarInt();
 
 		operator int() const { return mValue; }
+		CVarInt& operator=(int value) { mValue = value; return *this; }
 
 	private:
 		std::string mName;

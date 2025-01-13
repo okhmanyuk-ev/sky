@@ -3,16 +3,13 @@
 #include <common/frame_system.h>
 #include <sky/dispatcher.h>
 #include <renderer/all.h>
-
+#include <sky/console.h>
 #include <platform/system.h>
 #include <platform/input.h>
-
 #include <imgui.h>
 #include <imgui_stdlib.h>
-
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-
 #include <cstddef>
 
 #define IMGUI_SYSTEM sky::Locator<Shared::ImguiSystem>::GetService()
@@ -37,10 +34,10 @@ namespace Shared
 		void ensureFont();
 
 	public:
-		auto isSamplerNearest() const { return mSamplerNearest; }
+		bool isSamplerNearest() const { return mSamplerNearest; }
 		void setSamplerNearest(bool value) { mSamplerNearest = value; }
 
-		auto isScaleIndependence() const { return mScaleIndependence; }
+		bool isScaleIndependence() const { return mScaleIndependence; }
 		void setScaleIndependence(bool value) { mScaleIndependence = value; }
 
 		auto getLogicalSize() const { return mLogicalSize; }
@@ -50,8 +47,8 @@ namespace Shared
 		float getScale() const;
 
 	private:
-		bool mSamplerNearest = true;
-		bool mScaleIndependence = false;
+		sky::CVarBool mSamplerNearest = sky::CVarBool("imgui_sampler_nearest", false);
+		sky::CVarBool mScaleIndependence = sky::CVarBool("imgui_scale_independence", false);
 		glm::vec2 mLogicalSize = { 0.0f, 0.0f };
 
 	private:

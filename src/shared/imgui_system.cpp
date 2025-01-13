@@ -49,15 +49,10 @@ ImguiSystem::ImguiSystem()
 	io.KeyMap[ImGuiKey_X] = static_cast<int>(Key::X);
 	io.KeyMap[ImGuiKey_Y] = static_cast<int>(Key::Y);
 	io.KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);
-
-	sky::AddCVar("imgui_sampler_nearest", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(mSamplerNearest), CVAR_SETTER_BOOL(mSamplerNearest)));
-	sky::AddCVar("imgui_scale_independence", sky::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL(mScaleIndependence), CVAR_SETTER_BOOL(mScaleIndependence)));
 }
 
 ImguiSystem::~ImguiSystem()
 {
-	sky::GetService<sky::CommandProcessor>()->removeCVar("imgui_sampler_nearest");
-	sky::GetService<sky::CommandProcessor>()->removeCVar("imgui_scale_independence");
 	ImGui::DestroyContext();
 }
 
