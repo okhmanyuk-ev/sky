@@ -49,17 +49,13 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 {
 	sky::Log("Commands:");
 
-	auto commands = sky::GetService<sky::CommandProcessor>()->getItems() | std::views::filter([](const auto& pair) {
-		return std::holds_alternative<sky::CommandProcessor::Command>(pair.second);
-	}) | std::views::transform([](const auto& pair) {
-		return std::pair{ pair.first, std::get<sky::CommandProcessor::Command>(pair.second) };
-	});
+	auto commands = sky::GetService<sky::CommandProcessor>()->getItems()
+		| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::Command>(pair.second); })
+		| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::Command>(pair.second) }; })
+		| std::views::filter([&](const auto& pair) { return !CON_ARG_EXIST(0) || (pair.first.find(CON_ARG(0)) != std::string::npos); });
 
 	for (const auto& [name, command] : commands)
 	{
-		if (CON_ARG_EXIST(0) && (name.find(CON_ARG(0)) == std::string::npos))
-			continue;
-
 		auto s = " - " + name;
 
 		auto args = command.getArgsAsString();
@@ -80,17 +76,13 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 {
 	sky::Log("CVars:");
 
-	auto cvars = sky::GetService<sky::CommandProcessor>()->getItems() | std::views::filter([](const auto& pair) {
-		return std::holds_alternative<sky::CommandProcessor::CVar>(pair.second);
-	}) | std::views::transform([](const auto& pair) {
-		return std::pair{ pair.first, std::get<sky::CommandProcessor::CVar>(pair.second) };
-	});
+	auto cvars = sky::GetService<sky::CommandProcessor>()->getItems()
+		| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::CVar>(pair.second); })
+		| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::CVar>(pair.second) }; })
+		| std::views::filter([&](const auto& pair) { return !CON_ARG_EXIST(0) || (pair.first.find(CON_ARG(0)) != std::string::npos); });
 
 	for (const auto& [name, cvar] : cvars)
 	{
-		if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
-			continue;
-
 		auto value = cvar.getValueAsString();
 		auto description = cvar.description;
 		bool hasSetter = cvar.setter != nullptr;
@@ -154,22 +146,16 @@ void ConsoleCommands::onAlias(CON_ARGS)
 
 	if (CON_ARGS_COUNT < 2)
 	{
-		auto aliases = items | std::views::filter([](const auto& pair) {
-			return std::holds_alternative<sky::CommandProcessor::Alias>(pair.second);
-		}) | std::views::transform([](const auto& pair) {
-			return std::pair{ pair.first, std::get<sky::CommandProcessor::Alias>(pair.second) };
-		});
+		auto aliases = items
+			| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::Alias>(pair.second); })
+			| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::Alias>(pair.second) }; })
+			| std::views::filter([&](const auto& pair) { return !CON_ARG_EXIST(0) || (pair.first.find(CON_ARG(0)) != std::string::npos); });
 
 		if (aliases.empty())
 			sky::Log("alias list is empty");
 
 		for (const auto& [name, alias] : aliases)
-		{
-			if (CON_HAS_ARGS && (name.find(CON_ARG(0)) == std::string::npos))
-				continue;
-
 			sky::Log(" - {} = {}", name, sky::CommandProcessor::MakeStringFromTokens(alias.value));
-		}
 
 		sky::Log("aliases can be invoked by adding 'sharp' prefix, example: #alias_name");
 		return;
