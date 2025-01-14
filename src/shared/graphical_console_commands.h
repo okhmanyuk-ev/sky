@@ -19,13 +19,13 @@ namespace Shared
 	private:
 		sky::CVar<bool> mShowTargets = sky::CVar<bool>("r_showtargets", false);
 
-		sky::CVarProxy<bool> mVsync = sky::CVarProxy<bool>("r_vsync", skygfx::IsVsyncEnabled, skygfx::SetVsync);
+		sky::CVar<bool> mVsync = sky::CVar<bool>("r_vsync", skygfx::IsVsyncEnabled, skygfx::SetVsync);
 
-		sky::CVarProxy<bool> mBatching = sky::CVarProxy<bool>("r_batching",
+		sky::CVar<bool> mBatching = sky::CVar<bool>("r_batching",
 			std::bind(&Graphics::System::isBatching, GRAPHICS),
 			std::bind(&Graphics::System::setBatching, GRAPHICS, std::placeholders::_1));
 
-		sky::CVarProxy<float> mScale = sky::CVarProxy<float>("r_scale",
+		sky::CVar<float> mScale = sky::CVar<float>("r_scale",
 			std::bind(&Platform::System::getScale, PLATFORM),
 			std::bind(&Platform::System::setScale, PLATFORM, std::placeholders::_1),
 			"logical scaling on retina displays");

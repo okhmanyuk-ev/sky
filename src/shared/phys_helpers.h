@@ -119,9 +119,9 @@ namespace Shared::PhysHelpers
 		sky::CVar<bool> mShowStats = sky::CVar<bool>("phys_stats", false);
 		sky::CVar<int> mVelocityIterations = sky::CVar<int>("phys_velocity_iterations", 6);
 		sky::CVar<int> mPositionIterations = sky::CVar<int>("phys_position_iterations", 2);
-		sky::CVarProxy<bool> mAllowSleep;
-		sky::CVarProxy<bool> mTimeStepEnabled;
-		sky::CVarProxy<bool> mTimestepForceTimeCompletion;
+		sky::CVar<bool> mAllowSleep;
+		sky::CVar<bool> mTimeStepEnabled;
+		sky::CVar<bool> mTimestepForceTimeCompletion;
 
 	private:
 		class Draw : public b2Draw

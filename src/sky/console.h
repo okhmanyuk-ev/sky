@@ -207,13 +207,13 @@ namespace sky
 	};
 
 	template<class T>
-	class CVarProxy
+	class CVar
 	{
 	public:
 		using Getter = std::function<T()>;
 		using Setter = std::function<void(T)>;
 
-		CVarProxy(const std::string& name, Getter _getter, Setter _setter, std::optional<std::string> description = std::nullopt) :
+		CVar(const std::string& name, Getter _getter, Setter _setter, std::optional<std::string> description = std::nullopt) :
 			mName(name),
 			mGetter(_getter),
 			mSetter(_setter)
@@ -223,34 +223,30 @@ namespace sky
 			sky::Locator<CommandProcessor>::GetService()->addItem(mName, sky::CommandProcessor::CVar(description, CVarTraits<T>::Args, getter, setter));
 		}
 
-		~CVarProxy()
+		CVar(const std::string& name, std::shared_ptr<T> value, std::optional<std::string> description = std::nullopt) :
+			CVar(name, [value] { return *value; }, [value](T _value) { *value = _value; }, description)
+		{
+		}
+
+		CVar(const std::string& name, T value, std::optional<std::string> description = std::nullopt) :
+			CVar(name, std::make_shared<T>(value), description)
+		{
+		}
+
+		~CVar()
 		{
 			sky::Locator<CommandProcessor>::GetService()->removeItem(mName);
 		}
 
-		CVarProxy(const CVarProxy&) = delete;
-		CVarProxy& operator=(const CVarProxy&) = delete;
+		CVar(const CVar&) = delete;
+		CVar& operator=(const CVar&) = delete;
+
+		operator T() const { return mGetter(); }
+		CVar& operator=(T value) { mSetter(value); return *this; }
 
 	private:
 		std::string mName;
 		Getter mGetter;
 		Setter mSetter;
-	};
-
-	template<class T>
-	class CVar : public CVarProxy<T>
-	{
-	public:
-		CVar(const std::string& name, T value, std::optional<std::string> description = std::nullopt)
-			: CVarProxy<T>(name, [this] { return mValue; }, [this](T value) { mValue = value; }, description),
-			mValue(value)
-		{
-		}
-
-		operator T() const { return mValue; }
-		CVar& operator=(T value) { mValue = value; return *this; }
-
-	private:
-		T mValue;
 	};
 }
