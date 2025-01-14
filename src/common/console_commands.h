@@ -35,14 +35,14 @@
 #define CON_HAS_ARGS !CON_ARGS_NAME.empty()
 #define CON_ARGS_ACCUMULATED_STRING CON_HAS_ARGS ? std::accumulate(std::next(CON_ARGS_NAME.begin()), CON_ARGS_NAME.end(), *CON_ARGS_NAME.begin(), [](const auto& a, const auto& b) { return a + " " + b; }) : ""
 
-#define CON_ARG(N) CON_ARGS_NAME[N]
+#define CON_ARG(N) CON_ARGS_NAME.at(N)
 #define CON_ARG_EXIST(N) CON_ARGS_COUNT > N
 #define CON_ARG_INT(N) stoi(CON_ARG(N))
 #define CON_ARG_BOOL(N) stoi(CON_ARG(N))
 #define CON_ARG_FLOAT(N) stof(CON_ARG(N))
 #define CON_ARG_DOUBLE(N) stod(CON_ARG(N))
 
-#define CVAR_SETTER(V) [this](CON_ARGS) { try { V; } catch (const std::exception& e) { sky::Log(e.what()); } }
+#define CVAR_SETTER(V) [this](CON_ARGS) { V; }
 
 #define CVAR_SETTER_FLOAT(V) CVAR_SETTER(V = CON_ARG_FLOAT(0))
 #define CVAR_SETTER_FLOAT_FUNC(V) CVAR_SETTER(V(CON_ARG_FLOAT(0)))
