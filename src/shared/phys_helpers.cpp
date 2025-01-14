@@ -74,11 +74,7 @@ World::World()
 	b2BodyDef dummy_body_def;
 	mDummyBody = mB2World.CreateBody(&dummy_body_def);
 
-	sky::AddCVar("phys_debug", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(isDebug), CVAR_SETTER_BOOL_FUNC(setDebug)));
-	sky::AddCVar("phys_stats", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(getShowStats), CVAR_SETTER_BOOL_FUNC(setShowStats)));
 	sky::AddCVar("phys_allow_sleep", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(mB2World.GetAllowSleeping), CVAR_SETTER_BOOL_FUNC(mB2World.SetAllowSleeping)));
-	sky::AddCVar("phys_velocity_iterations", sky::CommandProcessor::CVar(std::nullopt, { "int" }, CVAR_GETTER_INT(mVelocityIterations), CVAR_SETTER_INT(mVelocityIterations)));
-	sky::AddCVar("phys_position_iterations", sky::CommandProcessor::CVar(std::nullopt, { "int" }, CVAR_GETTER_INT(mPositionIterations), CVAR_SETTER_INT(mPositionIterations)));
 
 	auto getter = [this] {
 		auto fps = 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep());
@@ -103,11 +99,7 @@ World::World()
 
 World::~World()
 {
-	sky::GetService<sky::CommandProcessor>()->removeItem("phys_debug");
-	sky::GetService<sky::CommandProcessor>()->removeItem("phys_stats");
 	sky::GetService<sky::CommandProcessor>()->removeItem("phys_allow_sleep");
-	sky::GetService<sky::CommandProcessor>()->removeItem("phys_velocity_iterations");
-	sky::GetService<sky::CommandProcessor>()->removeItem("phys_position_iterations");
 	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_fps");
 	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_enabled");
 	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_force_time_completion");

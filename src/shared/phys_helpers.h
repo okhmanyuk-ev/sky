@@ -104,10 +104,10 @@ namespace Shared::PhysHelpers
 	public:
 		auto& getB2World() { return mB2World; }
 
-		auto isDebug() const { return mDebug; }
+		bool isDebug() const { return mDebug; }
 		void setDebug(bool value) { mDebug = value; }
 
-		auto getShowStats() const { return mShowStats; }
+		bool getShowStats() const { return mShowStats; }
 		void setShowStats(bool value) { mShowStats = value; }
 
 	private:
@@ -115,10 +115,10 @@ namespace Shared::PhysHelpers
 		b2Body* mDummyBody = nullptr; // used for mouse moving
 		b2MouseJoint* mMouseJoint = nullptr;
 		Common::TimestepFixer mTimestepFixer;
-		bool mDebug = false;
-		bool mShowStats = false;
-		int mVelocityIterations = 6;
-		int mPositionIterations = 2;
+		sky::CVar<bool> mDebug = sky::CVar<bool>("phys_debug", false);
+		sky::CVar<bool> mShowStats = sky::CVar<bool>("phys_stats", false);
+		sky::CVar<int> mVelocityIterations = sky::CVar<int>("phys_velocity_iterations", 6);
+		sky::CVar<int> mPositionIterations = sky::CVar<int>("phys_position_iterations", 2);
 
 	private:
 		class Draw : public b2Draw
