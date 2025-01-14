@@ -17,6 +17,9 @@
 
 using namespace Shared;
 
+static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepEnabled;
+static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepTimeCompletion;
+
 Application::Application(const std::string& appname, const Flags& flags) : mFlags(flags)
 {
 	std::srand((unsigned int)std::time(nullptr));
@@ -91,13 +94,13 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 		sky::AddCVar("scene_timestep_fps", sky::CommandProcessor::CVar(std::nullopt, { "float" }, getter, setter));
 
-		sky::AddCVar("scene_timestep_enabled", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
-			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().isEnabled),
-			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setEnabled)));
+		gCVarSceneTimestepEnabled = std::make_unique<sky::CVar<bool>>("scene_timestep_enabled",
+			std::bind(&Common::TimestepFixer::isEnabled, &mScene->getTimestepFixer()),
+			std::bind(&Common::TimestepFixer::setEnabled, &mScene->getTimestepFixer(), std::placeholders::_1));
 
-		sky::AddCVar("scene_timestep_force_time_completion", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
-			CVAR_GETTER_BOOL_FUNC(mScene->getTimestepFixer().getForceTimeCompletion),
-			CVAR_SETTER_BOOL_FUNC(mScene->getTimestepFixer().setForceTimeCompletion)));
+		gCVarSceneTimestepTimeCompletion = std::make_unique<sky::CVar<bool>>("scene_timestep_force_time_completion",
+			std::bind(&Common::TimestepFixer::getForceTimeCompletion, &mScene->getTimestepFixer()),
+			std::bind(&Common::TimestepFixer::setForceTimeCompletion, &mScene->getTimestepFixer(), std::placeholders::_1));
 
 		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
 			float intensity = 0.5f;
@@ -276,6 +279,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 Application::~Application()
 {
+	gCVarSceneTimestepEnabled.reset();
+	gCVarSceneTimestepTimeCompletion.reset();
+
 	if (mFlags.count(Flag::Scene))
 	{
 		sky::Locator<Shared::SceneManager>::Reset();
