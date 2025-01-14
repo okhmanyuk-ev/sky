@@ -213,14 +213,13 @@ namespace sky
 		using Getter = std::function<T()>;
 		using Setter = std::function<void(T)>;
 
-		CVar(const std::string& name, Getter _getter, Setter _setter, std::optional<std::string> description = std::nullopt) :
+		CVar(const std::string& name, Getter getter, Setter setter, std::optional<std::string> description = std::nullopt) :
 			mName(name),
-			mGetter(_getter),
-			mSetter(_setter)
+			mGetter(getter),
+			mSetter(setter)
 		{
-			auto getter = [this] { return CVarTraits<T>::ValueToArgs(mGetter()); };
-			auto setter = [this](const auto& args) { mSetter(CVarTraits<T>::ArgsToValue(args)); };
-			sky::Locator<CommandProcessor>::GetService()->addItem(mName, sky::CommandProcessor::CVar(description, CVarTraits<T>::Args, getter, setter));
+			sky::Locator<CommandProcessor>::GetService()->addItem(mName, sky::CommandProcessor::CVar(description, CVarTraits<T>::Args,
+				[this] { return CVarTraits<T>::ValueToArgs(mGetter()); }, [this](const auto& args) { mSetter(CVarTraits<T>::ArgsToValue(args)); }));
 		}
 
 		CVar(const std::string& name, std::shared_ptr<T> value, std::optional<std::string> description = std::nullopt) :
