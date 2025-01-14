@@ -224,6 +224,9 @@ namespace sky
 			sky::Locator<CommandProcessor>::GetService()->removeItem(mName);
 		}
 
+		CVar(const CVar&) = delete;
+		CVar& operator=(const CVar&) = delete;
+
 		operator T() const { return mValue; }
 		CVar& operator=(T value) { mValue = value; return *this; }
 
