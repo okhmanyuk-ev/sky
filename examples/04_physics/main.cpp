@@ -1,6 +1,5 @@
 #include <sky/sky.h>
 
-
 void sky_main()
 {
 	Shared::Application app("Physics", { Shared::Application::Flag::Scene });
@@ -84,7 +83,7 @@ void sky_main()
 
 	framer.setCallback([spawnBox, spawnBall]{
 		ImGui::Begin("Options", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel);
-		ImGui::SetWindowPos(ImGui::User::TopLeftCorner());
+		ImGui::SetWindowPos(ImGui::User::TopRightCorner());
 
 		ImGui::Checkbox("Auto spawn", &auto_spawn);
 		ImGui::Separator();
