@@ -55,7 +55,13 @@ void Entity::setGravityScale(float value)
 
 // world
 
-World::World()
+World::World() :
+	mAllowSleep("phys_allow_sleep", std::bind(&b2World::GetAllowSleeping, &mB2World),
+		std::bind(&b2World::SetAllowSleeping, &mB2World, std::placeholders::_1)),
+	mTimeStepEnabled("phys_timestep_enabled", std::bind(&Common::TimestepFixer::isEnabled, &mTimestepFixer),
+		std::bind(&Common::TimestepFixer::setEnabled, &mTimestepFixer, std::placeholders::_1)),
+	mTimestepForceTimeCompletion("phys_timestep_force_time_completion", std::bind(&Common::TimestepFixer::getForceTimeCompletion, &mTimestepFixer),
+		std::bind(&Common::TimestepFixer::setForceTimeCompletion, &mTimestepFixer, std::placeholders::_1))
 {
 	mTimestepFixer.setForceTimeCompletion(false);
 	mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / 120.0f));
@@ -74,8 +80,6 @@ World::World()
 	b2BodyDef dummy_body_def;
 	mDummyBody = mB2World.CreateBody(&dummy_body_def);
 
-	sky::AddCVar("phys_allow_sleep", sky::CommandProcessor::CVar(std::nullopt, { "bool" }, CVAR_GETTER_BOOL_FUNC(mB2World.GetAllowSleeping), CVAR_SETTER_BOOL_FUNC(mB2World.SetAllowSleeping)));
-
 	auto getter = [this] {
 		auto fps = 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep());
 		return std::vector<std::string>({ std::to_string(fps) });
@@ -87,22 +91,11 @@ World::World()
 	};
 
 	sky::AddCVar("phys_timestep_fps", sky::CommandProcessor::CVar(std::nullopt, { "float" }, getter, setter));
-
-	sky::AddCVar("phys_timestep_enabled", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
-		CVAR_GETTER_BOOL_FUNC(mTimestepFixer.isEnabled),
-		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setEnabled)));
-
-	sky::AddCVar("phys_timestep_force_time_completion", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
-		CVAR_GETTER_BOOL_FUNC(mTimestepFixer.getForceTimeCompletion),
-		CVAR_SETTER_BOOL_FUNC(mTimestepFixer.setForceTimeCompletion)));
 }
 
 World::~World()
 {
-	sky::GetService<sky::CommandProcessor>()->removeItem("phys_allow_sleep");
 	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_fps");
-	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_enabled");
-	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_force_time_completion");
 }
 
 void World::onEvent(const Shared::TouchEmulator::Event& e)

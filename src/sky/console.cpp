@@ -450,7 +450,7 @@ std::vector<std::string> CVarTraits<bool>::ValueToArgs(bool value)
 
 bool CVarTraits<bool>::ArgsToValue(const std::vector<std::string>& args)
 {
-	return stof(args.at(0));
+	return stoi(args.at(0)) > 0;
 }
 
 const std::vector<std::string> CVarTraits<int>::Args = { "int" };
