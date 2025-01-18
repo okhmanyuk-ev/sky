@@ -7,16 +7,16 @@
 #include <sky/dispatcher.h>
 #include <platform/all.h>
 
-#define RENDERER sky::Locator<Renderer::System>::GetService()
+#define RENDERER sky::Locator<sky::Renderer>::GetService()
 
-namespace Renderer
+namespace sky
 {
-	class System : public sky::Listenable<Platform::System::ResizeEvent>
+	class Renderer : public sky::Listenable<Platform::System::ResizeEvent>
 	{
 	public:
-		System(std::optional<skygfx::BackendType> type = std::nullopt,
+		Renderer(std::optional<skygfx::BackendType> type = std::nullopt,
 			skygfx::Adapter adapter = skygfx::Adapter::HighPerformance);
-		~System();
+		~Renderer();
 
 	private:
 		void onEvent(const Platform::System::ResizeEvent& e) override;

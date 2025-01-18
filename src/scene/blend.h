@@ -1,6 +1,6 @@
 #pragma once
 
-#include <renderer/all.h>
+#include <skygfx/skygfx.h>
 
 namespace Scene
 {

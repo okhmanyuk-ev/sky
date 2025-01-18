@@ -4,7 +4,6 @@
 #include <common/frame_system.h>
 #include <shared/imgui_system.h>
 #include <platform/system.h>
-#include <renderer/system.h>
 #include <graphics/system.h>
 #include <network/system.h>
 #include <common/console_commands.h>

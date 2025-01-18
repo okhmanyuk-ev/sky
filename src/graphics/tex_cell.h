@@ -1,8 +1,8 @@
 #pragma  once
 
-#include <renderer/all.h>
 #include <graphics/tex_region.h>
 #include <memory>
+#include <skygfx/skygfx.h>
 
 namespace Graphics
 {

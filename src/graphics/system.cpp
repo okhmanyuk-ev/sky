@@ -1,6 +1,7 @@
 #include "system.h"
 #include <vector>
 #include <numeric>
+#include <sky/renderer.h>
 
 using namespace Graphics;
 

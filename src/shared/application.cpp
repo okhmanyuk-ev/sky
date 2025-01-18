@@ -9,6 +9,7 @@
 #include <sky/locator.h>
 #include <sky/cache.h>
 #include <sky/localization.h>
+#include <sky/renderer.h>
 #include <sky/dispatcher.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -32,7 +33,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<Common::FrameSystem>::Init(std::make_shared<Common::FrameSystem>());
 	sky::Locator<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
 	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
-	sky::Locator<Renderer::System>::Init(std::make_shared<Renderer::System>());
+	sky::Locator<sky::Renderer>::Init(std::make_shared<sky::Renderer>());
 	sky::Locator<sky::Console>::Init(std::make_shared<Shared::ImguiConsole>());
 	sky::Locator<Graphics::System>::Init(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
@@ -305,7 +306,7 @@ Application::~Application()
 	sky::Locator<Graphics::System>::Reset();
 	sky::Locator<sky::Console>::Reset();
 	sky::Locator<sky::CommandProcessor>::Reset();
-	sky::Locator<Renderer::System>::Reset();
+	sky::Locator<sky::Renderer>::Reset();
 	sky::Locator<Platform::System>::Reset();
 	sky::Locator<Common::ProfilerSystem>::Reset();
 	sky::Locator<Common::FrameSystem>::Reset();

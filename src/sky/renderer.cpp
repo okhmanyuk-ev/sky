@@ -1,12 +1,11 @@
-#include "system.h"
-
+#include "renderer.h"
 #include <platform/system_glfw.h>
 #include <platform/system_ios.h>
 #include <platform/system_emscripten.h>
 
-using namespace Renderer;
+using namespace sky;
 
-System::System(std::optional<skygfx::BackendType> type, skygfx::Adapter adapter)
+Renderer::Renderer(std::optional<skygfx::BackendType> type, skygfx::Adapter adapter)
 {
 	auto width = PLATFORM->getWidth();
 	auto height = PLATFORM->getHeight();
@@ -15,17 +14,17 @@ System::System(std::optional<skygfx::BackendType> type, skygfx::Adapter adapter)
 	skygfx::SetVsync(true);
 }
 
-System::~System()
+Renderer::~Renderer()
 {
 	skygfx::Finalize();
 }
 
-void System::onEvent(const Platform::System::ResizeEvent& e)
+void Renderer::onEvent(const Platform::System::ResizeEvent& e)
 {
 	skygfx::Resize(e.width, e.height);
 }
 
-void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
+void Renderer::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 {
 	if (value == nullptr)
 		skygfx::SetRenderTarget(std::nullopt);
@@ -33,12 +32,12 @@ void System::setRenderTarget(std::shared_ptr<skygfx::RenderTarget> value)
 		skygfx::SetRenderTarget(*value);
 }
 
-void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
+void Renderer::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
 	skygfx::Clear(color, depth, stencil);
 }
 
-void System::present()
+void Renderer::present()
 {
 	auto result = skygfx::Present();
 	mDrawcalls = result.drawcalls;

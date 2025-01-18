@@ -1,7 +1,7 @@
 #include "performance_console_commands.h"
 
 #include <common/console_commands.h>
-
+#include <sky/renderer.h>
 #include <imgui.h>
 #include <shared/imgui_user.h>
 #include <shared/stats_system.h>

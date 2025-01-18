@@ -1,10 +1,10 @@
 #pragma once
 
 #include <platform/asset.h>
-#include <renderer/all.h>
 #include <unordered_map>
 #include <memory>
 #include <glm/glm.hpp>
+#include <skygfx/skygfx.h>
 
 namespace Graphics
 {

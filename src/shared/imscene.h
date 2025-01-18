@@ -1,6 +1,6 @@
 #pragma once
 
-#include <renderer/all.h>
+#include <skygfx/skygfx.h>
 #include <graphics/all.h>
 #include <scene/all.h>
 

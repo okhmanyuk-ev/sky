@@ -2,7 +2,7 @@
 
 #include <common/frame_system.h>
 #include <sky/dispatcher.h>
-#include <renderer/all.h>
+#include <skygfx/skygfx.h>
 #include <sky/console.h>
 #include <platform/system.h>
 #include <platform/input.h>
@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <cstddef>
+#include <set>
 
 #define IMGUI_SYSTEM sky::Locator<Shared::ImguiSystem>::GetService()
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <renderer/all.h>
 #include <graphics/image.h>
 #include <graphics/tex_region.h>
 #include <map>

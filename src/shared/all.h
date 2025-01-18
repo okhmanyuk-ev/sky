@@ -24,7 +24,6 @@
 #include <common/buffer_helpers.h>
 
 #include <platform/all.h>
-#include <renderer/all.h>
 #include <scene/all.h>
 #include <graphics/all.h>
 

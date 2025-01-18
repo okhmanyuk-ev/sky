@@ -2,7 +2,6 @@
 
 #include <common/frame_system.h>
 #include <platform/system.h>
-#include <renderer/all.h>
 #include <sky/locator.h>
 #include <graphics/color.h>
 #include <graphics/font.h>
@@ -14,6 +13,7 @@
 #include <optional>
 #include <stack>
 #include "text_mesh.h"
+#include <set>
 
 #define GRAPHICS sky::Locator<Graphics::System>::GetService()
 

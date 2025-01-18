@@ -8,4 +8,5 @@
 #include <sky/dispatcher.h>
 #include <sky/localization.h>
 #include <sky/locator.h>
+#include <sky/renderer.h>
 #include <sky/utils.h>

@@ -4,7 +4,7 @@
 
 #include <imgui.h>
 #include <memory>
-#include <renderer/all.h>
+#include <skygfx/skygfx.h>
 
 namespace ImGui::User
 {

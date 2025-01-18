@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <renderer/all.h>
 #include "font.h"
+#include <skygfx/utils.h>
 
 namespace Graphics
 {
@@ -10,7 +10,7 @@ namespace Graphics
 	{
 		enum class Align
 		{
-			Left, 
+			Left,
 			Center,
 			Right
 		};
@@ -24,7 +24,7 @@ namespace Graphics
 		std::vector<float> symbol_line_y;
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
-	
+
 		static TextMesh createTextMesh(const Font& font, std::wstring::const_iterator begin,
 			std::wstring::const_iterator end);
 
