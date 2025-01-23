@@ -1,9 +1,5 @@
 #pragma once
 
-// TODO: change smart history
-// no cycle and checking,
-// just remove equal items when adding
-
 #include <sky/console.h>
 #include <common/interpolator.h>
 #include <sky/dispatcher.h>

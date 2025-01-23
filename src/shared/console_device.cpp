@@ -483,6 +483,9 @@ void ImguiConsole::enterInput()
 		mInputText.clear();
 		if (!line.empty())
 		{
+			mInputHistory.erase(std::remove_if(mInputHistory.begin(), mInputHistory.end(), [&](const std::string& str) {
+				return str == line;
+			}), mInputHistory.end());
 			mInputHistory.push_back(line);
 			mInputHistoryPos = static_cast<int>(mInputHistory.size());
 		}
@@ -583,38 +586,22 @@ void ImguiConsole::handleInputHistory(ImGuiInputTextCallbackData* data)
 		return;
 	}
 
-	if (mInputHistory.size() == 0)
+	if (mInputHistory.empty())
 		return;
 
 	mInputState = InputState::History;
 
-	int startPos = mInputHistoryPos;
+	if (data->EventKey == ImGuiKey::ImGuiKey_UpArrow)
+		mInputHistoryPos--;
+	else if (data->EventKey == ImGuiKey::ImGuiKey_DownArrow)
+		mInputHistoryPos++;
 
-	while (true)
-	{
-		int lastPos = mInputHistoryPos;
+	if (mInputHistoryPos < 0)
+		mInputHistoryPos = static_cast<int>(mInputHistory.size()) - 1;
+	else if (mInputHistoryPos > static_cast<int>(mInputHistory.size()) - 1)
+		mInputHistoryPos = 0;
 
-		if (data->EventKey == ImGuiKey::ImGuiKey_UpArrow)
-			mInputHistoryPos--;
-		else if (data->EventKey == ImGuiKey::ImGuiKey_DownArrow)
-			mInputHistoryPos++;
-
-		if (mInputHistoryPos < 0)
-			mInputHistoryPos = static_cast<int>(mInputHistory.size()) - 1;
-		else if (mInputHistoryPos > static_cast<int>(mInputHistory.size()) - 1)
-			mInputHistoryPos = 0;
-
-		if (lastPos == mInputHistory.size())
-			break;
-
-		if (mInputHistory[mInputHistoryPos] != mInputHistory[lastPos])
-			break;
-
-		if (startPos == mInputHistoryPos)
-			break;
-	}
-
-	auto s = mInputHistory[mInputHistoryPos];
+	auto s = mInputHistory.at(mInputHistoryPos);
 
 	memcpy(data->Buf, s.data(), s.size());
 	data->Buf[s.size()] = 0x00;
