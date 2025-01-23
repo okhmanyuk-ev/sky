@@ -283,6 +283,9 @@ Application::~Application()
 {
 	gCVarSceneTimestepEnabled.reset();
 	gCVarSceneTimestepTimeCompletion.reset();
+	mConsoleHelperCommands.reset();
+	mPerformanceConsoleCommands.reset();
+	mGraphicalConsoleCommands.reset();
 
 	if (mFlags.count(Flag::Scene))
 	{
@@ -290,14 +293,14 @@ Application::~Application()
 		mSceneEditor = nullptr;
 		mScene = nullptr;
 	}
-	if (mFlags.count(Flag::Audio))
-	{
-		sky::Locator<sky::Audio>::Reset();
-	}
 	sky::Locator<Shared::ImScene>::Reset();
 	sky::Locator<Shared::Stylebook>::Reset();
 	sky::Locator<Shared::ImguiSystem>::Reset();
 	sky::Locator<sky::Cache>::Reset();
+	if (mFlags.count(Flag::Audio))
+	{
+		sky::Locator<sky::Audio>::Reset();
+	}
 	sky::Locator<Shared::StatsSystem>::Reset();
 	sky::Locator<sky::Localization>::Reset();
 	if (mFlags.count(Flag::Network))
@@ -306,11 +309,11 @@ Application::~Application()
 	}
 	sky::Locator<Graphics::System>::Reset();
 	sky::Locator<sky::Console>::Reset();
-	sky::Locator<sky::CommandProcessor>::Reset();
 	sky::Locator<sky::Renderer>::Reset();
 	sky::Locator<Platform::System>::Reset();
 	sky::Locator<Common::ProfilerSystem>::Reset();
 	sky::Locator<sky::Scheduler>::Reset();
+	sky::Locator<sky::CommandProcessor>::Reset();
 #ifndef EMSCRIPTEN
 	sky::Locator<Common::TaskSystem>::Reset();
 #endif

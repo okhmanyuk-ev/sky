@@ -19,7 +19,7 @@
 
 namespace Shared
 {
-	class Application
+	class Application final
 	{
 	public:
 		enum class Flag
