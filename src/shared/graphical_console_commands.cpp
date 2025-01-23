@@ -1,5 +1,5 @@
 #include "graphical_console_commands.h"
-#include <shared/imgui_system.h>
+#include <sky/imgui_system.h>
 #include <shared/scene_editor.h>
 #include <sky/console.h>
 #include <sky/utils.h>

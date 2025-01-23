@@ -7,7 +7,7 @@
 #include <sky/console.h>
 #include <common/console_commands.h>
 
-using namespace Shared;
+using namespace sky;
 
 ImguiSystem::ImguiSystem()
 {

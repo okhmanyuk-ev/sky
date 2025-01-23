@@ -13,6 +13,7 @@
 #include <sky/dispatcher.h>
 #include <sky/scheduler.h>
 #include <sky/threadpool.h>
+#include <sky/imgui_system.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -45,7 +46,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<sky::Localization>::Init(std::make_shared<sky::Localization>());
 	sky::Locator<Shared::StatsSystem>::Init(std::make_shared<Shared::StatsSystem>());
 	sky::Locator<sky::Cache>::Init(std::make_shared<sky::Cache>());
-	sky::Locator<Shared::ImguiSystem>::Init(std::make_shared<Shared::ImguiSystem>());
+	sky::Locator<sky::ImguiSystem>::Init(std::make_shared<sky::ImguiSystem>());
 	sky::Locator<Shared::Stylebook>::Init(std::make_shared<Shared::Stylebook>());
 	sky::Locator<Shared::ImScene>::Init(std::make_shared<Shared::ImScene>());
 	if (flags.count(Flag::Audio))
@@ -296,7 +297,7 @@ Application::~Application()
 	}
 	sky::Locator<Shared::ImScene>::Reset();
 	sky::Locator<Shared::Stylebook>::Reset();
-	sky::Locator<Shared::ImguiSystem>::Reset();
+	sky::Locator<sky::ImguiSystem>::Reset();
 	sky::Locator<sky::Cache>::Reset();
 	if (mFlags.count(Flag::Audio))
 	{

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <shared/imgui_system.h>
 #include <platform/system.h>
 #include <graphics/system.h>
 #include <network/system.h>

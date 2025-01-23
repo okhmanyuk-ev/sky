@@ -13,9 +13,9 @@
 #include <cstddef>
 #include <set>
 
-#define IMGUI_SYSTEM sky::Locator<Shared::ImguiSystem>::GetService()
+#define IMGUI_SYSTEM sky::Locator<sky::ImguiSystem>::GetService()
 
-namespace Shared
+namespace sky
 {
 	class ImguiSystem :
 		public sky::Listenable<Platform::Input::Keyboard::Event>,
