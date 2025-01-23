@@ -1,10 +1,10 @@
 #pragma once
 
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 
 namespace Common
 {
-	class Timer final : public Scheduler::Frameable
+	class Timer final : public sky::Scheduler::Frameable
 	{
 	public:
 		using Callback = std::function<void()>;

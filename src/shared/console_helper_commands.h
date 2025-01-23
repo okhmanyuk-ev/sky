@@ -1,13 +1,13 @@
 #pragma once
 
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 #include <platform/system.h>
 #include <glm/glm.hpp>
 #include <sky/console.h>
 
 namespace Shared
 {
-	class ConsoleHelperCommands : public Common::Scheduler::Frameable
+	class ConsoleHelperCommands : public sky::Scheduler::Frameable
 	{
 	public:
 		ConsoleHelperCommands();

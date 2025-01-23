@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 #include <sky/dispatcher.h>
 #include <skygfx/skygfx.h>
 #include <sky/console.h>

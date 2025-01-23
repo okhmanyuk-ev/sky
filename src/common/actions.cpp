@@ -362,8 +362,8 @@ void Actions::Run(std::unique_ptr<Action> action)
 		player->update(SCHEDULER->getTimeDelta());
 
 		if (player->hasActions())
-			return Common::Scheduler::Status::Continue;
+			return sky::Scheduler::Status::Continue;
 
-		return Common::Scheduler::Status::Finished;
+		return sky::Scheduler::Status::Finished;
 	});
 }

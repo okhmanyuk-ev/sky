@@ -1,10 +1,10 @@
 #pragma once
 
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 
 namespace Common
 {
-	class Interpolator final : public Scheduler::Frameable
+	class Interpolator final : public sky::Scheduler::Frameable
 	{
 	public:
 		using FinishCallback = std::function<void()>;

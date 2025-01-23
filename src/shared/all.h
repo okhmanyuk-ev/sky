@@ -18,7 +18,6 @@
 #include <common/easing.h>
 #include <common/hash.h>
 #include <common/actions.h>
-#include <common/scheduler.h>
 #include <common/helpers.h>
 #include <common/bitbuffer.h>
 #include <common/buffer_helpers.h>

@@ -2,7 +2,7 @@
 
 #include <common/task_system.h>
 #include <platform/system.h>
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 #include <common/framerate_counter.h>
 #include <common/task_system.h>
 #include <sky/console.h>
@@ -10,7 +10,7 @@
 
 namespace Shared
 {
-	class PerformanceConsoleCommands : public Common::Scheduler::Frameable
+	class PerformanceConsoleCommands : public sky::Scheduler::Frameable
 	{
 	private:
 		void onFrame() override;

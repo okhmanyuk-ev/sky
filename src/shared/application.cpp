@@ -11,6 +11,7 @@
 #include <sky/localization.h>
 #include <sky/renderer.h>
 #include <sky/dispatcher.h>
+#include <sky/scheduler.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -30,7 +31,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<Common::TaskSystem>::Init(std::make_shared<Common::TaskSystem>());
 #endif
 	sky::Locator<sky::CommandProcessor>::Init(std::make_shared<sky::CommandProcessor>());
-	sky::Locator<Common::Scheduler>::Init(std::make_shared<Common::Scheduler>());
+	sky::Locator<sky::Scheduler>::Init(std::make_shared<sky::Scheduler>());
 	sky::Locator<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
 	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
 	sky::Locator<sky::Renderer>::Init(std::make_shared<sky::Renderer>());
@@ -309,7 +310,7 @@ Application::~Application()
 	sky::Locator<sky::Renderer>::Reset();
 	sky::Locator<Platform::System>::Reset();
 	sky::Locator<Common::ProfilerSystem>::Reset();
-	sky::Locator<Common::Scheduler>::Reset();
+	sky::Locator<sky::Scheduler>::Reset();
 #ifndef EMSCRIPTEN
 	sky::Locator<Common::TaskSystem>::Reset();
 #endif

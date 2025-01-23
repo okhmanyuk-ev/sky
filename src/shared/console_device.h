@@ -7,7 +7,7 @@
 #include <sky/console.h>
 #include <common/interpolator.h>
 #include <sky/dispatcher.h>
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 #include <common/timer.h>
 #include <platform/system.h>
 #include <platform/input.h>
@@ -22,7 +22,7 @@
 namespace Shared
 {
 	class ImguiConsole : public sky::Console,
-		public Common::Scheduler::Frameable,
+		public sky::Scheduler::Frameable,
 		public sky::Listenable<Platform::Input::Keyboard::Event>,
 		public sky::Listenable<TouchEmulator::Event>,
 		public sky::Listenable<Platform::System::VirtualKeyboardTextChanged>,

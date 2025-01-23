@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 #include <fmt/format.h>
 
 #define STATS sky::Locator<Shared::StatsSystem>::GetService()
@@ -16,7 +16,7 @@
 
 namespace Shared
 {
-	class StatsSystem : public Common::Scheduler::Frameable
+	class StatsSystem : public sky::Scheduler::Frameable
 	{
 	public:
 		enum class Align

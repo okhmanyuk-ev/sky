@@ -1,5 +1,5 @@
 #include "timestep_fixer.h"
-#include <common/frame_system.h>
+#include <sky/scheduler.h>
 
 using namespace Common;
 
@@ -37,5 +37,5 @@ void TimestepFixer::execute(sky::Duration dTime, Callback callback)
 
 void TimestepFixer::execute(Callback callback)
 {
-	execute(FRAME->getTimeDelta(), callback);
+	execute(SCHEDULER->getTimeDelta(), callback);
 }

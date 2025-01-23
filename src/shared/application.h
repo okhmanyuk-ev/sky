@@ -1,7 +1,6 @@
 #pragma once
 
 #include <common/task_system.h>
-#include <common/scheduler.h>
 #include <shared/imgui_system.h>
 #include <platform/system.h>
 #include <graphics/system.h>

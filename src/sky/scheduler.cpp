@@ -2,7 +2,7 @@
 #include <thread>
 #include <algorithm>
 
-using namespace Common;
+using namespace sky;
 
 void Scheduler::add(StatusCallback callback)
 {

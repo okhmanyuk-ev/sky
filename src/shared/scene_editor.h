@@ -5,7 +5,7 @@
 
 namespace Shared
 {
-	class SceneEditor : public Common::Scheduler::Frameable,
+	class SceneEditor : public sky::Scheduler::Frameable,
 		public sky::Listenable<Platform::Input::Mouse::ButtonEvent>,
 		public sky::Listenable<Platform::Input::Mouse::MoveEvent>,
 		public sky::Listenable<Platform::Input::Mouse::ScrollEvent>

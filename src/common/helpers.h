@@ -4,7 +4,7 @@
 #include <glm/ext.hpp>
 #include <nlohmann/json.hpp>
 #include <platform/asset.h>
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 
 namespace Common::Helpers
 {

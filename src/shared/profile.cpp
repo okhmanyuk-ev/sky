@@ -4,7 +4,7 @@
 #include <sky/console.h>
 #include <common/task_system.h>
 #include <sky/utils.h>
-#include <common/frame_system.h>
+#include <sky/scheduler.h>
 #include <common/helpers.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -67,7 +67,7 @@ void Profile::save()
 	auto str = json.dump();
 	emscripten_run_script(fmt::format("localStorage.setItem('profile', '{}');", str).c_str());
 #endif
-	FRAME->addOneThreadsafe([] {
+	SCHEDULER->addOneThreadsafe([] {
 		sky::Emit(ProfileSavedEvent());
 	});
 }

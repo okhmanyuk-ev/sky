@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <common/bitbuffer.h>
 #include <platform/defines.h>
-#include <common/scheduler.h>
+#include <sky/scheduler.h>
 #include <common/timer.h>
 
 #define NETWORK sky::Locator<Network::System>::GetService()
@@ -40,7 +40,7 @@ namespace Network
 		sky::BitBuffer buf;
 	};
 
-	class System : public Common::Scheduler::Frameable
+	class System : public sky::Scheduler::Frameable
 	{
 		friend Address;
 	public:

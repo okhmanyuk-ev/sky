@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <string>
-#include <common/frame_system.h>
+#include <sky/scheduler.h>
 #include <sky/utils.h>
 
 using namespace sky;
@@ -41,7 +41,7 @@ NativeConsole::NativeConsole()
 		{
 			std::string s;
 			std::getline(std::cin, s);
-			FRAME->addOne([this, s] {
+			SCHEDULER->addOne([this, s] {
 				sky::Emit(ReadEvent({ s }));
 			});
 		}
