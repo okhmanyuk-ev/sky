@@ -14,6 +14,7 @@
 #include <sky/scheduler.h>
 #include <sky/threadpool.h>
 #include <sky/imgui_system.h>
+#include <sky/imgui_console.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -37,7 +38,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
 	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
 	sky::Locator<sky::Renderer>::Init(std::make_shared<sky::Renderer>());
-	sky::Locator<sky::Console>::Init(std::make_shared<Shared::ImguiConsole>());
+	sky::Locator<sky::Console>::Init(std::make_shared<sky::ImguiConsole>());
 	sky::Locator<Graphics::System>::Init(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
 	{

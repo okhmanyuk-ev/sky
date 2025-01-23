@@ -7,6 +7,7 @@
 #include <sky/clock.h>
 #include <sky/console.h>
 #include <sky/dispatcher.h>
+#include <sky/imgui_console.h>
 #include <sky/imgui_system.h>
 #include <sky/localization.h>
 #include <sky/locator.h>

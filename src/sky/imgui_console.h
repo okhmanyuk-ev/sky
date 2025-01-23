@@ -15,12 +15,12 @@
 #include <deque>
 #include <imgui.h>
 
-namespace Shared
+namespace sky
 {
 	class ImguiConsole : public sky::Console,
 		public sky::Scheduler::Frameable,
 		public sky::Listenable<Platform::Input::Keyboard::Event>,
-		public sky::Listenable<TouchEmulator::Event>,
+		public sky::Listenable<Shared::TouchEmulator::Event>,
 		public sky::Listenable<Platform::System::VirtualKeyboardTextChanged>,
 		public sky::Listenable<Platform::System::VirtualKeyboardEnterPressed>
 	{
@@ -84,7 +84,7 @@ namespace Shared
 		void enterInput();
 
 		void onEvent(const Platform::Input::Keyboard::Event& e) override;
-		void onEvent(const TouchEmulator::Event& e) override;
+		void onEvent(const Shared::TouchEmulator::Event& e) override;
 		void onEvent(const Platform::System::VirtualKeyboardTextChanged& e) override;
 		void onEvent(const Platform::System::VirtualKeyboardEnterPressed& e) override;
 

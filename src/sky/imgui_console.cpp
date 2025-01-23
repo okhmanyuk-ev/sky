@@ -1,4 +1,4 @@
-#include "console_device.h"
+#include "imgui_console.h"
 #include <common/easing.h>
 #include <algorithm>
 #include <cassert>
@@ -12,7 +12,7 @@
 
 #define CONSOLE_STATS(KEY, VALUE) STATS_INDICATE_GROUP("console", KEY, VALUE)
 
-using namespace Shared;
+using namespace sky;
 
 ImguiConsole::ImguiConsole()
 {
@@ -507,12 +507,12 @@ void ImguiConsole::onEvent(const Platform::Input::Keyboard::Event& e)
 	}
 }
 
-void ImguiConsole::onEvent(const TouchEmulator::Event& e)
+void ImguiConsole::onEvent(const Shared::TouchEmulator::Event& e)
 {
 	if (mState == State::Closed)
 		return;
 
-	if (e.type == TouchEmulator::Event::Type::End)
+	if (e.type == Shared::TouchEmulator::Event::Type::End)
 	{
 		mCheckMouseForHints = true;
 		mCheckMouseForClose = true;
