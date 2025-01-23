@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 #include <fmt/format.h>
 
 #define STATS sky::Locator<Shared::StatsSystem>::GetService()
@@ -16,7 +16,7 @@
 
 namespace Shared
 {
-	class StatsSystem : public Common::FrameSystem::Frameable
+	class StatsSystem : public Common::Scheduler::Frameable
 	{
 	public:
 		enum class Align
@@ -34,7 +34,7 @@ namespace Shared
 		template <class T>
 		void indicate(const std::string& key, const T& value, const std::string& group = "")
 		{
-			mGroups[group][key] = { fmt::format("{}", value), FRAME->getUptime()};
+			mGroups[group][key] = { fmt::format("{}", value), SCHEDULER->getUptime()};
 		}
 
 	public:

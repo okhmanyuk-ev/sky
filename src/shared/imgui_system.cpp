@@ -65,7 +65,7 @@ void ImguiSystem::begin()
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	io.DeltaTime = sky::ToSeconds(FRAME->getTimeDelta());
+	io.DeltaTime = sky::ToSeconds(SCHEDULER->getTimeDelta());
 
 	io.DisplaySize.x = getLogicalWidth();
 	io.DisplaySize.y = getLogicalHeight();

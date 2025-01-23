@@ -109,7 +109,7 @@ std::unique_ptr<Action> Collection::Shake(std::shared_ptr<Scene::Transform> node
 std::unique_ptr<Action> Collection::Kill(std::shared_ptr<Scene::Node> node)
 {
 	return Execute([node] {
-		FRAME->addOne([node] {
+		SCHEDULER->addOne([node] {
 			if (auto parent = node->getParent(); parent != nullptr)
 				parent->detach(node);
 		});

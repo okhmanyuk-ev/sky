@@ -1070,7 +1070,7 @@ bool SceneHelpers::ImScene::IsMouseHovered(Scene::Node& node)
 	static std::unordered_set<Scene::Node*> touched_nodes_set;
 	static std::optional<uint64_t> prev_frame;
 
-	auto current_frame = FRAME->getFrameCount();
+	auto current_frame = SCHEDULER->getFrameCount();
 
 	if (prev_frame != current_frame)
 	{

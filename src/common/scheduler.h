@@ -7,11 +7,11 @@
 #include <sky/clock.h>
 #include <sky/console.h>
 
-#define FRAME sky::Locator<Common::FrameSystem>::GetService()
+#define SCHEDULER sky::Locator<Common::Scheduler>::GetService()
 
 namespace Common
 {
-	class FrameSystem
+	class Scheduler
 	{
 	public:
 		class Frameable;
@@ -75,7 +75,7 @@ namespace Common
 		bool mChoked = false;
 	};
 
-	class FrameSystem::Frameable
+	class Scheduler::Frameable
 	{
 	public:
 		Frameable();
@@ -88,7 +88,7 @@ namespace Common
 		std::shared_ptr<bool> mFinished = std::make_shared<bool>(false);
 	};
 
-	class FrameSystem::Framer final : public Frameable
+	class Scheduler::Framer final : public Frameable
 	{
 	public:
 		Framer(Callback callback = nullptr);

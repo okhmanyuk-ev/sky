@@ -159,10 +159,10 @@ std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void()> callba
 
 std::unique_ptr<Action> Collection::ExecuteInfiniteGlobal(std::function<void()> callback)
 {
-	auto prev_frame_count = FRAME->getFrameCount();
+	auto prev_frame_count = SCHEDULER->getFrameCount();
 
 	return ExecuteInfinite([prev_frame_count, callback]() mutable {
-		auto frame_count = FRAME->getFrameCount();
+		auto frame_count = SCHEDULER->getFrameCount();
 
 		if (prev_frame_count == frame_count)
 			return;
@@ -211,10 +211,10 @@ std::unique_ptr<Action> Collection::Wait(bool& while_flag)
 
 std::unique_ptr<Action> Collection::WaitGlobalFrame()
 {
-	auto frame_count = FRAME->getFrameCount();
+	auto frame_count = SCHEDULER->getFrameCount();
 
 	return Wait([frame_count] {
-		return frame_count == FRAME->getFrameCount();
+		return frame_count == SCHEDULER->getFrameCount();
 	});
 }
 
@@ -358,12 +358,12 @@ void Actions::Run(std::unique_ptr<Action> action)
 
 	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
 	player->add(std::move(action));
-	FRAME->add([player] {
-		player->update(FRAME->getTimeDelta());
+	SCHEDULER->add([player] {
+		player->update(SCHEDULER->getTimeDelta());
 
 		if (player->hasActions())
-			return Common::FrameSystem::Status::Continue;
+			return Common::Scheduler::Status::Continue;
 
-		return Common::FrameSystem::Status::Finished;
+		return Common::Scheduler::Status::Finished;
 	});
 }

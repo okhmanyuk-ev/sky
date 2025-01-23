@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <common/bitbuffer.h>
 #include <platform/defines.h>
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 #include <common/timer.h>
 
 #define NETWORK sky::Locator<Network::System>::GetService()
@@ -40,7 +40,7 @@ namespace Network
 		sky::BitBuffer buf;
 	};
 
-	class System : public Common::FrameSystem::Frameable
+	class System : public Common::Scheduler::Frameable
 	{
 		friend Address;
 	public:
@@ -49,7 +49,7 @@ namespace Network
 
 	private:
 		void onFrame() override;
-	
+
 	public:
 		using UdpSocketHandle = void*;
 		using ReadCallback = std::function<void(Packet&)>;

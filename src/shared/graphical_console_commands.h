@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 #include <sky/console.h>
 #include <skygfx/skygfx.h>
 #include <graphics/system.h>
@@ -8,7 +8,7 @@
 
 namespace Shared
 {
-	class GraphicalConsoleCommands : public Common::FrameSystem::Frameable
+	class GraphicalConsoleCommands : public Common::Scheduler::Frameable
 	{
 	public:
 		GraphicalConsoleCommands();

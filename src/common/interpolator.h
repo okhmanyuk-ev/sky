@@ -1,10 +1,10 @@
 #pragma once
 
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 
 namespace Common
 {
-	class Interpolator final : public FrameSystem::Frameable
+	class Interpolator final : public Scheduler::Frameable
 	{
 	public:
 		using FinishCallback = std::function<void()>;

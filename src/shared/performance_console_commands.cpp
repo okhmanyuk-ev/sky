@@ -17,7 +17,7 @@ void PerformanceConsoleCommands::onFrame()
 	{
 		auto str = std::to_string(mFramerateCounter.getFramerate());
 
-		auto time_scale = FRAME->getTimeScale();
+		auto time_scale = SCHEDULER->getTimeScale();
 
 		if (time_scale != 1.0f)
 			str = fmt::format("(x{}) {}", time_scale, str);
@@ -27,7 +27,7 @@ void PerformanceConsoleCommands::onFrame()
 		static bool choked = false;
 		static auto choke_time = now;
 
-		if (FRAME->isChoked())
+		if (SCHEDULER->isChoked())
 		{
 			choked = true;
 			choke_time = now;

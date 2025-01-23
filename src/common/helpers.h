@@ -4,7 +4,7 @@
 #include <glm/ext.hpp>
 #include <nlohmann/json.hpp>
 #include <platform/asset.h>
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 
 namespace Common::Helpers
 {
@@ -55,7 +55,7 @@ namespace sky
 	constexpr float default_delta_limit = 1.0f / 30.0f;
 
 	template<class T>
-	T ease_towards(T src, T dst, sky::Duration dTime = FRAME->getTimeDelta(),
+	T ease_towards(T src, T dst, sky::Duration dTime = SCHEDULER->getTimeDelta(),
 		float friction = default_friction, float delta_limit = default_delta_limit)
 	{
 		auto distance = dst - src;
@@ -63,7 +63,7 @@ namespace sky
 		return src + (distance * delta * friction);
 	}
 
-	float ease_rotation_towards(float src_radians, float dst_radians, sky::Duration dTime = FRAME->getTimeDelta(),
+	float ease_rotation_towards(float src_radians, float dst_radians, sky::Duration dTime = SCHEDULER->getTimeDelta(),
 		float friction = default_friction, float delta_limit = default_delta_limit);
 
 	bool chance(float normalized_percent);

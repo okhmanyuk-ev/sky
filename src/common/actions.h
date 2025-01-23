@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 #include <sky/dispatcher.h>
 #include <common/easing.h>
 #include <sky/clock.h>
@@ -83,7 +83,7 @@ namespace Actions
 		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value,
 			"T must be derived from Sequence or Parallel");
 	private:
-		Common::FrameSystem::Framer mFramer = Common::FrameSystem::Framer([this] { T::frame(FRAME->getTimeDelta()); });
+		Common::Scheduler::Framer mFramer = Common::Scheduler::Framer([this] { T::frame(SCHEDULER->getTimeDelta()); });
 	};
 
 	using SequentialActionsPlayer = ActionsPlayer<Sequence>;

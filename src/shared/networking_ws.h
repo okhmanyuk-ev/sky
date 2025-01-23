@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 #include <common/bitbuffer.h>
 #include <nlohmann/json.hpp>
 
@@ -65,7 +65,7 @@ namespace Shared::NetworkingWS
 	};
 
 #ifndef EMSCRIPTEN
-	class Server : public Common::FrameSystem::Frameable
+	class Server : public Common::Scheduler::Frameable
 	{
 	public:
 		Server(uint16_t port);
@@ -87,7 +87,7 @@ namespace Shared::NetworkingWS
 	};
 #endif
 
-	class Client : public Common::FrameSystem::Frameable
+	class Client : public Common::Scheduler::Frameable
 	{
 	public:
 		Client(const std::string& url);

@@ -1,15 +1,15 @@
-#include "frame_system.h"
+#include "scheduler.h"
 #include <thread>
 #include <algorithm>
 
 using namespace Common;
 
-void FrameSystem::add(StatusCallback callback)
+void Scheduler::add(StatusCallback callback)
 {
 	mFramers.push_back(callback);
 }
 
-void FrameSystem::addInfinity(Callback callback)
+void Scheduler::addInfinity(Callback callback)
 {
 	add([callback] {
 		callback();
@@ -17,7 +17,7 @@ void FrameSystem::addInfinity(Callback callback)
 	});
 }
 
-void FrameSystem::addOne(Callback callback)
+void Scheduler::addOne(Callback callback)
 {
 	add([callback] {
 		callback();
@@ -25,14 +25,14 @@ void FrameSystem::addOne(Callback callback)
 	});
 }
 
-void FrameSystem::addOneThreadsafe(Callback callback)
+void Scheduler::addOneThreadsafe(Callback callback)
 {
 	mMutex.lock();
 	mThreadsafeCallbacks.push_back(callback);
 	mMutex.unlock();
 }
 
-void FrameSystem::frame()
+void Scheduler::frame()
 {
 	mFrameCount += 1;
 
@@ -85,9 +85,9 @@ void FrameSystem::frame()
 	mMutex.unlock();
 }
 
-FrameSystem::Frameable::Frameable()
+Scheduler::Frameable::Frameable()
 {
-	FRAME->add([this, finished = mFinished] {
+	SCHEDULER->add([this, finished = mFinished] {
 		if (*finished)
 			return Status::Finished;
 
@@ -96,17 +96,17 @@ FrameSystem::Frameable::Frameable()
 	});
 }
 
-FrameSystem::Frameable::~Frameable()
+Scheduler::Frameable::~Frameable()
 {
 	*mFinished = true;
 }
 
-FrameSystem::Framer::Framer(Callback callback) : Frameable(),
+Scheduler::Framer::Framer(Callback callback) : Frameable(),
 	mCallback(callback)
 {
 }
 
-void FrameSystem::Framer::onFrame()
+void Scheduler::Framer::onFrame()
 {
 	if (mCallback == nullptr)
 		return;

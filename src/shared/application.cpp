@@ -30,7 +30,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<Common::TaskSystem>::Init(std::make_shared<Common::TaskSystem>());
 #endif
 	sky::Locator<sky::CommandProcessor>::Init(std::make_shared<sky::CommandProcessor>());
-	sky::Locator<Common::FrameSystem>::Init(std::make_shared<Common::FrameSystem>());
+	sky::Locator<Common::Scheduler>::Init(std::make_shared<Common::Scheduler>());
 	sky::Locator<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
 	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
 	sky::Locator<sky::Renderer>::Init(std::make_shared<sky::Renderer>());
@@ -272,7 +272,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		startup_commands.push_back(final_cmd);
 	}
 
-	FRAME->addOne([startup_commands] {
+	SCHEDULER->addOne([startup_commands] {
 		for (auto cmd : startup_commands)
 			sky::GetService<sky::CommandProcessor>()->execute(cmd);
 	});
@@ -309,7 +309,7 @@ Application::~Application()
 	sky::Locator<sky::Renderer>::Reset();
 	sky::Locator<Platform::System>::Reset();
 	sky::Locator<Common::ProfilerSystem>::Reset();
-	sky::Locator<Common::FrameSystem>::Reset();
+	sky::Locator<Common::Scheduler>::Reset();
 #ifndef EMSCRIPTEN
 	sky::Locator<Common::TaskSystem>::Reset();
 #endif
@@ -330,7 +330,7 @@ void Application::run()
 		{
 			mScene->frame();
 		}
-		FRAME->frame();
+		SCHEDULER->frame();
 		IMGUI_SYSTEM->end();
 		RENDERER->present();
 

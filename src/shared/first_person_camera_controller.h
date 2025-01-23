@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sky/dispatcher.h>
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 #include <common/timestep_fixer.h>
 #include <platform/system.h>
 #include <platform/input.h>
@@ -9,7 +9,7 @@
 
 namespace Shared
 {
-	class FirstPersonCameraController : public Common::FrameSystem::Frameable,
+	class FirstPersonCameraController : public Common::Scheduler::Frameable,
 		public sky::Listenable<Platform::Input::Keyboard::Event>,
 		public sky::Listenable<Platform::Input::Mouse::ButtonEvent>,
 		public sky::Listenable<Platform::Input::Mouse::MoveEvent>,

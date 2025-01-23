@@ -7,7 +7,7 @@ using namespace Common;
 
 void Interpolator::onFrame()
 {
-	mPassed += FRAME->getTimeDelta();
+	mPassed += SCHEDULER->getTimeDelta();
 
 	if (mPassed >= mDuration)
 	{

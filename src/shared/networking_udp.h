@@ -54,7 +54,7 @@ namespace Shared::NetworkingUDP
 		std::map<uint32_t, ReadCallback> mMessages;
 	};
 
-	class Channel : public Common::FrameSystem::Frameable
+	class Channel : public Common::Scheduler::Frameable
 	{
 	public:
 		using ReadCallback = std::function<void(sky::BitBuffer&)>;
@@ -154,7 +154,7 @@ namespace Shared::NetworkingUDP
 	};
 
 	class Client : public Networking,
-		public Common::FrameSystem::Frameable
+		public Common::Scheduler::Frameable
 	{
 	public:
 		Client(const Network::Address& server_address);

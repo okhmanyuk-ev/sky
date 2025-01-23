@@ -54,7 +54,7 @@ void StatsSystem::onFrame()
 	auto& style = ImGui::GetStyle();
 	ImVec4 col = style.Colors[ImGuiCol_Text];
 
-	auto now = FRAME->getUptime();
+	auto now = SCHEDULER->getUptime();
 
 	const float MaxLifetime = 5.0f;
 

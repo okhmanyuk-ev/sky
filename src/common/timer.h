@@ -1,10 +1,10 @@
 #pragma once
 
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 
 namespace Common
 {
-	class Timer final : public FrameSystem::Frameable
+	class Timer final : public Scheduler::Frameable
 	{
 	public:
 		using Callback = std::function<void()>;

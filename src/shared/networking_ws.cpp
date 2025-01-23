@@ -429,7 +429,7 @@ void RegularMessaging::Base::send()
 
 RegularMessaging::Client::Client()
 {
-	FRAME->addOne([this] {
+	SCHEDULER->addOne([this] {
 		send();
 	});
 }

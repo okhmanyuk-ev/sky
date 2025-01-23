@@ -8,7 +8,7 @@
 
 namespace Shared
 {
-	class ImScene : public Common::FrameSystem::Frameable
+	class ImScene : public Common::Scheduler::Frameable
 	{
 	private:
 		void onFrame() override;

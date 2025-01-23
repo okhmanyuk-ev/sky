@@ -4,7 +4,7 @@ using namespace Common;
 
 void Timer::onFrame()
 {
-	mPassed += FRAME->getTimeDelta();
+	mPassed += SCHEDULER->getTimeDelta();
 
 	if (mPassed < mInterval)
 		return;

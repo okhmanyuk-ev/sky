@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 #include <platform/system.h>
 #include <sky/locator.h>
 #include <graphics/color.h>
@@ -19,7 +19,7 @@
 
 namespace Graphics
 {
-	class System : public Common::FrameSystem::Frameable
+	class System : public Common::Scheduler::Frameable
 	{
 	public:
 		struct State;

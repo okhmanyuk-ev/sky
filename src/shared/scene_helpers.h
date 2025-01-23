@@ -534,7 +534,7 @@ namespace Shared::SceneHelpers
 			if (!mSmoothTransform)
 				return;
 
-			auto now = FRAME->getUptime();
+			auto now = SCHEDULER->getUptime();
 			if (mPrevTransformTimepoint.has_value())
 			{
 				auto dTime = now - mPrevTransformTimepoint.value();
@@ -552,7 +552,7 @@ namespace Shared::SceneHelpers
 			if (!mSmoothAbsoluteSize)
 				return;
 
-			auto now = FRAME->getUptime();
+			auto now = SCHEDULER->getUptime();
 			if (mPrevSizeTimepoint.has_value())
 			{
 				auto dTime = now - mPrevSizeTimepoint.value();

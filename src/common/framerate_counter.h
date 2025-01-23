@@ -1,11 +1,11 @@
 #pragma once
 
 #include <common/timer.h>
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 
 namespace Common
 {
-	class FramerateCounter: public FrameSystem::Frameable
+	class FramerateCounter: public Scheduler::Frameable
 	{
 	public:
 		FramerateCounter();

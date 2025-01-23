@@ -1,13 +1,13 @@
 #pragma once
 
-#include <common/frame_system.h>
+#include <common/scheduler.h>
 #include <platform/system.h>
 #include <glm/glm.hpp>
 #include <sky/console.h>
 
 namespace Shared
 {
-	class ConsoleHelperCommands : public Common::FrameSystem::Frameable
+	class ConsoleHelperCommands : public Common::Scheduler::Frameable
 	{
 	public:
 		ConsoleHelperCommands();
