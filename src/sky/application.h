@@ -16,7 +16,7 @@
 #include <shared/scene_stylebook.h>
 #include <shared/scene_editor.h>
 
-namespace Shared
+namespace sky
 {
 	class Application final
 	{
@@ -46,7 +46,7 @@ namespace Shared
 
 	private: // Scene
 		std::shared_ptr<Scene::Scene> mScene;
-		std::shared_ptr<SceneEditor> mSceneEditor;
+		std::shared_ptr<Shared::SceneEditor> mSceneEditor;
 		std::unordered_map<std::string, std::string> mStartupKeyValues;
 
 	private:

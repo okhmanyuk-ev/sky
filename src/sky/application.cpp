@@ -18,7 +18,7 @@
 #include <emscripten/fetch.h>
 #endif
 
-using namespace Shared;
+using namespace sky;
 
 static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepEnabled;
 static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepTimeCompletion;
@@ -79,7 +79,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			return !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup) 
 				&& !ImGui::IsAnyItemActive();
 		});
-		mSceneEditor = std::make_shared<SceneEditor>(*mScene);
+		mSceneEditor = std::make_shared<Shared::SceneEditor>(*mScene);
 
 		auto scene_manager = std::make_shared<Shared::SceneManager>();
 		sky::Locator<Shared::SceneManager>::Init(scene_manager);
