@@ -8,6 +8,7 @@
 #include <network/system.h>
 #include <common/helpers.h>
 #include <graphics/system.h>
+#include <common/threadpool.h>
 
 using namespace Shared;
 
@@ -62,9 +63,9 @@ void PerformanceConsoleCommands::onFrame()
 		ENGINE_STATS("targets", GRAPHICS->getRenderTargets().size());
 
 	if (mWantShowTasks > 1)
-		ENGINE_STATS("tasks", std::to_string(TASK->getTasksCount()) + " at " + std::to_string(TASK->getThreadsCount()) + " threads");
+		ENGINE_STATS("tasks", std::to_string(THREADPOOL->getTasksCount()) + " at " + std::to_string(THREADPOOL->getThreadsCount()) + " threads");
 	else if (mWantShowTasks > 0)
-		ENGINE_STATS("tasks", TASK->getTasksCount());
+		ENGINE_STATS("tasks", THREADPOOL->getTasksCount());
 
 	if (mWantShowNetSpeed)
 		STATS_INDICATE_GROUP("net", "net speed", Common::Helpers::BytesToNiceString(NETWORK->getBytesPerSecond()) + "/s");

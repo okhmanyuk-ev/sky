@@ -1,9 +1,9 @@
-#include "task_system.h"
+#include "threadpool.h"
 #include <algorithm>
 
 using namespace Common;
 
-TaskSystem::TaskSystem(int threadsCount)
+ThreadPool::ThreadPool(int threadsCount)
 {
 	if (threadsCount <= 0)
 		threadsCount = 1;
@@ -17,12 +17,12 @@ TaskSystem::TaskSystem(int threadsCount)
 				{
 					std::unique_lock<std::mutex> lock(mMutex);
 					mCondition.wait(lock, [this] {
-						return mFinished || !mTasks.empty(); 
+						return mFinished || !mTasks.empty();
 					});
-					
+
 					if (mFinished && mTasks.empty())
 						return;
-					
+
 					task = std::move(mTasks.front());
 					mTasks.pop_front();
 				}
@@ -34,18 +34,17 @@ TaskSystem::TaskSystem(int threadsCount)
 	}
 }
 
-TaskSystem::TaskSystem() : TaskSystem(std::max<int>(1, std::thread::hardware_concurrency() - 1))
+ThreadPool::ThreadPool() : ThreadPool(std::max<int>(1, std::thread::hardware_concurrency() - 1))
 {
-	//
 }
 
-TaskSystem::~TaskSystem()
+ThreadPool::~ThreadPool()
 {
 	{
 		std::unique_lock<std::mutex> lock(mMutex);
 		mFinished = true;
 	}
-	
+
 	mCondition.notify_all();
 
 	for (auto& thread : mThreads)

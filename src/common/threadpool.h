@@ -6,16 +6,16 @@
 #include <future>
 #include <condition_variable>
 
-#define TASK sky::Locator<Common::TaskSystem>::GetService()
+#define THREADPOOL sky::Locator<Common::ThreadPool>::GetService()
 
 namespace Common
 {
-	class TaskSystem
+	class ThreadPool
 	{
 	public:
-		TaskSystem(int threadsCount);
-		TaskSystem();
-		~TaskSystem();
+		ThreadPool(int threadsCount);
+		ThreadPool();
+		~ThreadPool();
 
 	public:
 		template<class F, class... Args> auto addTask(F&& f, Args&&... args) -> std::future<decltype(f(args...))>;
@@ -33,7 +33,7 @@ namespace Common
 		std::atomic<int> mBusyThreads = 0;
 	};
 
-	template<class F, class... Args> auto TaskSystem::addTask(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
+	template<class F, class... Args> auto ThreadPool::addTask(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
 	{
 		auto func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
 		auto task = std::make_shared<std::packaged_task<decltype(f(args...))()>>(func);

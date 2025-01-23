@@ -1,10 +1,8 @@
 #pragma once
 
-#include <common/task_system.h>
 #include <platform/system.h>
 #include <sky/scheduler.h>
 #include <common/framerate_counter.h>
-#include <common/task_system.h>
 #include <sky/console.h>
 #include <deque>
 

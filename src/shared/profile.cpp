@@ -2,7 +2,7 @@
 #include <platform/system.h>
 #include <platform/asset.h>
 #include <sky/console.h>
-#include <common/task_system.h>
+#include <common/threadpool.h>
 #include <sky/utils.h>
 #include <sky/scheduler.h>
 #include <common/helpers.h>
@@ -81,7 +81,7 @@ void Profile::clear()
 void Profile::saveAsync()
 {
 #ifndef EMSCRIPTEN
-	TASK->addTask([this] {
+	THREADPOOL->addTask([this] {
 		save();
 	});
 #else
