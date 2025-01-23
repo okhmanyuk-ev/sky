@@ -1,7 +1,7 @@
 #include "threadpool.h"
 #include <algorithm>
 
-using namespace Common;
+using namespace sky;
 
 ThreadPool::ThreadPool(int threadsCount)
 {

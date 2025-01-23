@@ -12,7 +12,7 @@
 #include <sky/renderer.h>
 #include <sky/dispatcher.h>
 #include <sky/scheduler.h>
-#include <common/threadpool.h>
+#include <sky/threadpool.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -29,7 +29,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 	sky::Locator<sky::Dispatcher>::Init(std::make_shared<sky::Dispatcher>());
 #ifndef EMSCRIPTEN
-	sky::Locator<Common::ThreadPool>::Init(std::make_shared<Common::ThreadPool>());
+	sky::Locator<sky::ThreadPool>::Init(std::make_shared<sky::ThreadPool>());
 #endif
 	sky::Locator<sky::CommandProcessor>::Init(std::make_shared<sky::CommandProcessor>());
 	sky::Locator<sky::Scheduler>::Init(std::make_shared<sky::Scheduler>());
@@ -316,7 +316,7 @@ Application::~Application()
 	sky::Locator<sky::Scheduler>::Reset();
 	sky::Locator<sky::CommandProcessor>::Reset();
 #ifndef EMSCRIPTEN
-	sky::Locator<Common::ThreadPool>::Reset();
+	sky::Locator<sky::ThreadPool>::Reset();
 #endif
 }
 

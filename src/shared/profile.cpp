@@ -2,7 +2,7 @@
 #include <platform/system.h>
 #include <platform/asset.h>
 #include <sky/console.h>
-#include <common/threadpool.h>
+#include <sky/threadpool.h>
 #include <sky/utils.h>
 #include <sky/scheduler.h>
 #include <common/helpers.h>

@@ -6,9 +6,9 @@
 #include <future>
 #include <condition_variable>
 
-#define THREADPOOL sky::Locator<Common::ThreadPool>::GetService()
+#define THREADPOOL sky::Locator<sky::ThreadPool>::GetService()
 
-namespace Common
+namespace sky
 {
 	class ThreadPool
 	{
