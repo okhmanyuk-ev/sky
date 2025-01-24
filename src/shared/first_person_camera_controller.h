@@ -2,7 +2,7 @@
 
 #include <sky/dispatcher.h>
 #include <sky/scheduler.h>
-#include <common/timestep_fixer.h>
+#include <sky/timestep_fixer.h>
 #include <platform/system.h>
 #include <platform/input.h>
 #include <skygfx/utils.h>
@@ -65,6 +65,6 @@ namespace Shared
 		float mSpeed = 1.0f;
 		bool mMouseCaptured = false;
 		glm::vec2 mSmoothDirection = { 0.0f, 0.0f };
-		Common::TimestepFixer mTimestepFixer;
+		sky::TimestepFixer mTimestepFixer;
 	};
 }

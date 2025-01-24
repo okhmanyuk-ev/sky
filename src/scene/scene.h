@@ -4,7 +4,7 @@
 #include <graphics/system.h>
 #include <sky/dispatcher.h>
 #include <scene/node.h>
-#include <common/timestep_fixer.h>
+#include <sky/timestep_fixer.h>
 #include <platform/input.h>
 
 namespace Scene
@@ -82,7 +82,7 @@ namespace Scene
 		InteractTestCallback mInteractTestCallback = nullptr;
 		BatchGroups mBatchGroups;
 		bool mBatchGroupsEnabled = true;
-		Common::TimestepFixer mTimestepFixer;
+		sky::TimestepFixer mTimestepFixer;
 		std::optional<glm::vec2> mScreenAdaption;
 	};
 

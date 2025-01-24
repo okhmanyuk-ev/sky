@@ -2,7 +2,6 @@
 
 #include <scene/node.h>
 #include <scene/auto_sized.h>
-#include <common/timestep_fixer.h>
 
 namespace Scene
 {

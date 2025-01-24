@@ -58,10 +58,10 @@ void Entity::setGravityScale(float value)
 World::World() :
 	mAllowSleep("phys_allow_sleep", std::bind(&b2World::GetAllowSleeping, &mB2World),
 		std::bind(&b2World::SetAllowSleeping, &mB2World, std::placeholders::_1)),
-	mTimeStepEnabled("phys_timestep_enabled", std::bind(&Common::TimestepFixer::isEnabled, &mTimestepFixer),
-		std::bind(&Common::TimestepFixer::setEnabled, &mTimestepFixer, std::placeholders::_1)),
-	mTimestepForceTimeCompletion("phys_timestep_force_time_completion", std::bind(&Common::TimestepFixer::getForceTimeCompletion, &mTimestepFixer),
-		std::bind(&Common::TimestepFixer::setForceTimeCompletion, &mTimestepFixer, std::placeholders::_1))
+	mTimeStepEnabled("phys_timestep_enabled", std::bind(&sky::TimestepFixer::isEnabled, &mTimestepFixer),
+		std::bind(&sky::TimestepFixer::setEnabled, &mTimestepFixer, std::placeholders::_1)),
+	mTimestepForceTimeCompletion("phys_timestep_force_time_completion", std::bind(&sky::TimestepFixer::getForceTimeCompletion, &mTimestepFixer),
+		std::bind(&sky::TimestepFixer::setForceTimeCompletion, &mTimestepFixer, std::placeholders::_1))
 {
 	mTimestepFixer.setForceTimeCompletion(false);
 	mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / 120.0f));

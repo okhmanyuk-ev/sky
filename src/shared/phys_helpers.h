@@ -4,6 +4,7 @@
 #include <box2d/box2d.h>
 #include <scene/all.h>
 #include <shared/touch_emulator.h>
+#include <sky/timestep_fixer.h>
 
 namespace Shared::PhysHelpers
 {
@@ -114,7 +115,7 @@ namespace Shared::PhysHelpers
 		b2World mB2World = b2World({ 0.0f, 10.0f });
 		b2Body* mDummyBody = nullptr; // used for mouse moving
 		b2MouseJoint* mMouseJoint = nullptr;
-		Common::TimestepFixer mTimestepFixer;
+		sky::TimestepFixer mTimestepFixer;
 		sky::CVar<bool> mDebug = sky::CVar<bool>("phys_debug", false);
 		sky::CVar<bool> mShowStats = sky::CVar<bool>("phys_stats", false);
 		sky::CVar<int> mVelocityIterations = sky::CVar<int>("phys_velocity_iterations", 6);

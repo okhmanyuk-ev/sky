@@ -100,12 +100,12 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		sky::AddCVar("scene_timestep_fps", sky::CommandProcessor::CVar(std::nullopt, { "float" }, getter, setter));
 
 		gCVarSceneTimestepEnabled = std::make_unique<sky::CVar<bool>>("scene_timestep_enabled",
-			std::bind(&Common::TimestepFixer::isEnabled, &mScene->getTimestepFixer()),
-			std::bind(&Common::TimestepFixer::setEnabled, &mScene->getTimestepFixer(), std::placeholders::_1));
+			std::bind(&sky::TimestepFixer::isEnabled, &mScene->getTimestepFixer()),
+			std::bind(&sky::TimestepFixer::setEnabled, &mScene->getTimestepFixer(), std::placeholders::_1));
 
 		gCVarSceneTimestepTimeCompletion = std::make_unique<sky::CVar<bool>>("scene_timestep_force_time_completion",
-			std::bind(&Common::TimestepFixer::getForceTimeCompletion, &mScene->getTimestepFixer()),
-			std::bind(&Common::TimestepFixer::setForceTimeCompletion, &mScene->getTimestepFixer(), std::placeholders::_1));
+			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &mScene->getTimestepFixer()),
+			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &mScene->getTimestepFixer(), std::placeholders::_1));
 
 		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
 			float intensity = 0.5f;

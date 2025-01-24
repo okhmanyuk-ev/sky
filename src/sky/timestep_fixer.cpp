@@ -1,7 +1,7 @@
 #include "timestep_fixer.h"
 #include <sky/scheduler.h>
 
-using namespace Common;
+using namespace sky;
 
 void TimestepFixer::execute(sky::Duration dTime, Callback callback)
 {

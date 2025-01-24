@@ -3,7 +3,7 @@
 #include <functional>
 #include <sky/clock.h>
 
-namespace Common
+namespace sky
 {
 	class TimestepFixer
 	{
