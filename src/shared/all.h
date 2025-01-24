@@ -14,7 +14,6 @@
 #include <tiny_obj_loader.h>
 #include <magic_enum.hpp>
 
-#include <common/timer.h>
 #include <common/easing.h>
 #include <common/hash.h>
 #include <common/actions.h>

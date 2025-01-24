@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/timer.h>
+#include <sky/timer.h>
 #include <sky/scheduler.h>
 
 namespace Common
@@ -22,7 +22,7 @@ namespace Common
 		auto getAverageFramerate() const { return mAverageFramerate; }
 
 	private:
-		Common::Timer mTimer;
+		sky::Timer mTimer;
 		uint64_t mFrameCount = 0;
 		int mFramerateInternal = 0;
 		int mFramerate = 0;

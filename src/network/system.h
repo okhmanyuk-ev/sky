@@ -5,7 +5,7 @@
 #include <common/bitbuffer.h>
 #include <platform/defines.h>
 #include <sky/scheduler.h>
-#include <common/timer.h>
+#include <sky/timer.h>
 
 #define NETWORK sky::Locator<Network::System>::GetService()
 
@@ -99,7 +99,7 @@ namespace Network
 		uint64_t mPrevIncomingBytesPerSecond = 0;
 		uint64_t mPrevOutgoingBytesPerSecond = 0;
 
-		Common::Timer mPacketsPerSecondTimer;
+		sky::Timer mPacketsPerSecondTimer;
 	};
 
 	class UdpSocket

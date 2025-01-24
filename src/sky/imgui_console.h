@@ -4,7 +4,7 @@
 #include <common/interpolator.h>
 #include <sky/dispatcher.h>
 #include <sky/scheduler.h>
-#include <common/timer.h>
+#include <sky/timer.h>
 #include <platform/system.h>
 #include <platform/input.h>
 #include <glm/glm.hpp>
@@ -132,7 +132,7 @@ namespace sky
 		bool mCheckScrollForHints = false;
 		InputState mInputState = InputState::None;
 		bool mEnabled = true;
-		Common::Timer mButtonTimer;
+		sky::Timer mButtonTimer;
 		int mButtonAttempts = 0;
 		const int MaxButtonAttempts = 5;
 	};

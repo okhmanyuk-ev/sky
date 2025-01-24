@@ -2,7 +2,7 @@
 
 #include <sky/scheduler.h>
 
-namespace Common
+namespace sky
 {
 	class Timer final : public sky::Scheduler::Frameable
 	{

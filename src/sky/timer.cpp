@@ -1,6 +1,6 @@
 #include "timer.h"
 
-using namespace Common;
+using namespace sky;
 
 void Timer::onFrame()
 {

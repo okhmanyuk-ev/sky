@@ -13,4 +13,5 @@
 #include <sky/locator.h>
 #include <sky/renderer.h>
 #include <sky/scheduler.h>
+#include <sky/timer.h>
 #include <sky/utils.h>

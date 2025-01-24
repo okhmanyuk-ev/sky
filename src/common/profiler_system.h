@@ -2,7 +2,7 @@
 
 #include <string>
 #include <list>
-#include <common/timer.h>
+#include <sky/timer.h>
 #include <sky/locator.h>
 #include <sky/clock.h>
 
@@ -23,7 +23,7 @@ namespace Common
 		void end();
 
 	private:
-		Common::Timer mTimer;
+		sky::Timer mTimer;
 
 	public:
 		auto& getNodes() { return mPublicNodes; }
