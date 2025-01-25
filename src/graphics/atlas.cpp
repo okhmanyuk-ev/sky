@@ -62,7 +62,7 @@ std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& _images, b
 	const auto dst_width = result_size.w;
 	const auto dst_height = result_size.h;
 	const int channels = 4;
-	
+
 	auto dst_image = Image(dst_width, dst_height, channels);
 	auto dst_regions = Regions();
 
@@ -72,18 +72,19 @@ std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& _images, b
 		const auto& src_image = std::next(images.begin(), i)->second;
 		const auto& name = std::next(images.begin(), i)->first;
 
-		auto& region = dst_regions[name];
-		region.pos = { static_cast<float>(rect.x), static_cast<float>(rect.y) };
-		region.size = { static_cast<float>(rect.w), static_cast<float>(rect.h) };
+		glm::vec2 pos = { static_cast<float>(rect.x), static_cast<float>(rect.y) };
+		glm::vec2 size = { static_cast<float>(rect.w), static_cast<float>(rect.h) };
 
 		if (anti_bleeding)
 		{
-			region.pos.x += 1;
-			region.pos.y += 1;
+			pos.x += 1;
+			pos.y += 1;
 
-			region.size.x -= 1;
-			region.size.y -= 1;
+			size.x -= 1;
+			size.y -= 1;
 		}
+
+		dst_regions.insert({ name, TexRegion(pos, size) });
 
 		for (int x = 0; x < src_image.getWidth(); x++)
 		{
@@ -169,13 +170,11 @@ Image Atlas::MakeAntibleedImage(const Image& image)
 Atlas::Atlas(const Regions& regions) :
 	mRegions(regions)
 {
-	//
 }
 
-Atlas::Atlas(const Platform::Asset& regions_file) : 
+Atlas::Atlas(const Platform::Asset& regions_file) :
 	Atlas(ParseRegionsFromFile(regions_file))
 {
-	//
 }
 
 Atlas::Regions Atlas::ParseRegionsFromFile(const Platform::Asset& file)
@@ -185,7 +184,9 @@ Atlas::Regions Atlas::ParseRegionsFromFile(const Platform::Asset& file)
 	auto regions = Regions();
 	for (const auto& [key, value] : json.items())
 	{
-		regions.insert({ key, { { value[0], value[1] }, { value[2], value[3] } } });
+		glm::vec2 pos = { value[0], value[1] };
+		glm::vec2 size = { value[2], value[3] };
+		regions.insert({ key, TexRegion(pos, size) });
 	}
 	return regions;
 }

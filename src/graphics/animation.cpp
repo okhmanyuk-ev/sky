@@ -17,16 +17,14 @@ void Animation::SaveToFile(const std::string& path, const States& states, Platfo
 	Platform::Asset::Write(path + ".json", json_dump.data(), json_dump.size(), storage);
 }
 
-Animation::Animation(const States& states) : 
+Animation::Animation(const States& states) :
 	mStates(states)
 {
-	//
 }
 
-Animation::Animation(const Platform::Asset& states_file) : 
+Animation::Animation(const Platform::Asset& states_file) :
 	Animation(ParseStatesFromFile(states_file))
 {
-	//
 }
 
 Animation::States Animation::ParseStatesFromFile(const Platform::Asset& file)
