@@ -44,21 +44,5 @@ namespace Scene
 		Graphics::TexRegion mTexRegion = {};
 		skygfx::TextureAddress mTextureAddress = DefaultTextureAddress;
 		sky::effects::IEffect* mEffect = nullptr;
-
-	public:
-		struct TexCoords
-		{
-			glm::vec2 top_left = { 0.0f, 0.0f };
-			glm::vec2 top_right = { 0.0f, 0.0f };
-			glm::vec2 bottom_left = { 0.0f, 0.0f };
-			glm::vec2 bottom_right = { 0.0f, 0.0f };
-		};
-
-	public:
-		auto getTexCoords() const { return mTexCoords; }
-		void setTexCoords(std::optional<TexCoords> value) { mTexCoords = value; }
-
-	private:
-		std::optional<TexCoords> mTexCoords;
 	};
 }

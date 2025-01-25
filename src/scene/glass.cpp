@@ -32,21 +32,6 @@ void Glass::draw()
 	if (mGenerateMipmaps)
 		getTexture()->generateMips();
 
-	auto tl = project({ 0.0f, 0.0f });
-	auto tr = project({ getAbsoluteWidth(), 0.0f });
-	auto bl = project({ 0.0f, getAbsoluteHeight() });
-	auto br = project({ getAbsoluteWidth(), getAbsoluteHeight() });
-
-	glm::vec2 min_pos = { static_cast<float>(x), static_cast<float>(y) };
-	glm::vec2 max_pos = min_pos + glm::vec2{ static_cast<float>(w), static_cast<float>(h) };
-
-	setTexCoords(Sprite::TexCoords{
-		.top_left = Common::Helpers::invLerp(min_pos, max_pos, tl),
-		.top_right = Common::Helpers::invLerp(min_pos, max_pos, tr),
-		.bottom_left = Common::Helpers::invLerp(min_pos, max_pos, bl),
-		.bottom_right = Common::Helpers::invLerp(min_pos, max_pos, br)
-	});
-
 	Sprite::draw();
 }
 

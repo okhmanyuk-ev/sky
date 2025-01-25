@@ -203,16 +203,6 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	if (auto sprite = std::dynamic_pointer_cast<Scene::Sprite>(node); sprite != nullptr)
 	{
 		showTexture(sprite->getTexture(), sprite->getTexRegion());
-
-		auto tex_coords = sprite->getTexCoords();
-
-		if (tex_coords.has_value())
-		{
-			ImGui::Text("%s", fmt::format("top left x: {}, y: {}", tex_coords->top_left.x, tex_coords->top_left.y).c_str());
-			ImGui::Text("%s", fmt::format("top right x: {}, y: {}", tex_coords->top_right.x, tex_coords->top_right.y).c_str());
-			ImGui::Text("%s", fmt::format("bottom left x: {}, y: {}", tex_coords->bottom_left.x, tex_coords->bottom_left.y).c_str());
-			ImGui::Text("%s", fmt::format("bottom right x: {}, y: {}", tex_coords->bottom_right.x, tex_coords->bottom_right.y).c_str());
-		}
 		ImGui::Separator();
 	}
 
