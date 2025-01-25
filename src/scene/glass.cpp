@@ -40,12 +40,12 @@ void Glass::draw()
 	glm::vec2 min_pos = { static_cast<float>(x), static_cast<float>(y) };
 	glm::vec2 max_pos = min_pos + glm::vec2{ static_cast<float>(w), static_cast<float>(h) };
 
-	Sprite::DirectTexCoords coords;
-	coords.top_left_uv = Common::Helpers::invLerp(min_pos, max_pos, tl);
-	coords.top_right_uv = Common::Helpers::invLerp(min_pos, max_pos, tr);
-	coords.bottom_left_uv = Common::Helpers::invLerp(min_pos, max_pos, bl);
-	coords.bottom_right_uv = Common::Helpers::invLerp(min_pos, max_pos, br);
-	setDirectTexCoords(coords);
+	setTexCoords(Sprite::TexCoords{
+		.top_left = Common::Helpers::invLerp(min_pos, max_pos, tl),
+		.top_right = Common::Helpers::invLerp(min_pos, max_pos, tr),
+		.bottom_left = Common::Helpers::invLerp(min_pos, max_pos, bl),
+		.bottom_right = Common::Helpers::invLerp(min_pos, max_pos, br)
+	});
 
 	Sprite::draw();
 }

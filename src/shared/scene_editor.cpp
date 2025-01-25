@@ -204,15 +204,14 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 	{
 		showTexture(sprite->getTexture(), sprite->getTexRegion());
 
-		auto direct_tex_coords = sprite->getDirectTexCoords();
+		auto tex_coords = sprite->getTexCoords();
 
-		if (direct_tex_coords.has_value())
+		if (tex_coords.has_value())
 		{
-			auto direct_tex_coords_nn = direct_tex_coords.value();
-			ImGui::Text("%s", fmt::format("top left x: {}, y: {}", direct_tex_coords_nn.top_left_uv.x, direct_tex_coords_nn.top_left_uv.y).c_str());
-			ImGui::Text("%s", fmt::format("top right x: {}, y: {}", direct_tex_coords_nn.top_right_uv.x, direct_tex_coords_nn.top_right_uv.y).c_str());
-			ImGui::Text("%s", fmt::format("bottom left x: {}, y: {}", direct_tex_coords_nn.bottom_left_uv.x, direct_tex_coords_nn.bottom_left_uv.y).c_str());
-			ImGui::Text("%s", fmt::format("bottom right x: {}, y: {}", direct_tex_coords_nn.bottom_right_uv.x, direct_tex_coords_nn.bottom_right_uv.y).c_str());
+			ImGui::Text("%s", fmt::format("top left x: {}, y: {}", tex_coords->top_left.x, tex_coords->top_left.y).c_str());
+			ImGui::Text("%s", fmt::format("top right x: {}, y: {}", tex_coords->top_right.x, tex_coords->top_right.y).c_str());
+			ImGui::Text("%s", fmt::format("bottom left x: {}, y: {}", tex_coords->bottom_left.x, tex_coords->bottom_left.y).c_str());
+			ImGui::Text("%s", fmt::format("bottom right x: {}, y: {}", tex_coords->bottom_right.x, tex_coords->bottom_right.y).c_str());
 		}
 		ImGui::Separator();
 	}

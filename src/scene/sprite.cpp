@@ -21,12 +21,12 @@ void Sprite::draw()
 
 	auto color = getColor();
 
-	if (mDirectTexCoords.has_value())
+	if (mTexCoords.has_value())
 	{
-		auto coords = mDirectTexCoords.value();
+		auto coords = mTexCoords.value();
 
-		GRAPHICS->drawTexturedRectangle(mEffect, mTexture, coords.top_left_uv, coords.top_right_uv,
-			coords.bottom_left_uv, coords.bottom_right_uv, color, color, color, color);
+		GRAPHICS->drawTexturedRectangle(mEffect, mTexture, coords.top_left, coords.top_right,
+			coords.bottom_left, coords.bottom_right, color, color, color, color);
 	}
 	else
 	{
