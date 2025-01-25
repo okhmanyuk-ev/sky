@@ -107,16 +107,53 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &mScene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &mScene->getTimestepFixer(), std::placeholders::_1));
 
-		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
-			float intensity = 0.5f;
+		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { "size", "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
+			float size = 192.0f;
 
 			if (CON_ARG_EXIST(0))
-				intensity = CON_ARG_FLOAT(0);
+				size = CON_ARG_FLOAT(0);
+
+			float intensity = 0.5f;
+
+			if (CON_ARG_EXIST(1))
+				intensity = CON_ARG_FLOAT(1);
 
 			int passes = 1;
 
+			if (CON_ARG_EXIST(2))
+				passes = CON_ARG_INT(2);
+
+			bool outlined = true;
+
+			if (CON_ARG_EXIST(3))
+				outlined = CON_ARG_BOOL(3);
+
+			float rounding = 0.0f;
+
+			if (CON_ARG_EXIST(4))
+				rounding = CON_ARG_FLOAT(4);
+
+			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::BlurredGlass>>>>>();
+			glass->setSize(size);
+			glass->setAnchor(0.5f);
+			glass->setPivot(0.5f);
+			glass->setOutlined(outlined);
+			glass->setBlurIntensity(intensity);
+			glass->setBlurPasses(passes);
+			glass->setRounding(rounding);
+			getScene()->getRoot()->attach(glass);
+		}));
+
+		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { "size", "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
+			float size = 192.0f;
+
+			if (CON_ARG_EXIST(0))
+				size = CON_ARG_FLOAT(0);
+
+			float intensity = 1.0f;
+
 			if (CON_ARG_EXIST(1))
-				passes = CON_ARG_INT(1);
+				intensity = CON_ARG_FLOAT(1);
 
 			bool outlined = true;
 
@@ -128,41 +165,14 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			if (CON_ARG_EXIST(3))
 				rounding = CON_ARG_FLOAT(3);
 
-			auto blur = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::BlurredGlass>>>>>();
-			blur->setSize(192.0f);
-			blur->setAnchor(0.5f);
-			blur->setPivot(0.5f);
-			blur->setOutlined(outlined);
-			blur->setBlurIntensity(intensity);
-			blur->setBlurPasses(passes);
-			blur->setRounding(rounding);
-			getScene()->getRoot()->attach(blur);
-		}));
-
-		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
-			float intensity = 1.0f;
-
-			if (CON_ARG_EXIST(0))
-				intensity = CON_ARG_FLOAT(0);
-
-			bool outlined = true;
-
-			if (CON_ARG_EXIST(1))
-				outlined = CON_ARG_BOOL(1);
-
-			float rounding = 0.0f;
-
-			if (CON_ARG_EXIST(2))
-				rounding = CON_ARG_FLOAT(2);
-
-			auto gray = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::GrayscaledGlass>>>>>();
-			gray->setSize(192.0f);
-			gray->setAnchor(0.5f);
-			gray->setPivot(0.5f);
-			gray->setOutlined(outlined);
-			gray->setRounding(rounding);
-			gray->setGrayscaleIntensity(intensity);
-			getScene()->getRoot()->attach(gray);
+			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::GrayscaledGlass>>>>>();
+			glass->setSize(size);
+			glass->setAnchor(0.5f);
+			glass->setPivot(0.5f);
+			glass->setOutlined(outlined);
+			glass->setRounding(rounding);
+			glass->setGrayscaleIntensity(intensity);
+			getScene()->getRoot()->attach(glass);
 		}));
 
 		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { "duration" }, [this](CON_ARGS) {
