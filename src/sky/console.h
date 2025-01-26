@@ -113,8 +113,6 @@ namespace sky
 			using Getter = std::function<std::vector<std::string>()>;
 			using Setter = std::function<void(const std::vector<std::string>&)>;
 
-			CVar(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments,
-				Getter getter, Setter setter);
 			CVar(std::optional<std::string> description, std::vector<std::string> arguments, Getter getter, Setter setter);
 
 			std::string getValueAsString() const;
@@ -122,7 +120,6 @@ namespace sky
 
 			std::optional<std::string> description;
 			std::vector<std::string> arguments;
-			std::vector<std::string> optional_arguments;
 			Getter getter;
 			Setter setter;
 		};

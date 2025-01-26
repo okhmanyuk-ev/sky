@@ -83,18 +83,11 @@ void NativeConsole::setTitle(const std::string& s)
 
 #endif
 
-CommandProcessor::CVar::CVar(std::optional<std::string> _description, std::vector<std::string> _arguments, std::vector<std::string> _optional_arguments,
-	Getter _getter, Setter _setter) :
+CommandProcessor::CVar::CVar(std::optional<std::string> _description, std::vector<std::string> _arguments, Getter _getter, Setter _setter) :
 	description(_description),
 	arguments(_arguments),
-	optional_arguments(_optional_arguments),
 	getter(_getter),
 	setter(_setter)
-{
-}
-
-CommandProcessor::CVar::CVar(std::optional<std::string> description, std::vector<std::string> arguments, Getter getter, Setter setter) :
-	CVar(description, arguments, {}, getter, setter)
 {
 }
 
@@ -415,11 +408,9 @@ std::string CommandProcessor::CVar::getValueAsString() const
 
 std::string CommandProcessor::CVar::getArgsAsString() const
 {
-	auto args = {
-		arguments | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
-		optional_arguments | sky::ranges::wrap("(<", ">)") | std::ranges::to<std::vector>()
-	};
-	return std::views::join(args)
+	return arguments
+		| sky::ranges::wrap("<", ">")
+		| std::ranges::to<std::vector>()
 		| std::views::filter(std::not_fn(std::ranges::empty))
 		| std::views::join_with(' ')
 		| std::ranges::to<std::string>();
