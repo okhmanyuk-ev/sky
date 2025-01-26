@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef EMSCRIPTEN
+
 #include <functional>
 #include <unordered_set>
 #include <common/bitbuffer.h>
@@ -119,3 +121,4 @@ namespace Network
 		System::UdpSocketHandle mHandle = 0;
 	};
 }
+#endif

@@ -1,4 +1,6 @@
 #include "system.h"
+
+#ifndef EMSCRIPTEN
 #include <asio.hpp>
 
 using namespace Network;
@@ -200,3 +202,5 @@ uint16_t UdpSocket::getPort() const
 {
 	return NETWORK->getUdpSocketPort(mHandle);
 }
+
+#endif

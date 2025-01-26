@@ -22,8 +22,10 @@ namespace Shared
 		sky::CVar<int> mWantShowBatches = sky::CVar<int>("hud_show_batches", 0, "show batches statistics");
 		sky::CVar<int> mWantShowTargets = sky::CVar<int>("hud_show_targets", 0, "show render targets statistics");
 		sky::CVar<int> mWantShowTasks = sky::CVar<int>("hud_show_tasks", 0, "show tasks count on screen");
+#ifndef EMSCRIPTEN
 		sky::CVar<bool> mWantShowNetSpeed = sky::CVar<bool>("hud_show_net_speed", false);
 		sky::CVar<bool> mWantShowNetPps = sky::CVar<bool>("hud_show_net_pps", false);
+#endif
 
 	private:
 		std::deque<float> mDeltaTimes;

@@ -44,8 +44,8 @@ void Profile::load()
 	}
 	catch (const std::exception& e)
 	{
-		sky::Log(Console::Color::Red, e.what());
-		sky::Log(Console::Color::Green, "making new profile");
+		sky::Log(sky::Console::Color::Red, e.what());
+		sky::Log(sky::Console::Color::Green, "making new profile");
 		makeDefault();
 		return;
 	}

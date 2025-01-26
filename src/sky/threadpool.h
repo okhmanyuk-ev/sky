@@ -4,6 +4,7 @@
 #include <thread>
 #include <mutex>
 #include <future>
+#include <functional>
 #include <condition_variable>
 
 #define THREADPOOL sky::Locator<sky::ThreadPool>::GetService()

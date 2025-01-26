@@ -42,7 +42,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<Graphics::System>::Init(std::make_shared<Graphics::System>());
 	if (flags.count(Flag::Network))
 	{
+#ifndef EMSCRIPTEN
 		sky::Locator<Network::System>::Init(std::make_shared<Network::System>());
+#endif
 	}
 	sky::Locator<sky::Localization>::Init(std::make_shared<sky::Localization>());
 	sky::Locator<Shared::StatsSystem>::Init(std::make_shared<Shared::StatsSystem>());
@@ -161,7 +163,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 				sprite->setSize(256.0f);
 				sprite->setAnchor(0.5f);
 				sprite->setPivot(0.5f);
-				sprite->setTexture(TEXTURE(url));
+				sprite->setTexture(sky::GetTexture(url));
 				getScene()->getRoot()->attach(sprite);
 			};
 
@@ -173,7 +175,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 				auto url = fetch->url;
 				auto image = Graphics::Image((void*)data, (size_t)size);
 
-				CACHE->loadTexture(image, url);
+				sky::GetService<sky::Cache>()->loadTexture(image, url);
 				spawn_sprite(url);
 				emscripten_fetch_close(fetch);
 			};
@@ -281,7 +283,9 @@ Application::~Application()
 	sky::Locator<sky::Localization>::Reset();
 	if (mFlags.count(Flag::Network))
 	{
+#ifndef EMSCRIPTEN
 		sky::Locator<Network::System>::Reset();
+#endif
 	}
 	sky::Locator<Graphics::System>::Reset();
 	sky::Locator<sky::Console>::Reset();

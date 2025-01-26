@@ -75,9 +75,11 @@ namespace sky
 
 	namespace ranges
 	{
-		auto wrap(const std::string& a, const std::string& b)
+		inline auto wrap(const std::string& a, const std::string& b)
 		{
 			return std::views::transform([&](const auto& s) { return a + s + b; });
 		};
 	}
+
+	std::string join(const std::vector<std::string>& vec, const std::string& delimiter);
 }

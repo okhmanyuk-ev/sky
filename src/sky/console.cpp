@@ -1,10 +1,12 @@
 #include "console.h"
-#include <conio.h>
+#ifdef PLATFORM_WINDOWS
 #include <Windows.h>
+#endif
 #include <iostream>
 #include <string>
 #include <sky/scheduler.h>
 #include <sky/utils.h>
+#include <ranges>
 
 using namespace sky;
 
@@ -45,7 +47,7 @@ NativeConsole::NativeConsole()
 				sky::Emit(ReadEvent({ s }));
 			});
 		}
-		});
+	});
 
 	mReadThread.detach();
 
@@ -408,26 +410,25 @@ std::string CommandProcessor::CVar::getValueAsString() const
 
 std::string CommandProcessor::CVar::getArgsAsString() const
 {
-	return arguments
+	auto args = arguments
 		| sky::ranges::wrap("<", ">")
 		| std::ranges::to<std::vector>()
 		| std::views::filter(std::not_fn(std::ranges::empty))
-		| std::views::join_with(' ')
-		| std::ranges::to<std::string>();
+		| std::ranges::to<std::vector>();
+
+	return sky::join(args, " ");
 }
 
 std::string CommandProcessor::Command::getArgsAsString() const
 {
 	auto to_string = std::views::transform([](const DefaultArgument& arg) { return arg.name + "=" + arg.default_value; });
-	auto args = {
+	auto args_groups = {
 		arguments | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
 		default_arguments | to_string | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
 		optional_arguments | sky::ranges::wrap("(<", ">)") | std::ranges::to<std::vector>()
 	};
-	return std::views::join(args)
-		| std::views::filter(std::not_fn(std::ranges::empty))
-		| std::views::join_with(' ')
-		| std::ranges::to<std::string>();
+	auto args = std::views::join(args_groups) | std::views::filter(std::not_fn(std::ranges::empty)) | std::ranges::to<std::vector>();
+	return sky::join(args, " ");
 }
 
 const std::vector<std::string> CVarTraits<bool>::Args = { "bool" };

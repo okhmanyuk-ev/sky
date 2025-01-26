@@ -2,10 +2,10 @@
 
 #ifdef PLATFORM_EMSCRIPTEN
 
-#include <common/event_system.h>
 #include <SDL.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <sky/utils.h>
 
 using namespace Platform;
 
@@ -57,7 +57,7 @@ void SystemEmscripten::process()
 				(int)((float)event.motion.y * mScale)
 			};
 
-			EVENT->emit(Input::Mouse::MoveEvent{
+			sky::Emit(Input::Mouse::MoveEvent{
 				.pos = mCursorPos
 			});
 		}
@@ -77,7 +77,7 @@ void SystemEmscripten::process()
 			if (!ButtonMap.contains(event.button.button))
 				continue;
 
-			EVENT->emit(Input::Mouse::ButtonEvent{
+			sky::Emit(Input::Mouse::ButtonEvent{
 				.type = TypeMap.at(event.type),
 				.button = ButtonMap.at(event.button.button),
 				.pos = {
@@ -93,7 +93,7 @@ void SystemEmscripten::process()
 
 			SDL_GetMouseState(&x, &y);
 
-			EVENT->emit(Input::Mouse::ScrollEvent{
+			sky::Emit(Input::Mouse::ScrollEvent{
 				.pos = {
 					(int)((float)x * mScale),
 					(int)((float)y * mScale)
@@ -106,7 +106,7 @@ void SystemEmscripten::process()
 		}
 		else if (event.type == SDL_TEXTINPUT)
 		{
-			EVENT->emit(Input::Keyboard::CharEvent{
+			sky::Emit(Input::Keyboard::CharEvent{
 				.codepoint = *(char32_t*)&event.text.text
 			});
 		}
@@ -206,7 +206,7 @@ void SystemEmscripten::process()
 			if (!KeyMap.contains(event.key.keysym.sym))
 				continue;
 
-			EVENT->emit(Input::Keyboard::Event{
+			sky::Emit(Input::Keyboard::Event{
 				.type = TypeMap.at(event.type),
 				.key = KeyMap.at(event.key.keysym.sym)
 			});
@@ -224,7 +224,7 @@ void SystemEmscripten::process()
 	{
 		mWidth = width;
 		mHeight = height;
-		EVENT->emit(ResizeEvent({ width, height }));
+		sky::Emit(ResizeEvent({ width, height }));
 	}
 }
 

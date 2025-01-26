@@ -95,3 +95,17 @@ std::wstring sky::to_wstring(const std::string& str)
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 	return converter.from_bytes(str);
 }
+
+std::string sky::join(const std::vector<std::string>& vec, const std::string& delimiter)
+{
+	std::string result;
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		result += vec.at(i);
+		if (i != vec.size() - 1)
+		{
+			result += delimiter;
+		}
+	}
+	return result;
+}

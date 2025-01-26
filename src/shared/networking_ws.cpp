@@ -3,6 +3,7 @@
 #include <common/buffer_helpers.h>
 #include <common/console_commands.h>
 #include <sky/utils.h>
+#include <nlohmann/json.hpp>
 #ifdef EMSCRIPTEN
 #include <emscripten/websocket.h>
 #else
