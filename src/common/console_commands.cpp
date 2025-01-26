@@ -158,7 +158,7 @@ void ConsoleCommands::onAlias(CON_ARGS)
 		for (const auto& [name, alias] : aliases)
 			sky::Log(" - {} = {}", name, sky::CommandProcessor::MakeStringFromTokens(alias.value));
 
-		sky::Log("aliases can be invoked by adding 'sharp' prefix, example: #alias_name");
+		sky::Log("aliases can be invoked by adding 'dereference' prefix, example: *alias_name");
 		return;
 	}
 

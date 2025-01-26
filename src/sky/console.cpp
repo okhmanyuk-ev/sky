@@ -369,7 +369,7 @@ std::vector<std::string> CommandProcessor::dereferenceTokens(std::vector<std::st
 			if (tokens[i].empty())
 				continue;
 
-			if (tokens[i][0] != '#')
+			if (tokens[i][0] != '*')
 				continue;
 
 			auto name = tokens[i].substr(1);
