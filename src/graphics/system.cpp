@@ -135,8 +135,8 @@ void System::flushBatch()
 	height /= scale;
 
 	auto [proj, view] = skygfx::utils::MakeCameraMatrices(skygfx::utils::OrthogonalCamera{
-		.width = width,
-		.height = height
+		.width = static_cast<uint32_t>(width),
+		.height = static_cast<uint32_t>(height)
 	});
 
 	skygfx::utils::ExecuteCommands({
