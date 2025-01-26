@@ -16,7 +16,7 @@ namespace sky
 		};
 
 	public:
-		BitBuffer();
+		BitBuffer() = default;
 		BitBuffer(const BitBuffer& other);
 		~BitBuffer();
 

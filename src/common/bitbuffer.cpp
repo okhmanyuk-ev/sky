@@ -5,11 +5,7 @@
 
 using namespace sky;
 
-BitBuffer::BitBuffer()
-{
-}
-
-BitBuffer::BitBuffer(const BitBuffer& other) : BitBuffer()
+BitBuffer::BitBuffer(const BitBuffer& other)
 {
 	write(other.getMemory(), other.getSize());
 	setPosition(other.getPosition());
