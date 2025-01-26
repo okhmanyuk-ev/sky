@@ -2,5 +2,5 @@
 
 void sky_main()
 {
-	Shared::Application("Hello, World!").run();
+	sky::Application("Hello, World!").run();
 }

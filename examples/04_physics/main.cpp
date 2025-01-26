@@ -2,7 +2,7 @@
 
 void sky_main()
 {
-	Shared::Application app("Physics", { Shared::Application::Flag::Scene });
+	sky::Application app("Physics", { sky::Application::Flag::Scene });
 
 	auto world = std::make_shared<Shared::PhysHelpers::World>();
 	world->setAnchor(0.5f);
@@ -79,9 +79,7 @@ void sky_main()
 		);
 	})));
 
-	static auto framer = Common::FrameSystem::Framer();
-
-	framer.setCallback([spawnBox, spawnBall]{
+	auto framer = sky::Scheduler::Framer([spawnBox, spawnBall]{
 		ImGui::Begin("Options", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel);
 		ImGui::SetWindowPos(ImGui::User::TopRightCorner());
 

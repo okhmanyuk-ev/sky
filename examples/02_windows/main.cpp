@@ -46,7 +46,7 @@ static std::shared_ptr<Shared::SceneManager::Window> CreateWindow()
 
 void sky_main()
 {
-	Shared::Application app("Windows", { Shared::Application::Flag::Scene });
+	sky::Application app("Windows", { sky::Application::Flag::Scene });
 
 	auto window = CreateWindow();
 	SCENE_MANAGER->pushWindow(window);

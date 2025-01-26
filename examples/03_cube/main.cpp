@@ -49,7 +49,7 @@ static const std::vector<uint32_t> Indices = {
 
 void sky_main()
 {
-	Shared::Application app("Cube", { Shared::Application::Flag::Scene });
+	sky::Application app("Cube", { sky::Application::Flag::Scene });
 
 	auto viewport = std::make_shared<Scene::Viewport3D>();
 	app.getScene()->getRoot()->attach(viewport);
