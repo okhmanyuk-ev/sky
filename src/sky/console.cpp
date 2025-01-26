@@ -107,13 +107,8 @@ CommandProcessor::Command::Command(std::optional<std::string> _description, std:
 {
 }
 
-CommandProcessor::Command::Command(std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback) :
-	Command(description, args, {}, callback)
-{
-}
-
 CommandProcessor::Command::Command(std::optional<std::string> description, Callback callback) :
-	Command(description, {}, callback)
+	Command(description, {}, {}, callback)
 {
 }
 

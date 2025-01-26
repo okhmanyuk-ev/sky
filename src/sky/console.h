@@ -132,7 +132,6 @@ namespace sky
 			using Callback = std::function<void(const std::vector<std::string>&)>;
 
 			Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<std::string> optional_arguments, Callback callback);
-			Command(std::optional<std::string> description, const std::vector<std::string>& args, Command::Callback callback);
 			Command(std::optional<std::string> description, Callback callback);
 
 			std::string getArgsAsString() const;
