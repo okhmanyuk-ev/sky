@@ -78,7 +78,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	{
 		mScene = std::make_shared<Scene::Scene>();
 		mScene->setInteractTestCallback([](const auto& pos) {
-			return !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup) 
+			return !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup)
 				&& !ImGui::IsAnyItemActive();
 		});
 		mSceneEditor = std::make_shared<Shared::SceneEditor>(*mScene);
@@ -107,31 +107,12 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &mScene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &mScene->getTimestepFixer(), std::placeholders::_1));
 
-		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { "size", "intensity", "passes", "outlined", "rounding" }, [this](CON_ARGS) {
-			float size = 192.0f;
-
-			if (CON_ARG_EXIST(0))
-				size = CON_ARG_FLOAT(0);
-
-			float intensity = 0.5f;
-
-			if (CON_ARG_EXIST(1))
-				intensity = CON_ARG_FLOAT(1);
-
-			int passes = 1;
-
-			if (CON_ARG_EXIST(2))
-				passes = CON_ARG_INT(2);
-
-			bool outlined = true;
-
-			if (CON_ARG_EXIST(3))
-				outlined = CON_ARG_BOOL(3);
-
-			float rounding = 0.0f;
-
-			if (CON_ARG_EXIST(4))
-				rounding = CON_ARG_FLOAT(4);
+		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [this](CON_ARGS) {
+			auto size = CON_ARG_FLOAT(0);
+			auto intensity = CON_ARG_FLOAT(1);
+			auto passes = CON_ARG_INT(2);
+			auto outlined = CON_ARG_BOOL(3);
+			auto rounding = CON_ARG_FLOAT(4);
 
 			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::BlurredGlass>>>>>();
 			glass->setSize(size);
@@ -144,26 +125,11 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			getScene()->getRoot()->attach(glass);
 		}));
 
-		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { "size", "intensity", "outlined", "rounding" }, [this](CON_ARGS) {
-			float size = 192.0f;
-
-			if (CON_ARG_EXIST(0))
-				size = CON_ARG_FLOAT(0);
-
-			float intensity = 1.0f;
-
-			if (CON_ARG_EXIST(1))
-				intensity = CON_ARG_FLOAT(1);
-
-			bool outlined = true;
-
-			if (CON_ARG_EXIST(2))
-				outlined = CON_ARG_BOOL(2);
-
-			float rounding = 0.0f;
-
-			if (CON_ARG_EXIST(3))
-				rounding = CON_ARG_FLOAT(3);
+		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [this](CON_ARGS) {
+			auto size = CON_ARG_FLOAT(0);
+			auto intensity = CON_ARG_FLOAT(1);
+			auto outlined = CON_ARG_BOOL(2);
+			auto rounding = CON_ARG_FLOAT(3);
 
 			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::GrayscaledGlass>>>>>();
 			glass->setSize(size);
@@ -175,11 +141,8 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			getScene()->getRoot()->attach(glass);
 		}));
 
-		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { "duration" }, [this](CON_ARGS) {
-			float duration = 1.0f;
-
-			if (CON_ARG_EXIST(0))
-				duration = CON_ARG_FLOAT(0);
+		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { { "duration", "1.0" } }, {}, [this](CON_ARGS) {
+			auto duration = CON_ARG_FLOAT(0);
 
 			auto shockwave = Shared::SceneHelpers::Shockwave::MakeAnimated(duration);
 			shockwave->setSize(256.0f);
@@ -189,7 +152,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			getScene()->getRoot()->attach(shockwave);
 		}));
 
-		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, { "url" }, [this](CON_ARGS) {
+		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, [this](CON_ARGS) {
 #ifndef EMSCRIPTEN
 			sky::Log("this is for emscripten");
 #else

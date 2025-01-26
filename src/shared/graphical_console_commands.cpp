@@ -12,7 +12,7 @@ GraphicalConsoleCommands::GraphicalConsoleCommands()
 	sky::AddCVar("r_resolution", sky::CommandProcessor::CVar("resolution of screen", { "int", "int" },
 		CVAR_GETTER_INT2_FUNC(PLATFORM->getWidth, PLATFORM->getHeight), CVAR_SETTER_INT2_FUNC(PLATFORM->resize)));
 
-	sky::AddCommand("rescale", sky::CommandProcessor::Command("smart scaling", { "float" }, {}, [](CON_ARGS) {
+	sky::AddCommand("rescale", sky::CommandProcessor::Command("smart scaling", { "float" }, {}, {}, [](CON_ARGS) {
 		PLATFORM->rescale(CON_ARG_FLOAT(0));
 	}));
 }

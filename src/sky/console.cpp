@@ -98,17 +98,23 @@ CommandProcessor::CVar::CVar(std::optional<std::string> description, std::vector
 {
 }
 
-CommandProcessor::Command::Command(std::optional<std::string> _description, std::vector<std::string> _arguments, std::vector<std::string> _optional_arguments,
-	Callback _callback) :
+CommandProcessor::Command::DefaultArgument::DefaultArgument(std::string _name, std::string _default_value) :
+	name(_name), default_value(_default_value)
+{
+}
+
+CommandProcessor::Command::Command(std::optional<std::string> _description, std::vector<std::string> _arguments, std::vector<DefaultArgument> _default_arguments,
+	std::vector<std::string> _optional_arguments, Callback _callback) :
 	description(_description),
 	arguments(_arguments),
+	default_arguments(_default_arguments),
 	optional_arguments(_optional_arguments),
 	callback(_callback)
 {
 }
 
 CommandProcessor::Command::Command(std::optional<std::string> description, Callback callback) :
-	Command(description, {}, {}, callback)
+	Command(description, {}, {}, {}, callback)
 {
 }
 
@@ -337,9 +343,16 @@ void CommandProcessor::processConsoleCommand(std::vector<std::string> args)
 		},
 		[&](const Command& command) {
 			if (command.arguments.size() > args.size())
+			{
 				sky::Log("Syntax: {} {}", name, command.getArgsAsString());
-			else
-				command.callback(args);
+				return;
+			}
+			for (size_t i = 0; i < command.default_arguments.size(); i++)
+			{
+				if (command.arguments.size() + i + 1 > args.size())
+					args.push_back(command.default_arguments.at(i).default_value);
+			}
+			command.callback(args);
 		},
 		[&](Alias& alias) {
 			if (args.size() == 0)
@@ -420,18 +433,33 @@ std::string CommandProcessor::CVar::getArgsAsString() const
 
 std::string CommandProcessor::Command::getArgsAsString() const
 {
-	std::string result = "";
+	std::string result;
 
-	if (arguments.size() > 0)
+	if (!arguments.empty())
 		result += "<" + std::accumulate(std::next(arguments.begin()), arguments.end(), *arguments.begin(),
 			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
 
-	if (arguments.size() > 0 && optional_arguments.size() > 0)
-		result += " ";
+	if (!default_arguments.empty())
+	{
+		auto default_args_strs = default_arguments | std::views::transform([](const DefaultArgument& arg) {
+			return fmt::format("{}={}", arg.name, arg.default_value);
+		});
+
+		if (!result.empty())
+			result += " ";
+
+		result += "<" + std::accumulate(std::next(default_args_strs.begin()), default_args_strs.end(), *default_args_strs.begin(),
+			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
+	}
 
 	if (optional_arguments.size() > 0)
+	{
+		if (!result.empty())
+			result += " ";
+
 		result += "(<" + std::accumulate(std::next(optional_arguments.begin()), optional_arguments.end(), *optional_arguments.begin(),
 			[](const auto& a, const auto& b) { return a + ">) (<" + b; }) + ">)";
+	}
 
 	return result;
 }

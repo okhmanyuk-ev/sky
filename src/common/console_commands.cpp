@@ -29,14 +29,14 @@ ConsoleCommands::ConsoleCommands()
 	};
 
 	sky::AddCVar("sys_time_delta_limit_fps", sky::CommandProcessor::CVar(std::nullopt, { "null/float" }, getter, setter));
-	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, { "filter" }, CMD_METHOD(onCmdList)));
-	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, { "filter" }, CMD_METHOD(onCVarList)));
-	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, { "text.." }, CMD_METHOD(onEcho)));
-	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, CMD_METHOD(onLater)));
-	sky::AddCommand("exec", sky::CommandProcessor::Command("execute console commands from file", { "path" }, { "path.." }, CMD_METHOD(onExec)));
+	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, CMD_METHOD(onCmdList)));
+	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, CMD_METHOD(onCVarList)));
+	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, CMD_METHOD(onEcho)));
+	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, CMD_METHOD(onLater)));
+	sky::AddCommand("exec", sky::CommandProcessor::Command("execute console commands from file", { "path" }, {}, { "path.." }, CMD_METHOD(onExec)));
 	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", CMD_METHOD(onClear)));
 	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", CMD_METHOD(onAlias)));
-	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, { "else" }, CMD_METHOD(onIf)));
+	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, CMD_METHOD(onIf)));
 	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", CMD_METHOD(onQuit)));
 
 	sky::Log("type \"cmdlist\" to see available commands");
