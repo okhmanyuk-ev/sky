@@ -415,53 +415,28 @@ std::string CommandProcessor::CVar::getValueAsString() const
 
 std::string CommandProcessor::CVar::getArgsAsString() const
 {
-	std::string result = "";
-
-	if (arguments.size() > 0)
-		result += "<" + std::accumulate(std::next(arguments.begin()), arguments.end(), *arguments.begin(),
-			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
-
-	if (arguments.size() > 0 && optional_arguments.size() > 0)
-		result += " ";
-
-	if (optional_arguments.size() > 0)
-		result += "(<" + std::accumulate(std::next(optional_arguments.begin()), optional_arguments.end(), *optional_arguments.begin(),
-			[](const auto& a, const auto& b) { return a + ">) (<" + b; }) + ">)";
-
-	return result;
+	auto args = {
+		arguments | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
+		optional_arguments | sky::ranges::wrap("(<", ">)") | std::ranges::to<std::vector>()
+	};
+	return std::views::join(args)
+		| std::views::filter(std::not_fn(std::ranges::empty))
+		| std::views::join_with(' ')
+		| std::ranges::to<std::string>();
 }
 
 std::string CommandProcessor::Command::getArgsAsString() const
 {
-	std::string result;
-
-	if (!arguments.empty())
-		result += "<" + std::accumulate(std::next(arguments.begin()), arguments.end(), *arguments.begin(),
-			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
-
-	if (!default_arguments.empty())
-	{
-		auto default_args_strs = default_arguments | std::views::transform([](const DefaultArgument& arg) {
-			return fmt::format("{}={}", arg.name, arg.default_value);
-		});
-
-		if (!result.empty())
-			result += " ";
-
-		result += "<" + std::accumulate(std::next(default_args_strs.begin()), default_args_strs.end(), *default_args_strs.begin(),
-			[](const auto& a, const auto& b) { return a + "> <" + b; }) + ">";
-	}
-
-	if (optional_arguments.size() > 0)
-	{
-		if (!result.empty())
-			result += " ";
-
-		result += "(<" + std::accumulate(std::next(optional_arguments.begin()), optional_arguments.end(), *optional_arguments.begin(),
-			[](const auto& a, const auto& b) { return a + ">) (<" + b; }) + ">)";
-	}
-
-	return result;
+	auto to_string = std::views::transform([](const DefaultArgument& arg) { return arg.name + "=" + arg.default_value; });
+	auto args = {
+		arguments | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
+		default_arguments | to_string | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
+		optional_arguments | sky::ranges::wrap("(<", ">)") | std::ranges::to<std::vector>()
+	};
+	return std::views::join(args)
+		| std::views::filter(std::not_fn(std::ranges::empty))
+		| std::views::join_with(' ')
+		| std::ranges::to<std::string>();
 }
 
 const std::vector<std::string> CVarTraits<bool>::Args = { "bool" };

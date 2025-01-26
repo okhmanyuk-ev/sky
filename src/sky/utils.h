@@ -57,4 +57,12 @@ namespace sky
 
 	void AddCommand(const std::string& name, CommandProcessor::Command command);
 	void AddCVar(const std::string& name, CommandProcessor::CVar cvar);
+
+	namespace ranges
+	{
+		auto wrap(const std::string& a, const std::string& b)
+		{
+			return std::views::transform([&](const auto& s) { return a + s + b; });
+		};
+	}
 }
