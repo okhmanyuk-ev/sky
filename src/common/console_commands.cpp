@@ -102,7 +102,13 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 
 void ConsoleCommands::onEcho(CON_ARGS)
 {
-	sky::Log(CON_ARGS_ACCUMULATED_STRING);
+	if (!CON_HAS_ARGS)
+		return;
+
+	auto str = std::accumulate(std::next(CON_ARGS_NAME.begin()), CON_ARGS_NAME.end(), *CON_ARGS_NAME.begin(),
+		[](const auto& a, const auto& b) { return a + " " + b; });
+
+	sky::Log(str);
 }
 
 void ConsoleCommands::onLater(CON_ARGS)
