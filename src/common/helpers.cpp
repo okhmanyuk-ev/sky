@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <common/bitbuffer.h>
 #include <locale>
-#include <codecvt>
 
 using namespace Common;
 
@@ -132,18 +131,6 @@ nlohmann::json Helpers::LoadJsonFromAsset(const Platform::Asset& asset)
 nlohmann::json Helpers::LoadBsonFromAsset(const Platform::Asset& asset)
 {
 	return nlohmann::json::from_bson(std::string((char*)asset.getMemory(), asset.getSize()));
-}
-
-std::string sky::to_string(const std::wstring& wstr)
-{
-	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-	return converter.to_bytes(wstr);
-}
-
-std::wstring sky::to_wstring(const std::string& str)
-{
-	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-	return converter.from_bytes(str);
 }
 
 float sky::sanitize(float value, float default_value)

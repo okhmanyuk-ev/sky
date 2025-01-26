@@ -43,20 +43,35 @@ namespace sky
 	void Log(const std::string& text);
 	void Log(Console::Color color, const std::string& text);
 
+	void AddCommand(const std::string& name, CommandProcessor::Command command);
+	void AddCVar(const std::string& name, CommandProcessor::CVar cvar);
+
+	std::string to_string(const std::wstring& wstr);
+	std::wstring to_wstring(const std::string& str);
+
+	template<class... Args>
+	std::wstring format(const std::wstring& wstr, Args&&... args)
+	{
+		return to_wstring(fmt::format(fmt::runtime(to_string(wstr)), args...));
+	}
+
+	template<class... Args>
+	std::string format(const std::string& str, Args&&... args)
+	{
+		return fmt::format(fmt::runtime(str), args...);
+	}
+
 	template<typename... Args>
 	void Log(const std::string& text, Args&&... args)
 	{
-		Log(fmt::format(text, args...));
+		Log(format(text, args...));
 	}
 
 	template<typename... Args>
 	void Log(Console::Color color, const std::string& text, Args&&... args)
 	{
-		Log(color, fmt::format(text, args...));
+		Log(color, format(text, args...));
 	}
-
-	void AddCommand(const std::string& name, CommandProcessor::Command command);
-	void AddCVar(const std::string& name, CommandProcessor::CVar cvar);
 
 	namespace ranges
 	{

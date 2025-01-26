@@ -892,7 +892,7 @@ SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 		auto h_pos = scrollbox->getHorizontalScrollPosition();
 		setBlurIntensity(1.0f - h_pos);
 		slider->setHorizontalPivot(1.0f - h_pos);
-		label->setText(fmt::format(L"{:.{}f}", getBlurIntensity(), 2));
+		label->setText(sky::format(L"{:.{}f}", getBlurIntensity(), 2));
 	}));
 }
 

@@ -45,9 +45,6 @@ namespace Common::Helpers
 
 namespace sky
 {
-	std::string to_string(const std::wstring& wstr);
-	std::wstring to_wstring(const std::string& str);
-
 	float sanitize(float value, float default_value = 0.0f);
 	glm::vec2 sanitize(glm::vec2 value, float default_value = 0.0f);
 

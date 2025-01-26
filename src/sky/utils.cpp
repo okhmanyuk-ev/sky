@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <sky/cache.h>
 #include <sky/localization.h>
+#include <codecvt>
 
 Graphics::TexCell sky::GetTexture(const std::string& name)
 {
@@ -81,4 +82,16 @@ void sky::AddCommand(const std::string& name, CommandProcessor::Command command)
 void sky::AddCVar(const std::string& name, CommandProcessor::CVar cvar)
 {
 	GetService<CommandProcessor>()->addItem(name, cvar);
+}
+
+std::string sky::to_string(const std::wstring& wstr)
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.to_bytes(wstr);
+}
+
+std::wstring sky::to_wstring(const std::string& str)
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.from_bytes(str);
 }
