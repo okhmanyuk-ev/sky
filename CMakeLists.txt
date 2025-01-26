@@ -341,4 +341,6 @@ set_property(TARGET tinyxml2 PROPERTY FOLDER ${LIBS_FOLDER})
 
 # examples
 
-add_subdirectory(examples)
+if(NOT EMSCRIPTEN)
+	add_subdirectory(examples)
+endif()
