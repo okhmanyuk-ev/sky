@@ -41,6 +41,9 @@ namespace Shared
 		auto getAlignment() const { return mAlignment; }
 		void setAlignment(Align value) { mAlignment = value; }
 
+		bool isEnabled() const { return mEnabled; }
+		void setEnabled(bool value) { mEnabled = value; }
+
 	private:
 		sky::CVar<bool> mEnabled = sky::CVar<bool>("g_stats", true);
 		Align mAlignment = Align::TopLeft;
