@@ -82,4 +82,13 @@ namespace sky
 	}
 
 	std::string join(const std::vector<std::string>& vec, const std::string& delimiter);
+
+	template<class... Ts> struct cases : Ts... { using Ts::operator()...; };
+	template<class... Ts> cases(Ts...) -> cases<Ts...>;
+
+	template<typename V, typename Callable>
+	decltype(auto) match(V&& v, Callable&& c)
+	{
+		return std::visit(std::forward<Callable>(c), std::forward<V>(v));
+	}
 }
