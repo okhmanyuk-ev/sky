@@ -3,6 +3,7 @@
 #include <shared/all.h>
 #include <sky/application.h>
 #include <sky/audio.h>
+#include <sky/bitflags.h>
 #include <sky/cache.h>
 #include <sky/clock.h>
 #include <sky/console.h>
