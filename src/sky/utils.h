@@ -10,6 +10,7 @@
 #include <sky/dispatcher.h>
 #include <sky/console.h>
 #include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace sky
 {
@@ -49,16 +50,10 @@ namespace sky
 	std::string to_string(const std::wstring& wstr);
 	std::wstring to_wstring(const std::string& str);
 
-	template<class... Args>
-	std::wstring format(const std::wstring& wstr, Args&&... args)
+	template<typename String, typename... Args>
+	auto format(String&& str, Args&&... args)
 	{
-		return to_wstring(fmt::format(fmt::runtime(to_string(wstr)), args...));
-	}
-
-	template<class... Args>
-	std::string format(const std::string& str, Args&&... args)
-	{
-		return fmt::format(fmt::runtime(str), args...);
+		return fmt::format(fmt::runtime(std::forward<String>(str)), std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
