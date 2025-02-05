@@ -95,12 +95,14 @@ elseif(EMSCRIPTEN)
 		-sDISABLE_EXCEPTION_THROWING=0
 	)
 	target_link_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
-		-g
+		-g3
+		-gsource-map
 		-sEXIT_RUNTIME
 		-sWEBSOCKET_DEBUG=1
 	,>)
 	target_compile_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
-		-g
+		-g3
+		-gsource-map
 	,>)
 endif()
 
