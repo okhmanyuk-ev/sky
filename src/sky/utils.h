@@ -48,6 +48,8 @@ namespace sky
 	void AddCommand(const std::string& name, CommandProcessor::Command command);
 	void AddCVar(const std::string& name, CommandProcessor::CVar cvar);
 
+	void ExecuteCommand(const std::string& str);
+
 	std::string to_string(const std::wstring& wstr);
 	std::wstring to_wstring(const std::string& str);
 

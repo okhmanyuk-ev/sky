@@ -83,6 +83,11 @@ void sky::AddCVar(const std::string& name, CommandProcessor::CVar cvar)
 	GetService<CommandProcessor>()->addItem(name, cvar);
 }
 
+void sky::ExecuteCommand(const std::string& str)
+{
+	GetService<CommandProcessor>()->execute(str);
+}
+
 std::string sky::to_string(const std::wstring& wstr)
 {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
