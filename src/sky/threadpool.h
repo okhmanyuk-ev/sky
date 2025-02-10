@@ -7,7 +7,7 @@
 #include <functional>
 #include <condition_variable>
 
-#define THREADPOOL sky::Locator<sky::ThreadPool>::GetService()
+#define THREADPOOL sky::Locator<sky::ThreadPool>::Get()
 
 namespace sky
 {

@@ -223,7 +223,7 @@ namespace sky
 			mGetter(getter),
 			mSetter(setter)
 		{
-			sky::Locator<CommandProcessor>::GetService()->addItem(mName, sky::CommandProcessor::CVar(description, CVarTraits<T>::Args,
+			sky::Locator<CommandProcessor>::Get()->addItem(mName, sky::CommandProcessor::CVar(description, CVarTraits<T>::Args,
 				[this] { return CVarTraits<T>::ValueToArgs(mGetter()); }, [this](const auto& args) { mSetter(CVarTraits<T>::ArgsToValue(args)); }));
 		}
 
@@ -239,7 +239,7 @@ namespace sky
 
 		~CVar()
 		{
-			sky::Locator<CommandProcessor>::GetService()->removeItem(mName);
+			sky::Locator<CommandProcessor>::Get()->removeItem(mName);
 		}
 
 		CVar(const CVar&) = delete;

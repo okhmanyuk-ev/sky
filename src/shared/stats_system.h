@@ -6,7 +6,7 @@
 #include <sky/scheduler.h>
 #include <fmt/format.h>
 
-#define STATS sky::Locator<Shared::StatsSystem>::GetService()
+#define STATS sky::Locator<Shared::StatsSystem>::Get()
 
 #define STATS_INDICATE(KEY, VALUE) STATS->indicate(KEY, VALUE)
 #define STATS_INDICATE_GROUP(GROUP, KEY, VALUE) STATS->indicate(KEY, VALUE, GROUP)

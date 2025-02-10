@@ -71,14 +71,14 @@ namespace sky
 	public:
 		Listenable()
 		{
-			mHandle = Locator<Dispatcher>::GetService()->createListener<T>([this](const T& e) {
+			mHandle = Locator<Dispatcher>::Get()->createListener<T>([this](const T& e) {
 				onEvent(e);
 			});
 		}
 
 		virtual ~Listenable()
 		{
-			Locator<Dispatcher>::GetService()->destroyListener<T>(mHandle);
+			Locator<Dispatcher>::Get()->destroyListener<T>(mHandle);
 		}
 
 	protected:

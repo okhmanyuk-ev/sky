@@ -13,7 +13,7 @@
 #include <cstddef>
 #include <set>
 
-#define IMGUI_SYSTEM sky::Locator<sky::ImguiSystem>::GetService()
+#define IMGUI_SYSTEM sky::Locator<sky::ImguiSystem>::Get()
 
 namespace sky
 {

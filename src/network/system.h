@@ -9,7 +9,7 @@
 #include <sky/scheduler.h>
 #include <sky/timer.h>
 
-#define NETWORK sky::Locator<Network::System>::GetService()
+#define NETWORK sky::Locator<Network::System>::Get()
 
 namespace Network
 {

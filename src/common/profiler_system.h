@@ -6,7 +6,7 @@
 #include <sky/locator.h>
 #include <sky/clock.h>
 
-#define PROFILER sky::Locator<Common::ProfilerSystem>::GetService()
+#define PROFILER sky::Locator<Common::ProfilerSystem>::Get()
 
 namespace Common
 {

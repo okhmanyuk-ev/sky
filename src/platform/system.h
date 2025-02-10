@@ -10,7 +10,7 @@
 #include <map>
 #include <optional>
 
-#define PLATFORM sky::Locator<Platform::System>::GetService()
+#define PLATFORM sky::Locator<Platform::System>::Get()
 
 extern void sky_main();
 
