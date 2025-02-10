@@ -14,7 +14,7 @@
 
 namespace sky
 {
-	template<class T>
+	template <class T>
 	T* GetService()
 	{
 		return Locator<T>::GetService();
@@ -32,7 +32,7 @@ namespace sky
 
 	std::wstring Localize(const std::string& key);
 
-	template<class T>
+	template <class T>
 	void Emit(const T& e)
 	{
 		GetService<Dispatcher>()->emit(e);
@@ -50,19 +50,19 @@ namespace sky
 	std::string to_string(const std::wstring& wstr);
 	std::wstring to_wstring(const std::string& str);
 
-	template<typename String, typename... Args>
+	template <typename String, typename... Args>
 	auto format(String&& str, Args&&... args)
 	{
 		return fmt::format(fmt::runtime(std::forward<String>(str)), std::forward<Args>(args)...);
 	}
 
-	template<typename... Args>
+	template <typename... Args>
 	void Log(const std::string& text, Args&&... args)
 	{
 		Log(format(text, args...));
 	}
 
-	template<typename... Args>
+	template <typename... Args>
 	void Log(Console::Color color, const std::string& text, Args&&... args)
 	{
 		Log(color, format(text, args...));
@@ -78,10 +78,15 @@ namespace sky
 
 	std::string join(const std::vector<std::string>& vec, const std::string& delimiter);
 
-	template<class... Ts> struct cases : Ts... { using Ts::operator()...; };
-	template<class... Ts> cases(Ts...) -> cases<Ts...>;
+	template <class... Ts>
+	struct cases : Ts...
+	{
+		using Ts::operator()...;
+	};
+	template <class... Ts>
+	cases(Ts...) -> cases<Ts...>;
 
-	template<typename V, typename Callable>
+	template <typename V, typename Callable>
 	decltype(auto) match(V&& v, Callable&& c)
 	{
 		return std::visit(std::forward<Callable>(c), std::forward<V>(v));
