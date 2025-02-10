@@ -15,7 +15,7 @@
 #include "text_mesh.h"
 #include <set>
 
-#define GRAPHICS sky::Locator<Graphics::System>::GetService()
+#define GRAPHICS sky::Locator<Graphics::System>::Get()
 
 namespace Graphics
 {

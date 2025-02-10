@@ -29,32 +29,32 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 {
 	std::srand((unsigned int)std::time(nullptr));
 
-	sky::Locator<sky::Dispatcher>::Init(std::make_shared<sky::Dispatcher>());
+	sky::Locator<sky::Dispatcher>::Init();
 #ifndef EMSCRIPTEN
-	sky::Locator<sky::ThreadPool>::Init(std::make_shared<sky::ThreadPool>());
+	sky::Locator<sky::ThreadPool>::Init();
 #endif
-	sky::Locator<sky::CommandProcessor>::Init(std::make_shared<sky::CommandProcessor>());
-	sky::Locator<sky::Scheduler>::Init(std::make_shared<sky::Scheduler>());
-	sky::Locator<Common::ProfilerSystem>::Init(std::make_shared<Common::ProfilerSystem>());
+	sky::Locator<sky::CommandProcessor>::Init();
+	sky::Locator<sky::Scheduler>::Init();
+	sky::Locator<Common::ProfilerSystem>::Init();
 	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
-	sky::Locator<sky::Renderer>::Init(std::make_shared<sky::Renderer>());
-	sky::Locator<sky::Console>::Init(std::make_shared<sky::ImguiConsole>());
-	sky::Locator<Graphics::System>::Init(std::make_shared<Graphics::System>());
+	sky::Locator<sky::Renderer>::Init();
+	sky::Locator<sky::Console>::Init(std::static_pointer_cast<sky::Console>(std::make_shared<sky::ImguiConsole>()));
+	sky::Locator<Graphics::System>::Init();
 	if (flags.count(Flag::Network))
 	{
 #ifndef EMSCRIPTEN
-		sky::Locator<Network::System>::Init(std::make_shared<Network::System>());
+		sky::Locator<Network::System>::Init();
 #endif
 	}
-	sky::Locator<sky::Localization>::Init(std::make_shared<sky::Localization>());
-	sky::Locator<Shared::StatsSystem>::Init(std::make_shared<Shared::StatsSystem>());
-	sky::Locator<sky::Cache>::Init(std::make_shared<sky::Cache>());
-	sky::Locator<sky::ImguiSystem>::Init(std::make_shared<sky::ImguiSystem>());
-	sky::Locator<Shared::Stylebook>::Init(std::make_shared<Shared::Stylebook>());
-	sky::Locator<Shared::ImScene>::Init(std::make_shared<Shared::ImScene>());
+	sky::Locator<sky::Localization>::Init();
+	sky::Locator<Shared::StatsSystem>::Init();
+	sky::Locator<sky::Cache>::Init();
+	sky::Locator<sky::ImguiSystem>::Init();
+	sky::Locator<Shared::Stylebook>::Init();
+	sky::Locator<Shared::ImScene>::Init();
 	if (flags.count(Flag::Audio))
 	{
-		sky::Locator<sky::Audio>::Init(std::make_shared<sky::Audio>());
+		sky::Locator<sky::Audio>::Init();
 	}
 
 	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();

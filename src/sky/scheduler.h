@@ -7,7 +7,7 @@
 #include <sky/clock.h>
 #include <sky/console.h>
 
-#define SCHEDULER sky::Locator<sky::Scheduler>::GetService()
+#define SCHEDULER sky::Locator<sky::Scheduler>::Get()
 
 namespace sky
 {

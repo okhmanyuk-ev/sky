@@ -50,13 +50,12 @@ std::wstring sky::Localize(const std::string& key)
 
 void sky::PlaySound(std::shared_ptr<Audio::Sound> sound)
 {
-	if (!sky::Locator<Audio>::HasService())
+	if (!HasService<Audio>())
 	{
 		Log("PlaySound: cannot find audio system");
 		return;
 	}
-
-	sky::Locator<Audio>::GetService()->play(sound);
+	GetService<Audio>()->play(sound);
 }
 
 void sky::PlaySound(const std::string& name)

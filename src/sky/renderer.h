@@ -7,7 +7,7 @@
 #include <sky/dispatcher.h>
 #include <platform/all.h>
 
-#define RENDERER sky::Locator<sky::Renderer>::GetService()
+#define RENDERER sky::Locator<sky::Renderer>::Get()
 
 namespace sky
 {

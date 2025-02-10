@@ -12,26 +12,32 @@ namespace sky
 		Locator(const Locator&) = delete;
 
 	public:
-		static bool HasService()
+		static bool Exists()
 		{
 			return Service != nullptr;
 		}
 
-		static T* GetService()
+		static const std::shared_ptr<T>& Get()
 		{
-			assert(HasService());
-			return Service.get();
+			assert(Exists());
+			return Service;
 		}
 
 		static void Init(std::shared_ptr<T> service)
 		{
-			assert(!HasService());
+			assert(!Exists());
 			Service = service;
+		}
+
+		template <typename... Args>
+		static void Init(Args&&... args)
+		{
+			Init(std::make_shared<T>(std::forward<Args>(args)...));
 		}
 
 		static void Reset()
 		{
-			assert(HasService());
+			assert(Exists());
 			Service.reset();
 		}
 

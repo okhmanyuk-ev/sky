@@ -14,11 +14,12 @@
 
 namespace sky
 {
-	template <class T>
-	T* GetService()
-	{
-		return Locator<T>::GetService();
-	}
+	// clang-format off
+
+	template <class T> const std::shared_ptr<T>& GetService() { return Locator<T>::Get(); }
+	template <class T> bool HasService() { return Locator<T>::Exists(); }
+
+	// clang-format on
 
 	Graphics::TexCell GetTexture(const std::string& name);
 	std::shared_ptr<Graphics::Font> GetFont(const std::string& name);
