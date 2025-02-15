@@ -23,7 +23,7 @@ namespace sky
 			return Service;
 		}
 
-		static void Init(std::shared_ptr<T> service)
+		static void Set(std::shared_ptr<T> service)
 		{
 			assert(!Exists());
 			Service = service;
@@ -32,7 +32,7 @@ namespace sky
 		template <typename... Args>
 		static void Init(Args&&... args)
 		{
-			Init(std::make_shared<T>(std::forward<Args>(args)...));
+			Set(std::make_shared<T>(std::forward<Args>(args)...));
 		}
 
 		static void Reset()

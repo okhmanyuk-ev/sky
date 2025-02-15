@@ -36,9 +36,9 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<sky::CommandProcessor>::Init();
 	sky::Locator<sky::Scheduler>::Init();
 	sky::Locator<Common::ProfilerSystem>::Init();
-	sky::Locator<Platform::System>::Init(Platform::System::create(appname));
+	sky::Locator<Platform::System>::Set(Platform::System::create(appname));
 	sky::Locator<sky::Renderer>::Init();
-	sky::Locator<sky::Console>::Init(std::static_pointer_cast<sky::Console>(std::make_shared<sky::ImguiConsole>()));
+	sky::Locator<sky::Console>::Set(std::make_shared<sky::ImguiConsole>());
 	sky::Locator<Graphics::System>::Init();
 	if (flags.count(Flag::Network))
 	{
@@ -85,9 +85,8 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 		});
 		mSceneEditor = std::make_shared<Shared::SceneEditor>(*mScene);
 
-		auto scene_manager = std::make_shared<Shared::SceneManager>();
-		sky::Locator<Shared::SceneManager>::Init(scene_manager);
-		mScene->getRoot()->attach(scene_manager);
+		sky::Locator<Shared::SceneManager>::Init();
+		mScene->getRoot()->attach(sky::GetService<Shared::SceneManager>());
 
 		auto getter = [this] {
 			auto fps = 1.0f / sky::ToSeconds(mScene->getTimestepFixer().getTimestep());
