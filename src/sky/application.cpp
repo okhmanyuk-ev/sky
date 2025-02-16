@@ -211,7 +211,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::GetService<sky::CommandProcessor>()->execute("hud_show_targets 1");
 #else
 	sky::GetService<sky::Console>()->setEnabled(false);
-	STATS->setEnabled(false);
+	sky::GetService<Shared::StatsSystem>()->setEnabled(false);
 #endif
 
 	std::vector<std::string> startup_commands;

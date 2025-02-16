@@ -1,5 +1,5 @@
 #include "imscene.h"
-#include <shared/stats_system.h>
+#include <sky/utils.h>
 
 using namespace Shared;
 
@@ -11,7 +11,7 @@ ImScene::NodeItem::NodeItem(std::shared_ptr<Scene::Node> _node, std::function<vo
 void ImScene::onFrame()
 {
 	if (!mNodeItems.empty())
-		STATS_INDICATE_GROUP("scene", "im nodes", mNodeItems.size());
+		sky::Indicator("scene", "im nodes", mNodeItems.size());
 
 	for (const auto& name : mUnusedNodes)
 	{

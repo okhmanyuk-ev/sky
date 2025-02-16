@@ -182,20 +182,20 @@ void World::update(sky::Duration delta)
 
 	if (mShowStats)
 	{
-		STATS_INDICATE_GROUP("phys", "phys bodies", mB2World.GetBodyCount());
-		STATS_INDICATE_GROUP("phys", "phys contacts", mB2World.GetContactCount());
-		STATS_INDICATE_GROUP("phys", "phys joints", mB2World.GetJointCount());
+		sky::Indicator("phys", "phys bodies", mB2World.GetBodyCount());
+		sky::Indicator("phys", "phys contacts", mB2World.GetContactCount());
+		sky::Indicator("phys", "phys joints", mB2World.GetJointCount());
 
 		const auto& profile = mB2World.GetProfile();
 
-		STATS_INDICATE_GROUP("phys", "phys step", fmt::format("{:.3f}", profile.step));
-		STATS_INDICATE_GROUP("phys", "phys collide", fmt::format("{:.3f}", profile.collide));
-		STATS_INDICATE_GROUP("phys", "phys solve", fmt::format("{:.3f}", profile.solve));
-		STATS_INDICATE_GROUP("phys", "phys solve init", fmt::format("{:.3f}", profile.solveInit));
-		STATS_INDICATE_GROUP("phys", "phys solve velocity", fmt::format("{:.3f}", profile.solveVelocity));
-		STATS_INDICATE_GROUP("phys", "phys solve pos", fmt::format("{:.3f}", profile.solvePosition));
-		STATS_INDICATE_GROUP("phys", "phys broadphase", fmt::format("{:.3f}", profile.broadphase));
-		STATS_INDICATE_GROUP("phys", "phys solve toi", fmt::format("{:.3f}", profile.solveTOI));
+		sky::Indicator("phys", "phys step", fmt::format("{:.3f}", profile.step));
+		sky::Indicator("phys", "phys collide", fmt::format("{:.3f}", profile.collide));
+		sky::Indicator("phys", "phys solve", fmt::format("{:.3f}", profile.solve));
+		sky::Indicator("phys", "phys solve init", fmt::format("{:.3f}", profile.solveInit));
+		sky::Indicator("phys", "phys solve velocity", fmt::format("{:.3f}", profile.solveVelocity));
+		sky::Indicator("phys", "phys solve pos", fmt::format("{:.3f}", profile.solvePosition));
+		sky::Indicator("phys", "phys broadphase", fmt::format("{:.3f}", profile.broadphase));
+		sky::Indicator("phys", "phys solve toi", fmt::format("{:.3f}", profile.solveTOI));
 	}
 
 	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())

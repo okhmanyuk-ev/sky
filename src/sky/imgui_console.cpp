@@ -10,8 +10,6 @@
 #include <shared/stats_system.h>
 #include <sky/utils.h>
 
-#define CONSOLE_STATS(KEY, VALUE) STATS_INDICATE_GROUP("console", KEY, VALUE)
-
 using namespace sky;
 
 ImguiConsole::ImguiConsole()
@@ -249,7 +247,7 @@ void ImguiConsole::onFrame()
 		mInputState = InputState::Text;
 	}
 
-	CONSOLE_STATS("state", magic_enum::enum_name(mInputState));
+	sky::Indicator("console", "con state", magic_enum::enum_name(mInputState));
 }
 
 void ImguiConsole::showHints(float height, float top)

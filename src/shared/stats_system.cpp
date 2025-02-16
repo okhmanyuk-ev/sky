@@ -127,3 +127,8 @@ void StatsSystem::onFrame()
 			group_it++;
 	}
 }
+
+void StatsSystem::indicator(const std::string& group, const std::string& key, const std::string& value)
+{
+	mGroups[group][key] = { value, SCHEDULER->getUptime() };
+}

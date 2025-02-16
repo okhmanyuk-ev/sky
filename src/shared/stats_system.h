@@ -1,18 +1,8 @@
 #pragma once
 
-#include <map>
 #include <string>
 #include <unordered_map>
 #include <sky/scheduler.h>
-#include <fmt/format.h>
-
-#define STATS sky::Locator<Shared::StatsSystem>::Get()
-
-#define STATS_INDICATE(KEY, VALUE) STATS->indicate(KEY, VALUE)
-#define STATS_INDICATE_GROUP(GROUP, KEY, VALUE) STATS->indicate(KEY, VALUE, GROUP)
-
-#define ENGINE_STATS(KEY, VALUE) STATS_INDICATE_GROUP("engine", KEY, VALUE)
-#define GAME_STATS(KEY, VALUE) STATS_INDICATE_GROUP("game", KEY, VALUE)
 
 namespace Shared
 {
@@ -31,11 +21,7 @@ namespace Shared
 		void onFrame() override;
 
 	public:
-		template <class T>
-		void indicate(const std::string& key, const T& value, const std::string& group = "")
-		{
-			mGroups[group][key] = { fmt::format("{}", value), SCHEDULER->getUptime()};
-		}
+		void indicator(const std::string& group, const std::string& key, const std::string& value);
 
 	public:
 		auto getAlignment() const { return mAlignment; }

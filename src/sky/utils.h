@@ -11,6 +11,7 @@
 #include <sky/console.h>
 #include <fmt/format.h>
 #include <fmt/xchar.h>
+#include <shared/stats_system.h>
 
 namespace sky
 {
@@ -69,6 +70,18 @@ namespace sky
 	void Log(Console::Color color, const std::string& text, Args&&... args)
 	{
 		Log(color, format(text, args...));
+	}
+
+	template <typename T>
+	void Indicator(const std::string& group, const std::string& key, const T& value)
+	{
+		GetService<Shared::StatsSystem>()->indicator(group, key, format("{}", value));
+	}
+
+	template <typename T>
+	void Indicator(const std::string& key, const T& value)
+	{
+		Indicator("common", key, value);
 	}
 
 	namespace ranges
