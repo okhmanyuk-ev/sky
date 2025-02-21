@@ -78,7 +78,8 @@ namespace sky
 
 		virtual ~Listenable()
 		{
-			Locator<Dispatcher>::Get()->destroyListener<T>(mHandle);
+			if (Locator<Dispatcher>::Exists())
+				Locator<Dispatcher>::Get()->destroyListener<T>(mHandle);
 		}
 
 	protected:
