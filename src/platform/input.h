@@ -195,6 +195,7 @@ namespace Platform::Input
 			enum class Type
 			{
 				Pressed,
+				Repeat,
 				Released
 			};
 

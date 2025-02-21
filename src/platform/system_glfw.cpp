@@ -472,7 +472,7 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 
 	static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {
 		{ GLFW_PRESS, Input::Keyboard::Event::Type::Pressed },
-		{ GLFW_REPEAT, Input::Keyboard::Event::Type::Pressed },
+		{ GLFW_REPEAT, Input::Keyboard::Event::Type::Repeat },
 		{ GLFW_RELEASE, Input::Keyboard::Event::Type::Released },
 	};
 
