@@ -396,7 +396,7 @@ void SystemEmscripten::alert(const std::string& text)
 {
 }
 
-void* SystemEmscripten::getWindow() const
+void* SystemEmscripten::getNativeWindowHandle() const
 {
 	return gWindow;
 }

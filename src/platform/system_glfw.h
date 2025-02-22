@@ -63,7 +63,7 @@ namespace Platform
 		void haptic(HapticType hapticType) override { /*nothing*/ }
 		void alert(const std::string& text) override;
 
-		void* getWindow() const override;
+		void* getNativeWindowHandle() const override;
 
 		std::string getClipboardText() const override;
 		void setClipboardText(const std::string& text) override;

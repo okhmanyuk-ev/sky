@@ -9,7 +9,7 @@ Renderer::Renderer(std::optional<skygfx::BackendType> type, skygfx::Adapter adap
 {
 	auto width = PLATFORM->getWidth();
 	auto height = PLATFORM->getHeight();
-	auto window = PLATFORM->getWindow();
+	auto window = PLATFORM->getNativeWindowHandle();
 	skygfx::Initialize(window, width, height, type, adapter);
 	skygfx::SetVsync(true);
 }

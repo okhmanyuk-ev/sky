@@ -73,7 +73,7 @@ namespace Platform
 
 		virtual void alert(const std::string& text) { };
 
-		virtual void* getWindow() const = 0;
+		virtual void* getNativeWindowHandle() const = 0;
 
 		virtual std::string getClipboardText() const = 0;
 		virtual void setClipboardText(const std::string& text) = 0;

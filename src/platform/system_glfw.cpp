@@ -332,7 +332,7 @@ void SystemGlfw::alert(const std::string& text)
 {
 }
 
-void* SystemGlfw::getWindow() const
+void* SystemGlfw::getNativeWindowHandle() const
 {
 	return mNativeWindow;
 }
