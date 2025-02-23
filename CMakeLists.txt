@@ -1,15 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
+
 project(sky)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(X64 TRUE)
+	set(X64 TRUE)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(X86 TRUE)
+	set(X86 TRUE)
 endif()
 
 set(LIBS_FOLDER "libs")
@@ -23,6 +21,11 @@ file(GLOB_RECURSE ALL_SRC
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ALL_SRC})
 
 add_library(${PROJECT_NAME} STATIC ${ALL_SRC})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
+)
 
 if(MSVC)
 	target_compile_options(${PROJECT_NAME} PUBLIC /MP /bigobj)
