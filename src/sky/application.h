@@ -39,22 +39,9 @@ namespace sky
 		Flags mFlags;
 
 	public:
-		auto getScene() const { return mScene; }
 		const auto& getStartupKeyValues() const { return mStartupKeyValues; }
 
-	private: // Scene
-		std::shared_ptr<Scene::Scene> mScene;
-		std::shared_ptr<Shared::SceneEditor> mSceneEditor;
-		std::unordered_map<std::string, std::string> mStartupKeyValues;
-
 	private:
-		std::shared_ptr<Common::ConsoleCommands> mConsoleCommands;
-		std::shared_ptr<Shared::GraphicalConsoleCommands> mGraphicalConsoleCommands;
-
-		std::shared_ptr<Shared::PerformanceConsoleCommands> mPerformanceConsoleCommands;
-		std::shared_ptr<Shared::ConsoleHelperCommands> mConsoleHelperCommands;
-
-		std::shared_ptr<Shared::TouchEmulator> mTouchEmulator;
-		std::shared_ptr<Shared::GestureDetector> mGestureDetector;
+		std::unordered_map<std::string, std::string> mStartupKeyValues;
 	};
 }

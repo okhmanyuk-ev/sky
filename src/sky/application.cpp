@@ -56,13 +56,12 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	{
 		sky::Locator<sky::Audio>::Init();
 	}
-
-	mConsoleCommands = std::make_shared<Common::ConsoleCommands>();
-	mGraphicalConsoleCommands = std::make_shared<Shared::GraphicalConsoleCommands>();
-	mPerformanceConsoleCommands = std::make_shared<Shared::PerformanceConsoleCommands>();
-	mConsoleHelperCommands = std::make_shared<Shared::ConsoleHelperCommands>();
-	mTouchEmulator = std::make_shared<Shared::TouchEmulator>();
-	mGestureDetector = std::make_shared<Shared::GestureDetector>();
+	sky::Locator<Common::ConsoleCommands>::Init();
+	sky::Locator<Shared::GraphicalConsoleCommands>::Init();
+	sky::Locator<Shared::PerformanceConsoleCommands>::Init();
+	sky::Locator<Shared::ConsoleHelperCommands>::Init();
+	sky::Locator<Shared::TouchEmulator>::Init();
+	sky::Locator<Shared::GestureDetector>::Init();
 
 	ImGui::User::SetupStyleFromColor(1.0f, 1.0f, 0.75f);
 
@@ -70,7 +69,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	style.WindowBorderSize = 0.0f;
 	style.PopupBorderSize = 0.0f;
 
-	mConsoleCommands->setQuitCallback([this] {
+	sky::GetService<Common::ConsoleCommands>()->setQuitCallback([this] {
 		PLATFORM->quit();
 	});
 
@@ -78,37 +77,39 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 
 	if (flags.count(Flag::Scene))
 	{
-		mScene = std::make_shared<Scene::Scene>();
-		mScene->setInteractTestCallback([](const auto& pos) {
+		sky::Locator<Scene::Scene>::Init();
+		auto scene = sky::GetService<Scene::Scene>();
+
+		scene->setInteractTestCallback([](const auto& pos) {
 			return !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup)
 				&& !ImGui::IsAnyItemActive();
 		});
-		mSceneEditor = std::make_shared<Shared::SceneEditor>(*mScene);
+		sky::Locator<Shared::SceneEditor>::Init(*scene);
 
 		sky::Locator<Shared::SceneManager>::Init();
-		mScene->getRoot()->attach(sky::GetService<Shared::SceneManager>());
+		scene->getRoot()->attach(sky::GetService<Shared::SceneManager>());
 
-		auto getter = [this] {
-			auto fps = 1.0f / sky::ToSeconds(mScene->getTimestepFixer().getTimestep());
+		auto getter = [] {
+			auto fps = 1.0f / sky::ToSeconds(sky::GetService<Scene::Scene>()->getTimestepFixer().getTimestep());
 			return std::vector<std::string>({ std::to_string(fps) });
 		};
 
-		auto setter = [this](CON_ARGS) {
+		auto setter = [](CON_ARGS) {
 			auto sec = std::stof(CON_ARG(0));
-			mScene->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / sec));
+			sky::GetService<Scene::Scene>()->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / sec));
 		};
 
 		sky::AddCVar("scene_timestep_fps", sky::CommandProcessor::CVar(std::nullopt, { "float" }, getter, setter));
 
 		gCVarSceneTimestepEnabled = std::make_unique<sky::CVar<bool>>("scene_timestep_enabled",
-			std::bind(&sky::TimestepFixer::isEnabled, &mScene->getTimestepFixer()),
-			std::bind(&sky::TimestepFixer::setEnabled, &mScene->getTimestepFixer(), std::placeholders::_1));
+			std::bind(&sky::TimestepFixer::isEnabled, &scene->getTimestepFixer()),
+			std::bind(&sky::TimestepFixer::setEnabled, &scene->getTimestepFixer(), std::placeholders::_1));
 
 		gCVarSceneTimestepTimeCompletion = std::make_unique<sky::CVar<bool>>("scene_timestep_force_time_completion",
-			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &mScene->getTimestepFixer()),
-			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &mScene->getTimestepFixer(), std::placeholders::_1));
+			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &scene->getTimestepFixer()),
+			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &scene->getTimestepFixer(), std::placeholders::_1));
 
-		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [this](CON_ARGS) {
+		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](CON_ARGS) {
 			auto size = CON_ARG_FLOAT(0);
 			auto intensity = CON_ARG_FLOAT(1);
 			auto passes = CON_ARG_INT(2);
@@ -123,7 +124,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			glass->setBlurIntensity(intensity);
 			glass->setBlurPasses(passes);
 			glass->setRounding(rounding);
-			getScene()->getRoot()->attach(glass);
+			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
 		}));
 
 		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [this](CON_ARGS) {
@@ -139,7 +140,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			glass->setOutlined(outlined);
 			glass->setRounding(rounding);
 			glass->setGrayscaleIntensity(intensity);
-			getScene()->getRoot()->attach(glass);
+			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
 		}));
 
 		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { { "duration", "1.0" } }, {}, [this](CON_ARGS) {
@@ -150,7 +151,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 			shockwave->setAnchor(0.5f);
 			shockwave->setPivot(0.5f);
 			shockwave->setScale(4.0f);
-			getScene()->getRoot()->attach(shockwave);
+			sky::GetService<Scene::Scene>()->getRoot()->attach(shockwave);
 		}));
 
 		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, [this](CON_ARGS) {
@@ -163,7 +164,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 				sprite->setAnchor(0.5f);
 				sprite->setPivot(0.5f);
 				sprite->setTexture(sky::GetTexture(url));
-				getScene()->getRoot()->attach(sprite);
+				sky::GetService<Scene::Scene>()->getRoot()->attach(sprite);
 			};
 
 			auto download_succeeded = [](emscripten_fetch_t* fetch) {
@@ -205,10 +206,10 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	}
 
 #if defined(BUILD_DEVELOPER)
-	sky::GetService<sky::CommandProcessor>()->execute("hud_show_fps 1");
-	sky::GetService<sky::CommandProcessor>()->execute("hud_show_drawcalls 1");
-	sky::GetService<sky::CommandProcessor>()->execute("hud_show_batches 1");
-	sky::GetService<sky::CommandProcessor>()->execute("hud_show_targets 1");
+	sky::ExecuteCommand("hud_show_fps 1");
+	sky::ExecuteCommand("hud_show_drawcalls 1");
+	sky::ExecuteCommand("hud_show_batches 1");
+	sky::ExecuteCommand("hud_show_targets 1");
 #else
 	sky::GetService<sky::Console>()->setEnabled(false);
 	sky::GetService<Shared::StatsSystem>()->setEnabled(false);
@@ -260,16 +261,19 @@ Application::~Application()
 {
 	gCVarSceneTimestepEnabled.reset();
 	gCVarSceneTimestepTimeCompletion.reset();
-	mConsoleHelperCommands.reset();
-	mPerformanceConsoleCommands.reset();
-	mGraphicalConsoleCommands.reset();
+	sky::Locator<Shared::GestureDetector>::Reset();
+	sky::Locator<Shared::TouchEmulator>::Reset();
+	sky::Locator<Shared::ConsoleHelperCommands>::Reset();
+	sky::Locator<Shared::PerformanceConsoleCommands>::Reset();
+	sky::Locator<Shared::GraphicalConsoleCommands>::Reset();
 
 	if (mFlags.count(Flag::Scene))
 	{
 		sky::Locator<Shared::SceneManager>::Reset();
-		mSceneEditor = nullptr;
-		mScene = nullptr;
+		sky::Locator<Shared::SceneEditor>::Reset();
+		sky::Locator<Scene::Scene>::Reset();
 	}
+	sky::Locator<Common::ConsoleCommands>::Reset();
 	sky::Locator<Shared::ImScene>::Reset();
 	sky::Locator<Shared::Stylebook>::Reset();
 	sky::Locator<sky::ImguiSystem>::Reset();
@@ -311,7 +315,7 @@ void Application::run()
 		IMGUI_SYSTEM->begin();
 		if (mFlags.count(Flag::Scene))
 		{
-			mScene->frame();
+			sky::GetService<Scene::Scene>()->frame();
 		}
 		SCHEDULER->frame();
 		IMGUI_SYSTEM->end();
