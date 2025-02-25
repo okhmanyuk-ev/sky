@@ -32,6 +32,7 @@ namespace sky
 		template <typename... Args>
 		static void Init(Args&&... args)
 		{
+			assert(!Exists());
 			Set(std::make_shared<T>(std::forward<Args>(args)...));
 		}
 
