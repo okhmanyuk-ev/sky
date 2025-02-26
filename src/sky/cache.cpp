@@ -2,6 +2,7 @@
 #include <nlohmann/json.hpp>
 #include <common/helpers.h>
 #include <sky/utils.h>
+#include <sky/asset.h>
 
 Graphics::TexCell sky::Cache::getTexture(const std::string& name)
 {
@@ -83,7 +84,7 @@ void sky::Cache::loadTexture(const std::string& path, std::optional<std::string>
 	if (mTextures.count(name) > 0)
 		return;
 
-	if (!Platform::Asset::Exists(path))
+	if (!sky::Asset::Exists(path))
 	{
 		sky::Log(Console::Color::Red, "cannot find texture: " + path);
 		return;
@@ -119,7 +120,7 @@ void sky::Cache::loadSound(const std::string& path, std::optional<std::string> _
 	if (mSounds.count(name) > 0)
 		return;
 
-	if (!Platform::Asset::Exists(path))
+	if (!sky::Asset::Exists(path))
 	{
 		sky::Log(Console::Color::Red, "cannot find sound: " + path);
 		return;
@@ -156,7 +157,7 @@ void sky::Cache::loadJson(const std::string& path, std::optional<std::string> _n
 	if (mJsons.count(name) > 0)
 		return;
 
-	if (!Platform::Asset::Exists(path))
+	if (!sky::Asset::Exists(path))
 		return;
 
 	mJsons[name] = Common::Helpers::LoadJsonFromAsset({ path });
@@ -168,7 +169,7 @@ void sky::Cache::makeAtlas(const std::string& name, const std::set<std::string>&
 
 	for (const auto& path : paths)
 	{
-		images.insert({ path, Graphics::Image(Platform::Asset(path)) });
+		images.insert({ path, Graphics::Image(sky::Asset(path)) });
 	}
 
 	auto [image, regions] = Graphics::Atlas::MakeFromImages(images);

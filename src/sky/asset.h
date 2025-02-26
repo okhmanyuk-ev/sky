@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
-#include "defines.h"
+#include <platform/defines.h>
 
-namespace Platform
+namespace sky
 {
 	class Asset
 	{

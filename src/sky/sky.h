@@ -1,6 +1,7 @@
 #pragma once
 
 #include <shared/all.h>
+#include <sky/asset.h>
 #include <sky/application.h>
 #include <sky/audio.h>
 #include <sky/bitflags.h>

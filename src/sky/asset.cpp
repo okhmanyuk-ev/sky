@@ -7,9 +7,7 @@
 #include <filesystem>
 #include <sys/stat.h>
 
-using namespace Platform;
-
-Asset::Asset(const std::string& path, Storage storage)
+sky::Asset::Asset(const std::string& path, Storage storage)
 {
 	assert(Exists(path, storage));
 #if defined(PLATFORM_ANDROID)
@@ -44,19 +42,19 @@ Asset::Asset(const std::string& path, Storage storage)
 #endif
 }
 
-Asset::Asset(const Asset& asset)
+sky::Asset::Asset(const Asset& asset)
 {
 	mSize = asset.getSize();
 	mMemory = malloc(mSize);
 	memcpy(mMemory, asset.getMemory(), mSize);
 }
 
-Asset::~Asset()
+sky::Asset::~Asset()
 {
 	free(mMemory);
 }
 
-void Asset::Write(const std::string& path, void* memory, size_t size, Storage storage)
+void sky::Asset::Write(const std::string& path, void* memory, size_t size, Storage storage)
 {
 #if defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
 #if defined(PLATFORM_IOS)
@@ -87,7 +85,7 @@ void Asset::Write(const std::string& path, void* memory, size_t size, Storage st
 #endif
 }
 
-bool Asset::Exists(const std::string& path, Storage storage)
+bool sky::Asset::Exists(const std::string& path, Storage storage)
 {
 #if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
 	auto abs_path = StoragePathToAbsolute(path, storage);
@@ -115,7 +113,7 @@ bool Asset::Exists(const std::string& path, Storage storage)
 #endif
 }
 
-std::string Asset::StoragePathToAbsolute(const std::string& path, Storage storage)
+std::string sky::Asset::StoragePathToAbsolute(const std::string& path, Storage storage)
 {
 	if (storage == Storage::Assets)
 	{

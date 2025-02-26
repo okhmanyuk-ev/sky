@@ -1,6 +1,5 @@
 #pragma once
 
-#include "asset.h"
 #include "defines.h"
 #include "input.h"
 //#include "low_level_api.h" // does not need here

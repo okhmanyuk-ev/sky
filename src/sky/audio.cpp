@@ -34,7 +34,7 @@ void Audio::play(std::shared_ptr<Sound> sound)
 #endif
 }
 
-Audio::Sound::Sound(const Platform::Asset& asset, bool loop)
+Audio::Sound::Sound(const sky::Asset& asset, bool loop)
 {
 #if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	FMOD_CREATESOUNDEXINFO exinfo;

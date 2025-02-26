@@ -130,7 +130,7 @@ Font::Font(void* data, size_t size)
 	mLinegap = linegap * scale;
 }
 
-Font::Font(const Platform::Asset& asset) : Font(asset.getMemory(), asset.getSize())
+Font::Font(const sky::Asset& asset) : Font(asset.getMemory(), asset.getSize())
 {
 }
 

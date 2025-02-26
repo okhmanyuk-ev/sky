@@ -1,6 +1,6 @@
 #include "profile.h"
 #include <platform/system.h>
-#include <platform/asset.h>
+#include <sky/asset.h>
 #include <sky/console.h>
 #include <sky/threadpool.h>
 #include <sky/utils.h>
@@ -17,7 +17,7 @@ void Profile::load()
 #ifndef EMSCRIPTEN
 	auto path = "save.bson";
 
-	if (!Platform::Asset::Exists(path, Platform::Asset::Storage::Bundle))
+	if (!sky::Asset::Exists(path, sky::Asset::Storage::Bundle))
 	{
 		makeDefault();
 		return;
@@ -25,7 +25,7 @@ void Profile::load()
 
 	try
 	{
-		auto json = Common::Helpers::LoadBsonFromAsset(Platform::Asset(path, Platform::Asset::Storage::Bundle));
+		auto json = Common::Helpers::LoadBsonFromAsset(sky::Asset(path, sky::Asset::Storage::Bundle));
 		read(json);
 	}
 	catch (const std::exception& e)
@@ -59,7 +59,7 @@ void Profile::save()
 	auto json = nlohmann::json();
 	write(json);
 	auto bson = nlohmann::json::to_bson(json);
-	Platform::Asset::Write("save.bson", bson.data(), bson.size(), Platform::Asset::Storage::Bundle);
+	sky::Asset::Write("save.bson", bson.data(), bson.size(), sky::Asset::Storage::Bundle);
 	mSaveMutex.unlock();
 #else
 	auto json = nlohmann::json();

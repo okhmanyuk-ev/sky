@@ -1,19 +1,19 @@
 #pragma once
 
-#include <platform/asset.h>
+#include <sky/asset.h>
 
 namespace Graphics
 {
 	class Image
 	{
 	public:
-		static void SaveToFile(const std::string& path, const Image& image, 
-			Platform::Asset::Storage storage = Platform::Asset::Storage::Assets);
+		static void SaveToFile(const std::string& path, const Image& image,
+			sky::Asset::Storage storage = sky::Asset::Storage::Assets);
 
 	public:
 		Image(int width, int height, int channels);
 		Image(void* data, size_t size);
-		Image(const Platform::Asset& asset);
+		Image(const sky::Asset& asset);
 		Image(const Image& image);
 		~Image();
 

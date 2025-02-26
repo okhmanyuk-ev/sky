@@ -12,14 +12,14 @@ namespace Graphics
 
 	public:
 		static void SaveToFile(const std::string& path, const States& states,
-			Platform::Asset::Storage storage = Platform::Asset::Storage::Assets);
+			sky::Asset::Storage storage = sky::Asset::Storage::Assets);
 
 	public:
 		Animation(const States& states);
-		Animation(const Platform::Asset& states_file);
+		Animation(const sky::Asset& states_file);
 
 	private:
-		static States ParseStatesFromFile(const Platform::Asset& file);
+		static States ParseStatesFromFile(const sky::Asset& file);
 
 	public:
 		const auto& getStates() const { return mStates; }

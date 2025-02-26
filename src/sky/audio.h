@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <fmod/fmod_studio.hpp>
-#include <platform/asset.h>
+#include <sky/asset.h>
 
 namespace sky
 {
@@ -29,7 +29,7 @@ namespace sky
 		friend class Audio;
 
 	public:
-		Sound(const Platform::Asset& asset, bool loop = false);
+		Sound(const sky::Asset& asset, bool loop = false);
 		~Sound();
 
 	private:

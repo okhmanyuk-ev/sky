@@ -8,14 +8,14 @@ using namespace Graphics;
 struct SaveImageContext
 {
 	std::string path;
-	Platform::Asset::Storage storage;
+	sky::Asset::Storage storage;
 };
 
-void Image::SaveToFile(const std::string& path, const Image& image, Platform::Asset::Storage storage)
+void Image::SaveToFile(const std::string& path, const Image& image, sky::Asset::Storage storage)
 {
 	auto writeFunc = [](void* context, void* memory, int size) {
 		auto saveImageContext = static_cast<SaveImageContext*>(context);
-		Platform::Asset::Write(saveImageContext->path + ".png", memory, size, saveImageContext->storage);
+		sky::Asset::Write(saveImageContext->path + ".png", memory, size, saveImageContext->storage);
 	};
 
 	SaveImageContext context;
@@ -39,9 +39,8 @@ Image::Image(void* data, size_t size)
 	mChannels = 4; // TODO: make adaptive channels
 }
 
-Image::Image(const Platform::Asset& asset) : Image(asset.getMemory(), asset.getSize())
+Image::Image(const sky::Asset& asset) : Image(asset.getMemory(), asset.getSize())
 {
-	//
 }
 
 Image::Image(const Image& image)
@@ -54,7 +53,7 @@ Image::Image(const Image& image)
 	memcpy(mMemory, image.getMemory(), size);
 }
 
-Image::~Image() 
+Image::~Image()
 {
 	free(mMemory);
 }

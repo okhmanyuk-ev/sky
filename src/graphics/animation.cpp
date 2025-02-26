@@ -3,7 +3,7 @@
 
 using namespace Graphics;
 
-void Animation::SaveToFile(const std::string& path, const States& states, Platform::Asset::Storage storage)
+void Animation::SaveToFile(const std::string& path, const States& states, sky::Asset::Storage storage)
 {
 	auto json = nlohmann::json();
 	for (const auto& [name, regions] : states)
@@ -14,7 +14,7 @@ void Animation::SaveToFile(const std::string& path, const States& states, Platfo
 		}
 	}
 	auto json_dump = json.dump(4);
-	Platform::Asset::Write(path + ".json", json_dump.data(), json_dump.size(), storage);
+	sky::Asset::Write(path + ".json", json_dump.data(), json_dump.size(), storage);
 }
 
 Animation::Animation(const States& states) :
@@ -22,12 +22,12 @@ Animation::Animation(const States& states) :
 {
 }
 
-Animation::Animation(const Platform::Asset& states_file) :
+Animation::Animation(const sky::Asset& states_file) :
 	Animation(ParseStatesFromFile(states_file))
 {
 }
 
-Animation::States Animation::ParseStatesFromFile(const Platform::Asset& file)
+Animation::States Animation::ParseStatesFromFile(const sky::Asset& file)
 {
 	auto json_string = std::string((char*)file.getMemory(), file.getSize());
 	auto json = nlohmann::json::parse(json_string);

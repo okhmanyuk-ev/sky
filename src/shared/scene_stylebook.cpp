@@ -6,7 +6,7 @@ using namespace Shared;
 Stylebook::Stylebook()
 {
 	auto path = "stylebook.json";
-	if (Platform::Asset::Exists(path))
+	if (sky::Asset::Exists(path))
 	{
 		load(path);
 	}
@@ -14,7 +14,7 @@ Stylebook::Stylebook()
 
 void Stylebook::load(const std::string& path_to_json)
 {
-	auto json_file = Platform::Asset(path_to_json);
+	auto json_file = sky::Asset(path_to_json);
 	auto json_string = std::string((char*)json_file.getMemory(), json_file.getSize());
 	mJson = nlohmann::json::parse(json_string); // TODO: add able to merge multiple jsons
 }

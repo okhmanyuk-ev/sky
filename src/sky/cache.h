@@ -2,7 +2,6 @@
 
 #include <skygfx/skygfx.h>
 #include <graphics/all.h>
-#include <platform/asset.h>
 #include <unordered_map>
 #include <memory>
 #include <set>

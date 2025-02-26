@@ -1,6 +1,6 @@
 #pragma once
 
-#include <platform/asset.h>
+#include <sky/asset.h>
 #include <unordered_map>
 #include <memory>
 #include <glm/glm.hpp>
@@ -26,7 +26,7 @@ namespace Graphics
 
 	public:
 		Font(void* data, size_t size);
-		Font(const Platform::Asset& asset);
+		Font(const sky::Asset& asset);
 		~Font();
 
 		auto getTexture() const { return mTexture; }

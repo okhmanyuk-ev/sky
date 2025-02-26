@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <nlohmann/json.hpp>
-#include <platform/asset.h>
+#include <sky/asset.h>
 #include <sky/scheduler.h>
 
 namespace Common::Helpers
@@ -31,8 +31,8 @@ namespace Common::Helpers
 
 	uint32_t crc32(void* data, size_t size, uint32_t initial = 0);
 
-	nlohmann::json LoadJsonFromAsset(const Platform::Asset& asset);
-	nlohmann::json LoadBsonFromAsset(const Platform::Asset& asset);
+	nlohmann::json LoadJsonFromAsset(const sky::Asset& asset);
+	nlohmann::json LoadBsonFromAsset(const sky::Asset& asset);
 
 	// TODO: find identical function in glm
 	// TODO: it seems every smoothstep function call should be changed to this

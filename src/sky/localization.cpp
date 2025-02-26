@@ -1,7 +1,7 @@
 #include "localization.h"
 #include <sstream>
 #include <cassert>
-#include <platform/asset.h>
+#include <sky/asset.h>
 #include <sky/utils.h>
 #include <common/helpers.h>
 
@@ -17,10 +17,10 @@ void sky::Localization::loadDicrionaries(const std::string& path)
 		auto& dictionary = mDictionaries[language];
 		auto _path = path + "/" + getLanguageName(language) + ".txt";
 
-		if (!Platform::Asset::Exists(_path))
+		if (!sky::Asset::Exists(_path))
 			return;
 
-		auto asset = Platform::Asset(_path);
+		auto asset = sky::Asset(_path);
 
 		auto s = sky::to_wstring(std::string((char*)asset.getMemory(), asset.getSize()));
 		auto ss = std::wstringstream(s);

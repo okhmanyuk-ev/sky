@@ -4,7 +4,7 @@
 
 using namespace Graphics;
 
-void Atlas::SaveToFile(const std::string& path, const Regions& regions, Platform::Asset::Storage storage)
+void Atlas::SaveToFile(const std::string& path, const Regions& regions, sky::Asset::Storage storage)
 {
 	auto json = nlohmann::json();
 	for (const auto& [name, region] : regions)
@@ -13,7 +13,7 @@ void Atlas::SaveToFile(const std::string& path, const Regions& regions, Platform
 	}
 	auto json_dump = json.dump(4);
 
-	Platform::Asset::Write(path + ".json", json_dump.data(), json_dump.size(), storage);
+	sky::Asset::Write(path + ".json", json_dump.data(), json_dump.size(), storage);
 }
 
 std::tuple<Image, Atlas::Regions> Atlas::MakeFromImages(const Images& _images, bool anti_bleeding)
@@ -172,12 +172,12 @@ Atlas::Atlas(const Regions& regions) :
 {
 }
 
-Atlas::Atlas(const Platform::Asset& regions_file) :
+Atlas::Atlas(const sky::Asset& regions_file) :
 	Atlas(ParseRegionsFromFile(regions_file))
 {
 }
 
-Atlas::Regions Atlas::ParseRegionsFromFile(const Platform::Asset& file)
+Atlas::Regions Atlas::ParseRegionsFromFile(const sky::Asset& file)
 {
 	auto json_string = std::string((char*)file.getMemory(), file.getSize());
 	auto json = nlohmann::json::parse(json_string);
