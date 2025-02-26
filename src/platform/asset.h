@@ -5,7 +5,7 @@
 
 namespace Platform
 {
-	class Asset 
+	class Asset
 	{
 	public:
 		inline static std::string AssetsFolder = "assets";
@@ -14,8 +14,7 @@ namespace Platform
 		enum class Storage
 		{
 			Assets,
-			Bundle,
-			Absolute
+			Bundle
 		};
 
 	public:
