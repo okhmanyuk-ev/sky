@@ -440,7 +440,7 @@ std::vector<std::string> CVarTraits<bool>::ValueToArgs(bool value)
 
 bool CVarTraits<bool>::ArgsToValue(const std::vector<std::string>& args)
 {
-	return stoi(args.at(0)) > 0;
+	return std::stoi(args.at(0)) > 0;
 }
 
 const std::vector<std::string> CVarTraits<int>::Args = { "int" };
@@ -452,7 +452,7 @@ std::vector<std::string> CVarTraits<int>::ValueToArgs(int value)
 
 int CVarTraits<int>::ArgsToValue(const std::vector<std::string>& args)
 {
-	return stoi(args.at(0));
+	return std::stoi(args.at(0));
 }
 
 const std::vector<std::string> CVarTraits<float>::Args = { "float" };
@@ -464,5 +464,5 @@ std::vector<std::string> CVarTraits<float>::ValueToArgs(float value)
 
 float CVarTraits<float>::ArgsToValue(const std::vector<std::string>& args)
 {
-	return stof(args.at(0));
+	return std::stof(args.at(0));
 }

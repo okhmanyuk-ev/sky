@@ -239,7 +239,8 @@ namespace sky
 
 		~CVar()
 		{
-			sky::Locator<CommandProcessor>::Get()->removeItem(mName);
+			if (sky::Locator<CommandProcessor>::Exists())
+				sky::Locator<CommandProcessor>::Get()->removeItem(mName);
 		}
 
 		CVar(const CVar&) = delete;
