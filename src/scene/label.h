@@ -21,7 +21,7 @@ namespace Scene
 
 	public:
 		auto getFont() const { return mFont; }
-		void setFont(const std::shared_ptr<Graphics::Font>& value) { mFont = value; }
+		void setFont(std::shared_ptr<Graphics::Font> value) { mFont = value; }
 
 		auto getFontSize() const { return mFontSize; }
 		void setFontSize(float value) { mFontSize = value; }
@@ -51,6 +51,10 @@ namespace Scene
 
 		bool isParseColorTagsEnabled() const { return mParseColorTags; }
 		void setParseColorTagsEnabled(bool value) { mParseColorTags = value; }
+
+	private:
+		std::tuple<std::vector<glm::vec4>, std::wstring> parseColorTags(std::wstring str);
+		std::wstring replaceEscapedNewlines(const std::wstring& str);
 
 	private:
 		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
