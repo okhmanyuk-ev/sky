@@ -1,14 +1,14 @@
 #pragma once
 
+#include <map>
 #include <string>
-#include <functional>
 #include <thread>
-#include <optional>
 #include <variant>
+#include <optional>
+#include <functional>
 #include <platform/defines.h>
 #include <sky/dispatcher.h>
 #include <sky/locator.h>
-#include <map>
 
 namespace sky
 {
@@ -209,6 +209,30 @@ namespace sky
 		static const std::vector<std::string> Args;
 		static std::vector<std::string> ValueToArgs(float value);
 		static float ArgsToValue(const std::vector<std::string>& args);
+	};
+
+	template<typename T>
+	struct CVarTraits<std::optional<T>>
+	{
+		static inline const std::vector<std::string> Args = { "null/" + CVarTraits<T>::Args.at(0) }; // TODO: conceptual problem
+
+		static std::vector<std::string> ValueToArgs(std::optional<T> value)
+		{
+			if (!value.has_value())
+				return { "null" };
+
+			return CVarTraits<T>::ValueToArgs(value.value());
+		}
+
+		static std::optional<T> ArgsToValue(const std::vector<std::string>& args)
+		{
+			auto arg = args.at(0);
+
+			if (arg == "null")
+				return std::nullopt;
+
+			return CVarTraits<T>::ArgsToValue(args);
+		}
 	};
 
 	template<class T>
