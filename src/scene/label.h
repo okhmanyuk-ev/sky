@@ -61,7 +61,7 @@ namespace Scene
 		float mFontSize = DefaultFontSize;
 		std::wstring mText;
 		Graphics::TextMesh::Align mAlign = Graphics::TextMesh::Align::Left;
-		Graphics::TextMesh mMesh;
+		std::optional<Graphics::TextMesh> mMesh;
 		std::wstring mPrevText;
 		float mPrevWidth = 0.0f;
 		float mPrevFontSize = 0.0f;

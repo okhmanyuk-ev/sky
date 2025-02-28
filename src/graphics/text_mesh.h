@@ -15,13 +15,24 @@ namespace Graphics
 			Right
 		};
 
-		skygfx::Topology topology = skygfx::Topology::TriangleList;
-		skygfx::utils::Mesh::Vertices vertices;
-		skygfx::utils::Mesh::Indices indices;
+		struct Symbol
+		{
+			Symbol(glm::vec2 pos, glm::vec2 size, float line_y);
+			glm::vec2 pos;
+			glm::vec2 size;
+			float line_y;
+		};
 
-		std::vector<glm::vec2> symbol_positions;
-		std::vector<glm::vec2> symbol_sizes;
-		std::vector<float> symbol_line_y;
+		using Vertices = skygfx::utils::Mesh::Vertices;
+		using Indices = skygfx::utils::Mesh::Indices;
+		using Symbols = std::vector<Symbol>;
+
+		TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols);
+
+		skygfx::Topology topology;
+		Vertices vertices;
+		Indices indices;
+		Symbols symbols;
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
 

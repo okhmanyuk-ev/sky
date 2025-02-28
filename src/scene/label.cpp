@@ -15,7 +15,10 @@ void Label::draw()
 	if (getAlpha() <= 0.0f && (mOutlineColor->getAlpha() <= 0.0f || mOutlineThickness <= 0.0f))
 		return;
 
-	if (mMesh.vertices.empty())
+	if (!mMesh.has_value())
+		return;
+
+	if (mMesh.value().vertices.empty())
 		return;
 
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
@@ -26,7 +29,7 @@ void Label::draw()
 
 	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushModelMatrix(model);
-	GRAPHICS->drawString(*mFont, mMesh, mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor(),
+	GRAPHICS->drawString(*mFont, mMesh.value(), mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor(),
 		smoothFactorScale);
 	GRAPHICS->pop(2);
 }
@@ -103,23 +106,21 @@ void Label::refresh()
 std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 {
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
-
-	auto pos = mMesh.symbol_positions.at(index) * scale;
-	auto size = mMesh.symbol_sizes.at(index) * scale;
-
+	const auto& symbol = mMesh.value().symbols.at(index);
+	auto pos = symbol.pos * scale;
+	auto size = symbol.size * scale;
 	return { pos, size };
 }
 
 float Label::getSymbolLineY(int index)
 {
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
-
-	return mMesh.symbol_line_y.at(index) * scale;
+	return mMesh.value().symbols.at(index).line_y * scale;
 }
 
 void Label::setSymbolColor(size_t index, const glm::vec4& color)
 {
-	mMesh.setSymbolColor(index, color);
+	mMesh.value().setSymbolColor(index, color);
 }
 
 std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstring str)
