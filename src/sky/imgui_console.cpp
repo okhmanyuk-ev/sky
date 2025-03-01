@@ -6,7 +6,7 @@
 #include <platform/defines.h>
 #include <platform/system_android.h>
 #include <sky/imgui_system.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <shared/stats_system.h>
 #include <sky/utils.h>
 #include <sky/color.h>

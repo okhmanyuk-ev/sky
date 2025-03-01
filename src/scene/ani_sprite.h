@@ -4,7 +4,7 @@
 #include <scene/sprite.h>
 #include <scene/adaptive.h>
 #include <graphics/animation.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace Scene
 {

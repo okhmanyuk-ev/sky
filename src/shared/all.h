@@ -12,7 +12,7 @@
 #include <nlohmann/json.hpp>
 
 #include <tiny_obj_loader.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum_all.hpp>
 
 #include <common/easing.h>
 #include <common/hash.h>

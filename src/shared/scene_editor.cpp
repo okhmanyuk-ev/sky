@@ -5,7 +5,7 @@
 #include <shared/imgui_user.h>
 #include <shared/scene_helpers.h>
 #include <imgui_stdlib.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <sky/utils.h>
 
 using namespace Shared;

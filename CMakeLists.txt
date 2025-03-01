@@ -320,7 +320,13 @@ set_property(TARGET box2d PROPERTY FOLDER ${LIBS_FOLDER})
 
 # magic_enum
 
-target_include_directories(${PROJECT_NAME} PUBLIC lib/magic_enum)
+add_library(magic_enum INTERFACE)
+target_include_directories(magic_enum INTERFACE lib/magic_enum)
+target_compile_definitions(magic_enum INTERFACE
+    MAGIC_ENUM_RANGE_MIN=0
+    MAGIC_ENUM_RANGE_MAX=256
+)
+target_link_libraries(${PROJECT_NAME} magic_enum)
 
 # skygfx
 
