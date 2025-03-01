@@ -157,13 +157,17 @@ std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstr
 		return sky::GetColor<glm::vec4>(type.value());
 	};
 
+	auto wregex = [](std::wstring expression) {
+		return std::wregex(expression, std::regex_constants::ECMAScript | std::regex_constants::icase);
+	};
+
 	std::vector<std::tuple<std::wregex, std::function<glm::vec4(std::wsmatch match)>>> color_tags = {
-		{ std::wregex(LR"(^<color=rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)>)"), parse_u8_color },
-		{ std::wregex(LR"(^<color=rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)>)"), parse_u8_color },
-		{ std::wregex(LR"(^<color=frgba\(\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*\)>)"), parse_float_color },
-		{ std::wregex(LR"(^<color=frgb\(\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*\)>)"), parse_float_color },
-		{ std::wregex(LR"(^<color=hex\(\s*([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})\s*\)>)"), parse_hex_color },
-		{ std::wregex(LR"(^<color=\s*([A-Za-z]+)\s*>)"), parse_named_color },
+		{ wregex(LR"(^<color=rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)>)"), parse_u8_color },
+		{ wregex(LR"(^<color=rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)>)"), parse_u8_color },
+		{ wregex(LR"(^<color=frgba\(\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*\)>)"), parse_float_color },
+		{ wregex(LR"(^<color=frgb\(\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*\)>)"), parse_float_color },
+		{ wregex(LR"(^<color=hex\(\s*([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})\s*\)>)"), parse_hex_color },
+		{ wregex(LR"(^<color=\s*([A-Za-z]+)\s*>)"), parse_named_color },
 	};
 
 	std::wsmatch match;
@@ -184,7 +188,7 @@ std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstr
 		return false;
 	};
 
-	std::wregex pop_color_regex(LR"(^</color>)");
+	auto pop_color_regex = wregex(LR"(^</color>)");
 	std::wstring result_text;
 	std::vector<glm::vec4> colormap;
 
