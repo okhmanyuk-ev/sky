@@ -1,5 +1,7 @@
 #include "label.h"
 #include <regex>
+#include <sky/utils.h>
+#include <magic_enum/magic_enum.hpp>
 
 using namespace Scene;
 
@@ -145,12 +147,23 @@ std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstr
 		return sky::ColorToNormalized(r, g, b, a);
 	};
 
+	auto parse_named_color = [](auto match) {
+		auto str = sky::to_string(match[1].str());
+		auto type = magic_enum::enum_cast<sky::Color>(str, magic_enum::case_insensitive);
+
+		if (!type.has_value())
+			return sky::GetColor<glm::vec4>(sky::Color::White);
+
+		return sky::GetColor<glm::vec4>(type.value());
+	};
+
 	std::vector<std::tuple<std::wregex, std::function<glm::vec4(std::wsmatch match)>>> color_tags = {
-		{ std::wregex(LR"(^<color=rgba\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)"), parse_u8_color },
-		{ std::wregex(LR"(^<color=rgb\([ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*,[ ]*(\d+)[ ]*\)>)"), parse_u8_color },
-		{ std::wregex(LR"(^<color=frgba\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\)>)"), parse_float_color },
-		{ std::wregex(LR"(^<color=frgb\([ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*,[ ]*(\d+|\d+\.\d+)[ ]*\)>)"), parse_float_color },
-		{ std::wregex(LR"(^<color=hex\([ ]*([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})[ ]*\)>)"), parse_hex_color },
+		{ std::wregex(LR"(^<color=rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)>)"), parse_u8_color },
+		{ std::wregex(LR"(^<color=rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)>)"), parse_u8_color },
+		{ std::wregex(LR"(^<color=frgba\(\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*\)>)"), parse_float_color },
+		{ std::wregex(LR"(^<color=frgb\(\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*,\s*(\d+|\d+\.\d+)\s*\)>)"), parse_float_color },
+		{ std::wregex(LR"(^<color=hex\(\s*([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})\s*\)>)"), parse_hex_color },
+		{ std::wregex(LR"(^<color=\s*([A-Za-z]+)\s*>)"), parse_named_color },
 	};
 
 	std::wsmatch match;
