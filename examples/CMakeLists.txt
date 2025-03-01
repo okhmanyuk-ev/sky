@@ -30,3 +30,13 @@ add_executable(04_physics 04_physics/main.cpp)
 target_link_libraries(04_physics sky)
 set_property(TARGET 04_physics PROPERTY FOLDER ${EXAMPLES_FOLDER})
 copy_required_libs(04_physics "${PROJECT_SOURCE_DIR}/lib/fmod")
+
+# 05 - labels
+
+add_executable(05_labels 05_labels/main.cpp)
+target_link_libraries(05_labels sky)
+set_property(TARGET 05_labels PROPERTY FOLDER ${EXAMPLES_FOLDER})
+copy_required_libs(05_labels "${PROJECT_SOURCE_DIR}/lib/fmod")
+if(MSVC)
+	set_target_properties(05_labels PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
