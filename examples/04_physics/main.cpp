@@ -8,7 +8,7 @@ void sky_main()
 	world->setAnchor(0.5f);
 	world->setPivot(0.5f);
 	world->setDebug(true);
-	app.getScene()->getRoot()->attach(world);
+	sky::GetService<Scene::Scene>()->getRoot()->attach(world);
 
 	auto floor = std::make_shared<Shared::PhysHelpers::Entity>();
 	floor->setSize({ 768.0f, 16.0f });

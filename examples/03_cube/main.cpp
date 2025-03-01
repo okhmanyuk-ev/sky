@@ -52,7 +52,7 @@ void sky_main()
 	sky::Application app("Cube", { sky::Application::Flag::Scene });
 
 	auto viewport = std::make_shared<Scene::Viewport3D>();
-	app.getScene()->getRoot()->attach(viewport);
+	sky::GetService<Scene::Scene>()->getRoot()->attach(viewport);
 
 	auto entity = std::make_shared<Scene::SingleMeshEntity>();
 	entity->setVertices(Vertices);
