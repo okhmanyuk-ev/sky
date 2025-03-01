@@ -44,13 +44,13 @@ namespace Scene
 		std::tuple<glm::vec2, glm::vec2> getSymbolBounds(int index);
 		float getSymbolLineY(int index);
 
-		void setSymbolColor(size_t index, const glm::vec4& color);
-
 		bool isReplaceEscapedNewLinesEnabled() const { return mReplaceEscapedNewLines; }
 		void setReplaceEscapedNewLinesEnabled(bool value) { mReplaceEscapedNewLines = value; }
 
 		bool isParseColorTagsEnabled() const { return mParseColorTags; }
 		void setParseColorTagsEnabled(bool value) { mParseColorTags = value; }
+
+		const auto& getTextMesh() const { return mTextMesh; }
 
 	private:
 		std::tuple<std::vector<glm::vec4>, std::wstring> parseColorTags(std::wstring str);
@@ -61,7 +61,7 @@ namespace Scene
 		float mFontSize = DefaultFontSize;
 		std::wstring mText;
 		Graphics::TextMesh::Align mAlign = Graphics::TextMesh::Align::Left;
-		std::optional<Graphics::TextMesh> mMesh;
+		std::optional<Graphics::TextMesh> mTextMesh;
 		std::wstring mPrevText;
 		float mPrevWidth = 0.0f;
 		float mPrevFontSize = 0.0f;

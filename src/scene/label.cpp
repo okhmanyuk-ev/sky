@@ -7,18 +7,16 @@ void Label::draw()
 {
 	Node::draw();
 
-	assert(mFont); // you should setup Label::DefaultFont
-
 	if (mFont == nullptr || mFontSize <= 0.0f)
 		return;
 
 	if (getAlpha() <= 0.0f && (mOutlineColor->getAlpha() <= 0.0f || mOutlineThickness <= 0.0f))
 		return;
 
-	if (!mMesh.has_value())
+	if (!mTextMesh.has_value())
 		return;
 
-	if (mMesh.value().vertices.empty())
+	if (mTextMesh.value().vertices.empty())
 		return;
 
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
@@ -29,7 +27,7 @@ void Label::draw()
 
 	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushModelMatrix(model);
-	GRAPHICS->drawString(*mFont, mMesh.value(), mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor(),
+	GRAPHICS->drawString(*mFont, mTextMesh.value(), mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor(),
 		smoothFactorScale);
 	GRAPHICS->pop(2);
 }
@@ -85,17 +83,17 @@ void Label::refresh()
 	if (!mMultiline)
 	{
 		height = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
-		mMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, text, -mFont->getDescent() + mFont->getCustomVerticalOffset());
+		mTextMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, text, -mFont->getDescent() + mFont->getCustomVerticalOffset());
 		setWidth(mFont->getStringWidth(text, mFontSize));
 	}
 	else
 	{
-		std::tie(height, mMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, text, width, mFontSize, mAlign);
+		std::tie(height, mTextMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, text, width, mFontSize, mAlign);
 	}
 
 	for (size_t i = 0; i < colormap.size(); i++)
 	{
-		setSymbolColor(i, colormap.at(i));
+		mTextMesh.value().setSymbolColor(i, colormap.at(i));
 	}
 
 	setHeight(height);
@@ -106,7 +104,7 @@ void Label::refresh()
 std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 {
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
-	const auto& symbol = mMesh.value().symbols.at(index);
+	const auto& symbol = mTextMesh.value().symbols.at(index);
 	auto pos = symbol.pos * scale;
 	auto size = symbol.size * scale;
 	return { pos, size };
@@ -115,12 +113,7 @@ std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 float Label::getSymbolLineY(int index)
 {
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
-	return mMesh.value().symbols.at(index).line_y * scale;
-}
-
-void Label::setSymbolColor(size_t index, const glm::vec4& color)
-{
-	mMesh.value().setSymbolColor(index, color);
+	return mTextMesh.value().symbols.at(index).line_y * scale;
 }
 
 std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstring str)
