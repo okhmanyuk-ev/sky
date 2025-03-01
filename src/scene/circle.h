@@ -44,8 +44,8 @@ namespace Scene
 		float mFill = 1.0f;
 		float mPie = 1.0f;
 		float mPiePivot = -1.0f;
-		glm::vec4 mInnerColor = { Graphics::Color::White, 1.0f };
-		glm::vec4 mOuterColor = { Graphics::Color::White, 1.0f };
+		glm::vec4 mInnerColor = sky::GetColor<glm::vec4>(sky::Color::White);
+		glm::vec4 mOuterColor = sky::GetColor<glm::vec4>(sky::Color::White);
 		bool mDrawTextureWhenAvailable = true;
 	};
 
@@ -72,7 +72,7 @@ namespace Scene
 	private:
 		int mSegments = 32;
 		float mFill = 1.0f;
-		glm::vec4 mInnerColor = { Graphics::Color::White, 1.0f };
-		glm::vec4 mOuterColor = { Graphics::Color::White, 1.0f };
+		glm::vec4 mInnerColor = sky::GetColor<glm::vec4>(sky::Color::White);
+		glm::vec4 mOuterColor = sky::GetColor<glm::vec4>(sky::Color::White);
 	};
 }

@@ -69,7 +69,7 @@ namespace Scene
 		float mDistance = 32.0f;
 		float mMinDuration = 1.0f;
 		float mMaxDuration = 1.0f;
-		glm::vec4 mEndColor = { Graphics::Color::White, 0.0f };
+		glm::vec4 mEndColor = { sky::GetColor(sky::Color::White), 0.0f };
 		glm::vec2 mMinDirection = { -1.0f, -1.0f };
 		glm::vec2 mMaxDirection = { 1.0f, 1.0f };
 		CreateParticleCallback mCreateParticleCallback = nullptr;

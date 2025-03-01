@@ -123,7 +123,7 @@ std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstr
 		auto g = static_cast<uint8_t>(std::stoi(match[2]));
 		auto b = static_cast<uint8_t>(std::stoi(match[3]));
 		auto a = match.size() > 4 ? static_cast<uint8_t>(std::stoi(match[4])) : 255;
-		return Graphics::Color::ToNormalized(r, g, b, a);
+		return sky::ColorToNormalized(r, g, b, a);
 	};
 
 	auto parse_float_color = [](auto match) {
@@ -142,7 +142,7 @@ std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstr
 		auto g = static_cast<uint8_t>((rgba >> (has_alpha ? 16 : 8)) & 0xFF);
 		auto b = static_cast<uint8_t>((rgba >> (has_alpha ? 8 : 0)) & 0xFF);
 		auto a = static_cast<uint8_t>(has_alpha ? (rgba & 0xFF) : 255);
-		return Graphics::Color::ToNormalized(r, g, b, a);
+		return sky::ColorToNormalized(r, g, b, a);
 	};
 
 	std::vector<std::tuple<std::wregex, std::function<glm::vec4(std::wsmatch match)>>> color_tags = {

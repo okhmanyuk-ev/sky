@@ -9,7 +9,6 @@
 #include <platform/input.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <graphics/color.h>
 #include <shared/touch_emulator.h>
 
 #include <deque>

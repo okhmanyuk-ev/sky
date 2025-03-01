@@ -67,7 +67,7 @@ namespace Scene
 		float mPrevFontSize = 0.0f;
 		std::shared_ptr<Graphics::Font> mPrevFont;
 		float mOutlineThickness = 0.0f;
-		std::shared_ptr<Color> mOutlineColor = std::make_shared<Color>(Graphics::Color::Black);
+		std::shared_ptr<Color> mOutlineColor = std::make_shared<Color>(sky::GetColor(sky::Color::Black));
 		Graphics::TextMesh::Align mPrevAlign = Graphics::TextMesh::Align::Left;
 		bool mMultiline = false;
 		bool mPrevMultiline = false;

@@ -828,7 +828,7 @@ std::shared_ptr<skygfx::Texture> System::makeGenericTexture(const glm::ivec2& si
 	pushCleanState();
 	pushRenderTarget(result);
 	pushOrthoMatrix(1.0f, 1.0f);
-	clear(glm::vec4{ Graphics::Color::White, 0.0f });
+	clear(glm::vec4{ sky::GetColor(sky::Color::White), 0.0f });
 	callback();
 	pop(3);
 

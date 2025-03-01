@@ -7,6 +7,7 @@
 #include <sky/bitflags.h>
 #include <sky/cache.h>
 #include <sky/clock.h>
+#include <sky/color.h>
 #include <sky/console.h>
 #include <sky/dispatcher.h>
 #include <sky/imgui_console.h>

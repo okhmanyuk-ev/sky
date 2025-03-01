@@ -447,12 +447,12 @@ void SceneEditor::highlightNodeUnderCursor()
 		ImGui::Selectable(name, selected);
 		if (selected)
 		{
-			highlightNode(node, Graphics::Color::Yellow, true);
+			highlightNode(node, sky::GetColor(sky::Color::Yellow), true);
 			mHoveredNode = node;
 		}
 		else
 		{
-			highlightNode(node, Graphics::Color::White, false);
+			highlightNode(node, sky::GetColor(sky::Color::White), false);
 		}
 	}
 
@@ -603,7 +603,7 @@ void SceneEditor::showBatchGroupsMenu()
 				ImGui::Selectable(_name);
 				if (ImGui::IsItemHovered())
 				{
-					highlightNode(node, Graphics::Color::Yellow);
+					highlightNode(node, sky::GetColor(sky::Color::Yellow));
 					showTooltip(node);
 				}
 			}

@@ -426,8 +426,8 @@ void World::Draw::DrawTransform(const b2Transform& xf)
 	b2Vec2 px = p + AxisScale * xf.q.GetXAxis();
 	b2Vec2 py = p + AxisScale * xf.q.GetYAxis();
 
-	glm::vec4 color1 = { Graphics::Color::Red, 1.0f };
-	glm::vec4 color2 = { Graphics::Color::Lime, 1.0f };
+	glm::vec4 color1 = sky::GetColor<glm::vec4>(sky::Color::Red);
+	glm::vec4 color2 = sky::GetColor<glm::vec4>(sky::Color::Lime);
 
 	GRAPHICS->draw(nullptr, nullptr, skygfx::utils::MeshBuilder::Mode::Lines, [&](auto vertex) {
 		vertex({ .pos = { p.x, p.y, 0.0f }, .color = color1 });

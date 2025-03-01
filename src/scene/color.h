@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <graphics/color.h>
+#include <sky/color.h>
 
 namespace Scene
 {
@@ -22,6 +22,6 @@ namespace Scene
 		void setAlpha(float value) { mColor.a = value; }
 
 	private:
-		glm::vec4 mColor = { Graphics::Color::White, 1.0f };
+		glm::vec4 mColor = sky::GetColor<glm::vec4>(sky::Color::White);
 	};
 }

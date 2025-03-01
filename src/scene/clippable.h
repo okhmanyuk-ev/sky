@@ -154,7 +154,7 @@ namespace Scene
 
 			GRAPHICS->push(state);
 			GRAPHICS->clear(std::nullopt, std::nullopt, 0);
-			GRAPHICS->drawRoundedRectangle({ Graphics::Color::White, 1.0f }, absolute_size, mRounding, false);
+			GRAPHICS->drawRoundedRectangle(sky::GetColor<glm::vec4>(sky::Color::White), absolute_size, mRounding, false);
 			GRAPHICS->pop();
 
 			stencil.write_mask = 255;

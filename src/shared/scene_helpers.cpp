@@ -163,7 +163,7 @@ void SceneHelpers::ParseColorFromXml(Scene::Color& node, const tinyxml2::XMLElem
 			auto g = static_cast<uint8_t>(std::stoi(match[2]));
 			auto b = static_cast<uint8_t>(std::stoi(match[3]));
 			auto a = match.size() > 4 ? static_cast<uint8_t>(std::stoi(match[4])) : static_cast<uint8_t>(default_alpha * 255.0f);
-			return Graphics::Color::ToNormalized(r, g, b, a);
+			return sky::ColorToNormalized(r, g, b, a);
 		};
 
 		auto parse_float_color = [](auto match, float default_alpha) {
@@ -182,7 +182,7 @@ void SceneHelpers::ParseColorFromXml(Scene::Color& node, const tinyxml2::XMLElem
 			auto g = static_cast<uint8_t>((rgba >> (has_alpha ? 16 : 8)) & 0xFF);
 			auto b = static_cast<uint8_t>((rgba >> (has_alpha ? 8 : 0)) & 0xFF);
 			auto a = static_cast<uint8_t>(has_alpha ? (rgba & 0xFF) : static_cast<uint8_t>(default_alpha * 255.0f));
-			return Graphics::Color::ToNormalized(r, g, b, a);
+			return sky::ColorToNormalized(r, g, b, a);
 		};
 
 		std::vector<std::tuple<std::regex, std::function<glm::vec4(std::smatch match, float default_alpha)>>> color_tags = {
@@ -701,7 +701,7 @@ SceneHelpers::StandardWindow::StandardWindow(const std::set<BackgroundEffect> ba
 	mContent->setPivot(0.5f);
 	mContentHolder->attach(mContent);
 
-	getBackshadeColor()->setColor({ Graphics::Color::Black, 0.0f });
+	getBackshadeColor()->setColor({ sky::GetColor(sky::Color::Black), 0.0f });
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
@@ -1104,7 +1104,7 @@ void SceneHelpers::ImScene::Tooltip(Scene::Node& holder,
 	{
 		rect->setAbsoluteRounding(true);
 		rect->setRounding(16.0f);
-		rect->setColor(Graphics::Color::Black);
+		rect->setColor(sky::GetColor(sky::Color::Black));
 		rect->setAlpha(0.5f);
 		rect->setPivot({ 0.0f, 1.0f });
 		rect->setOrigin({ -16.0f, 16.0f });
@@ -1135,7 +1135,7 @@ void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Nod
 
 	auto bounds = node.getGlobalBounds();
 
-	const auto color = Graphics::Color::Yellow;
+	const auto color = sky::GetColor(sky::Color::Yellow);
 
 	auto rect = IMSCENE->spawn<Shared::SceneHelpers::Smoother<Shared::SceneHelpers::Outlined<Scene::Rectangle>>>(holder);
 	if (IMSCENE->isFirstCall())

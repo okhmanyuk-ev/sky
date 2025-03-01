@@ -28,7 +28,7 @@ namespace Shared
 		void showTooltip(std::shared_ptr<Scene::Node> node);
 		void highlightNodeUnderCursor();
 		void highlightHoveredNode();
-		void highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color = Graphics::Color::White, bool filled = true);
+		void highlightNode(std::shared_ptr<Scene::Node> node, const glm::vec3& color = sky::GetColor(sky::Color::White), bool filled = true);
 		void showBatchGroupsMenu();
 
 	public:

@@ -3,7 +3,7 @@
 #include <sky/scheduler.h>
 #include <platform/system.h>
 #include <sky/locator.h>
-#include <graphics/color.h>
+#include <sky/color.h>
 #include <graphics/font.h>
 #include <graphics/tex_region.h>
 #include <graphics/effects.h>
@@ -69,7 +69,7 @@ namespace Graphics
 			const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color);
 
-		void drawRectangle(sky::effects::IEffect* effect, const glm::vec4& color = { Color::White, 1.0f });
+		void drawRectangle(sky::effects::IEffect* effect, const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
 		// rounded rectangle
 		void drawRoundedRectangle(const glm::vec4& top_left_color, const glm::vec4& top_right_color,
@@ -80,39 +80,39 @@ namespace Graphics
 		void drawRoundedSlicedRectangle(const glm::vec4& color, const glm::vec2& size, float rounding, bool absolute_rounding);
 
 		// colored line rectangle
-		void drawLineRectangle(const glm::vec4& color = { Color::White, 1.0f });
+		void drawLineRectangle(const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
 		// circle
-		void drawCircle(const glm::vec4& inner_color = { Color::White, 1.0f },
-			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f, float pie = 1.0f);
+		void drawCircle(const glm::vec4& inner_color = sky::GetColor<glm::vec4>(sky::Color::White),
+			const glm::vec4& outer_color = sky::GetColor<glm::vec4>(sky::Color::White), float fill = 1.0f, float pie = 1.0f);
 
-		void drawSegmentedCircle(int segments = 32, const glm::vec4& inner_color = { Color::White, 1.0f },
-			const glm::vec4& outer_color = { Color::White, 1.0f }, float fill = 1.0f);
+		void drawSegmentedCircle(int segments = 32, const glm::vec4& inner_color = sky::GetColor<glm::vec4>(sky::Color::White),
+			const glm::vec4& outer_color = sky::GetColor<glm::vec4>(sky::Color::White), float fill = 1.0f);
 
-		void drawCircleTexture(const glm::vec4& color = { Color::White, 1.0f });
+		void drawCircleTexture(const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
 		// sliced sprite
 		void drawSlicedSprite(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture, const TexRegion& center_region,
 			const glm::vec2& size, std::optional<float> edge_size = std::nullopt,
-			const glm::vec4& color = { Color::White, 1.0f });
+			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
 		// sdf mesh
 		void drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture> texture,
 			const skygfx::utils::Mesh::Vertices& vertices, const skygfx::utils::Mesh::Indices& indices,
 			float minValue, float maxValue, float smoothFactor,
-			const glm::vec4& color = { Graphics::Color::White, 1.0f });
+			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
 		// text
 		void drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue,
-			float smoothFactor, const glm::vec4& color = { Graphics::Color::White, 1.0f });
+			float smoothFactor, const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
 		void drawString(const Font& font, const TextMesh& mesh, float size,
-			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
-			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f }, float smoothFactorScale = 1.0f);
+			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White), float outlineThickness = 0.0f,
+			const glm::vec4& outlineColor = sky::GetColor<glm::vec4>(sky::Color::Black), float smoothFactorScale = 1.0f);
 
 		void drawString(const Font& font, const std::wstring& text, float size,
-			const glm::vec4& color = { Graphics::Color::White, 1.0f }, float outlineThickness = 0.0f,
-			const glm::vec4& outlineColor = { Graphics::Color::Black, 1.0f }, float smoothFactorScale = 1.0f);
+			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White), float outlineThickness = 0.0f,
+			const glm::vec4& outlineColor = sky::GetColor<glm::vec4>(sky::Color::Black), float smoothFactorScale = 1.0f);
 
 	public:
 		glm::vec3 project(const glm::vec3& pos);

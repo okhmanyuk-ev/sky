@@ -1,5 +1,5 @@
 #include "text_mesh.h"
-#include <graphics/color.h>
+#include <sky/color.h>
 
 using namespace Graphics;
 
@@ -67,7 +67,7 @@ TextMesh TextMesh::createTextMesh(const Font& font, std::wstring::const_iterator
 		auto uv1 = glyph.pos / tex_size;
 		auto uv2 = (glyph.pos + glyph.size) / tex_size;
 
-		glm::vec4 color = { Color::White, 1.0f };
+		auto color = sky::GetColor<glm::vec4>(sky::Color::White);
 
 		vtx[0] = { { p1.x, p1.y, 0.0f }, color, { uv1.x, uv1.y } };
 		vtx[1] = { { p1.x, p2.y, 0.0f }, color, { uv1.x, uv2.y } };

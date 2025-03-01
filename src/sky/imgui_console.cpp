@@ -9,6 +9,7 @@
 #include <magic_enum.hpp>
 #include <shared/stats_system.h>
 #include <sky/utils.h>
+#include <sky/color.h>
 
 using namespace sky;
 
@@ -387,65 +388,64 @@ void ImguiConsole::showCloseButton(float pos_y)
 
 void ImguiConsole::drawText(const Text& text, glm::vec4 colorMultiplier)
 {
-	auto& style = ImGui::GetStyle();
-	ImVec4 _col = style.Colors[ImGuiCol_Text];
-	glm::vec3 color = { _col.x, _col.y, _col.z };
-
+	std::optional<sky::Color> color;
 	switch (text.color)
 	{
 	case Console::Color::Black:
-		color = Graphics::Color::Black;
+		color = sky::Color::Black;
 		break;
 	case Console::Color::DarkBlue:
-		color = Graphics::Color::DarkBlue;
+		color = sky::Color::DarkBlue;
 		break;
 	case Console::Color::DarkGreen:
-		color = Graphics::Color::DarkGreen;
+		color = sky::Color::DarkGreen;
 		break;
 	case Console::Color::DarkCyan:
-		color = Graphics::Color::DarkCyan;
+		color = sky::Color::DarkCyan;
 		break;
 	case Console::Color::DarkRed:
-		color = Graphics::Color::DarkRed;
+		color = sky::Color::DarkRed;
 		break;
 	case Console::Color::DarkMagenta:
-		color = Graphics::Color::DarkMagenta;
+		color = sky::Color::DarkMagenta;
 		break;
 	case Console::Color::DarkYellow:
-		color = Graphics::Color::DarkYellow;
+		color = sky::Color::DarkYellow;
 		break;
 	case Console::Color::Gray:
-		color = Graphics::Color::Silver;
+		color = sky::Color::Silver;
 		break;
 	case Console::Color::DarkGray:
-		color = Graphics::Color::DarkGray;
+		color = sky::Color::DarkGray;
 		break;
 	case Console::Color::Blue:
-		color = Graphics::Color::Blue;
+		color = sky::Color::Blue;
 		break;
 	case Console::Color::Green:
-		color = Graphics::Color::Lime;
+		color = sky::Color::Lime;
 		break;
 	case Console::Color::Cyan:
-		color = Graphics::Color::Cyan;
+		color = sky::Color::Cyan;
 		break;
 	case Console::Color::Red:
-		color = Graphics::Color::Red;
+		color = sky::Color::Red;
 		break;
 	case Console::Color::Magenta:
-		color = Graphics::Color::Magenta;
+		color = sky::Color::Magenta;
 		break;
 	case Console::Color::Yellow:
-		color = Graphics::Color::Yellow;
+		color = sky::Color::Yellow;
 		break;
 	case Console::Color::White:
-		color = Graphics::Color::White;
+		color = sky::Color::White;
 		break;
 	case Console::Color::Default:
 		break;
 	}
 
-	auto color4 = glm::vec4(color, 1.0f);
+	auto& style = ImGui::GetStyle();
+	ImVec4 _col = style.Colors[ImGuiCol_Text];
+	auto color4 = glm::vec4(color.has_value() ? sky::GetColor(color.value()) : glm::vec3(_col.x, _col.y, _col.z), 1.0f);
 
 	color4 *= colorMultiplier;
 
