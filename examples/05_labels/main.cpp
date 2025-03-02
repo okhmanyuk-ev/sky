@@ -25,6 +25,14 @@ void sky_main()
 		column->attach(label);
 	};
 
+	sky::GetService<sky::Scheduler>()->addInfinity([column] {
+		auto scale = column->getScale().x;
+		ImGui::Begin("Settings");
+		ImGui::DragFloat("Scale", &scale, 0.01f);
+		ImGui::End();
+		column->setScale(scale);
+	});
+
 	createLabel(L"<b>Simple Label</b>");
 
 	createLabel(L"<color=rgba(0,255,0,96)>Semi-transparent Green (RGBA)</color>");
