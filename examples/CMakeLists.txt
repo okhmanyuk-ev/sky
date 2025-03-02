@@ -40,3 +40,10 @@ copy_required_libs(05_labels "${PROJECT_SOURCE_DIR}/lib/fmod")
 if(MSVC)
 	set_target_properties(05_labels PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
+
+# 06 - circles
+
+add_executable(06_circles 06_circles/main.cpp)
+target_link_libraries(06_circles sky)
+set_property(TARGET 06_circles PROPERTY FOLDER ${EXAMPLES_FOLDER})
+copy_required_libs(06_circles "${PROJECT_SOURCE_DIR}/lib/fmod")
