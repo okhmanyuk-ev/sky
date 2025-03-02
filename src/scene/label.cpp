@@ -24,13 +24,9 @@ void Label::draw()
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
-	auto absoluteScale = getAbsoluteScale();
-	auto smoothFactorScale = 1.0f / ((absoluteScale.x + absoluteScale.y) * 0.5f);
-
 	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushModelMatrix(model);
-	GRAPHICS->drawString(*mFont, mTextMesh.value(), mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor(),
-		smoothFactorScale);
+	GRAPHICS->drawString(*mFont, mTextMesh.value(), mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor());
 	GRAPHICS->pop(2);
 }
 

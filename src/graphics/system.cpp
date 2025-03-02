@@ -562,7 +562,7 @@ void System::drawString(const Font& font, const TextMesh& mesh, float minValue, 
 }
 
 void System::drawString(const Font& font, const TextMesh& mesh, float size, const glm::vec4& color,
-	float outlineThickness, const glm::vec4& outlineColor, float smoothFactorScale)
+	float outlineThickness, const glm::vec4& outlineColor)
 {
 	assert(!mesh.vertices.empty());
 	assert(!mesh.indices.empty());
@@ -573,22 +573,17 @@ void System::drawString(const Font& font, const TextMesh& mesh, float size, cons
 	const float mid = Font::SdfOnedge;
 	const float max = 1.0f;
 	const float outline = glm::lerp(mid, min, fixedOutlineThickness);
-	float smoothFactor = 2.0f / size / PLATFORM->getScale();
-
-	smoothFactor *= mSdfSmoothFactor;
-	smoothFactor *= smoothFactorScale;
 
 	if (fixedOutlineThickness > 0.0f)
-		drawString(font, mesh, outline, mid + (smoothFactor / 2.0f), smoothFactor, outlineColor);
+		drawString(font, mesh, outline, mid, mSdfSmoothFactor, outlineColor);
 
-	drawString(font, mesh, mid, max, smoothFactor, color);
+	drawString(font, mesh, mid, max, mSdfSmoothFactor, color);
 }
 
 void System::drawString(const Font& font, const std::wstring& text, float size, const glm::vec4& color,
-	float outlineThickness, const glm::vec4& outlineColor, float smoothFactorScale)
+	float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, color, outlineThickness, outlineColor,
-		smoothFactorScale);
+	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, color, outlineThickness, outlineColor);
 }
 
 glm::vec3 System::project(const glm::vec3& pos)

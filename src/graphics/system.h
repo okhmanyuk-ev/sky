@@ -108,11 +108,11 @@ namespace Graphics
 
 		void drawString(const Font& font, const TextMesh& mesh, float size,
 			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White), float outlineThickness = 0.0f,
-			const glm::vec4& outlineColor = sky::GetColor<glm::vec4>(sky::Color::Black), float smoothFactorScale = 1.0f);
+			const glm::vec4& outlineColor = sky::GetColor<glm::vec4>(sky::Color::Black));
 
 		void drawString(const Font& font, const std::wstring& text, float size,
 			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White), float outlineThickness = 0.0f,
-			const glm::vec4& outlineColor = sky::GetColor<glm::vec4>(sky::Color::Black), float smoothFactorScale = 1.0f);
+			const glm::vec4& outlineColor = sky::GetColor<glm::vec4>(sky::Color::Black));
 
 	public:
 		glm::vec3 project(const glm::vec3& pos);
@@ -169,15 +169,11 @@ namespace Graphics
 		bool isBatching() const { return mBatching; }
 		void setBatching(bool value);
 
-		auto getSdfSmoothFactor() const { return mSdfSmoothFactor; }
-		void setSdfSmoothFactor(float value) { mSdfSmoothFactor = value; }
-
 		auto getBatchesCount() const { return mBatchesCountPublic; }
 		auto getBatchFlushCount() const { return mFlushCountPublic; }
 
 	private:
 		bool mBatching = true;
-		float mSdfSmoothFactor = 1.0f;
 		int mBatchesCount = 0;
 		int mBatchesCountPublic = 0;
 		int mFlushCount = 0;
@@ -215,5 +211,8 @@ namespace Graphics
 		sky::effects::Effect<sky::effects::Rounded> mRoundedEffect;
 		skygfx::utils::Mesh mMesh;
 		skygfx::utils::MeshBuilder mMeshBuilder;
+
+	private:
+		sky::CVar<float> mSdfSmoothFactor = sky::CVar<float>("gl_sdf_smooth_factor", 0.5f);
 	};
 }

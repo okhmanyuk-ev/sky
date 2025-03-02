@@ -14,8 +14,9 @@ layout(binding = EFFECT_UNIFORM_BINDING) uniform _sdf
 void effect(inout vec4 result)
 {
 	float distance = texture(sColorTexture, In.tex_coord, settings.mipmap_bias).a;
-	float min_alpha = smoothstep(sdf.min_value - sdf.smooth_factor, sdf.min_value + sdf.smooth_factor, distance);
-	float max_alpha = smoothstep(sdf.max_value + sdf.smooth_factor, sdf.max_value - sdf.smooth_factor, distance);
+	float smoothing = fwidth(distance) * sdf.smooth_factor;
+	float min_alpha = smoothstep(sdf.min_value - smoothing, sdf.min_value + smoothing, distance);
+	float max_alpha = smoothstep(sdf.max_value + smoothing, sdf.max_value - smoothing, distance);
 	result = vec4(0.0, 0.0, 0.0, 0.0);
 	vec4 color = In.color * sdf.color;
 	if (max_alpha > 0.0 && min_alpha > 0.0)
