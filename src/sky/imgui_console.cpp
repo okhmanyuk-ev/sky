@@ -10,6 +10,7 @@
 #include <shared/stats_system.h>
 #include <sky/utils.h>
 #include <sky/color.h>
+#include <iostream>
 
 using namespace sky;
 
@@ -35,6 +36,8 @@ ImguiConsole::ImguiConsole()
 
 void ImguiConsole::write(const std::string& s, Console::Color color)
 {
+	std::cout << s;
+
 	Text text;
 	text.color = color;
 	text.linebreak = false;
@@ -45,6 +48,8 @@ void ImguiConsole::write(const std::string& s, Console::Color color)
 
 void ImguiConsole::writeLine(const std::string& s, Console::Color color)
 {
+	std::cout << s << std::endl;
+
 	Text text;
 	text.color = color;
 	text.linebreak = true;
