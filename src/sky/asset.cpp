@@ -113,8 +113,9 @@ bool sky::Asset::Exists(const std::string& path, Storage storage)
 #endif
 }
 
-std::string sky::Asset::StoragePathToAbsolute(const std::string& path, Storage storage)
+std::string sky::Asset::StoragePathToAbsolute(const std::string& _path, Storage storage)
 {
+	auto path = FixSlashes(_path);
 	if (storage == Storage::Assets)
 	{
 #if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
@@ -140,4 +141,17 @@ std::string sky::Asset::StoragePathToAbsolute(const std::string& path, Storage s
 	}
 
 	return path; // absolute
+}
+
+std::string sky::Asset::FixSlashes(const std::string& input)
+{
+	std::string result = input;
+	for (char& ch : result)
+	{
+		if (ch == '\\')
+		{
+			ch = '/';
+		}
+	}
+	return result;
 }
