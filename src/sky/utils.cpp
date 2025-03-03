@@ -65,11 +65,17 @@ void sky::PlaySound(const std::string& name)
 
 void sky::Log(const std::string& text)
 {
+	if (!HasService<Console>())
+		return;
+
 	GetService<Console>()->writeLine(text);
 }
 
 void sky::Log(Console::Color color, const std::string& text)
 {
+	if (!HasService<Console>())
+		return;
+
 	GetService<Console>()->writeLine(text, color);
 }
 
