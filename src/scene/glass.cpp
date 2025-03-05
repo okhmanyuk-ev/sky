@@ -27,7 +27,7 @@ void Glass::draw()
 	}
 
 	GRAPHICS->flushBatch();
-	skygfx::ReadPixels({ x, y }, { w, h }, *getTexture());
+	skygfx::CopyBackbufferToTexture(*getTexture(), { w, h }, { x, y });
 
 	if (mGenerateMipmaps)
 		getTexture()->generateMips();
