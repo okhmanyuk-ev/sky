@@ -103,6 +103,10 @@ elseif(EMSCRIPTEN)
 		-gsource-map
 		-sEXIT_RUNTIME
 		-sWEBSOCKET_DEBUG=1
+		-sASSERTIONS=2
+		-sSTACK_OVERFLOW_CHECK=2
+		-sGL_ASSERTIONS=1
+		#-sSAFE_HEAP=2 # uncomment to enable more checks but this highly reduce performance
 	,>)
 	target_compile_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:DEBUG>,
 		-g3
