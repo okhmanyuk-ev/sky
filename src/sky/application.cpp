@@ -313,11 +313,11 @@ void Application::run()
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
 		IMGUI_SYSTEM->begin();
+		SCHEDULER->frame();
 		if (mFlags.count(Flag::Scene))
 		{
 			sky::GetService<Scene::Scene>()->frame();
 		}
-		SCHEDULER->frame();
 		IMGUI_SYSTEM->end();
 		RENDERER->present();
 
