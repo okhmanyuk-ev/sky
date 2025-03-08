@@ -1,5 +1,6 @@
 #pragma once
 
+#include <skygfx/skygfx.h>
 #include <platform/system.h>
 #include <graphics/system.h>
 #include <network/system.h>
@@ -29,7 +30,8 @@ namespace sky
 		using Flags = std::set<Flag>;
 
 	public:
-		Application(const std::string& appname, const Flags& flags = {});
+		Application(const std::string& appname, const Flags& flags = {},
+			std::optional<skygfx::BackendType> backend_type = std::nullopt);
 		~Application();
 
 	public:

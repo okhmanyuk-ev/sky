@@ -25,7 +25,7 @@ using namespace sky;
 static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepEnabled;
 static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepTimeCompletion;
 
-Application::Application(const std::string& appname, const Flags& flags) : mFlags(flags)
+Application::Application(const std::string& appname, const Flags& flags, std::optional<skygfx::BackendType> backend_type) : mFlags(flags)
 {
 	std::srand((unsigned int)std::time(nullptr));
 
@@ -37,7 +37,7 @@ Application::Application(const std::string& appname, const Flags& flags) : mFlag
 	sky::Locator<sky::Scheduler>::Init();
 	sky::Locator<Common::ProfilerSystem>::Init();
 	sky::Locator<Platform::System>::Set(Platform::System::create(appname));
-	sky::Locator<sky::Renderer>::Init();
+	sky::Locator<sky::Renderer>::Init(backend_type);
 	sky::Locator<sky::Console>::Set(std::make_shared<sky::ImguiConsole>());
 	sky::Locator<Graphics::System>::Init();
 	if (flags.count(Flag::Network))
