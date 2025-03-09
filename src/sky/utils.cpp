@@ -96,20 +96,14 @@ void sky::ExecuteCommand(const std::string& str)
 
 std::string sky::to_string(const std::wstring& wstr)
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 	return converter.to_bytes(wstr);
-#pragma GCC diagnostic pop
 }
 
 std::wstring sky::to_wstring(const std::string& str)
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 	return converter.from_bytes(str);
-#pragma GCC diagnostic pop
 }
 
 std::string sky::join(const std::vector<std::string>& vec, const std::string& delimiter)

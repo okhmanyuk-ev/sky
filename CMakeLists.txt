@@ -120,6 +120,9 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 	-D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 	-D_SILENCE_CXX23_ALIGNED_STORAGE_DEPRECATION_WARNING
 )
+if(EMSCRIPTEN)
+	target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations)
+endif()
 
 # glm
 
@@ -252,6 +255,14 @@ endfunction()
 
 # imgui
 
+function(disable_warnings TARGET_NAME)
+	if(MSVC)
+		target_compile_options(${TARGET_NAME} PRIVATE /W0)
+	else()
+		target_compile_options(${TARGET_NAME} PRIVATE -w)
+	endif()
+endfunction()
+
 file(GLOB IMGUI_SRC
 	lib/imgui/*.cpp
 	lib/imgui/*.h
@@ -263,6 +274,7 @@ target_include_directories(imgui SYSTEM PUBLIC lib/imgui)
 target_include_directories(imgui SYSTEM PUBLIC lib/imgui/misc/cpp)
 target_link_libraries(${PROJECT_NAME} imgui)
 set_property(TARGET imgui PROPERTY FOLDER ${LIBS_FOLDER})
+disable_warnings(imgui)
 
 # fmt
 
