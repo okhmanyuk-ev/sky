@@ -59,7 +59,7 @@ namespace sky
 		}
 
 	public:
-		auto getListenersCount() const;
+		size_t getListenersCount() const;
 
 	private:
 		std::unordered_map<std::type_index, std::unordered_set<void*>> mListeners;
