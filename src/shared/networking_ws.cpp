@@ -248,7 +248,7 @@ void Client::connect()
 
 	mImpl->wsclient.connect(con);
 #endif
-	sky::Log("connecting");
+	sky::Log("connecting to {}", mUrl);
 }
 
 void Client::onChannelCreated(std::shared_ptr<Channel> channel)
