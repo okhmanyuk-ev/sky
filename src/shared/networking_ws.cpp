@@ -225,10 +225,17 @@ void Client::connect()
 
 	emscripten_websocket_set_onmessage_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> EM_BOOL {
 		auto self = static_cast<Client*>(userData);
-		auto buf = sky::BitBuffer();
-		buf.write(websocketEvent->data, websocketEvent->numBytes);
-		buf.toStart();
-		self->mChannel->read(buf);
+		try
+		{
+			auto buf = sky::BitBuffer();
+			buf.write(websocketEvent->data, websocketEvent->numBytes);
+			buf.toStart();
+			self->mChannel->read(buf);
+		}
+		catch (const std::exception& e)
+		{
+			sky::Log(e.what());
+		}
 		return eventType;
 	});
 
