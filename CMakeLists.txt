@@ -344,11 +344,6 @@ target_compile_definitions(magic_enum INTERFACE
 )
 target_link_libraries(${PROJECT_NAME} magic_enum)
 
-# skygfx
-
-add_subdirectory(lib/skygfx)
-target_link_libraries(${PROJECT_NAME} skygfx)
-
 # glfw
 
 if(WIN32 OR APPLE AND NOT IOS)
@@ -369,6 +364,11 @@ add_library(tinyxml2 STATIC
 target_include_directories(imgui PUBLIC lib/tinyxml2)
 target_link_libraries(${PROJECT_NAME} tinyxml2)
 set_property(TARGET tinyxml2 PROPERTY FOLDER ${LIBS_FOLDER})
+
+# skygfx
+
+add_subdirectory(lib/skygfx)
+target_link_libraries(${PROJECT_NAME} skygfx)
 
 # examples
 

@@ -1,7 +1,7 @@
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(EXAMPLES_FOLDER "examples")
+set(EXAMPLES_FOLDER "sky-examples")
 
 # 01 - hello_world
 
