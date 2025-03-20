@@ -36,10 +36,8 @@ copy_required_libs(04_physics "${PROJECT_SOURCE_DIR}/lib/fmod")
 add_executable(05_labels 05_labels/main.cpp)
 target_link_libraries(05_labels sky)
 set_property(TARGET 05_labels PROPERTY FOLDER ${EXAMPLES_FOLDER})
+set_target_properties(05_labels PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 copy_required_libs(05_labels "${PROJECT_SOURCE_DIR}/lib/fmod")
-if(MSVC)
-	set_target_properties(05_labels PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()
 
 # 06 - circles
 

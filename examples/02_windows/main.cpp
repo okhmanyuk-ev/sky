@@ -22,7 +22,7 @@ static std::shared_ptr<Shared::SceneManager::Window> CreateWindow()
 	close->setAnchor({ 1.0f, 0.0f });
 	close->setPivot({ 1.0f, 0.0f });
 	close->setPosition({ -8.0f, 8.0f });
-	close->setColor({ Graphics::Color::Red, 0.5f });
+	close->setColor({ sky::GetColor(sky::Color::Red), 0.5f });
 	close->setClickCallback([] {
 		SCENE_MANAGER->popWindow();
 	});
