@@ -1099,7 +1099,7 @@ void SceneHelpers::ImScene::Tooltip(Scene::Node& holder,
 
 	auto pos = holder.unproject(cursor_pos.value());
 
-	auto rect = IMSCENE->spawn<Smoother<Scene::AutoSized<Scene::ClippableScissor<Scene::Rectangle>>>>(holder, key);
+	auto rect = IMSCENE->spawn<Scene::Eased<Scene::AutoSized<Scene::ClippableScissor<Scene::Rectangle>>>>(holder, key);
 	if (IMSCENE->isFirstCall())
 	{
 		rect->setAbsoluteRounding(true);
@@ -1137,7 +1137,7 @@ void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Nod
 
 	const auto color = sky::GetColor(sky::Color::Yellow);
 
-	auto rect = IMSCENE->spawn<Shared::SceneHelpers::Smoother<Shared::SceneHelpers::Outlined<Scene::Rectangle>>>(holder);
+	auto rect = IMSCENE->spawn<Scene::Eased<Shared::SceneHelpers::Outlined<Scene::Rectangle>>>(holder);
 	if (IMSCENE->isFirstCall())
 	{
 		rect->setColor({ color, 0.25f });

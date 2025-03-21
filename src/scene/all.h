@@ -12,6 +12,7 @@
 #include <scene/clippable.h>
 #include <scene/color.h>
 #include <scene/cullable.h>
+#include <scene/eased.h>
 #include <scene/emitter.h>
 #include <scene/glass.h>
 #include <scene/grid.h>

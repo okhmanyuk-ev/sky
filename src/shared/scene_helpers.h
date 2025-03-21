@@ -521,60 +521,6 @@ namespace Shared::SceneHelpers
 		float mShockwaveForce = 1.0f;
 	};
 
-	template <class T> class Smoother : public T
-	{
-		static_assert(std::is_base_of<Scene::Node, T>::value, "T must be derived from Node");
-
-	protected:
-		void updateTransform() override
-		{
-			auto prev_transform = this->getTransform();
-			T::updateTransform();
-
-			if (!mSmoothTransform)
-				return;
-
-			auto now = SCHEDULER->getUptime();
-			if (mPrevTransformTimepoint.has_value())
-			{
-				auto dTime = now - mPrevTransformTimepoint.value();
-				auto new_transform = this->getTransform();
-				this->setTransform(sky::ease_towards(prev_transform, new_transform, dTime));
-			}
-			mPrevTransformTimepoint = now;
-		}
-
-		void updateAbsoluteSize() override
-		{
-			auto prev_size = this->getAbsoluteSize();
-			T::updateAbsoluteSize();
-
-			if (!mSmoothAbsoluteSize)
-				return;
-
-			auto now = SCHEDULER->getUptime();
-			if (mPrevSizeTimepoint.has_value())
-			{
-				auto dTime = now - mPrevSizeTimepoint.value();
-				auto new_size = this->getAbsoluteSize();
-				this->setAbsoluteSize(sky::ease_towards(prev_size, new_size, dTime));
-			}
-			mPrevSizeTimepoint = now;
-		}
-
-	private:
-		std::optional<sky::Duration> mPrevTransformTimepoint;
-		std::optional<sky::Duration> mPrevSizeTimepoint;
-
-	public:
-		void setSmoothTransform(bool value) { mSmoothTransform = value; }
-		void setSmoothAbsoluteSize(bool value) { mSmoothAbsoluteSize = value; }
-
-	private:
-		bool mSmoothTransform = true;
-		bool mSmoothAbsoluteSize = true;
-	};
-
 	class Checkbox : public Scene::Clickable<Scene::Node>
 	{
 	public:
