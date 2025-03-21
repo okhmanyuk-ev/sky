@@ -4,6 +4,7 @@ using namespace sky;
 
 Audio::Audio()
 {
+#if 0
 #if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	FMOD::Studio::System::create(&FmodStudio);
 	FmodStudio->getCoreSystem(&Fmod);
@@ -15,12 +16,15 @@ Audio::Audio()
 	Platform::SystemAndroid::EndEnv();
 #endif
 #endif
+#endif
 }
 
 Audio::~Audio()
 {
+#if 0
 #if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	FmodStudio->release();
+#endif
 #endif
 }
 
@@ -29,13 +33,16 @@ void Audio::play(std::shared_ptr<Sound> sound)
 	if (sound == nullptr)
 		return;
 
+#if 0
 #if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	Fmod->playSound(sound->sound, nullptr, false, &channel);
+#endif
 #endif
 }
 
 Audio::Sound::Sound(const sky::Asset& asset, bool loop)
 {
+#if 0
 #if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	FMOD_CREATESOUNDEXINFO exinfo;
 	memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
@@ -51,11 +58,14 @@ Audio::Sound::Sound(const sky::Asset& asset, bool loop)
 
 	Audio::Fmod->createSound((const char*)asset.getMemory(), mode, &exinfo, &sound);
 #endif
+#endif
 }
 
 Audio::Sound::~Sound()
 {
+#if 0
 #if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
 	sound->release();
+#endif
 #endif
 }
