@@ -328,6 +328,17 @@ if(NOT EMSCRIPTEN)
 	target_link_libraries(${PROJECT_NAME} websocketpp)
 endif()
 
+# openssl
+
+if(SKY_USE_OPENSSL)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC -DSKY_USE_OPENSSL)
+	if(NOT EMSCRIPTEN)
+		find_package(OpenSSL REQUIRED)
+		target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+		target_link_libraries(${PROJECT_NAME} ${OPENSSL_LIBRARIES})
+	endif()
+endif()
+
 # box2d
 
 add_subdirectory(lib/box2d)

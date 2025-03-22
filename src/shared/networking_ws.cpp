@@ -8,8 +8,13 @@
 #include <emscripten/websocket.h>
 #else
 #include <websocketpp/server.hpp>
+#ifdef SKY_USE_OPENSSL
+#include <websocketpp/config/asio.hpp>
+#include <websocketpp/config/asio_client.hpp>
+#else
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/config/asio_no_tls_client.hpp>
+#endif
 #include <websocketpp/client.hpp>
 #endif
 
@@ -63,7 +68,11 @@ void Channel::addMessageReader(const std::string& name, ReadCallback callback)
 #ifndef EMSCRIPTEN
 struct Server::Impl
 {
+#ifdef SKY_USE_OPENSSL
+	websocketpp::server<websocketpp::config::asio_tls> server;
+#else
 	websocketpp::server<websocketpp::config::asio> server;
+#endif
 };
 
 Server::Server(uint16_t port) :
@@ -109,6 +118,15 @@ Server::Server(uint16_t port) :
 	});
 
 	mImpl->server.init_asio();
+#ifdef SKY_USE_OPENSSL
+	mImpl->server.set_tls_init_handler([](websocketpp::connection_hdl hdl) {
+		auto ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
+		ctx->set_options(asio::ssl::context::default_workarounds | asio::ssl::context::no_sslv2 | asio::ssl::context::no_sslv3);
+		ctx->use_certificate_chain_file("cert.pem");
+		ctx->use_private_key_file("key.pem", asio::ssl::context::pem);
+		return ctx;
+	});
+#endif
 	mImpl->server.listen(port);
 	mImpl->server.start_accept();
 }
@@ -144,7 +162,11 @@ struct Client::Impl
 #ifdef EMSCRIPTEN
 	EMSCRIPTEN_WEBSOCKET_T handle = -1;
 #else
+#ifdef SKY_USE_OPENSSL
+	websocketpp::client<websocketpp::config::asio_tls_client> wsclient;
+#else
 	websocketpp::client<websocketpp::config::asio_client> wsclient;
+#endif
 #endif
 };
 
@@ -187,6 +209,13 @@ Client::Client(const std::string& url) :
 		buf.toStart();
 		mChannel->read(buf);
 	});
+#ifdef SKY_USE_OPENSSL
+	mImpl->wsclient.set_tls_init_handler([](websocketpp::connection_hdl) {
+		auto ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
+		ctx->set_options(asio::ssl::context::default_workarounds | asio::ssl::context::no_sslv2 | asio::ssl::context::no_sslv3);
+		return ctx;
+	});
+#endif
 #endif
 	connect();
 }
