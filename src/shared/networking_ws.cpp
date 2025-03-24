@@ -99,8 +99,10 @@ Server::Server(uint16_t port) :
 	});
 
 	mImpl->server.set_close_handler([this](websocketpp::connection_hdl hdl) {
+#ifndef LINUX
 		auto [ip, port] = getV4AddressFromHdl(hdl);
 		sky::Log("{}:{} disconnected", ip, port);
+#endif
 
 		auto channel = mChannels.at(hdl);
 		if (channel->mDisconnectCallback)
