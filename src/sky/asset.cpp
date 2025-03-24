@@ -31,7 +31,7 @@ sky::Asset::Asset(const std::string& path, Storage storage)
 		file.read((char*)mMemory, mSize);
 		file.close();
 	}
-#elif defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
+#elif defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN) | defined(LINUX)
 	auto p = StoragePathToAbsolute(path, storage);
 	std::ifstream file(p, std::ios::in | std::ios::binary);
 	file.seekg(0, file.end);
@@ -57,7 +57,7 @@ sky::Asset::~Asset()
 
 void sky::Asset::Write(const std::string& path, void* memory, size_t size, Storage storage)
 {
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN) | defined(LINUX)
 #if defined(PLATFORM_IOS)
 	assert(storage != Storage::Assets);
 	if (storage == Storage::Assets)
@@ -119,7 +119,7 @@ std::string sky::Asset::StoragePathToAbsolute(const std::string& _path, Storage 
 	auto path = FixSlashes(_path);
 	if (storage == Storage::Assets)
 	{
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN) | defined(LINUX)
 		return AssetsFolder + "/" + path;
 #elif defined(PLATFORM_IOS)
 		return std::string([[[NSBundle mainBundle]bundlePath] UTF8String]) + "/" + AssetsFolder + "/" + path;
