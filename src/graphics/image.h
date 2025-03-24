@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <sky/asset.h>
 
 namespace Graphics
