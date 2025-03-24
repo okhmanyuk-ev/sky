@@ -6,6 +6,7 @@
 #include <cassert>
 #include <filesystem>
 #include <sys/stat.h>
+#include <cstring>
 
 sky::Asset::Asset(const std::string& path, Storage storage)
 {
@@ -87,7 +88,7 @@ void sky::Asset::Write(const std::string& path, void* memory, size_t size, Stora
 
 bool sky::Asset::Exists(const std::string& path, Storage storage)
 {
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN) | defined(LINUX)
 	auto abs_path = StoragePathToAbsolute(path, storage);
 	auto status = std::filesystem::status(abs_path);
 	return status.type() == std::filesystem::file_type::regular;

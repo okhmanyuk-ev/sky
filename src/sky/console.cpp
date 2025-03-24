@@ -410,25 +410,27 @@ std::string CommandProcessor::CVar::getValueAsString() const
 
 std::string CommandProcessor::CVar::getArgsAsString() const
 {
-	auto args = arguments
-		| sky::ranges::wrap("<", ">")
-		| std::ranges::to<std::vector>()
-		| std::views::filter(std::not_fn(std::ranges::empty))
-		| std::ranges::to<std::vector>();
-
-	return sky::join(args, " ");
+	abort();
+	// auto args = arguments
+	// 	| sky::ranges::wrap("<", ">")
+	// 	| std::ranges::to<std::vector>()
+	// 	| std::views::filter(std::not_fn(std::ranges::empty))
+	// 	| std::ranges::to<std::vector>();
+	//
+	// return sky::join(args, " ");
 }
 
 std::string CommandProcessor::Command::getArgsAsString() const
 {
-	auto to_string = std::views::transform([](const DefaultArgument& arg) { return arg.name + "=" + arg.default_value; });
-	auto args_groups = {
-		arguments | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
-		default_arguments | to_string | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
-		optional_arguments | sky::ranges::wrap("(<", ">)") | std::ranges::to<std::vector>()
-	};
-	auto args = std::views::join(args_groups) | std::views::filter(std::not_fn(std::ranges::empty)) | std::ranges::to<std::vector>();
-	return sky::join(args, " ");
+	abort();
+	// auto to_string = std::views::transform([](const DefaultArgument& arg) { return arg.name + "=" + arg.default_value; });
+	// auto args_groups = {
+	// 	arguments | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
+	// 	default_arguments | to_string | sky::ranges::wrap("<", ">") | std::ranges::to<std::vector>(),
+	// 	optional_arguments | sky::ranges::wrap("(<", ">)") | std::ranges::to<std::vector>()
+	// };
+	// auto args = std::views::join(args_groups) | std::views::filter(std::not_fn(std::ranges::empty)) | std::ranges::to<std::vector>();
+	// return sky::join(args, " ");
 }
 
 const std::vector<std::string> CVarTraits<bool>::Args = { "bool" };
