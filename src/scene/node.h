@@ -47,7 +47,9 @@ namespace Scene
 		virtual void detach(std::shared_ptr<Node> node);
 		void clear();
 
-	public:
+		using SortPredicate = std::function<bool(const std::shared_ptr<Node>&, const std::shared_ptr<Node>&)>;
+		void sort(SortPredicate predicate);
+
 		glm::vec2 project(const glm::vec2& value) const;
 		glm::vec2 unproject(const glm::vec2& value) const;
 

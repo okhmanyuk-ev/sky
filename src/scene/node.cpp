@@ -57,6 +57,11 @@ void Node::clear()
 	}
 }
 
+void Node::sort(SortPredicate predicate)
+{
+	mNodes.sort(predicate);
+}
+
 glm::vec2 Node::project(const glm::vec2& value) const
 {
 	if (!mTransformReady)
