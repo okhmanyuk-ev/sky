@@ -4,8 +4,6 @@
 
 using namespace Actions;
 
-// parallel action
-
 Parallel::Parallel(Awaiting awaitingType) : mAwaitingType(awaitingType)
 {
 }
@@ -43,8 +41,6 @@ void Parallel::clear()
 	mActions.clear();
 }
 
-// sequence action
-
 Action::Status Sequence::frame(sky::Duration delta)
 {
 	if (mActions.empty())
@@ -71,8 +67,6 @@ void Sequence::clear()
 	mActions.clear();
 }
 
-// generic action
-
 Generic::Generic(StatusCallback callback) : mCallback(callback)
 {
 }
@@ -92,8 +86,6 @@ Action::Status Generic::frame(sky::Duration delta)
 	assert(mCallback);
 	return mCallback(delta);
 }
-
-// repeat action
 
 Repeat::Repeat(Callback callback) : mCallback(std::move(callback))
 {
@@ -119,8 +111,6 @@ Action::Status Repeat::frame(sky::Duration delta)
 
 	return Status::Continue;
 }
-
-// collection
 
 std::unique_ptr<Action> Collection::Insert(std::function<std::unique_ptr<Action>()> action)
 {
@@ -242,8 +232,6 @@ std::unique_ptr<Action> Collection::Delayed(bool& while_flag, std::unique_ptr<Ac
 	);
 }
 
-// breakable
-
 std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Action> action)
 {
 	return MakeParallel(Parallel::Awaiting::Any,
@@ -278,69 +266,6 @@ std::unique_ptr<Action> Collection::Pausable(std::function<bool()> run_callback,
 	});
 }
 
-std::unique_ptr<Action> Collection::Interpolate(float start, float dest, float duration, EasingFunction easing, std::function<void(float)> callback)
-{
-	return std::make_unique<Generic>([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
-		passed += sky::ToSeconds(delta);
-		if (passed >= duration)
-		{
-			callback(dest);
-			return Action::Status::Finished;
-		}
-		callback(glm::lerp(start, dest, easing(passed / duration)));
-		return Action::Status::Continue;
-	});
-}
-
-std::unique_ptr<Action> Collection::Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback)
-{
-	return Collection::Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
-		callback(glm::lerp(start, dest, value));
-	});
-}
-
-std::unique_ptr<Action> Collection::Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback)
-{
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
-		callback(glm::lerp(start, dest, value));
-	});
-}
-
-std::unique_ptr<Action> Collection::Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration, EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback)
-{
-	return Interpolate(0.0f, 1.0f, duration, easingFunction, [callback, start, dest](float value) {
-		callback(glm::lerp(start, dest, value));
-	});
-}
-
-std::unique_ptr<Action> Collection::Interpolate(float startValue, float destValue, float duration, float& value, EasingFunction easingFunction)
-{
-	return Interpolate(startValue, destValue, duration, easingFunction, [&value](float _value) {
-		value = _value;
-	});
-}
-
-std::unique_ptr<Action> Collection::Interpolate(float destValue, float duration, float& value, EasingFunction easingFunction)
-{
-	return Insert([destValue, duration, &value, easingFunction] {
-		return Collection::Interpolate(value, destValue, duration, value, easingFunction);
-	});
-}
-
-std::unique_ptr<Action> Collection::Interpolate(const glm::vec3& startValue, const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction)
-{
-	return Interpolate(startValue, destValue, duration, easingFunction, [&value](const glm::vec3& _value) {
-		value = _value;
-	});
-}
-
-std::unique_ptr<Action> Collection::Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value, EasingFunction easingFunction)
-{
-	return Insert([destValue, duration, &value, easingFunction] {
-		return Interpolate(value, destValue, duration, value, easingFunction);
-	});
-}
-
 std::unique_ptr<Action> Collection::Log(const std::string& text)
 {
 	return Execute([text] {
@@ -348,14 +273,8 @@ std::unique_ptr<Action> Collection::Log(const std::string& text)
 	});
 }
 
-// instant player
-
 void Actions::Run(std::unique_ptr<Action> action)
 {
-	//	FRAME->add([action = std::move(action)] {
-	//		return action->frame() == Status::Continue ? FrameSystem::Status::Continue : FrameSystem::Status::Finished;
-	//	});
-
 	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
 	player->add(std::move(action));
 	SCHEDULER->add([player] {

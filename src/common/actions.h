@@ -173,50 +173,92 @@ namespace Actions
 		std::unique_ptr<Action> Breakable(std::function<bool()> while_callback, std::unique_ptr<Action> action);
 
 		std::unique_ptr<Action> Pausable(std::function<bool()> run_callback, std::unique_ptr<Action> action);
+		std::unique_ptr<Action> Log(const std::string& text);
 
 		using EasingFunction = std::function<float(float)>;
 
-		std::unique_ptr<Action> Interpolate(float start, float dest, float duration, EasingFunction easingFunction,
-			std::function<void(float)> callback);
-		std::unique_ptr<Action> Interpolate(const glm::vec2& start, const glm::vec2& dest, float duration,
-			EasingFunction easingFunction, std::function<void(const glm::vec2&)> callback);
-		std::unique_ptr<Action> Interpolate(const glm::vec3& start, const glm::vec3& dest, float duration,
-			EasingFunction easingFunction, std::function<void(const glm::vec3&)> callback);
-		std::unique_ptr<Action> Interpolate(const glm::vec4& start, const glm::vec4& dest, float duration,
-			EasingFunction easingFunction, std::function<void(const glm::vec4&)> callback);
+		template <typename T, typename Func>
+			requires std::is_invocable_r_v<void, Func, T>
+		std::unique_ptr<Action> Interpolate(T start, T dest, float duration, EasingFunction easing, Func callback)
+		{
+			return std::make_unique<Generic>([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
+				passed += sky::ToSeconds(delta);
+				if (passed >= duration)
+				{
+					callback(dest);
+					return Action::Status::Finished;
+				}
+				callback(glm::lerp(start, dest, easing(passed / duration)));
+				return Action::Status::Continue;
+			});
+		}
 
-		std::unique_ptr<Action> Interpolate(float startValue, float destValue, float duration, float& value,
-			EasingFunction easingFunction = Easing::Linear);
-		std::unique_ptr<Action> Interpolate(float destValue, float duration, float& value,
-			EasingFunction easingFunction = Easing::Linear);
+		template<typename T>
+		concept Property = requires {
+			typename T::Type;
+			typename T::Object;
+			{ T::GetValue(std::declval<typename T::Object>()) } -> std::convertible_to<typename T::Type>;
+			{ T::SetValue(std::declval<typename T::Object>(), std::declval<typename T::Type>()) } -> std::same_as<void>;
+		};
 
-		std::unique_ptr<Action> Interpolate(const glm::vec3& startValue, const glm::vec3& destValue,
-			float duration, glm::vec3& value, EasingFunction easingFunction = Easing::Linear);
-		std::unique_ptr<Action> Interpolate(const glm::vec3& destValue, float duration, glm::vec3& value,
-			EasingFunction easingFunction = Easing::Linear);
+		template <Property T>
+		std::unique_ptr<Action> Interpolate(typename T::Object object, const typename T::Type& start, const typename T::Type& dest,
+			float duration, EasingFunction easing = Easing::Linear)
+		{
+			return Interpolate(start, dest, duration, easing, [object](const auto& value) {
+				T::SetValue(object, value);
+			});
+		}
 
-		std::unique_ptr<Action> Log(const std::string& text);
+		template <Property T>
+		std::unique_ptr<Action> Interpolate(typename T::Object object, const typename T::Type& dest, float duration,
+			EasingFunction easing = Easing::Linear)
+		{
+			return Insert([object, dest, duration, easing] {
+				return Interpolate<T>(object, T::GetValue(object), dest, duration, easing);
+			});
+		}
 
-		template<class...Args> std::unique_ptr<Sequence> MakeSequence(Args&&...args)
+		template <typename T>
+		std::unique_ptr<Action> Interpolate(T start, T dest, float duration, T& value, EasingFunction easing = Easing::Linear)
+		{
+			return Interpolate(start, dest, duration, easing, [&value](T _value) {
+				value = _value;
+			});
+		}
+
+		template <typename T>
+		std::unique_ptr<Action> Interpolate(T dest, float duration, T& value, EasingFunction easing = Easing::Linear)
+		{
+			return Insert([dest, duration, &value, easing] {
+				return Interpolate(value, dest, duration, value, easing);
+			});
+		}
+
+		template <typename...Args>
+		std::unique_ptr<Sequence> MakeSequence(Args&&...args)
 		{
 			auto seq = std::make_unique<Sequence>();
 			(seq->add(std::forward<Args>(args)), ...);
 			return seq;
 		}
 
-		template<class...Args> std::unique_ptr<Parallel> MakeParallel(Parallel::Awaiting awaitingType, Args&&...args)
+		template <typename...Args>
+		std::unique_ptr<Parallel> MakeParallel(Parallel::Awaiting awaitingType, Args&&...args)
 		{
 			auto parallel = std::make_unique<Parallel>(awaitingType);
 			(parallel->add(std::forward<Args>(args)), ...);
 			return parallel;
 		}
 
-		template<class...Args> std::unique_ptr<Parallel> MakeParallel(Args&&...args)
+		template <typename...Args>
+		std::unique_ptr<Parallel> MakeParallel(Args&&...args)
 		{
 			return MakeParallel(Parallel::Awaiting::All, std::forward<Args>(args)...);
 		}
 
-		template<class T> std::unique_ptr<Action> WaitEvent(typename sky::Listener<T>::Callback onEvent)
+		template <typename T>
+		std::unique_ptr<Action> WaitEvent(typename sky::Listener<T>::Callback onEvent)
 		{
 			auto event_holder = std::make_shared<std::optional<T>>();
 

@@ -8,24 +8,138 @@
 #include <common/actions.h>
 #include <common/easing.h>
 
+namespace Scene
+{
+	template <typename ObjectType, typename ValueType, typename GetterValueType, typename SetterValueType,
+		GetterValueType(ObjectType::* Getter)() const, void (ObjectType::* Setter)(SetterValueType)>
+	struct Property
+	{
+		using Type = ValueType;
+		using Object = std::shared_ptr<ObjectType>;
+		static Type GetValue(Object obj) { return static_cast<Type>((obj.get()->*Getter)()); }
+		static void SetValue(Object obj, SetterValueType value) { (obj.get()->*Setter)(value); }
+	};
+
+	using ColorProperty = Property<Color, glm::vec3, glm::vec4, const glm::vec3&, &Color::getColor, &Color::setColor>;
+	using AlphaProperty = Property<Color, float, float, float, &Color::getAlpha, &Color::setAlpha>;
+
+	using AnchorProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getAnchor, &Transform::setAnchor>;
+	using HorizontalAnchorProperty = Property<Transform, float, float, float, &Transform::getHorizontalAnchor, &Transform::setHorizontalAnchor>;
+	using VerticalAnchorProperty = Property<Transform, float, float, float, &Transform::getVerticalAnchor, &Transform::setVerticalAnchor>;
+
+	using PivotProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getPivot, &Transform::setPivot>;
+	using HorizontalPivotProperty = Property<Transform, float, float, float, &Transform::getHorizontalPivot, &Transform::setHorizontalPivot>;
+	using VerticalPivotProperty = Property<Transform, float, float, float, &Transform::getVerticalPivot, &Transform::setVerticalPivot>;
+
+	using PositionProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getPosition, &Transform::setPosition>;
+	using HorizontalPositionProperty = Property<Transform, float, float, float, &Transform::getHorizontalPosition, &Transform::setHorizontalPosition>;
+	using VerticalPositionProperty = Property<Transform, float, float, float, &Transform::getVerticalPosition, &Transform::setVerticalPosition>;
+
+	using OriginProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getOrigin, &Transform::setOrigin>;
+	using HorizontalOriginProperty = Property<Transform, float, float, float, &Transform::getHorizontalOrigin, &Transform::setHorizontalOrigin>;
+	using VerticalOriginProperty = Property<Transform, float, float, float, &Transform::getVerticalOrigin, &Transform::setVerticalOrigin>;
+
+	using SizeProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getSize, &Transform::setSize>;
+	using HorizontalSizeProperty = Property<Transform, float, float, float, &Transform::getHorizontalSize, &Transform::setHorizontalSize>;
+	using VerticalSizeProperty = Property<Transform, float, float, float, &Transform::getVerticalSize, &Transform::setVerticalSize>;
+
+	using StretchProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getStretch, &Transform::setStretch>;
+	using HorizontalStretchProperty = Property<Transform, float, float, float, &Transform::getHorizontalStretch, &Transform::setHorizontalStretch>;
+	using VerticalStretchProperty = Property<Transform, float, float, float, &Transform::getVerticalStretch, &Transform::setVerticalStretch>;
+
+	using ScaleProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getScale, &Transform::setScale>;
+	using HorizontalScaleProperty = Property<Transform, float, float, float, &Transform::getHorizontalScale, &Transform::setHorizontalScale>;
+	using VerticalScaleProperty = Property<Transform, float, float, float, &Transform::getVerticalScale, &Transform::setVerticalScale>;
+
+	using RotationProperty = Property<Transform, float, float, float, &Transform::getRotation, &Transform::setRotation>;
+	using RadialAnchorProperty = Property<Transform, float, float, float, &Transform::getRadialAnchor, &Transform::setRadialAnchor>;
+	using RadialPivotProperty = Property<Transform, float, float, float, &Transform::getRadialPivot, &Transform::setRadialPivot>;
+
+	using CirclePieProperty = Property<Circle, float, float, float, &Circle::getPie, &Circle::setPie>;
+	using CirclePiePivotProperty = Property<Circle, float, float, float, &Circle::getPiePivot, &Circle::setPiePivot>;
+	using CircleRadiusProperty = Property<Circle, float, float, float, &Circle::getRadius, &Circle::setRadius>;
+	using CircleFillProperty = Property<Circle, float, float, float, &Circle::getFill, &Circle::setFill>;
+
+	using ScrollPositionProperty = Property<Scrollbox, glm::vec2, glm::vec2, const glm::vec2&, &Scrollbox::getScrollPosition, &Scrollbox::setScrollPosition>;
+	using HorizontalScrollPositionProperty = Property<Scrollbox, float, float, float, &Scrollbox::getHorizontalScrollPosition, &Scrollbox::setHorizontalScrollPosition>;
+	using VerticalScrollPositionProperty = Property<Scrollbox, float, float, float, &Scrollbox::getVerticalScrollPosition, &Scrollbox::setVerticalScrollPosition>;
+
+	using BlurIntensityProperty = Property<BlurredGlass, float, float, float, &BlurredGlass::getBlurIntensity, &BlurredGlass::setBlurIntensity>;
+	using GrayscaleIntensityProperty = Property<GrayscaledGlass, float, float, float, &GrayscaledGlass::getGrayscaleIntensity, &GrayscaledGlass::setGrayscaleIntensity>;
+}
+
 namespace Actions::Collection
 {
+	template<typename T>
+	struct InterpolateWrapper
+	{
+		auto operator()(typename T::Object object, const typename T::Type& start, const typename T::Type& dest,
+			float duration, EasingFunction easing = Easing::Linear) const
+		{
+			return Interpolate<T>(object, start, dest, duration, easing);
+		}
+
+		auto operator()(typename T::Object object, const typename T::Type& dest,
+			float duration, EasingFunction easing = Easing::Linear) const
+		{
+			return Interpolate<T>(object, dest, duration, easing);
+		}
+	};
+
+	constexpr InterpolateWrapper<Scene::ColorProperty> ChangeColor;
+	constexpr InterpolateWrapper<Scene::AlphaProperty> ChangeAlpha;
+
+	constexpr InterpolateWrapper<Scene::HorizontalAnchorProperty> ChangeHorizontalAnchor;
+	constexpr InterpolateWrapper<Scene::VerticalAnchorProperty> ChangeVerticalAnchor;
+	constexpr InterpolateWrapper<Scene::AnchorProperty> ChangeAnchor;
+
+	constexpr InterpolateWrapper<Scene::HorizontalPivotProperty> ChangeHorizontalPivot;
+	constexpr InterpolateWrapper<Scene::VerticalPivotProperty> ChangeVerticalPivot;
+	constexpr InterpolateWrapper<Scene::PivotProperty> ChangePivot;
+
+	constexpr InterpolateWrapper<Scene::HorizontalPositionProperty> ChangeHorizontalPosition;
+	constexpr InterpolateWrapper<Scene::VerticalPositionProperty> ChangeVerticalPosition;
+	constexpr InterpolateWrapper<Scene::PositionProperty> ChangePosition;
+
+	constexpr InterpolateWrapper<Scene::HorizontalOriginProperty> ChangeHorizontalOrigin;
+	constexpr InterpolateWrapper<Scene::VerticalOriginProperty> ChangeVerticalOrigin;
+	constexpr InterpolateWrapper<Scene::OriginProperty> ChangeOrigin;
+
+	constexpr InterpolateWrapper<Scene::HorizontalSizeProperty> ChangeHorizontalSize;
+	constexpr InterpolateWrapper<Scene::VerticalSizeProperty> ChangeVerticalSize;
+	constexpr InterpolateWrapper<Scene::SizeProperty> ChangeSize;
+
+	constexpr InterpolateWrapper<Scene::HorizontalStretchProperty> ChangeHorizontalStretch;
+	constexpr InterpolateWrapper<Scene::VerticalStretchProperty> ChangeVerticalStretch;
+	constexpr InterpolateWrapper<Scene::StretchProperty> ChangeStretch;
+
+	constexpr InterpolateWrapper<Scene::HorizontalScaleProperty> ChangeHorizontalScale;
+	constexpr InterpolateWrapper<Scene::VerticalScaleProperty> ChangeVerticalScale;
+	constexpr InterpolateWrapper<Scene::ScaleProperty> ChangeScale;
+
+	constexpr InterpolateWrapper<Scene::RotationProperty> ChangeRotation;
+	constexpr InterpolateWrapper<Scene::RadialAnchorProperty> ChangeRadialAnchor;
+	constexpr InterpolateWrapper<Scene::RadialPivotProperty> ChangeRadialPivot;
+
+	constexpr InterpolateWrapper<Scene::CirclePieProperty> ChangeCirclePie;
+	constexpr InterpolateWrapper<Scene::CirclePiePivotProperty> ChangeCirclePiePivot;
+	constexpr InterpolateWrapper<Scene::CircleRadiusProperty> ChangeCircleRadius;
+	constexpr InterpolateWrapper<Scene::CircleFillProperty> ChangeCircleFill;
+
+	constexpr InterpolateWrapper<Scene::HorizontalScrollPositionProperty> ChangeHorizontalScrollPosition;
+	constexpr InterpolateWrapper<Scene::VerticalScrollPositionProperty> ChangeVerticalScrollPosition;
+	constexpr InterpolateWrapper<Scene::ScrollPositionProperty> ChangeScrollPosition;
+
+	constexpr InterpolateWrapper<Scene::BlurIntensityProperty> ChangeBlurIntensity;
+	constexpr InterpolateWrapper<Scene::GrayscaleIntensityProperty> ChangeGrayscaleIntensity;
+
 	std::unique_ptr<Action> ChangePositionByDirection(std::shared_ptr<Scene::Transform> node,
 		const glm::vec2& direction, float speed);
 	std::unique_ptr<Action> ChangePositionByDirection(std::shared_ptr<Scene::Transform> node,
 		const glm::vec2& direction, float speed, float duration);
 
-	std::unique_ptr<Action> ChangeColor(std::shared_ptr<Scene::Color> node, const glm::vec3& start,
-		const glm::vec3& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeColor(std::shared_ptr<Scene::Color> node, const glm::vec3& dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
 	std::unique_ptr<Action> ChangeColorRecursive(std::shared_ptr<Scene::Node> node, const glm::vec4& start,
 		const glm::vec4& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeAlpha(std::shared_ptr<Scene::Color> node, float start, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeAlpha(std::shared_ptr<Scene::Color> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
 
 	std::unique_ptr<Action> Hide(std::shared_ptr<Scene::Color> node, float duration,
 		EasingFunction easingFunction = Easing::Linear);
@@ -37,169 +151,4 @@ namespace Actions::Collection
 
 	std::unique_ptr<Action> Shake(std::shared_ptr<Scene::Transform> node, float radius, float duration);
 	std::unique_ptr<Action> Kill(std::shared_ptr<Scene::Node> node);
-
-	std::unique_ptr<Action> ChangeRotation(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeRotation(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeHorizontalAnchor(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeHorizontalAnchor(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeVerticalAnchor(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeVerticalAnchor(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeAnchor(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
-		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeAnchor(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeHorizontalPivot(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeHorizontalPivot(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeVerticalPivot(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeVerticalPivot(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangePivot(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
-		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangePivot(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeHorizontalPosition(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeHorizontalPosition(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-	
-	std::unique_ptr<Action> ChangeVerticalPosition(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeVerticalPosition(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangePosition(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
-		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangePosition(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeHorizontalOrigin(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeHorizontalOrigin(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeVerticalOrigin(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeVerticalOrigin(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeOrigin(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
-		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeOrigin(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeHorizontalSize(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeHorizontalSize(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-	
-	std::unique_ptr<Action> ChangeVerticalSize(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeVerticalSize(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeSize(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
-		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeSize(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeHorizontalStretch(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeHorizontalStretch(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeVerticalStretch(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeVerticalStretch(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeStretch(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
-		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeStretch(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeHorizontalScale(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeHorizontalScale(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeVerticalScale(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeVerticalScale(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeScale(std::shared_ptr<Scene::Transform> node, const glm::vec2& start,
-		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeScale(std::shared_ptr<Scene::Transform> node, const glm::vec2& dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeCirclePie(std::shared_ptr<Scene::Circle> circle, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeCirclePiePivot(std::shared_ptr<Scene::Circle> circle, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeCircleRadius(std::shared_ptr<Scene::Circle> circle, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeCircleFill(std::shared_ptr<Scene::Circle> circle, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start,
-		float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeHorizontalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float start,
-		float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeVerticalScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& start,
-		const glm::vec2& dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeScrollPosition(std::shared_ptr<Scene::Scrollbox> scrollbox, const glm::vec2& dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeRadialAnchor(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeRadialAnchor(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeRadialPivot(std::shared_ptr<Scene::Transform> node, float start, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeRadialPivot(std::shared_ptr<Scene::Transform> node, float dest, float duration,
-		EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float start,
-		float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeBlurIntensity(std::shared_ptr<Scene::BlurredGlass> blurred_glass, float dest,
-		float duration, EasingFunction easingFunction = Easing::Linear);
-
-	std::unique_ptr<Action> ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass,
-		float start, float dest, float duration, EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> ChangeGrayscaleIntensity(std::shared_ptr<Scene::GrayscaledGlass> grayscaled_glass,
-		float dest, float duration, EasingFunction easingFunction = Easing::Linear);
 }
