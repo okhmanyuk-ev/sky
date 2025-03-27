@@ -17,7 +17,6 @@ namespace Shared
 
 	private:
 		sky::CVar<bool> mShowCVars = sky::CVar<bool>("hud_show_cvars", false, "show cvars menu on screen");
-		sky::CVar<bool> mShowProfiler = sky::CVar<bool>("hud_show_profiler", false, "show profiler on screen");
 		sky::CVar<bool> mShowImguiDemo = sky::CVar<bool>("imgui_show_demo", false, "show imgui demo");
 	};
 }

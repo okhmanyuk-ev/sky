@@ -1,7 +1,6 @@
 #include "console_helper_commands.h"
 #include <imgui.h>
 #include <shared/imgui_user.h>
-#include <common/profiler_system.h>
 #include <common/console_commands.h>
 
 using namespace Shared;
@@ -64,48 +63,6 @@ void ConsoleHelperCommands::onFrame()
 				}
 			}
 		}
-
-		ImGui::End();
-	}
-
-	if (mShowProfiler)
-	{
-		ImGui::Begin("Profiler");
-
-		std::function<void(Common::ProfilerSystem::Node*)> show = [&show](Common::ProfilerSystem::Node* node) {
-			int flags = ImGuiTreeNodeFlags_DefaultOpen;
-
-			if (node->getNodes().size() == 0)
-				flags |= ImGuiTreeNodeFlags_Leaf;
-
-			int percentage = int(node->getPercentage() * 100.0f); // TODO: make relative percentage ?
-
-																  // TODO: percent must be right aligned
-
-			bool opened = ImGui::TreeNodeEx(node->getName().c_str(), flags, "%s - %d%%", node->getName().c_str(),
-				percentage > 100 ? 100 : percentage);
-
-			if (ImGui::IsItemHovered())
-			{
-				ImGui::BeginTooltip();
-				ImGui::Text("Name: %s", node->getName().c_str());
-				ImGui::Text("Count: %d", node->getCount());
-				ImGui::Text("Frame: %.3f msec", sky::ToSeconds(node->getDuration()) * 1000.0f);
-				ImGui::Text("Total: %.3f msec", sky::ToSeconds(node->getDuration() * node->getCount()) * 1000.0f);
-				ImGui::EndTooltip();
-			}
-
-			if (opened)
-			{
-				for (auto n : node->getNodes())
-					show(n);
-
-				ImGui::TreePop();
-			}
-		};
-
-		for (auto node : PROFILER->getNodes())
-			show(node);
 
 		ImGui::End();
 	}

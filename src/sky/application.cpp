@@ -35,7 +35,6 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 #endif
 	sky::Locator<sky::CommandProcessor>::Init();
 	sky::Locator<sky::Scheduler>::Init();
-	sky::Locator<Common::ProfilerSystem>::Init();
 	sky::Locator<Platform::System>::Set(Platform::System::create(appname));
 	sky::Locator<sky::Renderer>::Init(backend_type);
 	sky::Locator<sky::Console>::Set(std::make_shared<sky::ImguiConsole>());
@@ -294,7 +293,6 @@ Application::~Application()
 	sky::Locator<sky::Console>::Reset();
 	sky::Locator<sky::Renderer>::Reset();
 	sky::Locator<Platform::System>::Reset();
-	sky::Locator<Common::ProfilerSystem>::Reset();
 	sky::Locator<sky::Scheduler>::Reset();
 	sky::Locator<sky::CommandProcessor>::Reset();
 #ifndef EMSCRIPTEN

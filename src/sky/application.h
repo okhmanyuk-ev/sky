@@ -11,7 +11,6 @@
 #include <shared/stats_system.h>
 #include <shared/touch_emulator.h>
 #include <shared/gesture_detector.h>
-#include <common/profiler_system.h>
 #include <shared/scene_stylebook.h>
 #include <shared/scene_editor.h>
 
