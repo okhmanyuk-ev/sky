@@ -15,21 +15,13 @@ void effect(inout vec4 result)
 {
 	float distance = texture(sColorTexture, In.tex_coord, settings.mipmap_bias).a;
 	float smoothing = fwidth(distance) * sdf.smooth_factor;
+
 	float min_alpha = smoothstep(sdf.min_value - smoothing, sdf.min_value + smoothing, distance);
-	float max_alpha = smoothstep(sdf.max_value + smoothing, sdf.max_value - smoothing, distance);
-	result = vec4(0.0, 0.0, 0.0, 0.0);
+	float max_alpha = 1.0 - smoothstep(sdf.max_value - smoothing, sdf.max_value + smoothing, distance);
+
+	float alpha = min(min_alpha, max_alpha);
 	vec4 color = In.color * sdf.color;
-	if (max_alpha > 0.0 && min_alpha > 0.0)
-	{
-		if (max_alpha > 0.0)
-		{
-			result = vec4(color.rgb, color.a * max_alpha);
-		}
-		if (min_alpha > 0.0 && min_alpha < max_alpha)
-		{
-			result = vec4(color.rgb, color.a * min_alpha);
-		}
-	}
+	result = vec4(color.rgb, color.a * alpha);
 })";
 
 const std::string Circle::Effect = R"(
