@@ -114,6 +114,10 @@
 				.split('&')
 				.filter(Boolean)
 				.map(decodeURIComponent);
+			window.onbeforeunload = function (event) {
+				event.preventDefault();
+				return '';
+			};
 		</script>
 		{{{ SCRIPT }}}
 	</body>
