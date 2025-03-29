@@ -41,7 +41,7 @@ namespace Scene
 		void setPlaying(bool value) { mPlaying = value; }
 
 	private:
-		std::shared_ptr<Adaptive<Sprite>> mSprite = nullptr;
+		std::shared_ptr<Sprite> mSprite = nullptr;
 		float mFrequency = 10.0f;
 		std::string mState = "idle";
 		sky::Duration mAccumulator = sky::Duration::zero();

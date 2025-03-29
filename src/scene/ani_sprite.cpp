@@ -42,7 +42,6 @@ void AniSprite::update(sky::Duration delta)
 	const auto& region = regions.at(frame);
 
 	mSprite->setTexRegion(region);
-	mSprite->setAdaptSize(mMaxRegionSize);
 
 	if (getAbsoluteWidth() <= 0.0f)
 		setWidth(region.size.x);
