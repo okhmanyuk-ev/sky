@@ -2,93 +2,71 @@
 
 #include <scene/node.h>
 #include <scene/scene.h>
+#include <common/helpers.h>
 
 namespace Scene
 {
-	template <typename T> class Adaptive : public T
+	enum class AdaptBehavior
 	{
-		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
+		Width,
+		Height,
+		MinimalEdge,
+		MaximalEdge
+	};
 
-	public:
-		void updateTransform() override
+	template <typename T>
+		requires std::derived_from<T, Node>
+	class Adaptive : public T
+	{
+	protected:
+		void update(sky::Duration dTime) override
 		{
-			T::updateTransform();
+			T::update(dTime);
 
-			if (!mAdaptingEnabled)
+			if (!mAdaptEnabled)
 				return;
 
-			auto parent_size = this->hasParent() ? this->getParent()->getAbsoluteSize() : this->getScene()->getViewport().size;
-
-			auto size = mAdaptSize;
-			size -= mAdaptMargin;
-			size += mAdaptStretch * parent_size;
-
-			auto scale = size / this->getAbsoluteSize();
-			mAdaptScale = glm::min(scale.x, scale.y);
-
-			if (mBakingAdaption)
-			{
-				bakeAdaption();
+			if (!this->hasParent())
 				return;
-			}
 
-			auto offset = this->getPivot() * this->getAbsoluteSize();
+			auto parent_size = this->getParent()->getAbsoluteSize();
+			auto scale = parent_size / this->getSize();
 
-			auto transform = this->getTransform();
-			transform = glm::translate(transform, { offset, 0.0f });
-			transform = glm::scale(transform, { mAdaptScale, mAdaptScale, 1.0f });
-			transform = glm::translate(transform, { -offset, 0.0f });
-			this->setTransform(transform);
-		}
+			if (mBehavior == AdaptBehavior::Width)
+				mAdaptScale = scale.x;
+			else if (mBehavior == AdaptBehavior::Height)
+				mAdaptScale = scale.y;
+			else if (mBehavior == AdaptBehavior::MinimalEdge)
+				mAdaptScale = glm::min(scale.x, scale.y);
+			else if (mBehavior == AdaptBehavior::MaximalEdge)
+				mAdaptScale = glm::max(scale.x, scale.y);
 
-		void updateAbsoluteScale() override
-		{
-			T::updateAbsoluteScale();
-			auto absolute_scale = this->getAbsoluteScale();
-			absolute_scale *= mAdaptScale;
-			this->setAbsoluteScale(absolute_scale);
+			mAdaptScale = sky::sanitize(mAdaptScale);
 		}
 
 	public:
-		void bakeAdaption()
+		void updateAbsoluteSize() override
 		{
-			if (mAdaptScale == 0.0f)
+			T::updateAbsoluteSize();
+
+			if (!mAdaptEnabled)
 				return;
 
-			if (glm::isnan(mAdaptScale))
-				return;
-
-			this->setSize(this->getSize() * mAdaptScale);
-			mAdaptScale = 1.0f;
+			auto absolute_size = this->getAbsoluteSize();
+			absolute_size -= this->getSize();
+			absolute_size += this->getSize() * mAdaptScale;
+			this->setAbsoluteSize(absolute_size);
 		}
 
-	public:
-		auto getAdaptSize() const { return mAdaptSize; }
-		void setAdaptSize(const glm::vec2& value) { mAdaptSize = value; }
-		void setAdaptSize(float value) { setAdaptSize({ value, value }); }
+		auto isAdaptEnabled() const { return mAdaptEnabled; }
+		void setAdaptEnabled(bool value) { mAdaptEnabled = value; }
 
-		auto getAdaptMargin() const { return mAdaptMargin; }
-		void setAdaptMargin(const glm::vec2& value) { mAdaptMargin = value; }
-		void setAdaptMargin(float value) { setAdaptMargin({ value, value }); }
-
-		auto getAdaptStretch() const { return mAdaptStretch; }
-		void setAdaptStretch(const glm::vec2& value) { mAdaptStretch = value; }
-		void setAdaptStretch(float value) { setAdaptStretch({ value, value }); }
-
-		bool isAdaptingEnabled() const { return mAdaptingEnabled; }
-		void setAdaptingEnabled(bool value) { mAdaptingEnabled = value; }
-
-		auto getAdaptScale() const { return mAdaptScale; }
-
-		auto isBakingAdaption() const { return mBakingAdaption; }
-		void setBakingAdaption(bool value) { mBakingAdaption = value; }
+		auto getAdaptBehavior() const { return mBehavior; }
+		void setAdaptBehavior(AdaptBehavior value) { mBehavior = value; }
 
 	private:
-		bool mAdaptingEnabled = true;
-		glm::vec2 mAdaptSize = { 0.0f, 0.0f };
-		glm::vec2 mAdaptMargin = { 0.0f, 0.0f };
-		glm::vec2 mAdaptStretch = { 0.0f, 0.0f };
+		bool mAdaptEnabled = true;
 		float mAdaptScale = 1.0f;
-		bool mBakingAdaption = false;
+		AdaptBehavior mBehavior = AdaptBehavior::MinimalEdge;
 	};
 }
