@@ -4,13 +4,14 @@
 
 namespace Scene
 {
-	template <class T> class AutoScaled : public T
+	template <typename T>
+		requires std::derived_from<T, Node>
+	class AutoScaled : public T
 	{
-		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
 	protected:
-		void leaveUpdate() override
+		void update(sky::Duration dTime) override
 		{
-			T::leaveUpdate();
+			T::update(dTime);
 
 			if (!mAutoScaleEnabled)
 				return;
