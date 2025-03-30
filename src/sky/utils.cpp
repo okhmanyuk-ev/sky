@@ -2,6 +2,7 @@
 #include <sky/cache.h>
 #include <sky/localization.h>
 #include <codecvt>
+#include <regex>
 
 Graphics::TexCell sky::GetTexture(const std::string& name)
 {
@@ -46,6 +47,30 @@ void sky::PrecacheFont(const std::string& path, std::optional<std::string> name)
 std::wstring sky::Localize(const std::string& key)
 {
 	return GetService<Localization>()->getString(key);
+}
+
+std::wstring sky::UnfoldLocaleTags(const std::wstring& str)
+{
+	std::wregex pattern(LR"(<loc=([^>]+)>)");
+	std::wstring result;
+	std::wsregex_iterator it(str.begin(), str.end(), pattern);
+	std::wsregex_iterator end;
+	size_t last_pos = 0;
+	for (; it != end; ++it) {
+		const auto& match = *it;
+		auto start = match.position();
+		auto length = match.length();
+		auto key = match[1].str();
+		result += str.substr(last_pos, start - last_pos);
+		result += Localize(sky::to_string(key));
+		last_pos = start + length;
+	}
+	result += str.substr(last_pos);
+
+	if (std::regex_search(result, pattern))
+		return UnfoldLocaleTags(result);
+
+	return result;
 }
 
 void sky::PlaySound(std::shared_ptr<Audio::Sound> sound)
