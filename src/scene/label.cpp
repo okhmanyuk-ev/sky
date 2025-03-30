@@ -62,13 +62,17 @@ void Label::refresh()
 	markDirtyIfChanged(mPrevMultiline, mMultiline);
 	markDirtyIfChanged(mPrevReplaceEscapedNewLines, mReplaceEscapedNewLines);
 	markDirtyIfChanged(mPrevParseColorTags, mParseColorTags);
+	markDirtyIfChanged(mPrevParseLocaleTags, mParseLocaleTags);
 
 	if (!dirty)
 		return;
 
 	float height = 0.0f;
 
-	auto text = sky::UnfoldLocaleTags(mText);
+	auto text = mText;
+
+	if (mParseLocaleTags)
+		text = sky::UnfoldLocaleTags(text);
 
 	if (mReplaceEscapedNewLines)
 		text = replaceEscapedNewlines(text);
