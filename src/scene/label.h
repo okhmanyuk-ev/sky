@@ -50,6 +50,9 @@ namespace Scene
 		bool isParseColorTagsEnabled() const { return mParseColorTags; }
 		void setParseColorTagsEnabled(bool value) { mParseColorTags = value; }
 
+		bool isParseLocaleTagsEnabled() const { return mParseLocaleTags; }
+		void setParseLocaleTagsEnabled(bool value) { mParseLocaleTags = value; }
+
 		const auto& getTextMesh() const { return mTextMesh; }
 
 	private:
@@ -75,5 +78,7 @@ namespace Scene
 		bool mPrevReplaceEscapedNewLines = false;
 		bool mParseColorTags = false;
 		bool mPrevParseColorTags = false;
+		bool mParseLocaleTags = true;
+		bool mPrevParseLocaleTags = true;
 	};
 }
