@@ -68,7 +68,7 @@ void Label::refresh()
 
 	float height = 0.0f;
 
-	auto text = mText;
+	auto text = sky::UnfoldLocaleTags(mText);
 
 	if (mReplaceEscapedNewLines)
 		text = replaceEscapedNewlines(text);

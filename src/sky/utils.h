@@ -33,6 +33,7 @@ namespace sky
 	void PrecacheFont(const std::string& path, std::optional<std::string> name = std::nullopt);
 
 	std::wstring Localize(const std::string& key);
+	std::wstring UnfoldLocaleTags(const std::wstring& str);
 
 	template <class T>
 	void Emit(const T& e)
