@@ -69,7 +69,10 @@ void RichLabel::refresh()
 		sublimed_text.clear();
 	};
 
-	auto text = sky::UnfoldLocaleTags(mState.text);
+	auto text = mState.text;
+
+	if (mState.parse_locale_tags)
+		text = sky::UnfoldLocaleTags(text);
 
 	auto insertCustomTags = [&] {
 		for (const auto& [name, callback] : mTags)

@@ -29,6 +29,9 @@ namespace Scene
 		const auto& getText() const { return mState.text; }
 		void setText(std::wstring text) { mState.text = std::move(text); }
 
+		auto isParseLocaleTagsEnabled() const { return mState.parse_locale_tags; }
+		void setParseLocaleTagsEnabled(bool value) { mState.parse_locale_tags = value; }
+
 		void setTag(const std::string& name, std::function<std::shared_ptr<Node>()> callback);
 
 	private:
@@ -37,6 +40,7 @@ namespace Scene
 			std::wstring text;
 			std::shared_ptr<Graphics::Font> font = Label::DefaultFont;
 			float font_size = Label::DefaultFontSize;
+			bool parse_locale_tags = true;
 			bool operator==(const State& other) const = default;
 		};
 		State mState;
