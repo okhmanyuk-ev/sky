@@ -5,9 +5,12 @@
 
 namespace Scene
 {
-	template <class T> class Eased : public T
+	template <typename T>
+		requires std::derived_from<T, Node>
+	class Eased : public T
 	{
-		static_assert(std::is_base_of<Node, T>::value, "T must be derived from Node");
+	public:
+		using T::T;
 
 	protected:
 		void updateTransform() override
