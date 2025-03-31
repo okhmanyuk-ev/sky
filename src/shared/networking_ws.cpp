@@ -91,7 +91,11 @@ Server::Server(uint16_t port) :
 
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
-			mImpl->server.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
+			std::error_code ec;
+			mImpl->server.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY, ec);
+			if (ec) {
+				sky::Log("server.send failed: {}", ec.message().c_str());
+			}
 		});
 		channel->setHdl(hdl);
 		mChannels.insert({ hdl, channel });
@@ -151,7 +155,11 @@ void Server::onFrame()
 
 std::tuple<std::string/*ip*/, uint16_t/*port*/> Server::getV4AddressFromHdl(websocketpp::connection_hdl hdl)
 {
-	auto connection = mImpl->server.get_con_from_hdl(hdl);
+	std::error_code ec;
+	auto connection = mImpl->server.get_con_from_hdl(hdl, ec);
+	if (ec) {
+		return { "0.0.0.0", 0 };
+	}
 	auto endpoint = connection->get_raw_socket().remote_endpoint();
 	auto address = endpoint.address().to_v6().to_v4();
 	auto ip = address.to_string();
@@ -191,7 +199,11 @@ Client::Client(const std::string& url) :
 		sky::Log("connected");
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
-			mImpl->wsclient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY);
+			std::error_code ec;
+			mImpl->wsclient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY, ec);
+			if (ec) {
+				sky::Log("wsclient.send failed: {}", ec.message().c_str());
+			}
 		});
 		channel->setHdl(hdl);
 		mChannel = channel;
