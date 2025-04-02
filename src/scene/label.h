@@ -12,6 +12,13 @@ namespace Scene
 		inline static std::shared_ptr<Graphics::Font> DefaultFont = nullptr;
 		inline static float DefaultFontSize = 24.0f;
 
+		enum class Bold
+		{
+			None,
+			SemiBold,
+			Bold
+		};
+
 	protected:
 		void draw() override;
 		void update(sky::Duration dTime) override;
@@ -25,6 +32,9 @@ namespace Scene
 
 		auto getFontSize() const { return mFontSize; }
 		void setFontSize(float value) { mFontSize = value; }
+
+		auto getBold() const { return mBold; }
+		void setBold(Bold value) { mBold = value; }
 
 		const auto& getText() const { return mText; }
 		void setText(const std::wstring& value) { mText = value; }
@@ -62,6 +72,7 @@ namespace Scene
 	private:
 		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
 		float mFontSize = DefaultFontSize;
+		Bold mBold = Bold::None;
 		std::wstring mText;
 		Graphics::TextMesh::Align mAlign = Graphics::TextMesh::Align::Left;
 		std::optional<Graphics::TextMesh> mTextMesh;
