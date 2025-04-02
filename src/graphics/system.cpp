@@ -561,16 +561,17 @@ void System::drawString(const Font& font, const TextMesh& mesh, float minValue, 
 		maxValue, smoothFactor, color);
 }
 
-void System::drawString(const Font& font, const TextMesh& mesh, float size, const glm::vec4& color,
-	float outlineThickness, const glm::vec4& outlineColor)
+void System::drawString(const Font& font, const TextMesh& mesh, float size, float bold,
+	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
 	assert(!mesh.vertices.empty());
 	assert(!mesh.indices.empty());
 
 	float fixedOutlineThickness = glm::lerp(0.0f, 0.75f, outlineThickness);
 
+	const float bold_offset = 0.075f;
 	const float min = 0.0f;
-	const float mid = Font::SdfOnedge;
+	const float mid = Font::SdfOnedge - (bold * bold_offset);
 	const float max = 1.0f;
 	const float outline = glm::lerp(mid, min, fixedOutlineThickness);
 
@@ -580,10 +581,10 @@ void System::drawString(const Font& font, const TextMesh& mesh, float size, cons
 	drawString(font, mesh, mid, max, mSdfSmoothFactor, color);
 }
 
-void System::drawString(const Font& font, const std::wstring& text, float size, const glm::vec4& color,
+void System::drawString(const Font& font, const std::wstring& text, float size, float bold, const glm::vec4& color,
 	float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, color, outlineThickness, outlineColor);
+	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, bold, color, outlineThickness, outlineColor);
 }
 
 glm::vec3 System::project(const glm::vec3& pos)

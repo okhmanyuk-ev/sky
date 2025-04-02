@@ -24,9 +24,17 @@ void Label::draw()
 	auto scale = mFont->getScaleFactorForSize(mFontSize);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
+	static const std::unordered_map<Bold, float> BoldFactorMap = {
+		{ Bold::None, 0.0f },
+		{ Bold::SemiBold, 0.5f },
+		{ Bold::Bold, 1.0f },
+	};
+
+	auto bold = BoldFactorMap.at(mBold);
+
 	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushModelMatrix(model);
-	GRAPHICS->drawString(*mFont, mTextMesh.value(), mFontSize, getColor(), mOutlineThickness, mOutlineColor->getColor());
+	GRAPHICS->drawString(*mFont, mTextMesh.value(), mFontSize, bold, getColor(), mOutlineThickness, mOutlineColor->getColor());
 	GRAPHICS->pop(2);
 }
 
