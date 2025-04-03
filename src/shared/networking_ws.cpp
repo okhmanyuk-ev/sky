@@ -248,7 +248,7 @@ void Client::connect()
 		});
 		self->mChannel = channel;
 		self->onChannelCreated(self->mChannel);
-		return eventType;
+		return EM_TRUE;
 	});
 
 	emscripten_websocket_set_onclose_callback(mImpl->handle.value(), this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> EM_BOOL {
@@ -256,7 +256,7 @@ void Client::connect()
 		auto self = static_cast<Client*>(userData);
 		self->mChannel = nullptr;
 		self->connect();
-		return eventType;
+		return EM_TRUE;
 	});
 
 	emscripten_websocket_set_onmessage_callback(mImpl->handle.value(), this, [](int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> EM_BOOL {
@@ -272,14 +272,14 @@ void Client::connect()
 		{
 			sky::Log(e.what());
 		}
-		return eventType;
+		return EM_TRUE;
 	});
 
 	emscripten_websocket_set_onerror_callback(mImpl->handle.value(), this, [](int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> EM_BOOL {
 		sky::Log("failed");
 		auto self = static_cast<Client*>(userData);
 		self->connect();
-		return eventType;
+		return EM_TRUE;
 	});
 #else
 	websocketpp::lib::error_code ec;
