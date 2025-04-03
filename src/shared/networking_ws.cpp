@@ -160,7 +160,7 @@ std::tuple<std::string/*ip*/, uint16_t/*port*/> Server::getV4AddressFromHdl(webs
 struct Client::Impl
 {
 #ifdef EMSCRIPTEN
-	EMSCRIPTEN_WEBSOCKET_T handle = -1;
+	std::optional<EMSCRIPTEN_WEBSOCKET_T> handle;
 #else
 #ifdef SKY_USE_OPENSSL
 	websocketpp::client<websocketpp::config::asio_tls_client> wsclient;
@@ -222,29 +222,36 @@ Client::Client(const std::string& url) :
 
 Client::~Client()
 {
+#ifdef EMSCRIPTEN
+	if (mImpl->handle)
+		emscripten_websocket_delete(mImpl->handle.value());
+#endif
 }
 
 void Client::connect()
 {
 #ifdef EMSCRIPTEN
+	if (mImpl->handle)
+		emscripten_websocket_delete(mImpl->handle.value());
+
 	EmscriptenWebSocketCreateAttributes attributes;
 	emscripten_websocket_init_create_attributes(&attributes);
 	attributes.url = mUrl.c_str();
 	mImpl->handle = emscripten_websocket_new(&attributes);
 
-	emscripten_websocket_set_onopen_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketOpenEvent *websocketEvent, void *userData) -> EM_BOOL {
+	emscripten_websocket_set_onopen_callback(mImpl->handle.value(), this, [](int eventType, const EmscriptenWebSocketOpenEvent* websocketEvent, void* userData) -> EM_BOOL {
 		sky::Log("connected");
 		auto self = static_cast<Client*>(userData);
 		auto channel = self->createChannel();
 		channel->setSendCallback([self](const auto& buf) {
-			emscripten_websocket_send_binary(self->mImpl->handle, buf.getMemory(), buf.getSize());
+			emscripten_websocket_send_binary(self->mImpl->handle.value(), buf.getMemory(), buf.getSize());
 		});
 		self->mChannel = channel;
 		self->onChannelCreated(self->mChannel);
 		return eventType;
 	});
 
-	emscripten_websocket_set_onclose_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> EM_BOOL {
+	emscripten_websocket_set_onclose_callback(mImpl->handle.value(), this, [](int eventType, const EmscriptenWebSocketCloseEvent *websocketEvent, void *userData) -> EM_BOOL {
 		sky::Log("disconnected");
 		auto self = static_cast<Client*>(userData);
 		self->mChannel = nullptr;
@@ -252,7 +259,7 @@ void Client::connect()
 		return eventType;
 	});
 
-	emscripten_websocket_set_onmessage_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> EM_BOOL {
+	emscripten_websocket_set_onmessage_callback(mImpl->handle.value(), this, [](int eventType, const EmscriptenWebSocketMessageEvent *websocketEvent, void *userData) -> EM_BOOL {
 		auto self = static_cast<Client*>(userData);
 		try
 		{
@@ -268,7 +275,7 @@ void Client::connect()
 		return eventType;
 	});
 
-	emscripten_websocket_set_onerror_callback(mImpl->handle, this, [](int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> EM_BOOL {
+	emscripten_websocket_set_onerror_callback(mImpl->handle.value(), this, [](int eventType, const EmscriptenWebSocketErrorEvent *websocketEvent, void *userData) -> EM_BOOL {
 		sky::Log("failed");
 		auto self = static_cast<Client*>(userData);
 		self->connect();
