@@ -569,7 +569,7 @@ void System::drawString(const Font& font, const TextMesh& mesh, float size, floa
 
 	float fixedOutlineThickness = glm::lerp(0.0f, 0.75f, outlineThickness);
 
-	const float bold_offset = 0.075f;
+	const float bold_offset = 0.05f;
 	const float min = 0.0f;
 	const float mid = Font::SdfOnedge - (bold * bold_offset);
 	const float max = 1.0f;
