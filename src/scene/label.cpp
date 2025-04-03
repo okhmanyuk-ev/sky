@@ -28,6 +28,7 @@ void Label::draw()
 		{ Bold::None, 0.0f },
 		{ Bold::SemiBold, 0.5f },
 		{ Bold::Bold, 1.0f },
+		{ Bold::ExtraBold, 1.5f },
 	};
 
 	auto bold = BoldFactorMap.at(mBold);

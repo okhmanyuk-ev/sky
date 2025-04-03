@@ -16,7 +16,8 @@ namespace Scene
 		{
 			None,
 			SemiBold,
-			Bold
+			Bold,
+			ExtraBold
 		};
 
 	protected:
