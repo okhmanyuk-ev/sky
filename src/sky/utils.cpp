@@ -3,6 +3,9 @@
 #include <sky/localization.h>
 #include <codecvt>
 #include <regex>
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
 
 Graphics::TexCell sky::GetTexture(const std::string& name)
 {
@@ -117,6 +120,18 @@ void sky::AddCVar(const std::string& name, CommandProcessor::CVar cvar)
 void sky::ExecuteCommand(const std::string& str)
 {
 	GetService<CommandProcessor>()->execute(str);
+}
+
+void sky::OpenUrl(const std::string& url)
+{
+#if defined(EMSCRIPTEN)
+	EM_ASM_({
+		var url = UTF8ToString($0);
+		window.open(url);
+	}, url.c_str());
+#elif defined(PLATFORM_WINDOWS)
+	std::system(("start " + url).c_str());
+#endif
 }
 
 std::string sky::to_string(const std::wstring& wstr)
