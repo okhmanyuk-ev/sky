@@ -32,6 +32,7 @@ namespace Scene
 		auto isParseLocaleTagsEnabled() const { return mState.parse_locale_tags; }
 		void setParseLocaleTagsEnabled(bool value) { mState.parse_locale_tags = value; }
 
+		void setTag(const std::string& name, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)> callback);
 		void setTag(const std::string& name, std::function<std::shared_ptr<Node>()> callback);
 
 	private:
@@ -46,6 +47,6 @@ namespace Scene
 		State mState;
 		State mPrevState;
 		std::shared_ptr<AutoSized<Row>> mContent;
-		std::unordered_map<std::string, std::function<std::shared_ptr<Node>()>> mTags;
+		std::unordered_map<std::string, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)>> mTags;
 	};
 }

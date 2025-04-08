@@ -75,13 +75,33 @@ void RichLabel::refresh()
 		text = sky::UnfoldLocaleTags(text);
 
 	auto insertCustomTags = [&] {
+		std::wregex attribute_regex();
+
 		for (const auto& [name, callback] : mTags)
 		{
-			std::wregex tag(std::format(L"^<{}>", sky::to_wstring(name)));
+			std::wregex tag(sky::format(LR"delim(^<{}\s+(?:\w+="(?:\\"|[^"])*"\s*)*>)delim", sky::to_wstring(name)));
+
 			if (std::regex_search(text, match, tag))
 			{
+				std::unordered_map<std::string, std::string> arguments;
+			
+				auto attrs_str = match[0].str();
+				std::wregex attr_regex(LR"delim((\w+)="((?:\\"|[^"])*)")delim");
+				std::wsregex_iterator it(attrs_str.begin(), attrs_str.end(), attr_regex);
+				std::wsregex_iterator end;
+
+				for (; it != end; ++it)
+				{
+					auto attr_match = *it;
+					auto name = sky::to_string(attr_match[1].str());
+					auto raw_value = attr_match[2].str();
+					raw_value = std::regex_replace(raw_value, std::wregex(LR"(\\")"), L"\"");
+					auto value = sky::to_string(raw_value);
+					arguments.insert({ name, value });
+				}
+
 				flushLabelText();
-				append(callback(), true);
+				append(callback(arguments), true);
 				text.erase(0, match.length());
 				return true;
 			}
@@ -112,7 +132,14 @@ void RichLabel::refresh()
 		append(createLabel(sublimed_text), false);
 }
 
-void RichLabel::setTag(const std::string& name, std::function<std::shared_ptr<Node>()> callback)
+void RichLabel::setTag(const std::string& name, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)> callback)
 {
 	mTags[name] = callback;
+}
+
+void RichLabel::setTag(const std::string& name, std::function<std::shared_ptr<Node>()> callback)
+{
+	mTags[name] = [callback](const auto&) {
+		return callback();
+	};
 }
