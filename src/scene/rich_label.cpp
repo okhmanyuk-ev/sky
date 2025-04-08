@@ -79,7 +79,7 @@ void RichLabel::refresh()
 
 		for (const auto& [name, callback] : mTags)
 		{
-			std::wregex tag(sky::format(LR"delim(^<{}\s+(?:\w+="(?:\\"|[^"])*"\s*)*>)delim", sky::to_wstring(name)));
+			std::wregex tag(sky::format(LR"delim(^<{}(?:\s+\w+="(?:\\"|[^"])*")*\s*>)delim", sky::to_wstring(name)));
 
 			if (std::regex_search(text, match, tag))
 			{
