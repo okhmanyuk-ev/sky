@@ -31,8 +31,18 @@ namespace Scene
 		auto isParseLocaleTagsEnabled() const { return mState.parse_locale_tags; }
 		void setParseLocaleTagsEnabled(bool value) { mState.parse_locale_tags = value; }
 
-		void setTagHandler(const std::string& name, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)> callback);
-		void setTagHandler(const std::string& name, std::function<std::shared_ptr<Node>()> callback);
+	public:
+		using TagHandler = std::function<std::shared_ptr<Node>()>;
+		using TagHandlerSingleArg = std::function<std::shared_ptr<Node>(const std::string& value)>;
+		using TagHandlerMultipleArgs = std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)>;
+
+		using TagHandlerVariant = std::variant<
+			TagHandler,
+			TagHandlerSingleArg,
+			TagHandlerMultipleArgs
+		>;
+
+		void setTagHandler(const std::string& name, TagHandlerVariant callback);
 
 	private:
 		struct State
@@ -46,6 +56,7 @@ namespace Scene
 		State mState;
 		State mPrevState;
 		std::shared_ptr<AutoSized<Row>> mContent;
-		std::unordered_map<std::string, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)>> mTagHandlers;
+
+		std::unordered_map<std::string, TagHandlerVariant> mTagHandlers;
 	};
 }
