@@ -95,8 +95,8 @@ namespace Scene
 		bool isTouchable() const { return mTouchable; }
 		void setTouchable(bool value) { mTouchable = value; }
 
-		auto getTouchMask() const { return mTouchMask; }
-		void setTouchMask(int value) { mTouchMask = value; }
+		bool isTouchTransparent() const { return mTouchTransparent; }
+		void setTouchTransparent(bool value) { mTouchTransparent = value; }
 
 		auto isTouching() const { return mTouching; }
 
@@ -123,7 +123,7 @@ namespace Scene
 		bool mVisible = true;
 		bool mInteractions = true;
 		bool mTouchable = false;
-		int mTouchMask = 1 << 0;
+		bool mTouchTransparent = false;
 		bool mTouching = false;
 		bool mTransformReady = false;
 		std::optional<std::string> mBatchGroup;
