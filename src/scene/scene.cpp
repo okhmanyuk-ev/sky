@@ -85,16 +85,14 @@ bool Scene::Scene::interactTest(const glm::vec2& pos)
 std::list<std::weak_ptr<Scene::Node>> Scene::Scene::getTouchedNodes(const glm::vec2& pos) const
 {
 	std::list<std::weak_ptr<Node>> result;
-	int mask = 0;
+	auto touchable_nodes = getTouchableNodes(pos);
 
-	for (auto node : getTouchableNodes(pos))
+	for (auto node : touchable_nodes)
 	{
-		if ((mask & node->getTouchMask()) > 0)
-			continue;
-
-		mask |= node->getTouchMask();
-
 		result.push_back(node);
+
+		if (!node->isTouchTransparent())
+			break;
 	}
 
 	return result;
