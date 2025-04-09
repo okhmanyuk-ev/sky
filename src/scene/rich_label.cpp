@@ -75,7 +75,7 @@ void RichLabel::refresh()
 		text = sky::UnfoldLocaleTags(text);
 
 	auto insertCustomTags = [&] {
-		for (const auto& [name, callback] : mTags)
+		for (const auto& [name, callback] : mTagHandlers)
 		{
 			std::wregex tag(sky::format(LR"delim(^<{}(?:\s+\w+="(?:\\"|[^"])*")*\s*>)delim", sky::to_wstring(name)));
 
@@ -130,14 +130,14 @@ void RichLabel::refresh()
 		append(createLabel(sublimed_text), false);
 }
 
-void RichLabel::setTag(const std::string& name, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)> callback)
+void RichLabel::setTagHandler(const std::string& name, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)> callback)
 {
-	mTags[name] = callback;
+	mTagHandlers[name] = callback;
 }
 
-void RichLabel::setTag(const std::string& name, std::function<std::shared_ptr<Node>()> callback)
+void RichLabel::setTagHandler(const std::string& name, std::function<std::shared_ptr<Node>()> callback)
 {
-	mTags[name] = [callback](const auto&) {
+	mTagHandlers[name] = [callback](const auto&) {
 		return callback();
 	};
 }

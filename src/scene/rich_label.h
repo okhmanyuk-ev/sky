@@ -4,7 +4,6 @@
 #include <scene/auto_sized.h>
 #include <scene/label.h>
 #include <scene/grid.h>
-#include <graphics/tex_cell.h>
 
 namespace Scene
 {
@@ -32,8 +31,8 @@ namespace Scene
 		auto isParseLocaleTagsEnabled() const { return mState.parse_locale_tags; }
 		void setParseLocaleTagsEnabled(bool value) { mState.parse_locale_tags = value; }
 
-		void setTag(const std::string& name, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)> callback);
-		void setTag(const std::string& name, std::function<std::shared_ptr<Node>()> callback);
+		void setTagHandler(const std::string& name, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)> callback);
+		void setTagHandler(const std::string& name, std::function<std::shared_ptr<Node>()> callback);
 
 	private:
 		struct State
@@ -47,6 +46,6 @@ namespace Scene
 		State mState;
 		State mPrevState;
 		std::shared_ptr<AutoSized<Row>> mContent;
-		std::unordered_map<std::string, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)>> mTags;
+		std::unordered_map<std::string, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)>> mTagHandlers;
 	};
 }
