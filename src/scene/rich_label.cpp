@@ -13,6 +13,14 @@ RichLabel::RichLabel()
 	mContent->setAnchor(0.5f);
 	mContent->setPivot(0.5f);
 	attach(mContent);
+
+	setTagHandler("icon", [this_index = size_t(this)](const std::string& path) {
+		auto sprite = std::make_shared<Adaptive<Sprite>>();
+		sprite->setAdaptBehavior(AdaptBehavior::Height);
+		sprite->setTexture(sky::GetTexture(path));
+		sprite->setBatchGroup(sky::format("rich_label_icon_{}_{}", this_index, path));
+		return sprite;
+	});
 }
 
 void RichLabel::update(sky::Duration dTime)
@@ -48,16 +56,6 @@ void RichLabel::refresh()
 		return label;
 	};
 
-	auto createSprite = [this_index = size_t(this)](const std::string& path) {
-		auto sprite = std::make_shared<Adaptive<Sprite>>();
-		sprite->setAdaptBehavior(AdaptBehavior::Height);
-		sprite->setTexture(sky::GetTexture(path));
-		sprite->setBatchGroup(std::format("rich_label_icon_{}_{}", this_index, path));
-		return sprite;
-	};
-
-	std::wregex icon_tag(LR"(^<icon=([^>]+)>)");
-
 	std::wstring sublimed_text;
 	std::wsmatch match;
 
@@ -75,32 +73,58 @@ void RichLabel::refresh()
 		text = sky::UnfoldLocaleTags(text);
 
 	auto insertCustomTags = [&] {
-		for (const auto& [name, callback] : mTagHandlers)
+		for (const auto& [name, _callback] : mTagHandlers)
 		{
-			std::wregex tag(sky::format(LR"delim(^<{}(?:\s+\w+="(?:\\"|[^"])*")*\s*>)delim", sky::to_wstring(name)));
+			auto node = sky::match(_callback, sky::cases{
+				[&](const TagHandler& callback) -> std::optional<std::shared_ptr<Node>> {
+					std::wregex expression(sky::format(LR"delim(^<\s*{}\s*>)delim", sky::to_wstring(name)));
 
-			if (!std::regex_search(text, match, tag))
+					if (!std::regex_search(text, match, expression))
+						return std::nullopt;
+
+					return callback();
+				},
+				[&](const TagHandlerSingleArg& callback) -> std::optional<std::shared_ptr<Node>> {
+					std::wregex expression(sky::format(LR"delim(^<\s*{}\s*=\s*([^>]+)\s*>)delim", sky::to_wstring(name)));
+
+					if (!std::regex_search(text, match, expression))
+						return std::nullopt;
+
+					auto arg = sky::to_string(match[1].str());
+					return callback(arg);
+				},
+				[&](const TagHandlerMultipleArgs& callback) -> std::optional<std::shared_ptr<Node>> {
+					std::wregex expression(sky::format(LR"delim(^<\s*{}(?:\s+\w+="(?:\\"|[^"])*")*\s*>)delim", sky::to_wstring(name)));
+
+					if (!std::regex_search(text, match, expression))
+						return std::nullopt;
+
+					std::unordered_map<std::string, std::string> arguments;
+
+					auto attrs_str = match[0].str();
+					std::wregex attr_regex(LR"delim((\w+)\s*=\s*"((?:\\"|[^"])*)")delim");
+					std::wsregex_iterator it(attrs_str.begin(), attrs_str.end(), attr_regex);
+					std::wsregex_iterator end;
+
+					for (; it != end; ++it)
+					{
+						auto attr_match = *it;
+						auto name = sky::to_string(attr_match[1].str());
+						auto raw_value = attr_match[2].str();
+						raw_value = std::regex_replace(raw_value, std::wregex(LR"(\\")"), L"\"");
+						auto value = sky::to_string(raw_value);
+						arguments.insert({ name, value });
+					}
+
+					return callback(arguments);
+				}
+			});
+
+			if (!node.has_value())
 				continue;
 
-			std::unordered_map<std::string, std::string> arguments;
-
-			auto attrs_str = match[0].str();
-			std::wregex attr_regex(LR"delim((\w+)="((?:\\"|[^"])*)")delim");
-			std::wsregex_iterator it(attrs_str.begin(), attrs_str.end(), attr_regex);
-			std::wsregex_iterator end;
-
-			for (; it != end; ++it)
-			{
-				auto attr_match = *it;
-				auto name = sky::to_string(attr_match[1].str());
-				auto raw_value = attr_match[2].str();
-				raw_value = std::regex_replace(raw_value, std::wregex(LR"(\\")"), L"\"");
-				auto value = sky::to_string(raw_value);
-				arguments.insert({ name, value });
-			}
-
 			flushLabelText();
-			append(callback(arguments), true);
+			append(node.value(), true);
 			text.erase(0, match.length());
 			return true;
 		}
@@ -112,32 +136,15 @@ void RichLabel::refresh()
 		if (insertCustomTags())
 			continue;
 
-		if (std::regex_search(text, match, icon_tag))
-		{
-			flushLabelText();
-			auto path = sky::to_string(match[1]);
-			append(createSprite(path), true);
-			text.erase(0, match.length());
-		}
-		else
-		{
-			sublimed_text.push_back(text.front());
-			text.erase(0, 1);
-		}
+		sublimed_text.push_back(text.front());
+		text.erase(0, 1);
 	}
 
 	if (!sublimed_text.empty())
 		append(createLabel(sublimed_text), false);
 }
 
-void RichLabel::setTagHandler(const std::string& name, std::function<std::shared_ptr<Node>(const std::unordered_map<std::string, std::string>& args)> callback)
+void RichLabel::setTagHandler(const std::string& name, TagHandlerVariant callback)
 {
 	mTagHandlers[name] = callback;
-}
-
-void RichLabel::setTagHandler(const std::string& name, std::function<std::shared_ptr<Node>()> callback)
-{
-	mTagHandlers[name] = [callback](const auto&) {
-		return callback();
-	};
 }
