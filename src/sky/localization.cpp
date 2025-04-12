@@ -7,13 +7,13 @@
 
 sky::Localization::Localization(const std::string& path)
 {
-	loadDicrionaries(path);
-	setLanguage(Language::English);
+	loadDictionaries(path);
 }
 
-void sky::Localization::loadDicrionaries(const std::string& path)
+void sky::Localization::loadDictionaries(const std::string& path)
 {
-	auto loadDictionary = [this, path](Language language) {
+	for (auto language : { Language::English, Language::Russian })
+	{
 		auto& dictionary = mDictionaries[language];
 		auto _path = path + "/" + getLanguageName(language) + ".txt";
 
@@ -49,10 +49,7 @@ void sky::Localization::loadDicrionaries(const std::string& path)
 
 			dictionary[sky::to_string(key)] = value;
 		}
-	};
-
-	loadDictionary(Language::English);
-	loadDictionary(Language::Russian);
+	}
 }
 
 std::string sky::Localization::getLanguageName(Language language)
@@ -68,13 +65,19 @@ std::string sky::Localization::getLanguageName(Language language)
 
 std::wstring sky::Localization::getString(const std::string& key) const
 {
-	auto& dictionary = mDictionaries.at(mLanguage);
+	const auto& dictionary = mDictionaries.at(mLanguage);
 
-	if (dictionary.count(key) == 0)
+	if (!dictionary.contains(key))
 	{
 		sky::Log(Console::Color::Red, "cannot find locale: " + key);
 		return sky::to_wstring(key);
 	}
 
 	return dictionary.at(key);
+}
+
+bool sky::Localization::hasLocale(const std::string& key) const
+{
+	const auto& dictionary = mDictionaries.at(mLanguage);
+	return dictionary.contains(key);
 }
