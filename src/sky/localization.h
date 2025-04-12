@@ -21,9 +21,10 @@ namespace sky
 		Localization(const std::string& path = "localization");
 
 	public:
-		void loadDicrionaries(const std::string& path);
+		void loadDictionaries(const std::string& path);
 
 		std::wstring getString(const std::string& key) const;
+		bool hasLocale(const std::string& key) const;
 
 		auto getLanguage() const { return mLanguage; }
 		void setLanguage(Language value) { mLanguage = value; }
