@@ -10,7 +10,8 @@ namespace Shared::NetworkingWS
 	class NetCommands
 	{
 	public:
-		static bool inline LogEvents = false;
+		static bool inline LogHandledEvents = false;
+		static bool inline LogUnhandledEvents = true;
 
 	public:
 		NetCommands();

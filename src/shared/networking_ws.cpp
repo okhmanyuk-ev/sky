@@ -24,13 +24,16 @@ using namespace Shared::NetworkingWS;
 
 NetCommands::NetCommands()
 {
-	sky::AddCVar("net_log_events", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
-		CVAR_GETTER_BOOL(NetCommands::LogEvents), CVAR_SETTER_BOOL(NetCommands::LogEvents)));
+	sky::AddCVar("net_log_handled_events", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
+		CVAR_GETTER_BOOL(NetCommands::LogHandledEvents), CVAR_SETTER_BOOL(NetCommands::LogHandledEvents)));
+	sky::AddCVar("net_log_unhandled_events", sky::CommandProcessor::CVar(std::nullopt, { "bool" },
+		CVAR_GETTER_BOOL(NetCommands::LogUnhandledEvents), CVAR_SETTER_BOOL(NetCommands::LogUnhandledEvents)));
 }
 
 NetCommands::~NetCommands()
 {
-	sky::GetService<sky::CommandProcessor>()->removeItem("net_log_events");
+	sky::GetService<sky::CommandProcessor>()->removeItem("net_log_handled_events");
+	sky::GetService<sky::CommandProcessor>()->removeItem("net_log_unhandled_events");
 }
 
 // channel
@@ -347,7 +350,7 @@ void SimpleChannel::onEventMessage(sky::BitBuffer& buf)
 		json = nlohmann::json::from_bson(bson);
 	}
 
-	if (NetCommands::LogEvents || mEvents.count(name) == 0)
+	if (NetCommands::LogHandledEvents || (mEvents.count(name) == 0 && NetCommands::LogUnhandledEvents))
 	{
 		sky::Log("event: \"{}\", dump: \"{}\"", name, json.dump());
 	}
