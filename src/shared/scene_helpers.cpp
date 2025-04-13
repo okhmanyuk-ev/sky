@@ -1128,20 +1128,18 @@ void SceneHelpers::ImScene::Tooltip(Scene::Node& holder, const std::wstring& tex
 	}, sky::to_string(text));
 }
 
-void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Node& node)
+void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Node& node, HighlightSettings settings, std::optional<std::string> key)
 {
 	if (!IsMouseHovered(node))
 		return;
 
 	auto bounds = node.getGlobalBounds();
 
-	const auto color = sky::GetColor(sky::Color::Yellow);
-
-	auto rect = IMSCENE->spawn<Scene::Eased<Shared::SceneHelpers::Outlined<Scene::Rectangle>>>(holder);
+	auto rect = IMSCENE->spawn<Scene::Eased<Shared::SceneHelpers::Outlined<Scene::Rectangle>>>(holder, key);
 	if (IMSCENE->isFirstCall())
 	{
-		rect->setColor({ color, 0.25f });
-		rect->getOutlineColor()->setColor({ color, 0.5f });
+		rect->setColor(settings.rect_color);
+		rect->getOutlineColor()->setColor(settings.outline_color);
 		rect->setAlpha(0.25f);
 	}
 	rect->setPosition(holder.unproject(bounds.pos));
