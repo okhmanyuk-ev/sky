@@ -579,6 +579,14 @@ namespace Shared::SceneHelpers
 		void Tooltip(Scene::Node& holder, std::function<std::shared_ptr<Scene::Node>()> createContentCallback,
 			std::optional<std::string> key = std::nullopt);
 		void Tooltip(Scene::Node& holder, const std::wstring& text);
-		void HighlightUnderCursor(Scene::Node& holder, Scene::Node& node);
+
+		struct HighlightSettings
+		{
+			glm::vec4 rect_color = glm::vec4{ sky::GetColor(sky::Color::Yellow), 0.25f };
+			glm::vec4 outline_color = glm::vec4{ sky::GetColor(sky::Color::Yellow), 0.5f };
+		};
+
+		void HighlightUnderCursor(Scene::Node& holder, Scene::Node& node, HighlightSettings settings = HighlightSettings{},
+			std::optional<std::string> key = std::nullopt);
 	}
 }
