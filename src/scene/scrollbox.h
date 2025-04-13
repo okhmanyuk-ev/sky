@@ -76,7 +76,7 @@ namespace Scene
 		const auto& getPage() const { return mPage; }
 
 	private:
-		std::shared_ptr<Node> mBounding;
+		std::shared_ptr<AutoSized<Node>> mBounding;
 		std::shared_ptr<AutoSized<Node>> mContent;
 		glm::vec2 mSensitivity = { 1.0f, 1.0f };
 		glm::vec2 mSpeed = { 0.0f, 0.0f };

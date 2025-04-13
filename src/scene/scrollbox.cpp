@@ -7,7 +7,9 @@ Scrollbox::Scrollbox()
 {
 	setTouchable(true);
 
-	mBounding = std::make_shared<Node>();
+	mBounding = std::make_shared<AutoSized<Node>>();
+	mBounding->setAutoHeightEnabled(false);
+	mBounding->setAutoWidthEnabled(false);
 	attach(mBounding);
 
 	mContent = std::make_shared<AutoSized<Node>>();
