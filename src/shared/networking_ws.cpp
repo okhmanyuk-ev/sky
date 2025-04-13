@@ -91,10 +91,14 @@ Server::Server(uint16_t port) :
 
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
-			std::error_code ec;
-			mImpl->server.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY, ec);
-			if (ec) {
-				sky::Log("server.send failed: {}", ec.message().c_str());
+			try {
+				std::error_code ec;
+				mImpl->server.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY, ec);
+				if (ec) {
+					sky::Log("server.send failed: {}", ec.message().c_str());
+				}
+			} catch (const std::exception& e) {
+				sky::Log("server.exception: {}", e.what());
 			}
 		});
 		channel->setHdl(hdl);
@@ -155,16 +159,20 @@ void Server::onFrame()
 
 std::tuple<std::string/*ip*/, uint16_t/*port*/> Server::getV4AddressFromHdl(websocketpp::connection_hdl hdl)
 {
-	std::error_code ec;
-	auto connection = mImpl->server.get_con_from_hdl(hdl, ec);
-	if (ec) {
+	try {
+		std::error_code ec;
+		auto connection = mImpl->server.get_con_from_hdl(hdl, ec);
+		if (ec) {
+			return { "0.0.0.0", 0 };
+		}
+		auto endpoint = connection->get_raw_socket().remote_endpoint();
+		auto address = endpoint.address().to_v6().to_v4();
+		auto ip = address.to_string();
+		auto port = endpoint.port();
+		return { ip, port };
+	} catch (const std::exception& e) {
 		return { "0.0.0.0", 0 };
 	}
-	auto endpoint = connection->get_raw_socket().remote_endpoint();
-	auto address = endpoint.address().to_v6().to_v4();
-	auto ip = address.to_string();
-	auto port = endpoint.port();
-	return { ip, port };
 }
 #endif
 
@@ -199,10 +207,14 @@ Client::Client(const std::string& url) :
 		sky::Log("connected");
 		auto channel = createChannel();
 		channel->setSendCallback([this, hdl](const auto& buf) {
-			std::error_code ec;
-			mImpl->wsclient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY, ec);
-			if (ec) {
-				sky::Log("wsclient.send failed: {}", ec.message().c_str());
+			try {
+				std::error_code ec;
+				mImpl->wsclient.send(hdl, buf.getMemory(), buf.getSize(), websocketpp::frame::opcode::BINARY, ec);
+				if (ec) {
+					sky::Log("wsclient.send failed: {}", ec.message().c_str());
+				}
+			} catch (const std::exception& e) {
+				sky::Log("wsclient.exception: {}", e.what());
 			}
 		});
 		channel->setHdl(hdl);
@@ -299,14 +311,19 @@ void Client::connect()
 		return EM_TRUE;
 	});
 #else
-	websocketpp::lib::error_code ec;
-	auto con = mImpl->wsclient.get_connection(mUrl, ec);
-	if (ec) {
-		sky::Log("could not create connection because: " + ec.message());
+	try {
+		websocketpp::lib::error_code ec;
+		auto con = mImpl->wsclient.get_connection(mUrl, ec);
+		if (ec) {
+			sky::Log("could not create connection because: " + ec.message());
+			return;
+		}
+
+		mImpl->wsclient.connect(con);
+	} catch (const std::exception& e) {
+		sky::Log("wsclient.exception: {}", e.what());
 		return;
 	}
-
-	mImpl->wsclient.connect(con);
 #endif
 	sky::Log("connecting to {}", mUrl);
 }
