@@ -1140,7 +1140,6 @@ void SceneHelpers::ImScene::HighlightUnderCursor(Scene::Node& holder, Scene::Nod
 	{
 		rect->setColor(settings.rect_color);
 		rect->getOutlineColor()->setColor(settings.outline_color);
-		rect->setAlpha(0.25f);
 	}
 	rect->setPosition(holder.unproject(bounds.pos));
 	rect->setSize(holder.unproject(bounds.size));
