@@ -149,6 +149,20 @@ namespace Actions::Collection
 	std::unique_ptr<Action> HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
 		EasingFunction easingFunction = Easing::Linear);
 
-	std::unique_ptr<Action> Shake(std::shared_ptr<Scene::Transform> node, float radius, float duration);
+	template<Property T = Scene::OriginProperty>
+		requires std::same_as<typename T::Type, glm::vec2>
+	std::unique_ptr<Action> Shake(typename T::Object object, float radius, float duration, glm::vec2 base_value = { 0.0f, 0.0f })
+	{
+		return MakeSequence(
+			Interpolate(1.0f, 0.0f, duration, Easing::Linear, [object, radius, base_value](float value) {
+				auto power = radius * value;
+				T::SetValue(object, base_value + (power != 0.0f ? glm::circularRand(power) : glm::vec2{ 0.0f, 0.0f }));
+			}),
+			Execute([object, base_value] {
+				T::SetValue(object, base_value);
+			})
+		);
+	}
+
 	std::unique_ptr<Action> Kill(std::shared_ptr<Scene::Node> node);
 }

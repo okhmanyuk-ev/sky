@@ -56,19 +56,6 @@ std::unique_ptr<Action> Collection::HideRecursive(std::shared_ptr<Scene::Node> n
 	return parallel;
 }
 
-std::unique_ptr<Action> Collection::Shake(std::shared_ptr<Scene::Transform> node, float radius, float duration)
-{
-	return MakeSequence(
-		Interpolate(1.0f, 0.0f, duration, Easing::Linear, [node, radius](float value) {
-			auto power = radius * value;
-			node->setOrigin(power != 0.0f ? glm::circularRand(radius * value) : glm::vec2{ 0.0f, 0.0f });
-		}),
-		Execute([node] {
-			node->setOrigin({ 0.0f, 0.0f });
-		})
-	);
-}
-
 std::unique_ptr<Action> Collection::Kill(std::shared_ptr<Scene::Node> node)
 {
 	return Execute([node] {
