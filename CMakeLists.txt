@@ -111,6 +111,9 @@ elseif(EMSCRIPTEN)
 		-g3
 		-gsource-map
 	,>)
+	target_link_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:RELEASE>,
+		--emit-symbol-map
+	,>)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)
