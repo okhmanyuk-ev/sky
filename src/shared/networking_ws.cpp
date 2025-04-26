@@ -140,6 +140,7 @@ Server::Server(uint16_t port) :
 		return ctx;
 	});
 #endif
+	mImpl->server.set_reuse_addr(true);
 	mImpl->server.listen(port);
 	mImpl->server.start_accept();
 }
