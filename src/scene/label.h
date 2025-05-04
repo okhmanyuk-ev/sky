@@ -67,10 +67,6 @@ namespace Scene
 		const auto& getTextMesh() const { return mTextMesh; }
 
 	private:
-		std::tuple<std::vector<glm::vec4>, std::wstring> parseColorTags(std::wstring str);
-		std::wstring replaceEscapedNewlines(const std::wstring& str);
-
-	private:
 		Bold mBold = Bold::None;
 		std::optional<Graphics::TextMesh> mTextMesh;
 		float mPrevWidth = 0.0f;
