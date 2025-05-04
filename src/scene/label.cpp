@@ -45,82 +45,7 @@ void Label::update(sky::Duration dTime)
 	refresh();
 }
 
-void Label::refresh()
-{
-	if (mSettings.font == nullptr || mSettings.font_size <= 0.0f)
-		return;
-
-	auto dirty = false;
-	auto width = getAbsoluteWidth();
-
-	auto markDirtyIfChanged = [&](auto& prev, const auto& current) {
-		if (prev != current)
-		{
-			prev = current;
-			dirty = true;
-		}
-	};
-
-	if (mSettings.multiline)
-		markDirtyIfChanged(mPrevWidth, width);
-
-	markDirtyIfChanged(mPrevSettings, mSettings);
-
-	if (!dirty)
-		return;
-
-	float height = 0.0f;
-
-	auto text = mSettings.text;
-
-	if (mSettings.parse_locale_tags)
-		text = sky::UnfoldLocaleTags(text);
-
-	if (mSettings.replace_escaped_new_lines)
-		text = replaceEscapedNewlines(text);
-
-	std::vector<glm::vec4> colormap;
-
-	if (mSettings.parse_color_tags)
-		std::tie(colormap, text) = parseColorTags(text);
-
-	if (!mSettings.multiline)
-	{
-		height = (mSettings.font->getAscent() - (mSettings.font->getDescent() * 2.0f)) * mSettings.font->getScaleFactorForSize(mSettings.font_size);
-		mTextMesh = Graphics::TextMesh::createSinglelineTextMesh(*mSettings.font, text, -mSettings.font->getDescent() + mSettings.font->getCustomVerticalOffset());
-		setWidth(mSettings.font->getStringWidth(text, mSettings.font_size));
-	}
-	else
-	{
-		std::tie(height, mTextMesh) = Graphics::TextMesh::createMultilineTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
-	}
-
-	for (size_t i = 0; i < colormap.size(); i++)
-	{
-		mTextMesh.value().setSymbolColor(i, colormap.at(i));
-	}
-
-	setHeight(height);
-
-	updateAbsoluteSize();
-}
-
-std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
-{
-	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
-	const auto& symbol = mTextMesh.value().symbols.at(index);
-	auto pos = symbol.pos * scale;
-	auto size = symbol.size * scale;
-	return { pos, size };
-}
-
-float Label::getSymbolLineY(int index)
-{
-	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
-	return mTextMesh.value().symbols.at(index).line_y * scale;
-}
-
-std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstring str)
+static std::tuple<std::vector<glm::vec4>, std::wstring> ParseColorTags(std::wstring str)
 {
 	auto parse_u8_color = [](auto match) {
 		auto r = static_cast<uint8_t>(std::stoi(match[1]));
@@ -215,8 +140,83 @@ std::tuple<std::vector<glm::vec4>, std::wstring> Label::parseColorTags(std::wstr
 	return std::make_tuple(colormap, result_text);
 }
 
-std::wstring Label::replaceEscapedNewlines(const std::wstring& str)
+static std::wstring ReplaceEscapedNewlines(const std::wstring& str)
 {
 	std::wregex pattern(LR"(\\n)");
 	return std::regex_replace(str, pattern, L"\n");
+}
+
+void Label::refresh()
+{
+	if (mSettings.font == nullptr || mSettings.font_size <= 0.0f)
+		return;
+
+	auto dirty = false;
+	auto width = getAbsoluteWidth();
+
+	auto markDirtyIfChanged = [&](auto& prev, const auto& current) {
+		if (prev != current)
+		{
+			prev = current;
+			dirty = true;
+		}
+	};
+
+	if (mSettings.multiline)
+		markDirtyIfChanged(mPrevWidth, width);
+
+	markDirtyIfChanged(mPrevSettings, mSettings);
+
+	if (!dirty)
+		return;
+
+	float height = 0.0f;
+
+	auto text = mSettings.text;
+
+	if (mSettings.parse_locale_tags)
+		text = sky::UnfoldLocaleTags(text);
+
+	if (mSettings.replace_escaped_new_lines)
+		text = ReplaceEscapedNewlines(text);
+
+	std::vector<glm::vec4> colormap;
+
+	if (mSettings.parse_color_tags)
+		std::tie(colormap, text) = ParseColorTags(text);
+
+	if (!mSettings.multiline)
+	{
+		height = (mSettings.font->getAscent() - (mSettings.font->getDescent() * 2.0f)) * mSettings.font->getScaleFactorForSize(mSettings.font_size);
+		mTextMesh = Graphics::TextMesh::createSinglelineTextMesh(*mSettings.font, text, -mSettings.font->getDescent() + mSettings.font->getCustomVerticalOffset());
+		setWidth(mSettings.font->getStringWidth(text, mSettings.font_size));
+	}
+	else
+	{
+		std::tie(height, mTextMesh) = Graphics::TextMesh::createMultilineTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
+	}
+
+	for (size_t i = 0; i < colormap.size(); i++)
+	{
+		mTextMesh.value().setSymbolColor(i, colormap.at(i));
+	}
+
+	setHeight(height);
+
+	updateAbsoluteSize();
+}
+
+std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
+{
+	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
+	const auto& symbol = mTextMesh.value().symbols.at(index);
+	auto pos = symbol.pos * scale;
+	auto size = symbol.size * scale;
+	return { pos, size };
+}
+
+float Label::getSymbolLineY(int index)
+{
+	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
+	return mTextMesh.value().symbols.at(index).line_y * scale;
 }
