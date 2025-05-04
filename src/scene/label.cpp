@@ -9,7 +9,7 @@ void Label::draw()
 {
 	Node::draw();
 
-	if (mFont == nullptr || mFontSize <= 0.0f)
+	if (mSettings.font == nullptr || mSettings.font_size <= 0.0f)
 		return;
 
 	if (getAlpha() <= 0.0f && (mOutlineColor->getAlpha() <= 0.0f || mOutlineThickness <= 0.0f))
@@ -21,7 +21,7 @@ void Label::draw()
 	if (mTextMesh.value().vertices.empty())
 		return;
 
-	auto scale = mFont->getScaleFactorForSize(mFontSize);
+	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
 	auto model = glm::scale(getTransform(), { scale, scale, 1.0f });
 
 	static const std::unordered_map<Bold, float> BoldFactorMap = {
@@ -35,7 +35,7 @@ void Label::draw()
 
 	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushModelMatrix(model);
-	GRAPHICS->drawString(*mFont, mTextMesh.value(), mFontSize, bold, getColor(), mOutlineThickness, mOutlineColor->getColor());
+	GRAPHICS->drawString(*mSettings.font, mTextMesh.value(), mSettings.font_size, bold, getColor(), mOutlineThickness, mOutlineColor->getColor());
 	GRAPHICS->pop(2);
 }
 
@@ -47,7 +47,7 @@ void Label::update(sky::Duration dTime)
 
 void Label::refresh()
 {
-	if (mFont == nullptr || mFontSize <= 0.0f)
+	if (mSettings.font == nullptr || mSettings.font_size <= 0.0f)
 		return;
 
 	auto dirty = false;
@@ -61,45 +61,38 @@ void Label::refresh()
 		}
 	};
 
-	if (mMultiline)
+	if (mSettings.multiline)
 		markDirtyIfChanged(mPrevWidth, width);
 
-	markDirtyIfChanged(mPrevText, mText);
-	markDirtyIfChanged(mPrevFontSize, mFontSize);
-	markDirtyIfChanged(mPrevFont, mFont);
-	markDirtyIfChanged(mPrevAlign, mAlign);
-	markDirtyIfChanged(mPrevMultiline, mMultiline);
-	markDirtyIfChanged(mPrevReplaceEscapedNewLines, mReplaceEscapedNewLines);
-	markDirtyIfChanged(mPrevParseColorTags, mParseColorTags);
-	markDirtyIfChanged(mPrevParseLocaleTags, mParseLocaleTags);
+	markDirtyIfChanged(mPrevSettings, mSettings);
 
 	if (!dirty)
 		return;
 
 	float height = 0.0f;
 
-	auto text = mText;
+	auto text = mSettings.text;
 
-	if (mParseLocaleTags)
+	if (mSettings.parse_locale_tags)
 		text = sky::UnfoldLocaleTags(text);
 
-	if (mReplaceEscapedNewLines)
+	if (mSettings.replace_escaped_new_lines)
 		text = replaceEscapedNewlines(text);
 
 	std::vector<glm::vec4> colormap;
 
-	if (mParseColorTags)
+	if (mSettings.parse_color_tags)
 		std::tie(colormap, text) = parseColorTags(text);
 
-	if (!mMultiline)
+	if (!mSettings.multiline)
 	{
-		height = (mFont->getAscent() - (mFont->getDescent() * 2.0f)) * mFont->getScaleFactorForSize(mFontSize);
-		mTextMesh = Graphics::TextMesh::createSinglelineTextMesh(*mFont, text, -mFont->getDescent() + mFont->getCustomVerticalOffset());
-		setWidth(mFont->getStringWidth(text, mFontSize));
+		height = (mSettings.font->getAscent() - (mSettings.font->getDescent() * 2.0f)) * mSettings.font->getScaleFactorForSize(mSettings.font_size);
+		mTextMesh = Graphics::TextMesh::createSinglelineTextMesh(*mSettings.font, text, -mSettings.font->getDescent() + mSettings.font->getCustomVerticalOffset());
+		setWidth(mSettings.font->getStringWidth(text, mSettings.font_size));
 	}
 	else
 	{
-		std::tie(height, mTextMesh) = Graphics::TextMesh::createMultilineTextMesh(*mFont, text, width, mFontSize, mAlign);
+		std::tie(height, mTextMesh) = Graphics::TextMesh::createMultilineTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
 	}
 
 	for (size_t i = 0; i < colormap.size(); i++)
@@ -114,7 +107,7 @@ void Label::refresh()
 
 std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 {
-	auto scale = mFont->getScaleFactorForSize(mFontSize);
+	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
 	const auto& symbol = mTextMesh.value().symbols.at(index);
 	auto pos = symbol.pos * scale;
 	auto size = symbol.size * scale;
@@ -123,7 +116,7 @@ std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 
 float Label::getSymbolLineY(int index)
 {
-	auto scale = mFont->getScaleFactorForSize(mFontSize);
+	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
 	return mTextMesh.value().symbols.at(index).line_y * scale;
 }
 
