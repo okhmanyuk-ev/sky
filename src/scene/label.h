@@ -28,41 +28,41 @@ namespace Scene
 		void refresh();
 
 	public:
-		auto getFont() const { return mFont; }
-		void setFont(std::shared_ptr<Graphics::Font> value) { mFont = value; }
+		auto getFont() const { return mSettings.font; }
+		void setFont(std::shared_ptr<Graphics::Font> value) { mSettings.font = value; }
 
-		auto getFontSize() const { return mFontSize; }
-		void setFontSize(float value) { mFontSize = value; }
+		auto getFontSize() const { return mSettings.font_size; }
+		void setFontSize(float value) { mSettings.font_size = value; }
 
 		auto getBold() const { return mBold; }
 		void setBold(Bold value) { mBold = value; }
 
-		const auto& getText() const { return mText; }
-		void setText(const std::wstring& value) { mText = value; }
+		const auto& getText() const { return mSettings.text; }
+		void setText(const std::wstring& value) { mSettings.text = value; }
 
 		auto getOutlineThickness() const { return mOutlineThickness; }
 		void setOutlineThickness(float value) { mOutlineThickness = value; }
 
 		auto getOutlineColor() const { return mOutlineColor; }
 
-		auto getAlign() const { return mAlign; }
-		void setAlign(Graphics::TextMesh::Align value) { mAlign = value; }
+		auto getAlign() const { return mSettings.align; }
+		void setAlign(Graphics::TextMesh::Align value) { mSettings.align = value; }
 
-		auto isMultiline() const { return mMultiline; }
-		void setMultiline(bool value) { mMultiline = value; }
+		auto isMultiline() const { return mSettings.multiline; }
+		void setMultiline(bool value) { mSettings.multiline = value; }
 
 		// returning [pos, size]
 		std::tuple<glm::vec2, glm::vec2> getSymbolBounds(int index);
 		float getSymbolLineY(int index);
 
-		bool isReplaceEscapedNewLinesEnabled() const { return mReplaceEscapedNewLines; }
-		void setReplaceEscapedNewLinesEnabled(bool value) { mReplaceEscapedNewLines = value; }
+		bool isReplaceEscapedNewLinesEnabled() const { return mSettings.replace_escaped_new_lines; }
+		void setReplaceEscapedNewLinesEnabled(bool value) { mSettings.replace_escaped_new_lines = value; }
 
-		bool isParseColorTagsEnabled() const { return mParseColorTags; }
-		void setParseColorTagsEnabled(bool value) { mParseColorTags = value; }
+		bool isParseColorTagsEnabled() const { return mSettings.parse_color_tags; }
+		void setParseColorTagsEnabled(bool value) { mSettings.parse_color_tags = value; }
 
-		bool isParseLocaleTagsEnabled() const { return mParseLocaleTags; }
-		void setParseLocaleTagsEnabled(bool value) { mParseLocaleTags = value; }
+		bool isParseLocaleTagsEnabled() const { return mSettings.parse_locale_tags; }
+		void setParseLocaleTagsEnabled(bool value) { mSettings.parse_locale_tags = value; }
 
 		const auto& getTextMesh() const { return mTextMesh; }
 
@@ -71,26 +71,27 @@ namespace Scene
 		std::wstring replaceEscapedNewlines(const std::wstring& str);
 
 	private:
-		std::shared_ptr<Graphics::Font> mFont = DefaultFont;
-		float mFontSize = DefaultFontSize;
 		Bold mBold = Bold::None;
-		std::wstring mText;
-		Graphics::TextMesh::Align mAlign = Graphics::TextMesh::Align::Left;
 		std::optional<Graphics::TextMesh> mTextMesh;
-		std::wstring mPrevText;
 		float mPrevWidth = 0.0f;
-		float mPrevFontSize = 0.0f;
-		std::shared_ptr<Graphics::Font> mPrevFont;
 		float mOutlineThickness = 0.0f;
 		std::shared_ptr<Color> mOutlineColor = std::make_shared<Color>(sky::GetColor(sky::Color::Black));
-		Graphics::TextMesh::Align mPrevAlign = Graphics::TextMesh::Align::Left;
-		bool mMultiline = false;
-		bool mPrevMultiline = false;
-		bool mReplaceEscapedNewLines = false;
-		bool mPrevReplaceEscapedNewLines = false;
-		bool mParseColorTags = false;
-		bool mPrevParseColorTags = false;
-		bool mParseLocaleTags = true;
-		bool mPrevParseLocaleTags = true;
+
+		struct Settings
+		{
+			std::wstring text;
+			std::shared_ptr<Graphics::Font> font = DefaultFont;
+			float font_size = DefaultFontSize;
+			Graphics::TextMesh::Align align = Graphics::TextMesh::Align::Left;
+			bool multiline = false;
+			bool replace_escaped_new_lines = false;
+			bool parse_color_tags = false;
+			bool parse_locale_tags = true;
+
+			bool operator==(const Settings& other) const = default;
+		};
+
+		Settings mSettings;
+		std::optional<Settings> mPrevSettings;
 	};
 }
