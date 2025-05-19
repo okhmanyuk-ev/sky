@@ -50,7 +50,7 @@ void RichLabel::refresh()
 	auto createLabel = [&](const std::wstring& str) {
 		auto label = std::make_shared<Label>();
 		label->setText(str);
-		label->setParseColorTagsEnabled(true);
+		label->setParseColorTagsEnabled(mState.parse_color_tags);
 		label->setFont(mState.font);
 		label->setFontSize(mState.font_size);
 		return label;
