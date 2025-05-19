@@ -31,6 +31,9 @@ namespace Scene
 		auto isParseLocaleTagsEnabled() const { return mState.parse_locale_tags; }
 		void setParseLocaleTagsEnabled(bool value) { mState.parse_locale_tags = value; }
 
+		auto isParseColorTagsEnabled() const { return mState.parse_color_tags; }
+		void setParseColorTagsEnabled(bool value) { mState.parse_color_tags = value; }
+
 	public:
 		using TagHandler = std::function<std::shared_ptr<Node>()>;
 		using TagHandlerSingleArg = std::function<std::shared_ptr<Node>(const std::string& value)>;
@@ -50,6 +53,7 @@ namespace Scene
 			std::wstring text;
 			std::shared_ptr<Graphics::Font> font = Label::DefaultFont;
 			float font_size = Label::DefaultFontSize;
+			bool parse_color_tags = true;
 			bool parse_locale_tags = true;
 			bool operator==(const State& other) const = default;
 		};
