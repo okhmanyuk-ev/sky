@@ -18,11 +18,11 @@ namespace Scene
 		auto getTexture() const { return mTexture; }
 		void setTexture(std::shared_ptr<skygfx::Texture> value) { mTexture = value; }
 
-		auto getCenterRegion() const { return mCenterRegion; }
-		void setCenterRegion(const Graphics::TexRegion& value) { mCenterRegion = value; }
+		const auto& getCenterRegion() const { return mCenterRegion; }
+		void setCenterRegion(const std::optional<Graphics::TexRegion>& value) { mCenterRegion = value; }
 
 	private:
 		std::shared_ptr<skygfx::Texture> mTexture = nullptr;
-		Graphics::TexRegion mCenterRegion = {};
+		std::optional<Graphics::TexRegion> mCenterRegion;
 	};
 }

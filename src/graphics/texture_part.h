@@ -10,7 +10,7 @@ namespace Graphics
 	{
 	public:
 		TexturePart() = default;
-		TexturePart(std::shared_ptr<skygfx::Texture> texture, const TexRegion& region);
+		TexturePart(std::shared_ptr<skygfx::Texture> texture, std::optional<TexRegion> region);
 
 	public:
 		operator std::shared_ptr<skygfx::Texture>() const { return mTexture; }
@@ -24,6 +24,6 @@ namespace Graphics
 
 	private:
 		std::shared_ptr<skygfx::Texture> mTexture = nullptr;
-		TexRegion mRegion = {};
+		std::optional<TexRegion> mRegion;
 	};
 }

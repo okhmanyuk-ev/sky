@@ -62,7 +62,7 @@ namespace Graphics
 			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color);
 
 		void drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
-			const TexRegion& region, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+			const std::optional<TexRegion>& region, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 			const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color);
 
 		void drawRectangle(sky::effects::IEffect* effect,

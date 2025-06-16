@@ -287,16 +287,16 @@ void System::drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_pt
 }
 
 void System::drawTexturedRectangle(sky::effects::IEffect* effect, std::shared_ptr<skygfx::Texture> texture,
-	const TexRegion& region, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
+	const std::optional<TexRegion>& region, const glm::vec4& top_left_color, const glm::vec4& top_right_color,
 	const glm::vec4& bottom_left_color, const glm::vec4& bottom_right_color)
 {
 	float tex_w = static_cast<float>(texture->getWidth());
 	float tex_h = static_cast<float>(texture->getHeight());
 
-	float s_x1 = region.pos.x / tex_w;
-	float s_y1 = region.pos.y / tex_h;
-	float s_x2 = (region.size.x > 0.0f ? (region.size.x / tex_w) : 1.0f) + s_x1;
-	float s_y2 = (region.size.y > 0.0f ? (region.size.y / tex_h) : 1.0f) + s_y1;
+	float s_x1 = region.has_value() ? region->pos.x / tex_w : 0.0f;
+	float s_y1 = region.has_value() ? region->pos.y / tex_h : 0.0f;
+	float s_x2 = (region.has_value() ? (region->size.x / tex_w) : 1.0f) + s_x1;
+	float s_y2 = (region.has_value() ? (region->size.y / tex_h) : 1.0f) + s_y1;
 
 	glm::vec2 top_left_uv = { s_x1, s_y1 };
 	glm::vec2 top_right_uv = { s_x2, s_y1 };
@@ -345,10 +345,9 @@ void System::drawRoundedRectangle(const glm::vec4& color,
 void System::drawRoundedSlicedRectangle(const glm::vec4& color,
 	const glm::vec2& size, float rounding, bool absolute_rounding)
 {
-	auto center_region = Graphics::TexRegion{
-		.pos ={ (mWhiteCircleTexture->getWidth() / 2.0f) - 1.0f, (mWhiteCircleTexture->getHeight() / 2.0f) - 1.0f },
-		.size = { 2.0f, 2.0f }
-	};
+	glm::vec2 region_pos = { (mWhiteCircleTexture->getWidth() / 2.0f) - 1.0f, (mWhiteCircleTexture->getHeight() / 2.0f) - 1.0f };
+	glm::vec2 region_size = { 2.0f, 2.0f };
+	auto center_region = Graphics::TexRegion(region_pos, region_size);
 
 	float edge_size = absolute_rounding ? glm::clamp(rounding, 0.0f, glm::min(size.x, size.y) / 2.0f) :
 		(glm::clamp(rounding, 0.0f, 1.0f) * glm::min(size.x, size.y)) / 2.0f;

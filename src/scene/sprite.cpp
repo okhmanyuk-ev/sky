@@ -39,18 +39,12 @@ void Sprite::update(sky::Duration dTime)
 
 void Sprite::applyTextureWidth()
 {
-	if (mTexRegion.size.x > 0.0f)
-		setWidth(mTexRegion.size.x);
-	else
-		setWidth(static_cast<float>(mTexture->getWidth()));
+	setWidth(mTexRegion.has_value() ? mTexRegion->size.x : static_cast<float>(mTexture->getWidth()));
 }
 
 void Sprite::applyTextureHeight()
 {
-	if (mTexRegion.size.y > 0.0f)
-		setHeight(mTexRegion.size.y);
-	else
-		setHeight(static_cast<float>(mTexture->getHeight()));
+	setHeight(mTexRegion.has_value() ? mTexRegion->size.y : static_cast<float>(mTexture->getHeight()));
 }
 
 void Sprite::applyTextureSize()

@@ -12,9 +12,9 @@ Graphics::TexturePart sky::Cache::getTexture(const std::string& name)
 	loadTexture(name);
 
 	if (mTextures.count(name) == 0)
-		return Graphics::TexturePart(nullptr, Graphics::TexRegion());
+		return Graphics::TexturePart(nullptr, std::nullopt);
 
-	return Graphics::TexturePart(mTextures.at(name), Graphics::TexRegion());
+	return Graphics::TexturePart(mTextures.at(name), std::nullopt);
 }
 
 std::shared_ptr<Graphics::Font> sky::Cache::getFont(const std::string& name)

@@ -2,23 +2,23 @@
 
 using namespace Graphics;
 
-TexturePart::TexturePart(std::shared_ptr<skygfx::Texture> texture, const TexRegion& region) :
+TexturePart::TexturePart(std::shared_ptr<skygfx::Texture> texture, std::optional<TexRegion> region) :
 	mTexture(texture), mRegion(region)
 {
 }
 
 float TexturePart::getWidth() const
 {
-	if (mRegion.size.x > 0.0f)
-		return mRegion.size.x;
+	if (mRegion.has_value())
+		return mRegion.value().size.x;
 
 	return (float)mTexture->getWidth();
 }
 
 float TexturePart::getHeight() const
 {
-	if (mRegion.size.y > 0.0f)
-		return mRegion.size.y;
+	if (mRegion.has_value())
+		return mRegion.value().size.y;
 
 	return (float)mTexture->getHeight();
 }
