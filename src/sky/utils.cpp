@@ -7,7 +7,7 @@
 #include <emscripten.h>
 #endif
 
-Graphics::TexCell sky::GetTexture(const std::string& name)
+Graphics::TexturePart sky::GetTexture(const std::string& name)
 {
 	return GetService<Cache>()->getTexture(name);
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sky/locator.h>
-#include <graphics/tex_cell.h>
+#include <graphics/texture_part.h>
 #include <graphics/font.h>
 #include <graphics/animation.h>
 #include <graphics/atlas.h>
@@ -22,7 +22,7 @@ namespace sky
 
 	// clang-format on
 
-	Graphics::TexCell GetTexture(const std::string& name);
+	Graphics::TexturePart GetTexture(const std::string& name);
 	std::shared_ptr<Graphics::Font> GetFont(const std::string& name);
 	std::shared_ptr<Audio::Sound> GetSound(const std::string& name);
 	std::shared_ptr<Graphics::Animation> GetAnimation(const std::string& name);

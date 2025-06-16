@@ -14,7 +14,7 @@ namespace sky
 	class Cache
 	{
 	public:
-		Graphics::TexCell getTexture(const std::string& name);
+		Graphics::TexturePart getTexture(const std::string& name);
 		std::shared_ptr<Graphics::Font> getFont(const std::string& name);
 		std::shared_ptr<Audio::Sound> getSound(const std::string& name);
 		std::shared_ptr<Graphics::Atlas> getAtlas(const std::string& name);
@@ -52,6 +52,6 @@ namespace sky
 		std::unordered_map<std::string, nlohmann::json> mJsons;
 
 	private:
-		std::unordered_map<std::string, Graphics::TexCell> mTexCells;
+		std::unordered_map<std::string, Graphics::TexturePart> mTextureParts;
 	};
 }

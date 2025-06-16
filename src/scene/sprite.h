@@ -28,7 +28,7 @@ namespace Scene
 	public:
 		auto getTexture() const { return mTexture; }
 		void setTexture(std::shared_ptr<skygfx::Texture> value) { mTexture = value; }
-		void setTexture(const Graphics::TexCell& value);
+		void setTexture(const Graphics::TexturePart& value);
 
 		auto getTexRegion() const { return mTexRegion; }
 		void setTexRegion(const Graphics::TexRegion& value) { mTexRegion = value; }

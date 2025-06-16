@@ -4,17 +4,17 @@
 #include <sky/utils.h>
 #include <sky/asset.h>
 
-Graphics::TexCell sky::Cache::getTexture(const std::string& name)
+Graphics::TexturePart sky::Cache::getTexture(const std::string& name)
 {
-	if (mTexCells.count(name) > 0)
-		return mTexCells.at(name);
+	if (mTextureParts.count(name) > 0)
+		return mTextureParts.at(name);
 
 	loadTexture(name);
 
 	if (mTextures.count(name) == 0)
-		return { nullptr, Graphics::TexRegion() };
+		return Graphics::TexturePart(nullptr, Graphics::TexRegion());
 
-	return { mTextures.at(name), Graphics::TexRegion() };
+	return Graphics::TexturePart(mTextures.at(name), Graphics::TexRegion());
 }
 
 std::shared_ptr<Graphics::Font> sky::Cache::getFont(const std::string& name)
@@ -180,7 +180,7 @@ void sky::Cache::makeAtlas(const std::string& name, const std::set<std::string>&
 
 	for (const auto& [name, tex_region] : regions)
 	{
-		mTexCells.insert({ name, Graphics::TexCell(texture, tex_region) });
+		mTextureParts.insert({ name, Graphics::TexturePart(texture, tex_region) });
 	}
 }
 

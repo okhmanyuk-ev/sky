@@ -5,7 +5,7 @@
 #include <graphics/font.h>
 #include <graphics/image.h>
 #include <graphics/system.h>
-#include <graphics/tex_cell.h>
+#include <graphics/texture_part.h>
 #include <graphics/tex_region.h>
 #include <graphics/text_mesh.h>
 #include <graphics/effects.h>

@@ -6,13 +6,11 @@
 
 namespace Graphics
 {
-	class TexCell
+	class TexturePart
 	{
 	public:
-		TexCell() { }
-		TexCell(std::shared_ptr<skygfx::Texture> texture, const TexRegion& region) :
-			mTexture(texture), mRegion(region)
-		{ }
+		TexturePart() = default;
+		TexturePart(std::shared_ptr<skygfx::Texture> texture, const TexRegion& region);
 
 	public:
 		operator std::shared_ptr<skygfx::Texture>() const { return mTexture; }
@@ -21,21 +19,8 @@ namespace Graphics
 		auto getTexture() const { return mTexture; }
 		const auto& getRegion() const { return mRegion; }
 
-		float getWidth() const
-		{
-			if (mRegion.size.x > 0.0f)
-				return mRegion.size.x;
-
-			return (float)mTexture->getWidth();
-		}
-
-		float getHeight() const
-		{
-			if (mRegion.size.y > 0.0f)
-				return mRegion.size.y;
-
-			return (float)mTexture->getHeight();
-		}
+		float getWidth() const;
+		float getHeight() const;
 
 	private:
 		std::shared_ptr<skygfx::Texture> mTexture = nullptr;

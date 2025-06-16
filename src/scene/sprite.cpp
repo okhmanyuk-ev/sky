@@ -59,7 +59,7 @@ void Sprite::applyTextureSize()
 	applyTextureHeight();
 }
 
-void Sprite::setTexture(const Graphics::TexCell& value)
+void Sprite::setTexture(const Graphics::TexturePart& value)
 {
 	setTexture(value.getTexture());
 	setTexRegion(value.getRegion());
