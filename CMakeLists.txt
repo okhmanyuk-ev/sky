@@ -111,7 +111,7 @@ elseif(EMSCRIPTEN)
 		-g3
 		-gsource-map
 	,>)
-	target_link_options(${PROJECT_NAME} PUBLIC $<IF:$<CONFIG:RELEASE>,
+	target_link_options(${PROJECT_NAME} PUBLIC $<IF:$<OR:$<CONFIG:RELEASE>,$<CONFIG:MINSIZEREL>>,
 		--emit-symbol-map
 	,>)
 endif()
