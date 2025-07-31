@@ -10,62 +10,62 @@
 
 namespace Scene
 {
-	template <typename ObjectType, typename ValueType, typename GetterValueType, typename SetterValueType,
-		GetterValueType(ObjectType::* Getter)() const, void (ObjectType::* Setter)(SetterValueType)>
+	template <typename ObjectType, auto Getter, auto Setter>
 	struct Property
 	{
-		using Type = ValueType;
+		using Type = std::invoke_result_t<decltype(Getter), ObjectType*>;
 		using Object = std::shared_ptr<ObjectType>;
-		static Type GetValue(Object obj) { return static_cast<Type>((obj.get()->*Getter)()); }
-		static void SetValue(Object obj, SetterValueType value) { (obj.get()->*Setter)(value); }
+		static auto GetValue(Object obj) { return std::invoke(Getter, obj.get()); }
+		static void SetValue(Object obj, auto value) { std::invoke(Setter, obj.get(), std::move(value)); }
 	};
 
-	using ColorProperty = Property<Color, glm::vec3, glm::vec4, const glm::vec3&, &Color::getColor, &Color::setColor>;
-	using AlphaProperty = Property<Color, float, float, float, &Color::getAlpha, &Color::setAlpha>;
+	using ColorProperty = Property<Color, &Color::getColor, static_cast<void (Color::*)(const glm::vec3&)>(&Color::setColor)>;
+	using ColorRgbProperty = Property<Color, &Color::getRGB, &Color::setRGB>;
+	using AlphaProperty = Property<Color, &Color::getAlpha, &Color::setAlpha>;
 
-	using AnchorProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getAnchor, &Transform::setAnchor>;
-	using HorizontalAnchorProperty = Property<Transform, float, float, float, &Transform::getHorizontalAnchor, &Transform::setHorizontalAnchor>;
-	using VerticalAnchorProperty = Property<Transform, float, float, float, &Transform::getVerticalAnchor, &Transform::setVerticalAnchor>;
+	using AnchorProperty = Property<Transform, &Transform::getAnchor, static_cast<void (Transform::*)(const glm::vec2&)>(&Transform::setAnchor)>;
+	using HorizontalAnchorProperty = Property<Transform, &Transform::getHorizontalAnchor, &Transform::setHorizontalAnchor>;
+	using VerticalAnchorProperty = Property<Transform, &Transform::getVerticalAnchor, &Transform::setVerticalAnchor>;
 
-	using PivotProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getPivot, &Transform::setPivot>;
-	using HorizontalPivotProperty = Property<Transform, float, float, float, &Transform::getHorizontalPivot, &Transform::setHorizontalPivot>;
-	using VerticalPivotProperty = Property<Transform, float, float, float, &Transform::getVerticalPivot, &Transform::setVerticalPivot>;
+	using PivotProperty = Property<Transform, &Transform::getPivot, static_cast<void (Transform::*)(const glm::vec2&)>(&Transform::setPivot)>;
+	using HorizontalPivotProperty = Property<Transform, &Transform::getHorizontalPivot, &Transform::setHorizontalPivot>;
+	using VerticalPivotProperty = Property<Transform, &Transform::getVerticalPivot, &Transform::setVerticalPivot>;
 
-	using PositionProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getPosition, &Transform::setPosition>;
-	using HorizontalPositionProperty = Property<Transform, float, float, float, &Transform::getHorizontalPosition, &Transform::setHorizontalPosition>;
-	using VerticalPositionProperty = Property<Transform, float, float, float, &Transform::getVerticalPosition, &Transform::setVerticalPosition>;
+	using PositionProperty = Property<Transform, &Transform::getPosition, &Transform::setPosition>;
+	using HorizontalPositionProperty = Property<Transform, &Transform::getHorizontalPosition, &Transform::setHorizontalPosition>;
+	using VerticalPositionProperty = Property<Transform, &Transform::getVerticalPosition, &Transform::setVerticalPosition>;
 
-	using OriginProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getOrigin, &Transform::setOrigin>;
-	using HorizontalOriginProperty = Property<Transform, float, float, float, &Transform::getHorizontalOrigin, &Transform::setHorizontalOrigin>;
-	using VerticalOriginProperty = Property<Transform, float, float, float, &Transform::getVerticalOrigin, &Transform::setVerticalOrigin>;
+	using OriginProperty = Property<Transform, &Transform::getOrigin, static_cast<void (Transform::*)(const glm::vec2&)>(&Transform::setOrigin)>;
+	using HorizontalOriginProperty = Property<Transform, &Transform::getHorizontalOrigin, &Transform::setHorizontalOrigin>;
+	using VerticalOriginProperty = Property<Transform, &Transform::getVerticalOrigin, &Transform::setVerticalOrigin>;
 
-	using SizeProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getSize, &Transform::setSize>;
-	using HorizontalSizeProperty = Property<Transform, float, float, float, &Transform::getHorizontalSize, &Transform::setHorizontalSize>;
-	using VerticalSizeProperty = Property<Transform, float, float, float, &Transform::getVerticalSize, &Transform::setVerticalSize>;
+	using SizeProperty = Property<Transform, &Transform::getSize, static_cast<void (Transform::*)(const glm::vec2&)>(&Transform::setSize)>;
+	using HorizontalSizeProperty = Property<Transform, &Transform::getHorizontalSize, &Transform::setHorizontalSize>;
+	using VerticalSizeProperty = Property<Transform, &Transform::getVerticalSize, &Transform::setVerticalSize>;
 
-	using StretchProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getStretch, &Transform::setStretch>;
-	using HorizontalStretchProperty = Property<Transform, float, float, float, &Transform::getHorizontalStretch, &Transform::setHorizontalStretch>;
-	using VerticalStretchProperty = Property<Transform, float, float, float, &Transform::getVerticalStretch, &Transform::setVerticalStretch>;
+	using StretchProperty = Property<Transform, &Transform::getStretch, static_cast<void (Transform::*)(const glm::vec2&)>(&Transform::setStretch)>;
+	using HorizontalStretchProperty = Property<Transform, &Transform::getHorizontalStretch, &Transform::setHorizontalStretch>;
+	using VerticalStretchProperty = Property<Transform, &Transform::getVerticalStretch, &Transform::setVerticalStretch>;
 
-	using ScaleProperty = Property<Transform, glm::vec2, glm::vec2, const glm::vec2&, &Transform::getScale, &Transform::setScale>;
-	using HorizontalScaleProperty = Property<Transform, float, float, float, &Transform::getHorizontalScale, &Transform::setHorizontalScale>;
-	using VerticalScaleProperty = Property<Transform, float, float, float, &Transform::getVerticalScale, &Transform::setVerticalScale>;
+	using ScaleProperty = Property<Transform, &Transform::getScale, static_cast<void (Transform::*)(const glm::vec2&)>(&Transform::setScale)>;
+	using HorizontalScaleProperty = Property<Transform, &Transform::getHorizontalScale, &Transform::setHorizontalScale>;
+	using VerticalScaleProperty = Property<Transform, &Transform::getVerticalScale, &Transform::setVerticalScale>;
 
-	using RotationProperty = Property<Transform, float, float, float, &Transform::getRotation, &Transform::setRotation>;
-	using RadialAnchorProperty = Property<Transform, float, float, float, &Transform::getRadialAnchor, &Transform::setRadialAnchor>;
-	using RadialPivotProperty = Property<Transform, float, float, float, &Transform::getRadialPivot, &Transform::setRadialPivot>;
+	using RotationProperty = Property<Transform, &Transform::getRotation, &Transform::setRotation>;
+	using RadialAnchorProperty = Property<Transform, &Transform::getRadialAnchor, &Transform::setRadialAnchor>;
+	using RadialPivotProperty = Property<Transform, &Transform::getRadialPivot, &Transform::setRadialPivot>;
 
-	using CirclePieProperty = Property<Circle, float, float, float, &Circle::getPie, &Circle::setPie>;
-	using CirclePiePivotProperty = Property<Circle, float, float, float, &Circle::getPiePivot, &Circle::setPiePivot>;
-	using CircleRadiusProperty = Property<Circle, float, float, float, &Circle::getRadius, &Circle::setRadius>;
-	using CircleFillProperty = Property<Circle, float, float, float, &Circle::getFill, &Circle::setFill>;
+	using CirclePieProperty = Property<Circle, &Circle::getPie, &Circle::setPie>;
+	using CirclePiePivotProperty = Property<Circle, &Circle::getPiePivot, &Circle::setPiePivot>;
+	using CircleRadiusProperty = Property<Circle, &Circle::getRadius, &Circle::setRadius>;
+	using CircleFillProperty = Property<Circle, &Circle::getFill, &Circle::setFill>;
 
-	using ScrollPositionProperty = Property<Scrollbox, glm::vec2, glm::vec2, const glm::vec2&, &Scrollbox::getScrollPosition, &Scrollbox::setScrollPosition>;
-	using HorizontalScrollPositionProperty = Property<Scrollbox, float, float, float, &Scrollbox::getHorizontalScrollPosition, &Scrollbox::setHorizontalScrollPosition>;
-	using VerticalScrollPositionProperty = Property<Scrollbox, float, float, float, &Scrollbox::getVerticalScrollPosition, &Scrollbox::setVerticalScrollPosition>;
+	using ScrollPositionProperty = Property<Scrollbox, &Scrollbox::getScrollPosition, static_cast<void (Scrollbox::*)(const glm::vec2&)>(&Scrollbox::setScrollPosition)>;
+	using HorizontalScrollPositionProperty = Property<Scrollbox, &Scrollbox::getHorizontalScrollPosition, &Scrollbox::setHorizontalScrollPosition>;
+	using VerticalScrollPositionProperty = Property<Scrollbox, &Scrollbox::getVerticalScrollPosition, &Scrollbox::setVerticalScrollPosition>;
 
-	using BlurIntensityProperty = Property<BlurredGlass, float, float, float, &BlurredGlass::getBlurIntensity, &BlurredGlass::setBlurIntensity>;
-	using GrayscaleIntensityProperty = Property<GrayscaledGlass, float, float, float, &GrayscaledGlass::getGrayscaleIntensity, &GrayscaledGlass::setGrayscaleIntensity>;
+	using BlurIntensityProperty = Property<BlurredGlass, &BlurredGlass::getBlurIntensity, &BlurredGlass::setBlurIntensity>;
+	using GrayscaleIntensityProperty = Property<GrayscaledGlass, &GrayscaledGlass::getGrayscaleIntensity, &GrayscaledGlass::setGrayscaleIntensity>;
 }
 
 namespace Actions::Collection
@@ -87,6 +87,7 @@ namespace Actions::Collection
 	};
 
 	constexpr InterpolateWrapper<Scene::ColorProperty> ChangeColor;
+	constexpr InterpolateWrapper<Scene::ColorRgbProperty> ChangeColorRgb;
 	constexpr InterpolateWrapper<Scene::AlphaProperty> ChangeAlpha;
 
 	constexpr InterpolateWrapper<Scene::HorizontalAnchorProperty> ChangeHorizontalAnchor;

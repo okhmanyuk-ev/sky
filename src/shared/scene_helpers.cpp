@@ -769,7 +769,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction(
 	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
 		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
-		parallel->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
+		parallel->add(Actions::Collection::ChangeColorRgb(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
@@ -817,7 +817,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
 		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
-		parallel->add(Actions::Collection::ChangeColor(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
+		parallel->add(Actions::Collection::ChangeColorRgb(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Gray))

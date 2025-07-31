@@ -19,6 +19,9 @@ namespace Scene
 		void setColor(const glm::vec3& value) { mColor = { value, mColor.a }; }
 		void setColor(sky::Color value) { setColor(sky::GetColor(value)); }
 
+		auto getRGB() const { return glm::vec3{ mColor.r, mColor.g, mColor.b }; }
+		void setRGB(const glm::vec3& value) { setColor(value); }
+
 		float getAlpha() const { return mColor.a; }
 		void setAlpha(float value) { mColor.a = value; }
 
