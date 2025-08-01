@@ -17,7 +17,6 @@
 #include <sky/imgui_console.h>
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
-#include <emscripten/fetch.h>
 #endif
 
 using namespace sky;
@@ -154,53 +153,21 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		}));
 
 		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, [this](CON_ARGS) {
-#ifndef EMSCRIPTEN
-			sky::Log("this is for emscripten");
-#else
-			static auto spawn_sprite = [this](const std::string& url){
-				auto sprite = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Sprite>>>>();
-				sprite->setSize(256.0f);
-				sprite->setAnchor(0.5f);
-				sprite->setPivot(0.5f);
-				sprite->setTexture(sky::GetTexture(url));
-				sky::GetService<Scene::Scene>()->getRoot()->attach(sprite);
-			};
-
-			auto download_succeeded = [](emscripten_fetch_t* fetch) {
-				sky::Log("download succeeded");
-
-				auto data = fetch->data;
-				auto size = fetch->numBytes;
-				auto url = fetch->url;
-				auto image = Graphics::Image((void*)data, (size_t)size);
-
-				sky::GetService<sky::Cache>()->loadTexture(image, url);
-				spawn_sprite(url);
-				emscripten_fetch_close(fetch);
-			};
-
-			auto download_failed = [](emscripten_fetch_t* fetch) {
-				sky::Log("download failed");
-				emscripten_fetch_close(fetch);
-			};
-
-			auto download_progress = [](emscripten_fetch_t* fetch) {
-				sky::Log("download progress {} of {}", fetch->dataOffset, fetch->totalBytes);
-			};
-
 			auto url = CON_ARG_EXIST(0) ? CON_ARG(0) : std::string("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
+			sky::Asset::Fetch(url, {
+				.onSuccess = [url](const sky::Asset& asset) {
+					auto image = Graphics::Image(asset);
+					sky::GetService<sky::Cache>()->loadTexture(image, url);
 
-			emscripten_fetch_attr_t attr;
-			emscripten_fetch_attr_init(&attr);
-			strcpy(attr.requestMethod, "GET");
-			attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
-			attr.onsuccess = download_succeeded;
-			attr.onerror = download_failed;
-			attr.onprogress = download_progress;
-			emscripten_fetch(&attr, url.c_str());
-
-			sky::Log("fetching {}", url);
-#endif
+					auto sprite = std::make_shared<Shared::SceneHelpers::KillableByClick<
+					Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Sprite>>>>();
+					sprite->setSize(256.0f);
+					sprite->setAnchor(0.5f);
+					sprite->setPivot(0.5f);
+					sprite->setTexture(sky::GetTexture(url));
+					sky::GetService<Scene::Scene>()->getRoot()->attach(sprite);
+				}	
+			});
 		}));
 	}
 
