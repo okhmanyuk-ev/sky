@@ -21,7 +21,6 @@ namespace Shared
 	public:
 		void load();
 		void save();
-		void saveAsync();
 		void clear();
 
 	private:

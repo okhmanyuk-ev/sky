@@ -67,24 +67,11 @@ void Profile::save()
 	auto str = json.dump();
 	emscripten_run_script(fmt::format("localStorage.setItem('profile', '{}');", str).c_str());
 #endif
-	SCHEDULER->addOneThreadsafe([] {
-		sky::Emit(ProfileSavedEvent());
-	});
+	sky::Emit(ProfileSavedEvent());
 }
 
 void Profile::clear()
 {
 	sky::Emit(ProfileClearedEvent());
 	makeDefault();
-}
-
-void Profile::saveAsync()
-{
-#ifndef EMSCRIPTEN
-	THREADPOOL->addTask([this] {
-		save();
-	});
-#else
-	save();
-#endif
 }
