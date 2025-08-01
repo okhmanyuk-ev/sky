@@ -25,7 +25,7 @@ void sky_main()
 		column->attach(label);
 	};
 
-	sky::GetService<sky::Scheduler>()->addInfinity([column] {
+	sky::Schedule(sky::ScheduleBehavior::Everytime, [column] {
 		auto scale = column->getScale().x;
 		ImGui::Begin("Settings");
 		ImGui::DragFloat("Scale", &scale, 0.01f);
