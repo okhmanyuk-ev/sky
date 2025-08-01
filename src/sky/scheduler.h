@@ -35,7 +35,6 @@ namespace sky
 		void add(StatusCallback callback);
 		void addInfinity(Callback callback);
 		void addOne(Callback callback);
-		void addOneThreadsafe(Callback callback);
 
 	public:
 		int getFramerateLimit() const { return mFramerateLimit; }
@@ -62,7 +61,6 @@ namespace sky
 
 	private:
 		std::list<StatusCallback> mFramers;
-		std::list<Callback> mThreadsafeCallbacks;
 		sky::CVar<int> mFramerateLimit = sky::CVar<int>("sys_framerate", 0, "limit of fps");
 		sky::CVar<bool> mSleepAllowed = sky::CVar<bool>("sys_sleep", true, "cpu saving between frames");
 		sky::CVar<float> mTimeScale = sky::CVar<float>("sys_timescale", 1.0f, "time delta multiplier");
@@ -71,7 +69,6 @@ namespace sky
 		sky::Duration mUptime = sky::Duration::zero();
 		std::optional<sky::Duration> mTimeDeltaLimit; // this can save from animation breaks
 		uint64_t mFrameCount = 0;
-		std::mutex mMutex;
 		bool mChoked = false;
 	};
 

@@ -25,13 +25,6 @@ void Scheduler::addOne(Callback callback)
 	});
 }
 
-void Scheduler::addOneThreadsafe(Callback callback)
-{
-	mMutex.lock();
-	mThreadsafeCallbacks.push_back(callback);
-	mMutex.unlock();
-}
-
 void Scheduler::frame()
 {
 	mFrameCount += 1;
@@ -75,14 +68,6 @@ void Scheduler::frame()
 		else
 			it = mFramers.erase(it);
 	}
-
-	mMutex.lock();
-	for (auto callback : mThreadsafeCallbacks)
-	{
-		callback();
-	}
-	mThreadsafeCallbacks.clear();
-	mMutex.unlock();
 }
 
 Scheduler::Frameable::Frameable()
