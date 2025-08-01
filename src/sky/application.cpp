@@ -217,7 +217,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		startup_commands.push_back(final_cmd);
 	}
 
-	SCHEDULER->addOne([startup_commands] {
+	sky::Schedule(sky::ScheduleBehavior::Once, [startup_commands] {
 		for (auto cmd : startup_commands)
 			sky::GetService<sky::CommandProcessor>()->execute(cmd);
 	});

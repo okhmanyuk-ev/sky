@@ -134,6 +134,33 @@ void sky::OpenUrl(const std::string& url)
 #endif
 }
 
+void sky::Schedule(sky::Scheduler::StatusCallback callback)
+{
+	SCHEDULER->add(std::move(callback));
+}
+
+void sky::Schedule(std::unique_ptr<Actions::Action> action)
+{
+	auto player = std::make_shared<Actions::GenericActionsPlayer<Actions::Parallel>>();
+	player->add(std::move(action));
+	Schedule([player] {
+		player->update(SCHEDULER->getTimeDelta());
+
+		if (player->hasActions())
+			return sky::Scheduler::Status::Continue;
+
+		return sky::Scheduler::Status::Finished;
+	});
+}
+
+void sky::Schedule(ScheduleBehavior behavior, std::function<void()> callback)
+{
+	Schedule([behavior, callback] {
+		callback();
+		return behavior == ScheduleBehavior::Once ? sky::Scheduler::Status::Finished : sky::Scheduler::Status::Continue;
+	});
+}
+
 std::string sky::to_string(const std::wstring& wstr)
 {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;

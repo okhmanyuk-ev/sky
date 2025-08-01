@@ -272,17 +272,3 @@ std::unique_ptr<Action> Collection::Log(const std::string& text)
 		sky::Log(text);
 	});
 }
-
-void Actions::Run(std::unique_ptr<Action> action)
-{
-	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
-	player->add(std::move(action));
-	SCHEDULER->add([player] {
-		player->update(SCHEDULER->getTimeDelta());
-
-		if (player->hasActions())
-			return sky::Scheduler::Status::Continue;
-
-		return sky::Scheduler::Status::Finished;
-	});
-}

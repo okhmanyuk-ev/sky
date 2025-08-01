@@ -9,22 +9,6 @@ void Scheduler::add(StatusCallback callback)
 	mFramers.push_back(callback);
 }
 
-void Scheduler::addInfinity(Callback callback)
-{
-	add([callback] {
-		callback();
-		return Status::Continue;
-	});
-}
-
-void Scheduler::addOne(Callback callback)
-{
-	add([callback] {
-		callback();
-		return Status::Finished;
-	});
-}
-
 void Scheduler::frame()
 {
 	mFrameCount += 1;

@@ -59,7 +59,7 @@ std::unique_ptr<Action> Collection::HideRecursive(std::shared_ptr<Scene::Node> n
 std::unique_ptr<Action> Collection::Kill(std::shared_ptr<Scene::Node> node)
 {
 	return Execute([node] {
-		SCHEDULER->addOne([node] {
+		sky::Schedule(sky::ScheduleBehavior::Once, [node] {
 			if (auto parent = node->getParent(); parent != nullptr)
 				parent->detach(node);
 		});

@@ -279,8 +279,4 @@ namespace Actions
 			});
 		}
 	}
-
-	// an instant action player whithout states,
-	// will be removed as soon as action completed
-	void Run(std::unique_ptr<Action> action);
 }

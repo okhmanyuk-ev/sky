@@ -476,7 +476,7 @@ void RegularMessaging::Base::send()
 
 RegularMessaging::Client::Client()
 {
-	SCHEDULER->addOne([this] {
+	sky::Schedule(sky::ScheduleBehavior::Once, [this] {
 		send();
 	});
 }

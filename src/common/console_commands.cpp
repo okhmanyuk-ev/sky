@@ -3,6 +3,7 @@
 #include <fstream>
 #include <algorithm>
 #include <sky/scheduler.h>
+#include <sky/utils.h>
 
 using namespace Common;
 
@@ -114,7 +115,7 @@ void ConsoleCommands::onEcho(CON_ARGS)
 void ConsoleCommands::onLater(CON_ARGS)
 {
 	float seconds = std::stof(CON_ARG(0));
-	Actions::Run(Actions::Collection::Delayed(seconds,
+	sky::Schedule(Actions::Collection::Delayed(seconds,
 		Actions::Collection::Execute([this, command = CON_ARG(1)] {
 			sky::GetService<sky::CommandProcessor>()->execute(command);
 		})

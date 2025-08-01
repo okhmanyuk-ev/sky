@@ -33,8 +33,6 @@ namespace sky
 
 	public:
 		void add(StatusCallback callback);
-		void addInfinity(Callback callback);
-		void addOne(Callback callback);
 
 	public:
 		int getFramerateLimit() const { return mFramerateLimit; }

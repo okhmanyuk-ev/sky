@@ -43,7 +43,7 @@ NativeConsole::NativeConsole()
 		{
 			std::string s;
 			std::getline(std::cin, s);
-			SCHEDULER->addOne([this, s] {
+			sky::Schedule(sky::ScheduleBehavior::Once, [this, s] {
 				sky::Emit(ReadEvent({ s }));
 			});
 		}

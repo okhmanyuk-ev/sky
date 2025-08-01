@@ -12,6 +12,7 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <shared/stats_system.h>
+#include <common/actions.h>
 
 namespace sky
 {
@@ -53,6 +54,17 @@ namespace sky
 	void ExecuteCommand(const std::string& str);
 
 	void OpenUrl(const std::string& url);
+
+	void Schedule(sky::Scheduler::StatusCallback callback);
+	void Schedule(std::unique_ptr<Actions::Action> action);
+
+	enum class ScheduleBehavior
+	{
+		Once,
+		Everytime
+	};
+
+	void Schedule(ScheduleBehavior behavior, std::function<void()> callback);
 
 	std::string to_string(const std::wstring& wstr);
 	std::wstring to_wstring(const std::string& str);
