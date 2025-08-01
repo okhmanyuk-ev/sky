@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 #include <platform/defines.h>
 
 namespace sky
@@ -18,6 +19,7 @@ namespace sky
 		};
 
 	public:
+		Asset(const void* memory, size_t size);
 		Asset(const std::string& path, Storage storage = Storage::Assets);
 		Asset(const Asset& asset);
 		~Asset();
@@ -27,6 +29,15 @@ namespace sky
 		static bool Exists(const std::string& path, Storage storage = Storage::Assets);
 		static std::string StoragePathToAbsolute(const std::string& path, Storage storage);
 		static std::string FixSlashes(const std::string& path);
+
+		struct FetchCallbacks
+		{
+			std::function<void(const Asset& asset)> onSuccess = nullptr;
+			std::function<void(const std::string& reason)> onFail = nullptr;
+			std::function<void(size_t current, size_t total)> onProgress = nullptr;
+		};
+
+		static void Fetch(const std::string& url, FetchCallbacks callbacks);
 
 	public:
 		auto getMemory() const { return mMemory; }

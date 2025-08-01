@@ -6,6 +6,16 @@
 #include <cassert>
 #include <filesystem>
 #include <sys/stat.h>
+#ifdef EMSCRIPTEN
+#include <emscripten/fetch.h>
+#endif
+#include <sky/utils.h>
+
+sky::Asset::Asset(const void* memory, size_t size) : mSize(size)
+{
+	mMemory = malloc(mSize);
+	memcpy(mMemory, memory, mSize);
+}
 
 sky::Asset::Asset(const std::string& path, Storage storage)
 {
@@ -154,4 +164,48 @@ std::string sky::Asset::FixSlashes(const std::string& input)
 		}
 	}
 	return result;
+}
+
+void sky::Asset::Fetch(const std::string& url, FetchCallbacks callbacks)
+{
+#ifdef EMSCRIPTEN
+	sky::Log("fetching {}", url);
+	emscripten_fetch_attr_t attr;
+	emscripten_fetch_attr_init(&attr);
+	strcpy(attr.requestMethod, "GET");
+	attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+	attr.userData = new FetchCallbacks(std::move(callbacks));
+	attr.onsuccess = [](emscripten_fetch_t* fetch) {
+		sky::Log("fetch succeeded");
+		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
+		if (callbacks->onSuccess)
+		{
+			callbacks->onSuccess(Asset((const void*)fetch->data, (size_t)fetch->numBytes));
+		}
+		delete callbacks;
+		emscripten_fetch_close(fetch);
+	};
+	attr.onerror = [](emscripten_fetch_t* fetch) {
+		sky::Log("fetch failed");
+		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
+		if (callbacks->onFail)
+		{
+			callbacks->onFail(std::string(fetch->statusText));
+		}
+		delete callbacks;
+		emscripten_fetch_close(fetch);
+	};
+	attr.onprogress = [](emscripten_fetch_t* fetch) {
+		sky::Log("fetch progress {} of {}", fetch->dataOffset, fetch->totalBytes);
+		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
+		if (callbacks->onProgress)
+		{
+			callbacks->onProgress((size_t)fetch->dataOffset, (size_t)fetch->totalBytes);
+		}
+	};
+	emscripten_fetch(&attr, url.c_str());
+#else
+	if (callbacks.onFail)
+		callbacks.onFail("fetch is unsupported on this platform");
+#endif
 }
