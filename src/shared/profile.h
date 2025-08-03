@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nlohmann/json.hpp>
-#include <mutex>
 
 namespace Shared
 {
@@ -22,8 +21,5 @@ namespace Shared
 		void load();
 		void save();
 		void clear();
-
-	private:
-		std::mutex mSaveMutex;
 	};
 }

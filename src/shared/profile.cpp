@@ -55,12 +55,10 @@ void Profile::load()
 void Profile::save()
 {
 #ifndef EMSCRIPTEN
-	mSaveMutex.lock();
 	auto json = nlohmann::json();
 	write(json);
 	auto bson = nlohmann::json::to_bson(json);
 	sky::Asset::Write("save.bson", bson.data(), bson.size(), sky::Asset::Storage::Bundle);
-	mSaveMutex.unlock();
 #else
 	auto json = nlohmann::json();
 	write(json);
