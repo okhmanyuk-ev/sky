@@ -10,6 +10,10 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
 	set(X86 TRUE)
 endif()
 
+if(LINUX)
+	add_definitions(-DLINUX)
+endif()
+
 set(LIBS_FOLDER "libs")
 
 file(GLOB_RECURSE ALL_SRC
@@ -74,6 +78,11 @@ elseif(ANDROID)
 		GLESv3
 		log
 		m
+	)
+elseif(LINUX)
+	target_link_libraries(${PROJECT_NAME}
+		EGL
+		GLESv2
 	)
 elseif(EMSCRIPTEN)
 	if(NOT DEFINED EMSCRIPTEN_SHELL_FILE_PATH)
@@ -366,6 +375,8 @@ if(WIN32 OR APPLE AND NOT IOS)
 	add_subdirectory(lib/glfw)
 	set_property(TARGET glfw PROPERTY FOLDER ${LIBS_FOLDER}/glfw)
 	set_property(TARGET update_mappings PROPERTY FOLDER ${LIBS_FOLDER}/glfw)
+	target_link_libraries(${PROJECT_NAME} glfw)
+elseif(LINUX)
 	target_link_libraries(${PROJECT_NAME} glfw)
 endif()
 

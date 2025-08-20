@@ -1,16 +1,26 @@
 #include "system_glfw.h"
 
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)// | defined(PLATFORM_EMSCRIPTEN)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_LINUX)
 
 #if defined(PLATFORM_WINDOWS)
 #define GLFW_EXPOSE_NATIVE_WIN32
 #elif defined(PLATFORM_MAC)
 #define GLFW_EXPOSE_NATIVE_COCOA
+#elif defined(PLATFORM_LINUX)
+#define GLFW_EXPOSE_NATIVE_X11
 #endif
 #include <GLFW/glfw3.h>
 #if !defined(PLATFORM_EMSCRIPTEN)
 #include <GLFW/glfw3native.h>
 #endif
+
+#if defined(PLATFORM_LINUX)
+// Undefine X11 macro that conflicts
+#undef Always
+#undef None
+#undef Status
+#endif
+
 #include <sky/utils.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -56,6 +66,8 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	mNativeWindow = glfwGetCocoaWindow(gWindow);
 #elif defined(PLATFORM_EMSCRIPTEN)
 	mNativeWindow = gWindow;
+#elif defined(PLATFORM_LINUX)
+	mNativeWindow = (void*) glfwGetX11Window(gWindow);
 #endif
 
 	float x_scale;
