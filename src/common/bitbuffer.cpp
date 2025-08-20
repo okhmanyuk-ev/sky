@@ -3,6 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <cstdlib>
+#include <cstring>
 
 using namespace sky;
 
