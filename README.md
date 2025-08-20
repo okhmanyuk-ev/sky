@@ -1,7 +1,7 @@
 # sky - Crossplatform lightweight game engine
 
 # Features
-- Platforms: Windows, Mac, iOS, Android, Emscripten
+- Platforms: Windows, Mac, iOS, Android, Emscripten, Linux (X11)
 - Rendering API: D3D11, OpenGL, OpenGL ES
 - SDF font rendering
 - Batching 2D objects to reduce drawcalls
