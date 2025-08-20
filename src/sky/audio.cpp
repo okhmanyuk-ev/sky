@@ -1,4 +1,5 @@
 #include "audio.h"
+#include <cstring>
 
 using namespace sky;
 

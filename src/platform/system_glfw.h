@@ -2,7 +2,7 @@
 
 #include <platform/system.h>
 
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC)// | defined(PLATFORM_EMSCRIPTEN)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_MAC) | defined(PLATFORM_LINUX)
 
 #include <platform/low_level_api.h>
 #include <platform/input.h>
