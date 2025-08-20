@@ -1,10 +1,11 @@
 #include "audio.h"
+#include <cstring>
 
 using namespace sky;
 
 Audio::Audio()
 {
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN) & !defined(PLATFORM_LINUX)
 	FMOD::Studio::System::create(&FmodStudio);
 	FmodStudio->getCoreSystem(&Fmod);
 #if defined(PLATFORM_ANDROID)
@@ -19,7 +20,7 @@ Audio::Audio()
 
 Audio::~Audio()
 {
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN) & !defined(PLATFORM_LINUX)
 	FmodStudio->release();
 #endif
 }
@@ -29,14 +30,14 @@ void Audio::play(std::shared_ptr<Sound> sound)
 	if (sound == nullptr)
 		return;
 
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN) & !defined(PLATFORM_LINUX)
 	Fmod->playSound(sound->sound, nullptr, false, &channel);
 #endif
 }
 
 Audio::Sound::Sound(const sky::Asset& asset, bool loop)
 {
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN) & !defined(PLATFORM_LINUX)
 	FMOD_CREATESOUNDEXINFO exinfo;
 	memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
@@ -55,7 +56,7 @@ Audio::Sound::Sound(const sky::Asset& asset, bool loop)
 
 Audio::Sound::~Sound()
 {
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN) & !defined(PLATFORM_LINUX)
 	sound->release();
 #endif
 }
