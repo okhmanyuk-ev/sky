@@ -164,7 +164,7 @@ namespace Actions
 		}
 
 		template <typename...Args>
-		std::unique_ptr<Action> MakeSequence(Args&&...args)
+		std::unique_ptr<Action> Sequence(Args&&...args)
 		{
 			std::list<std::unique_ptr<Action>> actions;
 			(actions.push_back(std::forward<Args>(args)), ...);

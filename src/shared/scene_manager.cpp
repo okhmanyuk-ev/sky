@@ -26,7 +26,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishC
 	mPrevScreen = mCurrentScreen;
 
 	auto createLeaveAction = [this] {
-		return Actions::Collection::MakeSequence(
+		return Actions::Collection::Sequence(
 			Actions::Collection::Execute([this] {
 				mCurrentScreen->mState = Screen::State::Leaving;
 				mCurrentScreen->onLeaveBegin();
@@ -42,7 +42,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishC
 	};
 
 	auto createEnterAction = [this, screen] {
-		return Actions::Collection::MakeSequence(
+		return Actions::Collection::Sequence(
 			Actions::Collection::Execute([this, screen] {
 				mScreenHolder->attach(screen);
 				mCurrentScreen = screen;
@@ -70,7 +70,7 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishC
 	{
 		if (mCurrentScreen)
 		{
-			runAction(Actions::Collection::MakeSequence(
+			runAction(Actions::Collection::Sequence(
 				createLeaveAction(),
 				createFinalAction()
 			));
@@ -80,14 +80,14 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishC
 	{
 		if (!mCurrentScreen)
 		{
-			runAction(Actions::Collection::MakeSequence(
+			runAction(Actions::Collection::Sequence(
 				createEnterAction(),
 				createFinalAction()
 			));
 		}
 		else if (screen != mCurrentScreen)
 		{
-			runAction(Actions::Collection::MakeSequence(
+			runAction(Actions::Collection::Sequence(
 				createLeaveAction(),
 				createEnterAction(),
 				createFinalAction()
@@ -116,7 +116,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 	window->onOpenBegin();
 	window->mState = Window::State::Opening;
 
-	runAction(Actions::Collection::MakeSequence(
+	runAction(Actions::Collection::Sequence(
 		window->createOpenAction(),
 		Actions::Collection::Execute([this, window, finishCallback] {
 			window->onOpenEnd();
@@ -152,7 +152,7 @@ void SceneManager::popWindow(size_t count, Callback finishCallback)
 	window->onCloseBegin();
 	window->mState = Window::State::Closing;
 
-	runAction(Actions::Collection::MakeSequence(
+	runAction(Actions::Collection::Sequence(
 		Actions::Collection::Execute([this, window, count, finishCallback] {
 			if (mWindows.size() == 1 && mCurrentScreen)
 				mCurrentScreen->onWindowDisappearingBegin();

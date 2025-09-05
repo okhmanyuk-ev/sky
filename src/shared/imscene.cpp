@@ -46,7 +46,7 @@ void ImScene::destroyAction(std::unique_ptr<Actions::Action> action)
 	const auto& item = mNodeItems.at(mLastSpawnedKey);
 
 	auto func = make_shared_function([node = item.node, action = std::move(action)] () mutable {
-		node->runAction(Actions::Collection::MakeSequence(
+		node->runAction(Actions::Collection::Sequence(
 			std::move(action),
 			Actions::Collection::Kill(node)
 		));

@@ -16,7 +16,7 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakePopupLabel(std::shared_ptr<Scene
 	label->setPosition(holder->unproject(target->project({ target->getAbsoluteSize() / 2.0f })));
 	label->setPivot(0.5f);
 	label->setAlpha(0.0f);
-	label->runAction(Actions::Collection::MakeSequence(
+	label->runAction(Actions::Collection::Sequence(
 		Actions::Collection::Show(label, 0.5f),
 		Actions::Collection::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
 		Actions::Collection::Hide(label, 0.5f),
@@ -503,7 +503,7 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 			return;
 
 		mAlphaAnimating = true;
-		runAction(Actions::Collection::MakeSequence(
+		runAction(Actions::Collection::Sequence(
 			Actions::Collection::MakeParallel(
 				Actions::Collection::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
 				Actions::Collection::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
@@ -520,7 +520,7 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 			return;
 
 		mAlphaAnimating = true;
-		runAction(Actions::Collection::MakeSequence(
+		runAction(Actions::Collection::Sequence(
 			Actions::Collection::MakeParallel(
 				Actions::Collection::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
 				Actions::Collection::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
@@ -639,7 +639,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createEnterAction
 		actions.push_back(Actions::Collection::ChangeScale(mContent, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
 	}
 
-	return Actions::Collection::MakeSequence(
+	return Actions::Collection::Sequence(
 		Actions::Collection::WaitGlobalFrame(),
 		Actions::Collection::Parallel(std::move(actions))
 	);
@@ -666,7 +666,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction
 		actions.push_back(Actions::Collection::ChangeScale(mContent, StartScale, Duration, Easing::CubicIn));
 	}
 
-	return Actions::Collection::MakeSequence(
+	return Actions::Collection::Sequence(
 		Actions::Collection::WaitGlobalFrame(),
 		Actions::Collection::Parallel(std::move(actions))
 	);
@@ -797,7 +797,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction(
 		actions.push_back(Actions::Collection::ChangeScale(mContentHolder, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
 	}
 
-	return Actions::Collection::MakeSequence(
+	return Actions::Collection::Sequence(
 		Actions::Collection::WaitGlobalFrame(),
 		Actions::Collection::Parallel(std::move(actions))
 	);
@@ -845,7 +845,7 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 		actions.push_back(Actions::Collection::ChangeScale(mContentHolder, StartContentScale, Duration, Easing::CubicIn));
 	}
 
-	return Actions::Collection::MakeSequence(
+	return Actions::Collection::Sequence(
 		Actions::Collection::WaitGlobalFrame(),
 		Actions::Collection::Parallel(std::move(actions))
 	);
@@ -904,7 +904,7 @@ std::shared_ptr<SceneHelpers::Shockwave> SceneHelpers::Shockwave::MakeAnimated(f
 	shockwave->setShockwaveSize(0.0f);
 	shockwave->setShockwaveThickness(0.5f);
 	shockwave->setShockwaveForce(1.0f);
-	shockwave->runAction(Actions::Collection::MakeSequence(
+	shockwave->runAction(Actions::Collection::Sequence(
 		Actions::Collection::MakeParallel(
 			Actions::Collection::Interpolate(shockwave->getShockwaveSize(), 1.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
 				shockwave->setShockwaveSize(value);
@@ -1039,11 +1039,11 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 		setY(line_y);
 	}));
 
-	runAction(Actions::Collection::MakeSequence(
+	runAction(Actions::Collection::Sequence(
 		Actions::Collection::WaitGlobalFrame(),
 		Actions::Collection::Execute([this] {
 			runAction(Actions::Collection::RepeatInfinite([this] {
-				return Actions::Collection::MakeSequence(
+				return Actions::Collection::Sequence(
 					Actions::Collection::ChangeAlpha(shared_from_this(), 1.0f, 0.125f),
 					Actions::Collection::Wait(0.25f),
 					Actions::Collection::ChangeAlpha(shared_from_this(), 0.0f, 0.125f),

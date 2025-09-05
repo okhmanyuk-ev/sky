@@ -154,7 +154,7 @@ namespace Actions::Collection
 		requires std::same_as<typename T::Type, glm::vec2>
 	std::unique_ptr<Action> Shake(typename T::Object object, float radius, float duration, glm::vec2 base_value = { 0.0f, 0.0f })
 	{
-		return MakeSequence(
+		return Sequence(
 			Interpolate(1.0f, 0.0f, duration, Easing::Linear, [object, radius, base_value](float value) {
 				auto power = radius * value;
 				T::SetValue(object, base_value + (power != 0.0f ? glm::circularRand(power) : glm::vec2{ 0.0f, 0.0f }));

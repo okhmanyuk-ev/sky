@@ -68,7 +68,7 @@ void sky_main()
 	world->runAction(Actions::Collection::Pausable([]{ return auto_spawn; }, Actions::Collection::RepeatInfinite([spawnBox, spawnBall]() -> std::unique_ptr<Actions::Action> {
 		const auto delay = 0.125f;
 
-		return Actions::Collection::MakeSequence(
+		return Actions::Collection::Sequence(
 			Actions::Collection::Wait(delay),
 			Actions::Collection::Execute([spawnBox, spawnBall]{
 				if (sky::chance(ChanceValue))

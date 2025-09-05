@@ -142,7 +142,7 @@ namespace Shared::SceneHelpers
 				return;
 
 			mChooseAnimationStarted = true;
-			this->runAction(Actions::Collection::MakeSequence(
+			this->runAction(Actions::Collection::Sequence(
 				Actions::Collection::Execute([this] {
 					mChooseAnimationProcessing = true;
 				}),
@@ -163,7 +163,7 @@ namespace Shared::SceneHelpers
 			const float Duration = 0.125f / 1.5f;
 
 			mChooseAnimationStarted = false;
-			this->runAction(Actions::Collection::MakeSequence(
+			this->runAction(Actions::Collection::Sequence(
 				Actions::Collection::Wait(mChooseAnimationProcessing),
 				Actions::Collection::Execute([this] {
 					mChooseAnimationProcessing = true;

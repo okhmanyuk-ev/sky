@@ -223,7 +223,7 @@ std::unique_ptr<Action> Collection::WaitGlobalFrame()
 
 std::unique_ptr<Action> Collection::Delayed(float duration, std::unique_ptr<Action> action)
 {
-	return MakeSequence(
+	return Sequence(
 		Wait(duration),
 		std::move(action)
 	);
@@ -231,7 +231,7 @@ std::unique_ptr<Action> Collection::Delayed(float duration, std::unique_ptr<Acti
 
 std::unique_ptr<Action> Collection::Delayed(std::function<bool()> while_callback, std::unique_ptr<Action> action)
 {
-	return MakeSequence(
+	return Sequence(
 		Wait(while_callback),
 		std::move(action)
 	);
@@ -239,7 +239,7 @@ std::unique_ptr<Action> Collection::Delayed(std::function<bool()> while_callback
 
 std::unique_ptr<Action> Collection::Delayed(bool& while_flag, std::unique_ptr<Action> action)
 {
-	return MakeSequence(
+	return Sequence(
 		Wait(while_flag),
 		std::move(action)
 	);
