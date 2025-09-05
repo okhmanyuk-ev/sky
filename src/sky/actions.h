@@ -14,24 +14,13 @@
 
 namespace sky
 {
-	class Action
+	enum class ActionResult
 	{
-	public:
-		enum class Status
-		{
-			Continue,
-			Finished
-		};
-
-		using Callback = std::move_only_function<Status(sky::Duration)>;
-
-	public:
-		Action(Callback callback);
-		Status frame(sky::Duration delta);
-
-	private:
-		Callback mCallback = nullptr;
+		Continue,
+		Finished
 	};
+
+	using Action = std::move_only_function<ActionResult(sky::Duration)>;
 
 	class ActionsPlayer
 	{
@@ -50,7 +39,7 @@ namespace sky
 		Action Sequence(std::list<Action> actions);
 		Action Parallel(std::list<Action> actions);
 		Action Race(std::list<Action> actions);
-		Action Repeat(std::function<std::tuple<Action::Status, std::optional<Action>>()> callback);
+		Action Repeat(std::function<std::tuple<ActionResult, std::optional<Action>>()> callback);
 		Action Insert(std::function<Action()> action);
 		Action RepeatInfinite(std::function<std::optional<Action>()> action);
 
@@ -90,16 +79,16 @@ namespace sky
 			requires std::is_invocable_r_v<void, Func, T>
 		Action Interpolate(T start, T dest, float duration, EasingFunction easing, Func callback)
 		{
-			return Action([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
+			return [start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
 				passed += sky::ToSeconds(delta);
 				if (passed >= duration)
 				{
 					callback(dest);
-					return Action::Status::Finished;
+					return ActionResult::Finished;
 				}
 				callback(glm::lerp(start, dest, easing(passed / duration)));
-				return Action::Status::Continue;
-			});
+				return ActionResult::Continue;
+			};
 		}
 
 		template<typename T>
@@ -183,10 +172,10 @@ namespace sky
 
 			return std::make_unique<Action>([event_holder, listener, onEvent](auto delta) {
 				if (!event_holder->has_value())
-					return Action::Status::Continue;
+					return ActionResult::Continue;
 
 				onEvent(event_holder->value());
-				return Action::Status::Finished;
+				return ActionResult::Finished;
 			});
 		}
 	}

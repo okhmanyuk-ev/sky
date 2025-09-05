@@ -4,21 +4,12 @@
 
 using namespace sky;
 
-Action::Action(Callback callback) : mCallback(std::move(callback))
-{
-}
-
-Action::Status Action::frame(sky::Duration delta)
-{
-	return mCallback(delta);
-}
-
 void ActionsPlayer::update(sky::Duration delta)
 {
 	auto it = mActions.begin();
 	while (it != mActions.end())
 	{
-		if (it->frame(delta) == Action::Status::Continue)
+		if ((*it)(delta) == ActionResult::Continue)
 			++it;
 		else
 			it = mActions.erase(it);
@@ -42,110 +33,110 @@ bool ActionsPlayer::hasActions() const
 
 Action Actions::Sequence(std::list<Action> actions)
 {
-	return Action([actions = std::move(actions)] (auto delta) mutable {
+	return [actions = std::move(actions)] (auto delta) mutable {
 		if (actions.empty())
-			return Action::Status::Finished;
+			return ActionResult::Finished;
 
-		if (actions.front().frame(delta) == Action::Status::Finished)
+		if (actions.front()(delta) == ActionResult::Finished)
 			actions.pop_front();
 
-		return actions.empty() ? Action::Status::Finished : Action::Status::Continue;
-	});
+		return actions.empty() ? ActionResult::Finished : ActionResult::Continue;
+	};
 }
 
 Action Actions::Parallel(std::list<Action> actions)
 {
-	return Action([actions = std::move(actions)](auto delta) mutable {
+	return [actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
 		while (it != actions.end())
 		{
-			if (it->frame(delta) == Action::Status::Continue)
+			if ((*it)(delta) == ActionResult::Continue)
 				++it;
 			else
 				it = actions.erase(it);
 		}
 
 		if (actions.empty())
-			return Action::Status::Finished;
+			return ActionResult::Finished;
 
-		return Action::Status::Continue;
-	});
+		return ActionResult::Continue;
+	};
 }
 
 Action Actions::Race(std::list<Action> actions)
 {
-	return Action([actions = std::move(actions)](auto delta) mutable {
+	return [actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
 		while (it != actions.end())
 		{
-			if (it->frame(delta) == Action::Status::Continue)
+			if ((*it)(delta) == ActionResult::Continue)
 				++it;
 			else
-				return Action::Status::Finished;
+				return ActionResult::Finished;
 		}
 
 		if (actions.empty())
-			return Action::Status::Finished;
+			return ActionResult::Finished;
 
-		return Action::Status::Continue;
-	});
+		return ActionResult::Continue;
+	};
 }
 
-Action Actions::Repeat(std::function<std::tuple<Action::Status, std::optional<Action>>()> callback)
+Action Actions::Repeat(std::function<std::tuple<ActionResult, std::optional<Action>>()> callback)
 {
-	return Action([callback,
-		_status = std::optional<Action::Status>{ std::nullopt },
+	return [callback,
+		_status = std::optional<ActionResult>{ std::nullopt },
 		_action = std::optional<Action>{ std::nullopt }
 	] (auto delta) mutable {
 		if (!_status.has_value())
 			std::tie(_status, _action) = callback();
 		
-		auto status = Action::Status::Finished;
+		auto status = ActionResult::Finished;
 		
 		if (_action)
-			status = _action->frame(delta);
+			status = _action.value()(delta);
 		
-		if (status == Action::Status::Continue)
-			return Action::Status::Continue;
+		if (status == ActionResult::Continue)
+			return ActionResult::Continue;
 		
-		if (_status == Action::Status::Finished)
-			return Action::Status::Finished;
+		if (_status == ActionResult::Finished)
+			return ActionResult::Finished;
 		
 		_status.reset();
-		return Action::Status::Continue;
-	});
+		return ActionResult::Continue;
+	};
 }
 
 Action Actions::Insert(std::function<Action()> action)
 {
-	return Repeat([action]() -> std::tuple<Action::Status, std::optional<Action>> {
-		return { Action::Status::Finished, action() };
+	return Repeat([action]() -> std::tuple<ActionResult, std::optional<Action>> {
+		return { ActionResult::Finished, action() };
 	});
 }
 
 Action Actions::RepeatInfinite(std::function<std::optional<Action>()> action)
 {
-	return Repeat([action]() -> std::tuple<Action::Status, std::optional<Action>> {
-		return { Action::Status::Continue, action() };
+	return Repeat([action]() -> std::tuple<ActionResult, std::optional<Action>> {
+		return { ActionResult::Continue, action() };
 	});
 }
 
 Action Actions::Execute(std::function<void()> callback)
 {
-	return Action([callback](auto delta) {
+	return [callback](auto delta) {
 		if (callback)
 			callback();
 
-		return Action::Status::Finished;
-	});
+		return ActionResult::Finished;
+	};
 }
 
 Action Actions::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
 {
-	return Action([callback](auto delta) {
+	return [callback](auto delta) {
 		callback(delta);
-		return Action::Status::Continue;
-	});
+		return ActionResult::Continue;
+	};
 }
 
 Action Actions::ExecuteInfinite(std::function<void()> callback)
@@ -186,12 +177,12 @@ Action Actions::Wait(float duration)
 
 Action Actions::Wait(std::function<bool(sky::Duration delta)> while_callback)
 {
-	return Action([while_callback](auto delta) {
+	return [while_callback](auto delta) {
 		if (while_callback(delta))
-			return Action::Status::Continue;
+			return ActionResult::Continue;
 
-		return Action::Status::Finished;
-	});
+		return ActionResult::Finished;
+	};
 }
 
 Action Actions::Wait(std::function<bool()> while_callback)
@@ -262,17 +253,17 @@ Action Actions::Pausable(std::function<bool()> run_callback, Action action)
 	auto player = std::make_shared<ActionsPlayer>();
 	player->add(std::move(action));
 
-	return Action([run_callback, player](auto delta) {
+	return [run_callback, player](auto delta) {
 		if (!run_callback())
-			return Action::Status::Continue;
+			return ActionResult::Continue;
 
 		player->update(delta);
 
 		if (player->hasActions())
-			return Action::Status::Continue;
+			return ActionResult::Continue;
 
-		return Action::Status::Finished;
-	});
+		return ActionResult::Finished;
+	};
 }
 
 Action Actions::Log(const std::string& text)
