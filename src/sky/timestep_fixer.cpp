@@ -37,5 +37,5 @@ void TimestepFixer::execute(sky::Duration dTime, Callback callback)
 
 void TimestepFixer::execute(Callback callback)
 {
-	execute(SCHEDULER->getTimeDelta(), callback);
+	execute(sky::Scheduler::Instance->getTimeDelta(), callback);
 }

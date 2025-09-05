@@ -136,7 +136,7 @@ void sky::OpenUrl(const std::string& url)
 
 void sky::Schedule(sky::Scheduler::StatusCallback callback)
 {
-	SCHEDULER->add(std::move(callback));
+	sky::Scheduler::Instance->add(std::move(callback));
 }
 
 void sky::Schedule(Action action)
@@ -144,7 +144,7 @@ void sky::Schedule(Action action)
 	auto player = std::make_shared<ActionsPlayer>();
 	player->add(std::move(action));
 	Schedule([player] {
-		player->update(SCHEDULER->getTimeDelta());
+		player->update(sky::Scheduler::Instance->getTimeDelta());
 
 		if (player->hasActions())
 			return sky::Scheduler::Status::Continue;

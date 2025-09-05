@@ -10,7 +10,7 @@ using namespace Common;
 ConsoleCommands::ConsoleCommands()
 {
 	auto getter = []() -> std::vector<std::string> {
-		auto delta_limit = SCHEDULER->getTimeDeltaLimit();
+		auto delta_limit = sky::Scheduler::Instance->getTimeDeltaLimit();
 		if (!delta_limit.has_value())
 			return { "null" };
 
@@ -21,12 +21,12 @@ ConsoleCommands::ConsoleCommands()
 	auto setter = [](CON_ARGS) {
 		if (CON_ARG(0) == "null")
 		{
-			SCHEDULER->setTimeDeltaLimit(std::nullopt);
+			sky::Scheduler::Instance->setTimeDeltaLimit(std::nullopt);
 			return;
 		}
 
 		auto sec = std::stof(CON_ARG(0));
-		SCHEDULER->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec));
+		sky::Scheduler::Instance->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec));
 	};
 
 	sky::AddCVar("sys_time_delta_limit_fps", sky::CommandProcessor::CVar(std::nullopt, { "null/float" }, getter, setter));

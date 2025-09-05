@@ -4,7 +4,7 @@ using namespace sky;
 
 void Timer::onFrame()
 {
-	mPassed += SCHEDULER->getTimeDelta();
+	mPassed += sky::Scheduler::Instance->getTimeDelta();
 
 	if (mPassed < mInterval)
 		return;

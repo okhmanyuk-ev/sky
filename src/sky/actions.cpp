@@ -149,10 +149,10 @@ Action Actions::ExecuteInfinite(std::function<void()> callback)
 
 Action Actions::ExecuteInfiniteGlobal(std::function<void()> callback)
 {
-	auto prev_frame_count = SCHEDULER->getFrameCount();
+	auto prev_frame_count = sky::Scheduler::Instance->getFrameCount();
 
 	return ExecuteInfinite([prev_frame_count, callback]() mutable {
-		auto frame_count = SCHEDULER->getFrameCount();
+		auto frame_count = sky::Scheduler::Instance->getFrameCount();
 
 		if (prev_frame_count == frame_count)
 			return;
@@ -201,10 +201,10 @@ Action Actions::Wait(bool& while_flag)
 
 Action Actions::WaitGlobalFrame()
 {
-	auto frame_count = SCHEDULER->getFrameCount();
+	auto frame_count = sky::Scheduler::Instance->getFrameCount();
 
 	return Wait([frame_count] {
-		return frame_count == SCHEDULER->getFrameCount();
+		return frame_count == sky::Scheduler::Instance->getFrameCount();
 	});
 }
 

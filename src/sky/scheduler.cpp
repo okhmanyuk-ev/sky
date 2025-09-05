@@ -56,7 +56,7 @@ void Scheduler::frame()
 
 Scheduler::Frameable::Frameable()
 {
-	SCHEDULER->add([this, finished = mFinished] {
+	sky::Scheduler::Instance->add([this, finished = mFinished] {
 		if (*finished)
 			return Status::Finished;
 

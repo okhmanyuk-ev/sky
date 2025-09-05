@@ -278,7 +278,7 @@ void Application::run()
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
 		IMGUI_SYSTEM->begin();
-		SCHEDULER->frame();
+		sky::Scheduler::Instance->frame();
 		if (mFlags.count(Flag::Scene))
 		{
 			sky::GetService<Scene::Scene>()->frame();

@@ -21,7 +21,7 @@ namespace Scene
 			if (!mEasedTransformEnabled)
 				return;
 
-			auto now = SCHEDULER->getUptime();
+			auto now = sky::Scheduler::Instance->getUptime();
 			if (mPrevTransformTimepoint.has_value())
 			{
 				auto dTime = now - mPrevTransformTimepoint.value();
@@ -39,7 +39,7 @@ namespace Scene
 			if (!mEasedAbsoluteSizeEnabled)
 				return;
 
-			auto now = SCHEDULER->getUptime();
+			auto now = sky::Scheduler::Instance->getUptime();
 			if (mPrevSizeTimepoint.has_value())
 			{
 				auto dTime = now - mPrevSizeTimepoint.value();

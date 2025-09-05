@@ -7,12 +7,13 @@
 #include <sky/clock.h>
 #include <sky/console.h>
 
-#define SCHEDULER sky::Locator<sky::Scheduler>::Get()
-
 namespace sky
 {
 	class Scheduler
 	{
+	public:
+		static constexpr Locator<Scheduler>::Accessor Instance;
+
 	public:
 		class Frameable;
 		class Framer;

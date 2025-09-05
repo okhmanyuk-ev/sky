@@ -54,7 +54,7 @@ void StatsSystem::onFrame()
 	auto& style = ImGui::GetStyle();
 	ImVec4 col = style.Colors[ImGuiCol_Text];
 
-	auto now = SCHEDULER->getUptime();
+	auto now = sky::Scheduler::Instance->getUptime();
 
 	const float MaxLifetime = 5.0f;
 
@@ -130,5 +130,5 @@ void StatsSystem::onFrame()
 
 void StatsSystem::indicator(const std::string& group, const std::string& key, const std::string& value)
 {
-	mGroups[group][key] = { value, SCHEDULER->getUptime() };
+	mGroups[group][key] = { value, sky::Scheduler::Instance->getUptime() };
 }

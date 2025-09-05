@@ -18,7 +18,7 @@ void PerformanceConsoleCommands::onFrame()
 	{
 		auto str = std::to_string(mFramerateCounter.getFramerate());
 
-		auto time_scale = SCHEDULER->getTimeScale();
+		auto time_scale = sky::Scheduler::Instance->getTimeScale();
 
 		if (time_scale != 1.0f)
 			str = fmt::format("(x{}) {}", time_scale, str);
@@ -28,7 +28,7 @@ void PerformanceConsoleCommands::onFrame()
 		static bool choked = false;
 		static auto choke_time = now;
 
-		if (SCHEDULER->isChoked())
+		if (sky::Scheduler::Instance->isChoked())
 		{
 			choked = true;
 			choke_time = now;

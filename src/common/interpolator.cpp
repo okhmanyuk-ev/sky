@@ -7,7 +7,7 @@ using namespace Common;
 
 void Interpolator::onFrame()
 {
-	mPassed += SCHEDULER->getTimeDelta();
+	mPassed += sky::Scheduler::Instance->getTimeDelta();
 
 	if (mPassed >= mDuration)
 	{
