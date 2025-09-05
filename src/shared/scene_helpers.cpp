@@ -504,7 +504,7 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 
 		mAlphaAnimating = true;
 		runAction(Actions::Collection::Sequence(
-			Actions::Collection::MakeParallel(
+			Actions::Collection::Parallel(
 				Actions::Collection::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
 				Actions::Collection::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
 			),
@@ -521,7 +521,7 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 
 		mAlphaAnimating = true;
 		runAction(Actions::Collection::Sequence(
-			Actions::Collection::MakeParallel(
+			Actions::Collection::Parallel(
 				Actions::Collection::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
 				Actions::Collection::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
 			),
@@ -905,7 +905,7 @@ std::shared_ptr<SceneHelpers::Shockwave> SceneHelpers::Shockwave::MakeAnimated(f
 	shockwave->setShockwaveThickness(0.5f);
 	shockwave->setShockwaveForce(1.0f);
 	shockwave->runAction(Actions::Collection::Sequence(
-		Actions::Collection::MakeParallel(
+		Actions::Collection::Parallel(
 			Actions::Collection::Interpolate(shockwave->getShockwaveSize(), 1.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
 				shockwave->setShockwaveSize(value);
 			}),

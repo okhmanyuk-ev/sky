@@ -247,7 +247,7 @@ std::unique_ptr<Action> Collection::Delayed(bool& while_flag, std::unique_ptr<Ac
 
 std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Action> action)
 {
-	return MakeParallel(true,
+	return Parallel(true,
 		Wait(duration),
 		std::move(action)
 	);
@@ -255,7 +255,7 @@ std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Ac
 
 std::unique_ptr<Action> Collection::Breakable(std::function<bool()> while_callback, std::unique_ptr<Action> action)
 {
-	return MakeParallel(true,
+	return Parallel(true,
 		Wait(while_callback),
 		std::move(action)
 	);

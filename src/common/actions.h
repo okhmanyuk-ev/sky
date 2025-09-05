@@ -172,7 +172,7 @@ namespace Actions
 		}
 
 		template <typename...Args>
-		std::unique_ptr<Action> MakeParallel(bool break_on_any_completed, Args&&...args)
+		std::unique_ptr<Action> Parallel(bool break_on_any_completed, Args&&...args)
 		{
 			std::list<std::unique_ptr<Action>> actions;
 			(actions.push_back(std::forward<Args>(args)), ...);
@@ -180,9 +180,9 @@ namespace Actions
 		}
 
 		template <typename...Args>
-		std::unique_ptr<Action> MakeParallel(Args&&...args)
+		std::unique_ptr<Action> Parallel(Args&&...args)
 		{
-			return MakeParallel(false, std::forward<Args>(args)...);
+			return Parallel(false, std::forward<Args>(args)...);
 		}
 
 		template <typename T>

@@ -54,7 +54,7 @@ void Emitter::emit(int count)
 	auto direction = glm::linearRand(mMinDirection, mMaxDirection);
 
 	particle->runAction(Actions::Collection::Sequence(
-		Actions::Collection::MakeParallel(
+		Actions::Collection::Parallel(
 			Actions::Collection::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
 			Actions::Collection::ChangeScale(particle, mEndScale, duration),
 			Actions::Collection::ChangeColor(colored_particle, mEndColor, duration),
