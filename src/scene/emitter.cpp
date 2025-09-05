@@ -9,12 +9,12 @@ using namespace Scene;
 
 Emitter::Emitter()
 {
-	runAction(Actions::RepeatInfinite([this]()->std::unique_ptr<Actions::Action> {
+	runAction(sky::Actions::RepeatInfinite([this]()->std::unique_ptr<sky::Actions::Action> {
 		if (!mRunning)
 			return nullptr;
 
 		auto delay = glm::linearRand(mMinDelay, mMaxDelay);
-		return Actions::Delayed(delay, Actions::Execute([this] {
+		return sky::Actions::Delayed(delay, sky::Actions::Execute([this] {
 			if (!mRunning)
 				return;
 
@@ -53,14 +53,14 @@ void Emitter::emit(int count)
 	auto duration = glm::linearRand(mMinDuration, mMaxDuration);
 	auto direction = glm::linearRand(mMinDirection, mMaxDirection);
 
-	particle->runAction(Actions::Sequence(
-		Actions::Parallel(
-			Actions::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
-			Actions::ChangeScale(particle, mEndScale, duration),
-			Actions::ChangeColor(colored_particle, mEndColor, duration),
-			Actions::ChangeAlpha(colored_particle, mEndColor.a, duration)
+	particle->runAction(sky::Actions::Sequence(
+		sky::Actions::Parallel(
+			sky::Actions::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
+			sky::Actions::ChangeScale(particle, mEndScale, duration),
+			sky::Actions::ChangeColor(colored_particle, mEndColor, duration),
+			sky::Actions::ChangeAlpha(colored_particle, mEndColor.a, duration)
 		),
-		Actions::Kill(particle)
+		sky::Actions::Kill(particle)
 	));
 
 	holder->attach(particle);

@@ -5,7 +5,7 @@
 #include <scene/circle.h>
 #include <scene/scrollbox.h>
 #include <scene/glass.h>
-#include <common/actions.h>
+#include <sky/actions.h>
 #include <common/easing.h>
 
 namespace Scene
@@ -68,7 +68,7 @@ namespace Scene
 	using GrayscaleIntensityProperty = Property<GrayscaledGlass, &GrayscaledGlass::getGrayscaleIntensity, &GrayscaledGlass::setGrayscaleIntensity>;
 }
 
-namespace Actions
+namespace sky::Actions
 {
 	template<typename T>
 	struct InterpolateWrapper

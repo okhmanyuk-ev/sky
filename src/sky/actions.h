@@ -12,7 +12,7 @@
 #include <common/easing.h>
 #include <sky/clock.h>
 
-namespace Actions
+namespace sky::Actions
 {
 	class Action
 	{

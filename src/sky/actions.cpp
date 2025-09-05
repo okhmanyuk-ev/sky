@@ -2,6 +2,8 @@
 #include <cassert>
 #include <sky/utils.h>
 
+using namespace sky;
+
 Actions::Action::Action(StatusCallback callback) : mCallback(std::move(callback))
 {
 }

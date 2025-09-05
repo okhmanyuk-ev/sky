@@ -16,11 +16,11 @@ std::shared_ptr<Scene::Label> SceneHelpers::MakePopupLabel(std::shared_ptr<Scene
 	label->setPosition(holder->unproject(target->project({ target->getAbsoluteSize() / 2.0f })));
 	label->setPivot(0.5f);
 	label->setAlpha(0.0f);
-	label->runAction(Actions::Sequence(
-		Actions::Show(label, 0.5f),
-		Actions::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
-		Actions::Hide(label, 0.5f),
-		Actions::Kill(label)
+	label->runAction(sky::Actions::Sequence(
+		sky::Actions::Show(label, 0.5f),
+		sky::Actions::ChangePositionByDirection(label, { 0.0f, -1.0f }, 64.0f, move_duration),
+		sky::Actions::Hide(label, 0.5f),
+		sky::Actions::Kill(label)
 	));
 	holder->attach(label);
 	return label;
@@ -503,12 +503,12 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 			return;
 
 		mAlphaAnimating = true;
-		runAction(Actions::Sequence(
-			Actions::Parallel(
-				Actions::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
-				Actions::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
+		runAction(sky::Actions::Sequence(
+			sky::Actions::Parallel(
+				sky::Actions::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
+				sky::Actions::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
 			),
-			Actions::Execute([this] {
+			sky::Actions::Execute([this] {
 				mHidden = false;
 				mAlphaAnimating = false;
 			})
@@ -520,12 +520,12 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 			return;
 
 		mAlphaAnimating = true;
-		runAction(Actions::Sequence(
-			Actions::Parallel(
-				Actions::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
-				Actions::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
+		runAction(sky::Actions::Sequence(
+			sky::Actions::Parallel(
+				sky::Actions::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
+				sky::Actions::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
 			),
-			Actions::Execute([this] {
+			sky::Actions::Execute([this] {
 				mHidden = true;
 				mAlphaAnimating = false;
 			})
@@ -601,7 +601,7 @@ void SceneHelpers::StandardScreen::onWindowAppearingBegin()
 	setInteractions(false);
 	if (mEffects.contains(Effect::WindowAppearingScale))
 	{
-		runAction(Actions::ChangeScale(mContent, StartScale, 1.0f, Easing::CubicOut));
+		runAction(sky::Actions::ChangeScale(mContent, StartScale, 1.0f, Easing::CubicOut));
 	}
 }
 
@@ -609,7 +609,7 @@ void SceneHelpers::StandardScreen::onWindowDisappearingBegin()
 {
 	if (mEffects.contains(Effect::WindowAppearingScale))
 	{
-		runAction(Actions::ChangeScale(mContent, { 1.0f, 1.0f }, 1.0f, Easing::CubicOut));
+		runAction(sky::Actions::ChangeScale(mContent, { 1.0f, 1.0f }, 1.0f, Easing::CubicOut));
 	}
 }
 
@@ -618,57 +618,57 @@ void SceneHelpers::StandardScreen::onWindowDisappearingEnd()
 	setInteractions(true);
 }
 
-std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createEnterAction()
+std::unique_ptr<sky::Actions::Action> SceneHelpers::StandardScreen::createEnterAction()
 {
 	const float Duration = 0.25f;
 
-	std::list<std::unique_ptr<Actions::Action>> actions;
+	std::list<std::unique_ptr<sky::Actions::Action>> actions;
 
 	if (mEffects.contains(Effect::Alpha))
 	{
-		actions.push_back(Actions::Show(getRenderLayerColor(), Duration));
+		actions.push_back(sky::Actions::Show(getRenderLayerColor(), Duration));
 	}
 
 	if (mEffects.contains(Effect::Blur))
 	{
-		actions.push_back(Actions::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::Linear));
+		actions.push_back(sky::Actions::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::Linear));
 	}
 
 	if (mEffects.contains(Effect::Scale))
 	{
-		actions.push_back(Actions::ChangeScale(mContent, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
+		actions.push_back(sky::Actions::ChangeScale(mContent, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
 	}
 
-	return Actions::Sequence(
-		Actions::WaitGlobalFrame(),
-		Actions::Parallel(std::move(actions))
+	return sky::Actions::Sequence(
+		sky::Actions::WaitGlobalFrame(),
+		sky::Actions::Parallel(std::move(actions))
 	);
 };
 
-std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction()
+std::unique_ptr<sky::Actions::Action> SceneHelpers::StandardScreen::createLeaveAction()
 {
 	const float Duration = 0.25f;
 
-	std::list<std::unique_ptr<Actions::Action>> actions;
+	std::list<std::unique_ptr<sky::Actions::Action>> actions;
 
 	if (mEffects.contains(Effect::Alpha))
 	{
-		actions.push_back(Actions::Hide(getRenderLayerColor(), Duration));
+		actions.push_back(sky::Actions::Hide(getRenderLayerColor(), Duration));
 	}
 
 	if (mEffects.contains(Effect::Blur))
 	{
-		actions.push_back(Actions::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::Linear));
+		actions.push_back(sky::Actions::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::Linear));
 	}
 
 	if (mEffects.contains(Effect::Scale))
 	{
-		actions.push_back(Actions::ChangeScale(mContent, StartScale, Duration, Easing::CubicIn));
+		actions.push_back(sky::Actions::ChangeScale(mContent, StartScale, Duration, Easing::CubicIn));
 	}
 
-	return Actions::Sequence(
-		Actions::WaitGlobalFrame(),
-		Actions::Parallel(std::move(actions))
+	return sky::Actions::Sequence(
+		sky::Actions::WaitGlobalFrame(),
+		sky::Actions::Parallel(std::move(actions))
 	);
 };
 
@@ -755,99 +755,99 @@ void SceneHelpers::StandardWindow::onCloseBegin()
 	mContentHolder->setRenderLayerEnabled(true);
 }
 
-std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction()
+std::unique_ptr<sky::Actions::Action> SceneHelpers::StandardWindow::createOpenAction()
 {
 	const float Duration = 0.5f;
 
-	std::list<std::unique_ptr<Actions::Action>> actions;
+	std::list<std::unique_ptr<sky::Actions::Action>> actions;
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Fade))
 	{
-		actions.push_back(Actions::ChangeAlpha(getBackshadeColor(), 0.5f, Duration, Easing::CubicOut));
+		actions.push_back(sky::Actions::ChangeAlpha(getBackshadeColor(), 0.5f, Duration, Easing::CubicOut));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
-		actions.push_back(Actions::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
-		actions.push_back(Actions::ChangeColorRgb(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
+		actions.push_back(sky::Actions::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
+		actions.push_back(sky::Actions::ChangeColorRgb(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
 	{
-		actions.push_back(Actions::ChangeGrayscaleIntensity(mGray, 1.0f, Duration, Easing::CubicOut));
+		actions.push_back(sky::Actions::ChangeGrayscaleIntensity(mGray, 1.0f, Duration, Easing::CubicOut));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Anchor))
 	{
-		actions.push_back(Actions::ChangeAnchor(mContent, { 0.5f, 0.5f }, Duration, Easing::CubicOut));
+		actions.push_back(sky::Actions::ChangeAnchor(mContent, { 0.5f, 0.5f }, Duration, Easing::CubicOut));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Blur))
 	{
-		actions.push_back(Actions::ChangeBlurIntensity(mContentBlur, 0.0f, Duration, Easing::Linear));
+		actions.push_back(sky::Actions::ChangeBlurIntensity(mContentBlur, 0.0f, Duration, Easing::Linear));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Alpha))
 	{
-		actions.push_back(Actions::Show(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicOut));
+		actions.push_back(sky::Actions::Show(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicOut));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Scale))
 	{
-		actions.push_back(Actions::ChangeScale(mContentHolder, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
+		actions.push_back(sky::Actions::ChangeScale(mContentHolder, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
 	}
 
-	return Actions::Sequence(
-		Actions::WaitGlobalFrame(),
-		Actions::Parallel(std::move(actions))
+	return sky::Actions::Sequence(
+		sky::Actions::WaitGlobalFrame(),
+		sky::Actions::Parallel(std::move(actions))
 	);
 };
 
-std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction()
+std::unique_ptr<sky::Actions::Action> SceneHelpers::StandardWindow::createCloseAction()
 {
 	const float Duration = 0.5f;
 
-	std::list<std::unique_ptr<Actions::Action>> actions;
+	std::list<std::unique_ptr<sky::Actions::Action>> actions;
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Fade))
 	{
-		actions.push_back(Actions::ChangeAlpha(getBackshadeColor(), 0.0f, Duration, Easing::CubicIn));
+		actions.push_back(sky::Actions::ChangeAlpha(getBackshadeColor(), 0.0f, Duration, Easing::CubicIn));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
-		actions.push_back(Actions::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
-		actions.push_back(Actions::ChangeColorRgb(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
+		actions.push_back(sky::Actions::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
+		actions.push_back(sky::Actions::ChangeColorRgb(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
 	{
-		actions.push_back(Actions::ChangeGrayscaleIntensity(mGray, 0.0f, Duration, Easing::CubicIn));
+		actions.push_back(sky::Actions::ChangeGrayscaleIntensity(mGray, 0.0f, Duration, Easing::CubicIn));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Anchor))
 	{
-		actions.push_back(Actions::ChangeAnchor(mContent, StartContentAnchor, Duration, Easing::CubicIn));
+		actions.push_back(sky::Actions::ChangeAnchor(mContent, StartContentAnchor, Duration, Easing::CubicIn));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Blur))
 	{
-		actions.push_back(Actions::ChangeBlurIntensity(mContentBlur, StartContentBlur, Duration, Easing::Linear));
+		actions.push_back(sky::Actions::ChangeBlurIntensity(mContentBlur, StartContentBlur, Duration, Easing::Linear));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Alpha))
 	{
-		actions.push_back(Actions::Hide(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicIn));
+		actions.push_back(sky::Actions::Hide(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicIn));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Scale))
 	{
-		actions.push_back(Actions::ChangeScale(mContentHolder, StartContentScale, Duration, Easing::CubicIn));
+		actions.push_back(sky::Actions::ChangeScale(mContentHolder, StartContentScale, Duration, Easing::CubicIn));
 	}
 
-	return Actions::Sequence(
-		Actions::WaitGlobalFrame(),
-		Actions::Parallel(std::move(actions))
+	return sky::Actions::Sequence(
+		sky::Actions::WaitGlobalFrame(),
+		sky::Actions::Parallel(std::move(actions))
 	);
 };
 
@@ -885,7 +885,7 @@ SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
 	label->setFontSize(12.0f);
 	attach(label);
 
-	runAction(Actions::ExecuteInfinite([this, scrollbox, slider, label] {
+	runAction(sky::Actions::ExecuteInfinite([this, scrollbox, slider, label] {
 		if (!scrollbox->isTouching() && !scrollbox->isInerting() && !scrollbox->isPullbacking())
 			scrollbox->setHorizontalScrollPosition(1.0f - getBlurIntensity());
 
@@ -904,16 +904,16 @@ std::shared_ptr<SceneHelpers::Shockwave> SceneHelpers::Shockwave::MakeAnimated(f
 	shockwave->setShockwaveSize(0.0f);
 	shockwave->setShockwaveThickness(0.5f);
 	shockwave->setShockwaveForce(1.0f);
-	shockwave->runAction(Actions::Sequence(
-		Actions::Parallel(
-			Actions::Interpolate(shockwave->getShockwaveSize(), 1.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
+	shockwave->runAction(sky::Actions::Sequence(
+		sky::Actions::Parallel(
+			sky::Actions::Interpolate(shockwave->getShockwaveSize(), 1.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
 				shockwave->setShockwaveSize(value);
 			}),
-			Actions::Interpolate(shockwave->getShockwaveForce(), 0.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
+			sky::Actions::Interpolate(shockwave->getShockwaveForce(), 0.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
 				shockwave->setShockwaveForce(value);
 			})
 		),
-		Actions::Kill(shockwave)
+		sky::Actions::Kill(shockwave)
 	));
 	return shockwave;
 }
@@ -948,7 +948,7 @@ SceneHelpers::Checkbox::Checkbox()
 	mOuterRectangle->setPivot({ 0.0f, 0.5f });
 	attach(mOuterRectangle);
 
-	mOuterRectangle->runAction(Actions::ExecuteInfinite([this] {
+	mOuterRectangle->runAction(sky::Actions::ExecuteInfinite([this] {
 		mOuterRectangle->setWidth(mOuterRectangle->getAbsoluteHeight() + mOuterRectangle->getVerticalMargin());
 	}));
 
@@ -959,7 +959,7 @@ SceneHelpers::Checkbox::Checkbox()
 	mInnerRectangle->setAlpha(0.66f);
 	mOuterRectangle->attach(mInnerRectangle);
 
-	mInnerRectangle->runAction(Actions::ExecuteInfinite([this] {
+	mInnerRectangle->runAction(sky::Actions::ExecuteInfinite([this] {
 		mInnerRectangle->setVisible(isChecked());
 	}));
 
@@ -1007,7 +1007,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 	setAlpha(0.0f);
 	setWidth(2.0f);
 	setRounding(1.0f);
-	runAction(Actions::ExecuteInfinite([this, label] {
+	runAction(sky::Actions::ExecuteInfinite([this, label] {
 		auto font = label->getFont();
 
 		auto font_scale = font->getScaleFactorForSize(label->getFontSize());
@@ -1039,15 +1039,15 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 		setY(line_y);
 	}));
 
-	runAction(Actions::Sequence(
-		Actions::WaitGlobalFrame(),
-		Actions::Execute([this] {
-			runAction(Actions::RepeatInfinite([this] {
-				return Actions::Sequence(
-					Actions::ChangeAlpha(shared_from_this(), 1.0f, 0.125f),
-					Actions::Wait(0.25f),
-					Actions::ChangeAlpha(shared_from_this(), 0.0f, 0.125f),
-					Actions::Wait(0.25f)
+	runAction(sky::Actions::Sequence(
+		sky::Actions::WaitGlobalFrame(),
+		sky::Actions::Execute([this] {
+			runAction(sky::Actions::RepeatInfinite([this] {
+				return sky::Actions::Sequence(
+					sky::Actions::ChangeAlpha(shared_from_this(), 1.0f, 0.125f),
+					sky::Actions::Wait(0.25f),
+					sky::Actions::ChangeAlpha(shared_from_this(), 0.0f, 0.125f),
+					sky::Actions::Wait(0.25f)
 				);
 			}));
 		})

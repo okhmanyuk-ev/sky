@@ -1,6 +1,8 @@
 #include "actions.h"
 #include <shared/scene_helpers.h> // TODO: we should not include shared from scene
 
+using namespace sky;
+
 std::unique_ptr<Actions::Action> Actions::ChangePositionByDirection(std::shared_ptr<Scene::Transform> node, const glm::vec2& direction, float speed)
 {
 	return ExecuteInfinite([node, direction, speed](auto delta) {

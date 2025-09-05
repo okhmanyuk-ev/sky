@@ -5,7 +5,7 @@
 #include <scene/transform.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <common/actions.h>
+#include <sky/actions.h>
 
 namespace Scene
 {
@@ -131,11 +131,11 @@ namespace Scene
 		glm::vec2 mAbsoluteScale = { 1.0f, 1.0f };
 
 	public:
-		void runAction(std::unique_ptr<Actions::Action> action) { mActions.add(std::move(action)); }
+		void runAction(std::unique_ptr<sky::Actions::Action> action) { mActions.add(std::move(action)); }
 		void clearActions() { mActions.clear(); }
 		bool hasActions() const { return mActions.hasActions(); }
 
 	private:
-		Actions::ActionsPlayer mActions;
+		sky::Actions::ActionsPlayer mActions;
 	};
 }

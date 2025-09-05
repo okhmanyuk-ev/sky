@@ -142,12 +142,12 @@ namespace Shared::SceneHelpers
 				return;
 
 			mChooseAnimationStarted = true;
-			this->runAction(Actions::Sequence(
-				Actions::Execute([this] {
+			this->runAction(sky::Actions::Sequence(
+				sky::Actions::Execute([this] {
 					mChooseAnimationProcessing = true;
 				}),
-				Actions::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
-				Actions::Execute([this] {
+				sky::Actions::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
+				sky::Actions::Execute([this] {
 					mChooseAnimationProcessing = false;
 				})
 			));
@@ -163,14 +163,14 @@ namespace Shared::SceneHelpers
 			const float Duration = 0.125f / 1.5f;
 
 			mChooseAnimationStarted = false;
-			this->runAction(Actions::Sequence(
-				Actions::Wait(mChooseAnimationProcessing),
-				Actions::Execute([this] {
+			this->runAction(sky::Actions::Sequence(
+				sky::Actions::Wait(mChooseAnimationProcessing),
+				sky::Actions::Execute([this] {
 					mChooseAnimationProcessing = true;
 				}),
-				Actions::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
-				Actions::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
-				Actions::Execute([this] {
+				sky::Actions::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
+				sky::Actions::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
+				sky::Actions::Execute([this] {
 					mChooseAnimationProcessing = false;
 				})
 			));
@@ -352,7 +352,7 @@ namespace Shared::SceneHelpers
 		KillableByClick()
 		{
 			this->setClickCallback([this] {
-				this->runAction(Actions::Kill(this->shared_from_this()));
+				this->runAction(sky::Actions::Kill(this->shared_from_this()));
 			});
 		}
 	};
@@ -424,8 +424,8 @@ namespace Shared::SceneHelpers
 		void onWindowDisappearingEnd() override;
 
 	protected:
-		std::unique_ptr<Actions::Action> createEnterAction() override;
-		std::unique_ptr<Actions::Action> createLeaveAction() override;
+		std::unique_ptr<sky::Actions::Action> createEnterAction() override;
+		std::unique_ptr<sky::Actions::Action> createLeaveAction() override;
 
 	public:
 		auto getContent() const { return mContent; }
@@ -468,8 +468,8 @@ namespace Shared::SceneHelpers
 		void onCloseBegin() override;
 
 	public:
-		std::unique_ptr<Actions::Action> createOpenAction() override;
-		std::unique_ptr<Actions::Action> createCloseAction() override;
+		std::unique_ptr<sky::Actions::Action> createOpenAction() override;
+		std::unique_ptr<sky::Actions::Action> createCloseAction() override;
 
 	public:
 		auto getContent() { return mContent; }
