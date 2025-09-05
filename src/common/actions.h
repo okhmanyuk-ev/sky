@@ -55,10 +55,16 @@ namespace Actions
 		Awaiting mAwaitingType;
 	};
 
-	class ActionsPlayer : public Parallel
+	class ActionsPlayer
 	{
 	public:
 		void update(sky::Duration delta);
+		void add(std::unique_ptr<Action> action);
+		void clear();
+		bool hasActions() const;
+
+	private:
+		std::list<std::unique_ptr<Action>> mActions;
 	};
 
 	class Generic : public Action

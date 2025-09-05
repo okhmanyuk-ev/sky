@@ -43,7 +43,33 @@ void Parallel::clear()
 
 void ActionsPlayer::update(sky::Duration delta)
 {
-	frame(delta);
+	auto it = mActions.begin();
+	while (it != mActions.end())
+	{
+		auto& action = *it;
+
+		if (!action)
+			it = mActions.erase(it);
+		else if (action->frame(delta) == Action::Status::Continue)
+			++it;
+		else
+			it = mActions.erase(it);
+	}
+}
+
+void ActionsPlayer::add(std::unique_ptr<Action> action)
+{
+	mActions.push_back(std::move(action));
+}
+
+void ActionsPlayer::clear()
+{
+	mActions.clear();
+}
+
+bool ActionsPlayer::hasActions() const
+{
+	return !mActions.empty();
 }
 
 Generic::Generic(StatusCallback callback) : mCallback(std::move(callback))
