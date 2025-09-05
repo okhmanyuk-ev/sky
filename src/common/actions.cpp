@@ -67,13 +67,13 @@ void Sequence::clear()
 	mActions.clear();
 }
 
-Generic::Generic(StatusCallback callback) : mCallback(callback)
+Generic::Generic(StatusCallback callback) : mCallback(std::move(callback))
 {
 }
 
 Generic::Generic(Type type, Callback callback)
 {
-	mCallback = [type, callback](auto delta) {
+	mCallback = [type, callback = std::move(callback)](auto delta) mutable {
 		if (callback)
 			callback(delta);
 
@@ -87,41 +87,41 @@ Action::Status Generic::frame(sky::Duration delta)
 	return mCallback(delta);
 }
 
-Repeat::Repeat(Callback callback) : mCallback(std::move(callback))
+std::unique_ptr<Action> Collection::Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback)
 {
-}
-
-Action::Status Repeat::frame(sky::Duration delta)
-{
-	if (!mStatus.has_value())
-		std::tie(mStatus, mAction) = mCallback();
-
-	auto status = Status::Finished;
-
-	if (mAction)
-		status = mAction->frame(delta);
-
-	if (status == Status::Continue)
-		return Status::Continue;
-
-	if (mStatus == Status::Finished)
-		return Status::Finished;
-
-	mStatus.reset();
-
-	return Status::Continue;
+	return std::make_unique<Generic>([callback,
+		_status = std::optional<Action::Status>{ std::nullopt },
+		_action = std::unique_ptr<Action>{ nullptr }
+	] (auto delta) mutable {
+		if (!_status.has_value())
+			std::tie(_status, _action) = callback();
+		
+		auto status = Action::Status::Finished;
+		
+		if (_action)
+			status = _action->frame(delta);
+		
+		if (status == Action::Status::Continue)
+			return Action::Status::Continue;
+		
+		if (_status == Action::Status::Finished)
+			return Action::Status::Finished;
+		
+		_status.reset();
+		return Action::Status::Continue;
+	});
 }
 
 std::unique_ptr<Action> Collection::Insert(std::function<std::unique_ptr<Action>()> action)
 {
-	return std::make_unique<Repeat>([action]() -> Repeat::Result {
+	return Repeat([action]() -> std::tuple<Action::Status, std::unique_ptr<Action>> {
 		return { Action::Status::Finished, action() };
 	});
 }
 
 std::unique_ptr<Action> Collection::RepeatInfinite(std::function<std::unique_ptr<Action>()> action)
 {
-	return std::make_unique<Repeat>([action]() -> Repeat::Result {
+	return Repeat([action]() -> std::tuple<Action::Status, std::unique_ptr<Action>> {
 		return { Action::Status::Continue, action() };
 	});
 }

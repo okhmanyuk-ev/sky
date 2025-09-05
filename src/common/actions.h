@@ -101,8 +101,8 @@ namespace Actions
 	class Generic : public Action
 	{
 	public:
-		using StatusCallback = std::function<Status(sky::Duration)>;
-		using Callback = std::function<void(sky::Duration)>;
+		using StatusCallback = std::move_only_function<Status(sky::Duration)>;
+		using Callback = std::move_only_function<void(sky::Duration)>;
 
 	public:
 		enum class Type
@@ -122,26 +122,9 @@ namespace Actions
 		StatusCallback mCallback = nullptr;
 	};
 
-	class Repeat : public Action
-	{
-	public:
-		using Result = std::tuple<Action::Status, std::unique_ptr<Action>>;
-		using Callback = std::function<Result()>;
-
-	public:
-		Repeat(Callback callback);
-
-	private:
-		Status frame(sky::Duration delta) override;
-
-	private:
-		Callback mCallback;
-		std::optional<Action::Status> mStatus;
-		std::unique_ptr<Action> mAction = nullptr;
-	};
-
 	namespace Collection
 	{
+		std::unique_ptr<Action> Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback);
 		std::unique_ptr<Action> Insert(std::function<std::unique_ptr<Action>()> action);
 		std::unique_ptr<Action> RepeatInfinite(std::function<std::unique_ptr<Action>()> action);
 
