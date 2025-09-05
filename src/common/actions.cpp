@@ -41,32 +41,6 @@ void Parallel::clear()
 	mActions.clear();
 }
 
-Action::Status Sequence::frame(sky::Duration delta)
-{
-	if (mActions.empty())
-		return Status::Finished;
-
-	auto& action = mActions.front();
-
-	if (!action || action->frame(delta) == Status::Finished)
-		mActions.pop_front();
-
-	return mActions.empty() ? Status::Finished : Status::Continue;
-}
-
-void Sequence::add(std::unique_ptr<Action> action, Origin origin)
-{
-	if (origin == Origin::Begin)
-		mActions.push_front(std::move(action));
-	else
-		mActions.push_back(std::move(action));
-}
-
-void Sequence::clear()
-{
-	mActions.clear();
-}
-
 void ActionsPlayer::update(sky::Duration delta)
 {
 	frame(delta);
@@ -90,6 +64,21 @@ Action::Status Generic::frame(sky::Duration delta)
 {
 	assert(mCallback);
 	return mCallback(delta);
+}
+
+std::unique_ptr<Action> Collection::Sequence(std::list<std::unique_ptr<Action>> actions)
+{
+	return std::make_unique<Generic>([actions = std::move(actions)] (auto delta) mutable {
+		if (actions.empty())
+			return Action::Status::Finished;
+
+		auto& action = actions.front();
+
+		if (!action || action->frame(delta) == Action::Status::Finished)
+			actions.pop_front();
+
+		return actions.empty() ? Action::Status::Finished : Action::Status::Continue;
+	});
 }
 
 std::unique_ptr<Action> Collection::Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback)

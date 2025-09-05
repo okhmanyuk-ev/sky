@@ -55,29 +55,6 @@ namespace Actions
 		Awaiting mAwaitingType;
 	};
 
-	class Sequence : public Action
-	{
-		static_assert(std::has_virtual_destructor<Action>::value);
-
-	public:
-		enum class Origin
-		{
-			Begin,
-			End
-		};
-
-	protected:
-		Status frame(sky::Duration delta) override;
-
-	public:
-		void add(std::unique_ptr<Action> action, Origin origin = Origin::End);
-		void clear();
-		bool hasActions() const { return mActions.size() > 0; }
-
-	private:
-		std::list<std::unique_ptr<Action>> mActions;
-	};
-
 	class ActionsPlayer : public Parallel
 	{
 	public:
@@ -110,6 +87,7 @@ namespace Actions
 
 	namespace Collection
 	{
+		std::unique_ptr<Action> Sequence(std::list<std::unique_ptr<Action>> actions);
 		std::unique_ptr<Action> Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback);
 		std::unique_ptr<Action> Insert(std::function<std::unique_ptr<Action>()> action);
 		std::unique_ptr<Action> RepeatInfinite(std::function<std::unique_ptr<Action>()> action);
@@ -205,11 +183,11 @@ namespace Actions
 		}
 
 		template <typename...Args>
-		std::unique_ptr<Sequence> MakeSequence(Args&&...args)
+		std::unique_ptr<Action> MakeSequence(Args&&...args)
 		{
-			auto seq = std::make_unique<Sequence>();
-			(seq->add(std::forward<Args>(args)), ...);
-			return seq;
+			std::list<std::unique_ptr<Action>> seq;
+			(seq.push_back(std::forward<Args>(args)), ...);
+			return Sequence(std::move(seq));
 		}
 
 		template <typename...Args>
