@@ -141,7 +141,7 @@ void sky::Schedule(sky::Scheduler::StatusCallback callback)
 
 void sky::Schedule(std::unique_ptr<Actions::Action> action)
 {
-	auto player = std::make_shared<Actions::GenericActionsPlayer<Actions::Parallel>>();
+	auto player = std::make_shared<Actions::ActionsPlayer>();
 	player->add(std::move(action));
 	Schedule([player] {
 		player->update(SCHEDULER->getTimeDelta());

@@ -78,13 +78,10 @@ namespace Actions
 		std::list<std::unique_ptr<Action>> mActions;
 	};
 
-	template <typename T> class GenericActionsPlayer : public T
+	class ActionsPlayer : public Parallel
 	{
-		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value,
-			"T must be derived from Sequence or Parallel");
-
 	public:
-		void update(sky::Duration delta) { T::frame(delta); }
+		void update(sky::Duration delta);
 	};
 
 	class Generic : public Action

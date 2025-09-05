@@ -136,6 +136,6 @@ namespace Scene
 		bool hasActions() const { return mActions.hasActions(); }
 
 	private:
-		Actions::GenericActionsPlayer<Actions::Parallel> mActions;
+		Actions::ActionsPlayer mActions;
 	};
 }

@@ -67,6 +67,11 @@ void Sequence::clear()
 	mActions.clear();
 }
 
+void ActionsPlayer::update(sky::Duration delta)
+{
+	frame(delta);
+}
+
 Generic::Generic(StatusCallback callback) : mCallback(std::move(callback))
 {
 }
@@ -250,7 +255,7 @@ std::unique_ptr<Action> Collection::Breakable(std::function<bool()> while_callba
 
 std::unique_ptr<Action> Collection::Pausable(std::function<bool()> run_callback, std::unique_ptr<Action> action)
 {
-	auto player = std::make_shared<GenericActionsPlayer<Parallel>>();
+	auto player = std::make_shared<ActionsPlayer>();
 	player->add(std::move(action));
 
 	return std::make_unique<Generic>([run_callback, player](auto delta) {
