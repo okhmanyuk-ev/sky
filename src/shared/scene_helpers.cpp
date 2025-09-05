@@ -622,26 +622,26 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createEnterAction
 {
 	const float Duration = 0.25f;
 
-	auto parallel = Actions::Collection::MakeParallel();
+	std::list<std::unique_ptr<Actions::Action>> actions;
 
 	if (mEffects.contains(Effect::Alpha))
 	{
-		parallel->add(Actions::Collection::Show(getRenderLayerColor(), Duration));
+		actions.push_back(Actions::Collection::Show(getRenderLayerColor(), Duration));
 	}
 
 	if (mEffects.contains(Effect::Blur))
 	{
-		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::Linear));
+		actions.push_back(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::Linear));
 	}
 
 	if (mEffects.contains(Effect::Scale))
 	{
-		parallel->add(Actions::Collection::ChangeScale(mContent, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
+		actions.push_back(Actions::Collection::ChangeScale(mContent, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
 	}
 
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitGlobalFrame(),
-		std::move(parallel)
+		Actions::Collection::Parallel(std::move(actions))
 	);
 };
 
@@ -649,26 +649,26 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardScreen::createLeaveAction
 {
 	const float Duration = 0.25f;
 
-	auto parallel = Actions::Collection::MakeParallel();
+	std::list<std::unique_ptr<Actions::Action>> actions;
 
 	if (mEffects.contains(Effect::Alpha))
 	{
-		parallel->add(Actions::Collection::Hide(getRenderLayerColor(), Duration));
+		actions.push_back(Actions::Collection::Hide(getRenderLayerColor(), Duration));
 	}
 
 	if (mEffects.contains(Effect::Blur))
 	{
-		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::Linear));
+		actions.push_back(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::Linear));
 	}
 
 	if (mEffects.contains(Effect::Scale))
 	{
-		parallel->add(Actions::Collection::ChangeScale(mContent, StartScale, Duration, Easing::CubicIn));
+		actions.push_back(Actions::Collection::ChangeScale(mContent, StartScale, Duration, Easing::CubicIn));
 	}
 
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitGlobalFrame(),
-		std::move(parallel)
+		Actions::Collection::Parallel(std::move(actions))
 	);
 };
 
@@ -759,47 +759,47 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createOpenAction(
 {
 	const float Duration = 0.5f;
 
-	auto parallel = Actions::Collection::MakeParallel();
+	std::list<std::unique_ptr<Actions::Action>> actions;
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Fade))
 	{
-		parallel->add(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, Duration, Easing::CubicOut));
+		actions.push_back(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.5f, Duration, Easing::CubicOut));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
-		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
-		parallel->add(Actions::Collection::ChangeColorRgb(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
+		actions.push_back(Actions::Collection::ChangeBlurIntensity(mBlur, 1.0f, Duration, Easing::CubicOut));
+		actions.push_back(Actions::Collection::ChangeColorRgb(mBlur, glm::vec3(1.0f + (0.125f / 2.0f)), Duration, Easing::CubicOut));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
 	{
-		parallel->add(Actions::Collection::ChangeGrayscaleIntensity(mGray, 1.0f, Duration, Easing::CubicOut));
+		actions.push_back(Actions::Collection::ChangeGrayscaleIntensity(mGray, 1.0f, Duration, Easing::CubicOut));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Anchor))
 	{
-		parallel->add(Actions::Collection::ChangeAnchor(mContent, { 0.5f, 0.5f }, Duration, Easing::CubicOut));
+		actions.push_back(Actions::Collection::ChangeAnchor(mContent, { 0.5f, 0.5f }, Duration, Easing::CubicOut));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Blur))
 	{
-		parallel->add(Actions::Collection::ChangeBlurIntensity(mContentBlur, 0.0f, Duration, Easing::Linear));
+		actions.push_back(Actions::Collection::ChangeBlurIntensity(mContentBlur, 0.0f, Duration, Easing::Linear));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Alpha))
 	{
-		parallel->add(Actions::Collection::Show(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicOut));
+		actions.push_back(Actions::Collection::Show(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicOut));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Scale))
 	{
-		parallel->add(Actions::Collection::ChangeScale(mContentHolder, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
+		actions.push_back(Actions::Collection::ChangeScale(mContentHolder, { 1.0f, 1.0f }, Duration, Easing::CubicOut));
 	}
 
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitGlobalFrame(),
-		std::move(parallel)
+		Actions::Collection::Parallel(std::move(actions))
 	);
 };
 
@@ -807,47 +807,47 @@ std::unique_ptr<Actions::Action> SceneHelpers::StandardWindow::createCloseAction
 {
 	const float Duration = 0.5f;
 
-	auto parallel = Actions::Collection::MakeParallel();
+	std::list<std::unique_ptr<Actions::Action>> actions;
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Fade))
 	{
-		parallel->add(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, Duration, Easing::CubicIn));
+		actions.push_back(Actions::Collection::ChangeAlpha(getBackshadeColor(), 0.0f, Duration, Easing::CubicIn));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
-		parallel->add(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
-		parallel->add(Actions::Collection::ChangeColorRgb(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
+		actions.push_back(Actions::Collection::ChangeBlurIntensity(mBlur, 0.0f, Duration, Easing::CubicIn));
+		actions.push_back(Actions::Collection::ChangeColorRgb(mBlur, glm::vec3(1.0f), Duration, Easing::CubicIn));
 	}
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
 	{
-		parallel->add(Actions::Collection::ChangeGrayscaleIntensity(mGray, 0.0f, Duration, Easing::CubicIn));
+		actions.push_back(Actions::Collection::ChangeGrayscaleIntensity(mGray, 0.0f, Duration, Easing::CubicIn));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Anchor))
 	{
-		parallel->add(Actions::Collection::ChangeAnchor(mContent, StartContentAnchor, Duration, Easing::CubicIn));
+		actions.push_back(Actions::Collection::ChangeAnchor(mContent, StartContentAnchor, Duration, Easing::CubicIn));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Blur))
 	{
-		parallel->add(Actions::Collection::ChangeBlurIntensity(mContentBlur, StartContentBlur, Duration, Easing::Linear));
+		actions.push_back(Actions::Collection::ChangeBlurIntensity(mContentBlur, StartContentBlur, Duration, Easing::Linear));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Alpha))
 	{
-		parallel->add(Actions::Collection::Hide(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicIn));
+		actions.push_back(Actions::Collection::Hide(mContentHolder->getRenderLayerColor(), Duration, Easing::CubicIn));
 	}
 
 	if (mContentEffect.contains(ContentEffect::Scale))
 	{
-		parallel->add(Actions::Collection::ChangeScale(mContentHolder, StartContentScale, Duration, Easing::CubicIn));
+		actions.push_back(Actions::Collection::ChangeScale(mContentHolder, StartContentScale, Duration, Easing::CubicIn));
 	}
 
 	return Actions::Collection::MakeSequence(
 		Actions::Collection::WaitGlobalFrame(),
-		std::move(parallel)
+		Actions::Collection::Parallel(std::move(actions))
 	);
 };
 

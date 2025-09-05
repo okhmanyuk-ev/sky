@@ -28,33 +28,6 @@ namespace Actions
 		virtual Status frame(sky::Duration delta) = 0;
 	};
 
-	class Parallel : public Action
-	{
-		static_assert(std::has_virtual_destructor<Action>::value);
-
-	public:
-		enum class Awaiting
-		{
-			All,
-			Any
-		};
-
-	public:
-		Parallel(Awaiting awaitingType = Awaiting::All);
-
-	protected:
-		Status frame(sky::Duration delta) override;
-
-	public:
-		void add(std::unique_ptr<Action> action);
-		void clear();
-		bool hasActions() const { return mActions.size() > 0; }
-
-	private:
-		std::list<std::unique_ptr<Action>> mActions;
-		Awaiting mAwaitingType;
-	};
-
 	class ActionsPlayer
 	{
 	public:
@@ -94,6 +67,8 @@ namespace Actions
 	namespace Collection
 	{
 		std::unique_ptr<Action> Sequence(std::list<std::unique_ptr<Action>> actions);
+		std::unique_ptr<Action> Parallel(bool break_on_any_completed, std::list<std::unique_ptr<Action>> actions);
+		std::unique_ptr<Action> Parallel(std::list<std::unique_ptr<Action>> actions);
 		std::unique_ptr<Action> Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback);
 		std::unique_ptr<Action> Insert(std::function<std::unique_ptr<Action>()> action);
 		std::unique_ptr<Action> RepeatInfinite(std::function<std::unique_ptr<Action>()> action);
@@ -191,23 +166,23 @@ namespace Actions
 		template <typename...Args>
 		std::unique_ptr<Action> MakeSequence(Args&&...args)
 		{
-			std::list<std::unique_ptr<Action>> seq;
-			(seq.push_back(std::forward<Args>(args)), ...);
-			return Sequence(std::move(seq));
+			std::list<std::unique_ptr<Action>> actions;
+			(actions.push_back(std::forward<Args>(args)), ...);
+			return Sequence(std::move(actions));
 		}
 
 		template <typename...Args>
-		std::unique_ptr<Parallel> MakeParallel(Parallel::Awaiting awaitingType, Args&&...args)
+		std::unique_ptr<Action> MakeParallel(bool break_on_any_completed, Args&&...args)
 		{
-			auto parallel = std::make_unique<Parallel>(awaitingType);
-			(parallel->add(std::forward<Args>(args)), ...);
-			return parallel;
+			std::list<std::unique_ptr<Action>> actions;
+			(actions.push_back(std::forward<Args>(args)), ...);
+			return Parallel(break_on_any_completed, std::move(actions));
 		}
 
 		template <typename...Args>
-		std::unique_ptr<Parallel> MakeParallel(Args&&...args)
+		std::unique_ptr<Action> MakeParallel(Args&&...args)
 		{
-			return MakeParallel(Parallel::Awaiting::All, std::forward<Args>(args)...);
+			return MakeParallel(false, std::forward<Args>(args)...);
 		}
 
 		template <typename T>

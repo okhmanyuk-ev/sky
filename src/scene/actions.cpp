@@ -37,7 +37,7 @@ std::unique_ptr<Action> Collection::Show(std::shared_ptr<Scene::Color> node, flo
 std::unique_ptr<Action> Collection::HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
 	EasingFunction easingFunction)
 {
-	auto parallel = MakeParallel();
+	std::list<std::unique_ptr<Actions::Action>> actions;
 	std::function<void(std::shared_ptr<Scene::Node> node)> recursive_fill_func;
 	recursive_fill_func = [&](std::shared_ptr<Scene::Node> node){
 		for (auto child : node->getNodes())
@@ -50,10 +50,10 @@ std::unique_ptr<Action> Collection::HideRecursive(std::shared_ptr<Scene::Node> n
 		if (!color_node)
 			return;
 
-		parallel->add(Hide(color_node, duration, easingFunction));
+		actions.push_back(Hide(color_node, duration, easingFunction));
 	};
 	recursive_fill_func(node);
-	return parallel;
+	return Actions::Collection::Parallel(std::move(actions));
 }
 
 std::unique_ptr<Action> Collection::Kill(std::shared_ptr<Scene::Node> node)

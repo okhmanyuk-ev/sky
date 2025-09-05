@@ -4,43 +4,6 @@
 
 using namespace Actions;
 
-Parallel::Parallel(Awaiting awaitingType) : mAwaitingType(awaitingType)
-{
-}
-
-Action::Status Parallel::frame(sky::Duration delta)
-{
-	auto it = mActions.begin();
-	while (it != mActions.end())
-	{
-		auto& action = *it;
-
-		if (!action)
-			it = mActions.erase(it);
-		else if (action->frame(delta) == Status::Continue)
-			++it;
-		else if (mAwaitingType == Awaiting::Any)
-			return Status::Finished;
-		else
-			it = mActions.erase(it);
-	}
-
-	if (mActions.empty())
-		return Status::Finished;
-
-	return Status::Continue;
-}
-
-void Parallel::add(std::unique_ptr<Action> action)
-{
-	mActions.push_back(std::move(action));
-}
-
-void Parallel::clear()
-{
-	mActions.clear();
-}
-
 void ActionsPlayer::update(sky::Duration delta)
 {
 	auto it = mActions.begin();
@@ -105,6 +68,36 @@ std::unique_ptr<Action> Collection::Sequence(std::list<std::unique_ptr<Action>> 
 
 		return actions.empty() ? Action::Status::Finished : Action::Status::Continue;
 	});
+}
+
+std::unique_ptr<Action> Collection::Parallel(bool break_on_any_completed, std::list<std::unique_ptr<Action>> actions)
+{
+	return std::make_unique<Generic>([actions = std::move(actions), break_on_any_completed](auto delta) mutable {
+		auto it = actions.begin();
+		while (it != actions.end())
+		{
+			auto& action = *it;
+
+			if (!action)
+				it = actions.erase(it);
+			else if (action->frame(delta) == Action::Status::Continue)
+				++it;
+			else if (break_on_any_completed)
+				return Action::Status::Finished;
+			else
+				it = actions.erase(it);
+		}
+
+		if (actions.empty())
+			return Action::Status::Finished;
+
+		return Action::Status::Continue;
+	});
+}
+
+std::unique_ptr<Action> Collection::Parallel(std::list<std::unique_ptr<Action>> actions)
+{
+	return Parallel(false, std::move(actions));
 }
 
 std::unique_ptr<Action> Collection::Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback)
@@ -254,7 +247,7 @@ std::unique_ptr<Action> Collection::Delayed(bool& while_flag, std::unique_ptr<Ac
 
 std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Action> action)
 {
-	return MakeParallel(Parallel::Awaiting::Any,
+	return MakeParallel(true,
 		Wait(duration),
 		std::move(action)
 	);
@@ -262,7 +255,7 @@ std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Ac
 
 std::unique_ptr<Action> Collection::Breakable(std::function<bool()> while_callback, std::unique_ptr<Action> action)
 {
-	return MakeParallel(Parallel::Awaiting::Any,
+	return MakeParallel(true,
 		Wait(while_callback),
 		std::move(action)
 	);
