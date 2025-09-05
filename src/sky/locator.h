@@ -44,5 +44,14 @@ namespace sky
 
 	private:
 		static inline std::shared_ptr<T> Service;
+
+	public:
+		struct Accessor
+		{
+			const auto& operator->() const
+			{
+				return Get();
+			}
+		};
 	};
 }
