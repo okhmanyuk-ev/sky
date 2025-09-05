@@ -63,8 +63,8 @@ void sky_main()
 	camera->pitch = glm::radians(-25.0f);
 	camera->position = glm::vec3{ -5.0f, 2.0f, 0.0f };
 
-	viewport->runAction(Actions::Collection::RepeatInfinite([entity] {
-		return Actions::Collection::Interpolate(0.0f, 360.0f, 5.0f, Easing::Linear, [entity](float value) {
+	viewport->runAction(Actions::RepeatInfinite([entity] {
+		return Actions::Interpolate(0.0f, 360.0f, 5.0f, Easing::Linear, [entity](float value) {
 			entity->setRotation({ 0.0f, glm::radians(value), 0.0f });
 		});
 	}));

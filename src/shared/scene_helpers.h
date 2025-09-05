@@ -142,12 +142,12 @@ namespace Shared::SceneHelpers
 				return;
 
 			mChooseAnimationStarted = true;
-			this->runAction(Actions::Collection::Sequence(
-				Actions::Collection::Execute([this] {
+			this->runAction(Actions::Sequence(
+				Actions::Execute([this] {
 					mChooseAnimationProcessing = true;
 				}),
-				Actions::Collection::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
-				Actions::Collection::Execute([this] {
+				Actions::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
+				Actions::Execute([this] {
 					mChooseAnimationProcessing = false;
 				})
 			));
@@ -163,14 +163,14 @@ namespace Shared::SceneHelpers
 			const float Duration = 0.125f / 1.5f;
 
 			mChooseAnimationStarted = false;
-			this->runAction(Actions::Collection::Sequence(
-				Actions::Collection::Wait(mChooseAnimationProcessing),
-				Actions::Collection::Execute([this] {
+			this->runAction(Actions::Sequence(
+				Actions::Wait(mChooseAnimationProcessing),
+				Actions::Execute([this] {
 					mChooseAnimationProcessing = true;
 				}),
-				Actions::Collection::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
-				Actions::Collection::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
-				Actions::Collection::Execute([this] {
+				Actions::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
+				Actions::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
+				Actions::Execute([this] {
 					mChooseAnimationProcessing = false;
 				})
 			));
@@ -352,7 +352,7 @@ namespace Shared::SceneHelpers
 		KillableByClick()
 		{
 			this->setClickCallback([this] {
-				this->runAction(Actions::Collection::Kill(this->shared_from_this()));
+				this->runAction(Actions::Kill(this->shared_from_this()));
 			});
 		}
 	};

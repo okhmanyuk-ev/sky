@@ -68,7 +68,7 @@ namespace Scene
 	using GrayscaleIntensityProperty = Property<GrayscaledGlass, &GrayscaledGlass::getGrayscaleIntensity, &GrayscaledGlass::setGrayscaleIntensity>;
 }
 
-namespace Actions::Collection
+namespace Actions
 {
 	template<typename T>
 	struct InterpolateWrapper

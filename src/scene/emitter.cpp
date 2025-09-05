@@ -9,12 +9,12 @@ using namespace Scene;
 
 Emitter::Emitter()
 {
-	runAction(Actions::Collection::RepeatInfinite([this]()->std::unique_ptr<Actions::Action> {
+	runAction(Actions::RepeatInfinite([this]()->std::unique_ptr<Actions::Action> {
 		if (!mRunning)
 			return nullptr;
 
 		auto delay = glm::linearRand(mMinDelay, mMaxDelay);
-		return Actions::Collection::Delayed(delay, Actions::Collection::Execute([this] {
+		return Actions::Delayed(delay, Actions::Execute([this] {
 			if (!mRunning)
 				return;
 
@@ -53,14 +53,14 @@ void Emitter::emit(int count)
 	auto duration = glm::linearRand(mMinDuration, mMaxDuration);
 	auto direction = glm::linearRand(mMinDirection, mMaxDirection);
 
-	particle->runAction(Actions::Collection::Sequence(
-		Actions::Collection::Parallel(
-			Actions::Collection::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
-			Actions::Collection::ChangeScale(particle, mEndScale, duration),
-			Actions::Collection::ChangeColor(colored_particle, mEndColor, duration),
-			Actions::Collection::ChangeAlpha(colored_particle, mEndColor.a, duration)
+	particle->runAction(Actions::Sequence(
+		Actions::Parallel(
+			Actions::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
+			Actions::ChangeScale(particle, mEndScale, duration),
+			Actions::ChangeColor(colored_particle, mEndColor, duration),
+			Actions::ChangeAlpha(colored_particle, mEndColor.a, duration)
 		),
-		Actions::Collection::Kill(particle)
+		Actions::Kill(particle)
 	));
 
 	holder->attach(particle);

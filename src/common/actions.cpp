@@ -2,19 +2,17 @@
 #include <cassert>
 #include <sky/utils.h>
 
-using namespace Actions;
-
-Action::Action(StatusCallback callback) : mCallback(std::move(callback))
+Actions::Action::Action(StatusCallback callback) : mCallback(std::move(callback))
 {
 }
 
-Action::Status Action::frame(sky::Duration delta)
+Actions::Action::Status Actions::Action::frame(sky::Duration delta)
 {
 	assert(mCallback);
 	return mCallback(delta);
 }
 
-void ActionsPlayer::update(sky::Duration delta)
+void Actions::ActionsPlayer::update(sky::Duration delta)
 {
 	auto it = mActions.begin();
 	while (it != mActions.end())
@@ -30,22 +28,22 @@ void ActionsPlayer::update(sky::Duration delta)
 	}
 }
 
-void ActionsPlayer::add(std::unique_ptr<Action> action)
+void Actions::ActionsPlayer::add(std::unique_ptr<Action> action)
 {
 	mActions.push_back(std::move(action));
 }
 
-void ActionsPlayer::clear()
+void Actions::ActionsPlayer::clear()
 {
 	mActions.clear();
 }
 
-bool ActionsPlayer::hasActions() const
+bool Actions::ActionsPlayer::hasActions() const
 {
 	return !mActions.empty();
 }
 
-std::unique_ptr<Action> Collection::Sequence(std::list<std::unique_ptr<Action>> actions)
+std::unique_ptr<Actions::Action> Actions::Sequence(std::list<std::unique_ptr<Action>> actions)
 {
 	return std::make_unique<Action>([actions = std::move(actions)] (auto delta) mutable {
 		if (actions.empty())
@@ -60,7 +58,7 @@ std::unique_ptr<Action> Collection::Sequence(std::list<std::unique_ptr<Action>> 
 	});
 }
 
-std::unique_ptr<Action> Collection::Parallel(std::list<std::unique_ptr<Action>> actions)
+std::unique_ptr<Actions::Action> Actions::Parallel(std::list<std::unique_ptr<Action>> actions)
 {
 	return std::make_unique<Action>([actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
@@ -83,7 +81,7 @@ std::unique_ptr<Action> Collection::Parallel(std::list<std::unique_ptr<Action>> 
 	});
 }
 
-std::unique_ptr<Action> Collection::Race(std::list<std::unique_ptr<Action>> actions)
+std::unique_ptr<Actions::Action> Actions::Race(std::list<std::unique_ptr<Action>> actions)
 {
 	return std::make_unique<Action>([actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
@@ -106,7 +104,7 @@ std::unique_ptr<Action> Collection::Race(std::list<std::unique_ptr<Action>> acti
 	});
 }
 
-std::unique_ptr<Action> Collection::Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback)
+std::unique_ptr<Actions::Action> Actions::Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback)
 {
 	return std::make_unique<Action>([callback,
 		_status = std::optional<Action::Status>{ std::nullopt },
@@ -131,21 +129,21 @@ std::unique_ptr<Action> Collection::Repeat(std::function<std::tuple<Action::Stat
 	});
 }
 
-std::unique_ptr<Action> Collection::Insert(std::function<std::unique_ptr<Action>()> action)
+std::unique_ptr<Actions::Action> Actions::Insert(std::function<std::unique_ptr<Action>()> action)
 {
 	return Repeat([action]() -> std::tuple<Action::Status, std::unique_ptr<Action>> {
 		return { Action::Status::Finished, action() };
 	});
 }
 
-std::unique_ptr<Action> Collection::RepeatInfinite(std::function<std::unique_ptr<Action>()> action)
+std::unique_ptr<Actions::Action> Actions::RepeatInfinite(std::function<std::unique_ptr<Action>()> action)
 {
 	return Repeat([action]() -> std::tuple<Action::Status, std::unique_ptr<Action>> {
 		return { Action::Status::Continue, action() };
 	});
 }
 
-std::unique_ptr<Action> Collection::Execute(std::function<void()> callback)
+std::unique_ptr<Actions::Action> Actions::Execute(std::function<void()> callback)
 {
 	return std::make_unique<Action>([callback](auto delta) {
 		if (callback)
@@ -155,7 +153,7 @@ std::unique_ptr<Action> Collection::Execute(std::function<void()> callback)
 	});
 }
 
-std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
+std::unique_ptr<Actions::Action> Actions::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
 {
 	return std::make_unique<Action>([callback](auto delta) {
 		callback(delta);
@@ -163,7 +161,7 @@ std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void(sky::Dura
 	});
 }
 
-std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void()> callback)
+std::unique_ptr<Actions::Action> Actions::ExecuteInfinite(std::function<void()> callback)
 {
 	return ExecuteInfinite([callback](auto delta) {
 		if (callback)
@@ -171,7 +169,7 @@ std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void()> callba
 	});
 }
 
-std::unique_ptr<Action> Collection::ExecuteInfiniteGlobal(std::function<void()> callback)
+std::unique_ptr<Actions::Action> Actions::ExecuteInfiniteGlobal(std::function<void()> callback)
 {
 	auto prev_frame_count = SCHEDULER->getFrameCount();
 
@@ -186,12 +184,12 @@ std::unique_ptr<Action> Collection::ExecuteInfiniteGlobal(std::function<void()> 
 	});
 }
 
-std::unique_ptr<Action> Collection::Wait()
+std::unique_ptr<Actions::Action> Actions::Wait()
 {
 	return Execute(nullptr);
 }
 
-std::unique_ptr<Action> Collection::Wait(float duration)
+std::unique_ptr<Actions::Action> Actions::Wait(float duration)
 {
 	return Wait([duration](auto delta) mutable {
 		duration -= sky::ToSeconds(delta);
@@ -199,7 +197,7 @@ std::unique_ptr<Action> Collection::Wait(float duration)
 	});
 }
 
-std::unique_ptr<Action> Collection::Wait(std::function<bool(sky::Duration delta)> while_callback)
+std::unique_ptr<Actions::Action> Actions::Wait(std::function<bool(sky::Duration delta)> while_callback)
 {
 	return std::make_unique<Action>([while_callback](auto delta) {
 		if (while_callback(delta))
@@ -209,21 +207,21 @@ std::unique_ptr<Action> Collection::Wait(std::function<bool(sky::Duration delta)
 	});
 }
 
-std::unique_ptr<Action> Collection::Wait(std::function<bool()> while_callback)
+std::unique_ptr<Actions::Action> Actions::Wait(std::function<bool()> while_callback)
 {
 	return Wait([while_callback](auto delta) {
 		return while_callback();
 	});
 }
 
-std::unique_ptr<Action> Collection::Wait(bool& while_flag)
+std::unique_ptr<Actions::Action> Actions::Wait(bool& while_flag)
 {
 	return Wait([&while_flag] {
 		return while_flag;
 	});
 }
 
-std::unique_ptr<Action> Collection::WaitGlobalFrame()
+std::unique_ptr<Actions::Action> Actions::WaitGlobalFrame()
 {
 	auto frame_count = SCHEDULER->getFrameCount();
 
@@ -232,7 +230,7 @@ std::unique_ptr<Action> Collection::WaitGlobalFrame()
 	});
 }
 
-std::unique_ptr<Action> Collection::Delayed(float duration, std::unique_ptr<Action> action)
+std::unique_ptr<Actions::Action> Actions::Delayed(float duration, std::unique_ptr<Action> action)
 {
 	return Sequence(
 		Wait(duration),
@@ -240,7 +238,7 @@ std::unique_ptr<Action> Collection::Delayed(float duration, std::unique_ptr<Acti
 	);
 }
 
-std::unique_ptr<Action> Collection::Delayed(std::function<bool()> while_callback, std::unique_ptr<Action> action)
+std::unique_ptr<Actions::Action> Actions::Delayed(std::function<bool()> while_callback, std::unique_ptr<Action> action)
 {
 	return Sequence(
 		Wait(while_callback),
@@ -248,7 +246,7 @@ std::unique_ptr<Action> Collection::Delayed(std::function<bool()> while_callback
 	);
 }
 
-std::unique_ptr<Action> Collection::Delayed(bool& while_flag, std::unique_ptr<Action> action)
+std::unique_ptr<Actions::Action> Actions::Delayed(bool& while_flag, std::unique_ptr<Action> action)
 {
 	return Sequence(
 		Wait(while_flag),
@@ -256,7 +254,7 @@ std::unique_ptr<Action> Collection::Delayed(bool& while_flag, std::unique_ptr<Ac
 	);
 }
 
-std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Action> action)
+std::unique_ptr<Actions::Action> Actions::Breakable(float duration, std::unique_ptr<Action> action)
 {
 	return Race(
 		Wait(duration),
@@ -264,7 +262,7 @@ std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Ac
 	);
 }
 
-std::unique_ptr<Action> Collection::Breakable(std::function<bool()> while_callback, std::unique_ptr<Action> action)
+std::unique_ptr<Actions::Action> Actions::Breakable(std::function<bool()> while_callback, std::unique_ptr<Action> action)
 {
 	return Race(
 		Wait(while_callback),
@@ -272,7 +270,7 @@ std::unique_ptr<Action> Collection::Breakable(std::function<bool()> while_callba
 	);
 }
 
-std::unique_ptr<Action> Collection::Pausable(std::function<bool()> run_callback, std::unique_ptr<Action> action)
+std::unique_ptr<Actions::Action> Actions::Pausable(std::function<bool()> run_callback, std::unique_ptr<Action> action)
 {
 	auto player = std::make_shared<ActionsPlayer>();
 	player->add(std::move(action));
@@ -290,7 +288,7 @@ std::unique_ptr<Action> Collection::Pausable(std::function<bool()> run_callback,
 	});
 }
 
-std::unique_ptr<Action> Collection::Log(const std::string& text)
+std::unique_ptr<Actions::Action> Actions::Log(const std::string& text)
 {
 	return Execute([text] {
 		sky::Log(text);

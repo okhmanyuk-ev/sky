@@ -115,8 +115,8 @@ void ConsoleCommands::onEcho(CON_ARGS)
 void ConsoleCommands::onLater(CON_ARGS)
 {
 	float seconds = std::stof(CON_ARG(0));
-	sky::Schedule(Actions::Collection::Delayed(seconds,
-		Actions::Collection::Execute([this, command = CON_ARG(1)] {
+	sky::Schedule(Actions::Delayed(seconds,
+		Actions::Execute([this, command = CON_ARG(1)] {
 			sky::GetService<sky::CommandProcessor>()->execute(command);
 		})
 	));

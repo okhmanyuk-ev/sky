@@ -46,9 +46,9 @@ void ImScene::destroyAction(std::unique_ptr<Actions::Action> action)
 	const auto& item = mNodeItems.at(mLastSpawnedKey);
 
 	auto func = make_shared_function([node = item.node, action = std::move(action)] () mutable {
-		node->runAction(Actions::Collection::Sequence(
+		node->runAction(Actions::Sequence(
 			std::move(action),
-			Actions::Collection::Kill(node)
+			Actions::Kill(node)
 		));
 	});
 
@@ -64,7 +64,7 @@ void ImScene::dontKillWhileHaveChilds()
 {
 	const auto& item = mNodeItems.at(mLastSpawnedKey);
 
-	destroyAction(Actions::Collection::Wait([node = item.node] {
+	destroyAction(Actions::Wait([node = item.node] {
 		return node->hasNodes();
 	}));
 }
@@ -76,10 +76,10 @@ void ImScene::showAndHideWithScale()
 	if (isFirstCall())
 	{
 		item.node->setScale(0.0f);
-		item.node->runAction(Actions::Collection::ChangeScale(item.node, { 1.0f, 1.0f }, 0.25f, Easing::SinusoidalOut));
+		item.node->runAction(Actions::ChangeScale(item.node, { 1.0f, 1.0f }, 0.25f, Easing::SinusoidalOut));
 	}
 
-	destroyAction(Actions::Collection::ChangeScale(item.node, { 0.0f, 0.0f }, 0.25f, Easing::SinusoidalIn));
+	destroyAction(Actions::ChangeScale(item.node, { 0.0f, 0.0f }, 0.25f, Easing::SinusoidalIn));
 }
 
 void ImScene::showWithAlpha(float duration, float dst_alpha)
@@ -95,12 +95,12 @@ void ImScene::showWithAlpha(float duration, float dst_alpha)
 		return;
 
 	color->setAlpha(0.0f);
-	item.node->runAction(Actions::Collection::ChangeAlpha(color, dst_alpha, duration, Easing::SinusoidalOut));
+	item.node->runAction(Actions::ChangeAlpha(color, dst_alpha, duration, Easing::SinusoidalOut));
 }
 
 void ImScene::hideWithAlpha(std::shared_ptr<Scene::Color> color, float duration)
 {
-	destroyAction(Actions::Collection::Hide(color, duration, Easing::SinusoidalIn));
+	destroyAction(Actions::Hide(color, duration, Easing::SinusoidalIn));
 }
 
 void ImScene::hideWithAlpha(float duration)
