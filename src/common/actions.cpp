@@ -70,9 +70,9 @@ std::unique_ptr<Action> Collection::Sequence(std::list<std::unique_ptr<Action>> 
 	});
 }
 
-std::unique_ptr<Action> Collection::Parallel(bool break_on_any_completed, std::list<std::unique_ptr<Action>> actions)
+std::unique_ptr<Action> Collection::Parallel(std::list<std::unique_ptr<Action>> actions)
 {
-	return std::make_unique<Generic>([actions = std::move(actions), break_on_any_completed](auto delta) mutable {
+	return std::make_unique<Generic>([actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
 		while (it != actions.end())
 		{
@@ -82,8 +82,6 @@ std::unique_ptr<Action> Collection::Parallel(bool break_on_any_completed, std::l
 				it = actions.erase(it);
 			else if (action->frame(delta) == Action::Status::Continue)
 				++it;
-			else if (break_on_any_completed)
-				return Action::Status::Finished;
 			else
 				it = actions.erase(it);
 		}
@@ -95,9 +93,27 @@ std::unique_ptr<Action> Collection::Parallel(bool break_on_any_completed, std::l
 	});
 }
 
-std::unique_ptr<Action> Collection::Parallel(std::list<std::unique_ptr<Action>> actions)
+std::unique_ptr<Action> Collection::Race(std::list<std::unique_ptr<Action>> actions)
 {
-	return Parallel(false, std::move(actions));
+	return std::make_unique<Generic>([actions = std::move(actions)](auto delta) mutable {
+		auto it = actions.begin();
+		while (it != actions.end())
+		{
+			auto& action = *it;
+
+			if (!action)
+				it = actions.erase(it);
+			else if (action->frame(delta) == Action::Status::Continue)
+				++it;
+			else
+				return Action::Status::Finished;
+		}
+
+		if (actions.empty())
+			return Action::Status::Finished;
+
+		return Action::Status::Continue;
+	});
 }
 
 std::unique_ptr<Action> Collection::Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback)
@@ -247,7 +263,7 @@ std::unique_ptr<Action> Collection::Delayed(bool& while_flag, std::unique_ptr<Ac
 
 std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Action> action)
 {
-	return Parallel(true,
+	return Race(
 		Wait(duration),
 		std::move(action)
 	);
@@ -255,7 +271,7 @@ std::unique_ptr<Action> Collection::Breakable(float duration, std::unique_ptr<Ac
 
 std::unique_ptr<Action> Collection::Breakable(std::function<bool()> while_callback, std::unique_ptr<Action> action)
 {
-	return Parallel(true,
+	return Race(
 		Wait(while_callback),
 		std::move(action)
 	);

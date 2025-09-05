@@ -67,8 +67,8 @@ namespace Actions
 	namespace Collection
 	{
 		std::unique_ptr<Action> Sequence(std::list<std::unique_ptr<Action>> actions);
-		std::unique_ptr<Action> Parallel(bool break_on_any_completed, std::list<std::unique_ptr<Action>> actions);
 		std::unique_ptr<Action> Parallel(std::list<std::unique_ptr<Action>> actions);
+		std::unique_ptr<Action> Race(std::list<std::unique_ptr<Action>> actions);
 		std::unique_ptr<Action> Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback);
 		std::unique_ptr<Action> Insert(std::function<std::unique_ptr<Action>()> action);
 		std::unique_ptr<Action> RepeatInfinite(std::function<std::unique_ptr<Action>()> action);
@@ -172,17 +172,19 @@ namespace Actions
 		}
 
 		template <typename...Args>
-		std::unique_ptr<Action> Parallel(bool break_on_any_completed, Args&&...args)
+		std::unique_ptr<Action> Parallel(Args&&...args)
 		{
 			std::list<std::unique_ptr<Action>> actions;
 			(actions.push_back(std::forward<Args>(args)), ...);
-			return Parallel(break_on_any_completed, std::move(actions));
+			return Parallel(std::move(actions));
 		}
 
 		template <typename...Args>
-		std::unique_ptr<Action> Parallel(Args&&...args)
+		std::unique_ptr<Action> Race(Args&&...args)
 		{
-			return Parallel(false, std::forward<Args>(args)...);
+			std::list<std::unique_ptr<Action>> actions;
+			(actions.push_back(std::forward<Args>(args)), ...);
+			return Race(std::move(actions));
 		}
 
 		template <typename T>
