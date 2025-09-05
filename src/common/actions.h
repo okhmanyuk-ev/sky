@@ -24,17 +24,9 @@ namespace Actions
 		};
 
 		using StatusCallback = std::move_only_function<Status(sky::Duration)>;
-		using Callback = std::move_only_function<void(sky::Duration)>;
-
-		enum class Type
-		{
-			One,
-			Infinity
-		};
 
 	public:
 		Action(StatusCallback callback);
-		Action(Type type, Callback callback);
 		Status frame(sky::Duration delta);
 
 	private:

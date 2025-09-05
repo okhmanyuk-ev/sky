@@ -8,16 +8,6 @@ Action::Action(StatusCallback callback) : mCallback(std::move(callback))
 {
 }
 
-Action::Action(Type type, Callback callback)
-{
-	mCallback = [type, callback = std::move(callback)](auto delta) mutable {
-		if (callback)
-			callback(delta);
-
-		return type == Type::One ? Status::Finished : Status::Continue;
-	};
-}
-
 Action::Status Action::frame(sky::Duration delta)
 {
 	assert(mCallback);
@@ -157,15 +147,20 @@ std::unique_ptr<Action> Collection::RepeatInfinite(std::function<std::unique_ptr
 
 std::unique_ptr<Action> Collection::Execute(std::function<void()> callback)
 {
-	return std::make_unique<Action>(Action::Type::One, [callback](auto delta) {
+	return std::make_unique<Action>([callback](auto delta) {
 		if (callback)
 			callback();
+
+		return Action::Status::Finished;
 	});
 }
 
 std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
 {
-	return std::make_unique<Action>(Action::Type::Infinity, callback);
+	return std::make_unique<Action>([callback](auto delta) {
+		callback(delta);
+		return Action::Status::Continue;
+	});
 }
 
 std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void()> callback)
