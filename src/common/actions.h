@@ -78,17 +78,6 @@ namespace Actions
 		std::list<std::unique_ptr<Action>> mActions;
 	};
 
-	template <typename T> class ActionsPlayer : public T
-	{
-		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value,
-			"T must be derived from Sequence or Parallel");
-	private:
-		sky::Scheduler::Framer mFramer = sky::Scheduler::Framer([this] { T::frame(SCHEDULER->getTimeDelta()); });
-	};
-
-	using SequentialActionsPlayer = ActionsPlayer<Sequence>;
-	using ParallelActionsPlayer = ActionsPlayer<Parallel>;
-
 	template <typename T> class GenericActionsPlayer : public T
 	{
 		static_assert(std::is_same<T, Sequence>::value || std::is_same<T, Parallel>::value,
