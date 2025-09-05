@@ -22,9 +22,9 @@ void sky_main()
 	floor->attach(floor_rect);
 
 	auto enableAutoSuicide = [](std::shared_ptr<Scene::Node> node){
-		node->runAction(Actions::ExecuteInfinite([node]{
+		node->runAction(sky::Actions::ExecuteInfinite([node]{
 			if (node->getY() > 1000.0f)
-				node->runAction(Actions::Kill(node));
+				node->runAction(sky::Actions::Kill(node));
 		}));
 	};
 
@@ -65,12 +65,12 @@ void sky_main()
 	static bool auto_spawn = true;
 	static float ChanceValue = 0.5f;
 
-	world->runAction(Actions::Pausable([]{ return auto_spawn; }, Actions::RepeatInfinite([spawnBox, spawnBall]() -> std::unique_ptr<Actions::Action> {
+	world->runAction(sky::Actions::Pausable([]{ return auto_spawn; }, sky::Actions::RepeatInfinite([spawnBox, spawnBall]() -> std::optional<sky::Action> {
 		const auto delay = 0.125f;
 
-		return Actions::Sequence(
-			Actions::Wait(delay),
-			Actions::Execute([spawnBox, spawnBall]{
+		return sky::Actions::Sequence(
+			sky::Actions::Wait(delay),
+			sky::Actions::Execute([spawnBox, spawnBall]{
 				if (sky::chance(ChanceValue))
 					spawnBox();
 				else

@@ -4,17 +4,16 @@
 
 using namespace sky;
 
-Actions::Action::Action(StatusCallback callback) : mCallback(std::move(callback))
+Action::Action(Callback callback) : mCallback(std::move(callback))
 {
 }
 
-Actions::Action::Status Actions::Action::frame(sky::Duration delta)
+Action::Status Action::frame(sky::Duration delta)
 {
-	assert(mCallback);
 	return mCallback(delta);
 }
 
-void Actions::ActionsPlayer::update(sky::Duration delta)
+void ActionsPlayer::update(sky::Duration delta)
 {
 	auto it = mActions.begin();
 	while (it != mActions.end())
@@ -26,22 +25,22 @@ void Actions::ActionsPlayer::update(sky::Duration delta)
 	}
 }
 
-void Actions::ActionsPlayer::add(Action action)
+void ActionsPlayer::add(Action action)
 {
 	mActions.push_back(std::move(action));
 }
 
-void Actions::ActionsPlayer::clear()
+void ActionsPlayer::clear()
 {
 	mActions.clear();
 }
 
-bool Actions::ActionsPlayer::hasActions() const
+bool ActionsPlayer::hasActions() const
 {
 	return !mActions.empty();
 }
 
-Actions::Action Actions::Sequence(std::list<Action> actions)
+Action Actions::Sequence(std::list<Action> actions)
 {
 	return Action([actions = std::move(actions)] (auto delta) mutable {
 		if (actions.empty())
@@ -54,7 +53,7 @@ Actions::Action Actions::Sequence(std::list<Action> actions)
 	});
 }
 
-Actions::Action Actions::Parallel(std::list<Action> actions)
+Action Actions::Parallel(std::list<Action> actions)
 {
 	return Action([actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
@@ -73,7 +72,7 @@ Actions::Action Actions::Parallel(std::list<Action> actions)
 	});
 }
 
-Actions::Action Actions::Race(std::list<Action> actions)
+Action Actions::Race(std::list<Action> actions)
 {
 	return Action([actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
@@ -92,7 +91,7 @@ Actions::Action Actions::Race(std::list<Action> actions)
 	});
 }
 
-Actions::Action Actions::Repeat(std::function<std::tuple<Action::Status, std::optional<Action>>()> callback)
+Action Actions::Repeat(std::function<std::tuple<Action::Status, std::optional<Action>>()> callback)
 {
 	return Action([callback,
 		_status = std::optional<Action::Status>{ std::nullopt },
@@ -117,21 +116,21 @@ Actions::Action Actions::Repeat(std::function<std::tuple<Action::Status, std::op
 	});
 }
 
-Actions::Action Actions::Insert(std::function<Action()> action)
+Action Actions::Insert(std::function<Action()> action)
 {
 	return Repeat([action]() -> std::tuple<Action::Status, std::optional<Action>> {
 		return { Action::Status::Finished, action() };
 	});
 }
 
-Actions::Action Actions::RepeatInfinite(std::function<std::optional<Action>()> action)
+Action Actions::RepeatInfinite(std::function<std::optional<Action>()> action)
 {
 	return Repeat([action]() -> std::tuple<Action::Status, std::optional<Action>> {
 		return { Action::Status::Continue, action() };
 	});
 }
 
-Actions::Action Actions::Execute(std::function<void()> callback)
+Action Actions::Execute(std::function<void()> callback)
 {
 	return Action([callback](auto delta) {
 		if (callback)
@@ -141,7 +140,7 @@ Actions::Action Actions::Execute(std::function<void()> callback)
 	});
 }
 
-Actions::Action Actions::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
+Action Actions::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
 {
 	return Action([callback](auto delta) {
 		callback(delta);
@@ -149,7 +148,7 @@ Actions::Action Actions::ExecuteInfinite(std::function<void(sky::Duration delta)
 	});
 }
 
-Actions::Action Actions::ExecuteInfinite(std::function<void()> callback)
+Action Actions::ExecuteInfinite(std::function<void()> callback)
 {
 	return ExecuteInfinite([callback](auto delta) {
 		if (callback)
@@ -157,7 +156,7 @@ Actions::Action Actions::ExecuteInfinite(std::function<void()> callback)
 	});
 }
 
-Actions::Action Actions::ExecuteInfiniteGlobal(std::function<void()> callback)
+Action Actions::ExecuteInfiniteGlobal(std::function<void()> callback)
 {
 	auto prev_frame_count = SCHEDULER->getFrameCount();
 
@@ -172,12 +171,12 @@ Actions::Action Actions::ExecuteInfiniteGlobal(std::function<void()> callback)
 	});
 }
 
-Actions::Action Actions::Wait()
+Action Actions::Wait()
 {
 	return Execute(nullptr);
 }
 
-Actions::Action Actions::Wait(float duration)
+Action Actions::Wait(float duration)
 {
 	return Wait([duration](auto delta) mutable {
 		duration -= sky::ToSeconds(delta);
@@ -185,7 +184,7 @@ Actions::Action Actions::Wait(float duration)
 	});
 }
 
-Actions::Action Actions::Wait(std::function<bool(sky::Duration delta)> while_callback)
+Action Actions::Wait(std::function<bool(sky::Duration delta)> while_callback)
 {
 	return Action([while_callback](auto delta) {
 		if (while_callback(delta))
@@ -195,21 +194,21 @@ Actions::Action Actions::Wait(std::function<bool(sky::Duration delta)> while_cal
 	});
 }
 
-Actions::Action Actions::Wait(std::function<bool()> while_callback)
+Action Actions::Wait(std::function<bool()> while_callback)
 {
 	return Wait([while_callback](auto delta) {
 		return while_callback();
 	});
 }
 
-Actions::Action Actions::Wait(bool& while_flag)
+Action Actions::Wait(bool& while_flag)
 {
 	return Wait([&while_flag] {
 		return while_flag;
 	});
 }
 
-Actions::Action Actions::WaitGlobalFrame()
+Action Actions::WaitGlobalFrame()
 {
 	auto frame_count = SCHEDULER->getFrameCount();
 
@@ -218,7 +217,7 @@ Actions::Action Actions::WaitGlobalFrame()
 	});
 }
 
-Actions::Action Actions::Delayed(float duration, Action action)
+Action Actions::Delayed(float duration, Action action)
 {
 	return Sequence(
 		Wait(duration),
@@ -226,7 +225,7 @@ Actions::Action Actions::Delayed(float duration, Action action)
 	);
 }
 
-Actions::Action Actions::Delayed(std::function<bool()> while_callback, Action action)
+Action Actions::Delayed(std::function<bool()> while_callback, Action action)
 {
 	return Sequence(
 		Wait(while_callback),
@@ -234,7 +233,7 @@ Actions::Action Actions::Delayed(std::function<bool()> while_callback, Action ac
 	);
 }
 
-Actions::Action Actions::Delayed(bool& while_flag, Action action)
+Action Actions::Delayed(bool& while_flag, Action action)
 {
 	return Sequence(
 		Wait(while_flag),
@@ -242,7 +241,7 @@ Actions::Action Actions::Delayed(bool& while_flag, Action action)
 	);
 }
 
-Actions::Action Actions::Breakable(float duration, Action action)
+Action Actions::Breakable(float duration, Action action)
 {
 	return Race(
 		Wait(duration),
@@ -250,7 +249,7 @@ Actions::Action Actions::Breakable(float duration, Action action)
 	);
 }
 
-Actions::Action Actions::Breakable(std::function<bool()> while_callback, Action action)
+Action Actions::Breakable(std::function<bool()> while_callback, Action action)
 {
 	return Race(
 		Wait(while_callback),
@@ -258,7 +257,7 @@ Actions::Action Actions::Breakable(std::function<bool()> while_callback, Action 
 	);
 }
 
-Actions::Action Actions::Pausable(std::function<bool()> run_callback, Action action)
+Action Actions::Pausable(std::function<bool()> run_callback, Action action)
 {
 	auto player = std::make_shared<ActionsPlayer>();
 	player->add(std::move(action));
@@ -276,7 +275,7 @@ Actions::Action Actions::Pausable(std::function<bool()> run_callback, Action act
 	});
 }
 
-Actions::Action Actions::Log(const std::string& text)
+Action Actions::Log(const std::string& text)
 {
 	return Execute([text] {
 		sky::Log(text);

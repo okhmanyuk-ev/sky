@@ -35,7 +35,7 @@ void ImScene::destroyCallback(std::function<void()> func)
 	mNodeItems.at(mLastSpawnedKey).destroy_func = func;
 }
 
-void ImScene::destroyAction(sky::Actions::Action action)
+void ImScene::destroyAction(sky::Action action)
 {
 	auto make_shared_function = [](auto f) {
 		return [pf = std::make_shared<std::decay_t<decltype(f)>>(std::forward<decltype(f)>(f))] (auto&&...args)->decltype(auto) {

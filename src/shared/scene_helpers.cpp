@@ -618,11 +618,11 @@ void SceneHelpers::StandardScreen::onWindowDisappearingEnd()
 	setInteractions(true);
 }
 
-sky::Actions::Action SceneHelpers::StandardScreen::createEnterAction()
+sky::Action SceneHelpers::StandardScreen::createEnterAction()
 {
 	const float Duration = 0.25f;
 
-	std::list<sky::Actions::Action> actions;
+	std::list<sky::Action> actions;
 
 	if (mEffects.contains(Effect::Alpha))
 	{
@@ -645,11 +645,11 @@ sky::Actions::Action SceneHelpers::StandardScreen::createEnterAction()
 	);
 };
 
-sky::Actions::Action SceneHelpers::StandardScreen::createLeaveAction()
+sky::Action SceneHelpers::StandardScreen::createLeaveAction()
 {
 	const float Duration = 0.25f;
 
-	std::list<sky::Actions::Action> actions;
+	std::list<sky::Action> actions;
 
 	if (mEffects.contains(Effect::Alpha))
 	{
@@ -755,11 +755,11 @@ void SceneHelpers::StandardWindow::onCloseBegin()
 	mContentHolder->setRenderLayerEnabled(true);
 }
 
-sky::Actions::Action SceneHelpers::StandardWindow::createOpenAction()
+sky::Action SceneHelpers::StandardWindow::createOpenAction()
 {
 	const float Duration = 0.5f;
 
-	std::list<sky::Actions::Action> actions;
+	std::list<sky::Action> actions;
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Fade))
 	{
@@ -803,11 +803,11 @@ sky::Actions::Action SceneHelpers::StandardWindow::createOpenAction()
 	);
 };
 
-sky::Actions::Action SceneHelpers::StandardWindow::createCloseAction()
+sky::Action SceneHelpers::StandardWindow::createCloseAction()
 {
 	const float Duration = 0.5f;
 
-	std::list<sky::Actions::Action> actions;
+	std::list<sky::Action> actions;
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Fade))
 	{

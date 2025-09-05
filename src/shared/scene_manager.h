@@ -74,8 +74,8 @@ namespace Shared
 		virtual void onWindowDisappearingEnd() { }
 
 	public:
-		virtual sky::Actions::Action createEnterAction() = 0;
-		virtual sky::Actions::Action createLeaveAction() = 0;
+		virtual sky::Action createEnterAction() = 0;
+		virtual sky::Action createLeaveAction() = 0;
 	};
 
 	class SceneManager::Window : public Scene::Node
@@ -104,7 +104,7 @@ namespace Shared
 		virtual void onCloseEnd() { }
 
 	public:
-		virtual sky::Actions::Action createOpenAction() = 0;
-		virtual sky::Actions::Action createCloseAction() = 0;
+		virtual sky::Action createOpenAction() = 0;
+		virtual sky::Action createCloseAction() = 0;
 	};
 }

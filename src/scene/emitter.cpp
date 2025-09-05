@@ -9,7 +9,7 @@ using namespace Scene;
 
 Emitter::Emitter()
 {
-	runAction(sky::Actions::RepeatInfinite([this]()->std::optional<sky::Actions::Action> {
+	runAction(sky::Actions::RepeatInfinite([this]()->std::optional<sky::Action> {
 		if (!mRunning)
 			return std::nullopt;
 

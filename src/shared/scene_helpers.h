@@ -424,8 +424,8 @@ namespace Shared::SceneHelpers
 		void onWindowDisappearingEnd() override;
 
 	protected:
-		sky::Actions::Action createEnterAction() override;
-		sky::Actions::Action createLeaveAction() override;
+		sky::Action createEnterAction() override;
+		sky::Action createLeaveAction() override;
 
 	public:
 		auto getContent() const { return mContent; }
@@ -468,8 +468,8 @@ namespace Shared::SceneHelpers
 		void onCloseBegin() override;
 
 	public:
-		sky::Actions::Action createOpenAction() override;
-		sky::Actions::Action createCloseAction() override;
+		sky::Action createOpenAction() override;
+		sky::Action createCloseAction() override;
 
 	public:
 		auto getContent() { return mContent; }
