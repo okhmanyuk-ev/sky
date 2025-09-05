@@ -54,7 +54,7 @@ namespace Shared
 
 		bool isFirstCall() const { return mFirstCall; }
 		void destroyCallback(std::function<void()> func);
-		void destroyAction(std::unique_ptr<sky::Actions::Action> action);
+		void destroyAction(sky::Actions::Action action);
 		void dontKill();
 		void dontKillWhileHaveChilds();
 		void showAndHideWithScale();

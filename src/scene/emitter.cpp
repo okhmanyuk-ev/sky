@@ -9,9 +9,9 @@ using namespace Scene;
 
 Emitter::Emitter()
 {
-	runAction(sky::Actions::RepeatInfinite([this]()->std::unique_ptr<sky::Actions::Action> {
+	runAction(sky::Actions::RepeatInfinite([this]()->std::optional<sky::Actions::Action> {
 		if (!mRunning)
-			return nullptr;
+			return std::nullopt;
 
 		auto delay = glm::linearRand(mMinDelay, mMaxDelay);
 		return sky::Actions::Delayed(delay, sky::Actions::Execute([this] {

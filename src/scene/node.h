@@ -131,7 +131,7 @@ namespace Scene
 		glm::vec2 mAbsoluteScale = { 1.0f, 1.0f };
 
 	public:
-		void runAction(std::unique_ptr<sky::Actions::Action> action) { mActions.add(std::move(action)); }
+		void runAction(sky::Actions::Action action) { mActions.add(std::move(action)); }
 		void clearActions() { mActions.clear(); }
 		bool hasActions() const { return mActions.hasActions(); }
 

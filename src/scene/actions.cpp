@@ -3,7 +3,7 @@
 
 using namespace sky;
 
-std::unique_ptr<Actions::Action> Actions::ChangePositionByDirection(std::shared_ptr<Scene::Transform> node, const glm::vec2& direction, float speed)
+Actions::Action Actions::ChangePositionByDirection(std::shared_ptr<Scene::Transform> node, const glm::vec2& direction, float speed)
 {
 	return ExecuteInfinite([node, direction, speed](auto delta) {
 		auto dTime = sky::ToSeconds(delta);
@@ -11,12 +11,12 @@ std::unique_ptr<Actions::Action> Actions::ChangePositionByDirection(std::shared_
 	});
 }
 
-std::unique_ptr<Actions::Action> Actions::ChangePositionByDirection(std::shared_ptr<Scene::Transform> node, const glm::vec2& direction, float speed, float duration)
+Actions::Action Actions::ChangePositionByDirection(std::shared_ptr<Scene::Transform> node, const glm::vec2& direction, float speed, float duration)
 {
 	return Breakable(duration, ChangePositionByDirection(node, direction, speed));
 }
 
-std::unique_ptr<Actions::Action> Actions::ChangeColorRecursive(std::shared_ptr<Scene::Node> node, const glm::vec4& start,
+Actions::Action Actions::ChangeColorRecursive(std::shared_ptr<Scene::Node> node, const glm::vec4& start,
 	const glm::vec4& dest, float duration, EasingFunction easingFunction)
 {
 	return Interpolate(start, dest, duration, easingFunction, [node](const glm::vec4& value) {
@@ -24,20 +24,20 @@ std::unique_ptr<Actions::Action> Actions::ChangeColorRecursive(std::shared_ptr<S
 	});
 }
 
-std::unique_ptr<Actions::Action> Actions::Hide(std::shared_ptr<Scene::Color> node, float duration, EasingFunction easingFunction)
+Actions::Action Actions::Hide(std::shared_ptr<Scene::Color> node, float duration, EasingFunction easingFunction)
 {
 	return ChangeAlpha(node, 0.0f, duration, easingFunction);
 }
 
-std::unique_ptr<Actions::Action> Actions::Show(std::shared_ptr<Scene::Color> node, float duration, EasingFunction easingFunction)
+Actions::Action Actions::Show(std::shared_ptr<Scene::Color> node, float duration, EasingFunction easingFunction)
 {
 	return ChangeAlpha(node, 1.0f, duration, easingFunction);
 }
 
-std::unique_ptr<Actions::Action> Actions::HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
+Actions::Action Actions::HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
 	EasingFunction easingFunction)
 {
-	std::list<std::unique_ptr<Actions::Action>> actions;
+	std::list<Actions::Action> actions;
 	std::function<void(std::shared_ptr<Scene::Node> node)> recursive_fill_func;
 	recursive_fill_func = [&](std::shared_ptr<Scene::Node> node){
 		for (auto child : node->getNodes())
@@ -56,7 +56,7 @@ std::unique_ptr<Actions::Action> Actions::HideRecursive(std::shared_ptr<Scene::N
 	return Actions::Parallel(std::move(actions));
 }
 
-std::unique_ptr<Actions::Action> Actions::Kill(std::shared_ptr<Scene::Node> node)
+Actions::Action Actions::Kill(std::shared_ptr<Scene::Node> node)
 {
 	return Execute([node] {
 		sky::Schedule(sky::ScheduleBehavior::Once, [node] {

@@ -424,8 +424,8 @@ namespace Shared::SceneHelpers
 		void onWindowDisappearingEnd() override;
 
 	protected:
-		std::unique_ptr<sky::Actions::Action> createEnterAction() override;
-		std::unique_ptr<sky::Actions::Action> createLeaveAction() override;
+		sky::Actions::Action createEnterAction() override;
+		sky::Actions::Action createLeaveAction() override;
 
 	public:
 		auto getContent() const { return mContent; }
@@ -468,8 +468,8 @@ namespace Shared::SceneHelpers
 		void onCloseBegin() override;
 
 	public:
-		std::unique_ptr<sky::Actions::Action> createOpenAction() override;
-		std::unique_ptr<sky::Actions::Action> createCloseAction() override;
+		sky::Actions::Action createOpenAction() override;
+		sky::Actions::Action createCloseAction() override;
 
 	public:
 		auto getContent() { return mContent; }

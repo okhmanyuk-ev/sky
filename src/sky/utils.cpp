@@ -139,7 +139,7 @@ void sky::Schedule(sky::Scheduler::StatusCallback callback)
 	SCHEDULER->add(std::move(callback));
 }
 
-void sky::Schedule(std::unique_ptr<Actions::Action> action)
+void sky::Schedule(Actions::Action action)
 {
 	auto player = std::make_shared<Actions::ActionsPlayer>();
 	player->add(std::move(action));

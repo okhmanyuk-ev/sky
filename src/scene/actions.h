@@ -134,25 +134,25 @@ namespace sky::Actions
 	constexpr InterpolateWrapper<Scene::BlurIntensityProperty> ChangeBlurIntensity;
 	constexpr InterpolateWrapper<Scene::GrayscaleIntensityProperty> ChangeGrayscaleIntensity;
 
-	std::unique_ptr<Action> ChangePositionByDirection(std::shared_ptr<Scene::Transform> node,
+	Action ChangePositionByDirection(std::shared_ptr<Scene::Transform> node,
 		const glm::vec2& direction, float speed);
-	std::unique_ptr<Action> ChangePositionByDirection(std::shared_ptr<Scene::Transform> node,
+	Action ChangePositionByDirection(std::shared_ptr<Scene::Transform> node,
 		const glm::vec2& direction, float speed, float duration);
 
-	std::unique_ptr<Action> ChangeColorRecursive(std::shared_ptr<Scene::Node> node, const glm::vec4& start,
+	Action ChangeColorRecursive(std::shared_ptr<Scene::Node> node, const glm::vec4& start,
 		const glm::vec4& dest, float duration, EasingFunction easingFunction = Easing::Linear);
 
-	std::unique_ptr<Action> Hide(std::shared_ptr<Scene::Color> node, float duration,
+	Action Hide(std::shared_ptr<Scene::Color> node, float duration,
 		EasingFunction easingFunction = Easing::Linear);
-	std::unique_ptr<Action> Show(std::shared_ptr<Scene::Color> node, float duration,
+	Action Show(std::shared_ptr<Scene::Color> node, float duration,
 		EasingFunction easingFunction = Easing::Linear);
 
-	std::unique_ptr<Action> HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
+	Action HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
 		EasingFunction easingFunction = Easing::Linear);
 
 	template<Property T = Scene::OriginProperty>
 		requires std::same_as<typename T::Type, glm::vec2>
-	std::unique_ptr<Action> Shake(typename T::Object object, float radius, float duration, glm::vec2 base_value = { 0.0f, 0.0f })
+	Action Shake(typename T::Object object, float radius, float duration, glm::vec2 base_value = { 0.0f, 0.0f })
 	{
 		return Sequence(
 			Interpolate(1.0f, 0.0f, duration, Easing::Linear, [object, radius, base_value](float value) {
@@ -165,5 +165,5 @@ namespace sky::Actions
 		);
 	}
 
-	std::unique_ptr<Action> Kill(std::shared_ptr<Scene::Node> node);
+	Action Kill(std::shared_ptr<Scene::Node> node);
 }

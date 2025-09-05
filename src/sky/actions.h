@@ -37,58 +37,58 @@ namespace sky::Actions
 	{
 	public:
 		void update(sky::Duration delta);
-		void add(std::unique_ptr<Action> action);
+		void add(Action action);
 		void clear();
 		bool hasActions() const;
 
 	private:
-		std::list<std::unique_ptr<Action>> mActions;
+		std::list<Action> mActions;
 	};
 
-	std::unique_ptr<Action> Sequence(std::list<std::unique_ptr<Action>> actions);
-	std::unique_ptr<Action> Parallel(std::list<std::unique_ptr<Action>> actions);
-	std::unique_ptr<Action> Race(std::list<std::unique_ptr<Action>> actions);
-	std::unique_ptr<Action> Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback);
-	std::unique_ptr<Action> Insert(std::function<std::unique_ptr<Action>()> action);
-	std::unique_ptr<Action> RepeatInfinite(std::function<std::unique_ptr<Action>()> action);
+	Action Sequence(std::list<Action> actions);
+	Action Parallel(std::list<Action> actions);
+	Action Race(std::list<Action> actions);
+	Action Repeat(std::function<std::tuple<Action::Status, std::optional<Action>>()> callback);
+	Action Insert(std::function<Action()> action);
+	Action RepeatInfinite(std::function<std::optional<Action>()> action);
 
-	std::unique_ptr<Action> Execute(std::function<void()> callback);
-	std::unique_ptr<Action> ExecuteInfinite(std::function<void(sky::Duration delta)> callback);
-	std::unique_ptr<Action> ExecuteInfinite(std::function<void()> callback);
-	std::unique_ptr<Action> ExecuteInfiniteGlobal(std::function<void()> callback);
+	Action Execute(std::function<void()> callback);
+	Action ExecuteInfinite(std::function<void(sky::Duration delta)> callback);
+	Action ExecuteInfinite(std::function<void()> callback);
+	Action ExecuteInfiniteGlobal(std::function<void()> callback);
 
-	std::unique_ptr<Action> Wait();
-	std::unique_ptr<Action> Wait(float duration);
-
-	// will wait while returning true
-	std::unique_ptr<Action> Wait(std::function<bool(sky::Duration delta)> while_callback);
-	std::unique_ptr<Action> Wait(std::function<bool()> while_callback);
-
-	// will wait while flag is true
-	std::unique_ptr<Action> Wait(bool& while_flag);
-	std::unique_ptr<Action> WaitGlobalFrame();
-
-	std::unique_ptr<Action> Delayed(float duration, std::unique_ptr<Action> action);
+	Action Wait();
+	Action Wait(float duration);
 
 	// will wait while returning true
-	std::unique_ptr<Action> Delayed(std::function<bool()> while_callback, std::unique_ptr<Action> action);
+	Action Wait(std::function<bool(sky::Duration delta)> while_callback);
+	Action Wait(std::function<bool()> while_callback);
 
 	// will wait while flag is true
-	std::unique_ptr<Action> Delayed(bool& while_flag, std::unique_ptr<Action> action);
+	Action Wait(bool& while_flag);
+	Action WaitGlobalFrame();
 
-	std::unique_ptr<Action> Breakable(float duration, std::unique_ptr<Action> action);
-	std::unique_ptr<Action> Breakable(std::function<bool()> while_callback, std::unique_ptr<Action> action);
+	Action Delayed(float duration, Action action);
 
-	std::unique_ptr<Action> Pausable(std::function<bool()> run_callback, std::unique_ptr<Action> action);
-	std::unique_ptr<Action> Log(const std::string& text);
+	// will wait while returning true
+	Action Delayed(std::function<bool()> while_callback, Action action);
+
+	// will wait while flag is true
+	Action Delayed(bool& while_flag, Action action);
+
+	Action Breakable(float duration, Action action);
+	Action Breakable(std::function<bool()> while_callback, Action action);
+
+	Action Pausable(std::function<bool()> run_callback, Action action);
+	Action Log(const std::string& text);
 
 	using EasingFunction = std::function<float(float)>;
 
 	template <typename T, typename Func>
 		requires std::is_invocable_r_v<void, Func, T>
-	std::unique_ptr<Action> Interpolate(T start, T dest, float duration, EasingFunction easing, Func callback)
+	Action Interpolate(T start, T dest, float duration, EasingFunction easing, Func callback)
 	{
-		return std::make_unique<Action>([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
+		return Action([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
 			passed += sky::ToSeconds(delta);
 			if (passed >= duration)
 			{
@@ -109,7 +109,7 @@ namespace sky::Actions
 	};
 
 	template <Property T>
-	std::unique_ptr<Action> Interpolate(typename T::Object object, const typename T::Type& start, const typename T::Type& dest,
+	Action Interpolate(typename T::Object object, const typename T::Type& start, const typename T::Type& dest,
 		float duration, EasingFunction easing = Easing::Linear)
 	{
 		return Interpolate(start, dest, duration, easing, [object](const auto& value) {
@@ -118,7 +118,7 @@ namespace sky::Actions
 	}
 
 	template <Property T>
-	std::unique_ptr<Action> Interpolate(typename T::Object object, const typename T::Type& dest, float duration,
+	Action Interpolate(typename T::Object object, const typename T::Type& dest, float duration,
 		EasingFunction easing = Easing::Linear)
 	{
 		return Insert([object, dest, duration, easing] {
@@ -127,7 +127,7 @@ namespace sky::Actions
 	}
 
 	template <typename T>
-	std::unique_ptr<Action> Interpolate(T start, T dest, float duration, T& value, EasingFunction easing = Easing::Linear)
+	Action Interpolate(T start, T dest, float duration, T& value, EasingFunction easing = Easing::Linear)
 	{
 		return Interpolate(start, dest, duration, easing, [&value](T _value) {
 			value = _value;
@@ -135,7 +135,7 @@ namespace sky::Actions
 	}
 
 	template <typename T>
-	std::unique_ptr<Action> Interpolate(T dest, float duration, T& value, EasingFunction easing = Easing::Linear)
+	Action Interpolate(T dest, float duration, T& value, EasingFunction easing = Easing::Linear)
 	{
 		return Insert([dest, duration, &value, easing] {
 			return Interpolate(value, dest, duration, value, easing);
@@ -143,31 +143,31 @@ namespace sky::Actions
 	}
 
 	template <typename...Args>
-	std::unique_ptr<Action> Sequence(Args&&...args)
+	Action Sequence(Args&&...args)
 	{
-		std::list<std::unique_ptr<Action>> actions;
+		std::list<Action> actions;
 		(actions.push_back(std::forward<Args>(args)), ...);
 		return Sequence(std::move(actions));
 	}
 
 	template <typename...Args>
-	std::unique_ptr<Action> Parallel(Args&&...args)
+	Action Parallel(Args&&...args)
 	{
-		std::list<std::unique_ptr<Action>> actions;
+		std::list<Action> actions;
 		(actions.push_back(std::forward<Args>(args)), ...);
 		return Parallel(std::move(actions));
 	}
 
 	template <typename...Args>
-	std::unique_ptr<Action> Race(Args&&...args)
+	Action Race(Args&&...args)
 	{
-		std::list<std::unique_ptr<Action>> actions;
+		std::list<Action> actions;
 		(actions.push_back(std::forward<Args>(args)), ...);
 		return Race(std::move(actions));
 	}
 
 	template <typename T>
-	std::unique_ptr<Action> WaitEvent(typename sky::Listener<T>::Callback onEvent)
+	Action WaitEvent(typename sky::Listener<T>::Callback onEvent)
 	{
 		auto event_holder = std::make_shared<std::optional<T>>();
 
