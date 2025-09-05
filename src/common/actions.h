@@ -23,9 +23,22 @@ namespace Actions
 			Finished
 		};
 
+		using StatusCallback = std::move_only_function<Status(sky::Duration)>;
+		using Callback = std::move_only_function<void(sky::Duration)>;
+
+		enum class Type
+		{
+			One,
+			Infinity
+		};
+
 	public:
-		virtual ~Action() = default;
-		virtual Status frame(sky::Duration delta) = 0;
+		Action(StatusCallback callback);
+		Action(Type type, Callback callback);
+		Status frame(sky::Duration delta);
+
+	private:
+		StatusCallback mCallback = nullptr;
 	};
 
 	class ActionsPlayer
@@ -38,30 +51,6 @@ namespace Actions
 
 	private:
 		std::list<std::unique_ptr<Action>> mActions;
-	};
-
-	class Generic : public Action
-	{
-	public:
-		using StatusCallback = std::move_only_function<Status(sky::Duration)>;
-		using Callback = std::move_only_function<void(sky::Duration)>;
-
-	public:
-		enum class Type
-		{
-			One,
-			Infinity
-		};
-
-	public:
-		Generic(StatusCallback callback);
-		Generic(Type type, Callback callback);
-
-	private:
-		Status frame(sky::Duration delta) override;
-
-	private:
-		StatusCallback mCallback = nullptr;
 	};
 
 	namespace Collection
@@ -109,7 +98,7 @@ namespace Actions
 			requires std::is_invocable_r_v<void, Func, T>
 		std::unique_ptr<Action> Interpolate(T start, T dest, float duration, EasingFunction easing, Func callback)
 		{
-			return std::make_unique<Generic>([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
+			return std::make_unique<Action>([start, dest, duration, easing, callback, passed = 0.0f](auto delta) mutable {
 				passed += sky::ToSeconds(delta);
 				if (passed >= duration)
 				{
@@ -200,7 +189,7 @@ namespace Actions
 				*event_holder = e;
 			});
 
-			return std::make_unique<Actions::Generic>([event_holder, listener, onEvent](auto delta) {
+			return std::make_unique<Actions::Action>([event_holder, listener, onEvent](auto delta) {
 				if (!event_holder->has_value())
 					return Actions::Action::Status::Continue;
 

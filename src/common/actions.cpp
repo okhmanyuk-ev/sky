@@ -4,6 +4,26 @@
 
 using namespace Actions;
 
+Action::Action(StatusCallback callback) : mCallback(std::move(callback))
+{
+}
+
+Action::Action(Type type, Callback callback)
+{
+	mCallback = [type, callback = std::move(callback)](auto delta) mutable {
+		if (callback)
+			callback(delta);
+
+		return type == Type::One ? Status::Finished : Status::Continue;
+	};
+}
+
+Action::Status Action::frame(sky::Duration delta)
+{
+	assert(mCallback);
+	return mCallback(delta);
+}
+
 void ActionsPlayer::update(sky::Duration delta)
 {
 	auto it = mActions.begin();
@@ -35,29 +55,9 @@ bool ActionsPlayer::hasActions() const
 	return !mActions.empty();
 }
 
-Generic::Generic(StatusCallback callback) : mCallback(std::move(callback))
-{
-}
-
-Generic::Generic(Type type, Callback callback)
-{
-	mCallback = [type, callback = std::move(callback)](auto delta) mutable {
-		if (callback)
-			callback(delta);
-
-		return type == Type::One ? Status::Finished : Status::Continue;
-	};
-}
-
-Action::Status Generic::frame(sky::Duration delta)
-{
-	assert(mCallback);
-	return mCallback(delta);
-}
-
 std::unique_ptr<Action> Collection::Sequence(std::list<std::unique_ptr<Action>> actions)
 {
-	return std::make_unique<Generic>([actions = std::move(actions)] (auto delta) mutable {
+	return std::make_unique<Action>([actions = std::move(actions)] (auto delta) mutable {
 		if (actions.empty())
 			return Action::Status::Finished;
 
@@ -72,7 +72,7 @@ std::unique_ptr<Action> Collection::Sequence(std::list<std::unique_ptr<Action>> 
 
 std::unique_ptr<Action> Collection::Parallel(std::list<std::unique_ptr<Action>> actions)
 {
-	return std::make_unique<Generic>([actions = std::move(actions)](auto delta) mutable {
+	return std::make_unique<Action>([actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
 		while (it != actions.end())
 		{
@@ -95,7 +95,7 @@ std::unique_ptr<Action> Collection::Parallel(std::list<std::unique_ptr<Action>> 
 
 std::unique_ptr<Action> Collection::Race(std::list<std::unique_ptr<Action>> actions)
 {
-	return std::make_unique<Generic>([actions = std::move(actions)](auto delta) mutable {
+	return std::make_unique<Action>([actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();
 		while (it != actions.end())
 		{
@@ -118,7 +118,7 @@ std::unique_ptr<Action> Collection::Race(std::list<std::unique_ptr<Action>> acti
 
 std::unique_ptr<Action> Collection::Repeat(std::function<std::tuple<Action::Status, std::unique_ptr<Action>>()> callback)
 {
-	return std::make_unique<Generic>([callback,
+	return std::make_unique<Action>([callback,
 		_status = std::optional<Action::Status>{ std::nullopt },
 		_action = std::unique_ptr<Action>{ nullptr }
 	] (auto delta) mutable {
@@ -157,7 +157,7 @@ std::unique_ptr<Action> Collection::RepeatInfinite(std::function<std::unique_ptr
 
 std::unique_ptr<Action> Collection::Execute(std::function<void()> callback)
 {
-	return std::make_unique<Generic>(Generic::Type::One, [callback](auto delta) {
+	return std::make_unique<Action>(Action::Type::One, [callback](auto delta) {
 		if (callback)
 			callback();
 	});
@@ -165,7 +165,7 @@ std::unique_ptr<Action> Collection::Execute(std::function<void()> callback)
 
 std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
 {
-	return std::make_unique<Generic>(Generic::Type::Infinity, callback);
+	return std::make_unique<Action>(Action::Type::Infinity, callback);
 }
 
 std::unique_ptr<Action> Collection::ExecuteInfinite(std::function<void()> callback)
@@ -206,7 +206,7 @@ std::unique_ptr<Action> Collection::Wait(float duration)
 
 std::unique_ptr<Action> Collection::Wait(std::function<bool(sky::Duration delta)> while_callback)
 {
-	return std::make_unique<Generic>([while_callback](auto delta) {
+	return std::make_unique<Action>([while_callback](auto delta) {
 		if (while_callback(delta))
 			return Action::Status::Continue;
 
@@ -282,7 +282,7 @@ std::unique_ptr<Action> Collection::Pausable(std::function<bool()> run_callback,
 	auto player = std::make_shared<ActionsPlayer>();
 	player->add(std::move(action));
 
-	return std::make_unique<Generic>([run_callback, player](auto delta) {
+	return std::make_unique<Action>([run_callback, player](auto delta) {
 		if (!run_callback())
 			return Action::Status::Continue;
 
