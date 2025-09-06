@@ -20,7 +20,7 @@ namespace sky
 		Finished
 	};
 
-	using Action = std::move_only_function<ActionResult(sky::Duration)>;
+	using Action = std::function<ActionResult(sky::Duration)>;
 
 	class ActionsPlayer
 	{
