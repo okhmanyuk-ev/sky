@@ -107,7 +107,7 @@ Action Actions::Repeat(std::function<std::tuple<ActionResult, std::optional<Acti
 	};
 }
 
-Action Actions::Insert(std::function<Action()> action)
+Action Actions::Insert(std::function<std::optional<Action>()> action)
 {
 	return Repeat([action]() -> std::tuple<ActionResult, std::optional<Action>> {
 		return { ActionResult::Finished, action() };
