@@ -40,7 +40,7 @@ namespace sky
 		Action Parallel(std::list<Action> actions);
 		Action Race(std::list<Action> actions);
 		Action Repeat(std::function<std::tuple<ActionResult, std::optional<Action>>()> callback);
-		Action Insert(std::function<Action()> action);
+		Action Insert(std::function<std::optional<Action>()> action);
 		Action RepeatInfinite(std::function<std::optional<Action>()> action);
 
 		Action Execute(std::function<void()> callback);
