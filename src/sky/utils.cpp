@@ -134,9 +134,9 @@ void sky::OpenUrl(const std::string& url)
 #endif
 }
 
-void sky::Schedule(sky::Scheduler::StatusCallback callback)
+void sky::Schedule(Scheduler::Task task)
 {
-	sky::Scheduler::Instance->add(std::move(callback));
+	sky::Scheduler::Instance->add(std::move(task));
 }
 
 void sky::Schedule(Action action)

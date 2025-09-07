@@ -4,9 +4,9 @@
 
 using namespace sky;
 
-void Scheduler::add(StatusCallback callback)
+void Scheduler::add(Task task)
 {
-	mFramers.push_back(callback);
+	mTasks.push_back(std::move(task));
 }
 
 void Scheduler::frame()
@@ -44,12 +44,12 @@ void Scheduler::frame()
 
 	mUptime += mTimeDelta;
 
-	auto it = mFramers.begin();
-	while (it != mFramers.end())
+	auto it = mTasks.begin();
+	while (it != mTasks.end())
 	{
 		if ((*it)() == Status::Continue)
 			++it;
 		else
-			it = mFramers.erase(it);
+			it = mTasks.erase(it);
 	}
 }

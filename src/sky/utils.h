@@ -55,7 +55,7 @@ namespace sky
 
 	void OpenUrl(const std::string& url);
 
-	void Schedule(sky::Scheduler::StatusCallback callback);
+	void Schedule(Scheduler::Task task);
 	void Schedule(Action action);
 
 	enum class ScheduleBehavior

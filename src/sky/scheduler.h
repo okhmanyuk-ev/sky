@@ -14,21 +14,17 @@ namespace sky
 	public:
 		static constexpr Locator<Scheduler>::Accessor Instance;
 
-	public:
 		enum class Status
 		{
 			Finished,
 			Continue
 		};
 
-	public:
-		using StatusCallback = std::function<Status()>;
+		using Task = std::function<Status()>;
 
 	public:
 		void frame();
-
-	public:
-		void add(StatusCallback callback);
+		void add(Task task);
 
 	public:
 		int getFramerateLimit() const { return mFramerateLimit; }
@@ -43,7 +39,7 @@ namespace sky
 		void setTimeScale(float value) { mTimeScale = value; }
 
 		auto getFramerate() const { return 1.0f / sky::ToSeconds(mTimeDelta) * mTimeScale; } // frame count per second
-		auto getFramerCount() const { return mFramers.size(); }
+		auto getTasksCount() const { return mTasks.size(); }
 
 		auto getUptime() const { return mUptime; }
 		auto getFrameCount() { return mFrameCount; }
@@ -54,7 +50,7 @@ namespace sky
 		auto isChoked() const { return mChoked; }
 
 	private:
-		std::list<StatusCallback> mFramers;
+		std::list<Task> mTasks;
 		sky::CVar<int> mFramerateLimit = sky::CVar<int>("sys_framerate", 0, "limit of fps");
 		sky::CVar<bool> mSleepAllowed = sky::CVar<bool>("sys_sleep", true, "cpu saving between frames");
 		sky::CVar<float> mTimeScale = sky::CVar<float>("sys_timescale", 1.0f, "time delta multiplier");
