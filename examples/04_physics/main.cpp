@@ -79,7 +79,7 @@ void sky_main()
 		);
 	})));
 
-	auto framer = sky::Scheduler::Framer([spawnBox, spawnBall]{
+	sky::Scheduler::Instance->add([spawnBox, spawnBall] {
 		ImGui::Begin("Options", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel);
 		ImGui::SetWindowPos(ImGui::User::TopRightCorner());
 
@@ -135,6 +135,8 @@ void sky_main()
 		}
 
 		ImGui::End();
+
+		return sky::Scheduler::Status::Continue;
 	});
 
 	app.run();
