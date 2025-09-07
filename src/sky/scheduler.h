@@ -64,9 +64,9 @@ namespace sky
 	class Scheduler::Task
 	{
 	public:
-		Task(std::initializer_list<Task> tasks)
+		Task(std::list<Task> tasks)
 		{
-			mFunc = [tasks = std::list<Task>(std::move(tasks))]() mutable {
+			mFunc = [tasks = std::move(tasks)]() mutable {
 				if (tasks.empty())
 					return Status::Finished;
 
@@ -76,6 +76,10 @@ namespace sky
 				tasks.pop_front();
 				return tasks.empty() ? Status::Finished : Status::Continue;
 			};
+		}
+
+		Task(std::initializer_list<Task> tasks) : Task(std::list<Task>(tasks))
+		{
 		}
 
 		template <typename Func>
