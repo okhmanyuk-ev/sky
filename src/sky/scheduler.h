@@ -22,7 +22,6 @@ namespace sky
 		};
 
 	public:
-		using Callback = std::function<void()>;
 		using StatusCallback = std::function<Status()>;
 
 	public:
