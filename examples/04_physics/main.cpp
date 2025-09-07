@@ -79,7 +79,7 @@ void sky_main()
 		);
 	})));
 
-	sky::Scheduler::Instance->add([spawnBox, spawnBall] {
+	sky::Scheduler::Instance->run([spawnBox, spawnBall] {
 		ImGui::Begin("Options", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel);
 		ImGui::SetWindowPos(ImGui::User::TopRightCorner());
 

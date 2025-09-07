@@ -5,7 +5,7 @@ using namespace sky;
 
 Updatable::Updatable()
 {
-	Scheduler::Instance->add([this, finished = mFinished] {
+	Scheduler::Instance->run([this, finished = mFinished] {
 		if (*finished)
 			return Scheduler::Status::Finished;
 

@@ -24,7 +24,7 @@ namespace sky
 
 	public:
 		void frame();
-		void add(Task task);
+		void run(Task task);
 
 	public:
 		int getFramerateLimit() const { return mFramerateLimit; }

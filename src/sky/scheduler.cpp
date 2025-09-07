@@ -4,7 +4,7 @@
 
 using namespace sky;
 
-void Scheduler::add(Task task)
+void Scheduler::run(Task task)
 {
 	mTasks.push_back(std::move(task));
 }
