@@ -1,5 +1,5 @@
 #include "interpolator.h"
-
+#include <sky/scheduler.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 

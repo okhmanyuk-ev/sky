@@ -1,10 +1,12 @@
 #pragma once
 
-#include <sky/scheduler.h>
+#include <sky/updatable.h>
+#include <sky/clock.h>
+#include <functional>
 
 namespace sky
 {
-	class Timer final : public sky::Scheduler::Frameable
+	class Timer final : public sky::Updatable
 	{
 	public:
 		using Callback = std::function<void()>;

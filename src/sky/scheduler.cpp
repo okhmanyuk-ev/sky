@@ -53,19 +53,3 @@ void Scheduler::frame()
 			it = mFramers.erase(it);
 	}
 }
-
-Scheduler::Frameable::Frameable()
-{
-	sky::Scheduler::Instance->add([this, finished = mFinished] {
-		if (*finished)
-			return Status::Finished;
-
-		onFrame();
-		return Status::Continue;
-	});
-}
-
-Scheduler::Frameable::~Frameable()
-{
-	*mFinished = true;
-}

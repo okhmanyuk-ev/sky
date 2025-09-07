@@ -1,11 +1,11 @@
 #pragma once
 
 #include <sky/timer.h>
-#include <sky/scheduler.h>
+#include <sky/updatable.h>
 
 namespace Common
 {
-	class FramerateCounter: public sky::Scheduler::Frameable
+	class FramerateCounter: public sky::Updatable
 	{
 	public:
 		FramerateCounter();

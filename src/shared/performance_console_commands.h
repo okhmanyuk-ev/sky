@@ -1,14 +1,14 @@
 #pragma once
 
-#include <platform/system.h>
-#include <sky/scheduler.h>
-#include <common/framerate_counter.h>
+#include <sky/updatable.h>
 #include <sky/console.h>
+#include <platform/system.h>
+#include <common/framerate_counter.h>
 #include <deque>
 
 namespace Shared
 {
-	class PerformanceConsoleCommands : public sky::Scheduler::Frameable
+	class PerformanceConsoleCommands : public sky::Updatable
 	{
 	private:
 		void onFrame() override;

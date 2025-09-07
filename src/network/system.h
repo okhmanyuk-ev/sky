@@ -42,7 +42,7 @@ namespace Network
 		sky::BitBuffer buf;
 	};
 
-	class System : public sky::Scheduler::Frameable
+	class System : public sky::Updatable
 	{
 		friend Address;
 	public:

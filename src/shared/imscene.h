@@ -8,7 +8,7 @@
 
 namespace Shared
 {
-	class ImScene : public sky::Scheduler::Frameable
+	class ImScene : public sky::Updatable
 	{
 	private:
 		void onFrame() override;

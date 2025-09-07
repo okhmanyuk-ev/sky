@@ -1,12 +1,14 @@
 #pragma once
 
+#include <sky/updatable.h>
+#include <sky/console.h>
+#include <sky/clock.h>
 #include <string>
 #include <unordered_map>
-#include <sky/scheduler.h>
 
 namespace Shared
 {
-	class StatsSystem : public sky::Scheduler::Frameable
+	class StatsSystem : public sky::Updatable
 	{
 	public:
 		enum class Align

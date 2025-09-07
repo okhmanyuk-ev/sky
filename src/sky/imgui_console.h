@@ -3,7 +3,7 @@
 #include <sky/console.h>
 #include <common/interpolator.h>
 #include <sky/dispatcher.h>
-#include <sky/scheduler.h>
+#include <sky/updatable.h>
 #include <sky/timer.h>
 #include <platform/system.h>
 #include <platform/input.h>
@@ -17,7 +17,7 @@
 namespace sky
 {
 	class ImguiConsole : public sky::Console,
-		public sky::Scheduler::Frameable,
+		public sky::Updatable,
 		public sky::Listenable<Platform::Input::Keyboard::Event>,
 		public sky::Listenable<Shared::TouchEmulator::Event>,
 		public sky::Listenable<Platform::System::VirtualKeyboardTextChanged>,

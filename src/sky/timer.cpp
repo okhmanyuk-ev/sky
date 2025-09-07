@@ -1,4 +1,5 @@
 #include "timer.h"
+#include <sky/scheduler.h>
 
 using namespace sky;
 

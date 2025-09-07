@@ -15,9 +15,6 @@ namespace sky
 		static constexpr Locator<Scheduler>::Accessor Instance;
 
 	public:
-		class Frameable;
-
-	public:
 		enum class Status
 		{
 			Finished,
@@ -68,18 +65,5 @@ namespace sky
 		std::optional<sky::Duration> mTimeDeltaLimit; // this can save from animation breaks
 		uint64_t mFrameCount = 0;
 		bool mChoked = false;
-	};
-
-	class Scheduler::Frameable
-	{
-	public:
-		Frameable();
-		~Frameable();
-
-	public:
-		virtual void onFrame() = 0;
-
-	private:
-		std::shared_ptr<bool> mFinished = std::make_shared<bool>(false);
 	};
 }

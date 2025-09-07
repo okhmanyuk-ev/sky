@@ -1,9 +1,10 @@
 #pragma once
 
-#include <sky/scheduler.h>
-#include <platform/system.h>
+#include <sky/updatable.h>
 #include <sky/locator.h>
 #include <sky/color.h>
+#include <sky/console.h>
+#include <platform/system.h>
 #include <graphics/font.h>
 #include <graphics/tex_region.h>
 #include <graphics/effects.h>
@@ -19,7 +20,7 @@
 
 namespace Graphics
 {
-	class System : public sky::Scheduler::Frameable
+	class System : public sky::Updatable
 	{
 	public:
 		struct State;

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <map>
-#include <sky/scheduler.h>
+#include <sky/updatable.h>
 #include <common/bitbuffer.h>
 #include <nlohmann/json.hpp>
+#include <map>
 
 namespace Shared::NetworkingWS
 {
@@ -66,7 +66,7 @@ namespace Shared::NetworkingWS
 	};
 
 #ifndef EMSCRIPTEN
-	class Server : public sky::Scheduler::Frameable
+	class Server : public sky::Updatable
 	{
 	public:
 		Server(uint16_t port);
@@ -88,7 +88,7 @@ namespace Shared::NetworkingWS
 	};
 #endif
 
-	class Client : public sky::Scheduler::Frameable
+	class Client : public sky::Updatable
 	{
 	public:
 		Client(const std::string& url);

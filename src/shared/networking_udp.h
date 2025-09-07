@@ -56,7 +56,7 @@ namespace Shared::NetworkingUDP
 		std::map<uint32_t, ReadCallback> mMessages;
 	};
 
-	class Channel : public sky::Scheduler::Frameable
+	class Channel : public sky::Updatable
 	{
 	public:
 		using ReadCallback = std::function<void(sky::BitBuffer&)>;
@@ -156,7 +156,7 @@ namespace Shared::NetworkingUDP
 	};
 
 	class Client : public Networking,
-		public sky::Scheduler::Frameable
+		public sky::Updatable
 	{
 	public:
 		Client(const Network::Address& server_address);
