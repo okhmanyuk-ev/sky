@@ -69,16 +69,3 @@ Scheduler::Frameable::~Frameable()
 {
 	*mFinished = true;
 }
-
-Scheduler::Framer::Framer(Callback callback) : Frameable(),
-	mCallback(callback)
-{
-}
-
-void Scheduler::Framer::onFrame()
-{
-	if (mCallback == nullptr)
-		return;
-
-	mCallback();
-}

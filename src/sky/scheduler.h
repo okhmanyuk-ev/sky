@@ -16,7 +16,6 @@ namespace sky
 
 	public:
 		class Frameable;
-		class Framer;
 
 	public:
 		enum class Status
@@ -82,20 +81,5 @@ namespace sky
 
 	private:
 		std::shared_ptr<bool> mFinished = std::make_shared<bool>(false);
-	};
-
-	class Scheduler::Framer final : public Frameable
-	{
-	public:
-		Framer(Callback callback = nullptr);
-
-	private:
-		void onFrame() override;
-
-	public:
-		void setCallback(Callback value) { mCallback = value; }
-
-	private:
-		Callback mCallback = nullptr;
 	};
 }
