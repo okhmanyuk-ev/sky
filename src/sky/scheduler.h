@@ -64,23 +64,8 @@ namespace sky
 	class Scheduler::Task
 	{
 	public:
-		Task(std::list<Task> tasks)
-		{
-			mFunc = [tasks = std::move(tasks)]() mutable {
-				if (tasks.empty())
-					return Status::Finished;
-
-				if (tasks.front()() == Status::Continue)
-					return Status::Continue;
-
-				tasks.pop_front();
-				return tasks.empty() ? Status::Finished : Status::Continue;
-			};
-		}
-
-		Task(std::initializer_list<Task> tasks) : Task(std::list<Task>(tasks))
-		{
-		}
+		Task(std::list<Task> tasks);
+		Task(std::initializer_list<Task> tasks);
 
 		template <typename Func>
 			requires std::invocable<Func> &&
@@ -135,10 +120,7 @@ namespace sky
 			};
 		}
 
-		auto operator()()
-		{
-			return mFunc();
-		}
+		Status operator()();
 
 	private:
 		std::function<Status()> mFunc;

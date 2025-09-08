@@ -53,3 +53,26 @@ void Scheduler::frame()
 			it = mTasks.erase(it);
 	}
 }
+
+Scheduler::Task::Task(std::list<Task> tasks)
+{
+	mFunc = [tasks = std::move(tasks)]() mutable {
+		if (tasks.empty())
+			return Status::Finished;
+
+		if (tasks.front()() == Status::Continue)
+			return Status::Continue;
+
+		tasks.pop_front();
+		return tasks.empty() ? Status::Finished : Status::Continue;
+	};
+}
+
+Scheduler::Task::Task(std::initializer_list<Task> tasks) : Task(std::list<Task>(tasks))
+{
+}
+
+Scheduler::Status Scheduler::Task::operator()()
+{
+	return mFunc();
+}
