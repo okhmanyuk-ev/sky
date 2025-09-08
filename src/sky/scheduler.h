@@ -4,6 +4,7 @@
 #include <sky/console.h>
 #include <sky/clock.h>
 #include <functional>
+#include <optional>
 #include <list>
 
 namespace sky
@@ -86,7 +87,10 @@ namespace sky
 		}
 
 		template <typename Func>
-			requires std::invocable<Func> && (std::convertible_to<std::invoke_result_t<Func>, std::tuple<Status, std::optional<Task>>> ||
+			requires std::invocable<Func> &&
+			(!std::same_as<std::invoke_result_t<Func>, void>) &&
+			(!std::same_as<std::invoke_result_t<Func>, Status>) &&
+			(std::convertible_to<std::invoke_result_t<Func>, std::tuple<Status, std::optional<Task>>> ||
 				std::convertible_to<std::invoke_result_t<Func>, std::optional<Task>>)
 		Task(Func&& func)
 		{
