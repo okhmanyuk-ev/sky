@@ -4,6 +4,7 @@
 #include <common/bitbuffer.h>
 #include <nlohmann/json.hpp>
 #include <map>
+#include <list>
 
 namespace Shared::NetworkingWS
 {
