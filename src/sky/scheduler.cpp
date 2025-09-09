@@ -4,11 +4,6 @@
 
 using namespace sky;
 
-void Scheduler::run(Task task)
-{
-	mTasks.push_back(std::move(task));
-}
-
 void Scheduler::frame()
 {
 	mFrameCount += 1;
@@ -44,14 +39,37 @@ void Scheduler::frame()
 
 	mUptime += mTimeDelta;
 
-	auto it = mTasks.begin();
-	while (it != mTasks.end())
 	{
-		if ((*it)() == Status::Continue)
-			++it;
-		else
-			it = mTasks.erase(it);
+		auto it = mTasks.begin();
+		while (it != mTasks.end())
+		{
+			if ((*it)() == Status::Continue)
+				++it;
+			else
+				it = mTasks.erase(it);
+		}
 	}
+	{
+		auto it = mCoroutineTasks.begin();
+		while (it != mCoroutineTasks.end())
+		{
+			it->resume();
+			if (it->is_completed())
+				it = mCoroutineTasks.erase(it);
+			else
+				++it;
+		}
+	}
+}
+
+void Scheduler::run(Task task)
+{
+	mTasks.push_back(std::move(task));
+}
+
+void Scheduler::run(CoroutineTask<>&& task)
+{
+	mCoroutineTasks.push_back(std::move(task));
 }
 
 Scheduler::Task::Task(std::list<Task> tasks)
