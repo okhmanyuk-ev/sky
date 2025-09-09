@@ -5,7 +5,7 @@ using namespace sky;
 
 Updatable::Updatable()
 {
-	Scheduler::Instance->run([](Updatable* self, std::shared_ptr<bool> finished) -> sky::CoroutineTask<> {
+	Scheduler::Instance->run([](Updatable* self, std::shared_ptr<bool> finished) -> sky::Task<> {
 		while (true)
 		{
 			self->onFrame();

@@ -11,7 +11,7 @@
 namespace sky
 {
 	template<typename T = void>
-	struct CoroutineTask
+	struct Task
 	{
 		template<typename Derived>
 		struct PromiseBase
@@ -34,10 +34,10 @@ namespace sky
 				}
 			};
 
-			CoroutineTask<T> get_return_object() noexcept
+			Task<T> get_return_object() noexcept
 			{
 				auto handle = std::coroutine_handle<Derived>::from_promise(*(Derived*)this);
-				auto task = CoroutineTask<T>(handle);
+				auto task = Task<T>(handle);
 				task.coroutine.promise().last = task.coroutine;
 				return task;
 			}
@@ -71,16 +71,16 @@ namespace sky
 		handle_type coroutine;
 
 	public:
-		CoroutineTask() = default;
-		CoroutineTask(handle_type handle) { coroutine = handle; }
-		CoroutineTask(CoroutineTask const& other) = delete;
-		CoroutineTask& operator=(CoroutineTask const& other) = delete;
+		Task() = default;
+		Task(handle_type handle) { coroutine = handle; }
+		Task(Task const& other) = delete;
+		Task& operator=(Task const& other) = delete;
 	
-		CoroutineTask(CoroutineTask&& other) noexcept : coroutine(std::exchange(other.coroutine, nullptr))
+		Task(Task&& other) noexcept : coroutine(std::exchange(other.coroutine, nullptr))
 		{
 		}
 	
-		CoroutineTask& operator=(CoroutineTask&& other)
+		Task& operator=(Task&& other)
 		{
 			if (this != &other)
 			{
@@ -91,7 +91,7 @@ namespace sky
 			return *this;
 		}
 
-		~CoroutineTask()
+		~Task()
 		{
 			if (coroutine)
 				coroutine.destroy();
@@ -153,7 +153,7 @@ namespace sky
 
 	public:
 		void frame();
-		void run(CoroutineTask<>&& task);
+		void run(Task<>&& task);
 
 	public:
 		int getFramerateLimit() const { return mFramerateLimit; }
@@ -168,7 +168,7 @@ namespace sky
 		void setTimeScale(float value) { mTimeScale = value; }
 
 		auto getFramerate() const { return 1.0f / sky::ToSeconds(mTimeDelta) * mTimeScale; } // frame count per second
-		auto getTasksCount() const { return mCoroutineTasks.size(); }
+		auto getTasksCount() const { return mTasks.size(); }
 
 		auto getUptime() const { return mUptime; }
 		auto getFrameCount() { return mFrameCount; }
@@ -179,7 +179,7 @@ namespace sky
 		auto isChoked() const { return mChoked; }
 
 	private:
-		std::list<CoroutineTask<>> mCoroutineTasks;
+		std::list<Task<>> mTasks;
 		sky::CVar<int> mFramerateLimit = sky::CVar<int>("sys_framerate", 0, "limit of fps");
 		sky::CVar<bool> mSleepAllowed = sky::CVar<bool>("sys_sleep", true, "cpu saving between frames");
 		sky::CVar<float> mTimeScale = sky::CVar<float>("sys_timescale", 1.0f, "time delta multiplier");

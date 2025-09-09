@@ -38,18 +38,18 @@ void Scheduler::frame()
 	mLastTime = now;
 	mUptime += mTimeDelta;
 
-	auto it = mCoroutineTasks.begin();
-	while (it != mCoroutineTasks.end())
+	auto it = mTasks.begin();
+	while (it != mTasks.end())
 	{
 		it->resume();
 		if (it->is_completed())
-			it = mCoroutineTasks.erase(it);
+			it = mTasks.erase(it);
 		else
 			++it;
 	}
 }
 
-void Scheduler::run(CoroutineTask<>&& task)
+void Scheduler::run(Task<>&& task)
 {
-	mCoroutineTasks.push_back(std::move(task));
+	mTasks.push_back(std::move(task));
 }

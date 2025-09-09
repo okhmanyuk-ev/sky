@@ -136,7 +136,7 @@ void sky::OpenUrl(const std::string& url)
 
 void sky::Schedule(Action action)
 {
-	sky::Scheduler::Instance->run([](auto action) -> CoroutineTask<> {
+	sky::Scheduler::Instance->run([](auto action) -> Task<> {
 		ActionsPlayer player;
 		player.add(std::move(action));
 		while (player.hasActions())
@@ -149,7 +149,7 @@ void sky::Schedule(Action action)
 
 void sky::Schedule(ScheduleBehavior behavior, std::function<void()> callback)
 {
-	sky::Scheduler::Instance->run([](auto behavior, auto callback) -> CoroutineTask<> {
+	sky::Scheduler::Instance->run([](auto behavior, auto callback) -> Task<> {
 		while (true)
 		{
 			callback();
