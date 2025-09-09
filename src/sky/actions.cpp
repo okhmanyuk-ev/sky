@@ -272,3 +272,19 @@ Action Actions::Log(const std::string& text)
 		sky::Log(text);
 	});
 }
+
+sky::Action Actions::FromTask(std::function<sky::Task<>()> func)
+{
+	auto completed = std::make_shared<bool>(false);
+	return sky::Actions::Sequence(
+		sky::Actions::Execute([func, completed] {
+			sky::Scheduler::Instance->run([](auto func, auto completed) -> sky::Task<> {
+				co_await func();
+				*completed = true;
+			}(func, completed));
+		}),
+		sky::Actions::Wait([completed] {
+			return !*completed;
+		})
+	);
+}

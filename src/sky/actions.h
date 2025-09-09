@@ -73,6 +73,8 @@ namespace sky
 		Action Pausable(std::function<bool()> run_callback, Action action);
 		Action Log(const std::string& text);
 
+		Action FromTask(std::function<Task<>()> func);
+
 		using EasingFunction = std::function<float(float)>;
 
 		template <typename T, typename Func>
