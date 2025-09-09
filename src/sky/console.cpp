@@ -43,9 +43,10 @@ NativeConsole::NativeConsole()
 		{
 			std::string s;
 			std::getline(std::cin, s);
-			sky::Schedule(sky::ScheduleBehavior::Once, [this, s] {
+			sky::Scheduler::Instance->run([](auto s) -> Task<> {
 				sky::Emit(ReadEvent({ s }));
-			});
+				co_return;
+			}(s));
 		}
 	});
 

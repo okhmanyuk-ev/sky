@@ -147,21 +147,6 @@ void sky::Schedule(Action action)
 	}(action));
 }
 
-void sky::Schedule(ScheduleBehavior behavior, std::function<void()> callback)
-{
-	sky::Scheduler::Instance->run([](auto behavior, auto callback) -> Task<> {
-		while (true)
-		{
-			callback();
-
-			if (behavior == ScheduleBehavior::Once)
-				break;
-
-			co_await std::suspend_always{};
-		}
-	}(behavior, callback));
-}
-
 std::string sky::to_string(const std::wstring& wstr)
 {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;

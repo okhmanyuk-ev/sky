@@ -59,9 +59,10 @@ Action Actions::HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
 Action Actions::Kill(std::shared_ptr<Scene::Node> node)
 {
 	return Execute([node] {
-		sky::Schedule(sky::ScheduleBehavior::Once, [node] {
+		sky::Scheduler::Instance->run([](auto node) -> sky::Task<> {
 			if (auto parent = node->getParent(); parent != nullptr)
 				parent->detach(node);
-		});
+			co_return;
+		}(node));
 	});
 }

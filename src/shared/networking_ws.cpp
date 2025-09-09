@@ -476,7 +476,8 @@ void RegularMessaging::Base::send()
 
 RegularMessaging::Client::Client()
 {
-	sky::Schedule(sky::ScheduleBehavior::Once, [this] {
-		send();
-	});
+	sky::Scheduler::Instance->run([](auto self) -> sky::Task<> {
+		self->send();
+		co_return;
+	}(this));
 }
