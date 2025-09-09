@@ -55,7 +55,7 @@ namespace sky
 
 	void OpenUrl(const std::string& url);
 
-	void Schedule(Action action);
+	void RunAction(Action action);
 
 	std::string to_string(const std::wstring& wstr);
 	std::wstring to_wstring(const std::string& str);

@@ -134,7 +134,7 @@ void sky::OpenUrl(const std::string& url)
 #endif
 }
 
-void sky::Schedule(Action action)
+void sky::RunAction(Action action)
 {
 	sky::Scheduler::Instance->run([](auto action) -> Task<> {
 		ActionsPlayer player;
