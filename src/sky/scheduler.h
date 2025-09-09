@@ -145,12 +145,6 @@ namespace sky
 	public:
 		static constexpr Locator<Scheduler>::Accessor Instance;
 
-		enum class Status
-		{
-			Finished,
-			Continue
-		};
-
 	public:
 		void frame();
 		void run(Task<>&& task);
