@@ -134,11 +134,6 @@ void sky::OpenUrl(const std::string& url)
 #endif
 }
 
-void sky::Schedule(Scheduler::Task task)
-{
-	sky::Scheduler::Instance->run(std::move(task));
-}
-
 void sky::Schedule(Action action)
 {
 	sky::Scheduler::Instance->run([](auto action) -> CoroutineTask<> {

@@ -151,11 +151,8 @@ namespace sky
 			Continue
 		};
 
-		class Task;
-
 	public:
 		void frame();
-		void run(Task task);
 		void run(CoroutineTask<>&& task);
 
 	public:
@@ -171,7 +168,7 @@ namespace sky
 		void setTimeScale(float value) { mTimeScale = value; }
 
 		auto getFramerate() const { return 1.0f / sky::ToSeconds(mTimeDelta) * mTimeScale; } // frame count per second
-		auto getTasksCount() const { return mTasks.size(); }
+		auto getTasksCount() const { return mCoroutineTasks.size(); }
 
 		auto getUptime() const { return mUptime; }
 		auto getFrameCount() { return mFrameCount; }
@@ -182,7 +179,6 @@ namespace sky
 		auto isChoked() const { return mChoked; }
 
 	private:
-		std::list<Task> mTasks;
 		std::list<CoroutineTask<>> mCoroutineTasks;
 		sky::CVar<int> mFramerateLimit = sky::CVar<int>("sys_framerate", 0, "limit of fps");
 		sky::CVar<bool> mSleepAllowed = sky::CVar<bool>("sys_sleep", true, "cpu saving between frames");
@@ -193,73 +189,5 @@ namespace sky
 		std::optional<sky::Duration> mTimeDeltaLimit; // this can save from animation breaks
 		uint64_t mFrameCount = 0;
 		bool mChoked = false;
-	};
-
-	class Scheduler::Task
-	{
-	public:
-		Task(std::list<Task> tasks);
-		Task(std::initializer_list<Task> tasks);
-
-		template <typename Func>
-			requires std::invocable<Func> &&
-			(std::same_as<std::invoke_result_t<Func>, Status> || std::same_as<std::invoke_result_t<Func>, void>)
-		Task(Func&& func)
-		{			
-			mFunc = [func = std::forward<Func>(func)]() mutable {
-				if constexpr (std::same_as<std::invoke_result_t<Func>, Status>)
-				{
-					return func();
-				}
-				else
-				{
-					func();
-					return Status::Finished;
-				}
-			};
-		}
-
-		template <typename Func>
-			requires std::invocable<Func> &&
-			(!std::same_as<std::invoke_result_t<Func>, void>) &&
-			(!std::same_as<std::invoke_result_t<Func>, Status>) &&
-			(std::convertible_to<std::invoke_result_t<Func>, std::tuple<Status, std::optional<Task>>> ||
-				std::convertible_to<std::invoke_result_t<Func>, std::optional<Task>>)
-		Task(Func&& func)
-		{
-			mFunc = [func = std::forward<Func>(func), need_invoke_func = true, status = std::optional<Status>{ std::nullopt }, task = std::optional<Task>{ std::nullopt }]() mutable {
-				if (need_invoke_func)
-				{
-					if constexpr (std::convertible_to<std::invoke_result_t<Func>, std::tuple<Status, std::optional<Task>>>)
-					{
-						std::tie(status, task) = func();
-					}
-					else
-					{
-						status = Status::Finished;
-						task = func();
-					}
-					
-					need_invoke_func = false;
-				
-					if (task.has_value())
-						return Status::Continue;
-				}
-				
-				if (task.has_value())
-				{
-					if (task.value()() == Status::Continue)
-						return Status::Continue;
-				}
-				
-				need_invoke_func = true;
-				return status.value();
-			};
-		}
-
-		Status operator()();
-
-	private:
-		std::function<Status()> mFunc;
 	};
 }
