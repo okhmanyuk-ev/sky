@@ -48,7 +48,7 @@ namespace sky
 		{
 			std::optional<U> result;
 
-			void return_value(U&& value)
+			void return_value(U value)
 			{
 				result = std::forward<U>(value);
 			}
