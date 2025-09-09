@@ -6,8 +6,9 @@
 namespace sky
 {
 	template<typename T = void>
-	struct Task
+	class [[nodiscard]] Task
 	{
+	public:
 		template<typename Derived>
 		struct PromiseBase
 		{
