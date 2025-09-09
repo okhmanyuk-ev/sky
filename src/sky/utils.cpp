@@ -141,24 +141,30 @@ void sky::Schedule(Scheduler::Task task)
 
 void sky::Schedule(Action action)
 {
-	auto player = std::make_shared<ActionsPlayer>();
-	player->add(std::move(action));
-	Schedule([player] {
-		player->update(sky::Scheduler::Instance->getTimeDelta());
-
-		if (player->hasActions())
-			return sky::Scheduler::Status::Continue;
-
-		return sky::Scheduler::Status::Finished;
-	});
+	sky::Scheduler::Instance->run([](auto action) -> CoroutineTask<> {
+		ActionsPlayer player;
+		player.add(std::move(action));
+		while (player.hasActions())
+		{
+			player.update(sky::Scheduler::Instance->getTimeDelta());
+			co_await std::suspend_always{};
+		}
+	}(action));
 }
 
 void sky::Schedule(ScheduleBehavior behavior, std::function<void()> callback)
 {
-	Schedule([behavior, callback] {
-		callback();
-		return behavior == ScheduleBehavior::Once ? sky::Scheduler::Status::Finished : sky::Scheduler::Status::Continue;
-	});
+	sky::Scheduler::Instance->run([](auto behavior, auto callback) -> CoroutineTask<> {
+		while (true)
+		{
+			callback();
+
+			if (behavior == ScheduleBehavior::Once)
+				break;
+
+			co_await std::suspend_always{};
+		}
+	}(behavior, callback));
 }
 
 std::string sky::to_string(const std::wstring& wstr)
