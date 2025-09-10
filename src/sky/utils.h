@@ -56,6 +56,17 @@ namespace sky
 	void OpenUrl(const std::string& url);
 
 	void RunTask(sky::Task<>&& task);
+
+	template <typename T>
+	T RunTaskImmediately(sky::Task<T>&& task)
+	{
+		while (!task.is_completed())
+			task.resume();
+
+		if constexpr (!std::is_void_v<T>)
+			return task.result();
+	}
+
 	void RunAction(Action action);
 
 	std::string to_string(const std::wstring& wstr);
