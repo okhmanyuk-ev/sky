@@ -35,7 +35,20 @@ void Profile::load()
 		makeDefault();
 		return;
 	}
-#else
+#elif EMSCRIPTEN
+	EM_ASM((
+		const params = new URLSearchParams(location.search);
+		if (params.has('name') && params.get('name').length > 0) {
+			let profile = localStorage.getItem('profile');
+			if (!profile) {
+				profile = "{}"
+			}
+			profile = JSON.parse(profile);
+			profile.name = params.get('name');
+			localStorage.setItem('profile', JSON.stringify(profile));
+		}
+	));
+
 	auto str = emscripten_run_script_string("localStorage.getItem('profile');");
 	try
 	{

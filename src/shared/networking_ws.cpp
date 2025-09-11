@@ -41,6 +41,8 @@ NetCommands::~NetCommands()
 void Channel::read(sky::BitBuffer& buf)
 {
 	auto name = sky::bitbuffer_helpers::ReadString(buf);
+	if (name == "ws-event")
+		return;
 
 	if (mMessageReaders.count(name) == 0)
 		throw std::runtime_error(("unknown message type in channel: " + name).c_str());
