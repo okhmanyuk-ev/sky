@@ -136,4 +136,9 @@ namespace sky
 			last.resume();
 		}
 	};
+
+	namespace Tasks
+	{
+		Task<> WaitForSeconds(float seconds);
+	}
 }
