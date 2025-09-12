@@ -10,3 +10,12 @@ sky::Task<> sky::Tasks::WaitForSeconds(float seconds)
 		co_await std::suspend_always{};
 	}
 }
+
+sky::Task<> sky::Tasks::WaitForFrames(int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		co_await std::suspend_always{};
+	}
+}
+
