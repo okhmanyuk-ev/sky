@@ -1,8 +1,10 @@
 #pragma once
 
-#include <string>
-#include <functional>
+#include <sky/task.h>
 #include <platform/defines.h>
+#include <functional>
+#include <optional>
+#include <string>
 
 namespace sky
 {
@@ -38,6 +40,7 @@ namespace sky
 		};
 
 		static void Fetch(const std::string& url, FetchCallbacks callbacks);
+		static Task<std::optional<Asset>> FetchAsync(const std::string& url);
 
 	public:
 		auto getMemory() const { return mMemory; }
