@@ -209,3 +209,23 @@ void sky::Asset::Fetch(const std::string& url, FetchCallbacks callbacks)
 		callbacks.onFail("fetch is unsupported on this platform");
 #endif
 }
+
+sky::Task<std::optional<sky::Asset>> sky::Asset::FetchAsync(const std::string& url)
+{
+	auto completed = std::make_shared<bool>(false);
+	std::optional<sky::Asset> result;
+	sky::Asset::Fetch(url, {
+		.onSuccess = [&](const sky::Asset& asset) {
+			result = asset;
+			*completed = true;
+		},
+		.onFail = [&](auto) {
+			*completed = true;
+		}
+		});
+	while (!*completed)
+	{
+		co_await std::suspend_always{};
+	}
+	co_return result;
+}
