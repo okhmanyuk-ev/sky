@@ -140,5 +140,6 @@ namespace sky
 	namespace Tasks
 	{
 		Task<> WaitForSeconds(float seconds);
+		Task<> WaitForFrames(int count);
 	}
 }
