@@ -212,20 +212,17 @@ void sky::Asset::Fetch(const std::string& url, FetchCallbacks callbacks)
 
 sky::Task<std::optional<sky::Asset>> sky::Asset::FetchAsync(const std::string& url)
 {
-	auto completed = std::make_shared<bool>(false);
+	bool completed = false;
 	std::optional<sky::Asset> result;
 	sky::Asset::Fetch(url, {
 		.onSuccess = [&](const sky::Asset& asset) {
 			result = asset;
-			*completed = true;
+			completed = true;
 		},
 		.onFail = [&](auto) {
-			*completed = true;
+			completed = true;
 		}
-		});
-	while (!*completed)
-	{
-		co_await std::suspend_always{};
-	}
+	});
+	co_await sky::Tasks::WaitUntil(completed);
 	co_return result;
 }
