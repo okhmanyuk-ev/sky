@@ -19,3 +19,20 @@ sky::Task<> sky::Tasks::WaitForFrames(int count)
 	}
 }
 
+sky::Task<> sky::Tasks::WaitWhile(std::function<bool()> condition)
+{
+	while (condition())
+	{
+		co_await std::suspend_always{};
+	}
+}
+
+sky::Task<> sky::Tasks::WaitWhile(const bool& condition)
+{
+	co_await WaitWhile([&] { return condition; });
+}
+
+sky::Task<> sky::Tasks::WaitUntil(const bool& condition)
+{
+	co_await WaitWhile([&] { return !condition; });
+}
