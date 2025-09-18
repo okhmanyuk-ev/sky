@@ -125,4 +125,25 @@ namespace sky
 	{
 		return std::visit(std::forward<Callable>(c), std::forward<V>(v));
 	}
+
+	template<typename T>
+	struct InstanceTraits;
+
+	template<typename T>
+	concept InstanceTraitsHasCreate = requires {
+		{ InstanceTraits<T>::Create() } -> std::convertible_to<std::shared_ptr<T>>;
+	};
+
+	template <typename T>
+	static auto GetInstance()
+	{
+		if (!sky::Locator<T>::Exists())
+		{
+			if constexpr (InstanceTraitsHasCreate<T>)
+				sky::Locator<T>::Set(InstanceTraits<T>::Create());
+			else
+				sky::Locator<T>::Init();
+		}
+		return sky::Locator<T>::Get();
+	}
 }
