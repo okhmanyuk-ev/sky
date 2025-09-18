@@ -18,6 +18,7 @@
 #include <sky/renderer.h>
 #include <sky/scheduler.h>
 #include <sky/task.h>
+#include <sky/time_expiring_cache.h>
 #include <sky/timer.h>
 #include <sky/updatable.h>
 #include <sky/utils.h>
