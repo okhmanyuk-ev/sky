@@ -166,47 +166,49 @@ std::string sky::Asset::FixSlashes(const std::string& input)
 	return result;
 }
 
-void sky::Asset::Fetch(const std::string& url, FetchCallbacks callbacks)
+void sky::Asset::Fetch(const std::string& url, FetchSettings settings)
 {
 #ifdef EMSCRIPTEN
 	emscripten_fetch_attr_t attr;
 	emscripten_fetch_attr_init(&attr);
 	strcpy(attr.requestMethod, "GET");
 	attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
-	attr.userData = new FetchCallbacks(std::move(callbacks));
+	if (settings.persist_file)
+		attr.attributes |= EMSCRIPTEN_FETCH_PERSIST_FILE;
+	attr.userData = new FetchSettings(std::move(settings));
 	attr.onsuccess = [](emscripten_fetch_t* fetch) {
-		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
-		if (callbacks->onSuccess)
+		auto settings = static_cast<FetchSettings*>(fetch->userData);
+		if (settings->onSuccess)
 		{
-			callbacks->onSuccess(Asset((const void*)fetch->data, (size_t)fetch->numBytes));
+			settings->onSuccess(Asset((const void*)fetch->data, (size_t)fetch->numBytes));
 		}
-		delete callbacks;
+		delete settings;
 		emscripten_fetch_close(fetch);
 	};
 	attr.onerror = [](emscripten_fetch_t* fetch) {
-		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
-		if (callbacks->onFail)
+		auto settings = static_cast<FetchSettings*>(fetch->userData);
+		if (settings->onFail)
 		{
-			callbacks->onFail(std::string(fetch->statusText));
+			settings->onFail(std::string(fetch->statusText));
 		}
-		delete callbacks;
+		delete settings;
 		emscripten_fetch_close(fetch);
 	};
 	attr.onprogress = [](emscripten_fetch_t* fetch) {
-		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
-		if (callbacks->onProgress)
+		auto settings = static_cast<FetchSettings*>(fetch->userData);
+		if (settings->onProgress)
 		{
-			callbacks->onProgress((size_t)fetch->dataOffset, (size_t)fetch->totalBytes);
+			settings->onProgress((size_t)fetch->dataOffset, (size_t)fetch->totalBytes);
 		}
 	};
 	emscripten_fetch(&attr, url.c_str());
 #else
-	if (callbacks.onFail)
-		callbacks.onFail("fetch is unsupported on this platform");
+	if (settings.onFail)
+		settings.onFail("fetch is unsupported on this platform");
 #endif
 }
 
-sky::Task<std::optional<sky::Asset>> sky::Asset::FetchAsync(const std::string& url)
+sky::Task<std::optional<sky::Asset>> sky::Asset::FetchAsync(const std::string& url, bool persist_file)
 {
 	bool completed = false;
 	std::optional<sky::Asset> result;
@@ -217,7 +219,8 @@ sky::Task<std::optional<sky::Asset>> sky::Asset::FetchAsync(const std::string& u
 		},
 		.onFail = [&](auto) {
 			completed = true;
-		}
+		},
+		.persist_file = persist_file
 	});
 	co_await sky::Tasks::WaitUntil(completed);
 	co_return result;
