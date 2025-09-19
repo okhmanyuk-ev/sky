@@ -32,15 +32,16 @@ namespace sky
 		static std::string StoragePathToAbsolute(const std::string& path, Storage storage);
 		static std::string FixSlashes(const std::string& path);
 
-		struct FetchCallbacks
+		struct FetchSettings
 		{
 			std::function<void(const Asset& asset)> onSuccess = nullptr;
 			std::function<void(const std::string& reason)> onFail = nullptr;
 			std::function<void(size_t current, size_t total)> onProgress = nullptr;
+			bool persist_file = false;
 		};
 
-		static void Fetch(const std::string& url, FetchCallbacks callbacks);
-		static Task<std::optional<Asset>> FetchAsync(const std::string& url);
+		static void Fetch(const std::string& url, FetchSettings settings);
+		static Task<std::optional<Asset>> FetchAsync(const std::string& url, bool persist_file = false);
 
 	public:
 		auto getMemory() const { return mMemory; }
