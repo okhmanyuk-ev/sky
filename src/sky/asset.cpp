@@ -169,14 +169,12 @@ std::string sky::Asset::FixSlashes(const std::string& input)
 void sky::Asset::Fetch(const std::string& url, FetchCallbacks callbacks)
 {
 #ifdef EMSCRIPTEN
-	sky::Log("fetching {}", url);
 	emscripten_fetch_attr_t attr;
 	emscripten_fetch_attr_init(&attr);
 	strcpy(attr.requestMethod, "GET");
 	attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
 	attr.userData = new FetchCallbacks(std::move(callbacks));
 	attr.onsuccess = [](emscripten_fetch_t* fetch) {
-		sky::Log("fetch succeeded");
 		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
 		if (callbacks->onSuccess)
 		{
@@ -186,7 +184,6 @@ void sky::Asset::Fetch(const std::string& url, FetchCallbacks callbacks)
 		emscripten_fetch_close(fetch);
 	};
 	attr.onerror = [](emscripten_fetch_t* fetch) {
-		sky::Log("fetch failed");
 		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
 		if (callbacks->onFail)
 		{
@@ -196,7 +193,6 @@ void sky::Asset::Fetch(const std::string& url, FetchCallbacks callbacks)
 		emscripten_fetch_close(fetch);
 	};
 	attr.onprogress = [](emscripten_fetch_t* fetch) {
-		sky::Log("fetch progress {} of {}", fetch->dataOffset, fetch->totalBytes);
 		auto callbacks = static_cast<FetchCallbacks*>(fetch->userData);
 		if (callbacks->onProgress)
 		{
