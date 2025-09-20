@@ -222,6 +222,6 @@ sky::Task<std::optional<sky::Asset>> sky::Asset::FetchAsync(const std::string& u
 		},
 		.persist_file = persist_file
 	});
-	co_await sky::Tasks::WaitUntil(completed);
+	co_await sky::Tasks::WaitWhile([&]{ return !completed; });
 	co_return result;
 }

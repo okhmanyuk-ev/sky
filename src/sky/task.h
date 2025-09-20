@@ -143,7 +143,5 @@ namespace sky
 		Task<> WaitForSeconds(float seconds);
 		Task<> WaitForFrames(int count);
 		Task<> WaitWhile(std::function<bool()> condition);
-		Task<> WaitWhile(const bool& condition);
-		Task<> WaitUntil(const bool& condition);
 	}
 }
