@@ -1,11 +1,11 @@
 #include "updatable.h"
-#include <sky/scheduler.h>
+#include <sky/utils.h>
 
 using namespace sky;
 
 Updatable::Updatable()
 {
-	Scheduler::Instance->run([](Updatable* self, std::shared_ptr<bool> finished) -> sky::Task<> {
+	RunTask([](Updatable* self, std::shared_ptr<bool> finished) -> Task<> {
 		while (true)
 		{
 			self->onFrame();
