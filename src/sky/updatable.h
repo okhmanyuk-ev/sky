@@ -8,7 +8,7 @@ namespace sky
 	{
 	public:
 		Updatable();
-		~Updatable();
+		virtual ~Updatable();
 
 	public:
 		virtual void onFrame() = 0;
