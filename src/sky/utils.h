@@ -67,6 +67,7 @@ namespace sky
 			return task.result();
 	}
 
+	sky::Task<> ConvertActionToTask(Action action);
 	void RunAction(Action action);
 
 	std::string to_string(const std::wstring& wstr);

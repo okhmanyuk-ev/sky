@@ -139,17 +139,20 @@ void sky::RunTask(sky::Task<>&& task)
 	sky::Scheduler::Instance->run(std::move(task));
 }
 
+sky::Task<> sky::ConvertActionToTask(Action action)
+{
+	ActionsPlayer player;
+	player.add(std::move(action));
+	while (player.hasActions())
+	{
+		player.update(sky::Scheduler::Instance->getTimeDelta());
+		co_await std::suspend_always{};
+	}
+}
+
 void sky::RunAction(Action action)
 {
-	RunTask([](auto action) -> Task<> {
-		ActionsPlayer player;
-		player.add(std::move(action));
-		while (player.hasActions())
-		{
-			player.update(sky::Scheduler::Instance->getTimeDelta());
-			co_await std::suspend_always{};
-		}
-	}(action));
+	RunTask(ConvertActionToTask(action));
 }
 
 std::string sky::to_string(const std::wstring& wstr)
