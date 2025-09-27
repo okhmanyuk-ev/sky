@@ -41,6 +41,16 @@ namespace sky
 			};
 		}
 
+		template <typename Func>
+			requires std::invocable<Func> && std::same_as<std::invoke_result_t<Func>, void>
+		Action(Func&& func)
+		{
+			mFunc = [func = std::forward<Func>(func)](auto dTime) mutable {
+				func();
+				return Result::Finished;
+			};
+		}
+
 		Result operator()(sky::Duration dTime);
 
 	private:
