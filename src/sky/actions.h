@@ -76,7 +76,9 @@ namespace sky
 		}
 
 		template <typename Func>
-			requires std::invocable<Func> && std::convertible_to<std::invoke_result_t<Func>, std::optional<Action>>
+			requires std::invocable<Func> &&
+				(!std::is_void_v<std::invoke_result_t<Func>>) &&
+				std::convertible_to<std::invoke_result_t<Func>, std::optional<Action>>
 		Action(Func&& func) :
 			Action([func = std::forward<Func>(func)] -> std::tuple<Result, std::optional<Action>> {
 				return { Result::Finished, func() };
