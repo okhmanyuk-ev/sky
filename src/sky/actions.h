@@ -223,27 +223,5 @@ namespace sky
 			(actions.push_back(std::forward<Args>(args)), ...);
 			return Race(std::move(actions));
 		}
-
-		template <typename T>
-		Action WaitEvent(typename sky::Listener<T>::Callback onEvent)
-		{
-			auto event_holder = std::make_shared<std::optional<T>>();
-
-			auto listener = std::make_shared<sky::Listener<T>>();
-			listener->setCallback([event_holder](const auto& e) {
-				if (event_holder->has_value())
-					return;
-
-				*event_holder = e;
-			});
-
-			return std::make_unique<Action>([event_holder, listener, onEvent](auto delta) {
-				if (!event_holder->has_value())
-					return Action::Result::Continue;
-
-				onEvent(event_holder->value());
-				return Action::Result::Finished;
-			});
-		}
 	}
 }
