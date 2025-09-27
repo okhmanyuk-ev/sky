@@ -14,13 +14,40 @@
 
 namespace sky
 {
-	enum class ActionResult
+	class Action
 	{
-		Continue,
-		Finished
+	public:
+		enum class Result
+		{
+			Continue,
+			Finished
+		};
+
+		template <typename Func>
+			requires std::invocable<Func, sky::Duration> && std::same_as<std::invoke_result_t<Func, sky::Duration>, Result>
+		Action(Func&& func)
+		{
+			mFunc = [func = std::forward<Func>(func)](auto dTime) mutable {
+				return func(dTime);
+			};
+		}
+
+		template <typename Func>
+			requires std::invocable<Func> && std::same_as<std::invoke_result_t<Func>, Result>
+		Action(Func&& func)
+		{
+			mFunc = [func = std::forward<Func>(func)](auto dTime) mutable {
+				return func();
+			};
+		}
+
+		Result operator()(sky::Duration dTime);
+
+	private:
+		std::function<Result(sky::Duration)> mFunc;
 	};
 
-	using Action = std::function<ActionResult(sky::Duration)>;
+	using ActionResult = Action::Result;
 
 	class ActionsPlayer
 	{

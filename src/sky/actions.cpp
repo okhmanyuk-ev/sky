@@ -4,6 +4,11 @@
 
 using namespace sky;
 
+Action::Result Action::operator()(sky::Duration dTime)
+{
+	return mFunc(dTime);
+}
+
 void ActionsPlayer::update(sky::Duration delta)
 {
 	auto it = mActions.begin();
