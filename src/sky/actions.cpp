@@ -89,9 +89,7 @@ Action Actions::Race(std::list<Action> actions)
 
 Action Actions::Insert(std::function<std::optional<Action>()> action)
 {
-	return [action] -> std::tuple<Action::Result, std::optional<Action>> {
-		return { Action::Result::Finished, action() };
-	};
+	return action;
 }
 
 Action Actions::RepeatInfinite(std::function<std::optional<Action>()> action)

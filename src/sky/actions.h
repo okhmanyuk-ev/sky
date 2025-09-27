@@ -52,8 +52,7 @@ namespace sky
 		}
 
 		template <typename Func>
-			requires std::invocable<Func> &&
-			std::convertible_to<std::invoke_result_t<Func>, std::tuple<Result, std::optional<Action>>>
+			requires std::invocable<Func> && std::convertible_to<std::invoke_result_t<Func>, std::tuple<Result, std::optional<Action>>>
 		Action(Func&& func)
 		{
 			mFunc = [func = std::forward<Func>(func),
@@ -77,6 +76,15 @@ namespace sky
 				_status.reset();
 				return Result::Continue;
 			};
+		}
+
+		template <typename Func>
+			requires std::invocable<Func> && std::convertible_to<std::invoke_result_t<Func>, std::optional<Action>>
+		Action(Func&& func) :
+			Action([func = std::forward<Func>(func)] -> std::tuple<Result, std::optional<Action>> {
+				return { Result::Finished, func() };
+			})
+		{
 		}
 
 		Result operator()(sky::Duration dTime);
