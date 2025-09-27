@@ -47,8 +47,6 @@ namespace sky
 		std::function<Result(sky::Duration)> mFunc;
 	};
 
-	using ActionResult = Action::Result;
-
 	class ActionsPlayer
 	{
 	public:
@@ -66,7 +64,7 @@ namespace sky
 		Action Sequence(std::list<Action> actions);
 		Action Parallel(std::list<Action> actions);
 		Action Race(std::list<Action> actions);
-		Action Repeat(std::function<std::tuple<ActionResult, std::optional<Action>>()> callback);
+		Action Repeat(std::function<std::tuple<Action::Result, std::optional<Action>>()> callback);
 		Action Insert(std::function<std::optional<Action>()> action);
 		Action RepeatInfinite(std::function<std::optional<Action>()> action);
 
@@ -113,10 +111,10 @@ namespace sky
 				if (passed >= duration)
 				{
 					callback(dest);
-					return ActionResult::Finished;
+					return Action::Result::Finished;
 				}
 				callback(glm::lerp(start, dest, easing(passed / duration)));
-				return ActionResult::Continue;
+				return Action::Result::Continue;
 			};
 		}
 
@@ -201,10 +199,10 @@ namespace sky
 
 			return std::make_unique<Action>([event_holder, listener, onEvent](auto delta) {
 				if (!event_holder->has_value())
-					return ActionResult::Continue;
+					return Action::Result::Continue;
 
 				onEvent(event_holder->value());
-				return ActionResult::Finished;
+				return Action::Result::Finished;
 			});
 		}
 	}
