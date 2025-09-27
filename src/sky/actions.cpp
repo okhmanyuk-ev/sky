@@ -87,11 +87,6 @@ Action Actions::Race(std::list<Action> actions)
 	};
 }
 
-Action Actions::Repeat(std::function<std::tuple<Action::Result, std::optional<Action>>()> callback)
-{
-	return callback;
-}
-
 Action Actions::Insert(std::function<std::optional<Action>()> action)
 {
 	return [action] -> std::tuple<Action::Result, std::optional<Action>> {

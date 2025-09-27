@@ -102,7 +102,6 @@ namespace sky
 		Action Sequence(std::list<Action> actions);
 		Action Parallel(std::list<Action> actions);
 		Action Race(std::list<Action> actions);
-		Action Repeat(std::function<std::tuple<Action::Result, std::optional<Action>>()> callback);
 		Action Insert(std::function<std::optional<Action>()> action);
 		Action RepeatInfinite(std::function<std::optional<Action>()> action);
 
