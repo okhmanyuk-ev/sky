@@ -508,10 +508,10 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 				sky::Actions::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
 				sky::Actions::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
 			),
-			sky::Actions::Execute([this] {
+			[this] {
 				mHidden = false;
 				mAlphaAnimating = false;
-			})
+			}
 		));
 	}
 	else
@@ -525,10 +525,10 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 				sky::Actions::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
 				sky::Actions::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
 			),
-			sky::Actions::Execute([this] {
+			[this] {
 				mHidden = true;
 				mAlphaAnimating = false;
-			})
+			}
 		));
 	}
 }
@@ -1041,7 +1041,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 
 	runAction(sky::Actions::Sequence(
 		sky::Actions::WaitGlobalFrame(),
-		sky::Actions::Execute([this] {
+		[this] {
 			runAction(sky::Actions::RepeatInfinite([this] {
 				return sky::Actions::Sequence(
 					sky::Actions::ChangeAlpha(shared_from_this(), 1.0f, 0.125f),
@@ -1050,7 +1050,7 @@ SceneHelpers::CursorIndicator::CursorIndicator(std::shared_ptr<Scene::Label> lab
 					sky::Actions::Wait(0.25f)
 				);
 			}));
-		})
+		}
 	));
 }
 

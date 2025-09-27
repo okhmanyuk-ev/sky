@@ -78,7 +78,6 @@ namespace sky
 		Action Insert(std::function<std::optional<Action>()> action);
 		Action RepeatInfinite(std::function<std::optional<Action>()> action);
 
-		Action Execute(std::function<void()> callback);
 		Action ExecuteInfinite(std::function<void(sky::Duration delta)> callback);
 		Action ExecuteInfinite(std::function<void()> callback);
 		Action ExecuteInfiniteGlobal(std::function<void()> callback);

@@ -143,13 +143,13 @@ namespace Shared::SceneHelpers
 
 			mChooseAnimationStarted = true;
 			this->runAction(sky::Actions::Sequence(
-				sky::Actions::Execute([this] {
+				[this] {
 					mChooseAnimationProcessing = true;
-				}),
+				},
 				sky::Actions::Interpolate(1.0f - 0.125f, 0.125f / 4.0f, mRelativeScale),
-				sky::Actions::Execute([this] {
+				[this] {
 					mChooseAnimationProcessing = false;
-				})
+				}
 			));
 		}
 
@@ -165,14 +165,14 @@ namespace Shared::SceneHelpers
 			mChooseAnimationStarted = false;
 			this->runAction(sky::Actions::Sequence(
 				sky::Actions::Wait(mChooseAnimationProcessing),
-				sky::Actions::Execute([this] {
+				[this] {
 					mChooseAnimationProcessing = true;
-				}),
+				},
 				sky::Actions::Interpolate(1.125f, Duration / 2.0f, mRelativeScale),
 				sky::Actions::Interpolate(1.0f, Duration / 2.0f, mRelativeScale),
-				sky::Actions::Execute([this] {
+				[this] {
 					mChooseAnimationProcessing = false;
-				})
+				}
 			));
 		}
 

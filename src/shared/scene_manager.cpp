@@ -27,43 +27,43 @@ void SceneManager::switchScreen(std::shared_ptr<Screen> screen, Callback finishC
 
 	auto createLeaveAction = [this] {
 		return sky::Actions::Sequence(
-			sky::Actions::Execute([this] {
+			[this] {
 				mCurrentScreen->mState = Screen::State::Leaving;
 				mCurrentScreen->onLeaveBegin();
-			}),
+			},
 			mCurrentScreen->createLeaveAction(),
-			sky::Actions::Execute([this] {
+			[this] {
 				mCurrentScreen->mState = Screen::State::Leaved;
 				mCurrentScreen->onLeaveEnd();
 				mScreenHolder->detach(mCurrentScreen);
 				mCurrentScreen = nullptr;
-			})
+			}
 		);
 	};
 
 	auto createEnterAction = [this, screen] {
 		return sky::Actions::Sequence(
-			sky::Actions::Execute([this, screen] {
+			[this, screen] {
 				mScreenHolder->attach(screen);
 				mCurrentScreen = screen;
 				mCurrentScreen->mState = Screen::State::Entering;
 				mCurrentScreen->onEnterBegin();
-			}),
+			},
 			screen->createEnterAction(),
-			sky::Actions::Execute([this] {
+			[this] {
 				mInTransition = false;
 				mCurrentScreen->mState = Screen::State::Entered;
 				mCurrentScreen->onEnterEnd();
-			})
+			}
 		);
 	};
 
 	auto createFinalAction = [this, finishCallback] {
-		return sky::Actions::Execute([this, finishCallback] {
+		return [this, finishCallback] {
 			mInTransition = false;
 			if (finishCallback)
 				finishCallback();
-		});
+		};
 	};
 
 	if (screen == nullptr)
@@ -118,7 +118,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 
 	runAction(sky::Actions::Sequence(
 		window->createOpenAction(),
-		sky::Actions::Execute([this, window, finishCallback] {
+		[this, window, finishCallback] {
 			window->onOpenEnd();
 			window->mState = Window::State::Opened;
 
@@ -129,7 +129,7 @@ void SceneManager::pushWindow(std::shared_ptr<Window> window, Callback finishCal
 			{
 				finishCallback();
 			}
-		})
+		}
 	));
 }
 
@@ -153,12 +153,12 @@ void SceneManager::popWindow(size_t count, Callback finishCallback)
 	window->mState = Window::State::Closing;
 
 	runAction(sky::Actions::Sequence(
-		sky::Actions::Execute([this, window, count, finishCallback] {
+		[this, window, count, finishCallback] {
 			if (mWindows.size() == 1 && mCurrentScreen)
 				mCurrentScreen->onWindowDisappearingBegin();
-		}),
+		},
 		window->createCloseAction(),
-		sky::Actions::Execute([this, window, count, finishCallback] {
+		[this, window, count, finishCallback] {
 			window->onCloseEnd();
 			window->mState = Window::State::Closed;
 			mWindowHolder->detach(window);
@@ -168,7 +168,7 @@ void SceneManager::popWindow(size_t count, Callback finishCallback)
 				mCurrentScreen->onWindowDisappearingEnd();
 
 			popWindow(count - 1, finishCallback);
-		})
+		}
 	));
 }
 

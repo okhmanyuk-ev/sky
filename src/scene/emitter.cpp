@@ -14,12 +14,12 @@ Emitter::Emitter()
 			return std::nullopt;
 
 		auto delay = glm::linearRand(mMinDelay, mMaxDelay);
-		return sky::Actions::Delayed(delay, sky::Actions::Execute([this] {
+		return sky::Actions::Delayed(delay, [this] {
 			if (!mRunning)
 				return;
 
 			emit();
-		}));
+		});
 	}));
 }
 

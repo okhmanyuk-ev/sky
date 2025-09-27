@@ -126,16 +126,6 @@ Action Actions::RepeatInfinite(std::function<std::optional<Action>()> action)
 	});
 }
 
-Action Actions::Execute(std::function<void()> callback)
-{
-	return [callback](auto delta) {
-		if (callback)
-			callback();
-
-		return Action::Result::Finished;
-	};
-}
-
 Action Actions::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
 {
 	return [callback](auto delta) {
@@ -169,7 +159,7 @@ Action Actions::ExecuteInfiniteGlobal(std::function<void()> callback)
 
 Action Actions::Wait()
 {
-	return Execute(nullptr);
+	return [] {};
 }
 
 Action Actions::Wait(float duration)
@@ -273,21 +263,21 @@ Action Actions::Pausable(std::function<bool()> run_callback, Action action)
 
 Action Actions::Log(const std::string& text)
 {
-	return Execute([text] {
+	return [text] {
 		sky::Log(text);
-	});
+	};
 }
 
 sky::Action Actions::FromTask(std::function<sky::Task<>()> func)
 {
 	auto completed = std::make_shared<bool>(false);
 	return sky::Actions::Sequence(
-		sky::Actions::Execute([func, completed] {
+		[func, completed] {
 			sky::Scheduler::Instance->run([](auto func, auto completed) -> sky::Task<> {
 				co_await func();
 				*completed = true;
 			}(func, completed));
-		}),
+		},
 		sky::Actions::Wait([completed] {
 			return !*completed;
 		})
