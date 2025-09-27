@@ -110,7 +110,6 @@ namespace sky
 		Action Sequence(std::list<Action> actions);
 		Action Parallel(std::list<Action> actions);
 		Action Race(std::list<Action> actions);
-		Action Insert(std::function<std::optional<Action>()> action);
 		Action RepeatInfinite(std::function<std::optional<Action>()> action);
 
 		Action ExecuteInfinite(std::function<void(sky::Duration delta)> callback);
@@ -183,9 +182,9 @@ namespace sky
 		Action Interpolate(typename T::Object object, const typename T::Type& dest, float duration,
 			EasingFunction easing = Easing::Linear)
 		{
-			return Insert([object, dest, duration, easing] {
+			return [object, dest, duration, easing] {
 				return Interpolate<T>(object, T::GetValue(object), dest, duration, easing);
-			});
+			};
 		}
 
 		template <typename T>
@@ -199,9 +198,9 @@ namespace sky
 		template <typename T>
 		Action Interpolate(T dest, float duration, T& value, EasingFunction easing = Easing::Linear)
 		{
-			return Insert([dest, duration, &value, easing] {
+			return [dest, duration, &value, easing] {
 				return Interpolate(value, dest, duration, value, easing);
-			});
+			};
 		}
 
 		template <typename...Args>
