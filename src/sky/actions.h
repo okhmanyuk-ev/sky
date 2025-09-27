@@ -51,6 +51,34 @@ namespace sky
 			};
 		}
 
+		template <typename Func>
+			requires std::invocable<Func> &&
+			std::convertible_to<std::invoke_result_t<Func>, std::tuple<Result, std::optional<Action>>>
+		Action(Func&& func)
+		{
+			mFunc = [func = std::forward<Func>(func),
+				_status = std::optional<Result>{ std::nullopt },
+				_action = std::optional<Action>{ std::nullopt }
+			] (auto delta) mutable {
+				if (!_status.has_value())
+					std::tie(_status, _action) = func();
+
+				auto status = Result::Finished;
+
+				if (_action)
+					status = _action.value()(delta);
+
+				if (status == Result::Continue)
+					return Result::Continue;
+
+				if (_status == Result::Finished)
+					return Result::Finished;
+
+				_status.reset();
+				return Result::Continue;
+			};
+		}
+
 		Result operator()(sky::Duration dTime);
 
 	private:

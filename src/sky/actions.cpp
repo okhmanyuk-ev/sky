@@ -89,41 +89,21 @@ Action Actions::Race(std::list<Action> actions)
 
 Action Actions::Repeat(std::function<std::tuple<Action::Result, std::optional<Action>>()> callback)
 {
-	return [callback,
-		_status = std::optional<Action::Result>{ std::nullopt },
-		_action = std::optional<Action>{ std::nullopt }
-	] (auto delta) mutable {
-		if (!_status.has_value())
-			std::tie(_status, _action) = callback();
-		
-		auto status = Action::Result::Finished;
-		
-		if (_action)
-			status = _action.value()(delta);
-		
-		if (status == Action::Result::Continue)
-			return Action::Result::Continue;
-		
-		if (_status == Action::Result::Finished)
-			return Action::Result::Finished;
-		
-		_status.reset();
-		return Action::Result::Continue;
-	};
+	return callback;
 }
 
 Action Actions::Insert(std::function<std::optional<Action>()> action)
 {
-	return Repeat([action]() -> std::tuple<Action::Result, std::optional<Action>> {
+	return [action] -> std::tuple<Action::Result, std::optional<Action>> {
 		return { Action::Result::Finished, action() };
-	});
+	};
 }
 
 Action Actions::RepeatInfinite(std::function<std::optional<Action>()> action)
 {
-	return Repeat([action]() -> std::tuple<Action::Result, std::optional<Action>> {
+	return [action] -> std::tuple<Action::Result, std::optional<Action>> {
 		return { Action::Result::Continue, action() };
-	});
+	};
 }
 
 Action Actions::ExecuteInfinite(std::function<void(sky::Duration delta)> callback)
