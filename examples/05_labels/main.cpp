@@ -25,12 +25,13 @@ void sky_main()
 		column->attach(label);
 	};
 
-	sky::Schedule(sky::ScheduleBehavior::Everytime, [column] {
+	sky::RunAction([column] {
 		auto scale = column->getScale().x;
 		ImGui::Begin("Settings");
 		ImGui::DragFloat("Scale", &scale, 0.01f);
 		ImGui::End();
 		column->setScale(scale);
+		return sky::Action::Result::Continue;
 	});
 
 	createLabel(L"<b>Simple Label</b>");

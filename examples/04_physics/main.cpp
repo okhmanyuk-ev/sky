@@ -70,16 +70,16 @@ void sky_main()
 
 		return sky::Actions::Sequence(
 			sky::Actions::Wait(delay),
-			sky::Actions::Execute([spawnBox, spawnBall]{
+			[spawnBox, spawnBall]{
 				if (sky::chance(ChanceValue))
 					spawnBox();
 				else
 					spawnBall();
-			})
+			}
 		);
 	})));
 
-	sky::Scheduler::Instance->run([spawnBox, spawnBall] {
+	sky::RunAction([spawnBox, spawnBall] {
 		ImGui::Begin("Options", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel);
 		ImGui::SetWindowPos(ImGui::User::TopRightCorner());
 
@@ -136,7 +136,7 @@ void sky_main()
 
 		ImGui::End();
 
-		return sky::Scheduler::Status::Continue;
+		return sky::Action::Result::Continue;
 	});
 
 	app.run();
