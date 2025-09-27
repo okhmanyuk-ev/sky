@@ -229,13 +229,6 @@ Action Actions::Pausable(std::function<bool()> run_callback, Action action)
 	};
 }
 
-Action Actions::Log(const std::string& text)
-{
-	return [text] {
-		sky::Log(text);
-	};
-}
-
 sky::Action Actions::FromTask(std::function<sky::Task<>()> func)
 {
 	auto completed = std::make_shared<bool>(false);

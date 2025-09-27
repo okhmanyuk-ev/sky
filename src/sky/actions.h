@@ -136,7 +136,6 @@ namespace sky
 		Action Breakable(std::function<bool()> while_callback, Action action);
 
 		Action Pausable(std::function<bool()> run_callback, Action action);
-		Action Log(const std::string& text);
 
 		Action FromTask(std::function<Task<>()> func);
 
