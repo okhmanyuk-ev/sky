@@ -25,40 +25,36 @@ namespace sky
 
 		template <typename Func>
 			requires std::invocable<Func, sky::Duration> && std::same_as<std::invoke_result_t<Func, sky::Duration>, Result>
-		Action(Func&& func)
+		Action(Func&& func) : mFunc(std::move(func))
 		{
-			mFunc = [func = std::forward<Func>(func)](auto dTime) mutable {
-				return func(dTime);
-			};
 		}
 
 		template <typename Func>
 			requires std::invocable<Func> && std::same_as<std::invoke_result_t<Func>, Result>
-		Action(Func&& func)
-		{
-			mFunc = [func = std::forward<Func>(func)](auto dTime) mutable {
+		Action(Func&& func) :
+			Action([func = std::forward<Func>(func)](auto dTime) {
 				return func();
-			};
+			})
+		{
 		}
 
 		template <typename Func>
 			requires std::invocable<Func> && std::same_as<std::invoke_result_t<Func>, void>
-		Action(Func&& func)
-		{
-			mFunc = [func = std::forward<Func>(func)](auto dTime) mutable {
+		Action(Func&& func) :
+			Action([func = std::forward<Func>(func)](auto dTime) {
 				func();
 				return Result::Finished;
-			};
+			})
+		{
 		}
 
 		template <typename Func>
 			requires std::invocable<Func> && std::convertible_to<std::invoke_result_t<Func>, std::tuple<Result, std::optional<Action>>>
-		Action(Func&& func)
-		{
-			mFunc = [func = std::forward<Func>(func),
+		Action(Func&& func) :
+			Action([func = std::forward<Func>(func),
 				_status = std::optional<Result>{ std::nullopt },
 				_action = std::optional<Action>{ std::nullopt }
-			] (auto delta) mutable {
+			](auto delta) mutable {
 				if (!_status.has_value())
 					std::tie(_status, _action) = func();
 
@@ -75,7 +71,8 @@ namespace sky
 
 				_status.reset();
 				return Result::Continue;
-			};
+			})
+		{
 		}
 
 		template <typename Func>
