@@ -54,7 +54,7 @@ void Emitter::emit(int count)
 	auto direction = glm::linearRand(mMinDirection, mMaxDirection);
 
 	particle->runAction(sky::Actions::Sequence(
-		sky::Actions::Parallel(
+		sky::Actions::Concurrent(
 			sky::Actions::ChangePosition(particle, particle->getPosition() + (direction * mDistance), duration, Easing::CubicOut),
 			sky::Actions::ChangeScale(particle, mEndScale, duration),
 			sky::Actions::ChangeColor(colored_particle, mEndColor, duration),

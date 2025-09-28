@@ -53,7 +53,7 @@ Action Actions::HideRecursive(std::shared_ptr<Scene::Node> node, float duration,
 		actions.push_back(Hide(color_node, duration, easingFunction));
 	};
 	recursive_fill_func(node);
-	return Actions::Parallel(std::move(actions));
+	return Actions::Concurrent(std::move(actions));
 }
 
 Action Actions::Kill(std::shared_ptr<Scene::Node> node)

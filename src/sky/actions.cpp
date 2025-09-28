@@ -49,7 +49,7 @@ Action Actions::Sequence(std::list<Action> actions)
 	};
 }
 
-Action Actions::Parallel(std::list<Action> actions)
+Action Actions::Concurrent(std::list<Action> actions)
 {
 	return [actions = std::move(actions)](auto delta) mutable {
 		auto it = actions.begin();

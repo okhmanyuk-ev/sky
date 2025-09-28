@@ -504,7 +504,7 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 
 		mAlphaAnimating = true;
 		runAction(sky::Actions::Sequence(
-			sky::Actions::Parallel(
+			sky::Actions::Concurrent(
 				sky::Actions::ChangeAlpha(shared_from_this(), BarAlpha, AnimDuration, Easing::CubicInOut),
 				sky::Actions::ChangeAlpha(mIndicator, IndicatorAlpha, AnimDuration, Easing::CubicInOut)
 			),
@@ -521,7 +521,7 @@ void SceneHelpers::VerticalScrollbar::update(sky::Duration dTime)
 
 		mAlphaAnimating = true;
 		runAction(sky::Actions::Sequence(
-			sky::Actions::Parallel(
+			sky::Actions::Concurrent(
 				sky::Actions::ChangeAlpha(shared_from_this(), 0.0f, AnimDuration, Easing::CubicInOut),
 				sky::Actions::ChangeAlpha(mIndicator, 0.0f, AnimDuration, Easing::CubicInOut)
 			),
@@ -641,7 +641,7 @@ sky::Action SceneHelpers::StandardScreen::createEnterAction()
 
 	return sky::Actions::Sequence(
 		sky::Actions::WaitGlobalFrame(),
-		sky::Actions::Parallel(std::move(actions))
+		sky::Actions::Concurrent(std::move(actions))
 	);
 };
 
@@ -668,7 +668,7 @@ sky::Action SceneHelpers::StandardScreen::createLeaveAction()
 
 	return sky::Actions::Sequence(
 		sky::Actions::WaitGlobalFrame(),
-		sky::Actions::Parallel(std::move(actions))
+		sky::Actions::Concurrent(std::move(actions))
 	);
 };
 
@@ -799,7 +799,7 @@ sky::Action SceneHelpers::StandardWindow::createOpenAction()
 
 	return sky::Actions::Sequence(
 		sky::Actions::WaitGlobalFrame(),
-		sky::Actions::Parallel(std::move(actions))
+		sky::Actions::Concurrent(std::move(actions))
 	);
 };
 
@@ -847,7 +847,7 @@ sky::Action SceneHelpers::StandardWindow::createCloseAction()
 
 	return sky::Actions::Sequence(
 		sky::Actions::WaitGlobalFrame(),
-		sky::Actions::Parallel(std::move(actions))
+		sky::Actions::Concurrent(std::move(actions))
 	);
 };
 
@@ -905,7 +905,7 @@ std::shared_ptr<SceneHelpers::Shockwave> SceneHelpers::Shockwave::MakeAnimated(f
 	shockwave->setShockwaveThickness(0.5f);
 	shockwave->setShockwaveForce(1.0f);
 	shockwave->runAction(sky::Actions::Sequence(
-		sky::Actions::Parallel(
+		sky::Actions::Concurrent(
 			sky::Actions::Interpolate(shockwave->getShockwaveSize(), 1.0f, duration, Easing::SinusoidalOut, [shockwave](float value) {
 				shockwave->setShockwaveSize(value);
 			}),

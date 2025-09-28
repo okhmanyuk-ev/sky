@@ -107,7 +107,7 @@ namespace sky
 	namespace Actions
 	{
 		Action Sequence(std::list<Action> actions);
-		Action Parallel(std::list<Action> actions);
+		Action Concurrent(std::list<Action> actions);
 		Action Race(std::list<Action> actions);
 		Action RepeatInfinite(std::function<std::optional<Action>()> action);
 
@@ -210,11 +210,11 @@ namespace sky
 		}
 
 		template <typename...Args>
-		Action Parallel(Args&&...args)
+		Action Concurrent(Args&&...args)
 		{
 			std::list<Action> actions;
 			(actions.push_back(std::forward<Args>(args)), ...);
-			return Parallel(std::move(actions));
+			return Concurrent(std::move(actions));
 		}
 
 		template <typename...Args>
