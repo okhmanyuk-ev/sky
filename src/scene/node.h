@@ -5,7 +5,7 @@
 #include <scene/transform.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <sky/actions.h>
+#include <sky/action.h>
 
 namespace Scene
 {

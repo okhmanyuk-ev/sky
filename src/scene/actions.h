@@ -5,7 +5,7 @@
 #include <scene/circle.h>
 #include <scene/scrollbox.h>
 #include <scene/glass.h>
-#include <sky/actions.h>
+#include <sky/action.h>
 #include <common/easing.h>
 
 namespace Scene

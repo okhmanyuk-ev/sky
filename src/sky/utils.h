@@ -12,7 +12,7 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <shared/stats_system.h>
-#include <sky/actions.h>
+#include <sky/action.h>
 
 namespace sky
 {
