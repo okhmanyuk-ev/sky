@@ -13,7 +13,7 @@ Action Actions::ChangePositionByDirection(std::shared_ptr<Scene::Transform> node
 
 Action Actions::ChangePositionByDirection(std::shared_ptr<Scene::Transform> node, const glm::vec2& direction, float speed, float duration)
 {
-	return Breakable(duration, ChangePositionByDirection(node, direction, speed));
+	return Timeout(duration, ChangePositionByDirection(node, direction, speed));
 }
 
 Action Actions::ChangeColorRecursive(std::shared_ptr<Scene::Node> node, const glm::vec4& start,

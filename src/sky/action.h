@@ -134,7 +134,7 @@ namespace sky
 		// will wait while flag is true
 		Action Delayed(bool& while_flag, Action action);
 
-		Action Breakable(float duration, Action action);
+		Action Timeout(float duration, Action action);
 		Action Breakable(std::function<bool()> while_callback, Action action);
 
 		Action Pausable(std::function<bool()> run_callback, Action action);

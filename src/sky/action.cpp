@@ -208,7 +208,7 @@ Action Actions::Delayed(bool& while_flag, Action action)
 	);
 }
 
-Action Actions::Breakable(float duration, Action action)
+Action Actions::Timeout(float duration, Action action)
 {
 	return Race(
 		Wait(duration),
