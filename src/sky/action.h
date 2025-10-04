@@ -114,7 +114,6 @@ namespace sky
 		Action ExecuteInfinite(std::function<void()> callback);
 		Action ExecuteInfiniteGlobal(std::function<void()> callback);
 
-		Action Wait();
 		Action Wait(float duration);
 
 		// will wait while returning true

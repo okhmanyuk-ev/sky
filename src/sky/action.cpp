@@ -125,11 +125,6 @@ Action Actions::ExecuteInfiniteGlobal(std::function<void()> callback)
 	});
 }
 
-Action Actions::Wait()
-{
-	return [] {};
-}
-
 Action Actions::Wait(float duration)
 {
 	return Wait([duration](auto delta) mutable {
