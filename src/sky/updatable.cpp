@@ -5,14 +5,13 @@ using namespace sky;
 
 Updatable::Updatable()
 {
-	RunTask([](Updatable* self, std::shared_ptr<bool> finished) -> Task<> {
-		while (true)
-		{
-			self->onFrame();
-			if (!*finished)
-				co_await std::suspend_always{};
-		}
-	}(this, mFinished));
+	RunAction([this, finished = mFinished] {
+		if (*finished)
+			return Action::Result::Finished;
+
+		onFrame();
+		return Action::Result::Continue;
+	});
 }
 
 Updatable::~Updatable()
