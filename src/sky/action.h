@@ -85,6 +85,8 @@ namespace sky
 		{
 		}
 
+		Action(Task<>&& task);
+
 		Result operator()(sky::Duration dTime);
 
 	private:
@@ -136,8 +138,6 @@ namespace sky
 		Action Breakable(std::function<bool()> while_callback, Action action);
 
 		Action Pausable(std::function<bool()> run_callback, Action action);
-
-		Action FromTask(std::function<Task<>()> func);
 
 		using EasingFunction = std::function<float(float)>;
 

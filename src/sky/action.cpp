@@ -4,6 +4,24 @@
 
 using namespace sky;
 
+Action::Action(Task<>&& task)
+{
+	auto completed = std::make_shared<bool>(false);
+	auto task_ptr = std::make_shared<sky::Task<>>(std::move(task));
+
+	mFunc = Actions::Sequence(
+		[task_ptr, completed] {
+			sky::Scheduler::Instance->run([](auto task_ptr, auto completed) -> sky::Task<> {
+				co_await *task_ptr;
+				*completed = true;
+			}(task_ptr, completed));
+		},
+		Actions::Wait([completed] {
+			return !*completed;
+		})
+	);
+}
+
 Action::Result Action::operator()(sky::Duration dTime)
 {
 	return mFunc(dTime);
@@ -222,20 +240,4 @@ Action Actions::Pausable(std::function<bool()> run_callback, Action action)
 
 		return Action::Result::Finished;
 	};
-}
-
-sky::Action Actions::FromTask(std::function<sky::Task<>()> func)
-{
-	auto completed = std::make_shared<bool>(false);
-	return sky::Actions::Sequence(
-		[func, completed] {
-			sky::Scheduler::Instance->run([](auto func, auto completed) -> sky::Task<> {
-				co_await func();
-				*completed = true;
-			}(func, completed));
-		},
-		sky::Actions::Wait([completed] {
-			return !*completed;
-		})
-	);
 }
