@@ -248,33 +248,33 @@ std::shared_ptr<T> CreateNode(const tinyxml2::XMLElement& root)
 	return result;
 }
 
-std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>(const tinyxml2::XMLElement& root)>> SceneHelpers::XmlCreateFuncs = {
+static std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>(const tinyxml2::XMLElement& root)>> XmlHandlers = {
 	{ "Node", [](const auto& root) {
 		auto node = CreateNode<Scene::Node>(root);
-		ParseNodeFromXml(*node, root);
+		SceneHelpers::ParseNodeFromXml(*node, root);
 		return node;
 	} },
 	{ "Sprite", [](const auto& root) {
 		auto node = CreateNode<Scene::Sprite>(root);
-		ParseSpriteFromXml(*node, root);
+		SceneHelpers::ParseSpriteFromXml(*node, root);
 		return node;
 	} },
 	{ "Rectangle", [](const auto& root) {
 		auto node = CreateNode<Scene::Rectangle>(root);
-		ParseNodeFromXml(*node, root);
-		ParseColorFromXml(*node, root);
+		SceneHelpers::ParseNodeFromXml(*node, root);
+		SceneHelpers::ParseColorFromXml(*node, root);
 		node->setRounding(root.FloatAttribute("rounding", node->getRounding()));
 		node->setAbsoluteRounding(root.BoolAttribute("absolute_rounding", node->isAbsoluteRounding()));
 		return node;
 	} },
 	{ "Label", [](const auto& root) {
 		auto node = CreateNode<Scene::Label>(root);
-		ParseLabelFromXml(*node, root);
+		SceneHelpers::ParseLabelFromXml(*node, root);
 		return node;
 	} },
 	{ "RichLabel", [](const auto& root) {
 		auto node = CreateNode<Scene::RichLabel>(root);
-		ParseNodeFromXml(*node, root);
+		SceneHelpers::ParseNodeFromXml(*node, root);
 		node->setFontSize(root.FloatAttribute("font_size", Scene::Label::DefaultFontSize));
 		auto text = sky::to_wstring(root.Attribute("text"));
 		node->setText(root.BoolAttribute("localized") ? sky::Localize(sky::to_string(text)) : text);
@@ -282,7 +282,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>(const
 	} },
 	{ "Column", [](const auto& root) {
 		auto node = CreateNode<Scene::Column>(root);
-		ParseNodeFromXml(*node, root);
+		SceneHelpers::ParseNodeFromXml(*node, root);
 		auto align = root.FloatAttribute("align");
 		node->setAlign(align);
 		return node;
@@ -295,8 +295,8 @@ static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XM
 	std::shared_ptr<Scene::Node> result;
 	std::string name = root.Name();
 
-	if (SceneHelpers::XmlCreateFuncs.contains(name))
-		result = SceneHelpers::XmlCreateFuncs.at(name)(root);
+	if (XmlHandlers.contains(name))
+		result = XmlHandlers.at(name)(root);
 
 	if (!result)
 		return nullptr;
@@ -311,6 +311,12 @@ static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XM
 	}
 
 	return result;
+}
+
+void SceneHelpers::RegisterXmlHandler(const std::string& name, std::function<std::shared_ptr<Scene::Node>(const tinyxml2::XMLElement& root)> handler)
+{
+	assert(!XmlHandlers.contains(name));
+	XmlHandlers[name] = handler;
 }
 
 std::tuple<std::shared_ptr<Scene::Node>, std::unordered_map<std::string, std::shared_ptr<Scene::Node>>>

@@ -28,7 +28,7 @@ namespace Shared::SceneHelpers
 	void ParseSpriteFromXml(Scene::Sprite& node, const tinyxml2::XMLElement& root);
 	void ParseLabelFromXml(Scene::Label& node, const tinyxml2::XMLElement& root);
 
-	extern std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node>(const tinyxml2::XMLElement& root)>> XmlCreateFuncs;
+	void RegisterXmlHandler(const std::string& name, std::function<std::shared_ptr<Scene::Node>(const tinyxml2::XMLElement& root)> handler);
 
 	std::tuple<std::shared_ptr<Scene::Node>, std::unordered_map<std::string, std::shared_ptr<Scene::Node>>>
 		CreateNodesFromXml(const std::string& xml);
