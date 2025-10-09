@@ -292,14 +292,11 @@ static std::unordered_map<std::string, std::function<std::shared_ptr<Scene::Node
 static std::shared_ptr<Scene::Node> CreateNodesFromXmlElement(const tinyxml2::XMLElement& root,
 	std::unordered_map<std::string, std::shared_ptr<Scene::Node>>& collection)
 {
-	std::shared_ptr<Scene::Node> result;
 	std::string name = root.Name();
 
-	if (XmlHandlers.contains(name))
-		result = XmlHandlers.at(name)(root);
-
-	if (!result)
-		return nullptr;
+	assert(XmlHandlers.contains(name));
+	auto handler = XmlHandlers.at(name);
+	auto result = handler(root);
 
 	if (auto id = root.Attribute("id"); id != nullptr)
 		collection.insert({ id, result });
