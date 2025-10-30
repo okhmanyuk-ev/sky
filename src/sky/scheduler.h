@@ -30,7 +30,7 @@ namespace sky
 		void setTimeScale(float value) { mTimeScale = value; }
 
 		auto getFramerate() const { return 1.0f / sky::ToSeconds(mTimeDelta) * mTimeScale; } // frame count per second
-		auto getTasksCount() const { return mTasks.size(); }
+		auto getTasksCount() const { return mTasksCount; }
 
 		auto getUptime() const { return mUptime; }
 		auto getFrameCount() { return mFrameCount; }
@@ -42,6 +42,7 @@ namespace sky
 
 	private:
 		std::list<Task<>> mTasks;
+		size_t mTasksCount = 0;
 		sky::CVar<int> mFramerateLimit = sky::CVar<int>("sys_framerate", 0, "limit of fps");
 		sky::CVar<bool> mSleepAllowed = sky::CVar<bool>("sys_sleep", true, "cpu saving between frames");
 		sky::CVar<float> mTimeScale = sky::CVar<float>("sys_timescale", 1.0f, "time delta multiplier");
