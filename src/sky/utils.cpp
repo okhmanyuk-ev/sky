@@ -146,7 +146,7 @@ sky::Task<> sky::ConvertActionToTask(Action action)
 	while (player.hasActions())
 	{
 		player.update(sky::Scheduler::Instance->getTimeDelta());
-		co_await std::suspend_always{};
+		co_await sky::Tasks::NextFrame();
 	}
 }
 

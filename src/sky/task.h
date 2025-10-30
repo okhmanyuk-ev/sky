@@ -140,6 +140,7 @@ namespace sky
 
 	namespace Tasks
 	{
+		Task<> NextFrame();
 		Task<> WaitForSeconds(float seconds);
 		Task<> WaitForFrames(int count);
 		Task<> WaitWhile(std::function<bool()> condition);
