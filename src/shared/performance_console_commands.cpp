@@ -67,6 +67,9 @@ void PerformanceConsoleCommands::onFrame()
 	else if (mWantShowThreadpool > 0)
 		sky::Indicator("engine", "threadpool", THREADPOOL->getTasksCount());
 
+	if (mWantShowTasks)
+		sky::Indicator("engine", "tasks", sky::Scheduler::Instance->getTasksCount());
+
 #ifndef EMSCRIPTEN
 	if (mWantShowNetSpeed)
 		sky::Indicator("net", "net speed", Common::Helpers::BytesToNiceString(NETWORK->getBytesPerSecond()) + "/s");

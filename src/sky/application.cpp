@@ -173,6 +173,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 
 #if defined(BUILD_DEVELOPER)
 	sky::ExecuteCommand("hud_show_fps 1");
+	sky::ExecuteCommand("hud_show_tasks 1");
 	sky::ExecuteCommand("hud_show_drawcalls 1");
 	sky::ExecuteCommand("hud_show_batches 1");
 	sky::ExecuteCommand("hud_show_targets 1");
