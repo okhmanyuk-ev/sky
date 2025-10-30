@@ -217,11 +217,10 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		startup_commands.push_back(final_cmd);
 	}
 
-	sky::Scheduler::Instance->run([](auto startup_commands) -> Task<> {
+	sky::RunAction([startup_commands] {
 		for (auto cmd : startup_commands)
 			sky::GetService<sky::CommandProcessor>()->execute(cmd);
-		co_return;
-	}(startup_commands));
+	});
 }
 
 Application::~Application()
