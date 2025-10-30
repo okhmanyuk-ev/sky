@@ -62,10 +62,10 @@ void PerformanceConsoleCommands::onFrame()
 	if (mWantShowTargets > 0)
 		sky::Indicator("engine", "targets", GRAPHICS->getRenderTargets().size());
 
-	if (mWantShowTasks > 1)
-		sky::Indicator("engine", "tasks", std::to_string(THREADPOOL->getTasksCount()) + " at " + std::to_string(THREADPOOL->getThreadsCount()) + " threads");
-	else if (mWantShowTasks > 0)
-		sky::Indicator("engine", "tasks", THREADPOOL->getTasksCount());
+	if (mWantShowThreadpool > 1)
+		sky::Indicator("engine", "threadpool", std::to_string(THREADPOOL->getTasksCount()) + " at " + std::to_string(THREADPOOL->getThreadsCount()) + " threads");
+	else if (mWantShowThreadpool > 0)
+		sky::Indicator("engine", "threadpool", THREADPOOL->getTasksCount());
 
 #ifndef EMSCRIPTEN
 	if (mWantShowNetSpeed)
