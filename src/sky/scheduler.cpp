@@ -38,15 +38,19 @@ void Scheduler::frame()
 	mLastTime = now;
 	mUptime += mTimeDelta;
 
-	auto it = mTasks.begin();
-	while (it != mTasks.end())
+	auto tasks = std::move(mTasks);
+
+	auto it = tasks.begin();
+	while (it != tasks.end())
 	{
 		it->resume();
 		if (it->is_completed())
-			it = mTasks.erase(it);
+			it = tasks.erase(it);
 		else
 			++it;
 	}
+
+	mTasks.insert(mTasks.begin(), std::make_move_iterator(tasks.begin()), std::make_move_iterator(tasks.end()));
 }
 
 void Scheduler::run(Task<>&& task)
