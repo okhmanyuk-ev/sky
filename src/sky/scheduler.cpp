@@ -37,6 +37,7 @@ void Scheduler::frame()
 
 	mLastTime = now;
 	mUptime += mTimeDelta;
+	mTasksCount = mTasks.size();
 
 	auto tasks = std::move(mTasks);
 
