@@ -4,7 +4,7 @@
 #include <glm/gtx/integer.hpp>
 #include <cstdio>
 /*
-int test_floor_log2()
+static int test_floor_log2()
 {
 	int Error = 0;
 
@@ -20,7 +20,7 @@ int test_floor_log2()
 	return Error;
 }
 */
-int test_log2()
+static int test_log2()
 {
 	int Error = 0;
 
@@ -33,7 +33,7 @@ int test_log2()
 		Error += glm::abs(double(A) - B) <= 24 ? 0 : 1;
 		assert(!Error);
 
-		std::printf("Log2(%d) error A=%d, B=%d\n", 1 << i, A, B);
+		std::printf("Log2(%d) error A=%u, B=%u\n", 1 << i, A, B);
 	}
 
 	std::printf("log2 error=%d\n", Error);
@@ -41,18 +41,18 @@ int test_log2()
 	return Error;
 }
 
-int test_nlz()
+static int test_nlz()
 {
 	int Error = 0;
 
 	for(glm::uint i = 1; i < glm::uint(33); ++i)
-		Error += glm::nlz(i) == glm::uint(31u) - glm::findMSB(i) ? 0 : 1;
+		Error += glm::nlz(i) == 31u - static_cast<glm::uint>(glm::findMSB(i)) ? 0 : 1;
 		//printf("%d, %d\n", glm::nlz(i), 31u - glm::findMSB(i));
 
 	return Error;
 }
 
-int test_pow_uint()
+static int test_pow_uint()
 {
 	int Error = 0;
 
@@ -68,7 +68,7 @@ int test_pow_uint()
 	return Error;
 }
 
-int test_pow_int()
+static int test_pow_int()
 {
 	int Error = 0;
 

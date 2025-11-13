@@ -1,7 +1,7 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #if GLM_LANG & GLM_LANG_CXXMS_FLAG
 #include <glm/gtc/type_precision.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/io.hpp>
 #include <iostream>
 #include <sstream>
@@ -10,7 +10,7 @@
 namespace
 {
 	template<typename CTy, typename CTr>
-	std::basic_ostream<CTy,CTr>& operator<<(std::basic_ostream<CTy,CTr>& os, glm::qualifier const& a)
+	static std::basic_ostream<CTy,CTr>& operator<<(std::basic_ostream<CTy,CTr>& os, glm::qualifier const& a)
 	{
 		typename std::basic_ostream<CTy,CTr>::sentry const cerberus(os);
 
@@ -32,7 +32,7 @@ namespace
 	}
 
 	template<typename U, glm::qualifier P, typename T, typename CTy, typename CTr>
-	std::basic_string<CTy> type_name(std::basic_ostream<CTy,CTr>&, T const&)
+	static std::basic_string<CTy> type_name(std::basic_ostream<CTy,CTr>&, T const&)
 	{
 		std::basic_ostringstream<CTy,CTr> ostr;
 
@@ -51,16 +51,16 @@ namespace
 		else if (typeid(T) == typeid(glm::mat<4, 4, U,P>)) { ostr << "mat4x4"; }
 		else                                             { ostr << "unknown"; }
 
-		ostr << '<' << typeid(U).name() << ',' << P << '>';
+		ostr << "<" << typeid(U).name() << "," << P << ">";
 
 		return ostr.str();
 	}
 } // namespace {
 
 template<typename T, glm::qualifier P, typename OS>
-int test_io_quat(OS& os)
+static int test_io_quat(OS& os)
 {
-	os << '\n' << typeid(OS).name() << '\n';
+	os << "\n" << typeid(OS).name() << "\n";
 
 	glm::qua<T, P> const q(1, 0, 0, 0);
 
@@ -68,46 +68,46 @@ int test_io_quat(OS& os)
 		glm::io::basic_format_saver<typename OS::char_type> const iofs(os);
 
 		os << glm::io::precision(2) << glm::io::width(1 + 2 + 1 + 2)
-			<< type_name<T, P>(os, q) << ": " << q << '\n';
+			<< type_name<T, P>(os, q) << ": " << q << "\n";
 	}
 
 	{
 		glm::io::basic_format_saver<typename OS::char_type> const iofs(os);
 
 		os << glm::io::unformatted
-			<< type_name<T, P>(os, q) << ": " << q << '\n';
+			<< type_name<T, P>(os, q) << ": " << q << "\n";
 	}
 
 	return 0;
 }
 
 template<typename T, glm::qualifier P, typename OS>
-int test_io_vec(OS& os)
+static int test_io_vec(OS& os)
 {
-	os << '\n' << typeid(OS).name() << '\n';
+	os << "\n" << typeid(OS).name() << "\n";
 
 	glm::vec<2, T,P> const v2(0, 1);
 	glm::vec<3, T,P> const v3(2, 3, 4);
 	glm::vec<4, T,P> const v4(5, 6, 7, 8);
 
-	os << type_name<T,P>(os, v2) << ": " << v2 << '\n'
-		<< type_name<T,P>(os, v3) << ": " << v3 << '\n'
-		<< type_name<T,P>(os, v4) << ": " << v4 << '\n';
+	os << type_name<T,P>(os, v2) << ": " << v2 << "\n"
+		<< type_name<T,P>(os, v3) << ": " << v3 << "\n"
+		<< type_name<T,P>(os, v4) << ": " << v4 << "\n";
 
 	glm::io::basic_format_saver<typename OS::char_type> const iofs(os);
 
 	os << glm::io::precision(2) << glm::io::width(1 + 2 + 1 + 2)
-		<< type_name<T,P>(os, v2) << ": " << v2 << '\n'
-		<< type_name<T,P>(os, v3) << ": " << v3 << '\n'
-		<< type_name<T,P>(os, v4) << ": " << v4 << '\n';
+		<< type_name<T,P>(os, v2) << ": " << v2 << "\n"
+		<< type_name<T,P>(os, v3) << ": " << v3 << "\n"
+		<< type_name<T,P>(os, v4) << ": " << v4 << "\n";
 
 	return 0;
 }
 
 template<typename T, glm::qualifier P, typename OS>
-int test_io_mat(OS& os, glm::io::order_type otype)
+static int test_io_mat(OS& os, glm::io::order_type otype)
 {
-	os << '\n' << typeid(OS).name() << '\n';
+	os << "\n" << typeid(OS).name() << "\n";
 
 	glm::vec<2, T,P> const v2_1( 0,  1);
 	glm::vec<2, T,P> const v2_2( 2,  3);
@@ -126,27 +126,27 @@ int test_io_mat(OS& os, glm::io::order_type otype)
 
 	os << glm::io::precision(2) << glm::io::width(1 + 2 + 1 + 2)
 		<< glm::io::order(otype)
-		<< "mat2x2<" << typeid(T).name() << ',' << P << ">: " << glm::mat<2, 2, T,P>(v2_1, v2_2) << '\n'
-		<< "mat2x3<" << typeid(T).name() << ',' << P << ">: " << glm::mat<2, 3, T,P>(v3_1, v3_2) << '\n'
-		<< "mat2x4<" << typeid(T).name() << ',' << P << ">: " << glm::mat<2, 4, T,P>(v4_1, v4_2) << '\n'
-		<< "mat3x2<" << typeid(T).name() << ',' << P << ">: " << glm::mat<3, 2, T,P>(v2_1, v2_2, v2_3) << '\n'
-		<< "mat3x3<" << typeid(T).name() << ',' << P << ">: " << glm::mat<3, 3, T,P>(v3_1, v3_2, v3_3) << '\n'
-		<< "mat3x4<" << typeid(T).name() << ',' << P << ">: " << glm::mat<3, 4, T,P>(v4_1, v4_2, v4_3) << '\n'
-		<< "mat4x2<" << typeid(T).name() << ',' << P << ">: " << glm::mat<4, 2, T,P>(v2_1, v2_2, v2_3, v2_4) << '\n'
-		<< "mat4x3<" << typeid(T).name() << ',' << P << ">: " << glm::mat<4, 3, T,P>(v3_1, v3_2, v3_3, v3_4) << '\n'
-		<< "mat4x4<" << typeid(T).name() << ',' << P << ">: " << glm::mat<4, 4, T,P>(v4_1, v4_2, v4_3, v4_4) << '\n';
+		<< "mat2x2<" << typeid(T).name() << "," << P << ">: " << glm::mat<2, 2, T,P>(v2_1, v2_2) << "\n"
+		<< "mat2x3<" << typeid(T).name() << "," << P << ">: " << glm::mat<2, 3, T,P>(v3_1, v3_2) << "\n"
+		<< "mat2x4<" << typeid(T).name() << "," << P << ">: " << glm::mat<2, 4, T,P>(v4_1, v4_2) << "\n"
+		<< "mat3x2<" << typeid(T).name() << "," << P << ">: " << glm::mat<3, 2, T,P>(v2_1, v2_2, v2_3) << "\n"
+		<< "mat3x3<" << typeid(T).name() << "," << P << ">: " << glm::mat<3, 3, T,P>(v3_1, v3_2, v3_3) << "\n"
+		<< "mat3x4<" << typeid(T).name() << "," << P << ">: " << glm::mat<3, 4, T,P>(v4_1, v4_2, v4_3) << "\n"
+		<< "mat4x2<" << typeid(T).name() << "," << P << ">: " << glm::mat<4, 2, T,P>(v2_1, v2_2, v2_3, v2_4) << "\n"
+		<< "mat4x3<" << typeid(T).name() << "," << P << ">: " << glm::mat<4, 3, T,P>(v3_1, v3_2, v3_3, v3_4) << "\n"
+		<< "mat4x4<" << typeid(T).name() << "," << P << ">: " << glm::mat<4, 4, T,P>(v4_1, v4_2, v4_3, v4_4) << "\n";
 
 	os << glm::io::unformatted
 		<< glm::io::order(otype)
-		<< "mat2x2<" << typeid(T).name() << ',' << P << ">: " << glm::mat<2, 2, T,P>(v2_1, v2_2) << '\n'
-		<< "mat2x3<" << typeid(T).name() << ',' << P << ">: " << glm::mat<2, 3, T,P>(v3_1, v3_2) << '\n'
-		<< "mat2x4<" << typeid(T).name() << ',' << P << ">: " << glm::mat<2, 4, T,P>(v4_1, v4_2) << '\n'
-		<< "mat3x2<" << typeid(T).name() << ',' << P << ">: " << glm::mat<3, 2, T,P>(v2_1, v2_2, v2_3) << '\n'
-		<< "mat3x3<" << typeid(T).name() << ',' << P << ">: " << glm::mat<3, 3, T,P>(v3_1, v3_2, v3_3) << '\n'
-		<< "mat3x4<" << typeid(T).name() << ',' << P << ">: " << glm::mat<3, 4, T,P>(v4_1, v4_2, v4_3) << '\n'
-		<< "mat4x2<" << typeid(T).name() << ',' << P << ">: " << glm::mat<4, 2, T,P>(v2_1, v2_2, v2_3, v2_4) << '\n'
-		<< "mat4x3<" << typeid(T).name() << ',' << P << ">: " << glm::mat<4, 3, T,P>(v3_1, v3_2, v3_3, v3_4) << '\n'
-		<< "mat4x4<" << typeid(T).name() << ',' << P << ">: " << glm::mat<4, 4, T,P>(v4_1, v4_2, v4_3, v4_4) << '\n';
+		<< "mat2x2<" << typeid(T).name() << "," << P << ">: " << glm::mat<2, 2, T,P>(v2_1, v2_2) << "\n"
+		<< "mat2x3<" << typeid(T).name() << "," << P << ">: " << glm::mat<2, 3, T,P>(v3_1, v3_2) << "\n"
+		<< "mat2x4<" << typeid(T).name() << "," << P << ">: " << glm::mat<2, 4, T,P>(v4_1, v4_2) << "\n"
+		<< "mat3x2<" << typeid(T).name() << "," << P << ">: " << glm::mat<3, 2, T,P>(v2_1, v2_2, v2_3) << "\n"
+		<< "mat3x3<" << typeid(T).name() << "," << P << ">: " << glm::mat<3, 3, T,P>(v3_1, v3_2, v3_3) << "\n"
+		<< "mat3x4<" << typeid(T).name() << "," << P << ">: " << glm::mat<3, 4, T,P>(v4_1, v4_2, v4_3) << "\n"
+		<< "mat4x2<" << typeid(T).name() << "," << P << ">: " << glm::mat<4, 2, T,P>(v2_1, v2_2, v2_3, v2_4) << "\n"
+		<< "mat4x3<" << typeid(T).name() << "," << P << ">: " << glm::mat<4, 3, T,P>(v3_1, v3_2, v3_3, v3_4) << "\n"
+		<< "mat4x4<" << typeid(T).name() << "," << P << ">: " << glm::mat<4, 4, T,P>(v4_1, v4_2, v4_3, v4_4) << "\n";
   
 	return 0;
 }
