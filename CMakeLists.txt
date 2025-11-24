@@ -99,7 +99,6 @@ elseif(EMSCRIPTEN)
 		-sALLOW_MEMORY_GROWTH
 		-sCASE_INSENSITIVE_FS
 		--shell-file ${EMSCRIPTEN_SHELL_FILE_PATH}
-		--use-preload-cache
 		-lwebsocket.js
 	)
 	target_compile_options(${PROJECT_NAME} PUBLIC
