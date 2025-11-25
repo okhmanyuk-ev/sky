@@ -112,6 +112,7 @@ namespace sky
 	}
 
 	std::string join(const std::vector<std::string>& vec, const std::string& delimiter);
+	std::string trim(const std::string& s);
 
 	template <class... Ts>
 	struct cases : Ts...
