@@ -180,3 +180,11 @@ std::string sky::join(const std::vector<std::string>& vec, const std::string& de
 	}
 	return result;
 }
+
+std::string sky::trim(const std::string& s)
+{
+	size_t start = s.find_first_not_of(" \t\n\r\f\v");
+	size_t end = s.find_last_not_of(" \t\n\r\f\v");
+	return (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
+}
+
