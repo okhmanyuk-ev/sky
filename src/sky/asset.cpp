@@ -66,7 +66,7 @@ sky::Asset::~Asset()
 
 void sky::Asset::Write(const std::string& path, void* memory, size_t size, Storage storage)
 {
-#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN)
+#if defined(PLATFORM_WINDOWS) | defined(PLATFORM_IOS) | defined(PLATFORM_MAC) | defined(PLATFORM_EMSCRIPTEN) | defined(LINUX)
 #if defined(PLATFORM_IOS)
 	assert(storage != Storage::Assets);
 	if (storage == Storage::Assets)
@@ -169,6 +169,26 @@ std::string sky::Asset::FixSlashes(const std::string& input)
 void sky::Asset::Fetch(const std::string& url, FetchSettings settings)
 {
 #ifdef EMSCRIPTEN
+#ifdef BUILD_DZ
+	EM_ASM((
+		const url = UTF8ToString($0);
+		if (!Module.fetchedUrls) {
+			Module.fetchedUrls = {};
+			Module.printFetchedUrls = () => {
+				let payload = "";
+				for (const key of Object.keys(Module.fetchedUrls)) {
+					payload += key + "\n";
+				}
+				console.log(payload);
+			};
+		}
+
+		if (!url.endsWith(".mp3") && !url.endsWith(".wav")) {
+			Module.fetchedUrls[url] = 1;
+		}
+	), url.c_str());
+#endif
+
 	emscripten_fetch_attr_t attr;
 	emscripten_fetch_attr_init(&attr);
 	strcpy(attr.requestMethod, "GET");
