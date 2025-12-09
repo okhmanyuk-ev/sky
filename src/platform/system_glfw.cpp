@@ -29,6 +29,7 @@ static void CharCallback(GLFWwindow* window, unsigned int codepoint);
 static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 static void WindowSizeCallback(GLFWwindow* window, int width, int height);
 static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+static void JoystickCallback(int id, int event);
 
 int main(int argc, char* argv[])
 {
@@ -85,6 +86,7 @@ SystemGlfw::SystemGlfw(const std::string& appname) : mAppName(appname)
 	glfwSetScrollCallback(gWindow, ScrollCallback);
 	glfwSetWindowSizeCallback(gWindow, WindowSizeCallback);
 	glfwSetFramebufferSizeCallback(gWindow, FramebufferSizeCallback);
+	glfwSetJoystickCallback(JoystickCallback);
 
 	double mouse_x;
 	double mouse_y;
@@ -352,6 +354,41 @@ const std::vector<std::string>& SystemGlfw::getArguments() const
 	return gArguments;
 }
 
+void SystemGlfw::updateGamepadMapping(const char* str)
+{
+	glfwUpdateGamepadMappings(str);
+}
+
+bool SystemGlfw::isJoystickPresent(int index) const
+{
+	return glfwJoystickPresent(index) == GLFW_TRUE;
+}
+
+const unsigned char* SystemGlfw::getJoystickButtons(int jid, int* count) const
+{
+	return glfwGetJoystickButtons(jid, count);
+}
+
+const float* SystemGlfw::getJoystickAxes(int jid, int* count) const
+{
+	return glfwGetJoystickAxes(jid, count);
+}
+
+bool SystemGlfw::getGamepadState(int jid, Input::Joystick::GamepadState* state) const
+{
+	GLFWgamepadstate _state;
+	auto result = glfwGetGamepadState(jid, &_state);
+	for (int i = 0; i < 15; i++)
+	{
+		state->buttons[i] = _state.buttons[i];
+	}
+	for (int i = 0; i < 6; i++)
+	{
+		state->axes[i] = _state.axes[i];
+	}
+	return result;
+}
+
 static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	static const std::unordered_map<int, Input::Mouse::ButtonEvent::Type> TypeMap = {
@@ -526,6 +563,22 @@ static void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 	gWidth = width;
 	gHeight = height;
 	sky::Emit(Platform::System::ResizeEvent({ width, height }));
+}
+
+static void JoystickCallback(int id, int event)
+{
+	static const std::unordered_map<int, Input::Joystick::ChangedEvent::Type> TypeMap = {
+		{ GLFW_CONNECTED, Input::Joystick::ChangedEvent::Type::Connected },
+		{ GLFW_DISCONNECTED, Input::Joystick::ChangedEvent::Type::Disconnected },
+	};
+
+	if (!TypeMap.contains(event))
+		return;
+
+	sky::Emit(Input::Joystick::ChangedEvent{
+		.id = id,
+		.type = TypeMap.at(event)
+	});
 }
 
 #endif

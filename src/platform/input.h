@@ -243,6 +243,29 @@ namespace Platform::Input
 		};
 	}
 
+	namespace Joystick
+	{
+		struct ChangedEvent
+		{
+			enum class Type
+			{
+				Connected,
+				Disconnected
+			};
+
+			int id;
+			Type type;
+		};
+
+		struct GamepadState
+		{
+			static const int BUTTON_COUNT = 15;
+			static const int AXIS_COUNT = 6;
+			unsigned char buttons[BUTTON_COUNT];
+			float axes[AXIS_COUNT];
+		};
+	}
+
 	namespace Touch
 	{
 		struct Event

@@ -13,6 +13,8 @@ static SystemEmscripten* gContext = nullptr;
 static SDL_Window* gWindow = nullptr;
 static std::vector<std::string> gArguments;
 
+static std::unordered_map<SDL_JoystickID, SDL_GameController*> gGamepads;
+
 int main(int argc, char* argv[])
 {
 	gArguments = std::vector<std::string>(argv, argv + argc);
@@ -27,7 +29,7 @@ std::shared_ptr<System> System::create(const std::string& appname)
 
 SystemEmscripten::SystemEmscripten(const std::string& appname) : mAppName(appname)
 {
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 
 	auto window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 	gWindow = SDL_CreateWindow(appname.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWidth, mHeight, window_flags);
@@ -210,6 +212,35 @@ void SystemEmscripten::process()
 				.type = TypeMap.at(event.type),
 				.key = KeyMap.at(event.key.keysym.sym)
 			});
+		}
+		else if (event.type == SDL_JOYDEVICEADDED)
+		{
+			auto id = event.jdevice.which;
+			if (SDL_IsGameController(id)) {
+				auto gc = SDL_GameControllerOpen(id);
+				if (gc)
+				{
+					auto id = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(gc));
+					gGamepads[id] = gc;
+					sky::Emit(Input::Joystick::ChangedEvent{
+						.id = id,
+						.type = Input::Joystick::ChangedEvent::Type::Connected
+					});
+				}
+			}
+		}
+		else if (event.type == SDL_JOYDEVICEREMOVED)
+		{
+			auto id = event.jdevice.which;
+			if (gGamepads.contains(id))
+			{
+				SDL_GameControllerClose(gGamepads.at(id));
+				gGamepads.erase(id);
+				sky::Emit(Input::Joystick::ChangedEvent{
+					.id = id,
+					.type = Input::Joystick::ChangedEvent::Type::Disconnected
+				});
+			}
 		}
 	}
 
@@ -414,6 +445,111 @@ void SystemEmscripten::setClipboardText(const std::string& text)
 const std::vector<std::string>& SystemEmscripten::getArguments() const
 {
 	return gArguments;
+}
+
+void SystemEmscripten::updateGamepadMapping(const char* str)
+{
+	std::istringstream stream(str);
+	std::string line;
+	while (std::getline(stream, line))
+	{
+		if (!line.empty() && line.back() == '\r')
+			line.pop_back();
+
+		if (!line.empty() && line[0] != '#')
+			SDL_GameControllerAddMapping(line.c_str());
+	}
+}
+
+bool SystemEmscripten::isJoystickPresent(int index) const
+{
+	return gGamepads.contains(index);
+}
+
+const unsigned char* SystemEmscripten::getJoystickButtons(int jid, int* count) const
+{
+	static unsigned char g_buttonBuffer[32] = { 0 };
+
+	auto joy = SDL_GameControllerGetJoystick(gGamepads.at(jid));
+	auto num = SDL_JoystickNumButtons(joy);
+
+	if (num > 32)
+		num = 32;
+
+	for (int i = 0; i < num; ++i)
+	{
+		g_buttonBuffer[i] = (unsigned char)SDL_JoystickGetButton(joy, i);
+	}
+
+	if (count)
+		*count = num;
+
+	return g_buttonBuffer;
+}
+
+const float* SystemEmscripten::getJoystickAxes(int jid, int* count) const
+{
+	static float g_axisBuffer[32] = { 0.0f };
+
+	auto joy = SDL_GameControllerGetJoystick(gGamepads.at(jid));
+	auto numAxes = SDL_JoystickNumAxes(joy);
+
+	if (numAxes > 32)
+		numAxes = 32;
+
+	for (int i = 0; i < numAxes; ++i)
+	{
+		auto value = SDL_JoystickGetAxis(joy, i);
+		g_axisBuffer[i] = value / 32768.0f;
+	}
+
+	if (count)
+		*count = numAxes;
+
+	return g_axisBuffer;
+}
+
+bool SystemEmscripten::getGamepadState(int jid, Input::Joystick::GamepadState* state) const
+{
+    if (!state)
+        return false;
+
+	if (!gGamepads.contains(jid))
+        return false;
+
+    auto gc = gGamepads.at(jid);
+
+    const SDL_GameControllerButton btns[] = {
+        SDL_CONTROLLER_BUTTON_A,
+        SDL_CONTROLLER_BUTTON_B,
+        SDL_CONTROLLER_BUTTON_X,
+        SDL_CONTROLLER_BUTTON_Y,
+        SDL_CONTROLLER_BUTTON_LEFTSHOULDER,
+        SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
+        SDL_CONTROLLER_BUTTON_BACK,
+        SDL_CONTROLLER_BUTTON_START,
+        SDL_CONTROLLER_BUTTON_GUIDE,
+        SDL_CONTROLLER_BUTTON_LEFTSTICK,
+        SDL_CONTROLLER_BUTTON_RIGHTSTICK,
+        SDL_CONTROLLER_BUTTON_DPAD_UP,
+        SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
+        SDL_CONTROLLER_BUTTON_DPAD_DOWN,
+        SDL_CONTROLLER_BUTTON_DPAD_LEFT
+    };
+
+    for (int i = 0; i < 15; ++i)
+	{
+        state->buttons[i] = (unsigned char)SDL_GameControllerGetButton(gc, btns[i]);
+    }
+
+    state->axes[0] = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_LEFTX) / 32768.0f;
+    state->axes[1] = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_LEFTY) / 32768.0f;
+    state->axes[2] = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_RIGHTX) / 32768.0f;
+    state->axes[3] = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_RIGHTY) / 32768.0f;
+    state->axes[4] = (SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_TRIGGERLEFT) - (32768.0f * 0.5f)) / (32768.0f * 0.5f);
+    state->axes[5] = (SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) - (32768.0f * 0.5f)) / (32768.0f * 0.5f);
+
+    return true;
 }
 
 #endif

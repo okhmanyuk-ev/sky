@@ -80,6 +80,12 @@ namespace Platform
 
 		virtual const std::vector<std::string>& getArguments() const = 0;
 
+		virtual void updateGamepadMapping(const char* str) = 0;
+		virtual bool isJoystickPresent(int index) const = 0;
+		virtual const unsigned char* getJoystickButtons(int jid, int* count) const = 0;
+		virtual const float* getJoystickAxes(int jid, int* count) const = 0;
+		virtual bool getGamepadState(int jid, Input::Joystick::GamepadState* state) const = 0;
+
 	public:
 		enum class HapticType
 		{

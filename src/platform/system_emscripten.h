@@ -69,6 +69,12 @@ namespace Platform
 
 		const std::vector<std::string>& getArguments() const override;
 
+		void updateGamepadMapping(const char* str) override;
+		bool isJoystickPresent(int index) const override;
+		const unsigned char* getJoystickButtons(int jid, int* count) const override;
+		const float* getJoystickAxes(int jid, int* count) const override;
+		bool getGamepadState(int jid, Input::Joystick::GamepadState* state) const override;
+
 	private:
 		std::string mAppName;
 		float mScale = 1.0f;
