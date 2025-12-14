@@ -408,7 +408,19 @@ void SystemEmscripten::setCursorMode(Input::CursorMode mode)
 
 Input::CursorMode SystemEmscripten::getCursorMode() const
 {
-	if (SDL_GetRelativeMouseMode())
+	//if (SDL_GetRelativeMouseMode())		<--- this doesnt work in emscripten
+	//	return Input::CursorMode::Locked;
+
+	bool isLocked = EM_ASM_INT({
+		var canvas = Module?.canvas || document.getElementById('canvas');
+		if (!canvas) return 0;
+		var plElement = document.pointerLockElement ||
+						document.mozPointerLockElement ||
+						document.webkitPointerLockElement;
+		return (plElement === canvas) ? 1 : 0;
+	});
+
+	if (isLocked)
 		return Input::CursorMode::Locked;
 
 	return SDL_ShowCursor(SDL_QUERY) == SDL_DISABLE ? Input::CursorMode::Hidden : Input::CursorMode::Normal;
