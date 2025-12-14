@@ -54,10 +54,11 @@ namespace Platform
 
 		virtual void resize(int width, int height) = 0;
 		virtual void setTitle(const std::string& text) = 0;
-		virtual void hideCursor() = 0;
-		virtual void showCursor() = 0;
-		virtual void setCursorPos(int x, int y) = 0;
 
+		virtual void setCursorMode(Input::CursorMode mode) = 0;
+		virtual Input::CursorMode getCursorMode() const = 0;
+
+		virtual void setCursorPos(int x, int y) = 0;
 		virtual std::optional<glm::ivec2> getCursorPos() const;
 
 		virtual std::string getAppName() const = 0;

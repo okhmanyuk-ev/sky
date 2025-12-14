@@ -39,10 +39,11 @@ namespace Platform
 
 		void resize(int width, int height) override;
 		void setTitle(const std::string& text) override;
-		void hideCursor() override;
-		void showCursor() override;
-		void setCursorPos(int x, int y) override;
 
+		void setCursorMode(Input::CursorMode mode) override;
+		Input::CursorMode getCursorMode() const override;
+
+		void setCursorPos(int x, int y) override;
 		std::optional<glm::ivec2> getCursorPos() const override;
 
 		std::string getAppName() const override;

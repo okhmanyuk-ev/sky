@@ -138,7 +138,7 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::ButtonEv
 	if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Pressed && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 	{
 		mLookAround = true;
-		PLATFORM->hideCursor();
+		PLATFORM->setCursorMode(Platform::Input::CursorMode::Hidden);
 		mStartAngles = e.pos;
 		mCurrentAngles = mStartAngles;
 		mPrevAngles = mStartAngles;
@@ -147,7 +147,7 @@ void FirstPersonCameraController::onEvent(const Platform::Input::Mouse::ButtonEv
 	if (e.type == Platform::Input::Mouse::ButtonEvent::Type::Released)
 	{
 		mLookAround = false;
-		PLATFORM->showCursor();
+		PLATFORM->setCursorMode(Platform::Input::CursorMode::Normal);
 	}
 }
 

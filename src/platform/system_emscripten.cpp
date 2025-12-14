@@ -388,12 +388,30 @@ void SystemEmscripten::setTitle(const std::string& text)
 {
 }
 
-void SystemEmscripten::hideCursor()
+void SystemEmscripten::setCursorMode(Input::CursorMode mode)
 {
+	if (mode == Input::CursorMode::Normal)
+	{
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_ShowCursor(SDL_ENABLE);
+	}
+	else if (mode == Input::CursorMode::Hidden)
+	{
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_ShowCursor(SDL_DISABLE);
+	}
+	else if (mode == Input::CursorMode::Locked)
+	{
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+	}
 }
 
-void SystemEmscripten::showCursor()
+Input::CursorMode SystemEmscripten::getCursorMode() const
 {
+	if (SDL_GetRelativeMouseMode())
+		return Input::CursorMode::Locked;
+
+	return SDL_ShowCursor(SDL_QUERY) == SDL_DISABLE ? Input::CursorMode::Hidden : Input::CursorMode::Normal;
 }
 
 void SystemEmscripten::setCursorPos(int x, int y)

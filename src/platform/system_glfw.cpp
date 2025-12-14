@@ -292,14 +292,25 @@ void SystemGlfw::setTitle(const std::string& text)
 	glfwSetWindowTitle(gWindow, text.c_str());
 }
 
-void SystemGlfw::hideCursor()
+void SystemGlfw::setCursorMode(Input::CursorMode mode)
 {
-	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	static const std::unordered_map<Input::CursorMode, int> CursorMode = {
+		{ Input::CursorMode::Normal, GLFW_CURSOR_NORMAL },
+		{ Input::CursorMode::Hidden, GLFW_CURSOR_HIDDEN },
+		{ Input::CursorMode::Locked, GLFW_CURSOR_DISABLED }
+	};
+	glfwSetInputMode(gWindow, GLFW_CURSOR, CursorMode.at(mode));
 }
 
-void SystemGlfw::showCursor()
+Input::CursorMode SystemGlfw::getCursorMode() const
 {
-	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	static const std::unordered_map<int, Input::CursorMode> CursorMode = {
+		{ GLFW_CURSOR_NORMAL, Input::CursorMode::Normal },
+		{ GLFW_CURSOR_HIDDEN, Input::CursorMode::Hidden },
+		{ GLFW_CURSOR_DISABLED, Input::CursorMode::Locked }
+	};
+	int mode = glfwGetInputMode(gWindow, GLFW_CURSOR);
+	return CursorMode.at(mode);
 }
 
 void SystemGlfw::setCursorPos(int x, int y)

@@ -281,4 +281,11 @@ namespace Platform::Input
 			glm::ivec2 pos;
 		};
 	}
+
+	enum class CursorMode
+	{
+		Normal,
+		Hidden,
+		Locked
+	};
 }
