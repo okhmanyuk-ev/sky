@@ -398,6 +398,11 @@ void SystemEmscripten::showCursor()
 
 void SystemEmscripten::setCursorPos(int x, int y)
 {
+	SDL_WarpMouseInWindow(gWindow, x, y);
+	mCursorPos = {
+		(int)((float)x * mScale),
+		(int)((float)y * mScale)
+	};
 }
 
 std::optional<glm::ivec2> SystemEmscripten::getCursorPos() const
