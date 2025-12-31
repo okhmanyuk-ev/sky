@@ -188,12 +188,12 @@ void Label::refresh()
 	if (!mSettings.multiline)
 	{
 		height = (mSettings.font->getAscent() - (mSettings.font->getDescent() * 2.0f)) * mSettings.font->getScaleFactorForSize(mSettings.font_size);
-		mTextMesh = Graphics::TextMesh::createSinglelineTextMesh(*mSettings.font, text, -mSettings.font->getDescent() + mSettings.font->getCustomVerticalOffset());
+		mTextMesh = sky::TextMesh::createSinglelineTextMesh(*mSettings.font, text, -mSettings.font->getDescent() + mSettings.font->getCustomVerticalOffset());
 		setWidth(mSettings.font->getStringWidth(text, mSettings.font_size));
 	}
 	else
 	{
-		std::tie(height, mTextMesh) = Graphics::TextMesh::createMultilineTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
+		std::tie(height, mTextMesh) = sky::TextMesh::createMultilineTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
 	}
 
 	for (size_t i = 0; i < colormap.size(); i++)

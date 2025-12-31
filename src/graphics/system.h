@@ -13,7 +13,7 @@
 #include <glm/ext.hpp>
 #include <optional>
 #include <stack>
-#include "text_mesh.h"
+#include <sky/text_mesh.h>
 #include <set>
 
 #define GRAPHICS sky::Locator<Graphics::System>::Get()
@@ -104,10 +104,10 @@ namespace Graphics
 			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
 		// text
-		void drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue,
+		void drawString(const Font& font, const sky::TextMesh& mesh, float minValue, float maxValue,
 			float smoothFactor, const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
-		void drawString(const Font& font, const TextMesh& mesh, float size, float bold = 0.0f,
+		void drawString(const Font& font, const sky::TextMesh& mesh, float size, float bold = 0.0f,
 			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White), float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = sky::GetColor<glm::vec4>(sky::Color::Black));
 

@@ -7,5 +7,4 @@
 #include <graphics/system.h>
 #include <graphics/texture_part.h>
 #include <graphics/tex_region.h>
-#include <graphics/text_mesh.h>
 #include <graphics/effects.h>

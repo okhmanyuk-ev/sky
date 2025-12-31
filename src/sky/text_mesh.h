@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cstdint>
-#include "font.h"
+#include <graphics/font.h>
 #include <skygfx/utils.h>
 
-namespace Graphics
+namespace sky
 {
 	struct TextMesh
 	{
@@ -36,13 +36,13 @@ namespace Graphics
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
 
-		static TextMesh createTextMesh(const Font& font, std::wstring::const_iterator begin,
+		static TextMesh createTextMesh(const Graphics::Font & font, std::wstring::const_iterator begin,
 			std::wstring::const_iterator end);
 
-		static TextMesh createSinglelineTextMesh(const Font& font, const std::wstring& text,
+		static TextMesh createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text,
 			float vertical_offset = 0.0f);
 
-		static std::tuple<float, TextMesh> createMultilineTextMesh(const Font& font, const std::wstring& text,
+		static std::tuple<float, TextMesh> createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
 			float maxWidth, float size, Align align = Align::Left);
 	};
 }

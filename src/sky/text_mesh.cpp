@@ -1,7 +1,7 @@
 #include "text_mesh.h"
 #include <sky/color.h>
 
-using namespace Graphics;
+using namespace sky;
 
 TextMesh::Symbol::Symbol(glm::vec2 pos, glm::vec2 size, float line_y) :
 	pos(pos), size(size), line_y(line_y)
@@ -26,7 +26,7 @@ void TextMesh::setSymbolColor(size_t index, const glm::vec4& color)
 	}
 }
 
-TextMesh TextMesh::createTextMesh(const Font& font, std::wstring::const_iterator begin,
+TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::const_iterator begin,
 	std::wstring::const_iterator end)
 {
 	const auto texture = font.getTexture();
@@ -89,7 +89,7 @@ TextMesh TextMesh::createTextMesh(const Font& font, std::wstring::const_iterator
 	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols));
 }
 
-TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const std::wstring& text, float vertical_offset)
+TextMesh TextMesh::createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text, float vertical_offset)
 {
 	auto mesh = createTextMesh(font, text.begin(), text.end());
 
@@ -101,7 +101,7 @@ TextMesh TextMesh::createSinglelineTextMesh(const Font& font, const std::wstring
 	return mesh;
 }
 
-std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Font& font, const std::wstring& text,
+std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
 	float maxWidth, float size, Align align)
 {
 	auto scale = font.getScaleFactorForSize(size);

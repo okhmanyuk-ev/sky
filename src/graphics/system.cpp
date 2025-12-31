@@ -550,7 +550,7 @@ void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture>
 	draw(&mSdfEffect, texture, topology, vertices, indices);
 }
 
-void System::drawString(const Font& font, const TextMesh& mesh, float minValue, float maxValue,
+void System::drawString(const Font& font, const sky::TextMesh& mesh, float minValue, float maxValue,
 	float smoothFactor, const glm::vec4& color)
 {
 	assert(!mesh.vertices.empty());
@@ -560,7 +560,7 @@ void System::drawString(const Font& font, const TextMesh& mesh, float minValue, 
 		maxValue, smoothFactor, color);
 }
 
-void System::drawString(const Font& font, const TextMesh& mesh, float size, float bold,
+void System::drawString(const Font& font, const sky::TextMesh& mesh, float size, float bold,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
 	assert(!mesh.vertices.empty());
@@ -583,7 +583,7 @@ void System::drawString(const Font& font, const TextMesh& mesh, float size, floa
 void System::drawString(const Font& font, const std::wstring& text, float size, float bold, const glm::vec4& color,
 	float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(font, TextMesh::createSinglelineTextMesh(font, text), size, bold, color, outlineThickness, outlineColor);
+	drawString(font, sky::TextMesh::createSinglelineTextMesh(font, text), size, bold, color, outlineThickness, outlineColor);
 }
 
 glm::vec3 System::project(const glm::vec3& pos)

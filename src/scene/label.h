@@ -3,6 +3,7 @@
 #include <scene/node.h>
 #include <scene/color.h>
 #include <graphics/font.h>
+#include <sky/text_mesh.h>
 
 namespace Scene
 {
@@ -46,7 +47,7 @@ namespace Scene
 		auto getOutlineColor() const { return mOutlineColor; }
 
 		auto getAlign() const { return mSettings.align; }
-		void setAlign(Graphics::TextMesh::Align value) { mSettings.align = value; }
+		void setAlign(sky::TextMesh::Align value) { mSettings.align = value; }
 
 		auto isMultiline() const { return mSettings.multiline; }
 		void setMultiline(bool value) { mSettings.multiline = value; }
@@ -68,7 +69,7 @@ namespace Scene
 
 	private:
 		Bold mBold = Bold::None;
-		std::optional<Graphics::TextMesh> mTextMesh;
+		std::optional<sky::TextMesh> mTextMesh;
 		float mPrevWidth = 0.0f;
 		float mOutlineThickness = 0.0f;
 		std::shared_ptr<Color> mOutlineColor = std::make_shared<Color>(sky::GetColor(sky::Color::Black));
@@ -78,7 +79,7 @@ namespace Scene
 			std::wstring text;
 			std::shared_ptr<Graphics::Font> font = DefaultFont;
 			float font_size = DefaultFontSize;
-			Graphics::TextMesh::Align align = Graphics::TextMesh::Align::Left;
+			sky::TextMesh::Align align = sky::TextMesh::Align::Left;
 			bool multiline = false;
 			bool replace_escaped_new_lines = false;
 			bool parse_color_tags = false;
