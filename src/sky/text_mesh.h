@@ -27,21 +27,22 @@ namespace sky
 		using Indices = skygfx::utils::Mesh::Indices;
 		using Symbols = std::vector<Symbol>;
 
-		TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols);
+		TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, float height);
 
 		skygfx::Topology topology;
 		Vertices vertices;
 		Indices indices;
 		Symbols symbols;
+		float height;
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
 
 		static TextMesh createTextMesh(const Graphics::Font & font, std::wstring::const_iterator begin,
-			std::wstring::const_iterator end);
+			std::wstring::const_iterator end, float size);
 
-		static TextMesh createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text);
+		static TextMesh createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text, float size);
 
-		static std::tuple<float, TextMesh> createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
+		static TextMesh createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
 			float maxWidth, float size, Align align = Align::Left);
 	};
 }

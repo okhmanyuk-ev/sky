@@ -35,7 +35,7 @@ void Label::draw()
 
 	GRAPHICS->pushSampler(skygfx::Sampler::Linear);
 	GRAPHICS->pushModelMatrix(model);
-	GRAPHICS->drawString(*mSettings.font, mTextMesh.value(), mSettings.font_size, bold, getColor(), mOutlineThickness, mOutlineColor->getColor());
+	GRAPHICS->drawString(*mSettings.font, mTextMesh.value(), bold, getColor(), mOutlineThickness, mOutlineColor->getColor());
 	GRAPHICS->pop(2);
 }
 
@@ -170,8 +170,6 @@ void Label::refresh()
 	if (!dirty)
 		return;
 
-	float height = 0.0f;
-
 	auto text = mSettings.text;
 
 	if (mSettings.parse_locale_tags)
@@ -187,13 +185,12 @@ void Label::refresh()
 
 	if (!mSettings.multiline)
 	{
-		height = (mSettings.font->getAscent() - mSettings.font->getDescent()) * mSettings.font->getScaleFactorForSize(mSettings.font_size);
-		mTextMesh = sky::TextMesh::createSinglelineTextMesh(*mSettings.font, text);
+		mTextMesh = sky::TextMesh::createSinglelineTextMesh(*mSettings.font, text, mSettings.font_size);
 		setWidth(mSettings.font->getStringWidth(text, mSettings.font_size));
 	}
 	else
 	{
-		std::tie(height, mTextMesh) = sky::TextMesh::createMultilineTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
+		mTextMesh = sky::TextMesh::createMultilineTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
 	}
 
 	for (size_t i = 0; i < colormap.size(); i++)
@@ -201,7 +198,7 @@ void Label::refresh()
 		mTextMesh.value().setSymbolColor(i, colormap.at(i));
 	}
 
-	setHeight(height);
+	setHeight(mTextMesh.value().height);
 
 	updateAbsoluteSize();
 }

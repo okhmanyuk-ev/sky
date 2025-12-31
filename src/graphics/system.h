@@ -107,7 +107,7 @@ namespace Graphics
 		void drawString(const Font& font, const sky::TextMesh& mesh, float minValue, float maxValue,
 			float smoothFactor, const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White));
 
-		void drawString(const Font& font, const sky::TextMesh& mesh, float size, float bold = 0.0f,
+		void drawString(const Font& font, const sky::TextMesh& mesh, float bold = 0.0f,
 			const glm::vec4& color = sky::GetColor<glm::vec4>(sky::Color::White), float outlineThickness = 0.0f,
 			const glm::vec4& outlineColor = sky::GetColor<glm::vec4>(sky::Color::Black));
 

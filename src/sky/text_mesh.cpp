@@ -8,11 +8,12 @@ TextMesh::Symbol::Symbol(glm::vec2 pos, glm::vec2 size, float line_y) :
 {
 }
 
-TextMesh::TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols) :
+TextMesh::TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, float height) :
 	topology(topology),
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
-	symbols(std::move(symbols))
+	symbols(std::move(symbols)),
+	height(height)
 {
 }
 
@@ -27,7 +28,7 @@ void TextMesh::setSymbolColor(size_t index, const glm::vec4& color)
 }
 
 TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::const_iterator begin,
-	std::wstring::const_iterator end)
+	std::wstring::const_iterator end, float size)
 {
 	const auto texture = font.getTexture();
 
@@ -86,12 +87,14 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::cons
 		symbols.push_back(Symbol(p1, glyph.size, 0.0f));
 	}
 
-	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols));
+	auto height = (font.getAscent() - font.getDescent()) * font.getScaleFactorForSize(size);
+
+	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), height);
 }
 
-TextMesh TextMesh::createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text)
+TextMesh TextMesh::createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text, float size)
 {
-	return createTextMesh(font, text.begin(), text.end());
+	return createTextMesh(font, text.begin(), text.end(), size);
 }
 
 static float GetAlignNormalizedValue(TextMesh::Align align)
@@ -105,7 +108,7 @@ static float GetAlignNormalizedValue(TextMesh::Align align)
 	return 0.0f;
 }
 
-std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
+TextMesh TextMesh::createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
 	float maxWidth, float size, Align align)
 {
 	auto scale = font.getScaleFactorForSize(size);
@@ -118,7 +121,7 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Graphics::Fo
 	Symbols symbols;
 
 	auto appendTextMesh = [&](std::wstring::const_iterator begin, std::wstring::const_iterator end) {
-		auto mesh = createTextMesh(font, begin, end);
+		auto mesh = createTextMesh(font, begin, end, size);
 		for (auto index : mesh.indices)
 		{
 			index += static_cast<uint32_t>(vertices.size());
@@ -192,8 +195,7 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Graphics::Fo
 		appendTextMesh(begin, text.end());
 
 	height -= font.getLinegap();
+	height *= scale;
 
-	auto mesh = TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols));
-
-	return { height * scale, mesh };
+	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), height);
 }
