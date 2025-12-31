@@ -94,6 +94,17 @@ TextMesh TextMesh::createSinglelineTextMesh(const Graphics::Font& font, const st
 	return createTextMesh(font, text.begin(), text.end());
 }
 
+static float GetAlignNormalizedValue(TextMesh::Align align)
+{
+	if (align == TextMesh::Align::Center)
+		return 0.5f;
+
+	if (align == TextMesh::Align::Right)
+		return 1.0f;
+
+	return 0.0f;
+}
+
 std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
 	float maxWidth, float size, Align align)
 {
@@ -116,23 +127,14 @@ std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Graphics::Fo
 		auto str_w = font.getStringWidth(begin, end);
 		for (auto vertex : mesh.vertices)
 		{
-			if (align == Align::Right)
-				vertex.pos.x += scaledMaxWidth - str_w;
-			else if (align == Align::Center)
-				vertex.pos.x += (scaledMaxWidth - str_w) / 2.0f;
-
+			vertex.pos.x += (scaledMaxWidth - str_w) * GetAlignNormalizedValue(align);
 			vertex.pos.y += height;
 			vertices.push_back(vertex);
 		}
 		for (const auto& symbol_info : mesh.symbols)
 		{
 			auto pos = symbol_info.pos;
-
-			if (align == Align::Right)
-				pos.x += scaledMaxWidth - str_w;
-			else if (align == Align::Center)
-				pos.x += (scaledMaxWidth - str_w) / 2.0f;
-
+			pos.x += (scaledMaxWidth - str_w) * GetAlignNormalizedValue(align);
 			pos.y += height;
 			auto line_y = symbol_info.line_y + height;
 			symbols.push_back(Symbol(pos, symbol_info.size, line_y));
