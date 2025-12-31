@@ -89,16 +89,9 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::cons
 	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols));
 }
 
-TextMesh TextMesh::createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text, float vertical_offset)
+TextMesh TextMesh::createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text)
 {
-	auto mesh = createTextMesh(font, text.begin(), text.end());
-
-	for (auto& vertex : mesh.vertices)
-	{
-		vertex.pos.y += vertical_offset;
-	}
-
-	return mesh;
+	return createTextMesh(font, text.begin(), text.end());
 }
 
 std::tuple<float, TextMesh> TextMesh::createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
