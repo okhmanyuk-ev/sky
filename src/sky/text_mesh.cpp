@@ -108,7 +108,7 @@ static float GetAlignNormalizedValue(TextMesh::Align align)
 	return 0.0f;
 }
 
-TextMesh TextMesh::createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
+TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std::wstring& text,
 	float maxWidth, float size, Align align)
 {
 	auto scale = font.getScaleFactorForSize(size);

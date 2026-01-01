@@ -162,7 +162,7 @@ void Label::refresh()
 		}
 	};
 
-	if (mSettings.multiline)
+	if (mSettings.word_wrap_mode)
 		markDirtyIfChanged(mPrevWidth, width);
 
 	markDirtyIfChanged(mPrevSettings, mSettings);
@@ -183,14 +183,14 @@ void Label::refresh()
 	if (mSettings.parse_color_tags)
 		std::tie(colormap, text) = ParseColorTags(text);
 
-	if (!mSettings.multiline)
+	if (!mSettings.word_wrap_mode)
 	{
 		mTextMesh = sky::TextMesh::createTextMesh(*mSettings.font, text, mSettings.font_size);
 		setWidth(mSettings.font->getStringWidth(text, mSettings.font_size));
 	}
 	else
 	{
-		mTextMesh = sky::TextMesh::createMultilineTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
+		mTextMesh = sky::TextMesh::createWordWrapTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
 	}
 
 	for (size_t i = 0; i < colormap.size(); i++)

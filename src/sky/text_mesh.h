@@ -42,7 +42,7 @@ namespace sky
 
 		static TextMesh createTextMesh(const Graphics::Font& font, const std::wstring& text, float size);
 
-		static TextMesh createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
+		static TextMesh createWordWrapTextMesh(const Graphics::Font& font, const std::wstring& text,
 			float maxWidth, float size, Align align = Align::Left);
 	};
 }

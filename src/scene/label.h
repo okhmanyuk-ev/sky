@@ -49,8 +49,8 @@ namespace Scene
 		auto getAlign() const { return mSettings.align; }
 		void setAlign(sky::TextMesh::Align value) { mSettings.align = value; }
 
-		auto isMultiline() const { return mSettings.multiline; }
-		void setMultiline(bool value) { mSettings.multiline = value; }
+		auto isWordWrapMode() const { return mSettings.word_wrap_mode; }
+		void setWordWrapMode(bool value) { mSettings.word_wrap_mode = value; }
 
 		// returning [pos, size]
 		std::tuple<glm::vec2, glm::vec2> getSymbolBounds(int index);
@@ -80,7 +80,7 @@ namespace Scene
 			std::shared_ptr<Graphics::Font> font = DefaultFont;
 			float font_size = DefaultFontSize;
 			sky::TextMesh::Align align = sky::TextMesh::Align::Left;
-			bool multiline = false;
+			bool word_wrap_mode = false;
 			bool replace_escaped_new_lines = false;
 			bool parse_color_tags = false;
 			bool parse_locale_tags = true;
