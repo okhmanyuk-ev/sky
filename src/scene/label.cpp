@@ -186,7 +186,7 @@ void Label::refresh()
 	if (!mSettings.word_wrap_mode)
 	{
 		mTextMesh = sky::TextMesh::createTextMesh(*mSettings.font, text, mSettings.font_size);
-		setWidth(mSettings.font->getStringWidth(text, mSettings.font_size));
+		setWidth(mTextMesh.value().size.x);
 	}
 	else
 	{
@@ -198,7 +198,7 @@ void Label::refresh()
 		mTextMesh.value().setSymbolColor(i, colormap.at(i));
 	}
 
-	setHeight(mTextMesh.value().height);
+	setHeight(mTextMesh.value().size.y);
 
 	updateAbsoluteSize();
 }

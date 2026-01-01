@@ -27,13 +27,13 @@ namespace sky
 		using Indices = skygfx::utils::Mesh::Indices;
 		using Symbols = std::vector<Symbol>;
 
-		TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, float height);
+		TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, glm::vec2 size);
 
 		skygfx::Topology topology;
 		Vertices vertices;
 		Indices indices;
 		Symbols symbols;
-		float height;
+		glm::vec2 size;
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
 

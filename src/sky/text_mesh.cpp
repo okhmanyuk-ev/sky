@@ -8,12 +8,12 @@ TextMesh::Symbol::Symbol(glm::vec2 pos, glm::vec2 size, float line_y) :
 {
 }
 
-TextMesh::TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, float height) :
+TextMesh::TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, glm::vec2 size) :
 	topology(topology),
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
 	symbols(std::move(symbols)),
-	height(height)
+	size(size)
 {
 }
 
@@ -87,9 +87,10 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::cons
 		symbols.push_back(Symbol(p1, glyph.size, 0.0f));
 	}
 
+	auto width = font.getStringWidth(begin, end, size);
 	auto height = (font.getAscent() - font.getDescent()) * font.getScaleFactorForSize(size);
 
-	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), height);
+	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), { width, height });
 }
 
 TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring& text, float size)
@@ -197,5 +198,5 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 	height -= font.getLinegap();
 	height *= scale;
 
-	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), height);
+	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), { maxWidth, height });
 }
