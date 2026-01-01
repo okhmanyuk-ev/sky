@@ -151,27 +151,6 @@ const Font::Glyph& Font::getGlyph(wchar_t symbol) const
 	return mGlyphs.at(symbol);
 }
 
-float Font::getStringWidth(std::wstring::const_iterator begin, std::wstring::const_iterator end, float size) const
-{
-	float result = 0.0f;
-
-	for (auto it = begin; it != end; ++it)
-	{
-		result += getGlyph(*it).xadvance;
-
-		if (it != end - 1)
-		{
-			result += getKerning(*it, *(it + 1));
-		}
-	}
-	return result * Font::getScaleFactorForSize(size);
-}
-
-float Font::getStringWidth(const std::wstring& text, float size) const
-{
-	return getStringWidth(text.begin(), text.end(), size);
-}
-
 float Font::getKerning(wchar_t left, wchar_t right) const
 {
 	if (mKernings.count(left) == 0)

@@ -34,10 +34,6 @@ namespace Graphics
 
 		static float getScaleFactorForSize(float size);
 
-		float getStringWidth(std::wstring::const_iterator begin, std::wstring::const_iterator end,
-			float size = GlyphSize) const;
-		float getStringWidth(const std::wstring& text, float size = GlyphSize) const;
-
 		float getKerning(wchar_t left, wchar_t right) const;
 
 		float getAscent() const { return mAscent; }

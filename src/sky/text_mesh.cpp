@@ -27,6 +27,22 @@ void TextMesh::setSymbolColor(size_t index, const glm::vec4& color)
 	}
 }
 
+static float GetStringWidth(const Graphics::Font& font, std::wstring::const_iterator begin, std::wstring::const_iterator end, float size = Graphics::Font::GlyphSize)
+{
+	float result = 0.0f;
+
+	for (auto it = begin; it != end; ++it)
+	{
+		result += font.getGlyph(*it).xadvance;
+
+		if (it != end - 1)
+		{
+			result += font.getKerning(*it, *(it + 1));
+		}
+	}
+	return result * Graphics::Font::getScaleFactorForSize(size);
+}
+
 TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::const_iterator begin,
 	std::wstring::const_iterator end, float size)
 {
@@ -87,7 +103,7 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::cons
 		symbols.push_back(Symbol(p1, glyph.size, 0.0f));
 	}
 
-	auto width = font.getStringWidth(begin, end, size);
+	auto width = GetStringWidth(font, begin, end, size);
 	auto height = (font.getAscent() - font.getDescent()) * font.getScaleFactorForSize(size);
 
 	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), { width, height });
@@ -128,7 +144,7 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 			index += static_cast<uint32_t>(vertices.size());
 			indices.push_back(index);
 		}
-		auto str_w = font.getStringWidth(begin, end);
+		auto str_w = GetStringWidth(font, begin, end);
 		for (auto vertex : mesh.vertices)
 		{
 			vertex.pos.x += (scaledMaxWidth - str_w) * GetAlignNormalizedValue(align);
@@ -165,7 +181,7 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 		if (length <= 1)
 			continue;
 
-		auto str_w = font.getStringWidth(begin, it);
+		auto str_w = GetStringWidth(font, begin, it);
 
 		if (str_w <= scaledMaxWidth)
 			continue;
