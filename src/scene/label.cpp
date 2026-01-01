@@ -185,7 +185,7 @@ void Label::refresh()
 
 	if (!mSettings.multiline)
 	{
-		mTextMesh = sky::TextMesh::createSinglelineTextMesh(*mSettings.font, text, mSettings.font_size);
+		mTextMesh = sky::TextMesh::createTextMesh(*mSettings.font, text, mSettings.font_size);
 		setWidth(mSettings.font->getStringWidth(text, mSettings.font_size));
 	}
 	else

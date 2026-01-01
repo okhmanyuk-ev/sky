@@ -40,7 +40,7 @@ namespace sky
 		static TextMesh createTextMesh(const Graphics::Font & font, std::wstring::const_iterator begin,
 			std::wstring::const_iterator end, float size);
 
-		static TextMesh createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text, float size);
+		static TextMesh createTextMesh(const Graphics::Font& font, const std::wstring& text, float size);
 
 		static TextMesh createMultilineTextMesh(const Graphics::Font& font, const std::wstring& text,
 			float maxWidth, float size, Align align = Align::Left);

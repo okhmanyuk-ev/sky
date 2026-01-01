@@ -92,7 +92,7 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::cons
 	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), height);
 }
 
-TextMesh TextMesh::createSinglelineTextMesh(const Graphics::Font& font, const std::wstring& text, float size)
+TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring& text, float size)
 {
 	return createTextMesh(font, text.begin(), text.end(), size);
 }

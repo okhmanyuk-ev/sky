@@ -583,7 +583,7 @@ void System::drawString(const Font& font, const sky::TextMesh& mesh, float bold,
 void System::drawString(const Font& font, const std::wstring& text, float size, float bold, const glm::vec4& color,
 	float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(font, sky::TextMesh::createSinglelineTextMesh(font, text, size), bold, color, outlineThickness, outlineColor);
+	drawString(font, sky::TextMesh::createTextMesh(font, text, size), bold, color, outlineThickness, outlineColor);
 }
 
 glm::vec3 System::project(const glm::vec3& pos)
