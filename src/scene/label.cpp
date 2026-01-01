@@ -185,7 +185,7 @@ void Label::refresh()
 
 	if (!mSettings.word_wrap_mode)
 	{
-		mTextMesh = sky::TextMesh::createTextMesh(*mSettings.font, text, mSettings.font_size);
+		mTextMesh = sky::TextMesh::createTextMesh(*mSettings.font, text, mSettings.font_size, mSettings.align);
 		setWidth(mTextMesh.value().size.x);
 	}
 	else

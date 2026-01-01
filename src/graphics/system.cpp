@@ -580,10 +580,10 @@ void System::drawString(const Font& font, const sky::TextMesh& mesh, float bold,
 	drawString(font, mesh, mid, max, mSdfSmoothFactor, color);
 }
 
-void System::drawString(const Font& font, const std::wstring& text, float size, float bold, const glm::vec4& color,
+void System::drawString(const Font& font, const std::wstring& text, float size, sky::TextMesh::Align align, float bold, const glm::vec4& color,
 	float outlineThickness, const glm::vec4& outlineColor)
 {
-	drawString(font, sky::TextMesh::createTextMesh(font, text, size), bold, color, outlineThickness, outlineColor);
+	drawString(font, sky::TextMesh::createTextMesh(font, text, size, align), bold, color, outlineThickness, outlineColor);
 }
 
 glm::vec3 System::project(const glm::vec3& pos)
