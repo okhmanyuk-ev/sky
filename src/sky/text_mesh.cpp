@@ -110,7 +110,7 @@ static std::vector<Line> CreateLines(const Graphics::Font& font, const std::wstr
 
 TextMesh::TextMesh(const Graphics::Font& font, const std::wstring& text, std::optional<float> maxWidth, float fontSize, Align align)
 {
-	topology = skygfx::Topology::TriangleList;
+	mTopology = skygfx::Topology::TriangleList;
 
 	auto lines = CreateLines(font, text, maxWidth, fontSize);
 
@@ -122,30 +122,30 @@ TextMesh::TextMesh(const Graphics::Font& font, const std::wstring& text, std::op
 	for (const auto& line : lines)
 	{
 		length += std::distance(line.begin, line.end);
-		size.x = glm::max(size.x, line.width);
+		mSize.x = glm::max(mSize.x, line.width);
 	}
 
 	if (maxWidth.has_value())
-		size.x = glm::max(size.x, maxWidth.value() / font.getScaleFactorForSize(fontSize));
+		mSize.x = glm::max(mSize.x, maxWidth.value() / font.getScaleFactorForSize(fontSize));
 
-	vertices.resize(length * 4);
-	indices.resize(length * 6);
+	mVertices.resize(length * 4);
+	mIndices.resize(length * 6);
 
 	int i = 0;
 
 	for (const auto& line : lines)
 	{
-		float pos_x = (size.x - line.width) * GetAlignNormalizedValue(align);
+		float pos_x = (mSize.x - line.width) * GetAlignNormalizedValue(align);
 
 		for (auto it = line.begin; it != line.end; ++it, i++)
 		{
 			const auto& glyph = font.getGlyph(*it);
 
-			auto vtx = &vertices[i * 4];
-			auto idx = &indices[i * 6];
+			auto vtx = &mVertices[i * 4];
+			auto idx = &mIndices[i * 6];
 
 			pos_x += glyph.offset.x;
-			float pos_y = size.y + font.getAscent() + glyph.offset.y;
+			float pos_y = mSize.y + font.getAscent() + glyph.offset.y;
 
 			glm::vec2 p1 = { pos_x, pos_y };
 			glm::vec2 p2 = glm::vec2{ pos_x, pos_y } + glyph.size;
@@ -177,14 +177,14 @@ TextMesh::TextMesh(const Graphics::Font& font, const std::wstring& text, std::op
 			idx[4] = base_vtx + 2;
 			idx[5] = base_vtx + 3;
 
-			symbols.push_back(TextMesh::Symbol(p1, glyph.size, size.y));
+			mSymbols.push_back(TextMesh::Symbol(p1, glyph.size, mSize.y));
 		}
 
-		size.y += font.getAscent() - font.getDescent() + font.getLinegap();
+		mSize.y += font.getAscent() - font.getDescent() + font.getLinegap();
 	}
 
-	size.y -= font.getLinegap();
-	size *= font.getScaleFactorForSize(fontSize);
+	mSize.y -= font.getLinegap();
+	mSize *= font.getScaleFactorForSize(fontSize);
 }
 
 void TextMesh::setSymbolColor(size_t index, const glm::vec4& color)
@@ -193,6 +193,6 @@ void TextMesh::setSymbolColor(size_t index, const glm::vec4& color)
 
 	for (size_t i = base_vtx; i < base_vtx + 4; i++)
 	{
-		vertices[i].color = color;
+		mVertices[i].color = color;
 	}
 }

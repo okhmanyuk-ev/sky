@@ -18,7 +18,7 @@ void Label::draw()
 	if (!mTextMesh.has_value())
 		return;
 
-	if (mTextMesh.value().vertices.empty())
+	if (mTextMesh.value().getVertices().empty())
 		return;
 
 	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
@@ -186,7 +186,7 @@ void Label::refresh()
 	if (!mSettings.word_wrap_mode)
 	{
 		mTextMesh = sky::TextMesh(*mSettings.font, text, std::nullopt, mSettings.font_size, mSettings.align);
-		setWidth(mTextMesh.value().size.x);
+		setWidth(mTextMesh.value().getSize().x);
 	}
 	else
 	{
@@ -198,7 +198,7 @@ void Label::refresh()
 		mTextMesh.value().setSymbolColor(i, colormap.at(i));
 	}
 
-	setHeight(mTextMesh.value().size.y);
+	setHeight(mTextMesh.value().getSize().y);
 
 	updateAbsoluteSize();
 }
@@ -206,7 +206,7 @@ void Label::refresh()
 std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 {
 	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
-	const auto& symbol = mTextMesh.value().symbols.at(index);
+	const auto& symbol = mTextMesh.value().getSymbols().at(index);
 	auto pos = symbol.pos * scale;
 	auto size = symbol.size * scale;
 	return { pos, size };
@@ -215,5 +215,5 @@ std::tuple<glm::vec2, glm::vec2> Label::getSymbolBounds(int index)
 float Label::getSymbolLineY(int index)
 {
 	auto scale = mSettings.font->getScaleFactorForSize(mSettings.font_size);
-	return mTextMesh.value().symbols.at(index).line_y * scale;
+	return mTextMesh.value().getSymbols().at(index).line_y * scale;
 }

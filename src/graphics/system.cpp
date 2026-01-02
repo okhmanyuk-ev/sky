@@ -553,18 +553,18 @@ void System::drawSdf(skygfx::Topology topology, std::shared_ptr<skygfx::Texture>
 void System::drawString(const Font& font, const sky::TextMesh& mesh, float minValue, float maxValue,
 	float smoothFactor, const glm::vec4& color)
 {
-	assert(!mesh.vertices.empty());
-	assert(!mesh.indices.empty());
+	assert(!mesh.getVertices().empty());
+	assert(!mesh.getIndices().empty());
 
-	drawSdf(mesh.topology, font.getTexture(), mesh.vertices, mesh.indices, minValue,
+	drawSdf(mesh.getTopology(), font.getTexture(), mesh.getVertices(), mesh.getIndices(), minValue,
 		maxValue, smoothFactor, color);
 }
 
 void System::drawString(const Font& font, const sky::TextMesh& mesh, float bold,
 	const glm::vec4& color, float outlineThickness, const glm::vec4& outlineColor)
 {
-	assert(!mesh.vertices.empty());
-	assert(!mesh.indices.empty());
+	assert(!mesh.getVertices().empty());
+	assert(!mesh.getIndices().empty());
 
 	float fixedOutlineThickness = glm::lerp(0.0f, 0.75f, outlineThickness);
 

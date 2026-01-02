@@ -6,8 +6,9 @@
 
 namespace sky
 {
-	struct TextMesh
+	class TextMesh
 	{
+	public:
 		enum class Align
 		{
 			Left,
@@ -23,18 +24,25 @@ namespace sky
 			float line_y;
 		};
 
+		using Symbols = std::vector<Symbol>;
 		using Vertices = skygfx::utils::Mesh::Vertices;
 		using Indices = skygfx::utils::Mesh::Indices;
-		using Symbols = std::vector<Symbol>;
 
 		TextMesh(const Graphics::Font& font, const std::wstring& text, std::optional<float> maxWidth, float fontSize, Align align);
 
-		skygfx::Topology topology;
-		Vertices vertices;
-		Indices indices;
-		Symbols symbols;
-		glm::vec2 size = { 0.0f, 0.0f };
-
 		void setSymbolColor(size_t index, const glm::vec4& color);
+
+		auto getTopology() const { return mTopology; }
+		const auto& getVertices() const { return mVertices; }
+		const auto& getIndices() const { return mIndices; }
+		const auto& getSymbols() const { return mSymbols; }
+		const auto& getSize() const { return mSize; }
+
+	private:
+		skygfx::Topology mTopology;
+		Indices mIndices;
+		Vertices mVertices;
+		Symbols mSymbols;
+		glm::vec2 mSize = { 0.0f, 0.0f };
 	};
 }
