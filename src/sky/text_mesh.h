@@ -27,7 +27,6 @@ namespace sky
 		using Indices = skygfx::utils::Mesh::Indices;
 		using Symbols = std::vector<Symbol>;
 
-		TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, glm::vec2 size);
 		TextMesh(const Graphics::Font& font, const std::wstring& text, std::optional<float> maxWidth, float fontSize, Align align);
 
 		skygfx::Topology topology;

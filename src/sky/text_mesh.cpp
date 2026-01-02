@@ -8,15 +8,6 @@ TextMesh::Symbol::Symbol(glm::vec2 pos, glm::vec2 size, float line_y) :
 {
 }
 
-TextMesh::TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, glm::vec2 size) :
-	topology(topology),
-	vertices(std::move(vertices)),
-	indices(std::move(indices)),
-	symbols(std::move(symbols)),
-	size(size)
-{
-}
-
 static float GetStringWidth(const Graphics::Font& font, std::wstring::const_iterator begin, std::wstring::const_iterator end, float size = Graphics::Font::GlyphSize)
 {
 	float result = 0.0f;
