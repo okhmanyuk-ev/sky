@@ -149,7 +149,7 @@ static TextMesh CreateTextMesh(const Graphics::Font& font, const std::vector<Lin
 	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), { width, height });
 }
 
-TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring& text, float size, Align align)
+TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring& text, std::optional<float> maxWidth, float size, Align align)
 {
 	std::vector<Line> lines;
 
@@ -162,38 +162,15 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring
 		if (*it == '\n')
 		{
 			lines.push_back(Line(font, begin, it));
-			it++;
+			++it;
 			begin = it;
 			continue;
 		}
 
-		it++;
-	}
+		++it;
 
-	if (begin != end)
-		lines.push_back(Line(font, begin, end));
-
-	return CreateTextMesh(font, lines, size, align);
-}
-
-TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std::wstring& text,
-	float maxWidth, float size, Align align)
-{
-	std::vector<Line> lines;
-
-	auto begin = text.begin();
-	auto it = begin;
-
-	while (it != text.end())
-	{
-		std::advance(it, 1);
-
-		if (it != text.end() && *it == '\n')
-		{
-			lines.push_back(Line(font, begin, it));
-			begin = it + 1;
+		if (!maxWidth.has_value())
 			continue;
-		}
 
 		auto length = std::distance(begin, it);
 
@@ -202,7 +179,7 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 
 		auto str_w = GetStringWidth(font, begin, it, size);
 
-		if (str_w <= maxWidth)
+		if (str_w <= maxWidth.value())
 			continue;
 
 		--it;
@@ -227,8 +204,9 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 		begin = it;
 	}
 
-	if (begin != text.end())
-		lines.push_back(Line(font, begin, text.end()));
+	lines.push_back(Line(font, begin, end));
 
-	return CreateTextMesh(font, lines, size, align, maxWidth / font.getScaleFactorForSize(size));
+	auto minWidth = maxWidth.has_value() ? maxWidth.value() / font.getScaleFactorForSize(size) : 0.0f;
+
+	return CreateTextMesh(font, lines, size, align, minWidth);
 }

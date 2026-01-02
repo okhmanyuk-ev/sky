@@ -185,12 +185,12 @@ void Label::refresh()
 
 	if (!mSettings.word_wrap_mode)
 	{
-		mTextMesh = sky::TextMesh::createTextMesh(*mSettings.font, text, mSettings.font_size, mSettings.align);
+		mTextMesh = sky::TextMesh::createTextMesh(*mSettings.font, text, std::nullopt, mSettings.font_size, mSettings.align);
 		setWidth(mTextMesh.value().size.x);
 	}
 	else
 	{
-		mTextMesh = sky::TextMesh::createWordWrapTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
+		mTextMesh = sky::TextMesh::createTextMesh(*mSettings.font, text, width, mSettings.font_size, mSettings.align);
 	}
 
 	for (size_t i = 0; i < colormap.size(); i++)
