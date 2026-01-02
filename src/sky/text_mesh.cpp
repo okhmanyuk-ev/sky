@@ -67,7 +67,7 @@ struct Line
 	float width;
 };
 
-static TextMesh CreateTextMesh(const Graphics::Font& font, const std::vector<Line>& lines, float size, TextMesh::Align align)
+static TextMesh CreateTextMesh(const Graphics::Font& font, const std::vector<Line>& lines, float size, TextMesh::Align align, float minWidth = 0.0f)
 {
 	const auto texture = font.getTexture();
 
@@ -81,6 +81,8 @@ static TextMesh CreateTextMesh(const Graphics::Font& font, const std::vector<Lin
 		length += std::distance(line.begin, line.end);
 		width = glm::max(width, line.width);
 	}
+
+	width = glm::max(width, minWidth);
 
 	auto vertices = TextMesh::Vertices(length * 4);
 	auto indices = TextMesh::Indices(length * 6);
@@ -181,39 +183,9 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring
 TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std::wstring& text,
 	float maxWidth, float size, Align align)
 {
-	auto scale = font.getScaleFactorForSize(size);
-	float height = 0.0f;
+	float unscaledMaxWidth = maxWidth / font.getScaleFactorForSize(size);
 
-	float scaledMaxWidth = maxWidth / scale;
-
-	Vertices vertices;
-	Indices indices;
-	Symbols symbols;
-
-	auto appendTextMesh = [&](std::wstring::const_iterator begin, std::wstring::const_iterator end) {
-		auto mesh = createTextMesh(font, begin, end, size, align);
-		for (auto index : mesh.indices)
-		{
-			index += static_cast<uint32_t>(vertices.size());
-			indices.push_back(index);
-		}
-		auto str_w = GetStringWidth(font, begin, end);
-		for (auto vertex : mesh.vertices)
-		{
-			vertex.pos.x += (scaledMaxWidth - str_w) * GetAlignNormalizedValue(align);
-			vertex.pos.y += height;
-			vertices.push_back(vertex);
-		}
-		for (const auto& symbol_info : mesh.symbols)
-		{
-			auto pos = symbol_info.pos;
-			pos.x += (scaledMaxWidth - str_w) * GetAlignNormalizedValue(align);
-			pos.y += height;
-			auto line_y = symbol_info.line_y + height;
-			symbols.push_back(Symbol(pos, symbol_info.size, line_y));
-		}
-		height += font.getAscent() - font.getDescent() + font.getLinegap();
-	};
+	std::vector<Line> lines;
 
 	auto begin = text.begin();
 	auto it = begin;
@@ -224,7 +196,7 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 
 		if (it != text.end() && *it == '\n')
 		{
-			appendTextMesh(begin, it);
+			lines.push_back(Line(font, begin, it));
 			begin = it + 1;
 			continue;
 		}
@@ -236,7 +208,7 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 
 		auto str_w = GetStringWidth(font, begin, it);
 
-		if (str_w <= scaledMaxWidth)
+		if (str_w <= unscaledMaxWidth)
 			continue;
 
 		--it;
@@ -257,15 +229,12 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 		if (best_it != begin)
 			it = best_it;
 
-		appendTextMesh(begin, it);
+		lines.push_back(Line(font, begin, it));
 		begin = it;
 	}
 
 	if (begin != text.end())
-		appendTextMesh(begin, text.end());
+		lines.push_back(Line(font, begin, text.end()));
 
-	height -= font.getLinegap();
-	height *= scale;
-
-	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), { maxWidth, height });
+	return CreateTextMesh(font, lines, size, align, unscaledMaxWidth);
 }
