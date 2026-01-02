@@ -179,8 +179,6 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring
 TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std::wstring& text,
 	float maxWidth, float size, Align align)
 {
-	float unscaledMaxWidth = maxWidth / font.getScaleFactorForSize(size);
-
 	std::vector<Line> lines;
 
 	auto begin = text.begin();
@@ -202,9 +200,9 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 		if (length <= 1)
 			continue;
 
-		auto str_w = GetStringWidth(font, begin, it);
+		auto str_w = GetStringWidth(font, begin, it, size);
 
-		if (str_w <= unscaledMaxWidth)
+		if (str_w <= maxWidth)
 			continue;
 
 		--it;
@@ -232,5 +230,5 @@ TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std:
 	if (begin != text.end())
 		lines.push_back(Line(font, begin, text.end()));
 
-	return CreateTextMesh(font, lines, size, align, unscaledMaxWidth);
+	return CreateTextMesh(font, lines, size, align, maxWidth / font.getScaleFactorForSize(size));
 }
