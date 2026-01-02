@@ -28,15 +28,14 @@ namespace sky
 		using Symbols = std::vector<Symbol>;
 
 		TextMesh(skygfx::Topology topology, Vertices vertices, Indices indices, Symbols symbols, glm::vec2 size);
+		TextMesh(const Graphics::Font& font, const std::wstring& text, std::optional<float> maxWidth, float fontSize, Align align);
 
 		skygfx::Topology topology;
 		Vertices vertices;
 		Indices indices;
 		Symbols symbols;
-		glm::vec2 size;
+		glm::vec2 size = { 0.0f, 0.0f };
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
-
-		static TextMesh createTextMesh(const Graphics::Font& font, const std::wstring& text, std::optional<float> maxWidth, float size, Align align);
 	};
 }
