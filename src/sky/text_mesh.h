@@ -37,9 +37,6 @@ namespace sky
 
 		void setSymbolColor(size_t index, const glm::vec4& color);
 
-		static TextMesh createTextMesh(const Graphics::Font & font, std::wstring::const_iterator begin,
-			std::wstring::const_iterator end, float size, Align align);
-
 		static TextMesh createTextMesh(const Graphics::Font& font, const std::wstring& text, float size, Align align);
 
 		static TextMesh createWordWrapTextMesh(const Graphics::Font& font, const std::wstring& text,

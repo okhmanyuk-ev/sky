@@ -149,11 +149,12 @@ static TextMesh CreateTextMesh(const Graphics::Font& font, const std::vector<Lin
 	return TextMesh(skygfx::Topology::TriangleList, std::move(vertices), std::move(indices), std::move(symbols), { width, height });
 }
 
-TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::const_iterator begin,
-	std::wstring::const_iterator end, float size, Align align)
+TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring& text, float size, Align align)
 {
 	std::vector<Line> lines;
 
+	auto begin = text.begin();
+	auto end = text.end();
 	auto it = begin;
 
 	while (it != end)
@@ -173,11 +174,6 @@ TextMesh TextMesh::createTextMesh(const Graphics::Font& font, std::wstring::cons
 		lines.push_back(Line(font, begin, end));
 
 	return CreateTextMesh(font, lines, size, align);
-}
-
-TextMesh TextMesh::createTextMesh(const Graphics::Font& font, const std::wstring& text, float size, Align align)
-{
-	return createTextMesh(font, text.begin(), text.end(), size, align);
 }
 
 TextMesh TextMesh::createWordWrapTextMesh(const Graphics::Font& font, const std::wstring& text,
