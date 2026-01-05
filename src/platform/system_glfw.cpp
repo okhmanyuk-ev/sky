@@ -328,10 +328,7 @@ Input::CursorMode SystemGlfw::getCursorMode() const
 void SystemGlfw::setCursorPos(int x, int y)
 {
 	glfwSetCursorPos(gWindow, (double)x, (double)y);
-	mCursorPos = {
-		(int)((float)x * gScale),
-		(int)((float)y * gScale)
-	};
+	mCursorPos = { x, y };
 }
 
 std::optional<glm::ivec2> SystemGlfw::getCursorPos() const
