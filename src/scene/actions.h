@@ -159,9 +159,9 @@ namespace sky::Actions
 				auto power = radius * value;
 				T::SetValue(object, base_value + (power != 0.0f ? glm::circularRand(power) : glm::vec2{ 0.0f, 0.0f }));
 			}),
-			Execute([object, base_value] {
+			[object, base_value] {
 				T::SetValue(object, base_value);
-			})
+			}
 		);
 	}
 
