@@ -16,13 +16,28 @@ void sky_main()
 	column->setPivot(0.5f);
 	bg->attach(column);
 
-	auto createLabel = [&](const std::wstring& text) {
-		auto label = std::make_shared<Shared::SceneHelpers::Outlined<Scene::Label>>();
-		label->setAnchor({ 0.5f, 0.0f });
-		label->setPivot({ 0.5f, 0.0f });
-		label->setParseColorTagsEnabled(true);
+	auto createLabel = [&](const std::wstring& text, bool parse_color_tags = true) {
+		auto holder = std::make_shared<Scene::AutoSized<Scene::Node>>();
+		holder->setAnchor({ 0.5f, 0.0f });
+		holder->setPivot({ 0.5f, 0.0f });
+		holder->setMargin({ -8.0f, -8.0f });
+
+		auto rect = std::make_shared<Scene::AutoSized<Scene::Rectangle>>();
+		rect->setAnchor(0.5f);
+		rect->setPivot(0.5f);
+		rect->setMargin({ -16.0f, -8.0f });
+		rect->setRounding(0.5f);
+		rect->setColor(glm::vec4{ 1.0f, 1.0f, 1.0f, 0.25f });
+		holder->attach(rect);
+
+		auto label = std::make_shared<Scene::Label>();
+		label->setAnchor(0.5f);
+		label->setPivot(0.5f);
+		label->setParseColorTagsEnabled(parse_color_tags);
 		label->setText(text);
-		column->attach(label);
+		rect->attach(label);
+
+		column->attach(holder);
 	};
 
 	sky::RunAction([column] {
@@ -52,15 +67,7 @@ void sky_main()
 	createLabel(L"<color=hex(0000FF)><u><b>Underlined Bold Blue</b></u></color>");
 	createLabel(L"<color=yellow>Yellow <color=green>Green <color=blue>Blue <color=red>Red <color=purple>Purple</color> Back to Red</color> Back to Blue</color> Back to Green</color> Back to Yellow</color>");
 	createLabel(L"<color=red>Red <color=blue>Blue <color=green>Green <color=yellow>Yellow <color=orange>Orange <color=purple>Purple <color=black>Black</color> Back to Purple</color> Back to Orange</color> Back to Yellow</color> Back to Green</color> Back to Blue</color> Back to Red</color>");
-
-	{
-		auto label = std::make_shared<Shared::SceneHelpers::Outlined<Scene::Label>>();
-		label->setAnchor({ 0.5f, 0.0f });
-		label->setPivot({ 0.5f, 0.0f });
-		label->setAlign(sky::TextMesh::Align::Center);
-		label->setText(L"multilined text\nnon word wrap");
-		column->attach(label);
-	}
+	createLabel(L"multilined text\nnon word wrap", false);
 
 	app.run();
 }
