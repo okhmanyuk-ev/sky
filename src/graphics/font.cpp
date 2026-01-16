@@ -121,9 +121,7 @@ Font::Font(void* data, size_t size)
 	int descent = 0;
 	int linegap = 0;
 
-	auto res = stbtt_GetFontVMetricsOS2(&info, &ascent, &descent, &linegap);
-
-	assert(res == 1);
+	stbtt_GetFontVMetrics(&info, &ascent, &descent, &linegap);
 
 	mAscent = ascent * scale;
 	mDescent = descent * scale;
