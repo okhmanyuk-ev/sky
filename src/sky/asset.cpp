@@ -166,35 +166,64 @@ std::string sky::Asset::FixSlashes(const std::string& input)
 	return result;
 }
 
+#if defined(EMSCRIPTEN) && defined(BUILD_DZ)
+extern "C" void EMSCRIPTEN_KEEPALIVE skyAssetFetch(char* url, sky::Asset::FetchSettings *settings) {
+	if (url) {
+		sky::Asset::Fetch(url, *settings);
+		free(url);
+	} else if (settings->onFail) {
+		settings->onFail("fetch failed");
+	}
+	delete settings;
+}
+#endif
+
 void sky::Asset::Fetch(const std::string& url, FetchSettings settings)
 {
 #ifdef EMSCRIPTEN
 #ifdef BUILD_DZ
-	EM_ASM((
-		const url = UTF8ToString($0);
-		if (!Module.fetchedUrls) {
-			Module.fetchedUrls = {};
-			Module.printFetchedUrls = () => {
-				let payload = "";
-				for (const key of Object.keys(Module.fetchedUrls)) {
-					payload += key + "\n";
-				}
-				console.log(payload);
-			};
-		}
+	if (url.starts_with(FETCHED_FOLDER)) {
+		EM_ASM((
+			const url = UTF8ToString($0);
+			if (!Module.fetchedUrls) {
+				Module.fetchedUrls = {};
+				Module.printFetchedUrls = () => {
+					let payload = "";
+					for (const key of Object.keys(Module.fetchedUrls)) {
+						payload += key + "\n";
+					}
+					console.log(payload);
+				};
+			}
 
-		if (!url.endsWith(".mp3") && !url.endsWith(".wav")) {
-			Module.fetchedUrls[url] = 1;
-		}
-	), url.c_str());
+			if (!url.endsWith(".mp3") && !url.endsWith(".wav")) {
+				Module.fetchedUrls[url] = 1;
+			}
+		), url.c_str());
+
+		FetchSettings* copy = new FetchSettings(std::move(settings));
+		EM_ASM((
+			const url = UTF8ToString($0);
+			Module.getAsyncUrl(url).then((url) => {
+				Module._skyAssetFetch(stringToNewUTF8(url), $1);
+			}).catch ((e) => {
+				console.error("can't fetch url: ", url);
+				console.error(e);
+				Module._skyAssetFetch(0, $1);
+			});
+		), (std::string("vc-assets/local/") + url.substr(strlen(FETCHED_FOLDER))).c_str(), copy);
+		return;
+	}
 #endif
 
 	emscripten_fetch_attr_t attr;
 	emscripten_fetch_attr_init(&attr);
 	strcpy(attr.requestMethod, "GET");
 	attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+#ifndef BUILD_DZ
 	if (settings.persist_file)
 		attr.attributes |= EMSCRIPTEN_FETCH_PERSIST_FILE;
+#endif
 	attr.userData = new FetchSettings(std::move(settings));
 	attr.onsuccess = [](emscripten_fetch_t* fetch) {
 		auto settings = static_cast<FetchSettings*>(fetch->userData);
@@ -204,6 +233,13 @@ void sky::Asset::Fetch(const std::string& url, FetchSettings settings)
 		}
 		delete settings;
 		emscripten_fetch_close(fetch);
+#if defined(EMSCRIPTE) && defined(BUILD_DZ)
+		EM_ASM((
+			setTimeout(() => {
+				URL.revokeObjectURL(UTF8ToString($0));
+			}, 10000);
+		), fetch->url);
+#endif
 	};
 	attr.onerror = [](emscripten_fetch_t* fetch) {
 		auto settings = static_cast<FetchSettings*>(fetch->userData);
