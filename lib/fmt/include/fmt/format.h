@@ -46,6 +46,7 @@
 #  include <cstdint>  // uint32_t
 #  include <cstring>  // std::memcpy
 #  include <limits>   // std::numeric_limits
+#  include <cstdlib>  // malloc, free
 #  include <new>      // std::bad_alloc
 #  if defined(__GLIBCXX__) && !defined(_GLIBCXX_USE_DUAL_ABI)
 // Workaround for pre gcc 5 libstdc++.
