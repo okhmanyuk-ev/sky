@@ -148,7 +148,7 @@ void ConsoleCommands::onAlias(CON_ARGS)
 {
 	const auto& items = sky::GetService<sky::CommandProcessor>()->getItems();
 
-	if (CON_ARGS_COUNT < 2)
+	if (args.size() < 2)
 	{
 		auto aliases = items
 			| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::Alias>(pair.second); })
