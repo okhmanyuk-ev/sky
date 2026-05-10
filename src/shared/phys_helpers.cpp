@@ -81,16 +81,14 @@ World::World() :
 	mDummyBody = mB2World.CreateBody(&dummy_body_def);
 
 	auto getter = [this] {
-		auto fps = 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep());
-		return std::vector<std::string>({ std::to_string(fps) });
+		return 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep());
 	};
 
-	auto setter = [this](CON_ARGS) {
-		auto sec = std::stof(CON_ARG(0));
-		mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / sec));
+	auto setter = [this](float fps) {
+		mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / fps));
 	};
 
-	sky::AddCVar("phys_timestep_fps", sky::CommandProcessor::CVar(std::nullopt, { "float" }, getter, setter));
+	sky::AddCVar("phys_timestep_fps", sky::CVar<float>::CreateDefinition(getter, setter));
 }
 
 World::~World()
