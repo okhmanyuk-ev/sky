@@ -64,7 +64,6 @@ namespace Common
 	{
 	public:
 		ConsoleCommands();
-		~ConsoleCommands();
 
 	private:
 		void onCmdList(CON_ARGS);

@@ -43,10 +43,6 @@ ConsoleCommands::ConsoleCommands()
 	sky::Log("type \"cmdlist\" to see available commands");
 }
 
-ConsoleCommands::~ConsoleCommands()
-{
-}
-
 void ConsoleCommands::onCmdList(CON_ARGS)
 {
 	sky::Log("Commands:");
