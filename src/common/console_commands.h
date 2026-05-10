@@ -53,7 +53,6 @@
 #define CVAR_SETTER_INT2_FUNC(V) CVAR_SETTER(V(CON_ARG_INT(0), CON_ARG_INT(1)))
 
 #define CMD_METHOD(V) [this](CON_ARGS) { V(CON_ARGS_NAME); }
-#define CMD_METHOD_NO_ARGS(V) [this](CON_ARGS) { V(); }
 
 namespace Common
 {
