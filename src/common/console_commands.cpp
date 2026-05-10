@@ -9,27 +9,24 @@ using namespace Common;
 
 ConsoleCommands::ConsoleCommands()
 {
-	auto getter = []() -> std::vector<std::string> {
+	auto getter = []() -> std::optional<float> {
 		auto delta_limit = sky::Scheduler::Instance->getTimeDeltaLimit();
 		if (!delta_limit.has_value())
-			return { "null" };
+			return std::nullopt;
 
-		auto fps = 1.0f / sky::ToSeconds(delta_limit.value());
-		return { std::to_string(fps) };
+		return 1.0f / sky::ToSeconds(delta_limit.value());
 	};
 
-	auto setter = [](CON_ARGS) {
-		if (CON_ARG(0) == "null")
+	auto setter = [](std::optional<float> sec) {
+		if (!sec.has_value())
 		{
 			sky::Scheduler::Instance->setTimeDeltaLimit(std::nullopt);
 			return;
 		}
-
-		auto sec = std::stof(CON_ARG(0));
-		sky::Scheduler::Instance->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec));
+		sky::Scheduler::Instance->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec.value()));
 	};
 
-	sky::AddCVar("sys_time_delta_limit_fps", sky::CommandProcessor::CVar(std::nullopt, { "null/float" }, getter, setter));
+	sky::AddCVar("sys_time_delta_limit_fps", sky::CVar<std::optional<float>>::CreateDefinition(getter, setter));
 	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, CMD_METHOD(onCmdList)));
 	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, CMD_METHOD(onCVarList)));
 	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, CMD_METHOD(onEcho)));
