@@ -99,7 +99,7 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 
 void ConsoleCommands::onEcho(CON_ARGS)
 {
-	if (!CON_HAS_ARGS)
+	if (args.empty())
 		return;
 
 	auto str = std::accumulate(std::next(CON_ARGS_NAME.begin()), CON_ARGS_NAME.end(), *CON_ARGS_NAME.begin(),
