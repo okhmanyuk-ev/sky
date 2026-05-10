@@ -88,16 +88,14 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		scene->getRoot()->attach(sky::GetService<Shared::SceneManager>());
 
 		auto getter = [] {
-			auto fps = 1.0f / sky::ToSeconds(sky::GetService<Scene::Scene>()->getTimestepFixer().getTimestep());
-			return std::vector<std::string>({ std::to_string(fps) });
+			return 1.0f / sky::ToSeconds(sky::GetService<Scene::Scene>()->getTimestepFixer().getTimestep());
 		};
 
-		auto setter = [](CON_ARGS) {
-			auto sec = std::stof(CON_ARG(0));
+		auto setter = [](float sec) {
 			sky::GetService<Scene::Scene>()->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / sec));
 		};
 
-		sky::AddCVar("scene_timestep_fps", sky::CommandProcessor::CVar(std::nullopt, { "float" }, getter, setter));
+		sky::AddCVar("scene_timestep_fps", sky::CVar<float>::CreateDefinition(getter, setter));
 
 		gCVarSceneTimestepEnabled = std::make_unique<sky::CVar<bool>>("scene_timestep_enabled",
 			std::bind(&sky::TimestepFixer::isEnabled, &scene->getTimestepFixer()),
