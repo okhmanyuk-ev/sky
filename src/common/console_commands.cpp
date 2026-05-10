@@ -34,7 +34,6 @@ ConsoleCommands::ConsoleCommands()
 	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, CMD_METHOD(onCVarList)));
 	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, CMD_METHOD(onEcho)));
 	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, CMD_METHOD(onLater)));
-	sky::AddCommand("exec", sky::CommandProcessor::Command("execute console commands from file", { "path" }, {}, { "path.." }, CMD_METHOD(onExec)));
 	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", CMD_METHOD(onClear)));
 	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", CMD_METHOD(onAlias)));
 	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, CMD_METHOD(onIf)));
@@ -116,27 +115,6 @@ void ConsoleCommands::onLater(CON_ARGS)
 			sky::GetService<sky::CommandProcessor>()->execute(command);
 		}
 	));
-}
-
-void ConsoleCommands::onExec(CON_ARGS)
-{
-	/*for (auto path : args) // TODO: find solution
-	{
-		if (!std::experimental::filesystem::exists(path))
-		{
-			CONSOLE_DEVICE.writeLine(path + " does not exist");
-			return;
-		}
-
-		std::ifstream file(path, std::fstream::in);
-		std::string line;
-
-		while (std::getline(file, line))
-		{
-			CONSOLE.execute(line);
-		}
-	}*/
-	sky::Log("TODO"); // TODO: make
 }
 
 void ConsoleCommands::onClear(CON_ARGS)

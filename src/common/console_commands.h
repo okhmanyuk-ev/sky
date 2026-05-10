@@ -66,7 +66,6 @@ namespace Common
 		void onCVarList(CON_ARGS);
 		void onEcho(CON_ARGS);
 		void onLater(CON_ARGS);
-		void onExec(CON_ARGS);
 		void onClear(CON_ARGS);
 		void onAlias(CON_ARGS);
 		void onIf(CON_ARGS);
