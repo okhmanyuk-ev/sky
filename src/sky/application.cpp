@@ -91,8 +91,8 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			return 1.0f / sky::ToSeconds(sky::GetService<Scene::Scene>()->getTimestepFixer().getTimestep());
 		};
 
-		auto setter = [](float sec) {
-			sky::GetService<Scene::Scene>()->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / sec));
+		auto setter = [](float fps) {
+			sky::GetService<Scene::Scene>()->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / fps));
 		};
 
 		sky::AddCVar("scene_timestep_fps", sky::CVar<float>::CreateDefinition(getter, setter));
