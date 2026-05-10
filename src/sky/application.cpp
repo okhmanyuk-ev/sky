@@ -153,7 +153,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		}));
 
 		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, [this](CON_ARGS) {
-			auto url = CON_ARG_EXIST(0) ? CON_ARG(0) : std::string("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
+			auto url = !args.empty() ? CON_ARG(0) : std::string("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
 			sky::Asset::Fetch(url, {
 				.onSuccess = [url](const sky::Asset& asset) {
 					auto image = Graphics::Image(asset);
@@ -166,7 +166,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 					sprite->setPivot(0.5f);
 					sprite->setTexture(sky::GetTexture(url));
 					sky::GetService<Scene::Scene>()->getRoot()->attach(sprite);
-				}	
+				}
 			});
 		}));
 	}

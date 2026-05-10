@@ -33,7 +33,6 @@
 #define CON_ARGS_COUNT CON_ARGS_NAME.size()
 
 #define CON_ARG(N) CON_ARGS_NAME.at(N)
-#define CON_ARG_EXIST(N) (CON_ARGS_COUNT > N)
 #define CON_ARG_INT(N) stoi(CON_ARG(N))
 #define CON_ARG_BOOL(N) static_cast<bool>(stoi(CON_ARG(N)))
 #define CON_ARG_FLOAT(N) stof(CON_ARG(N))

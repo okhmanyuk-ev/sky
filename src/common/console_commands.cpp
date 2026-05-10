@@ -50,7 +50,7 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 	auto commands = sky::GetService<sky::CommandProcessor>()->getItems()
 		| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::Command>(pair.second); })
 		| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::Command>(pair.second) }; })
-		| std::views::filter([&](const auto& pair) { return !CON_ARG_EXIST(0) || (pair.first.find(CON_ARG(0)) != std::string::npos); });
+		| std::views::filter([&](const auto& pair) { return args.empty() || (pair.first.find(CON_ARG(0)) != std::string::npos); });
 
 	for (const auto& [name, command] : commands)
 	{
@@ -77,7 +77,7 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 	auto cvars = sky::GetService<sky::CommandProcessor>()->getItems()
 		| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::CVar>(pair.second); })
 		| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::CVar>(pair.second) }; })
-		| std::views::filter([&](const auto& pair) { return !CON_ARG_EXIST(0) || (pair.first.find(CON_ARG(0)) != std::string::npos); });
+		| std::views::filter([&](const auto& pair) { return args.empty() || (pair.first.find(CON_ARG(0)) != std::string::npos); });
 
 	for (const auto& [name, cvar] : cvars)
 	{
@@ -153,7 +153,7 @@ void ConsoleCommands::onAlias(CON_ARGS)
 		auto aliases = items
 			| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::Alias>(pair.second); })
 			| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::Alias>(pair.second) }; })
-			| std::views::filter([&](const auto& pair) { return !CON_ARG_EXIST(0) || (pair.first.find(CON_ARG(0)) != std::string::npos); });
+			| std::views::filter([&](const auto& pair) { return args.empty() || (pair.first.find(CON_ARG(0)) != std::string::npos); });
 
 		if (aliases.empty())
 			sky::Log("alias list is empty");
@@ -206,7 +206,7 @@ void ConsoleCommands::onIf(CON_ARGS)
 	auto condition_value = sky::CommandProcessor::MakeTokensFromString(CON_ARG(1));
 	auto then_cmd = CON_ARG(2);
 	auto else_cmd = std::string();
-	auto has_else_cmd = CON_ARG_EXIST(3);
+	auto has_else_cmd = args.size() > 3;
 
 	if (has_else_cmd)
 		else_cmd = CON_ARG(3);
