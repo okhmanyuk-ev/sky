@@ -191,14 +191,14 @@ ConsoleCommands::ConsoleCommands()
 	};
 
 	sky::AddCVar("sys_time_delta_limit_fps", sky::CVar<std::optional<float>>::CreateDefinition(getter, setter));
-	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, sky::CreateCommandCallback(OnCmdList)));
-	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, sky::CreateCommandCallback(OnCVarList)));
-	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, {}, sky::CreateCommandCallback(OnEcho)));
-	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, sky::CreateCommandCallback(OnLater)));
-	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", {}, {}, {}, sky::CreateCommandCallback(OnClear)));
-	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", {}, {}, { "name", "value" }, sky::CreateCommandCallback(OnAlias)));
-	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, sky::CreateCommandCallback(OnIf)));
-	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", {}, {}, {}, sky::CreateCommandCallback([this] { onQuit(); })));
+	sky::AddCommand("cmdlist", "show list of commands", {}, {}, { "filter" }, OnCmdList);
+	sky::AddCommand("cvarlist", "show list of cvars", {}, {}, { "filter" }, OnCVarList);
+	sky::AddCommand("echo", "print to console", { "text" }, {}, {}, OnEcho);
+	sky::AddCommand("later", "delayed execution", { "time", "command" }, {}, {}, OnLater);
+	sky::AddCommand("clear", "clear console field", {}, {}, {}, OnClear);
+	sky::AddCommand("alias", "manage aliases", {}, {}, { "name", "value" }, OnAlias);
+	sky::AddCommand("if", "condition checking and execution", { "var", "value", "then" }, {}, { "else" }, OnIf);
+	sky::AddCommand("quit", "shutdown the app", {}, {}, {}, [this] { onQuit(); });
 
 	sky::Log("type \"cmdlist\" to see available commands");
 }

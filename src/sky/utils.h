@@ -48,7 +48,14 @@ namespace sky
 	void Log(const std::string& text);
 	void Log(Console::Color color, const std::string& text);
 
-	void AddCommand(const std::string& name, CommandProcessor::Command command);
+	template<typename F>
+	void AddCommand(const std::string& name, std::optional<std::string> description, std::vector<std::string> arguments,
+		std::vector<CommandProcessor::Command::DefaultArgument> default_arguments, std::vector<std::string> optional_arguments, F&& func)
+	{
+		GetService<CommandProcessor>()->addItem(name, CommandProcessor::Command(description, arguments, default_arguments, optional_arguments,
+			CreateCommandCallback(func)));
+	}
+
 	void AddCVar(const std::string& name, CommandProcessor::CVar cvar);
 
 	void ExecuteCommand(const std::string& str);

@@ -100,7 +100,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &scene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &scene->getTimestepFixer(), std::placeholders::_1));
 
-		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, CreateCommandCallback([](float size, float intensity, int passes, bool outlined, float rounding) {
+		sky::AddCommand("spawn_blur_glass", std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](float size, float intensity, int passes, bool outlined, float rounding) {
 			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::BlurredGlass>>>>>();
 			glass->setSize(size);
 			glass->setAnchor(0.5f);
@@ -110,9 +110,9 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			glass->setBlurPasses(passes);
 			glass->setRounding(rounding);
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
-		})));
+		});
 
-		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, CreateCommandCallback([](float size, float intensity, bool outlined, float rounding) {
+		sky::AddCommand("spawn_gray_glass", std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](float size, float intensity, bool outlined, float rounding) {
 			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::GrayscaledGlass>>>>>();
 			glass->setSize(size);
 			glass->setAnchor(0.5f);
@@ -121,18 +121,18 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			glass->setRounding(rounding);
 			glass->setGrayscaleIntensity(intensity);
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
-		})));
+		});
 
-		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { { "duration", "1.0" } }, {}, CreateCommandCallback([](float duration) {
+		sky::AddCommand("spawn_shockwave", std::nullopt, {}, { { "duration", "1.0" } }, {}, [](float duration) {
 			auto shockwave = Shared::SceneHelpers::Shockwave::MakeAnimated(duration);
 			shockwave->setSize(256.0f);
 			shockwave->setAnchor(0.5f);
 			shockwave->setPivot(0.5f);
 			shockwave->setScale(4.0f);
 			sky::GetService<Scene::Scene>()->getRoot()->attach(shockwave);
-		})));
+		});
 
-		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, CreateCommandCallback([](std::optional<std::string> _url) {
+		sky::AddCommand("spawn_sprite_from_url", std::nullopt, {}, {}, { "url" }, [](std::optional<std::string> _url) {
 			auto url = _url.value_or("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
 			sky::Asset::Fetch(url, {
 				.onSuccess = [url](const sky::Asset& asset) {
@@ -148,7 +148,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 					sky::GetService<Scene::Scene>()->getRoot()->attach(sprite);
 				}
 			});
-		})));
+		});
 	}
 
 #if defined(BUILD_DEVELOPER)
