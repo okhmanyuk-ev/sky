@@ -12,9 +12,9 @@ GraphicalConsoleCommands::GraphicalConsoleCommands()
 	sky::AddCVar("r_resolution", sky::CommandProcessor::CVar("resolution of screen", { "int", "int" },
 		CVAR_GETTER_INT2_FUNC(PLATFORM->getWidth, PLATFORM->getHeight), CVAR_SETTER_INT2_FUNC(PLATFORM->resize)));
 
-	sky::AddCommand("rescale", sky::CommandProcessor::Command("smart scaling", { "float" }, {}, {}, [](const std::vector<std::string>& args) {
-		PLATFORM->rescale(CON_ARG_FLOAT(0));
-	}));
+	sky::AddCommand("rescale", sky::CommandProcessor::Command("smart scaling", { "float" }, {}, {}, sky::CreateCommandCallback([](float value) {
+		PLATFORM->rescale(value);
+	})));
 }
 
 void GraphicalConsoleCommands::onFrame()
