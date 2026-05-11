@@ -60,8 +60,10 @@ World::World() :
 		std::bind(&b2World::SetAllowSleeping, &mB2World, std::placeholders::_1)),
 	mTimeStepEnabled("phys_timestep_enabled", std::bind(&sky::TimestepFixer::isEnabled, &mTimestepFixer),
 		std::bind(&sky::TimestepFixer::setEnabled, &mTimestepFixer, std::placeholders::_1)),
-	mTimestepForceTimeCompletion("phys_timestep_force_time_completion", std::bind(&sky::TimestepFixer::getForceTimeCompletion, &mTimestepFixer),
-		std::bind(&sky::TimestepFixer::setForceTimeCompletion, &mTimestepFixer, std::placeholders::_1))
+	mTimeStepForceTimeCompletion("phys_timestep_force_time_completion", std::bind(&sky::TimestepFixer::getForceTimeCompletion, &mTimestepFixer),
+		std::bind(&sky::TimestepFixer::setForceTimeCompletion, &mTimestepFixer, std::placeholders::_1)),
+	mTimeStepFps("phys_timestep_fps", [this] { return 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep()); },
+		[this](float fps) { mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / fps)); })
 {
 	mTimestepFixer.setForceTimeCompletion(false);
 	mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / 120.0f));
@@ -79,21 +81,6 @@ World::World() :
 
 	b2BodyDef dummy_body_def;
 	mDummyBody = mB2World.CreateBody(&dummy_body_def);
-
-	auto getter = [this] {
-		return 1.0f / sky::ToSeconds(mTimestepFixer.getTimestep());
-	};
-
-	auto setter = [this](float fps) {
-		mTimestepFixer.setTimestep(sky::FromSeconds(1.0f / fps));
-	};
-
-	sky::AddCVar("phys_timestep_fps", sky::CVar<float>::CreateDefinition(getter, setter));
-}
-
-World::~World()
-{
-	sky::GetService<sky::CommandProcessor>()->removeItem("phys_timestep_fps");
 }
 
 void World::onEvent(const Shared::TouchEmulator::Event& e)

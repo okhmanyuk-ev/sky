@@ -89,7 +89,6 @@ namespace Shared::PhysHelpers
 
 	public:
 		World();
-		~World();
 
 	private:
 		void onEvent(const Shared::TouchEmulator::Event& e) override;
@@ -122,7 +121,8 @@ namespace Shared::PhysHelpers
 		sky::CVar<int> mPositionIterations = sky::CVar<int>("phys_position_iterations", 2);
 		sky::CVar<bool> mAllowSleep;
 		sky::CVar<bool> mTimeStepEnabled;
-		sky::CVar<bool> mTimestepForceTimeCompletion;
+		sky::CVar<bool> mTimeStepForceTimeCompletion;
+		sky::CVar<float> mTimeStepFps;
 
 	private:
 		class Draw : public b2Draw
