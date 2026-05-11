@@ -79,7 +79,7 @@ static void OnLater(float seconds, std::string command)
 	}));
 }
 
-static void OnClear(const std::vector<std::string>& args)
+static void OnClear()
 {
 	sky::GetService<sky::Console>()->clear();
 }
@@ -212,14 +212,14 @@ ConsoleCommands::ConsoleCommands()
 	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, OnEcho));
 	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, sky::CreateCommandCallback<float, std::string>(OnLater)));
 	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", OnClear));
-	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", OnAlias));
+	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", {}, {}, { "name" }, OnAlias));
 	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, OnIf));
-	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", [this](const auto& args) { onQuit(args); }));
+	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", [this] { onQuit(); }));
 
 	sky::Log("type \"cmdlist\" to see available commands");
 }
 
-void ConsoleCommands::onQuit(const std::vector<std::string>& args)
+void ConsoleCommands::onQuit()
 {
 	if (mQuitCallback != nullptr)
 		mQuitCallback();

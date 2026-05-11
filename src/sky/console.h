@@ -126,7 +126,7 @@ namespace sky
 
 		struct Command
 		{
-			using Callback = std::function<void(const std::vector<std::string>&)>;
+			using Callback = std::function<void(const std::vector<std::string>& args)>;
 
 			struct DefaultArgument
 			{
@@ -137,7 +137,7 @@ namespace sky
 
 			Command(std::optional<std::string> description, std::vector<std::string> arguments, std::vector<DefaultArgument> default_arguments,
 				std::vector<std::string> optional_arguments, Callback callback);
-			Command(std::optional<std::string> description, Callback callback);
+			Command(std::optional<std::string> description, std::function<void()> callback);
 
 			std::string getArgsAsString() const;
 

@@ -109,8 +109,8 @@ CommandProcessor::Command::Command(std::optional<std::string> _description, std:
 {
 }
 
-CommandProcessor::Command::Command(std::optional<std::string> description, Callback callback) :
-	Command(description, {}, {}, {}, callback)
+CommandProcessor::Command::Command(std::optional<std::string> description, std::function<void()> callback) :
+	Command(description, {}, {}, {}, [callback](const auto& args) { callback(); })
 {
 }
 

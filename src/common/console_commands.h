@@ -32,7 +32,7 @@ namespace Common
 		ConsoleCommands();
 
 	private:
-		void onQuit(const std::vector<std::string>& args);
+		void onQuit();
 
 	public:
 		void setQuitCallback(std::function<void()> value) { mQuitCallback = value; }
