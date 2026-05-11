@@ -12,14 +12,12 @@
 
 #define CVAR_GETTER_BOOL(V) CVAR_GETTER(std::to_string(V))
 
-#define CON_ARGS const std::vector<std::string>& args
-
 #define CON_ARG(N) args.at(N)
 #define CON_ARG_INT(N) stoi(CON_ARG(N))
 #define CON_ARG_BOOL(N) static_cast<bool>(stoi(CON_ARG(N)))
 #define CON_ARG_FLOAT(N) stof(CON_ARG(N))
 
-#define CVAR_SETTER(V) [this](CON_ARGS) { V; }
+#define CVAR_SETTER(V) [this](const std::vector<std::string>& args) { V; }
 
 #define CVAR_SETTER_BOOL(V) CVAR_SETTER(V = CON_ARG_BOOL(0))
 
@@ -34,7 +32,7 @@ namespace Common
 		ConsoleCommands();
 
 	private:
-		void onQuit(CON_ARGS);
+		void onQuit(const std::vector<std::string>& args);
 
 	public:
 		void setQuitCallback(std::function<void()> value) { mQuitCallback = value; }

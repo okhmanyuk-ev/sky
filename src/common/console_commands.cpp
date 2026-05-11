@@ -7,7 +7,7 @@
 
 using namespace Common;
 
-static void OnCmdList(CON_ARGS)
+static void OnCmdList(const std::vector<std::string>& args)
 {
 	sky::Log("Commands:");
 
@@ -34,7 +34,7 @@ static void OnCmdList(CON_ARGS)
 	}
 }
 
-static void OnCVarList(CON_ARGS)
+static void OnCVarList(const std::vector<std::string>& args)
 {
 	sky::Log("CVars:");
 
@@ -61,7 +61,7 @@ static void OnCVarList(CON_ARGS)
 	}
 }
 
-static void OnEcho(CON_ARGS)
+static void OnEcho(const std::vector<std::string>& args)
 {
 	if (args.empty())
 		return;
@@ -72,7 +72,7 @@ static void OnEcho(CON_ARGS)
 	sky::Log(str);
 }
 
-static void OnLater(CON_ARGS)
+static void OnLater(const std::vector<std::string>& args)
 {
 	float seconds = std::stof(CON_ARG(0));
 	sky::RunAction(sky::Actions::Delayed(seconds,
@@ -82,12 +82,12 @@ static void OnLater(CON_ARGS)
 	));
 }
 
-static void OnClear(CON_ARGS)
+static void OnClear(const std::vector<std::string>& args)
 {
 	sky::GetService<sky::Console>()->clear();
 }
 
-static void OnAlias(CON_ARGS)
+static void OnAlias(const std::vector<std::string>& args)
 {
 	const auto& items = sky::GetService<sky::CommandProcessor>()->getItems();
 
@@ -143,7 +143,7 @@ static void OnAlias(CON_ARGS)
 	sky::Log("alias {} added", name);
 }
 
-static void OnIf(CON_ARGS)
+static void OnIf(const std::vector<std::string>& args)
 {
 	auto var = CON_ARG(0);
 	auto condition_value = sky::CommandProcessor::MakeTokensFromString(CON_ARG(1));
@@ -222,7 +222,7 @@ ConsoleCommands::ConsoleCommands()
 	sky::Log("type \"cmdlist\" to see available commands");
 }
 
-void ConsoleCommands::onQuit(CON_ARGS)
+void ConsoleCommands::onQuit(const std::vector<std::string>& args)
 {
 	if (mQuitCallback != nullptr)
 		mQuitCallback();

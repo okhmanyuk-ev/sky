@@ -105,7 +105,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &scene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &scene->getTimestepFixer(), std::placeholders::_1));
 
-		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](CON_ARGS) {
+		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](const std::vector<std::string>& args) {
 			auto size = CON_ARG_FLOAT(0);
 			auto intensity = CON_ARG_FLOAT(1);
 			auto passes = CON_ARG_INT(2);
@@ -123,7 +123,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
 		}));
 
-		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [this](CON_ARGS) {
+		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [this](const std::vector<std::string>& args) {
 			auto size = CON_ARG_FLOAT(0);
 			auto intensity = CON_ARG_FLOAT(1);
 			auto outlined = CON_ARG_BOOL(2);
@@ -139,7 +139,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
 		}));
 
-		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { { "duration", "1.0" } }, {}, [this](CON_ARGS) {
+		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { { "duration", "1.0" } }, {}, [this](const std::vector<std::string>& args) {
 			auto duration = CON_ARG_FLOAT(0);
 
 			auto shockwave = Shared::SceneHelpers::Shockwave::MakeAnimated(duration);
@@ -150,7 +150,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			sky::GetService<Scene::Scene>()->getRoot()->attach(shockwave);
 		}));
 
-		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, [this](CON_ARGS) {
+		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, [this](const std::vector<std::string>& args) {
 			auto url = !args.empty() ? CON_ARG(0) : std::string("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
 			sky::Asset::Fetch(url, {
 				.onSuccess = [url](const sky::Asset& asset) {
