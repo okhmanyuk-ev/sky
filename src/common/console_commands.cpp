@@ -195,10 +195,10 @@ ConsoleCommands::ConsoleCommands()
 	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, sky::CreateCommandCallback(OnCVarList)));
 	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, {}, sky::CreateCommandCallback(OnEcho)));
 	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, sky::CreateCommandCallback(OnLater)));
-	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", OnClear));
+	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", {}, {}, {}, sky::CreateCommandCallback(OnClear)));
 	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", {}, {}, { "name", "value" }, sky::CreateCommandCallback(OnAlias)));
 	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, sky::CreateCommandCallback(OnIf)));
-	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", [this] { onQuit(); }));
+	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", {}, {}, {}, sky::CreateCommandCallback([this] { onQuit(); })));
 
 	sky::Log("type \"cmdlist\" to see available commands");
 }

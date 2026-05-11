@@ -109,11 +109,6 @@ CommandProcessor::Command::Command(std::optional<std::string> _description, std:
 {
 }
 
-CommandProcessor::Command::Command(std::optional<std::string> description, std::function<void()> callback) :
-	Command(description, {}, {}, {}, [callback](const auto& args) { callback(); })
-{
-}
-
 CommandProcessor::Alias::Alias(std::vector<std::string> _value) :
 	value(_value)
 {
