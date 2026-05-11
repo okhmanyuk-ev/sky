@@ -7,39 +7,7 @@
 
 using namespace Common;
 
-ConsoleCommands::ConsoleCommands()
-{
-	auto getter = []() -> std::optional<float> {
-		auto delta_limit = sky::Scheduler::Instance->getTimeDeltaLimit();
-		if (!delta_limit.has_value())
-			return std::nullopt;
-
-		return 1.0f / sky::ToSeconds(delta_limit.value());
-	};
-
-	auto setter = [](std::optional<float> sec) {
-		if (!sec.has_value())
-		{
-			sky::Scheduler::Instance->setTimeDeltaLimit(std::nullopt);
-			return;
-		}
-		sky::Scheduler::Instance->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec.value()));
-	};
-
-	sky::AddCVar("sys_time_delta_limit_fps", sky::CVar<std::optional<float>>::CreateDefinition(getter, setter));
-	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, CMD_METHOD(onCmdList)));
-	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, CMD_METHOD(onCVarList)));
-	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, CMD_METHOD(onEcho)));
-	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, CMD_METHOD(onLater)));
-	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", CMD_METHOD(onClear)));
-	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", CMD_METHOD(onAlias)));
-	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, CMD_METHOD(onIf)));
-	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", CMD_METHOD(onQuit)));
-
-	sky::Log("type \"cmdlist\" to see available commands");
-}
-
-void ConsoleCommands::onCmdList(CON_ARGS)
+static void OnCmdList(CON_ARGS)
 {
 	sky::Log("Commands:");
 
@@ -66,7 +34,7 @@ void ConsoleCommands::onCmdList(CON_ARGS)
 	}
 }
 
-void ConsoleCommands::onCVarList(CON_ARGS)
+static void OnCVarList(CON_ARGS)
 {
 	sky::Log("CVars:");
 
@@ -93,7 +61,7 @@ void ConsoleCommands::onCVarList(CON_ARGS)
 	}
 }
 
-void ConsoleCommands::onEcho(CON_ARGS)
+static void OnEcho(CON_ARGS)
 {
 	if (args.empty())
 		return;
@@ -104,22 +72,22 @@ void ConsoleCommands::onEcho(CON_ARGS)
 	sky::Log(str);
 }
 
-void ConsoleCommands::onLater(CON_ARGS)
+static void OnLater(CON_ARGS)
 {
 	float seconds = std::stof(CON_ARG(0));
 	sky::RunAction(sky::Actions::Delayed(seconds,
-		[this, command = CON_ARG(1)] {
+		[command = CON_ARG(1)] {
 			sky::GetService<sky::CommandProcessor>()->execute(command);
 		}
 	));
 }
 
-void ConsoleCommands::onClear(CON_ARGS)
+static void OnClear(CON_ARGS)
 {
 	sky::GetService<sky::Console>()->clear();
 }
 
-void ConsoleCommands::onAlias(CON_ARGS)
+static void OnAlias(CON_ARGS)
 {
 	const auto& items = sky::GetService<sky::CommandProcessor>()->getItems();
 
@@ -175,7 +143,7 @@ void ConsoleCommands::onAlias(CON_ARGS)
 	sky::Log("alias {} added", name);
 }
 
-void ConsoleCommands::onIf(CON_ARGS)
+static void OnIf(CON_ARGS)
 {
 	auto var = CON_ARG(0);
 	auto condition_value = sky::CommandProcessor::MakeTokensFromString(CON_ARG(1));
@@ -220,6 +188,38 @@ void ConsoleCommands::onIf(CON_ARGS)
 		sky::GetService<sky::CommandProcessor>()->execute(then_cmd);
 	else if (has_else_cmd)
 		sky::GetService<sky::CommandProcessor>()->execute(else_cmd);
+}
+
+ConsoleCommands::ConsoleCommands()
+{
+	auto getter = []() -> std::optional<float> {
+		auto delta_limit = sky::Scheduler::Instance->getTimeDeltaLimit();
+		if (!delta_limit.has_value())
+			return std::nullopt;
+
+		return 1.0f / sky::ToSeconds(delta_limit.value());
+	};
+
+	auto setter = [](std::optional<float> sec) {
+		if (!sec.has_value())
+		{
+			sky::Scheduler::Instance->setTimeDeltaLimit(std::nullopt);
+			return;
+		}
+		sky::Scheduler::Instance->setTimeDeltaLimit(sky::FromSeconds(1.0f / sec.value()));
+	};
+
+	sky::AddCVar("sys_time_delta_limit_fps", sky::CVar<std::optional<float>>::CreateDefinition(getter, setter));
+	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, OnCmdList));
+	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, OnCVarList));
+	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, OnEcho));
+	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, OnLater));
+	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", OnClear));
+	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", OnAlias));
+	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, OnIf));
+	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", [this](const auto& args) { onQuit(args); }));
+
+	sky::Log("type \"cmdlist\" to see available commands");
 }
 
 void ConsoleCommands::onQuit(CON_ARGS)

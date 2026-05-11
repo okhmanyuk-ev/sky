@@ -27,8 +27,6 @@
 #define CVAR_SETTER_INT(V) CVAR_SETTER(V = CON_ARG_INT(0))
 #define CVAR_SETTER_INT2_FUNC(V) CVAR_SETTER(V(CON_ARG_INT(0), CON_ARG_INT(1)))
 
-#define CMD_METHOD(V) [this](CON_ARGS) { V(CON_ARGS_NAME); }
-
 namespace Common
 {
 	class ConsoleCommands
@@ -37,13 +35,6 @@ namespace Common
 		ConsoleCommands();
 
 	private:
-		void onCmdList(CON_ARGS);
-		void onCVarList(CON_ARGS);
-		void onEcho(CON_ARGS);
-		void onLater(CON_ARGS);
-		void onClear(CON_ARGS);
-		void onAlias(CON_ARGS);
-		void onIf(CON_ARGS);
 		void onQuit(CON_ARGS);
 
 	public:
