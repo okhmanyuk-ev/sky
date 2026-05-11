@@ -247,7 +247,7 @@ namespace sky
 	template<>
 	struct CVarTraits<bool>
 	{
-		static const std::vector<std::string> Args;
+		inline static const std::vector<std::string> Args = { "bool" };
 		static std::vector<std::string> ValueToArgs(bool value);
 		static bool ArgsToValue(const std::vector<std::string>& args);
 	};
@@ -255,7 +255,7 @@ namespace sky
 	template<>
 	struct CVarTraits<int>
 	{
-		static const std::vector<std::string> Args;
+		inline static const std::vector<std::string> Args = { "int" };
 		static std::vector<std::string> ValueToArgs(int value);
 		static int ArgsToValue(const std::vector<std::string>& args);
 	};
@@ -263,7 +263,7 @@ namespace sky
 	template<>
 	struct CVarTraits<float>
 	{
-		static const std::vector<std::string> Args;
+		inline static const std::vector<std::string> Args = { "float" };
 		static std::vector<std::string> ValueToArgs(float value);
 		static float ArgsToValue(const std::vector<std::string>& args);
 	};

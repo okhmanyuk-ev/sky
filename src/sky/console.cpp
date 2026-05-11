@@ -452,8 +452,6 @@ std::string CommandTraits<std::string>::ArgToValue(const std::string& arg)
 	return arg;
 }
 
-const std::vector<std::string> CVarTraits<bool>::Args = { "bool" };
-
 std::vector<std::string> CVarTraits<bool>::ValueToArgs(bool value)
 {
 	return { std::to_string(value) };
@@ -464,8 +462,6 @@ bool CVarTraits<bool>::ArgsToValue(const std::vector<std::string>& args)
 	return std::stoi(args.at(0)) > 0;
 }
 
-const std::vector<std::string> CVarTraits<int>::Args = { "int" };
-
 std::vector<std::string> CVarTraits<int>::ValueToArgs(int value)
 {
 	return { std::to_string(value) };
@@ -475,9 +471,6 @@ int CVarTraits<int>::ArgsToValue(const std::vector<std::string>& args)
 {
 	return std::stoi(args.at(0));
 }
-
-const std::vector<std::string> CVarTraits<float>::Args = { "float" };
-
 std::vector<std::string> CVarTraits<float>::ValueToArgs(float value)
 {
 	return { std::to_string(value) };
