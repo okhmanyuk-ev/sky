@@ -105,13 +105,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &scene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &scene->getTimestepFixer(), std::placeholders::_1));
 
-		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](const std::vector<std::string>& args) {
-			auto size = CON_ARG_FLOAT(0);
-			auto intensity = CON_ARG_FLOAT(1);
-			auto passes = CON_ARG_INT(2);
-			auto outlined = CON_ARG_BOOL(3);
-			auto rounding = CON_ARG_FLOAT(4);
-
+		sky::AddCommand("spawn_blur_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, CreateCommandCallback<float, float, int, bool, float>([](float size, float intensity, int passes, bool outlined, float rounding) {
 			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::BlurredGlass>>>>>();
 			glass->setSize(size);
 			glass->setAnchor(0.5f);
@@ -121,14 +115,9 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			glass->setBlurPasses(passes);
 			glass->setRounding(rounding);
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
-		}));
+		})));
 
-		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [this](const std::vector<std::string>& args) {
-			auto size = CON_ARG_FLOAT(0);
-			auto intensity = CON_ARG_FLOAT(1);
-			auto outlined = CON_ARG_BOOL(2);
-			auto rounding = CON_ARG_FLOAT(3);
-
+		sky::AddCommand("spawn_gray_glass", sky::CommandProcessor::Command(std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, CreateCommandCallback<float, float, bool, float>([](float size, float intensity, bool outlined, float rounding) {
 			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::GrayscaledGlass>>>>>();
 			glass->setSize(size);
 			glass->setAnchor(0.5f);
@@ -137,18 +126,16 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			glass->setRounding(rounding);
 			glass->setGrayscaleIntensity(intensity);
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
-		}));
+		})));
 
-		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { { "duration", "1.0" } }, {}, [this](const std::vector<std::string>& args) {
-			auto duration = CON_ARG_FLOAT(0);
-
+		sky::AddCommand("spawn_shockwave", sky::CommandProcessor::Command(std::nullopt, {}, { { "duration", "1.0" } }, {}, CreateCommandCallback<float>([](float duration) {
 			auto shockwave = Shared::SceneHelpers::Shockwave::MakeAnimated(duration);
 			shockwave->setSize(256.0f);
 			shockwave->setAnchor(0.5f);
 			shockwave->setPivot(0.5f);
 			shockwave->setScale(4.0f);
 			sky::GetService<Scene::Scene>()->getRoot()->attach(shockwave);
-		}));
+		})));
 
 		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, [this](const std::vector<std::string>& args) {
 			auto url = !args.empty() ? CON_ARG(0) : std::string("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
