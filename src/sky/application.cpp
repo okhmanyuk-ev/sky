@@ -21,6 +21,7 @@
 
 using namespace sky;
 
+static std::unique_ptr<sky::CVar<float>> gCVarSceneTimestepFps;
 static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepEnabled;
 static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepTimeCompletion;
 
@@ -87,15 +88,9 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		sky::Locator<Shared::SceneManager>::Init();
 		scene->getRoot()->attach(sky::GetService<Shared::SceneManager>());
 
-		auto getter = [] {
-			return 1.0f / sky::ToSeconds(sky::GetService<Scene::Scene>()->getTimestepFixer().getTimestep());
-		};
-
-		auto setter = [](float fps) {
-			sky::GetService<Scene::Scene>()->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / fps));
-		};
-
-		sky::AddCVar("scene_timestep_fps", sky::CVar<float>::CreateDefinition(getter, setter));
+		gCVarSceneTimestepFps = std::make_unique<sky::CVar<float>>("scene_timestep_fps",
+			[] { return 1.0f / sky::ToSeconds(sky::GetService<Scene::Scene>()->getTimestepFixer().getTimestep()); },
+			[](float fps) { sky::GetService<Scene::Scene>()->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / fps)); });
 
 		gCVarSceneTimestepEnabled = std::make_unique<sky::CVar<bool>>("scene_timestep_enabled",
 			std::bind(&sky::TimestepFixer::isEnabled, &scene->getTimestepFixer()),
@@ -211,6 +206,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 
 Application::~Application()
 {
+	gCVarSceneTimestepFps.reset();
 	gCVarSceneTimestepEnabled.reset();
 	gCVarSceneTimestepTimeCompletion.reset();
 	sky::Locator<Shared::GestureDetector>::Reset();
