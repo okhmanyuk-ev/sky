@@ -7,14 +7,14 @@
 
 using namespace Common;
 
-static void OnCmdList(const std::vector<std::string>& args)
+static void OnCmdList(std::optional<std::string> filter)
 {
 	sky::Log("Commands:");
 
 	auto commands = sky::GetService<sky::CommandProcessor>()->getItems()
 		| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::Command>(pair.second); })
 		| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::Command>(pair.second) }; })
-		| std::views::filter([&](const auto& pair) { return args.empty() || (pair.first.find(CON_ARG(0)) != std::string::npos); });
+		| std::views::filter([&](const auto& pair) { return !filter.has_value() || (pair.first.find(filter.value()) != std::string::npos); });
 
 	for (const auto& [name, command] : commands)
 	{
@@ -34,14 +34,14 @@ static void OnCmdList(const std::vector<std::string>& args)
 	}
 }
 
-static void OnCVarList(const std::vector<std::string>& args)
+static void OnCVarList(std::optional<std::string> filter)
 {
 	sky::Log("CVars:");
 
 	auto cvars = sky::GetService<sky::CommandProcessor>()->getItems()
 		| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::CVar>(pair.second); })
 		| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::CVar>(pair.second) }; })
-		| std::views::filter([&](const auto& pair) { return args.empty() || (pair.first.find(CON_ARG(0)) != std::string::npos); });
+		| std::views::filter([&](const auto& pair) { return !filter.has_value() || (pair.first.find(filter.value()) != std::string::npos); });
 
 	for (const auto& [name, cvar] : cvars)
 	{
@@ -61,15 +61,9 @@ static void OnCVarList(const std::vector<std::string>& args)
 	}
 }
 
-static void OnEcho(const std::vector<std::string>& args)
+static void OnEcho(std::string text)
 {
-	if (args.empty())
-		return;
-
-	auto str = std::accumulate(std::next(args.begin()), args.end(), *args.begin(),
-		[](const auto& a, const auto& b) { return a + " " + b; });
-
-	sky::Log(str);
+	sky::Log(text);
 }
 
 static void OnLater(float seconds, std::string command)
@@ -84,16 +78,16 @@ static void OnClear()
 	sky::GetService<sky::Console>()->clear();
 }
 
-static void OnAlias(const std::vector<std::string>& args)
+static void OnAlias(std::optional<std::string> _name, std::optional<std::string> _value)
 {
 	const auto& items = sky::GetService<sky::CommandProcessor>()->getItems();
 
-	if (args.size() < 2)
+	if (!_value.has_value())
 	{
 		auto aliases = items
 			| std::views::filter([](const auto& pair) { return std::holds_alternative<sky::CommandProcessor::Alias>(pair.second); })
 			| std::views::transform([](const auto& pair) { return std::pair{ pair.first, std::get<sky::CommandProcessor::Alias>(pair.second) }; })
-			| std::views::filter([&](const auto& pair) { return args.empty() || (pair.first.find(CON_ARG(0)) != std::string::npos); });
+			| std::views::filter([&](const auto& pair) { return !_name.has_value() || (pair.first.find(_name.value()) != std::string::npos); });
 
 		if (aliases.empty())
 			sky::Log("alias list is empty");
@@ -105,7 +99,7 @@ static void OnAlias(const std::vector<std::string>& args)
 		return;
 	}
 
-	auto name = CON_ARG(0);
+	const auto& name = _name.value();
 
 	if (name.empty())
 	{
@@ -131,26 +125,18 @@ static void OnAlias(const std::vector<std::string>& args)
 		sky::Log("alias {} removed", name);
 	}
 
-	auto value = CON_ARG(1);
+	const auto& value = _value.value();
 
 	if (value.empty())
 		return;
 
-	sky::GetService<sky::CommandProcessor>()->addItem(name, sky::CommandProcessor::Alias(sky::CommandProcessor::MakeTokensFromString(CON_ARG(1))));
+	sky::GetService<sky::CommandProcessor>()->addItem(name, sky::CommandProcessor::Alias(sky::CommandProcessor::MakeTokensFromString(value)));
 	sky::Log("alias {} added", name);
 }
 
-static void OnIf(const std::vector<std::string>& args)
+static void OnIf(std::string var, std::string _condition_value, std::string then_cmd, std::optional<std::string> else_cmd)
 {
-	auto var = CON_ARG(0);
-	auto condition_value = sky::CommandProcessor::MakeTokensFromString(CON_ARG(1));
-	auto then_cmd = CON_ARG(2);
-	auto else_cmd = std::string();
-	auto has_else_cmd = args.size() > 3;
-
-	if (has_else_cmd)
-		else_cmd = CON_ARG(3);
-
+	auto condition_value = sky::CommandProcessor::MakeTokensFromString(_condition_value);
 	const auto& items = sky::GetService<sky::CommandProcessor>()->getItems();
 
 	auto var_value = std::vector<std::string>();
@@ -179,12 +165,10 @@ static void OnIf(const std::vector<std::string>& args)
 		return;
 	}
 
-	bool equals = condition_value == var_value;
-
-	if (equals)
+	if (condition_value == var_value)
 		sky::GetService<sky::CommandProcessor>()->execute(then_cmd);
-	else if (has_else_cmd)
-		sky::GetService<sky::CommandProcessor>()->execute(else_cmd);
+	else if (else_cmd.has_value())
+		sky::GetService<sky::CommandProcessor>()->execute(else_cmd.value());
 }
 
 ConsoleCommands::ConsoleCommands()
@@ -207,13 +191,13 @@ ConsoleCommands::ConsoleCommands()
 	};
 
 	sky::AddCVar("sys_time_delta_limit_fps", sky::CVar<std::optional<float>>::CreateDefinition(getter, setter));
-	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, OnCmdList));
-	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, OnCVarList));
-	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, OnEcho));
+	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, sky::CreateCommandCallback(OnCmdList)));
+	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, sky::CreateCommandCallback(OnCVarList)));
+	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, {}, sky::CreateCommandCallback(OnEcho)));
 	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, sky::CreateCommandCallback(OnLater)));
 	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", OnClear));
-	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", {}, {}, { "name" }, OnAlias));
-	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, OnIf));
+	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", {}, {}, { "name", "value" }, sky::CreateCommandCallback(OnAlias)));
+	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, sky::CreateCommandCallback(OnIf)));
 	sky::AddCommand("quit", sky::CommandProcessor::Command("shutdown the app", [this] { onQuit(); }));
 
 	sky::Log("type \"cmdlist\" to see available commands");

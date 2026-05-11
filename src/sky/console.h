@@ -211,13 +211,31 @@ namespace sky
 		static std::string ArgToValue(const std::string& arg);
 	};
 
+	template<typename T>
+	struct CommandTraits<std::optional<T>>
+	{
+		static std::optional<T> ArgToValue(const std::string& arg)
+		{
+			return CommandTraits<T>::ArgToValue(arg);
+		}
+	};
+
 	template<typename F>
 	static auto CreateCommandCallback(F&& func)
 	{
 		return []<typename R, typename... Args>(std::function<R(Args...)>&& callback) {
 			return [callback = std::move(callback)](const auto& args) {
 				[&]<std::size_t... I>(std::index_sequence<I...>) {
-					callback(CommandTraits<Args>::ArgToValue(args.at(I))...);
+					auto get_arg = [&]<typename T>(std::size_t idx) -> T {
+						if (idx < args.size())
+							return CommandTraits<T>::ArgToValue(args.at(idx));
+
+						if constexpr (std::constructible_from<T, std::nullopt_t>)
+							return std::nullopt;
+
+						std::unreachable();
+					};
+					callback(get_arg.template operator()<Args>(I)...);
 				}(std::index_sequence_for<Args...>{});
 			};
 		}(std::function{ std::forward<F>(func) });
