@@ -185,6 +185,43 @@ namespace sky
 	};
 
 	template<typename T>
+	struct CommandTraits;
+
+	template<>
+	struct CommandTraits<bool>
+	{
+		static bool ArgToValue(const std::string& arg);
+	};
+
+	template<>
+	struct CommandTraits<int>
+	{
+		static int ArgToValue(const std::string& arg);
+	};
+
+	template<>
+	struct CommandTraits<float>
+	{
+		static float ArgToValue(const std::string& arg);
+	};
+
+	template<>
+	struct CommandTraits<std::string>
+	{
+		static std::string ArgToValue(const std::string& arg);
+	};
+
+	template<typename... Args>
+	static CommandProcessor::Command::Callback CreateCommandCallback(std::function<void(Args...)> callback)
+	{
+		return [callback](const std::vector<std::string>& args) {
+			[&]<std::size_t... I>(std::index_sequence<I...>) {
+				callback(CommandTraits<Args>::ArgToValue(args.at(I))...);
+			}(std::index_sequence_for<Args...>{});
+		};
+	}
+
+	template<typename T>
 	struct CVarTraits;
 
 	template<>

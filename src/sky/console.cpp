@@ -432,6 +432,26 @@ std::string CommandProcessor::Command::getArgsAsString() const
 	return sky::join(args, " ");
 }
 
+bool CommandTraits<bool>::ArgToValue(const std::string& arg)
+{
+	return static_cast<bool>(std::stoi(arg));
+}
+
+int CommandTraits<int>::ArgToValue(const std::string& arg)
+{
+	return std::stoi(arg);
+}
+
+float CommandTraits<float>::ArgToValue(const std::string& arg)
+{
+	return std::stof(arg);
+}
+
+std::string CommandTraits<std::string>::ArgToValue(const std::string& arg)
+{
+	return arg;
+}
+
 const std::vector<std::string> CVarTraits<bool>::Args = { "bool" };
 
 std::vector<std::string> CVarTraits<bool>::ValueToArgs(bool value)

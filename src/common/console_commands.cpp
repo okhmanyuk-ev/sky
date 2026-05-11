@@ -72,14 +72,11 @@ static void OnEcho(const std::vector<std::string>& args)
 	sky::Log(str);
 }
 
-static void OnLater(const std::vector<std::string>& args)
+static void OnLater(float seconds, std::string command)
 {
-	float seconds = std::stof(CON_ARG(0));
-	sky::RunAction(sky::Actions::Delayed(seconds,
-		[command = CON_ARG(1)] {
-			sky::GetService<sky::CommandProcessor>()->execute(command);
-		}
-	));
+	sky::RunAction(sky::Actions::Delayed(seconds, [command] {
+		sky::GetService<sky::CommandProcessor>()->execute(command);
+	}));
 }
 
 static void OnClear(const std::vector<std::string>& args)
@@ -213,7 +210,7 @@ ConsoleCommands::ConsoleCommands()
 	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, OnCmdList));
 	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, OnCVarList));
 	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, OnEcho));
-	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, OnLater));
+	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, sky::CreateCommandCallback<float, std::string>(OnLater)));
 	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", OnClear));
 	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", OnAlias));
 	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, OnIf));
