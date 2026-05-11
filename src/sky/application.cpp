@@ -132,15 +132,15 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			sky::GetService<Scene::Scene>()->getRoot()->attach(shockwave);
 		})));
 
-		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, [this](const std::vector<std::string>& args) {
-			auto url = !args.empty() ? CON_ARG(0) : std::string("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
+		sky::AddCommand("spawn_sprite_from_url", sky::CommandProcessor::Command(std::nullopt, {}, {}, { "url" }, CreateCommandCallback([](std::optional<std::string> _url) {
+			auto url = _url.value_or("https://raw.githubusercontent.com/okhmanyuk-ev/idle-phone-inc/master/art_src/ico.png");
 			sky::Asset::Fetch(url, {
 				.onSuccess = [url](const sky::Asset& asset) {
 					auto image = Graphics::Image(asset);
 					sky::GetService<sky::Cache>()->loadTexture(image, url);
 
 					auto sprite = std::make_shared<Shared::SceneHelpers::KillableByClick<
-					Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Sprite>>>>();
+						Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Sprite>>>>();
 					sprite->setSize(256.0f);
 					sprite->setAnchor(0.5f);
 					sprite->setPivot(0.5f);
@@ -148,7 +148,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 					sky::GetService<Scene::Scene>()->getRoot()->attach(sprite);
 				}
 			});
-		}));
+		})));
 	}
 
 #if defined(BUILD_DEVELOPER)
