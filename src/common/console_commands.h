@@ -12,10 +12,9 @@
 
 #define CVAR_GETTER_BOOL(V) CVAR_GETTER(std::to_string(V))
 
-#define CON_ARGS_NAME args
-#define CON_ARGS const std::vector<std::string>& CON_ARGS_NAME
+#define CON_ARGS const std::vector<std::string>& args
 
-#define CON_ARG(N) CON_ARGS_NAME.at(N)
+#define CON_ARG(N) args.at(N)
 #define CON_ARG_INT(N) stoi(CON_ARG(N))
 #define CON_ARG_BOOL(N) static_cast<bool>(stoi(CON_ARG(N)))
 #define CON_ARG_FLOAT(N) stof(CON_ARG(N))

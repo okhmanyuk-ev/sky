@@ -66,7 +66,7 @@ static void OnEcho(CON_ARGS)
 	if (args.empty())
 		return;
 
-	auto str = std::accumulate(std::next(CON_ARGS_NAME.begin()), CON_ARGS_NAME.end(), *CON_ARGS_NAME.begin(),
+	auto str = std::accumulate(std::next(args.begin()), args.end(), *args.begin(),
 		[](const auto& a, const auto& b) { return a + " " + b; });
 
 	sky::Log(str);
