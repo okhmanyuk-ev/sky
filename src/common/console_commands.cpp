@@ -210,7 +210,7 @@ ConsoleCommands::ConsoleCommands()
 	sky::AddCommand("cmdlist", sky::CommandProcessor::Command("show list of commands", {}, {}, { "filter" }, OnCmdList));
 	sky::AddCommand("cvarlist", sky::CommandProcessor::Command("show list of cvars", {}, {}, { "filter" }, OnCVarList));
 	sky::AddCommand("echo", sky::CommandProcessor::Command("print to console", { "text" }, {}, { "text.." }, OnEcho));
-	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, sky::CreateCommandCallback<float, std::string>(OnLater)));
+	sky::AddCommand("later", sky::CommandProcessor::Command("delayed execution", { "time", "command" }, {}, {}, sky::CreateCommandCallback(OnLater)));
 	sky::AddCommand("clear", sky::CommandProcessor::Command("clear console field", OnClear));
 	sky::AddCommand("alias", sky::CommandProcessor::Command("manage aliases", {}, {}, { "name" }, OnAlias));
 	sky::AddCommand("if", sky::CommandProcessor::Command("condition checking and execution", { "var", "value", "then" }, {}, { "else" }, OnIf));

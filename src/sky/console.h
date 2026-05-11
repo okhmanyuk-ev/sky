@@ -211,14 +211,16 @@ namespace sky
 		static std::string ArgToValue(const std::string& arg);
 	};
 
-	template<typename... Args>
-	static CommandProcessor::Command::Callback CreateCommandCallback(std::function<void(Args...)> callback)
+	template<typename F>
+	static auto CreateCommandCallback(F&& func)
 	{
-		return [callback](const std::vector<std::string>& args) {
-			[&]<std::size_t... I>(std::index_sequence<I...>) {
-				callback(CommandTraits<Args>::ArgToValue(args.at(I))...);
-			}(std::index_sequence_for<Args...>{});
-		};
+		return []<typename R, typename... Args>(std::function<R(Args...)>&& callback) {
+			return [callback = std::move(callback)](const auto& args) {
+				[&]<std::size_t... I>(std::index_sequence<I...>) {
+					callback(CommandTraits<Args>::ArgToValue(args.at(I))...);
+				}(std::index_sequence_for<Args...>{});
+			};
+		}(std::function{ std::forward<F>(func) });
 	}
 
 	template<typename T>
