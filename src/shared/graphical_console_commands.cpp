@@ -10,7 +10,16 @@ using namespace Shared;
 GraphicalConsoleCommands::GraphicalConsoleCommands()
 {
 	sky::AddCVar("r_resolution", sky::CommandProcessor::CVar("resolution of screen", { "int", "int" },
-		CVAR_GETTER_INT2_FUNC(PLATFORM->getWidth, PLATFORM->getHeight), CVAR_SETTER_INT2_FUNC(PLATFORM->resize)));
+		[this] {
+			return std::vector{
+				std::to_string(PLATFORM->getWidth()),
+				std::to_string(PLATFORM->getHeight())
+			};
+		},
+		[this](const auto& args) {
+			PLATFORM->resize(stoi(args.at(0)), stoi(args.at(1)));
+		})
+	);
 
 	sky::AddCommand("rescale", "smart scaling", { "float" }, {}, {}, [](float value) {
 		PLATFORM->rescale(value);
