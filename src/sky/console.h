@@ -4,6 +4,7 @@
 #include <string>
 #include <thread>
 #include <variant>
+#include <ranges>
 #include <optional>
 #include <functional>
 #include <platform/defines.h>
@@ -290,6 +291,31 @@ namespace sky
 				return std::nullopt;
 
 			return CVarTraits<T>::ArgsToValue(args);
+		}
+	};
+
+	template<typename... Ts>
+	struct CVarTraits<std::tuple<Ts...>>
+	{
+		inline static const std::vector<std::string> Args = std::views::join(std::array{ std::views::all(CVarTraits<Ts>::Args)... })
+			| std::ranges::to<std::vector>();
+
+		static std::vector<std::string> ValueToArgs(const std::tuple<Ts...>& value)
+		{
+			return std::apply([&](const Ts&... elems) {
+				return std::array{ CVarTraits<Ts>::ValueToArgs(elems)... } | std::views::join | std::ranges::to<std::vector>();
+			}, value);
+		}
+
+		static std::tuple<Ts...> ArgsToValue(const std::vector<std::string>& args)
+		{
+			auto it = args.begin();
+			return std::tuple{ CVarTraits<Ts>::ArgsToValue([&] {
+				const auto n = CVarTraits<Ts>::Args.size();
+				std::vector<std::string> sub(it, it + n);
+				it += n;
+				return sub;
+			}())... };
 		}
 	};
 

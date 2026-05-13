@@ -9,17 +9,9 @@ using namespace Shared;
 
 GraphicalConsoleCommands::GraphicalConsoleCommands()
 {
-	sky::AddCVar("r_resolution", sky::CommandProcessor::CVar("resolution of screen", { "int", "int" },
-		[this] {
-			return std::vector{
-				std::to_string(PLATFORM->getWidth()),
-				std::to_string(PLATFORM->getHeight())
-			};
-		},
-		[this](const auto& args) {
-			PLATFORM->resize(stoi(args.at(0)), stoi(args.at(1)));
-		})
-	);
+	sky::AddCVar("r_resolution", sky::CVar<std::tuple<int, int>>::CreateDefinition(
+		[] { return std::tuple{ PLATFORM->getWidth(), PLATFORM->getHeight() }; },
+		[](std::tuple<int, int> value) { PLATFORM->resize(std::get<0>(value), std::get<1>(value)); }, "resolution of screen"));
 
 	sky::AddCommand("rescale", "smart scaling", { "float" }, {}, {}, [](float value) {
 		PLATFORM->rescale(value);
