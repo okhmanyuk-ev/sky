@@ -8,13 +8,13 @@ void Scheduler::frame()
 {
 	mFrameCount += 1;
 
-	if (mFramerateLimit > 0)
+	if (mFramerateLimit.getValue() > 0)
 	{
-		auto frameTime = sky::FromSeconds(1.0 / mFramerateLimit);
+		auto frameTime = sky::FromSeconds(1.0 / mFramerateLimit.getValue());
 
 		while (sky::Now() - mLastTime < frameTime)
 		{
-			if (!mSleepAllowed)
+			if (!mSleepAllowed.getValue())
 				continue;
 
 			std::this_thread::sleep_for(sky::FromMilliseconds(1));
@@ -23,7 +23,7 @@ void Scheduler::frame()
 
 	auto now = sky::Now();
 
-	mTimeDelta = sky::FromSeconds(sky::ToSeconds(now - mLastTime) * mTimeScale);
+	mTimeDelta = sky::FromSeconds(sky::ToSeconds(now - mLastTime) * mTimeScale.getValue());
 
 	if (mTimeDeltaLimit.has_value() && mTimeDelta > mTimeDeltaLimit.value())
 	{

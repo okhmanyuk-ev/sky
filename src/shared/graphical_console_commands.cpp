@@ -20,7 +20,7 @@ GraphicalConsoleCommands::GraphicalConsoleCommands()
 
 void GraphicalConsoleCommands::onFrame()
 {
-	if (mShowTargets)
+	if (mShowTargets.getValue())
 	{
 		ImGui::Begin("Render Targets");
 		for (const auto& [name, target] : GRAPHICS->getRenderTargets())

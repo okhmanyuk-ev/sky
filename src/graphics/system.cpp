@@ -575,9 +575,9 @@ void System::drawString(const Font& font, const sky::TextMesh& mesh, float bold,
 	const float outline = glm::lerp(mid, min, fixedOutlineThickness);
 
 	if (fixedOutlineThickness > 0.0f)
-		drawString(font, mesh, outline, mid, mSdfSmoothFactor, outlineColor);
+		drawString(font, mesh, outline, mid, mSdfSmoothFactor.getValue(), outlineColor);
 
-	drawString(font, mesh, mid, max, mSdfSmoothFactor, color);
+	drawString(font, mesh, mid, max, mSdfSmoothFactor.getValue(), color);
 }
 
 void System::drawString(const Font& font, const std::wstring& text, float size, sky::TextMesh::Align align, float bold, const glm::vec4& color,

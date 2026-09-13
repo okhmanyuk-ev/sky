@@ -165,7 +165,7 @@ void World::update(sky::Duration delta)
 {
 	Scene::Node::update(delta);
 
-	if (mShowStats)
+	if (mShowStats.getValue())
 	{
 		sky::Indicator("phys", "phys bodies", mB2World.GetBodyCount());
 		sky::Indicator("phys", "phys contacts", mB2World.GetContactCount());
@@ -208,7 +208,7 @@ void World::update(sky::Duration delta)
 	}
 
 	mTimestepFixer.execute(delta, [&](auto delta) {
-		mB2World.Step(sky::ToSeconds(delta), mVelocityIterations, mPositionIterations);
+		mB2World.Step(sky::ToSeconds(delta), mVelocityIterations.getValue(), mPositionIterations.getValue());
 	});
 
 	for (auto body = mB2World.GetBodyList(); body; body = body->GetNext())

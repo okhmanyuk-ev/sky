@@ -103,7 +103,7 @@ void ImguiSystem::end()
 	ImGui::Render();
 
 	GRAPHICS->begin();
-	GRAPHICS->pushSampler(mSamplerNearest ? skygfx::Sampler::Nearest : skygfx::Sampler::Linear);
+	GRAPHICS->pushSampler(mSamplerNearest.getValue() ? skygfx::Sampler::Nearest : skygfx::Sampler::Linear);
 	GRAPHICS->pushOrthoMatrix(getLogicalWidth(), getLogicalHeight());
 
 	auto blendMode = skygfx::BlendStates::NonPremultiplied;
@@ -230,7 +230,7 @@ float ImguiSystem::getScale() const
 {
 	float result = 1.0f;
 
-	if (mScaleIndependence)
+	if (mScaleIndependence.getValue())
 		result /= PLATFORM->getScale();
 
 	return result;

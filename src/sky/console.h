@@ -368,8 +368,8 @@ namespace sky
 		CVar(const CVar&) = delete;
 		CVar& operator=(const CVar&) = delete;
 
-		operator T() const { return mGetter(); }
-		CVar& operator=(T value) { mSetter(value); return *this; }
+		T getValue() const { return mGetter(); }
+		void setValue(T value) { mSetter(value); }
 
 	private:
 		std::string mName;

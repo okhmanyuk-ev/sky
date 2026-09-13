@@ -14,7 +14,7 @@ using namespace Shared;
 
 void PerformanceConsoleCommands::onFrame()
 {
-	if (mWantShowFps > 0)
+	if (mWantShowFps.getValue() > 0)
 	{
 		auto str = std::to_string(mFramerateCounter.getFramerate());
 
@@ -41,7 +41,7 @@ void PerformanceConsoleCommands::onFrame()
 		if (choked)
 			str = "(!) " + str;
 
-		if (mWantShowFps > 1)
+		if (mWantShowFps.getValue() > 1)
 		{
 			auto avg_framerate = mFramerateCounter.getAverageFramerate();
 			str = fmt::format("{} ({} avg)", str, avg_framerate);
@@ -50,31 +50,31 @@ void PerformanceConsoleCommands::onFrame()
 		sky::Indicator("engine", "fps", str);
 	}
 
-	if (mWantShowDrawcalls > 0)
+	if (mWantShowDrawcalls.getValue() > 0)
 		sky::Indicator("engine", "drawcalls", RENDERER->getDrawcalls());
 
-	if (mWantShowBatches > 0)
+	if (mWantShowBatches.getValue() > 0)
 	{
 		sky::Indicator("engine", "batches", GRAPHICS->getBatchesCount());
 		sky::Indicator("engine", "flushes", GRAPHICS->getBatchFlushCount());
 	}
 
-	if (mWantShowTargets > 0)
+	if (mWantShowTargets.getValue() > 0)
 		sky::Indicator("engine", "targets", GRAPHICS->getRenderTargets().size());
 
-	if (mWantShowThreadpool > 1)
+	if (mWantShowThreadpool.getValue() > 1)
 		sky::Indicator("engine", "threadpool", std::to_string(THREADPOOL->getTasksCount()) + " at " + std::to_string(THREADPOOL->getThreadsCount()) + " threads");
-	else if (mWantShowThreadpool > 0)
+	else if (mWantShowThreadpool.getValue() > 0)
 		sky::Indicator("engine", "threadpool", THREADPOOL->getTasksCount());
 
-	if (mWantShowTasks)
+	if (mWantShowTasks.getValue())
 		sky::Indicator("engine", "tasks", sky::Scheduler::Instance->getTasksCount());
 
 #ifndef EMSCRIPTEN
-	if (mWantShowNetSpeed)
+	if (mWantShowNetSpeed.getValue())
 		sky::Indicator("net", "net speed", Common::Helpers::BytesToNiceString(NETWORK->getBytesPerSecond()) + "/s");
 
-	if (mWantShowNetPps)
+	if (mWantShowNetPps.getValue())
 		sky::Indicator("net", "net pps", std::to_string(NETWORK->getPacketsPerSecond()));
 #endif
 }

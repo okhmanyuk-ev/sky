@@ -35,11 +35,11 @@ namespace sky
 		void ensureFont();
 
 	public:
-		bool isSamplerNearest() const { return mSamplerNearest; }
-		void setSamplerNearest(bool value) { mSamplerNearest = value; }
+		bool isSamplerNearest() const { return mSamplerNearest.getValue(); }
+		void setSamplerNearest(bool value) { mSamplerNearest.setValue(value); }
 
-		bool isScaleIndependence() const { return mScaleIndependence; }
-		void setScaleIndependence(bool value) { mScaleIndependence = value; }
+		bool isScaleIndependence() const { return mScaleIndependence.getValue(); }
+		void setScaleIndependence(bool value) { mScaleIndependence.setValue(value); }
 
 		auto getLogicalSize() const { return mLogicalSize; }
 		auto getLogicalWidth() const { return mLogicalSize.x; }

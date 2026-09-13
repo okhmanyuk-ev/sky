@@ -18,18 +18,18 @@ namespace sky
 		void run(Task<>&& task);
 
 	public:
-		int getFramerateLimit() const { return mFramerateLimit; }
-		void setFramerateLimit(int value) { mFramerateLimit = value; }
+		int getFramerateLimit() const { return mFramerateLimit.getValue(); }
+		void setFramerateLimit(int value) { mFramerateLimit.setValue(value); }
 
-		bool isSleepAllowed() const { return mSleepAllowed; }
-		void setSleepAllowed(bool value) { mSleepAllowed = value; }
+		bool isSleepAllowed() const { return mSleepAllowed.getValue(); }
+		void setSleepAllowed(bool value) { mSleepAllowed.setValue(value); }
 
 		auto getTimeDelta() const { return mTimeDelta; }
 
-		float getTimeScale() const { return mTimeScale; }
-		void setTimeScale(float value) { mTimeScale = value; }
+		float getTimeScale() const { return mTimeScale.getValue(); }
+		void setTimeScale(float value) { mTimeScale.setValue(value); }
 
-		auto getFramerate() const { return 1.0f / sky::ToSeconds(mTimeDelta) * mTimeScale; } // frame count per second
+		auto getFramerate() const { return 1.0f / sky::ToSeconds(mTimeDelta) * mTimeScale.getValue(); } // frame count per second
 		auto getTasksCount() const { return mTasksCount; }
 
 		auto getUptime() const { return mUptime; }

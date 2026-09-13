@@ -18,12 +18,12 @@ ConsoleHelperCommands::ConsoleHelperCommands()
 
 void ConsoleHelperCommands::onFrame()
 {
-	if (mShowImguiDemo)
+	if (mShowImguiDemo.getValue())
 	{
 		ImGui::ShowDemoWindow();
 	}
 
-	if (mShowCVars)
+	if (mShowCVars.getValue())
 	{
 		ImGui::Begin("CVars", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel);
 		ImGui::SetWindowPos(ImGui::User::TopRightCorner());

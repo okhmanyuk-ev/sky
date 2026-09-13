@@ -44,7 +44,7 @@ void SceneEditor::onEvent(const Platform::Input::Mouse::ScrollEvent& e)
 
 void SceneEditor::onFrame()
 {
-	if (!mEnabled)
+	if (!mEnabled.getValue())
 		return;
 
 	mNodeSelectingMode = (PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::LeftCtrl) || PLATFORM->isKeyPressed(Platform::Input::Keyboard::Key::RightCtrl))
@@ -68,9 +68,9 @@ void SceneEditor::onFrame()
 
 void SceneEditor::showNodeTreeWindow()
 {
-	bool enabled = mEnabled;
+	bool enabled = mEnabled.getValue();
 	ImGui::Begin("Scene", &enabled);
-	mEnabled = enabled;
+	mEnabled.setValue(enabled);
 	if (ImGui::Button("Batch Groups"))
 	{
 		mBatchGroupsEnabled = true;

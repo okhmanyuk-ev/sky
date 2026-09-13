@@ -11,7 +11,7 @@ using namespace Shared;
 
 void StatsSystem::onFrame()
 {
-	if (!mEnabled)
+	if (!mEnabled.getValue())
 		return;
 
 	if (mGroups.empty())
@@ -43,7 +43,7 @@ void StatsSystem::onFrame()
 		}
 		if (ImGui::MenuItem("Close"))
 		{
-			mEnabled = false;
+			mEnabled.setValue(false);
 		}
 		ImGui::EndPopup();
 	}

@@ -104,11 +104,11 @@ namespace Shared::PhysHelpers
 	public:
 		auto& getB2World() { return mB2World; }
 
-		bool isDebug() const { return mDebug; }
-		void setDebug(bool value) { mDebug = value; }
+		bool isDebug() const { return mDebug.getValue(); }
+		void setDebug(bool value) { mDebug.setValue(value); }
 
-		bool getShowStats() const { return mShowStats; }
-		void setShowStats(bool value) { mShowStats = value; }
+		bool getShowStats() const { return mShowStats.getValue(); }
+		void setShowStats(bool value) { mShowStats.setValue(value); }
 
 	private:
 		b2World mB2World = b2World({ 0.0f, 10.0f });
