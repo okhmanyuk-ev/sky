@@ -1,4 +1,4 @@
-# sky - Crossplatform lightweight game engine
+# sky - Crossplatform lightweight game library
 
 # Features
 - Platforms: Windows, Mac, iOS, Android, Emscripten
