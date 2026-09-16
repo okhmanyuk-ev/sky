@@ -18,6 +18,7 @@ namespace sky
 			std::coroutine_handle<> last;
 
 			PromiseBase* root{ this };
+			std::exception_ptr eptr;
 
 			struct FinalAwaiter
 			{
@@ -42,7 +43,11 @@ namespace sky
 
 			auto initial_suspend() { return std::suspend_always{}; }
 			auto final_suspend() noexcept(true) { return FinalAwaiter{}; }
-			void unhandled_exception() { throw; }
+
+			void unhandled_exception()
+			{
+				eptr = std::current_exception();
+			}
 		};
 
 		template<typename U>
@@ -114,6 +119,9 @@ namespace sky
 
 				auto await_resume()
 				{
+					if (current.promise().eptr)
+						std::rethrow_exception(current.promise().eptr);
+
 					if constexpr (!std::is_void<T>())
 						return std::move(current.promise().result.value());
 				}
