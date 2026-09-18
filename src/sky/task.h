@@ -4,6 +4,7 @@
 #include <functional>
 #include <optional>
 #include <utility>
+#include <exception>
 
 namespace sky
 {
