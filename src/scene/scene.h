@@ -9,7 +9,7 @@
 
 namespace Scene
 {
-	class Scene :
+	class Scene : public sky::Updatable,
 		public sky::Listenable<Platform::Input::Mouse::ButtonEvent>,
 		public sky::Listenable<Platform::Input::Mouse::MoveEvent>,
 		public sky::Listenable<Platform::Input::Mouse::ScrollEvent>,
@@ -26,9 +26,10 @@ namespace Scene
 		Scene();
 		~Scene();
 
-	public:
-		void frame();
+	private:
+		void onFrame() override;
 
+	public:
 		size_t getNodesCount(std::shared_ptr<Node> node = nullptr) const;
 
 	private:

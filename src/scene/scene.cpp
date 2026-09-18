@@ -196,7 +196,7 @@ std::list<std::shared_ptr<Scene::Node>> Scene::Scene::getNodes(const glm::vec2& 
 	return getNodes(mRoot, pos);
 }
 
-void Scene::Scene::frame()
+void Scene::Scene::onFrame()
 {
 	if (mRenderTarget)
 	{
