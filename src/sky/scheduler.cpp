@@ -15,9 +15,9 @@ void Scheduler::frame()
 		while (sky::Now() - mLastTime < frameTime)
 		{
 			if (!mSleepAllowed.getValue())
-				continue;
-
-			std::this_thread::sleep_for(sky::FromMilliseconds(1));
+				std::this_thread::yield();
+			else
+				std::this_thread::sleep_for(sky::FromMilliseconds(1));
 		}
 	}
 
