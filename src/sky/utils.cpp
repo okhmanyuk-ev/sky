@@ -147,7 +147,7 @@ sky::Task<> sky::ConvertActionToTask(Action action)
 
 void sky::RunAction(Action action)
 {
-	RunTask(ConvertActionToTask(action));
+	RunTask(ConvertActionToTask(std::move(action)));
 }
 
 std::string sky::to_string(const std::wstring& wstr)

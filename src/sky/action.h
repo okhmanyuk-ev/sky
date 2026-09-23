@@ -12,6 +12,61 @@
 #include <common/easing.h>
 #include <sky/clock.h>
 
+#ifdef EMSCRIPTEN
+namespace polyfill
+{
+	template <class Sig> class move_only_function;
+
+	template <class R, class... Args>
+	class move_only_function<R(Args...)>
+	{
+		struct base
+		{
+			virtual ~base() = default;
+			virtual R call(Args... args) = 0;
+		};
+
+		template <class F>
+		struct impl final : base
+		{
+			F f;
+			explicit impl(F&& fn) : f(std::move(fn)) {}
+			R call(Args... args) override
+			{
+				return std::invoke(f, std::forward<Args>(args)...);
+			}
+		};
+
+		std::unique_ptr<base> ptr_;
+
+	public:
+		move_only_function() noexcept = default;
+		move_only_function(std::nullptr_t) noexcept {}
+
+		template <class F,
+				  class D = std::decay_t<F>,
+				  class = std::enable_if_t<
+					  !std::is_same_v<D, move_only_function> &&
+					  std::is_invocable_r_v<R, D&, Args...>>>
+		move_only_function(F&& f)
+			: ptr_(std::make_unique<impl<D>>(std::forward<F>(f))) {}
+
+		move_only_function(move_only_function&&) noexcept = default;
+		move_only_function& operator=(move_only_function&&) noexcept = default;
+
+		move_only_function(const move_only_function&) = delete;
+		move_only_function& operator=(const move_only_function&) = delete;
+
+		explicit operator bool() const noexcept { return static_cast<bool>(ptr_); }
+
+		R operator()(Args... args)
+		{
+			return ptr_->call(std::forward<Args>(args)...);
+		}
+	};
+}
+#endif
+
 namespace sky
 {
 	class Action
@@ -23,9 +78,14 @@ namespace sky
 			Finished
 		};
 
+		Action(Action&&) noexcept = default;
+		Action& operator=(Action&&) noexcept = default;
+		Action(const Action&) = delete;
+		Action& operator=(const Action&) = delete;
+
 		template <std::invocable<sky::Duration> Func>
-			requires std::same_as<std::invoke_result_t<Func, sky::Duration>, Result>
-		Action(Func&& func) : mFunc(std::move(func))
+			requires std::same_as<std::invoke_result_t<Func, sky::Duration>, Result> && (!std::same_as<std::remove_cvref_t<Func>, Action>)
+		Action(Func&& func) : mFunc(std::forward<Func>(func))
 		{
 		}
 
@@ -90,7 +150,11 @@ namespace sky
 		Result operator()(sky::Duration dTime);
 
 	private:
-		std::function<Result(sky::Duration)> mFunc;
+#ifdef EMSCRIPTEN
+		polyfill::move_only_function<Result(sky::Duration)> mFunc;
+#else
+		std::move_only_function<Result(sky::Duration)> mFunc;
+#endif
 	};
 
 	class ActionsPlayer
