@@ -36,7 +36,12 @@ namespace sky
 			std::coroutine_handle<> await_suspend(std::coroutine_handle<T> current) noexcept
 			{
 				auto& promise = current.promise();
-				return promise.prev ? promise.prev : std::noop_coroutine();
+
+				if (!promise.prev)
+					return std::noop_coroutine();
+
+				promise.root->last = promise.prev;
+				return promise.prev;
 			}
 		};
 
