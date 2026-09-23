@@ -51,7 +51,7 @@ namespace sky
 		void unhandled_exception() { eptr = std::current_exception(); }
 
 		template<typename T>
-			requires (!is_task<T>::value)
+			requires (!is_task<std::remove_cvref_t<T>>::value)
 		auto await_transform(T&& a) noexcept
 		{
 			return std::forward<T>(a);
