@@ -12,7 +12,7 @@ Action::Action(Task<>&& task)
 	mFunc = Actions::Sequence(
 		[task_ptr, completed] {
 			sky::Scheduler::Instance->run([](auto task_ptr, auto completed) -> sky::Task<> {
-				co_await *task_ptr;
+				co_await std::move(*task_ptr);
 				*completed = true;
 			}(task_ptr, completed));
 		},
