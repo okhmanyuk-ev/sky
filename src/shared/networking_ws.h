@@ -20,7 +20,7 @@ namespace Shared::NetworkingWS
 	};
 
 	class Client;
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 	class Server;
 #endif
 
@@ -31,7 +31,7 @@ namespace Shared::NetworkingWS
 	class Channel
 	{
 		friend Client;
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 		friend Server;
 #endif
 
@@ -51,7 +51,7 @@ namespace Shared::NetworkingWS
 	public:
 		void setSendCallback(SendCallback value) { mSendCallback = value; }
 		void setDisconnectCallback(DisconnectCallback value) { mDisconnectCallback = value; }
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 		auto getHdl() const { return mHdl; }
 
 	private:
@@ -61,12 +61,12 @@ namespace Shared::NetworkingWS
 		SendCallback mSendCallback = nullptr;
 		DisconnectCallback mDisconnectCallback = nullptr;
 		std::map<std::string, ReadCallback> mMessageReaders;
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 		connection_hdl mHdl;
 #endif
 	};
 
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 	class Server : public sky::Updatable
 	{
 	public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 
 #include <map>
 #include <set>

@@ -23,7 +23,7 @@ namespace Shared
 		sky::CVar<int> mWantShowTargets = sky::CVar<int>("hud_show_targets", 0, "show render targets statistics");
 		sky::CVar<int> mWantShowThreadpool = sky::CVar<int>("hud_show_threadpool", 0, "show threadpool tasks on screen");
 		sky::CVar<int> mWantShowTasks = sky::CVar<int>("hud_show_tasks", 0, "show tasks on screen");
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 		sky::CVar<bool> mWantShowNetSpeed = sky::CVar<bool>("hud_show_net_speed", false);
 		sky::CVar<bool> mWantShowNetPps = sky::CVar<bool>("hud_show_net_pps", false);
 #endif

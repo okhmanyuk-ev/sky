@@ -4,7 +4,7 @@ using namespace sky;
 
 Audio::Audio()
 {
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(PLATFORM_EMSCRIPTEN)
 	FMOD::Studio::System::create(&FmodStudio);
 	FmodStudio->getCoreSystem(&Fmod);
 #if defined(PLATFORM_ANDROID)
@@ -19,7 +19,7 @@ Audio::Audio()
 
 Audio::~Audio()
 {
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(PLATFORM_EMSCRIPTEN)
 	FmodStudio->release();
 #endif
 }
@@ -29,14 +29,14 @@ void Audio::play(std::shared_ptr<Sound> sound)
 	if (sound == nullptr)
 		return;
 
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(PLATFORM_EMSCRIPTEN)
 	Fmod->playSound(sound->sound, nullptr, false, &channel);
 #endif
 }
 
 Audio::Sound::Sound(const sky::Asset& asset, bool loop)
 {
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(PLATFORM_EMSCRIPTEN)
 	FMOD_CREATESOUNDEXINFO exinfo;
 	memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
@@ -55,7 +55,7 @@ Audio::Sound::Sound(const sky::Asset& asset, bool loop)
 
 Audio::Sound::~Sound()
 {
-#if !defined(PLATFORM_MAC) & !defined(EMSCRIPTEN)
+#if !defined(PLATFORM_MAC) & !defined(PLATFORM_EMSCRIPTEN)
 	sound->release();
 #endif
 }

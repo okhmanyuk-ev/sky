@@ -6,7 +6,7 @@
 #include <sky/utils.h>
 #include <sky/scheduler.h>
 #include <common/helpers.h>
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten.h>
 #endif
 
@@ -14,7 +14,7 @@ using namespace Shared;
 
 void Profile::load()
 {
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 	auto path = "save.bson";
 
 	if (!sky::Asset::Exists(path, sky::Asset::Storage::Bundle))
@@ -54,7 +54,7 @@ void Profile::load()
 
 void Profile::save()
 {
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 	auto json = nlohmann::json();
 	write(json);
 	auto bson = nlohmann::json::to_bson(json);

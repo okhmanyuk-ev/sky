@@ -4,7 +4,7 @@
 	#define PLATFORM_WINDOWS
 #elif __ANDROID__
 	#define PLATFORM_ANDROID
-#elif EMSCRIPTEN
+#elif __EMSCRIPTEN__
 	#define PLATFORM_EMSCRIPTEN
 #endif
 

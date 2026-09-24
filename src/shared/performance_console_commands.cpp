@@ -70,7 +70,7 @@ void PerformanceConsoleCommands::onFrame()
 	if (mWantShowTasks.getValue())
 		sky::Indicator("engine", "tasks", sky::Scheduler::Instance->getTasksCount());
 
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 	if (mWantShowNetSpeed.getValue())
 		sky::Indicator("net", "net speed", Common::Helpers::BytesToNiceString(NETWORK->getBytesPerSecond()) + "/s");
 

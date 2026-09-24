@@ -12,7 +12,7 @@
 #include <common/easing.h>
 #include <sky/clock.h>
 
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 namespace polyfill
 {
 	template <class Sig> class move_only_function;
@@ -150,7 +150,7 @@ namespace sky
 		Result operator()(sky::Duration dTime);
 
 	private:
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 		polyfill::move_only_function<Result(sky::Duration)> mFunc;
 #else
 		std::move_only_function<Result(sky::Duration)> mFunc;

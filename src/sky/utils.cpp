@@ -3,7 +3,7 @@
 #include <sky/localization.h>
 #include <codecvt>
 #include <regex>
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten.h>
 #endif
 
@@ -119,7 +119,7 @@ void sky::ExecuteCommand(const std::string& str)
 
 void sky::OpenUrl(const std::string& url)
 {
-#if defined(EMSCRIPTEN)
+#if defined(PLATFORM_EMSCRIPTEN)
 	EM_ASM_({
 		var url = UTF8ToString($0);
 		window.open(url);

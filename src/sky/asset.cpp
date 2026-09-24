@@ -6,7 +6,7 @@
 #include <cassert>
 #include <filesystem>
 #include <sys/stat.h>
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten/fetch.h>
 #endif
 #include <sky/utils.h>
@@ -176,7 +176,7 @@ std::string sky::Asset::FixSlashes(const std::string& input)
 
 void sky::Asset::Fetch(const std::string& url, FetchSettings settings)
 {
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 	emscripten_fetch_attr_t attr;
 	emscripten_fetch_attr_init(&attr);
 	strcpy(attr.requestMethod, "GET");

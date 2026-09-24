@@ -15,7 +15,7 @@
 #include <sky/threadpool.h>
 #include <sky/imgui_system.h>
 #include <sky/imgui_console.h>
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten.h>
 #endif
 
@@ -30,7 +30,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 	std::srand((unsigned int)std::time(nullptr));
 
 	sky::Locator<sky::Dispatcher>::Init();
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 	sky::Locator<sky::ThreadPool>::Init();
 #endif
 	sky::Locator<sky::CommandProcessor>::Init();
@@ -41,7 +41,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 	sky::Locator<Graphics::System>::Init();
 	if (flags.count(Flag::Network))
 	{
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 		sky::Locator<Network::System>::Init();
 #endif
 	}
@@ -234,7 +234,7 @@ Application::~Application()
 	sky::Locator<sky::Localization>::Reset();
 	if (mFlags.count(Flag::Network))
 	{
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 		sky::Locator<Network::System>::Reset();
 #endif
 	}
@@ -244,7 +244,7 @@ Application::~Application()
 	sky::Locator<Platform::System>::Reset();
 	sky::Locator<sky::Scheduler>::Reset();
 	sky::Locator<sky::CommandProcessor>::Reset();
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 	sky::Locator<sky::ThreadPool>::Reset();
 #endif
 }
@@ -267,7 +267,7 @@ void Application::run()
 		return true;
 	};
 
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 	emscripten_set_main_loop([] { frame(); }, 0, 1);
 #else
 	while (true)

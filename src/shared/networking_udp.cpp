@@ -1,6 +1,6 @@
 #include "networking_udp.h"
 
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 
 #include <sky/console.h>
 #include <common/buffer_helpers.h>

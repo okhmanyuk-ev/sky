@@ -1,6 +1,6 @@
 #include "system.h"
 
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 #include <asio.hpp>
 
 using namespace Network;

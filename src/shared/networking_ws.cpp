@@ -4,7 +4,7 @@
 #include <common/console_commands.h>
 #include <sky/utils.h>
 #include <nlohmann/json.hpp>
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten/websocket.h>
 #else
 #include <websocketpp/server.hpp>
@@ -68,7 +68,7 @@ void Channel::addMessageReader(const std::string& name, ReadCallback callback)
 
 // server
 
-#ifndef EMSCRIPTEN
+#ifndef PLATFORM_EMSCRIPTEN
 struct Server::Impl
 {
 #ifdef SKY_USE_OPENSSL
@@ -162,7 +162,7 @@ std::tuple<std::string/*ip*/, uint16_t/*port*/> Server::getV4AddressFromHdl(webs
 
 struct Client::Impl
 {
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 	std::optional<EMSCRIPTEN_WEBSOCKET_T> handle;
 #else
 #ifdef SKY_USE_OPENSSL
@@ -177,7 +177,7 @@ Client::Client(const std::string& url) :
 	mUrl(url),
 	mImpl(std::make_unique<Impl>())
 {
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 	// nothing for emscripten
 #else
 	mImpl->wsclient.set_access_channels(websocketpp::log::alevel::none);
@@ -225,7 +225,7 @@ Client::Client(const std::string& url) :
 
 Client::~Client()
 {
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 	if (mImpl->handle)
 		emscripten_websocket_delete(mImpl->handle.value());
 #endif
@@ -233,7 +233,7 @@ Client::~Client()
 
 void Client::connect()
 {
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 	if (mImpl->handle)
 		emscripten_websocket_delete(mImpl->handle.value());
 
@@ -303,7 +303,7 @@ void Client::onChannelCreated(std::shared_ptr<Channel> channel)
 
 void Client::onFrame()
 {
-#ifdef EMSCRIPTEN
+#ifdef PLATFORM_EMSCRIPTEN
 #else
 	mImpl->wsclient.poll();
 #endif
