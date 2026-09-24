@@ -85,6 +85,8 @@ elseif(LINUX)
 		GLESv2
 	)
 elseif(EMSCRIPTEN)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC -DSKY_EMSCRIPTEN)
+
 	if(NOT DEFINED EMSCRIPTEN_SHELL_FILE_PATH)
 		set(EMSCRIPTEN_SHELL_FILE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/platform/emscripten/shell.html)
 	endif()
