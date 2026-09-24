@@ -174,7 +174,7 @@ std::string sky::Asset::FixSlashes(const std::string& input)
 	return result;
 }
 
-#if defined(EMSCRIPTEN) && defined(BUILD_DZ)
+#if defined(PLATFORM_EMSCRIPTEN) && defined(BUILD_DZ)
 extern "C" void EMSCRIPTEN_KEEPALIVE skyAssetFetch(char* url, sky::Asset::FetchSettings *settings) {
 	if (url) {
 		sky::Asset::Fetch(url, *settings);
@@ -241,7 +241,7 @@ void sky::Asset::Fetch(const std::string& url, FetchSettings settings)
 		}
 		delete settings;
 		emscripten_fetch_close(fetch);
-#if defined(EMSCRIPTE) && defined(BUILD_DZ)
+#if defined(PLATFORM_EMSCRIPTEN) && defined(BUILD_DZ)
 		EM_ASM((
 			setTimeout(() => {
 				URL.revokeObjectURL(UTF8ToString($0));
