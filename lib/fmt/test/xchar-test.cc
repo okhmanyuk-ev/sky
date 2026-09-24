@@ -1,15 +1,13 @@
 // Formatting library for C++ - formatting library tests
 //
-// Copyright (c) 2012 - present, Victor Zverovich
+// Copyright (c) 2012 - present, Victor Zverovich and {fmt} contributors
 // All rights reserved.
 //
 // For the license information refer to format.h.
 
 #include "fmt/xchar.h"
 
-#include <algorithm>
 #include <complex>
-#include <cwchar>
 #include <vector>
 
 #include "fmt/chrono.h"
@@ -74,6 +72,7 @@ TEST(xchar_test, format_explicitly_convertible_to_wstring_view) {
 TEST(xchar_test, format) {
   EXPECT_EQ(fmt::format(L"{}", 42), L"42");
   EXPECT_EQ(fmt::format(L"{}", 4.2), L"4.2");
+  EXPECT_EQ(fmt::format(L"{}", 1e100), L"1e+100");
   EXPECT_EQ(fmt::format(L"{}", L"abc"), L"abc");
   EXPECT_EQ(fmt::format(L"{}", L'z'), L"z");
   EXPECT_THROW(fmt::format(fmt::runtime(L"{:*\x343E}"), 42), fmt::format_error);
@@ -145,6 +144,26 @@ TEST(format_test, wide_format_to_n) {
   EXPECT_EQ(L"BC x", fmt::wstring_view(buffer, 4));
 }
 
+TEST(format_test, wide_format_to_n_runtime) {
+  wchar_t buffer[4];
+  buffer[3] = L'x';
+  auto result = fmt::format_to_n(buffer, 3, fmt::runtime(L"{}"), 12345);
+  EXPECT_EQ(5u, result.size);
+  EXPECT_EQ(buffer + 3, result.out);
+  EXPECT_EQ(L"123x", fmt::wstring_view(buffer, 4));
+  buffer[0] = L'x';
+  buffer[1] = L'x';
+  buffer[2] = L'x';
+  result = fmt::format_to_n(buffer, 3, fmt::runtime(L"{}"), L'A');
+  EXPECT_EQ(1u, result.size);
+  EXPECT_EQ(buffer + 1, result.out);
+  EXPECT_EQ(L"Axxx", fmt::wstring_view(buffer, 4));
+  result = fmt::format_to_n(buffer, 3, fmt::runtime(L"{}{} "), L'B', L'C');
+  EXPECT_EQ(3u, result.size);
+  EXPECT_EQ(buffer + 3, result.out);
+  EXPECT_EQ(L"BC x", fmt::wstring_view(buffer, 4));
+}
+
 TEST(xchar_test, named_arg_udl) {
   using namespace fmt::literals;
   auto udl_a =
@@ -158,7 +177,7 @@ TEST(xchar_test, named_arg_udl) {
 
 TEST(xchar_test, print) {
   // Check that the wide print overload compiles.
-  if (fmt::detail::const_check(false)) {
+  if (false) {
     fmt::print(L"test");
     fmt::println(L"test");
   }
@@ -166,10 +185,27 @@ TEST(xchar_test, print) {
 
 TEST(xchar_test, join) {
   int v[3] = {1, 2, 3};
+  EXPECT_EQ(fmt::format(u"({})", fmt::join(v, v + 3, u", ")), u"(1, 2, 3)");
+  EXPECT_EQ(fmt::format(U"({})", fmt::join(v, v + 3, U", ")), U"(1, 2, 3)");
   EXPECT_EQ(fmt::format(L"({})", fmt::join(v, v + 3, L", ")), L"(1, 2, 3)");
-  auto t = std::tuple<wchar_t, int, float>('a', 1, 2.0f);
-  EXPECT_EQ(fmt::format(L"({})", fmt::join(t, L", ")), L"(a, 1, 2)");
+  auto vector = std::vector<int>{1, 2, 3};
+  EXPECT_EQ(fmt::format(u"({})", fmt::join(vector, u", ")), u"(1, 2, 3)");
+  EXPECT_EQ(fmt::format(U"({})", fmt::join(vector, U", ")), U"(1, 2, 3)");
+  EXPECT_EQ(fmt::format(L"({})", fmt::join(vector, L", ")), L"(1, 2, 3)");
+  auto tuple_char16 = std::tuple<char16_t, int, float>(u'a', 1, 2.0f);
+  EXPECT_EQ(fmt::format(u"({})", fmt::join(tuple_char16, u", ")), u"(a, 1, 2)");
+  auto tuple_char32 = std::tuple<char32_t, int, float>(U'a', 1, 2.0f);
+  EXPECT_EQ(fmt::format(U"({})", fmt::join(tuple_char32, U", ")), U"(a, 1, 2)");
+  auto tuple_wchar = std::tuple<wchar_t, int, float>(L'a', 1, 2.0f);
+  EXPECT_EQ(fmt::format(L"({})", fmt::join(tuple_wchar, L", ")), L"(a, 1, 2)");
 }
+
+#ifdef __cpp_lib_byte
+TEST(xchar_test, join_bytes) {
+  auto v = std::vector<std::byte>{std::byte(1), std::byte(2), std::byte(3)};
+  EXPECT_EQ(fmt::format(L"{}", fmt::join(v, L", ")), L"1, 2, 3");
+}
+#endif
 
 enum streamable_enum {};
 
@@ -224,106 +260,9 @@ TEST(xchar_test, chrono) {
   EXPECT_EQ(L"42s", fmt::format(L"{}", std::chrono::seconds(42)));
   EXPECT_EQ(fmt::format(L"{:%F}", tm), L"2016-04-25");
   EXPECT_EQ(fmt::format(L"{:%T}", tm), L"11:22:33");
-}
 
-std::wstring system_wcsftime(const std::wstring& format, const std::tm* timeptr,
-                             std::locale* locptr = nullptr) {
-  auto loc = locptr ? *locptr : std::locale::classic();
-  auto& facet = std::use_facet<std::time_put<wchar_t>>(loc);
-  std::wostringstream os;
-  os.imbue(loc);
-  facet.put(os, os, L' ', timeptr, format.c_str(),
-            format.c_str() + format.size());
-#ifdef _WIN32
-  // Workaround a bug in older versions of Universal CRT.
-  auto str = os.str();
-  if (str == L"-0000") str = L"+0000";
-  return str;
-#else
-  return os.str();
-#endif
-}
-
-TEST(chrono_test_wchar, time_point) {
-  auto t1 = std::chrono::time_point_cast<std::chrono::seconds>(
-      std::chrono::system_clock::now());
-
-  std::vector<std::wstring> spec_list = {
-      L"%%",  L"%n",  L"%t",  L"%Y",  L"%EY", L"%y",  L"%Oy", L"%Ey", L"%C",
-      L"%EC", L"%G",  L"%g",  L"%b",  L"%h",  L"%B",  L"%m",  L"%Om", L"%U",
-      L"%OU", L"%W",  L"%OW", L"%V",  L"%OV", L"%j",  L"%d",  L"%Od", L"%e",
-      L"%Oe", L"%a",  L"%A",  L"%w",  L"%Ow", L"%u",  L"%Ou", L"%H",  L"%OH",
-      L"%I",  L"%OI", L"%M",  L"%OM", L"%S",  L"%OS", L"%x",  L"%Ex", L"%X",
-      L"%EX", L"%D",  L"%F",  L"%R",  L"%T",  L"%p"};
-#ifndef _WIN32
-  // Disabled on Windows, because these formats is not consistent among
-  // platforms.
-  spec_list.insert(spec_list.end(), {L"%c", L"%Ec", L"%r"});
-#elif !FMT_HAS_C99_STRFTIME
-  // Only C89 conversion specifiers when using MSVCRT instead of UCRT
-  spec_list = {L"%%", L"%Y", L"%y", L"%b", L"%B", L"%m", L"%U",
-               L"%W", L"%j", L"%d", L"%a", L"%A", L"%w", L"%H",
-               L"%I", L"%M", L"%S", L"%x", L"%X", L"%p"};
-#endif
-  spec_list.push_back(L"%Y-%m-%d %H:%M:%S");
-
-  for (const auto& spec : spec_list) {
-    auto t = std::chrono::system_clock::to_time_t(t1);
-    auto tm = *std::gmtime(&t);
-
-    auto sys_output = system_wcsftime(spec, &tm);
-
-    auto fmt_spec = fmt::format(L"{{:{}}}", spec);
-    EXPECT_EQ(sys_output, fmt::format(fmt::runtime(fmt_spec), t1));
-    EXPECT_EQ(sys_output, fmt::format(fmt::runtime(fmt_spec), tm));
-  }
-
-  // Timezone formatters tests makes sense for localtime.
-#if FMT_HAS_C99_STRFTIME
-  spec_list = {L"%z", L"%Z"};
-#else
-  spec_list = {L"%Z"};
-#endif
-  for (const auto& spec : spec_list) {
-    auto t = std::chrono::system_clock::to_time_t(t1);
-    auto tm = *std::localtime(&t);
-
-    auto sys_output = system_wcsftime(spec, &tm);
-
-    auto fmt_spec = fmt::format(L"{{:{}}}", spec);
-    EXPECT_EQ(sys_output, fmt::format(fmt::runtime(fmt_spec), tm));
-
-    if (spec == L"%z") {
-      sys_output.insert(sys_output.end() - 2, 1, L':');
-      EXPECT_EQ(sys_output, fmt::format(L"{:%Ez}", tm));
-      EXPECT_EQ(sys_output, fmt::format(L"{:%Oz}", tm));
-    }
-  }
-
-  // Separate tests for UTC, since std::time_put can use local time and ignoring
-  // the timezone in std::tm (if it presents on platform).
-  if (fmt::detail::has_member_data_tm_zone<std::tm>::value) {
-    auto t = std::chrono::system_clock::to_time_t(t1);
-    auto tm = *std::gmtime(&t);
-
-    std::vector<std::wstring> tz_names = {L"GMT", L"UTC"};
-    EXPECT_THAT(tz_names, Contains(fmt::format(L"{:%Z}", t1)));
-    EXPECT_THAT(tz_names, Contains(fmt::format(L"{:%Z}", tm)));
-  }
-
-  if (fmt::detail::has_member_data_tm_gmtoff<std::tm>::value) {
-    auto t = std::chrono::system_clock::to_time_t(t1);
-    auto tm = *std::gmtime(&t);
-
-    EXPECT_EQ(L"+0000", fmt::format(L"{:%z}", t1));
-    EXPECT_EQ(L"+0000", fmt::format(L"{:%z}", tm));
-
-    EXPECT_EQ(L"+00:00", fmt::format(L"{:%Ez}", t1));
-    EXPECT_EQ(L"+00:00", fmt::format(L"{:%Ez}", tm));
-
-    EXPECT_EQ(L"+00:00", fmt::format(L"{:%Oz}", t1));
-    EXPECT_EQ(L"+00:00", fmt::format(L"{:%Oz}", tm));
-  }
+  auto t = fmt::sys_time<std::chrono::seconds>(std::chrono::seconds(290088000));
+  EXPECT_EQ(fmt::format("{:%Y-%m-%d %H:%M:%S}", t), "1979-03-12 12:00:00");
 }
 
 TEST(xchar_test, color) {
@@ -468,7 +407,7 @@ TEST(locale_test, int_formatter) {
   f.parse(parse_ctx);
   auto buf = fmt::memory_buffer();
   fmt::basic_format_context<fmt::appender, char> format_ctx(
-      fmt::appender(buf), {}, fmt::detail::locale_ref(loc));
+      fmt::appender(buf), {}, fmt::locale_ref(loc));
   f.format(12345, format_ctx);
   EXPECT_EQ(fmt::to_string(buf), "12,345");
 }
