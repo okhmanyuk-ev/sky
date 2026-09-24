@@ -92,7 +92,7 @@ namespace sky
 		template <std::invocable Func>
 			requires std::same_as<std::invoke_result_t<Func>, Result>
 		Action(Func&& func) :
-			Action([func = std::forward<Func>(func)](auto dTime) {
+			Action([func = std::forward<Func>(func)](auto dTime) mutable {
 				return func();
 			})
 		{
@@ -101,7 +101,7 @@ namespace sky
 		template <std::invocable Func>
 			requires std::same_as<std::invoke_result_t<Func>, void>
 		Action(Func&& func) :
-			Action([func = std::forward<Func>(func)](auto dTime) {
+			Action([func = std::forward<Func>(func)](auto dTime) mutable {
 				func();
 				return Result::Finished;
 			})
@@ -139,7 +139,7 @@ namespace sky
 			requires (!std::is_void_v<std::invoke_result_t<Func>>) &&
 				std::convertible_to<std::invoke_result_t<Func>, std::optional<Action>>
 		Action(Func&& func) :
-			Action([func = std::forward<Func>(func)] -> std::tuple<Result, std::optional<Action>> {
+			Action([func = std::forward<Func>(func)] mutable -> std::tuple<Result, std::optional<Action>> {
 				return { Result::Finished, func() };
 			})
 		{

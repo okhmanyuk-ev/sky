@@ -7,17 +7,24 @@ using namespace sky;
 Action::Action(Task<>&& task)
 {
 	auto completed = std::make_shared<bool>(false);
-	auto task_ptr = std::make_shared<sky::Task<>>(std::move(task));
+	auto eptr = std::make_shared<std::exception_ptr>(nullptr);
 
 	mFunc = Actions::Sequence(
-		[task_ptr, completed] {
-			sky::Scheduler::Instance->run([](auto task_ptr, auto completed) -> sky::Task<> {
-				co_await std::move(*task_ptr);
+		[task = std::move(task), completed, eptr] mutable {
+			Scheduler::Instance->run([](auto task, auto completed, auto eptr) -> sky::Task<> {
+				try { co_await std::move(task); }
+				catch (...) { *eptr = std::current_exception(); }
 				*completed = true;
-			}(task_ptr, completed));
+			}(std::move(task), completed, eptr));
 		},
-		Actions::Wait([completed] {
-			return !*completed;
+		Actions::Wait([completed, eptr] {
+			if (!*completed)
+				return true;
+
+			if (*eptr)
+				std::rethrow_exception(*eptr);
+
+			return false;
 		})
 	);
 }
