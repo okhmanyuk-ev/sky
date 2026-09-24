@@ -283,7 +283,7 @@ disable_warnings(imgui)
 
 # fmt
 
-add_subdirectory(lib/fmt)
+add_subdirectory(lib/fmt EXCLUDE_FROM_ALL)
 target_link_libraries(${PROJECT_NAME} fmt)
 set_property(TARGET fmt PROPERTY FOLDER ${LIBS_FOLDER})
 
