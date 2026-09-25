@@ -21,7 +21,7 @@ void Glass::draw()
 
 	if (bounds.size != mPrevSize || !mBackbufferFormat.has_value() || mBackbufferFormat.value() != format)
 	{
-		setTexture(std::make_shared<skygfx::Texture>(w, h, format, skygfx::GetMipCount(w, h)));
+		setTexture(std::make_shared<skygfx::Texture>(w, h, format, mGenerateMipmaps ? skygfx::GetMipCount(w, h) : 1));
 		mPrevSize = bounds.size;
 		mBackbufferFormat = format;
 	}
