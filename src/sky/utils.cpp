@@ -162,6 +162,12 @@ std::wstring sky::to_wstring(const std::string& str)
 	return converter.from_bytes(str);
 }
 
+std::u32string sky::utf8_to_utf32(const char* str)
+{
+	std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+	return converter.from_bytes(str);
+}
+
 std::string sky::join(const std::vector<std::string>& vec, const std::string& delimiter)
 {
 	std::string result;

@@ -79,6 +79,7 @@ namespace sky
 
 	std::string to_string(const std::wstring& wstr);
 	std::wstring to_wstring(const std::string& str);
+	std::u32string utf8_to_utf32(const char* str);
 
 	template <typename String, typename... Args>
 	auto format(String&& str, Args&&... args)
