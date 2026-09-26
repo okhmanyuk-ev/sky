@@ -108,8 +108,9 @@ void SystemEmscripten::process()
 		}
 		else if (event.type == SDL_TEXTINPUT)
 		{
+			auto str = sky::utf8_to_utf32(event.text.text);
 			sky::Emit(Input::Keyboard::CharEvent{
-				.codepoint = *(char32_t*)&event.text.text
+				.codepoint = *(char32_t*)str.c_str()
 			});
 		}
 		else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
