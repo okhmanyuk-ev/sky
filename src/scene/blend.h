@@ -11,6 +11,6 @@ namespace Scene
 		void setBlendMode(skygfx::BlendMode value) { mBlendMode = value; }
 
 	private:
-		skygfx::BlendMode mBlendMode = skygfx::BlendStates::NonPremultiplied;
+		skygfx::BlendMode mBlendMode = skygfx::BlendStates::NonPremultipliedAlphaAccumulate;
 	};
 }

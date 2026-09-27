@@ -57,8 +57,7 @@ namespace Scene
 				GRAPHICS->pushRenderTarget(target);
 			}
 
-			GRAPHICS->pushBlendMode(skygfx::BlendMode(skygfx::Blend::SrcAlpha, skygfx::Blend::InvSrcAlpha,
-				skygfx::Blend::One, skygfx::Blend::InvSrcAlpha));
+			GRAPHICS->pushBlendMode(skygfx::BlendStates::NonPremultipliedAlphaAccumulate);
 			GRAPHICS->clear();
 		}
 

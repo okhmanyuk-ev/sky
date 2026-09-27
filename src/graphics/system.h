@@ -152,7 +152,7 @@ namespace Graphics
 			std::optional<skygfx::Viewport> viewport = std::nullopt;
 			std::optional<skygfx::DepthMode> depth_mode = std::nullopt;
 			skygfx::CullMode cull_mode = skygfx::CullMode::None;
-			skygfx::BlendMode blend_mode = skygfx::BlendStates::NonPremultiplied;
+			skygfx::BlendMode blend_mode = skygfx::BlendStates::NonPremultipliedAlphaAccumulate;
 			skygfx::Sampler sampler = skygfx::Sampler::Nearest;
 			skygfx::TextureAddress texture_address = skygfx::TextureAddress::Clamp;
 			std::optional<skygfx::StencilMode> stencil_mode = std::nullopt;
