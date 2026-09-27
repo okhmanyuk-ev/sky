@@ -149,6 +149,16 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 				}
 			});
 		});
+
+		sky::AddCommand("spawn_rect", std::nullopt, {}, { { "red", "0.0" }, { "green", "0.0" }, { "blue", "0.0" }, { "alpha", "0.5" } }, {}, [](float red, float green, float blue, float alpha) {
+			auto rect = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rectangle>>>>();
+			rect->setSize(256.0f);
+			rect->setAnchor(0.5f);
+			rect->setPivot(0.5f);
+			rect->setOutlined(true);
+			rect->setColor(glm::vec4{ red, green, blue, alpha });
+			sky::GetService<Scene::Scene>()->getRoot()->attach(rect);
+		});
 	}
 
 #if defined(BUILD_DEVELOPER)
