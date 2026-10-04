@@ -12,7 +12,7 @@
 #include <sky/console.h>
 #include <sky/dispatcher.h>
 #include <sky/imgui_console.h>
-#include <sky/imgui_system.h>
+#include <sky/imgui.h>
 #include <sky/localization.h>
 #include <sky/locator.h>
 #include <sky/renderer.h>

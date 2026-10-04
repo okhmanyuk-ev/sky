@@ -13,7 +13,7 @@
 #include <sky/dispatcher.h>
 #include <sky/scheduler.h>
 #include <sky/threadpool.h>
-#include <sky/imgui_system.h>
+#include <sky/imgui.h>
 #include <sky/imgui_console.h>
 #ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten.h>
