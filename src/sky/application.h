@@ -44,5 +44,9 @@ namespace sky
 
 	private:
 		std::unordered_map<std::string, std::string> mStartupKeyValues;
+
+		std::unique_ptr<sky::CVar<float>> mCVarSceneTimestepFps;
+		std::unique_ptr<sky::CVar<bool>> mCVarSceneTimestepEnabled;
+		std::unique_ptr<sky::CVar<bool>> mCVarSceneTimestepTimeCompletion;
 	};
 }

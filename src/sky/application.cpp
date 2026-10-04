@@ -21,10 +21,6 @@
 
 using namespace sky;
 
-static std::unique_ptr<sky::CVar<float>> gCVarSceneTimestepFps;
-static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepEnabled;
-static std::unique_ptr<sky::CVar<bool>> gCVarSceneTimestepTimeCompletion;
-
 Application::Application(const std::string& appname, const Flags& flags, std::optional<skygfx::BackendType> backend_type) : mFlags(flags)
 {
 	std::srand((unsigned int)std::time(nullptr));
@@ -88,15 +84,15 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		sky::Locator<Shared::SceneManager>::Init();
 		scene->getRoot()->attach(sky::GetService<Shared::SceneManager>());
 
-		gCVarSceneTimestepFps = std::make_unique<sky::CVar<float>>("scene_timestep_fps",
+		mCVarSceneTimestepFps = std::make_unique<sky::CVar<float>>("scene_timestep_fps",
 			[] { return 1.0f / sky::ToSeconds(sky::GetService<Scene::Scene>()->getTimestepFixer().getTimestep()); },
 			[](float fps) { sky::GetService<Scene::Scene>()->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / fps)); });
 
-		gCVarSceneTimestepEnabled = std::make_unique<sky::CVar<bool>>("scene_timestep_enabled",
+		mCVarSceneTimestepEnabled = std::make_unique<sky::CVar<bool>>("scene_timestep_enabled",
 			std::bind(&sky::TimestepFixer::isEnabled, &scene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setEnabled, &scene->getTimestepFixer(), std::placeholders::_1));
 
-		gCVarSceneTimestepTimeCompletion = std::make_unique<sky::CVar<bool>>("scene_timestep_force_time_completion",
+		mCVarSceneTimestepTimeCompletion = std::make_unique<sky::CVar<bool>>("scene_timestep_force_time_completion",
 			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &scene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &scene->getTimestepFixer(), std::placeholders::_1));
 
@@ -216,9 +212,6 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 
 Application::~Application()
 {
-	gCVarSceneTimestepFps.reset();
-	gCVarSceneTimestepEnabled.reset();
-	gCVarSceneTimestepTimeCompletion.reset();
 	sky::Locator<Shared::GestureDetector>::Reset();
 	sky::Locator<Shared::TouchEmulator>::Reset();
 	sky::Locator<Shared::ConsoleHelperCommands>::Reset();
