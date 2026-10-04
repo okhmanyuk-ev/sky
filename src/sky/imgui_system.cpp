@@ -8,7 +8,7 @@
 
 using namespace sky;
 
-ImguiSystem::ImguiSystem()
+Imgui::Imgui()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -50,12 +50,12 @@ ImguiSystem::ImguiSystem()
 	io.KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);
 }
 
-ImguiSystem::~ImguiSystem()
+Imgui::~Imgui()
 {
 	ImGui::DestroyContext();
 }
 
-void ImguiSystem::begin()
+void Imgui::begin()
 {
 	mLogicalSize = { PLATFORM->getLogicalWidth(), PLATFORM->getLogicalHeight() };
 	mLogicalSize /= getScale();
@@ -98,7 +98,7 @@ void ImguiSystem::begin()
 	mReleasedMouseButtons.clear();
 }
 
-void ImguiSystem::end()
+void Imgui::end()
 {
 	ImGui::Render();
 
@@ -147,7 +147,7 @@ void ImguiSystem::end()
 	GRAPHICS->end();
 }
 
-void ImguiSystem::ensureFont()
+void Imgui::ensureFont()
 {
 	auto& io = ImGui::GetIO();
 
@@ -163,7 +163,7 @@ void ImguiSystem::ensureFont()
 		skygfx::PixelFormat::RGBA8UNorm, data));
 }
 
-void ImguiSystem::onEvent(const Platform::Input::Touch::Event& e)
+void Imgui::onEvent(const Platform::Input::Touch::Event& e)
 {
 	mMousePos = e.pos;
 
@@ -175,7 +175,7 @@ void ImguiSystem::onEvent(const Platform::Input::Touch::Event& e)
 		mReleasedMouseButtons.insert(0);
 }
 
-void ImguiSystem::onEvent(const Platform::Input::Keyboard::Event& e)
+void Imgui::onEvent(const Platform::Input::Keyboard::Event& e)
 {
 	auto& io = ImGui::GetIO();
 
@@ -187,13 +187,13 @@ void ImguiSystem::onEvent(const Platform::Input::Keyboard::Event& e)
 		mReleasedKeyboardKeys.insert(key);
 }
 
-void ImguiSystem::onEvent(const Platform::Input::Keyboard::CharEvent& e)
+void Imgui::onEvent(const Platform::Input::Keyboard::CharEvent& e)
 {
 	auto& io = ImGui::GetIO();
 	io.AddInputCharacter(e.codepoint);
 }
 
-void ImguiSystem::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
+void Imgui::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 {
 	auto& io = ImGui::GetIO();
 
@@ -213,17 +213,17 @@ void ImguiSystem::onEvent(const Platform::Input::Mouse::ButtonEvent& e)
 	}
 }
 
-void ImguiSystem::onEvent(const Platform::Input::Mouse::MoveEvent& e)
+void Imgui::onEvent(const Platform::Input::Mouse::MoveEvent& e)
 {
 	mMousePos = e.pos;
 }
 
-void ImguiSystem::onEvent(const Platform::Input::Mouse::ScrollEvent& e)
+void Imgui::onEvent(const Platform::Input::Mouse::ScrollEvent& e)
 {
 	mMouseWheel += e.scroll;
 }
 
-float ImguiSystem::getScale() const
+float Imgui::getScale() const
 {
 	float result = 1.0f;
 

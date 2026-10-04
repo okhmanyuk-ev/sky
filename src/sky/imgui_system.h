@@ -15,7 +15,7 @@
 
 namespace sky
 {
-	class ImguiSystem :
+	class Imgui :
 		public sky::Listenable<Platform::Input::Keyboard::Event>,
 		public sky::Listenable<Platform::Input::Keyboard::CharEvent>,
 		public sky::Listenable<Platform::Input::Mouse::ButtonEvent>,
@@ -24,11 +24,11 @@ namespace sky
 		public sky::Listenable<Platform::Input::Touch::Event>
 	{
 	public:
-		static constexpr Locator<ImguiSystem>::Accessor Instance;
+		static constexpr Locator<Imgui>::Accessor Instance;
 
 	public:
-		ImguiSystem();
-		~ImguiSystem();
+		Imgui();
+		~Imgui();
 
 	public:
 		void begin();

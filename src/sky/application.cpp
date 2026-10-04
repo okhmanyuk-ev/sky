@@ -44,7 +44,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 	sky::Locator<sky::Localization>::Init();
 	sky::Locator<Shared::StatsSystem>::Init();
 	sky::Locator<sky::Cache>::Init();
-	sky::Locator<sky::ImguiSystem>::Init();
+	sky::Locator<sky::Imgui>::Init();
 	sky::Locator<Shared::Stylebook>::Init();
 	sky::Locator<Shared::ImScene>::Init();
 	if (flags.count(Flag::Audio))
@@ -68,7 +68,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		PLATFORM->quit();
 	});
 
-	sky::ImguiSystem::Instance->setSamplerNearest(false);
+	sky::Imgui::Instance->setSamplerNearest(false);
 
 	if (flags.count(Flag::Scene))
 	{
@@ -227,7 +227,7 @@ Application::~Application()
 	sky::Locator<Common::ConsoleCommands>::Reset();
 	sky::Locator<Shared::ImScene>::Reset();
 	sky::Locator<Shared::Stylebook>::Reset();
-	sky::Locator<sky::ImguiSystem>::Reset();
+	sky::Locator<sky::Imgui>::Reset();
 	sky::Locator<sky::Cache>::Reset();
 	if (mFlags.count(Flag::Audio))
 	{
@@ -262,9 +262,9 @@ void Application::run()
 
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
-		sky::ImguiSystem::Instance->begin();
+		sky::Imgui::Instance->begin();
 		sky::Scheduler::Instance->frame();
-		sky::ImguiSystem::Instance->end();
+		sky::Imgui::Instance->end();
 		RENDERER->present();
 
 		return true;
