@@ -84,15 +84,15 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		sky::Locator<Shared::SceneManager>::Init();
 		scene->getRoot()->attach(sky::GetService<Shared::SceneManager>());
 
-		mCVarSceneTimestepFps = std::make_unique<sky::CVar<float>>("scene_timestep_fps",
+		mCVarSceneTimestepFps.emplace("scene_timestep_fps",
 			[] { return 1.0f / sky::ToSeconds(sky::GetService<Scene::Scene>()->getTimestepFixer().getTimestep()); },
 			[](float fps) { sky::GetService<Scene::Scene>()->getTimestepFixer().setTimestep(sky::FromSeconds(1.0f / fps)); });
 
-		mCVarSceneTimestepEnabled = std::make_unique<sky::CVar<bool>>("scene_timestep_enabled",
+		mCVarSceneTimestepEnabled.emplace("scene_timestep_enabled",
 			std::bind(&sky::TimestepFixer::isEnabled, &scene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setEnabled, &scene->getTimestepFixer(), std::placeholders::_1));
 
-		mCVarSceneTimestepTimeCompletion = std::make_unique<sky::CVar<bool>>("scene_timestep_force_time_completion",
+		mCVarSceneTimestepTimeCompletion.emplace("scene_timestep_force_time_completion",
 			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &scene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &scene->getTimestepFixer(), std::placeholders::_1));
 
