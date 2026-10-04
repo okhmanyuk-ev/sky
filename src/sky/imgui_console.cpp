@@ -115,12 +115,12 @@ void ImguiConsole::onFrame()
 
 	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
-	auto bg_width = IMGUI_SYSTEM->getLogicalWidth();
+	auto bg_width = sky::ImguiSystem::Instance->getLogicalWidth();
 
 	bg_width -= PLATFORM->getSafeAreaLeftMargin();
 	bg_width -= PLATFORM->getSafeAreaRightMargin();
 
-	auto bg_height = IMGUI_SYSTEM->getLogicalHeight();
+	auto bg_height = sky::ImguiSystem::Instance->getLogicalHeight();
 
 #if defined(PLATFORM_MOBILE)
 	bg_height *= 0.33f;
@@ -273,7 +273,7 @@ void ImguiConsole::showHints(float height, float top)
 		return;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
-	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, IMGUI_SYSTEM->getLogicalHeight() - height - top - 10));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, sky::ImguiSystem::Instance->getLogicalHeight() - height - top - 10));
 
 	ImGui::Begin("ConsoleHints", nullptr, ImGui::User::ImGuiWindowFlags_ControlPanel & ~ImGuiWindowFlags_NoBringToFrontOnFocus);
 	ImGui::SetWindowPos(ImVec2(8 + PLATFORM->getSafeAreaLeftMargin(), 4 + top + height));
@@ -337,7 +337,7 @@ void ImguiConsole::showFastLogs()
 		ImGuiWindowFlags_NoNav |
 		ImGuiWindowFlags_NoBackground);
 
-	ImGui::SetWindowSize(ImVec2(IMGUI_SYSTEM->getLogicalWidth(), 0));
+	ImGui::SetWindowSize(ImVec2(sky::ImguiSystem::Instance->getLogicalWidth(), 0));
 	ImGui::SetWindowPos(ImGui::User::BottomLeftCorner(0.0f));
 
 	auto now = sky::Now();
@@ -375,7 +375,7 @@ void ImguiConsole::showCloseButton(float pos_y)
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
 
 	ImGui::Begin("ConsoleCloseButton", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-	ImGui::SetWindowPos(ImVec2((IMGUI_SYSTEM->getLogicalWidth()) - ImGui::GetWindowWidth() - 10.0f - PLATFORM->getSafeAreaRightMargin(), pos_y + 4.0f));
+	ImGui::SetWindowPos(ImVec2((sky::ImguiSystem::Instance->getLogicalWidth()) - ImGui::GetWindowWidth() - 10.0f - PLATFORM->getSafeAreaRightMargin(), pos_y + 4.0f));
 
 	ImGui::Button("Close");
 

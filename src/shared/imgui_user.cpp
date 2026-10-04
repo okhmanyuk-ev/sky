@@ -95,46 +95,46 @@ namespace ImGui::User
 
 	ImVec2 TopLeftCorner(float margin)
 	{
-		return ImVec2(margin + (PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()),
-            margin + (PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()));
+		return ImVec2(margin + (PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale()),
+            margin + (PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale()));
 	}
 
 	ImVec2 TopRightCorner(float margin)
 	{
-		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - (PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()),
-            margin + (PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()));
+		return ImVec2(sky::ImguiSystem::Instance->getLogicalWidth() - GetWindowWidth() - margin - (PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale()),
+            margin + (PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale()));
 	}
 
 	ImVec2 BottomLeftCorner(float margin)
 	{
-		return ImVec2(margin + (PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()),
-            IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - (PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()));
+		return ImVec2(margin + (PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale()),
+			sky::ImguiSystem::Instance->getLogicalHeight() - GetWindowHeight() - margin - (PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale()));
 	}
 
 	ImVec2 BottomRightCorner(float margin)
 	{
-		return ImVec2(IMGUI_SYSTEM->getLogicalWidth() - GetWindowWidth() - margin - (PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()),
-            IMGUI_SYSTEM->getLogicalHeight() - GetWindowHeight() - margin - (PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale()));
+		return ImVec2(sky::ImguiSystem::Instance->getLogicalWidth() - GetWindowWidth() - margin - (PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale()),
+			sky::ImguiSystem::Instance->getLogicalHeight() - GetWindowHeight() - margin - (PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale()));
 	}
 
     float GetSafeAreaTop()
     {
-        return PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
+        return PLATFORM->getSafeAreaTopMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale();
     }
 
     float GetSafeAreaBottom()
     {
-        return PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
+        return PLATFORM->getSafeAreaBottomMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale();
     }
 
     float GetSafeAreaLeft()
     {
-        return PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
+        return PLATFORM->getSafeAreaLeftMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale();
     }
 
     float GetSafeAreaRight()
     {
-        return PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / IMGUI_SYSTEM->getScale();
+        return PLATFORM->getSafeAreaRightMargin() / PLATFORM->getScale() / sky::ImguiSystem::Instance->getScale();
     }
 
 	ImTextureID GetImTextureID(std::shared_ptr<skygfx::Texture> texture)

@@ -13,8 +13,6 @@
 #include <cstddef>
 #include <set>
 
-#define IMGUI_SYSTEM sky::Locator<sky::ImguiSystem>::Get()
-
 namespace sky
 {
 	class ImguiSystem :
@@ -25,6 +23,9 @@ namespace sky
 		public sky::Listenable<Platform::Input::Mouse::ScrollEvent>,
 		public sky::Listenable<Platform::Input::Touch::Event>
 	{
+	public:
+		static constexpr Locator<ImguiSystem>::Accessor Instance;
+
 	public:
 		ImguiSystem();
 		~ImguiSystem();

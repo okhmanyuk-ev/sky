@@ -68,7 +68,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 		PLATFORM->quit();
 	});
 
-	IMGUI_SYSTEM->setSamplerNearest(false);
+	sky::ImguiSystem::Instance->setSamplerNearest(false);
 
 	if (flags.count(Flag::Scene))
 	{
@@ -262,9 +262,9 @@ void Application::run()
 
 		RENDERER->setRenderTarget(nullptr);
 		RENDERER->clear();
-		IMGUI_SYSTEM->begin();
+		sky::ImguiSystem::Instance->begin();
 		sky::Scheduler::Instance->frame();
-		IMGUI_SYSTEM->end();
+		sky::ImguiSystem::Instance->end();
 		RENDERER->present();
 
 		return true;
