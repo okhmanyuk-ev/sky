@@ -88,7 +88,7 @@ void System::applyState()
 	}
 
 	if (renderTargetChanged)
-		RENDERER->setRenderTarget(state.render_target);
+		sky::Renderer::Instance->setRenderTarget(state.render_target);
 
 	mAppliedState = state;
 }
@@ -161,7 +161,7 @@ void System::flushBatch()
 void System::clear(std::optional<glm::vec4> color, std::optional<float> depth, std::optional<uint8_t> stencil)
 {
 	applyState();
-	RENDERER->clear(color, depth, stencil);
+	sky::Renderer::Instance->clear(color, depth, stencil);
 }
 
 void System::draw(sky::effects::IEffect* effect, skygfx::Texture* texture, skygfx::Topology topology,

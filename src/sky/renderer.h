@@ -7,12 +7,13 @@
 #include <sky/dispatcher.h>
 #include <platform/all.h>
 
-#define RENDERER sky::Locator<sky::Renderer>::Get()
-
 namespace sky
 {
 	class Renderer : public sky::Listenable<Platform::System::ResizeEvent>
 	{
+	public:
+		static constexpr Locator<Renderer>::Accessor Instance;
+
 	public:
 		Renderer(std::optional<skygfx::BackendType> type = std::nullopt,
 			skygfx::Adapter adapter = skygfx::Adapter::HighPerformance);

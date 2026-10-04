@@ -260,12 +260,12 @@ void Application::run()
 		if (PLATFORM->isFinished())
 			return false;
 
-		RENDERER->setRenderTarget(nullptr);
-		RENDERER->clear();
+		sky::Renderer::Instance->setRenderTarget(nullptr);
+		sky::Renderer::Instance->clear();
 		sky::Imgui::Instance->begin();
 		sky::Scheduler::Instance->frame();
 		sky::Imgui::Instance->end();
-		RENDERER->present();
+		sky::Renderer::Instance->present();
 
 		return true;
 	};

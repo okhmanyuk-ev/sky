@@ -51,7 +51,7 @@ void PerformanceConsoleCommands::onFrame()
 	}
 
 	if (mWantShowDrawcalls.getValue() > 0)
-		sky::Indicator("engine", "drawcalls", RENDERER->getDrawcalls());
+		sky::Indicator("engine", "drawcalls", sky::Renderer::Instance->getDrawcalls());
 
 	if (mWantShowBatches.getValue() > 0)
 	{
