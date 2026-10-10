@@ -61,7 +61,6 @@ namespace Scene
 
 		virtual void updateTransform();
 		virtual void updateAbsoluteSize();
-		virtual void updateAbsoluteScale();
 
 	protected:
 		virtual void enterUpdate();
@@ -109,11 +108,8 @@ namespace Scene
 		auto getAbsoluteWidth() const { return mAbsoluteSize.x; }
 		auto getAbsoluteHeight() const { return mAbsoluteSize.y; }
 
-		auto getAbsoluteScale() const { return mAbsoluteScale; }
-
 	protected:
 		void setAbsoluteSize(const glm::vec2& value) { mAbsoluteSize = value; }
-		void setAbsoluteScale(const glm::vec2& value) { mAbsoluteScale = value; }
 
 	private:
 		Node* mParent = nullptr;
@@ -128,7 +124,6 @@ namespace Scene
 		bool mTransformReady = false;
 		std::optional<std::string> mBatchGroup;
 		glm::vec2 mAbsoluteSize = { 0.0f, 0.0f };
-		glm::vec2 mAbsoluteScale = { 1.0f, 1.0f };
 
 	public:
 		void runAction(sky::Action action) { mActions.add(std::move(action)); }
