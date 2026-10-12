@@ -155,11 +155,14 @@ void Label::refresh()
 	auto width = getAbsoluteWidth();
 
 	auto markDirtyIfChanged = [&](auto& prev, const auto& current) {
-		if (prev != current)
-		{
-			prev = current;
-			dirty = true;
-		}
+		if (dirty)
+			return;
+
+		if (prev == current)
+			return;
+
+		prev = current;
+		dirty = true;
 	};
 
 	if (mSettings.word_wrap_mode)
