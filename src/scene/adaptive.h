@@ -3,17 +3,10 @@
 #include <scene/node.h>
 #include <scene/scene.h>
 #include <common/helpers.h>
+#include <sky/utils.h>
 
 namespace Scene
 {
-	enum class AdaptBehavior
-	{
-		Width,
-		Height,
-		MinimalEdge,
-		MaximalEdge
-	};
-
 	template <typename T>
 		requires std::derived_from<T, Node>
 	class Adaptive : public T
@@ -29,19 +22,8 @@ namespace Scene
 			if (!this->hasParent())
 				return;
 
-			auto parent_size = this->getParent()->getAbsoluteSize();
-			auto scale = parent_size / this->getSize();
-
-			if (mBehavior == AdaptBehavior::Width)
-				mAdaptScale = scale.x;
-			else if (mBehavior == AdaptBehavior::Height)
-				mAdaptScale = scale.y;
-			else if (mBehavior == AdaptBehavior::MinimalEdge)
-				mAdaptScale = glm::min(scale.x, scale.y);
-			else if (mBehavior == AdaptBehavior::MaximalEdge)
-				mAdaptScale = glm::max(scale.x, scale.y);
-
-			mAdaptScale = sky::sanitize(mAdaptScale);
+			mAdaptScale = sky::CalculateScaleToFit(mBehavior, this->getSize(),
+				this->getParent()->getAbsoluteSize());
 		}
 
 	public:
@@ -62,11 +44,11 @@ namespace Scene
 		void setAdaptEnabled(bool value) { mAdaptEnabled = value; }
 
 		auto getAdaptBehavior() const { return mBehavior; }
-		void setAdaptBehavior(AdaptBehavior value) { mBehavior = value; }
+		void setAdaptBehavior(sky::FitMode value) { mBehavior = value; }
 
 	private:
 		bool mAdaptEnabled = true;
 		float mAdaptScale = 1.0f;
-		AdaptBehavior mBehavior = AdaptBehavior::MinimalEdge;
+		sky::FitMode mBehavior = sky::FitMode::MinimalEdge;
 	};
 }

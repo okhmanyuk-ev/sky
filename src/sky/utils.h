@@ -156,4 +156,14 @@ namespace sky
 		}
 		return sky::Locator<T>::Get();
 	}
+
+	enum class FitMode
+	{
+		Width,
+		Height,
+		MinimalEdge,
+		MaximalEdge
+	};
+
+	[[nodiscard]] float CalculateScaleToFit(FitMode mode, const glm::vec2& currentSize, const glm::vec2& targetSize);
 }

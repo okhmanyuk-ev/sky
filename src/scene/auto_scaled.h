@@ -19,9 +19,9 @@ namespace Scene
 			if (!this->hasParent())
 				return;
 
-			auto parent_size = this->getParent()->getAbsoluteSize();
-			auto scale = parent_size / this->getSize();
-			this->setScale(glm::min(scale.x, scale.y));
+			auto scale = sky::CalculateScaleToFit(sky::FitMode::MinimalEdge, this->getSize(),
+				this->getParent()->getAbsoluteSize());
+			this->setScale(scale);
 		}
 
 	public:

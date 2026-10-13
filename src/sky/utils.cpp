@@ -3,6 +3,7 @@
 #include <sky/localization.h>
 #include <codecvt>
 #include <regex>
+#include <common/helpers.h>
 #ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten.h>
 #endif
@@ -189,3 +190,19 @@ std::string sky::trim(const std::string& s)
 	return (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
 }
 
+float sky::CalculateScaleToFit(FitMode mode, const glm::vec2& currentSize, const glm::vec2& targetSize)
+{
+	auto scale = targetSize / currentSize;
+	float result = 0.0f;
+
+	if (mode == FitMode::Width)
+		result = scale.x;
+	else if (mode == FitMode::Height)
+		result = scale.y;
+	else if (mode == FitMode::MinimalEdge)
+		result = glm::min(scale.x, scale.y);
+	else if (mode == FitMode::MaximalEdge)
+		result = glm::max(scale.x, scale.y);
+
+	return sanitize(result);
+}
