@@ -119,6 +119,18 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
 		});
 
+		sky::AddCommand("spawn_bloom_glass", std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "threshold", "0.7" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](float size, float intensity, float threshold, bool outlined, float rounding) {
+			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::BloomedGlass>>>>>();
+			glass->setSize(size);
+			glass->setAnchor(0.5f);
+			glass->setPivot(0.5f);
+			glass->setOutlined(outlined);
+			glass->setRounding(rounding);
+			glass->setBloomIntensity(intensity);
+			glass->setBrightThreshold(threshold);
+			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
+		});
+
 		sky::AddCommand("spawn_shockwave", std::nullopt, {}, { { "duration", "1.0" } }, {}, [](float duration) {
 			auto shockwave = Shared::SceneHelpers::Shockwave::MakeAnimated(duration);
 			shockwave->setSize(256.0f);

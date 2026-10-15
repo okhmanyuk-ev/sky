@@ -1,5 +1,7 @@
 #include "glass.h"
 #include <common/helpers.h> // invlerp
+#include <skygfx/utils.h>
+#include <fmt/format.h>
 
 using namespace Scene;
 
@@ -21,18 +23,24 @@ void Glass::draw()
 
 	if (bounds.size != mPrevSize || !mBackbufferFormat.has_value() || mBackbufferFormat.value() != format)
 	{
-		setTexture(std::make_shared<skygfx::Texture>(w, h, format, mGenerateMipmaps ? skygfx::GetMipCount(w, h) : 1));
+		mBackbufferTexture = std::make_shared<skygfx::Texture>(w, h, format, mGenerateMipmaps ? skygfx::GetMipCount(w, h) : 1);
 		mPrevSize = bounds.size;
 		mBackbufferFormat = format;
 	}
 
 	GRAPHICS->flushBatch();
-	skygfx::CopyBackbufferToTexture(*getTexture(), { w, h }, { x, y });
+	skygfx::CopyBackbufferToTexture(*mBackbufferTexture, { w, h }, { x, y });
 
 	if (mGenerateMipmaps)
-		getTexture()->generateMips();
+		mBackbufferTexture->generateMips();
 
+	setTexture(postprocess(mBackbufferTexture));
 	Sprite::draw();
+}
+
+std::shared_ptr<skygfx::Texture> Glass::postprocess(std::shared_ptr<skygfx::Texture> texture)
+{
+	return texture;
 }
 
 // blurred glass
@@ -74,4 +82,23 @@ void GrayscaledGlass::draw()
 	setEffect(&effect);
 
 	Glass::draw();
+}
+
+// bloomed glass
+
+BloomedGlass::BloomedGlass()
+{
+	setBlendMode(skygfx::BlendStates::Opaque);
+	setSampler(skygfx::Sampler::Linear);
+}
+
+std::shared_ptr<skygfx::Texture> BloomedGlass::postprocess(std::shared_ptr<skygfx::Texture> texture)
+{
+	auto result = GRAPHICS->getRenderTarget(fmt::format("bloom_glass_{}", (void*)this), texture->getWidth(), texture->getHeight());
+	GRAPHICS->pushCleanState();
+	GRAPHICS->pushRenderTarget(result);
+	GRAPHICS->clear();
+	skygfx::utils::passes::Bloom(texture.get(), result.get(), mBrightThreshold, mBloomIntensity);
+	GRAPHICS->pop(2);
+	return result;
 }

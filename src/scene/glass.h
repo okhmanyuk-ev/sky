@@ -8,8 +8,10 @@ namespace Scene
 	{
 	protected:
 		void draw() override;
+		virtual std::shared_ptr<skygfx::Texture> postprocess(std::shared_ptr<skygfx::Texture> texture);
 
 	private:
+		std::shared_ptr<skygfx::Texture> mBackbufferTexture;
 		glm::vec2 mPrevSize = { 0.0f, 0.0f };
 		std::optional<skygfx::PixelFormat> mBackbufferFormat;
 
@@ -52,5 +54,25 @@ namespace Scene
 
 	private:
 		float mGrayscaleIntensity = 1.0f;
+	};
+
+	class BloomedGlass : public Glass
+	{
+	public:
+		BloomedGlass();
+
+	protected:
+		std::shared_ptr<skygfx::Texture> postprocess(std::shared_ptr<skygfx::Texture> texture) override;
+
+	public:
+		auto getBloomIntensity() const { return mBloomIntensity; }
+		void setBloomIntensity(float value) { mBloomIntensity = value; }
+
+		auto getBrightThreshold() const { return mBrightThreshold; }
+		void setBrightThreshold(float value) { mBrightThreshold = value; }
+
+	private:
+		float mBloomIntensity = 0.5f;
+		float mBrightThreshold = 0.7f;
 	};
 }
