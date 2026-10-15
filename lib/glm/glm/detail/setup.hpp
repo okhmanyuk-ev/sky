@@ -588,7 +588,11 @@
 // Qualifiers
 
 #if (GLM_COMPILER & GLM_COMPILER_VC) || ((GLM_COMPILER & GLM_COMPILER_INTEL) && (GLM_PLATFORM & GLM_PLATFORM_WINDOWS))
-#	define GLM_DEPRECATED __declspec(deprecated)
+#	if GLM_LANG & GLM_LANG_CXX14_FLAG
+#		define GLM_DEPRECATED [[deprecated]] // __declspec before [[nodiscard]] triggers C5240
+#	else
+#		define GLM_DEPRECATED __declspec(deprecated)
+#	endif
 #	define GLM_ALIGNED_TYPEDEF(type, name, alignment) typedef __declspec(align(alignment)) type name
 #elif GLM_COMPILER & (GLM_COMPILER_GCC | GLM_COMPILER_CLANG | GLM_COMPILER_INTEL)
 #	if GLM_LANG & GLM_LANG_CXX14_FLAG
