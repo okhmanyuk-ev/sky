@@ -14,10 +14,11 @@ void Glass::draw()
 	if (bounds.size.x <= 0 || bounds.size.y <= 0)
 		return;
 
-	auto x = (int)glm::round(bounds.pos.x);
-	auto y = (int)glm::round(bounds.pos.y);
-	auto w = (int)glm::round(bounds.size.x);
-	auto h = (int)glm::round(bounds.size.y);
+	// copy pixel-aligned area that fully covers the fractional bounds
+	auto x = (int)glm::floor(bounds.pos.x);
+	auto y = (int)glm::floor(bounds.pos.y);
+	auto w = (int)glm::ceil(bounds.size.x) + 1;
+	auto h = (int)glm::ceil(bounds.size.y) + 1;
 
 	auto format = skygfx::GetBackbufferFormat();
 
@@ -35,6 +36,7 @@ void Glass::draw()
 		mBackbufferTexture->generateMips();
 
 	setTexture(postprocess(mBackbufferTexture));
+	setTexRegion(Graphics::TexRegion(glm::fract(bounds.pos), bounds.size)); // exactly the pixels under the glass
 	Sprite::draw();
 }
 
