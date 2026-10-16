@@ -16,6 +16,7 @@ namespace sky
 	public:
 		void frame();
 		void run(Task<>&& task);
+		bool isFrameReady() const;
 
 	public:
 		int getFramerateLimit() const { return mFramerateLimit.getValue(); }
@@ -47,6 +48,7 @@ namespace sky
 		sky::CVar<bool> mSleepAllowed = sky::CVar<bool>("sys_sleep", true, "cpu saving between frames");
 		sky::CVar<float> mTimeScale = sky::CVar<float>("sys_timescale", 1.0f, "time delta multiplier");
 		sky::TimePoint mLastTime = sky::Now();
+		sky::TimePoint mNextFrameTime = sky::Now();
 		sky::Duration mTimeDelta = sky::Duration::zero();
 		sky::Duration mUptime = sky::Duration::zero();
 		std::optional<sky::Duration> mTimeDeltaLimit; // this can save from animation breaks

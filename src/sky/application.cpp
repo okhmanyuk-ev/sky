@@ -6,6 +6,7 @@
 #include <shared/scene_manager.h>
 #include <shared/scene_helpers.h>
 #include <regex>
+#include <thread>
 #include <sky/locator.h>
 #include <sky/cache.h>
 #include <sky/localization.h>
@@ -271,6 +272,15 @@ void Application::run()
 
 		if (PLATFORM->isFinished())
 			return false;
+
+		if (!sky::Scheduler::Instance->isFrameReady())
+		{
+#ifndef SKY_EMSCRIPTEN
+			if (sky::Scheduler::Instance->isSleepAllowed())
+				std::this_thread::sleep_for(sky::FromMilliseconds(1));
+#endif
+			return true; // browser keeps showing previous frame if nothing was drawn
+		}
 
 		sky::Renderer::Instance->setRenderTarget(nullptr);
 		sky::Renderer::Instance->clear();
