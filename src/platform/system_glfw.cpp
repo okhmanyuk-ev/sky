@@ -183,6 +183,20 @@ bool SystemGlfw::isKeyPressed(Input::Keyboard::Key key) const
 		{ Input::Keyboard::Key::PrintScreen, GLFW_KEY_PRINT_SCREEN },
 		{ Input::Keyboard::Key::Insert, GLFW_KEY_INSERT },
 		{ Input::Keyboard::Key::Delete, GLFW_KEY_DELETE },
+		{ Input::Keyboard::Key::LeftWindows, GLFW_KEY_LEFT_SUPER },
+		{ Input::Keyboard::Key::RightWindows, GLFW_KEY_RIGHT_SUPER },
+		{ Input::Keyboard::Key::Apps, GLFW_KEY_MENU },
+
+		{ Input::Keyboard::Key::D0, GLFW_KEY_0 },
+		{ Input::Keyboard::Key::D1, GLFW_KEY_1 },
+		{ Input::Keyboard::Key::D2, GLFW_KEY_2 },
+		{ Input::Keyboard::Key::D3, GLFW_KEY_3 },
+		{ Input::Keyboard::Key::D4, GLFW_KEY_4 },
+		{ Input::Keyboard::Key::D5, GLFW_KEY_5 },
+		{ Input::Keyboard::Key::D6, GLFW_KEY_6 },
+		{ Input::Keyboard::Key::D7, GLFW_KEY_7 },
+		{ Input::Keyboard::Key::D8, GLFW_KEY_8 },
+		{ Input::Keyboard::Key::D9, GLFW_KEY_9 },
 
 		{ Input::Keyboard::Key::A, GLFW_KEY_A },
 		{ Input::Keyboard::Key::B, GLFW_KEY_B },
@@ -241,7 +255,17 @@ bool SystemGlfw::isKeyPressed(Input::Keyboard::Key key) const
 		{ Input::Keyboard::Key::F11, GLFW_KEY_F11 },
 		{ Input::Keyboard::Key::F12, GLFW_KEY_F12 },
 
+		{ Input::Keyboard::Key::Semicolon, GLFW_KEY_SEMICOLON },
+		{ Input::Keyboard::Key::Plus, GLFW_KEY_EQUAL },
+		{ Input::Keyboard::Key::Comma, GLFW_KEY_COMMA },
+		{ Input::Keyboard::Key::Minus, GLFW_KEY_MINUS },
+		{ Input::Keyboard::Key::Period, GLFW_KEY_PERIOD },
+		{ Input::Keyboard::Key::Question, GLFW_KEY_SLASH },
 		{ Input::Keyboard::Key::Tilde, GLFW_KEY_GRAVE_ACCENT },
+		{ Input::Keyboard::Key::OpenBrackets, GLFW_KEY_LEFT_BRACKET },
+		{ Input::Keyboard::Key::Pipe, GLFW_KEY_BACKSLASH },
+		{ Input::Keyboard::Key::CloseBrackets, GLFW_KEY_RIGHT_BRACKET },
+		{ Input::Keyboard::Key::Quotes, GLFW_KEY_APOSTROPHE },
 	};
 
 	auto button = KeyMap.at(key);
@@ -510,6 +534,20 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		{ GLFW_KEY_PRINT_SCREEN, Input::Keyboard::Key::PrintScreen },
 		{ GLFW_KEY_INSERT, Input::Keyboard::Key::Insert },
 		{ GLFW_KEY_DELETE, Input::Keyboard::Key::Delete },
+		{ GLFW_KEY_LEFT_SUPER, Input::Keyboard::Key::LeftWindows },
+		{ GLFW_KEY_RIGHT_SUPER, Input::Keyboard::Key::RightWindows },
+		{ GLFW_KEY_MENU, Input::Keyboard::Key::Apps },
+
+		{ GLFW_KEY_0, Input::Keyboard::Key::D0 },
+		{ GLFW_KEY_1, Input::Keyboard::Key::D1 },
+		{ GLFW_KEY_2, Input::Keyboard::Key::D2 },
+		{ GLFW_KEY_3, Input::Keyboard::Key::D3 },
+		{ GLFW_KEY_4, Input::Keyboard::Key::D4 },
+		{ GLFW_KEY_5, Input::Keyboard::Key::D5 },
+		{ GLFW_KEY_6, Input::Keyboard::Key::D6 },
+		{ GLFW_KEY_7, Input::Keyboard::Key::D7 },
+		{ GLFW_KEY_8, Input::Keyboard::Key::D8 },
+		{ GLFW_KEY_9, Input::Keyboard::Key::D9 },
 
 		{ GLFW_KEY_A, Input::Keyboard::Key::A },
 		{ GLFW_KEY_B, Input::Keyboard::Key::B },
@@ -568,7 +606,17 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		{ GLFW_KEY_F11, Input::Keyboard::Key::F11 },
 		{ GLFW_KEY_F12, Input::Keyboard::Key::F12 },
 
+		{ GLFW_KEY_SEMICOLON, Input::Keyboard::Key::Semicolon },
+		{ GLFW_KEY_EQUAL, Input::Keyboard::Key::Plus },
+		{ GLFW_KEY_COMMA, Input::Keyboard::Key::Comma },
+		{ GLFW_KEY_MINUS, Input::Keyboard::Key::Minus },
+		{ GLFW_KEY_PERIOD, Input::Keyboard::Key::Period },
+		{ GLFW_KEY_SLASH, Input::Keyboard::Key::Question },
 		{ GLFW_KEY_GRAVE_ACCENT, Input::Keyboard::Key::Tilde },
+		{ GLFW_KEY_LEFT_BRACKET, Input::Keyboard::Key::OpenBrackets },
+		{ GLFW_KEY_BACKSLASH, Input::Keyboard::Key::Pipe },
+		{ GLFW_KEY_RIGHT_BRACKET, Input::Keyboard::Key::CloseBrackets },
+		{ GLFW_KEY_APOSTROPHE, Input::Keyboard::Key::Quotes },
 	};
 
 	static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {

@@ -140,6 +140,20 @@ void SystemEmscripten::process()
 				{ SDLK_PRINTSCREEN, Input::Keyboard::Key::PrintScreen },
 				{ SDLK_INSERT, Input::Keyboard::Key::Insert },
 				{ SDLK_DELETE, Input::Keyboard::Key::Delete },
+				{ SDLK_LGUI, Input::Keyboard::Key::LeftWindows },
+				{ SDLK_RGUI, Input::Keyboard::Key::RightWindows },
+				{ SDLK_APPLICATION, Input::Keyboard::Key::Apps },
+
+				{ SDLK_0, Input::Keyboard::Key::D0 },
+				{ SDLK_1, Input::Keyboard::Key::D1 },
+				{ SDLK_2, Input::Keyboard::Key::D2 },
+				{ SDLK_3, Input::Keyboard::Key::D3 },
+				{ SDLK_4, Input::Keyboard::Key::D4 },
+				{ SDLK_5, Input::Keyboard::Key::D5 },
+				{ SDLK_6, Input::Keyboard::Key::D6 },
+				{ SDLK_7, Input::Keyboard::Key::D7 },
+				{ SDLK_8, Input::Keyboard::Key::D8 },
+				{ SDLK_9, Input::Keyboard::Key::D9 },
 
 				{ SDLK_a, Input::Keyboard::Key::A },
 				{ SDLK_b, Input::Keyboard::Key::B },
@@ -198,7 +212,17 @@ void SystemEmscripten::process()
 				{ SDLK_F11, Input::Keyboard::Key::F11 },
 				{ SDLK_F12, Input::Keyboard::Key::F12 },
 
+				{ SDLK_SEMICOLON, Input::Keyboard::Key::Semicolon },
+				{ SDLK_EQUALS, Input::Keyboard::Key::Plus },
+				{ SDLK_COMMA, Input::Keyboard::Key::Comma },
+				{ SDLK_MINUS, Input::Keyboard::Key::Minus },
+				{ SDLK_PERIOD, Input::Keyboard::Key::Period },
+				{ SDLK_SLASH, Input::Keyboard::Key::Question },
 				{ SDLK_BACKQUOTE, Input::Keyboard::Key::Tilde },
+				{ SDLK_LEFTBRACKET, Input::Keyboard::Key::OpenBrackets },
+				{ SDLK_BACKSLASH, Input::Keyboard::Key::Pipe },
+				{ SDLK_RIGHTBRACKET, Input::Keyboard::Key::CloseBrackets },
+				{ SDLK_QUOTE, Input::Keyboard::Key::Quotes },
 			};
 
 			static const std::unordered_map<int, Input::Keyboard::Event::Type> TypeMap = {
@@ -296,6 +320,20 @@ bool SystemEmscripten::isKeyPressed(Input::Keyboard::Key key) const
 		{ Input::Keyboard::Key::PrintScreen, SDLK_PRINTSCREEN },
 		{ Input::Keyboard::Key::Insert, SDLK_INSERT },
 		{ Input::Keyboard::Key::Delete, SDLK_DELETE },
+		{ Input::Keyboard::Key::LeftWindows, SDLK_LGUI },
+		{ Input::Keyboard::Key::RightWindows, SDLK_RGUI },
+		{ Input::Keyboard::Key::Apps, SDLK_APPLICATION },
+
+		{ Input::Keyboard::Key::D0, SDLK_0 },
+		{ Input::Keyboard::Key::D1, SDLK_1 },
+		{ Input::Keyboard::Key::D2, SDLK_2 },
+		{ Input::Keyboard::Key::D3, SDLK_3 },
+		{ Input::Keyboard::Key::D4, SDLK_4 },
+		{ Input::Keyboard::Key::D5, SDLK_5 },
+		{ Input::Keyboard::Key::D6, SDLK_6 },
+		{ Input::Keyboard::Key::D7, SDLK_7 },
+		{ Input::Keyboard::Key::D8, SDLK_8 },
+		{ Input::Keyboard::Key::D9, SDLK_9 },
 
 		{ Input::Keyboard::Key::A, SDLK_a },
 		{ Input::Keyboard::Key::B, SDLK_b },
@@ -354,7 +392,17 @@ bool SystemEmscripten::isKeyPressed(Input::Keyboard::Key key) const
 		{ Input::Keyboard::Key::F11, SDLK_F11 },
 		{ Input::Keyboard::Key::F12, SDLK_F12 },
 
+		{ Input::Keyboard::Key::Semicolon, SDLK_SEMICOLON },
+		{ Input::Keyboard::Key::Plus, SDLK_EQUALS },
+		{ Input::Keyboard::Key::Comma, SDLK_COMMA },
+		{ Input::Keyboard::Key::Minus, SDLK_MINUS },
+		{ Input::Keyboard::Key::Period, SDLK_PERIOD },
+		{ Input::Keyboard::Key::Question, SDLK_SLASH },
 		{ Input::Keyboard::Key::Tilde, SDLK_BACKQUOTE },
+		{ Input::Keyboard::Key::OpenBrackets, SDLK_LEFTBRACKET },
+		{ Input::Keyboard::Key::Pipe, SDLK_BACKSLASH },
+		{ Input::Keyboard::Key::CloseBrackets, SDLK_RIGHTBRACKET },
+		{ Input::Keyboard::Key::Quotes, SDLK_QUOTE },
 	};
 
 	if (!KeyMap.contains(key))
