@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <sky/scheduler.h>
 #include <sky/utils.h>
+#include <common/helpers.h>
 
 using namespace Common;
 
@@ -172,6 +173,14 @@ static void OnIf(std::string var, std::string _condition_value, std::string then
 		sky::GetService<sky::CommandProcessor>()->execute(else_cmd.value());
 }
 
+static void OnChance(float probability, std::string then_cmd, std::optional<std::string> else_cmd)
+{
+	if (sky::chance(probability))
+		sky::GetService<sky::CommandProcessor>()->execute(then_cmd);
+	else if (else_cmd.has_value())
+		sky::GetService<sky::CommandProcessor>()->execute(else_cmd.value());
+}
+
 static std::optional<float> TryParseFloat(const std::string& str)
 {
 	char* end = nullptr;
@@ -282,6 +291,7 @@ ConsoleCommands::ConsoleCommands()
 	sky::AddCommand("clear", "clear console field", {}, {}, {}, OnClear);
 	sky::AddCommand("alias", "manage aliases", {}, {}, { "name", "value" }, OnAlias);
 	sky::AddCommand("if", "condition checking and execution", { "var", "value", "then" }, {}, { "else" }, OnIf);
+	sky::AddCommand("chance", "random execution with probability 0.0..1.0", { "probability", "then" }, {}, { "else" }, OnChance);
 	sky::AddCommand("toggle", "cycle cvar or alias through values (0 and 1 by default)", { "var" }, {}, { "values..." }, OnToggle);
 	sky::AddCommand("quit", "shutdown the app", {}, {}, {}, [this] { onQuit(); });
 
