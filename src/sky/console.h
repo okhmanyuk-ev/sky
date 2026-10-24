@@ -227,13 +227,20 @@ namespace sky
 			return [callback = std::move(callback)](const auto& args) {
 				[&]<std::size_t... I>(std::index_sequence<I...>) {
 					auto get_arg = [&]<typename T>(std::size_t idx) -> T {
-						if (idx < args.size())
-							return CommandTraits<T>::ArgToValue(args.at(idx));
+						if constexpr (std::same_as<T, std::vector<std::string>>)
+						{
+							return args | std::views::drop(idx) | std::ranges::to<std::vector>();
+						}
+						else
+						{
+							if (idx < args.size())
+								return CommandTraits<T>::ArgToValue(args.at(idx));
 
-						if constexpr (std::constructible_from<T, std::nullopt_t>)
-							return std::nullopt;
+							if constexpr (std::constructible_from<T, std::nullopt_t>)
+								return std::nullopt;
 
-						std::unreachable();
+							std::unreachable();
+						}
 					};
 					callback(get_arg.template operator()<Args>(I)...);
 				}(std::index_sequence_for<Args...>{});

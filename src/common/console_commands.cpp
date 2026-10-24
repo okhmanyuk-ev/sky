@@ -2,6 +2,7 @@
 #include <numeric>
 #include <fstream>
 #include <algorithm>
+#include <cstdlib>
 #include <sky/scheduler.h>
 #include <sky/utils.h>
 
@@ -171,6 +172,89 @@ static void OnIf(std::string var, std::string _condition_value, std::string then
 		sky::GetService<sky::CommandProcessor>()->execute(else_cmd.value());
 }
 
+static std::optional<float> TryParseFloat(const std::string& str)
+{
+	char* end = nullptr;
+	auto value = std::strtof(str.c_str(), &end);
+
+	if (str.empty() || end != str.c_str() + str.size())
+		return std::nullopt;
+
+	return value;
+}
+
+static bool IsSameValue(const std::vector<std::string>& a, const std::vector<std::string>& b)
+{
+	return std::ranges::equal(a, b, [](const auto& x, const auto& y) {
+		auto fx = TryParseFloat(x);
+		auto fy = TryParseFloat(y);
+
+		if (fx.has_value() && fy.has_value())
+			return fx.value() == fy.value();
+
+		return x == y;
+	});
+}
+
+static std::vector<std::string> GetNextValue(const std::vector<std::vector<std::string>>& values, const std::vector<std::string>& current)
+{
+	auto it = std::ranges::find_if(values, [&](const auto& value) { return IsSameValue(value, current); });
+
+	if (it == values.end() || std::next(it) == values.end())
+		return values.front();
+
+	return *std::next(it);
+}
+
+static void OnToggle(std::string var, std::vector<std::string> _values)
+{
+	if (_values.size() == 1)
+	{
+		sky::Log("toggle needs at least two values");
+		return;
+	}
+
+	if (_values.empty())
+		_values = { "0", "1" };
+
+	auto values = _values
+		| std::views::transform(sky::CommandProcessor::MakeTokensFromString)
+		| std::ranges::to<std::vector>();
+
+	auto command_processor = sky::GetService<sky::CommandProcessor>();
+	const auto& items = command_processor->getItems();
+	auto item = items.find(var);
+
+	if (item == items.end())
+	{
+		sky::Log("variable {} not found", var);
+		return;
+	}
+
+	if (auto cvar = std::get_if<sky::CommandProcessor::CVar>(&item->second))
+	{
+		if (cvar->setter == nullptr)
+		{
+			sky::Log("cvar {} is readonly", var);
+			return;
+		}
+
+		cvar->setter(GetNextValue(values, cvar->getter()));
+		sky::Log("{} = {}", var, cvar->getValueAsString());
+	}
+	else if (auto alias = std::get_if<sky::CommandProcessor::Alias>(&item->second))
+	{
+		auto value = GetNextValue(values, alias->value);
+		sky::Log("{} = {}", var, sky::CommandProcessor::MakeStringFromTokens(value));
+		command_processor->removeItem(var);
+		command_processor->addItem(var, sky::CommandProcessor::Alias(std::move(value)));
+	}
+	else
+	{
+		sky::Log("{} is a command, not a variable", var);
+	}
+}
+
 ConsoleCommands::ConsoleCommands()
 {
 	auto getter = []() -> std::optional<float> {
@@ -198,6 +282,7 @@ ConsoleCommands::ConsoleCommands()
 	sky::AddCommand("clear", "clear console field", {}, {}, {}, OnClear);
 	sky::AddCommand("alias", "manage aliases", {}, {}, { "name", "value" }, OnAlias);
 	sky::AddCommand("if", "condition checking and execution", { "var", "value", "then" }, {}, { "else" }, OnIf);
+	sky::AddCommand("toggle", "cycle cvar or alias through values (0 and 1 by default)", { "var" }, {}, { "values..." }, OnToggle);
 	sky::AddCommand("quit", "shutdown the app", {}, {}, {}, [this] { onQuit(); });
 
 	sky::Log("type \"cmdlist\" to see available commands");
