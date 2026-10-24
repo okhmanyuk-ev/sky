@@ -17,9 +17,9 @@ namespace Shared
 		~KeyBindings();
 
 	public:
-		void bind(const std::string& key, const std::string& command) { mBindings[key] = command; }
-		void unbind(const std::string& key) { mBindings.erase(key); }
-		void unbindAll() { mBindings.clear(); }
+		void bind(const std::string& key, const std::string& command);
+		void unbind(const std::string& key);
+		void unbindAll();
 
 		const auto& getBindings() const { return mBindings; }
 
