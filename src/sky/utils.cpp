@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <sky/cache.h>
 #include <sky/localization.h>
+#include <algorithm>
 #include <codecvt>
 #include <regex>
 #include <common/helpers.h>
@@ -188,6 +189,12 @@ std::string sky::trim(const std::string& s)
 	size_t start = s.find_first_not_of(" \t\n\r\f\v");
 	size_t end = s.find_last_not_of(" \t\n\r\f\v");
 	return (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
+}
+
+std::string sky::to_lower(std::string s)
+{
+	std::transform(s.begin(), s.end(), s.begin(), tolower);
+	return s;
 }
 
 float sky::CalculateScaleToFit(FitMode mode, const glm::vec2& currentSize, const glm::vec2& targetSize)

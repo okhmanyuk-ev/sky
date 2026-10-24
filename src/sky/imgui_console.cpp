@@ -617,9 +617,7 @@ std::vector<ImguiConsole::Hint> ImguiConsole::getHints(const std::string& match)
 	if (match.empty())
 		return {};
 
-	auto lowercase_match = match;
-
-	std::transform(lowercase_match.begin(), lowercase_match.end(), lowercase_match.begin(), tolower);
+	auto lowercase_match = sky::to_lower(match);
 
 	std::vector<Hint> result = {};
 

@@ -306,9 +306,7 @@ void CommandProcessor::processConsoleCommand(std::vector<std::string> args)
 	if (args.size() == 0)
 		return;
 
-	auto name = args[0];
-
-	std::transform(name.begin(), name.end(), name.begin(), tolower);
+	auto name = sky::to_lower(args[0]);
 
 	if (name.empty())
 		return;
@@ -370,8 +368,7 @@ std::vector<std::string> CommandProcessor::dereferenceTokens(std::vector<std::st
 			if (tokens[i][0] != '*')
 				continue;
 
-			auto name = tokens[i].substr(1);
-			std::transform(name.begin(), name.end(), name.begin(), tolower);
+			auto name = sky::to_lower(tokens[i].substr(1));
 			tokens[i].clear();
 
 			if (!mItems.contains(name))
