@@ -56,6 +56,7 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 	sky::Locator<Shared::GraphicalConsoleCommands>::Init();
 	sky::Locator<Shared::PerformanceConsoleCommands>::Init();
 	sky::Locator<Shared::ConsoleHelperCommands>::Init();
+	sky::Locator<Shared::KeyBindings>::Init();
 	sky::Locator<Shared::TouchEmulator>::Init();
 	sky::Locator<Shared::GestureDetector>::Init();
 
@@ -227,6 +228,7 @@ Application::~Application()
 {
 	sky::Locator<Shared::GestureDetector>::Reset();
 	sky::Locator<Shared::TouchEmulator>::Reset();
+	sky::Locator<Shared::KeyBindings>::Reset();
 	sky::Locator<Shared::ConsoleHelperCommands>::Reset();
 	sky::Locator<Shared::PerformanceConsoleCommands>::Reset();
 	sky::Locator<Shared::GraphicalConsoleCommands>::Reset();
