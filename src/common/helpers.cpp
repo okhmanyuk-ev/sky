@@ -166,5 +166,5 @@ float sky::ease_rotation_towards(float src_radians, float dst_radians, sky::Dura
 
 bool sky::chance(float normalized_percent)
 {
-	return glm::linearRand(0.0f, 1.0f) <= normalized_percent;
+	return normalized_percent >= 1.0f || glm::linearRand(0.0f, 1.0f) < normalized_percent;
 }
