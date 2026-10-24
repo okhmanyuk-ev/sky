@@ -100,6 +100,17 @@ static const std::map<Keyboard::Key, std::string> KeyNames = {
 	{ Keyboard::Key::RightCtrl, "rctrl" },
 	{ Keyboard::Key::LeftAlt, "alt" },
 	{ Keyboard::Key::RightAlt, "ralt" },
+	{ Keyboard::Key::Semicolon, "semicolon" },
+	{ Keyboard::Key::Plus, "=" },
+	{ Keyboard::Key::Comma, "," },
+	{ Keyboard::Key::Minus, "-" },
+	{ Keyboard::Key::Period, "." },
+	{ Keyboard::Key::Question, "/" },
+//	{ Keyboard::Key::Tilde, "`" },
+	{ Keyboard::Key::OpenBrackets, "[" },
+	{ Keyboard::Key::Pipe, "\\" },
+	{ Keyboard::Key::CloseBrackets, "]" },
+	{ Keyboard::Key::Quotes, "apostrophe" },
 };
 
 static const std::map<Mouse::Button, std::string> MouseButtonNames = {

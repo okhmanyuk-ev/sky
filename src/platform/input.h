@@ -155,21 +155,22 @@ namespace Platform::Input
 			LaunchMail = 0xb4,
 			SelectMedia = 0xb5,
 			LaunchApplication1 = 0xb6,
-			LaunchApplication2 = 0xb7,
+			LaunchApplication2 = 0xb7,*/
 
 			Semicolon = 0xba,
 			Plus = 0xbb,
 			Comma = 0xbc,
 			Minus = 0xbd,
 			Period = 0xbe,
-			Question = 0xbf, */
+			Question = 0xbf,
 			Tilde = 0xc0,
 
-		/*	OpenBrackets = 0xdb,
+			OpenBrackets = 0xdb,
 			Pipe = 0xdc,
 			CloseBrackets = 0xdd,
 			Quotes = 0xde,
-			Oem8 = 0xdf,
+
+		/*	Oem8 = 0xdf,
 
 			Backslash = 0xe2,
 
