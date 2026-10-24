@@ -55,6 +55,9 @@ namespace Platform
 		virtual void resize(int width, int height) = 0;
 		virtual void setTitle(const std::string& text) = 0;
 
+		virtual bool isFullscreen() const { return true; }
+		virtual void setFullscreen(bool value) { }
+
 		virtual void setCursorMode(Input::CursorMode mode) = 0;
 		virtual Input::CursorMode getCursorMode() const = 0;
 

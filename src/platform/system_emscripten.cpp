@@ -389,6 +389,55 @@ void SystemEmscripten::setTitle(const std::string& text)
 {
 }
 
+bool SystemEmscripten::isFullscreen() const
+{
+	return EM_ASM_INT({
+		return (document.fullscreenElement || document.webkitFullscreenElement) ? 1 : 0;
+	});
+}
+
+void SystemEmscripten::setFullscreen(bool value)
+{
+	if (value == isFullscreen())
+		return;
+
+	if (value)
+	{
+		EM_ASM({
+			var request = () => {
+				var el = document.documentElement;
+				var fn = el.requestFullscreen || el.webkitRequestFullscreen;
+				if (!fn)
+					return Promise.reject();
+				return Promise.resolve(fn.call(el)).then(() => {
+					// escape goes to the game, exit fullscreen by holding escape, ctrl+w doesnt close the tab (chromium only)
+					if (navigator.keyboard && navigator.keyboard.lock)
+						navigator.keyboard.lock('Escape KeyW'.split(' ')).catch(() => {});
+				});
+			};
+			request().catch(() => {
+				// no user activation (e.g. startup command) - retry on next user input
+				var events = 'keydown mousedown touchend'.split(' ');
+				var handler = () => {
+					events.forEach((e) => window.removeEventListener(e, handler, true));
+					request().catch(() => {});
+				};
+				events.forEach((e) => window.addEventListener(e, handler, true));
+			});
+		});
+	}
+	else
+	{
+		EM_ASM({
+			if (navigator.keyboard && navigator.keyboard.unlock)
+				navigator.keyboard.unlock();
+			var fn = document.exitFullscreen || document.webkitExitFullscreen;
+			if (fn)
+				fn.call(document);
+		});
+	}
+}
+
 void SystemEmscripten::setCursorMode(Input::CursorMode mode)
 {
 	if (mode == Input::CursorMode::Normal)

@@ -29,5 +29,9 @@ namespace Shared
 			std::bind(&Platform::System::getScale, PLATFORM),
 			std::bind(&Platform::System::setScale, PLATFORM, std::placeholders::_1),
 			"logical scaling on retina displays");
+
+		sky::CVar<bool> mFullscreen = sky::CVar<bool>("r_fullscreen",
+			std::bind(&Platform::System::isFullscreen, PLATFORM),
+			std::bind(&Platform::System::setFullscreen, PLATFORM, std::placeholders::_1));
 	};
 }

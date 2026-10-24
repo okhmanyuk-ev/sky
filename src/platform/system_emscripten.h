@@ -40,6 +40,9 @@ namespace Platform
 		void resize(int width, int height) override;
 		void setTitle(const std::string& text) override;
 
+		bool isFullscreen() const override;
+		void setFullscreen(bool value) override;
+
 		void setCursorMode(Input::CursorMode mode) override;
 		Input::CursorMode getCursorMode() const override;
 

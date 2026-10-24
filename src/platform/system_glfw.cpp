@@ -292,6 +292,58 @@ void SystemGlfw::setTitle(const std::string& text)
 	glfwSetWindowTitle(gWindow, text.c_str());
 }
 
+bool SystemGlfw::isFullscreen() const
+{
+	return glfwGetWindowMonitor(gWindow) != nullptr;
+}
+
+static GLFWmonitor* GetMonitorForWindow(GLFWwindow* window)
+{
+	int win_x, win_y, win_w, win_h;
+	glfwGetWindowPos(window, &win_x, &win_y);
+	glfwGetWindowSize(window, &win_w, &win_h);
+
+	auto center_x = win_x + (win_w / 2);
+	auto center_y = win_y + (win_h / 2);
+
+	int count;
+	auto monitors = glfwGetMonitors(&count);
+
+	for (int i = 0; i < count; i++)
+	{
+		int mon_x, mon_y;
+		glfwGetMonitorPos(monitors[i], &mon_x, &mon_y);
+		auto mode = glfwGetVideoMode(monitors[i]);
+
+		if (center_x >= mon_x && center_x < mon_x + mode->width &&
+			center_y >= mon_y && center_y < mon_y + mode->height)
+			return monitors[i];
+	}
+
+	return glfwGetPrimaryMonitor();
+}
+
+void SystemGlfw::setFullscreen(bool value)
+{
+	if (value == isFullscreen())
+		return;
+
+	if (value)
+	{
+		glfwGetWindowPos(gWindow, &mWindowedPos.x, &mWindowedPos.y);
+		glfwGetWindowSize(gWindow, &mWindowedSize.x, &mWindowedSize.y);
+
+		auto monitor = GetMonitorForWindow(gWindow);
+		auto mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(gWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+	}
+	else
+	{
+		glfwSetWindowMonitor(gWindow, nullptr, mWindowedPos.x, mWindowedPos.y,
+			mWindowedSize.x, mWindowedSize.y, GLFW_DONT_CARE);
+	}
+}
+
 void SystemGlfw::setCursorMode(Input::CursorMode mode)
 {
 	static const std::unordered_map<Input::CursorMode, int> CursorMode = {

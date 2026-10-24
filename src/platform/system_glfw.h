@@ -41,6 +41,9 @@ namespace Platform
 		void resize(int width, int height) override;
 		void setTitle(const std::string& text) override;
 
+		bool isFullscreen() const override;
+		void setFullscreen(bool value) override;
+
 		void setCursorMode(Input::CursorMode mode) override;
 		Input::CursorMode getCursorMode() const override;
 
@@ -81,6 +84,8 @@ namespace Platform
 		std::string mAppName;
 		glm::ivec2 mCursorPos = { 0, 0 };
 		void* mNativeWindow = nullptr;
+		glm::ivec2 mWindowedPos = { 0, 0 };
+		glm::ivec2 mWindowedSize = { 800, 600 };
 	};
 }
 #endif
