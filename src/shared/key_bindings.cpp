@@ -205,6 +205,21 @@ KeyBindings::~KeyBindings()
 		sky::GetService<sky::CommandProcessor>()->removeItem(name);
 }
 
+void KeyBindings::bind(const std::string& key, const std::string& command)
+{
+	mBindings[key] = command;
+}
+
+void KeyBindings::unbind(const std::string& key)
+{
+	mBindings.erase(key);
+}
+
+void KeyBindings::unbindAll()
+{
+	mBindings.clear();
+}
+
 void KeyBindings::onEvent(const Keyboard::Event& e)
 {
 	auto key = FindKeyName(KeyNames, e.key);
