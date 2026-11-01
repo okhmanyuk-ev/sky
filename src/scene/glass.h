@@ -23,10 +23,10 @@ namespace Scene
 		bool mGenerateMipmaps = false;
 	};
 
-	class BlurredGlass : public Glass
+	class BlurGlass : public Glass
 	{
 	public:
-		BlurredGlass();
+		BlurGlass();
 
 	protected:
 		void draw() override;
@@ -43,7 +43,7 @@ namespace Scene
 		int mBlurPasses = 1;
 	};
 
-	class GrayscaledGlass : public Glass
+	class GrayscaleGlass : public Glass
 	{
 	protected:
 		void draw() override;
@@ -56,10 +56,10 @@ namespace Scene
 		float mGrayscaleIntensity = 1.0f;
 	};
 
-	class BloomedGlass : public Glass
+	class BloomGlass : public Glass
 	{
 	public:
-		BloomedGlass();
+		BloomGlass();
 
 	protected:
 		std::shared_ptr<skygfx::Texture> postprocess(std::shared_ptr<skygfx::Texture> texture) override;

@@ -64,8 +64,8 @@ namespace Scene
 	using HorizontalScrollPositionProperty = Property<Scrollbox, &Scrollbox::getHorizontalScrollPosition, &Scrollbox::setHorizontalScrollPosition>;
 	using VerticalScrollPositionProperty = Property<Scrollbox, &Scrollbox::getVerticalScrollPosition, &Scrollbox::setVerticalScrollPosition>;
 
-	using BlurIntensityProperty = Property<BlurredGlass, &BlurredGlass::getBlurIntensity, &BlurredGlass::setBlurIntensity>;
-	using GrayscaleIntensityProperty = Property<GrayscaledGlass, &GrayscaledGlass::getGrayscaleIntensity, &GrayscaledGlass::setGrayscaleIntensity>;
+	using BlurIntensityProperty = Property<BlurGlass, &BlurGlass::getBlurIntensity, &BlurGlass::setBlurIntensity>;
+	using GrayscaleIntensityProperty = Property<GrayscaleGlass, &GrayscaleGlass::getGrayscaleIntensity, &GrayscaleGlass::setGrayscaleIntensity>;
 }
 
 namespace sky::Actions

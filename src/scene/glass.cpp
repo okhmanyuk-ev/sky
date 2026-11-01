@@ -45,16 +45,16 @@ std::shared_ptr<skygfx::Texture> Glass::postprocess(std::shared_ptr<skygfx::Text
 	return texture;
 }
 
-// blurred glass
+// blur glass
 
-BlurredGlass::BlurredGlass()
+BlurGlass::BlurGlass()
 {
 	setBlendMode(skygfx::BlendStates::Opaque);
 	setGenerateMipmaps(true);
 	setSampler(skygfx::Sampler::Linear);
 }
 
-void BlurredGlass::draw()
+void BlurGlass::draw()
 {
 	if (mBlurIntensity <= 0.0f)
 		return;
@@ -72,9 +72,9 @@ void BlurredGlass::draw()
 	GRAPHICS->pop();
 }
 
-// grayscaled glass
+// grayscale glass
 
-void GrayscaledGlass::draw()
+void GrayscaleGlass::draw()
 {
 	if (mGrayscaleIntensity <= 0.0f)
 		return;
@@ -86,15 +86,15 @@ void GrayscaledGlass::draw()
 	Glass::draw();
 }
 
-// bloomed glass
+// bloom glass
 
-BloomedGlass::BloomedGlass()
+BloomGlass::BloomGlass()
 {
 	setBlendMode(skygfx::BlendStates::Opaque);
 	setSampler(skygfx::Sampler::Linear);
 }
 
-std::shared_ptr<skygfx::Texture> BloomedGlass::postprocess(std::shared_ptr<skygfx::Texture> texture)
+std::shared_ptr<skygfx::Texture> BloomGlass::postprocess(std::shared_ptr<skygfx::Texture> texture)
 {
 	auto result = GRAPHICS->getRenderTarget(fmt::format("bloom_glass_{}", (void*)this), texture->getWidth(), texture->getHeight());
 	GRAPHICS->pushCleanState();
