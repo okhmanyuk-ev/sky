@@ -215,6 +215,8 @@ void ImguiConsole::onFrame()
 
 	ImGui::PushItemWidth(-1);
 
+	const bool acceptInput = isFullyOpened();
+
 	int input_flags =
 		ImGuiInputTextFlags_EnterReturnsTrue |
 		ImGuiInputTextFlags_CallbackCharFilter |
@@ -226,6 +228,10 @@ void ImguiConsole::onFrame()
 	input_flags |= ImGuiInputTextFlags_ReadOnly;
 #endif
 
+	// while the console opens or closes the input only keeps the focus, so the game doesn't receive the keys
+	if (!acceptInput)
+		input_flags = ImGuiInputTextFlags_ReadOnly;
+
 	ImGui::SetKeyboardFocusHere();
 
 	if (ImGui::InputText("Input", &mInputText, input_flags, filterLetters, this))
@@ -233,7 +239,7 @@ void ImguiConsole::onFrame()
 		enterInput();
 	}
 
-	if (ImGui::IsItemClicked())
+	if (acceptInput && ImGui::IsItemClicked())
 		PLATFORM->showVirtualKeyboard();
 
 	ImGui::PopItemWidth();
@@ -512,7 +518,7 @@ void ImguiConsole::onEvent(const Platform::Input::Keyboard::Event& e)
 
 void ImguiConsole::onEvent(const Shared::TouchEmulator::Event& e)
 {
-	if (mState == State::Closed)
+	if (!isFullyOpened())
 		return;
 
 	if (e.type == Shared::TouchEmulator::Event::Type::End)
@@ -524,7 +530,7 @@ void ImguiConsole::onEvent(const Shared::TouchEmulator::Event& e)
 
 void ImguiConsole::onEvent(const Platform::System::VirtualKeyboardTextChanged& e)
 {
-	if (!isOpened())
+	if (!isFullyOpened())
 		return;
 
 	mInputText = e.text;
@@ -533,7 +539,7 @@ void ImguiConsole::onEvent(const Platform::System::VirtualKeyboardTextChanged& e
 
 void ImguiConsole::onEvent(const Platform::System::VirtualKeyboardEnterPressed& e)
 {
-	if (!isOpened())
+	if (!isFullyOpened())
 		return;
 
 	enterInput();
