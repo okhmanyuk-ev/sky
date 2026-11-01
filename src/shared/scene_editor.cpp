@@ -257,7 +257,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Separator();
 	}
 
-	if (auto blur = std::dynamic_pointer_cast<Scene::BlurredGlass>(node); blur != nullptr)
+	if (auto blur = std::dynamic_pointer_cast<Scene::BlurGlass>(node); blur != nullptr)
 	{
 		auto intensity = blur->getBlurIntensity();
 		ImGui::SliderFloat("Blur Intensity", &intensity, 0.0f, 1.0f);
@@ -269,7 +269,7 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Separator();
 	}
 
-	if (auto gray = std::dynamic_pointer_cast<Scene::GrayscaledGlass>(node); gray != nullptr)
+	if (auto gray = std::dynamic_pointer_cast<Scene::GrayscaleGlass>(node); gray != nullptr)
 	{
 		auto intensity = gray->getGrayscaleIntensity();
 		ImGui::SliderFloat("GrayIntensity", &intensity, 0.0f, 1.0f);

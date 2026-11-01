@@ -555,7 +555,7 @@ SceneHelpers::StandardScreen::StandardScreen(const std::set<Effect>& effects) :
 
 	if (mEffects.contains(Effect::Blur))
 	{
-		mBlur = std::make_shared<Scene::BlurredGlass>();
+		mBlur = std::make_shared<Scene::BlurGlass>();
 		mBlur->setStretch(1.0f);
 		attach(mBlur);
 	}
@@ -708,7 +708,7 @@ SceneHelpers::StandardWindow::StandardWindow(const std::set<BackgroundEffect> ba
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Blur))
 	{
-		mBlur = std::make_shared<Scene::BlurredGlass>();
+		mBlur = std::make_shared<Scene::BlurGlass>();
 		mBlur->setStretch(1.0f);
 		mBlur->setBlurIntensity(0.0f);
 		attach(mBlur, Scene::Node::AttachDirection::Front);
@@ -716,7 +716,7 @@ SceneHelpers::StandardWindow::StandardWindow(const std::set<BackgroundEffect> ba
 
 	if (mBackgroundEffect.contains(BackgroundEffect::Gray))
 	{
-		mGray = std::make_shared<Scene::GrayscaledGlass>();
+		mGray = std::make_shared<Scene::GrayscaleGlass>();
 		mGray->setStretch(1.0f);
 		mGray->setGrayscaleIntensity(0.0f);
 		attach(mGray, Scene::Node::AttachDirection::Front);
@@ -724,7 +724,7 @@ SceneHelpers::StandardWindow::StandardWindow(const std::set<BackgroundEffect> ba
 
 	if (mContentEffect.contains(ContentEffect::Blur))
 	{
-		mContentBlur = std::make_shared<Scene::BlurredGlass>();
+		mContentBlur = std::make_shared<Scene::BlurGlass>();
 		mContentBlur->setStretch(1.0f);
 		mContentBlur->setBlurIntensity(StartContentBlur);
 		mContentHolder->attach(mContentBlur);
@@ -854,9 +854,9 @@ sky::Action SceneHelpers::StandardWindow::createCloseAction()
 	);
 };
 
-// blurred glass demo
+// blur glass demo
 
-SceneHelpers::BlurredGlassDemo::BlurredGlassDemo()
+SceneHelpers::BlurGlassDemo::BlurGlassDemo()
 {
 	auto scroll_bg = std::make_shared<Scene::Rectangle>();
 	scroll_bg->setStretch({ 1.0f, 0.0f });

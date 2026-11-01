@@ -433,7 +433,7 @@ namespace Shared::SceneHelpers
 	private:
 		std::set<Effect> mEffects;
 		std::shared_ptr<Scene::Node> mContent;
-		std::shared_ptr<Scene::BlurredGlass> mBlur;
+		std::shared_ptr<Scene::BlurGlass> mBlur;
 	};
 
 	class StandardWindow : public Scene::Clickable<Backshaded<Shared::SceneManager::Window>>
@@ -480,18 +480,18 @@ namespace Shared::SceneHelpers
 	private:
 		std::shared_ptr<Scene::RenderLayer<Scene::Node>> mContentHolder;
 		std::shared_ptr<Scene::Node> mContent;
-		std::shared_ptr<Scene::BlurredGlass> mContentBlur;
-		std::shared_ptr<Scene::BlurredGlass> mBlur;
-		std::shared_ptr<Scene::GrayscaledGlass> mGray;
+		std::shared_ptr<Scene::BlurGlass> mContentBlur;
+		std::shared_ptr<Scene::BlurGlass> mBlur;
+		std::shared_ptr<Scene::GrayscaleGlass> mGray;
 		bool mCloseOnMissclick = true;
 		std::set<BackgroundEffect> mBackgroundEffect;
 		std::set<ContentEffect> mContentEffect;
 	};
 
-	class BlurredGlassDemo : public KillableByClick<MovableByHand<Outlined<Scene::BlurredGlass>>>
+	class BlurGlassDemo : public KillableByClick<MovableByHand<Outlined<Scene::BlurGlass>>>
 	{
 	public:
-		BlurredGlassDemo();
+		BlurGlassDemo();
 	};
 
 	class Shockwave : public Scene::Glass
