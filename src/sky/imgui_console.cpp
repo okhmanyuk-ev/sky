@@ -247,7 +247,10 @@ void ImguiConsole::onFrame()
 	auto closeButtonY = ImGui::GetWindowHeight();
 
 	ImGui::End();
-	showHints(height, top);
+
+	if (acceptInput)
+		showHints(height, top);
+
 	ImGui::PopStyleVar(2);
 
 	showCloseButton(closeButtonY);
