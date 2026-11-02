@@ -123,3 +123,72 @@ void effect(inout vec4 result)
 
 	result = texture(sColorTexture, In.tex_coord - disp);
 })";
+
+const std::string LiquidGlass::Effect = R"(
+layout(binding = EFFECT_UNIFORM_BINDING) uniform _liquid_glass
+{
+	vec4 tint;
+	vec2 size;
+	float radius;
+	float bezel;
+	float refraction;
+	float chromatic;
+	float highlight;
+	float saturation;
+} liquid_glass;
+
+// signed distance to a rounded box in x, its outward normal in yz
+vec3 RoundedBoxSdf(vec2 p, vec2 half_size, float radius)
+{
+	vec2 w = abs(p) - half_size + radius;
+	float g = max(w.x, w.y);
+	vec2 q = max(w, 0.0);
+	float l = length(q);
+	vec2 normal = sign(p) * (g > 0.0 ? q / l : (w.x > w.y ? vec2(1.0, 0.0) : vec2(0.0, 1.0)));
+	return vec3((g > 0.0 ? l : g) - radius, normal);
+}
+
+void effect(inout vec4 result)
+{
+	vec2 local_pos = (inverse(settings.model) * vec4(In.world_position, 1.0)).xy;
+	vec2 half_size = liquid_glass.size * 0.5;
+	vec2 p = local_pos * liquid_glass.size - half_size;
+
+	float d = RoundedBoxSdf(p, half_size, liquid_glass.radius).x;
+
+	// bezel is shaped by a box rounded at least by bezel width, otherwise sharp corners
+	// produce diagonal seams where the normal flips between horizontal and vertical edges
+	float bezel_radius = min(max(liquid_glass.radius, liquid_glass.bezel), min(half_size.x, half_size.y));
+	vec3 bezel = RoundedBoxSdf(p, half_size, bezel_radius);
+	vec2 normal = bezel.yz;
+
+	// 1 on the edge, 0 where the bezel ends and the flat part of the glass begins
+	float edge = 1.0 - clamp(-bezel.x / max(liquid_glass.bezel, 0.0001), 0.0, 1.0);
+	float lens = edge * edge;
+
+	// bezel acts like a convex lens: pull pixels from the inner area towards the edge
+	vec2 texel = 1.0 / vec2(textureSize(sColorTexture, 0));
+	vec2 offset = normal * lens * liquid_glass.refraction * liquid_glass.bezel * texel;
+
+	float aberration = 1.0 + liquid_glass.chromatic;
+
+	vec3 color;
+	color.r = texture(sColorTexture, In.tex_coord - offset * aberration).r;
+	color.g = texture(sColorTexture, In.tex_coord - offset).g;
+	color.b = texture(sColorTexture, In.tex_coord - offset / aberration).b;
+
+	float luma = dot(color, vec3(0.299, 0.587, 0.114));
+	color = mix(vec3(luma), color, liquid_glass.saturation);
+	color = mix(color, liquid_glass.tint.rgb, liquid_glass.tint.a);
+
+	// specular from top-left light and weaker reflection on the opposite side
+	const vec2 light_dir = vec2(-0.70710678, -0.70710678);
+	float light = dot(normal, light_dir);
+	float specular = pow(max(light, 0.0), 3.0) + pow(max(-light, 0.0), 3.0) * 0.4;
+	float rim = 1.0 - smoothstep(0.0, 1.5, -d);
+	color += (specular * lens + rim * 0.5) * liquid_glass.highlight;
+
+	float alpha = clamp(0.5 - d, 0.0, 1.0);
+	vec4 basic_color = In.color * settings.color;
+	result = vec4(clamp(color, 0.0, 1.0) * basic_color.rgb, alpha * basic_color.a);
+})";

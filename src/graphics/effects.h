@@ -112,4 +112,18 @@ namespace sky::effects
 
 		static const std::string Effect;
 	};
+
+	struct alignas(16) LiquidGlass
+	{
+		glm::vec4 tint = { 1.0f, 1.0f, 1.0f, 0.0f };
+		glm::vec2 size = { 0.0f, 0.0f };
+		float radius = 0.0f;
+		float bezel = 24.0f;
+		float refraction = 1.0f;
+		float chromatic = 0.15f;
+		float highlight = 0.5f;
+		float saturation = 1.2f;
+
+		static const std::string Effect;
+	};
 }

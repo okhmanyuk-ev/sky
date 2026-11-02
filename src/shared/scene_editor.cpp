@@ -277,6 +277,37 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		ImGui::Separator();
 	}
 
+	if (auto liquid = std::dynamic_pointer_cast<Scene::LiquidGlass>(node); liquid != nullptr)
+	{
+		auto rounding = liquid->getRounding();
+		auto bezel = liquid->getBezel();
+		auto refraction = liquid->getRefraction();
+		auto blur = liquid->getLiquidBlur();
+		auto chromatic = liquid->getChromatic();
+		auto highlight = liquid->getHighlight();
+		auto saturation = liquid->getSaturation();
+		auto tint = liquid->getTint();
+
+		ImGui::SliderFloat("Liquid Rounding", &rounding, 0.0f, 1.0f);
+		ImGui::SliderFloat("Liquid Bezel", &bezel, 0.0f, 128.0f);
+		ImGui::SliderFloat("Liquid Refraction", &refraction, 0.0f, 4.0f);
+		ImGui::SliderFloat("Liquid Blur", &blur, 0.0f, Scene::LiquidGlass::MaxBlurLevels);
+		ImGui::SliderFloat("Liquid Chromatic", &chromatic, 0.0f, 1.0f);
+		ImGui::SliderFloat("Liquid Highlight", &highlight, 0.0f, 1.0f);
+		ImGui::SliderFloat("Liquid Saturation", &saturation, 0.0f, 2.0f);
+		ImGui::ColorEdit4("Liquid Tint", (float*)&tint);
+
+		liquid->setRounding(rounding);
+		liquid->setBezel(bezel);
+		liquid->setRefraction(refraction);
+		liquid->setLiquidBlur(blur);
+		liquid->setChromatic(chromatic);
+		liquid->setHighlight(highlight);
+		liquid->setSaturation(saturation);
+		liquid->setTint(tint);
+		ImGui::Separator();
+	}
+
 	if (auto shockwave = std::dynamic_pointer_cast<Shared::SceneHelpers::Shockwave>(node); shockwave != nullptr)
 	{
 		auto size = shockwave->getShockwaveSize();

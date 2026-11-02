@@ -133,6 +133,20 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
 		});
 
+		sky::AddCommand("spawn_liquid_glass", std::nullopt, {}, { { "width", "256" }, { "height", "128" }, { "rounding", "1.0" }, { "bezel", "32" }, { "refraction", "1.0" }, { "blur", "1.0" }, { "chromatic", "0.15" }, { "outlined", "0" } }, {}, [](float width, float height, float rounding, float bezel, float refraction, float blur, float chromatic, bool outlined) {
+			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::LiquidGlass>>>>();
+			glass->setSize({ width, height });
+			glass->setAnchor(0.5f);
+			glass->setPivot(0.5f);
+			glass->setOutlined(outlined);
+			glass->setRounding(rounding);
+			glass->setBezel(bezel);
+			glass->setRefraction(refraction);
+			glass->setLiquidBlur(blur);
+			glass->setChromatic(chromatic);
+			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
+		});
+
 		sky::AddCommand("spawn_shockwave", std::nullopt, {}, { { "duration", "1.0" } }, {}, [](float duration) {
 			auto shockwave = Shared::SceneHelpers::Shockwave::MakeAnimated(duration);
 			shockwave->setSize(256.0f);
