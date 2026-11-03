@@ -1,4 +1,6 @@
 #include "renderer.h"
+#include <sky/utils.h>
+#include <magic_enum/magic_enum.hpp>
 #include <platform/system_glfw.h>
 #include <platform/system_ios.h>
 #include <platform/system_emscripten.h>
@@ -41,4 +43,25 @@ void Renderer::present()
 {
 	auto result = skygfx::Present();
 	mDrawcalls = result.drawcalls;
+
+	if (!mPendingBackendType.has_value())
+		return;
+
+	auto type = mPendingBackendType.value();
+	mPendingBackendType.reset();
+
+	try
+	{
+		skygfx::SetBackendType(type);
+		sky::Log("render api switched to {}", magic_enum::enum_name(type));
+	}
+	catch (const std::exception& e)
+	{
+		sky::Log(sky::Console::Color::Red, "cannot switch render api to {}: {}", magic_enum::enum_name(type), e.what());
+	}
+}
+
+void Renderer::setBackendType(skygfx::BackendType type)
+{
+	mPendingBackendType = type;
 }

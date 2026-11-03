@@ -30,10 +30,14 @@ namespace sky
 
 		void present();
 
+		// applied after present, because all gpu objects are recreated
+		void setBackendType(skygfx::BackendType type);
+
 	public:
 		int getDrawcalls() const { return mDrawcalls; }
 
 	private:
 		int mDrawcalls = 0;
+		std::optional<skygfx::BackendType> mPendingBackendType;
 	};
 }
