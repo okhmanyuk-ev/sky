@@ -58,7 +58,6 @@ std::shared_ptr<skygfx::Texture> Glass::postprocess(std::shared_ptr<skygfx::Text
 BlurGlass::BlurGlass()
 {
 	setBlendMode(skygfx::BlendStates::Opaque);
-	setGenerateMipmaps(true);
 	setSampler(skygfx::Sampler::Linear);
 }
 
@@ -67,17 +66,20 @@ void BlurGlass::draw()
 	if (mBlurIntensity <= 0.0f)
 		return;
 
-	GRAPHICS->pushMipmapBias(mBlurIntensity * 8.0f);
+	Glass::draw();
+}
 
-	if (mBlurPasses < 1)
-		mBlurPasses = 1;
+std::shared_ptr<skygfx::Texture> BlurGlass::postprocess(std::shared_ptr<skygfx::Texture> texture)
+{
+	auto levels = glm::clamp(mBlurIntensity, 0.0f, 1.0f) * 8.0f;
 
-	for (int i = 0; i < mBlurPasses; i++)
-	{
-		Glass::draw();
-	}
-
-	GRAPHICS->pop();
+	auto result = GRAPHICS->getRenderTarget(fmt::format("blur_glass_{}", (void*)this), texture->getWidth(), texture->getHeight());
+	GRAPHICS->pushCleanState();
+	GRAPHICS->pushRenderTarget(result);
+	GRAPHICS->clear();
+	skygfx::utils::passes::DualFilterBlur(texture.get(), result.get(), levels);
+	GRAPHICS->pop(2);
+	return result;
 }
 
 // grayscale glass

@@ -98,14 +98,13 @@ Application::Application(const std::string& appname, const Flags& flags, std::op
 			std::bind(&sky::TimestepFixer::getForceTimeCompletion, &scene->getTimestepFixer()),
 			std::bind(&sky::TimestepFixer::setForceTimeCompletion, &scene->getTimestepFixer(), std::placeholders::_1));
 
-		sky::AddCommand("spawn_blur_glass", std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "passes", "1" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](float size, float intensity, int passes, bool outlined, float rounding) {
+		sky::AddCommand("spawn_blur_glass", std::nullopt, {}, { { "size", "512" }, { "intensity", "0.5" }, { "outlined", "1" }, { "rounding", "0.0" } }, {}, [](float size, float intensity, bool outlined, float rounding) {
 			auto glass = std::make_shared<Shared::SceneHelpers::KillableByClick<Shared::SceneHelpers::MovableByHand<Shared::SceneHelpers::Outlined<Scene::Rounded<Scene::BlurGlass>>>>>();
 			glass->setSize(size);
 			glass->setAnchor(0.5f);
 			glass->setPivot(0.5f);
 			glass->setOutlined(outlined);
 			glass->setBlurIntensity(intensity);
-			glass->setBlurPasses(passes);
 			glass->setRounding(rounding);
 			sky::GetService<Scene::Scene>()->getRoot()->attach(glass);
 		});

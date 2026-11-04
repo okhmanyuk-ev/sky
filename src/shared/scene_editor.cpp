@@ -262,10 +262,6 @@ void SceneEditor::showNodeEditor(std::shared_ptr<Scene::Node> node)
 		auto intensity = blur->getBlurIntensity();
 		ImGui::SliderFloat("Blur Intensity", &intensity, 0.0f, 1.0f);
 		blur->setBlurIntensity(intensity);
-
-		auto passes = blur->getBlurPasses();
-		ImGui::SliderInt("Blur Passes", &passes, 1, 32);
-		blur->setBlurPasses(passes);
 		ImGui::Separator();
 	}
 
