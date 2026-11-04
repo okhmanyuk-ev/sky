@@ -13,13 +13,6 @@ namespace Scene
 
 	private:
 		std::shared_ptr<skygfx::Texture> mBackbufferTexture;
-
-	public:
-		auto getGenerateMipmaps() const { return mGenerateMipmaps; }
-		void setGenerateMipmaps(bool value) { mGenerateMipmaps = value; }
-
-	private:
-		bool mGenerateMipmaps = false;
 	};
 
 	class BlurGlass : public Glass

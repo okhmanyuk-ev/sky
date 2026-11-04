@@ -29,19 +29,15 @@ void Glass::draw()
 		return;
 
 	auto format = skygfx::GetBackbufferFormat();
-	auto mip_count = mGenerateMipmaps ? skygfx::GetMipCount(size.x, size.y) : 1u;
 
 	if (mBackbufferTexture == nullptr || glm::uvec2{ mBackbufferTexture->getWidth(), mBackbufferTexture->getHeight() } != size ||
-		mBackbufferTexture->getFormat() != format || mBackbufferTexture->getMipCount() != mip_count)
+		mBackbufferTexture->getFormat() != format)
 	{
-		mBackbufferTexture = std::make_shared<skygfx::Texture>(size.x, size.y, format, mip_count);
+		mBackbufferTexture = std::make_shared<skygfx::Texture>(size.x, size.y, format, 1);
 	}
 
 	GRAPHICS->flushBatch();
 	skygfx::CopyBackbufferToTexture(*mBackbufferTexture, copy_size, copy_min, copy_min - origin);
-
-	if (mGenerateMipmaps)
-		mBackbufferTexture->generateMips();
 
 	setTexture(postprocess(mBackbufferTexture));
 	setTexRegion(Graphics::TexRegion(bounds.pos - glm::vec2(origin), bounds.size)); // exactly the pixels under the glass
