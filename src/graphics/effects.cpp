@@ -103,6 +103,7 @@ void effect(inout vec4 result)
 const std::string Shockwave::Effect = R"(
 layout(binding = EFFECT_UNIFORM_BINDING) uniform _shockwave
 {
+	vec2 resolution;
 	float size;
 	float thickness;
 	float force;
@@ -111,7 +112,8 @@ layout(binding = EFFECT_UNIFORM_BINDING) uniform _shockwave
 void effect(inout vec4 result)
 {
 	const vec2 center = vec2(0.5, 0.5);
-	float d = distance(In.tex_coord, center);
+	vec2 local_pos = (inverse(settings.model) * vec4(In.world_position, 1.0)).xy;
+	float d = distance(local_pos, center);
 
 	float scaled_size = shockwave.size * 0.5;
 	float scaled_thickness = shockwave.thickness * 0.25;
@@ -119,7 +121,9 @@ void effect(inout vec4 result)
 	float mask = (1.0 - smoothstep(scaled_size - scaled_thickness, scaled_size, d));
 	mask *= smoothstep(scaled_size - scaled_thickness - scaled_thickness, scaled_size - scaled_thickness, d);
 
-	vec2 disp = (In.tex_coord - center) * mask * shockwave.force;
+	// displacement is computed in glass space and converted to texture space through pixels,
+	// captured texture may differ from the glass when it is clamped by backbuffer edges
+	vec2 disp = (local_pos - center) * mask * shockwave.force * shockwave.resolution / vec2(textureSize(sColorTexture, 0));
 
 	result = texture(sColorTexture, In.tex_coord - disp);
 })";

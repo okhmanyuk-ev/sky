@@ -15,19 +15,21 @@ void Glass::draw()
 		return;
 
 	// pixel-aligned area that fully covers the fractional bounds plus padding,
-	// its size does not depend on position, so texture is not recreated while moving
+	// its size depends only on bounds size, not on fractional position
 	auto padding = (int)glm::ceil(getCapturePadding());
 	auto origin = glm::ivec2(glm::floor(bounds.pos)) - padding;
-	auto size = glm::uvec2(glm::ceil(bounds.size)) + 1u + (uint32_t)(padding * 2);
+	auto area = glm::ivec2(glm::ceil(bounds.size)) + 1 + (padding * 2);
 
-	// only the part inside the backbuffer is copied, the rest of the texture keeps old pixels
+	// only the part inside the backbuffer is captured, clamp sampling extends its edges,
+	// so texture is recreated only while the area crosses backbuffer edges
 	auto backbuffer_size = glm::ivec2(skygfx::GetBackbufferWidth(), skygfx::GetBackbufferHeight());
-	auto copy_min = glm::max(origin, 0);
-	auto copy_size = glm::min(origin + glm::ivec2(size), backbuffer_size) - copy_min;
+	auto capture_min = glm::max(origin, 0);
+	auto capture_size = glm::min(origin + area, backbuffer_size) - capture_min;
 
-	if (copy_size.x <= 0 || copy_size.y <= 0)
+	if (capture_size.x <= 0 || capture_size.y <= 0)
 		return;
 
+	auto size = glm::uvec2(capture_size);
 	auto format = skygfx::GetBackbufferFormat();
 
 	if (mBackbufferTexture == nullptr || glm::uvec2{ mBackbufferTexture->getWidth(), mBackbufferTexture->getHeight() } != size ||
@@ -37,10 +39,10 @@ void Glass::draw()
 	}
 
 	GRAPHICS->flushBatch();
-	skygfx::CopyBackbufferToTexture(*mBackbufferTexture, copy_size, copy_min, copy_min - origin);
+	skygfx::CopyBackbufferToTexture(*mBackbufferTexture, capture_size, capture_min);
 
 	setTexture(postprocess(mBackbufferTexture));
-	setTexRegion(Graphics::TexRegion(bounds.pos - glm::vec2(origin), bounds.size)); // exactly the pixels under the glass
+	setTexRegion(Graphics::TexRegion(bounds.pos - glm::vec2(capture_min), bounds.size)); // exactly the pixels under the glass
 	Sprite::draw();
 }
 

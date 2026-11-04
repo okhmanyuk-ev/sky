@@ -106,6 +106,7 @@ namespace sky::effects
 
 	struct alignas(16) Shockwave
 	{
+		glm::vec2 resolution = { 0.0f, 0.0f }; // glass size in backbuffer pixels
 		float size = 1.0f;
 		float thickness = 1.0f;
 		float force = 1.0f;

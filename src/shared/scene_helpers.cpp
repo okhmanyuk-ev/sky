@@ -929,6 +929,7 @@ SceneHelpers::Shockwave::Shockwave()
 void SceneHelpers::Shockwave::draw()
 {
 	static auto effect = sky::effects::Effect<sky::effects::Shockwave>();
+	effect.uniform.resolution = getGlobalBounds().size;
 	effect.uniform.size = mShockwaveSize;
 	effect.uniform.thickness = mShockwaveThickness;
 	effect.uniform.force = mShockwaveForce;
