@@ -10,9 +10,11 @@ namespace Scene
 		void draw() override;
 		virtual std::shared_ptr<skygfx::Texture> postprocess(std::shared_ptr<skygfx::Texture> texture);
 		virtual float getCapturePadding() const { return 0.0f; } // extra backbuffer pixels around bounds for postprocess
+		Graphics::TexCoords getTexCoords() const override;
 
 	private:
 		std::shared_ptr<skygfx::Texture> mBackbufferTexture;
+		glm::ivec2 mCaptureMin = { 0, 0 };
 	};
 
 	class BlurGlass : public Glass

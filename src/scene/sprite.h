@@ -18,6 +18,8 @@ namespace Scene
 		void update(sky::Duration dTime) override;
 		void draw() override;
 
+		virtual Graphics::TexCoords getTexCoords() const;
+
 	private:
 		void applyTextureWidth();
 		void applyTextureHeight();

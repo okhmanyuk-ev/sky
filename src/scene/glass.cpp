@@ -41,14 +41,30 @@ void Glass::draw()
 	GRAPHICS->flushBatch();
 	skygfx::CopyBackbufferToTexture(*mBackbufferTexture, capture_size, capture_min);
 
+	mCaptureMin = capture_min;
 	setTexture(postprocess(mBackbufferTexture));
-	setTexRegion(Graphics::TexRegion(bounds.pos - glm::vec2(capture_min), bounds.size)); // exactly the pixels under the glass
 	Sprite::draw();
 }
 
 std::shared_ptr<skygfx::Texture> Glass::postprocess(std::shared_ptr<skygfx::Texture> texture)
 {
 	return texture;
+}
+
+Graphics::TexCoords Glass::getTexCoords() const
+{
+	// each corner samples exactly the backbuffer pixel under it, so rotated glass shows what is behind it
+	auto size = getAbsoluteSize();
+	auto texture_size = glm::vec2(mBackbufferTexture->getWidth(), mBackbufferTexture->getHeight());
+	auto uv = [&](const glm::vec2& local_pos) {
+		return (project(local_pos) - glm::vec2(mCaptureMin)) / texture_size;
+	};
+	return {
+		.top_left = uv({ 0.0f, 0.0f }),
+		.top_right = uv({ size.x, 0.0f }),
+		.bottom_left = uv({ 0.0f, size.y }),
+		.bottom_right = uv(size)
+	};
 }
 
 // blur glass
